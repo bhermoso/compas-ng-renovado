@@ -45,7 +45,8 @@ const EMPTY_AGGREGATES: AUDITCAggregates = {
  */
 export interface AUDITCCSVParseOptions {
   ageBands: AgeBand[];
-  /** Año de referencia para calcular la edad. Por defecto: año actual. */
+  /** Año de referencia para calcular la edad. Obligatorio si el CSV incluye columnas
+   *  demográficas; sin él, la distribución edad×sexo no se calcula. */
   referenceYear?: number;
 }
 
@@ -217,8 +218,14 @@ export function parseAUDITCCSV(
 
   let ageSexObserved: AgeSexObservedResult | undefined;
   if (hasDemographics && options?.ageBands && demographicRows.length > 0) {
-    const refYear = options.referenceYear ?? new Date().getFullYear();
-    ageSexObserved = buildAgeSexObserved(demographicRows, refYear, options.ageBands);
+    if (options.referenceYear == null) {
+      warnings.push(
+        "Columnas demográficas detectadas pero referenceYear no proporcionado: " +
+        "la distribución edad×sexo no se ha calculado."
+      );
+    } else {
+      ageSexObserved = buildAgeSexObserved(demographicRows, options.referenceYear, options.ageBands);
+    }
   }
 
   return { aggregates, methodologicalCautions: buildCautions(aggregates), warnings, ageSexObserved };

@@ -1,9 +1,8 @@
 // Convenciones:
 // - edad = referenceYear - birthYear (diferencia de años calendario)
-// - margen ±1 en límites de banda: cubre la ambigüedad de cumpleaños no transcurrido.
-//   Se aplica solo cuando la edad exacta no cae en ninguna banda (segundo paso).
+// - pertenencia exacta [min, max]; si no cae en ninguna banda → outOfBand
 // - sin dato: respondiente sin sexo reconocible, sin birthYear, o fuera de todas las
-//   bandas incluso con el margen → no asignable. Se cuenta y declara; nunca se imputa.
+//   bandas → no asignable. Se cuenta y declara; nunca se imputa.
 
 import type { AgeSexCell } from "../../domain/sam/PopulationReference";
 
@@ -35,21 +34,14 @@ export interface AgeSexObservedResult {
 function normalizeSex(sex: string | undefined): "male" | "female" | null {
   if (!sex) return null;
   const s = sex.trim().toLowerCase();
-  if (s === "1" || s === "male" || s === "hombre" || s === "h") return "male";
-  if (s === "2" || s === "female" || s === "mujer" || s === "m") return "female";
+  if (s === "1" || s === "male" || s === "hombre") return "male";
+  if (s === "2" || s === "female" || s === "mujer") return "female";
   return null;
 }
 
-/** Devuelve el índice de la banda a la que pertenece `age`, o -1 si no hay ninguna.
- *  Paso 1: pertenencia exacta [min, max].
- *  Paso 2: si ninguna banda lo contiene, se acepta con margen ±1 (primer match gana).
- */
 function findBand(age: number, bands: AgeBand[]): number {
   for (let i = 0; i < bands.length; i++) {
     if (age >= bands[i].min && age <= bands[i].max) return i;
-  }
-  for (let i = 0; i < bands.length; i++) {
-    if (age >= bands[i].min - 1 && age <= bands[i].max + 1) return i;
   }
   return -1;
 }

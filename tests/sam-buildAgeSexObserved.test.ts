@@ -26,21 +26,22 @@ describe("buildAgeSexObserved — caso básico con datos completos", () => {
     expect(result.cells.find((c) => c.ageBand === "25-29")!.female).toBe(1);
   });
 
-  it("acepta códigos de texto: hombre/mujer y male/female", () => {
+  it("acepta códigos de texto: hombre/mujer y male/female; H/M no son válidos", () => {
     const rows = [
       { sex: "hombre", birthYear: 2000 },
       { sex: "mujer", birthYear: 2000 },
       { sex: "male", birthYear: 2000 },
       { sex: "female", birthYear: 2000 },
-      { sex: "H", birthYear: 2000 },
-      { sex: "M", birthYear: 2000 },
+      { sex: "H", birthYear: 2000 },   // abreviatura no aceptada → noSex
+      { sex: "M", birthYear: 2000 },   // abreviatura no aceptada → noSex
     ];
     const result = buildAgeSexObserved(rows, 2024, BANDS_ADULT);
-    expect(result.assignedCount).toBe(6);
-    expect(result.unassignableCount).toBe(0);
+    expect(result.assignedCount).toBe(4);
+    expect(result.unassignableCount).toBe(2);
+    expect(result.unassignableBreakdown.noSex).toBe(2);
     const banda = result.cells.find((c) => c.ageBand === "20-24")!;
-    expect(banda.male).toBe(3);
-    expect(banda.female).toBe(3);
+    expect(banda.male).toBe(2);
+    expect(banda.female).toBe(2);
   });
 });
 
@@ -105,35 +106,39 @@ describe("buildAgeSexObserved — respondientes fuera de bandas", () => {
   });
 });
 
-describe("buildAgeSexObserved — margen ±1 en límites de banda", () => {
-  it("edad = bandMin - 1 asignada a esa banda (margen inferior)", () => {
-    // banda 20-24: min=20 → edad 19 debería caer en 16-19 exactamente.
-    // pero si las bandas son [20-24] y [25-29] y edad=19, solo matchea 20-24 con margen
+describe("buildAgeSexObserved — pertenencia exacta en límites de banda", () => {
+  it("edad = bandMin - 1 → outOfBand (sin margen)", () => {
     const SOLO_20_24: AgeBand[] = [{ label: "20-24", min: 20, max: 24 }];
-    const rows = [{ sex: "1", birthYear: 2005 }]; // edad 19 en 2024
+    const rows = [{ sex: "1", birthYear: 2005 }]; // edad 19 en 2024 = 20 - 1
     const result = buildAgeSexObserved(rows, 2024, SOLO_20_24);
-    // 19 = 20 - 1 → margen aceptado
-    expect(result.assignedCount).toBe(1);
-    expect(result.cells[0].male).toBe(1);
+    expect(result.unassignableBreakdown.outOfBand).toBe(1);
+    expect(result.assignedCount).toBe(0);
   });
 
-  it("edad = bandMax + 1 asignada a esa banda (margen superior)", () => {
+  it("edad = bandMax + 1 → outOfBand (sin margen)", () => {
     const SOLO_20_24: AgeBand[] = [{ label: "20-24", min: 20, max: 24 }];
     const rows = [{ sex: "2", birthYear: 1999 }]; // edad 25 en 2024 = 24 + 1
     const result = buildAgeSexObserved(rows, 2024, SOLO_20_24);
-    expect(result.assignedCount).toBe(1);
-    expect(result.cells[0].female).toBe(1);
+    expect(result.unassignableBreakdown.outOfBand).toBe(1);
+    expect(result.assignedCount).toBe(0);
   });
 
-  it("el margen no supera 1: edad = bandMax + 2 → outOfBand", () => {
+  it("edad = bandMax + 2 → outOfBand", () => {
     const SOLO_20_24: AgeBand[] = [{ label: "20-24", min: 20, max: 24 }];
     const rows = [{ sex: "1", birthYear: 1998 }]; // edad 26 en 2024 = 24 + 2
     const result = buildAgeSexObserved(rows, 2024, SOLO_20_24);
     expect(result.unassignableBreakdown.outOfBand).toBe(1);
   });
 
-  it("con bandas contiguas, el match exacto tiene prioridad sobre el margen", () => {
-    // edad 20: cae exactamente en 20-24, no en 16-19 con margen
+  it("edad exactamente en límite inferior → asignada", () => {
+    const SOLO_20_24: AgeBand[] = [{ label: "20-24", min: 20, max: 24 }];
+    const rows = [{ sex: "1", birthYear: 2004 }]; // edad 20 en 2024 = min exacto
+    const result = buildAgeSexObserved(rows, 2024, SOLO_20_24);
+    expect(result.assignedCount).toBe(1);
+    expect(result.cells[0].male).toBe(1);
+  });
+
+  it("con bandas contiguas, cada edad cae en su banda exacta", () => {
     const rows = [{ sex: "1", birthYear: 2004 }]; // edad 20 en 2024
     const result = buildAgeSexObserved(rows, 2024, BANDS_ADULT);
     expect(result.cells.find((c) => c.ageBand === "20-24")!.male).toBe(1);

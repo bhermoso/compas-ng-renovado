@@ -95,3 +95,15 @@ describe("parseAUDITCCSV — columnas demo presentes pero sin ageBands (no calcu
     expect(result.ageSexObserved).toBeUndefined();
   });
 });
+
+describe("parseAUDITCCSV — columnas demo presentes, ageBands presentes, sin referenceYear", () => {
+  it("ageSexObserved undefined cuando falta referenceYear", () => {
+    const result = parseAUDITCCSV(CSV_CON_DEMO, { ageBands: BANDS });
+    expect(result.ageSexObserved).toBeUndefined();
+  });
+
+  it("warnings incluye aviso de referenceYear no proporcionado", () => {
+    const result = parseAUDITCCSV(CSV_CON_DEMO, { ageBands: BANDS });
+    expect(result.warnings.some((w) => w.includes("referenceYear"))).toBe(true);
+  });
+});
