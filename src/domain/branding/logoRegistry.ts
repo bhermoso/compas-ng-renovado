@@ -36,7 +36,7 @@ export const LOGO_REGISTRY: LogoEntry[] = [
   },
   {
     id: "relas",
-    label: "RELAS — Red de Acción Local en Salud",
+    label: "RELAS — Red Local de Acción en Salud",
     owner: "Junta de Andalucía / Servicio Andaluz de Salud",
     kind: "program",
     file: "relas.jpeg",
