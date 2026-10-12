@@ -4,7 +4,7 @@
  * Referencias de población de la Encuesta Andaluza de Salud 2023 (EAS 2023).
  *
  * Procedencia: calculado por el autor desde microdatos EAS 2023 ponderados
- * para Granada-provincia (PROV=18) y Andalucía. El script de recomputación
+ * para Granada-provincia y Andalucía. El script de recomputación
  * queda en src/application/eas-references/reproducible/ (pendiente de
  * microdatos, que no forman parte del repositorio).
  *
@@ -208,7 +208,7 @@ export const EAS_2023_REFERENCES: EAS2023ReferenceEntry[] = [
   },
   {
     easKey: "P23_ex",
-    easVariable: "P23 (valor 3)",
+    easVariable: "P23", // filtro: valor 3 (ex-fumador); variable derivada por confirmar con microdatos
     topic: "Ex-fumador/a",
     unit: "%",
     refAndalucia: 15.6,
@@ -463,10 +463,6 @@ export function getEAS2023ContextForIndicator(
       // PSQI mide calidad subjetiva del sueño; P33b_insomnio mide problemas
       // para dormir en población general — instrumento distinto, tema común.
       return getEAS2023Reference("P33b_insomnio");
-    case "auditc-positivo":
-      // AUDIT-C cribado de uso de riesgo de alcohol; P32_CAGE mide riesgo
-      // de alcoholismo en población general — instrumento distinto, tema común.
-      return getEAS2023Reference("P32_CAGE");
     default:
       return undefined;
   }

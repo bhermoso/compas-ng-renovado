@@ -235,12 +235,6 @@ describe("getEAS2023ContextForIndicator — mapeo a indicadores NG", () => {
     expect(ctx!.easKey).toBe("P33b_insomnio");
   });
 
-  it("auditc-positivo → P32_CAGE (riesgo alcoholismo)", () => {
-    const ctx = getEAS2023ContextForIndicator("auditc-positivo");
-    expect(ctx).toBeDefined();
-    expect(ctx!.easKey).toBe("P32_CAGE");
-  });
-
   it("indicadores con fixture propio no reciben contexto EAS2023", () => {
     // Estos ya tienen referencia autonómica vía fixture; no se duplica.
     expect(getEAS2023ContextForIndicator("cage-riesgo")).toBeUndefined();
@@ -250,6 +244,9 @@ describe("getEAS2023ContextForIndicator — mapeo a indicadores NG", () => {
   });
 
   it("indicadores sin mapeo devuelven undefined", () => {
+    // auditc-positivo no se enlaza: AUDIT-C y CAGE miden cosas distintas
+    // (uso de riesgo vs. dependencia); NG no fusiona instrumentos.
+    expect(getEAS2023ContextForIndicator("auditc-positivo")).toBeUndefined();
     expect(getEAS2023ContextForIndicator("ibse-indice-total")).toBeUndefined();
     expect(getEAS2023ContextForIndicator("duke-apoyo-global")).toBeUndefined();
     expect(getEAS2023ContextForIndicator("ghq12-positivo")).toBeUndefined();
