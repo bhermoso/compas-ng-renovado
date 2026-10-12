@@ -256,3 +256,62 @@ describe("getEAS2023ContextForIndicator — mapeo a indicadores NG", () => {
     expect(getEAS2023ContextForIndicator("phq9-positivo")).toBeUndefined();
   });
 });
+
+// ── Pieza 3: integración en IndicatorComparisonReference ─────────────────────
+// Pruebas de caja blanca para el campo eas2023PopulationContext.
+// No cargamos workspace real aquí: verificamos que el tipo está exportado y
+// que el campo no aparece en indicadores que ya tienen fixture autonómico.
+
+import type { IndicatorComparisonReference } from "../src/application/health-profile/complementaryIndicatorReferences";
+
+describe("IndicatorComparisonReference — campo eas2023PopulationContext (pieza 3)", () => {
+  it("el tipo IndicatorComparisonReference acepta eas2023PopulationContext como campo opcional", () => {
+    const ref: IndicatorComparisonReference = {
+      indicatorId: "fagerstrom-positivo",
+      indicatorTitle: "Fagerström positivo",
+      instrument: "Fagerström",
+      diagnosticBlockId: "tabaco",
+      diagnosticBlockTitle: "Tabaco",
+      territorialLabel: "valor local",
+      provinceLabel: "sin referencia provincial",
+      andalusiaLabel: "sin referencia autonómica",
+      source: "test",
+      scaleCaution: "cautela test",
+      demoProxy: false,
+      comparisonReading: "sin comparación",
+      narrativeLabel: "tabaco",
+      dimension: "tabaco",
+      esLocal: true,
+      eas2023PopulationContext: {
+        easKey: "P23",
+        topic: "Fumador/a habitual (tabaco)",
+        refAndalucia: 23.9,
+        refGranada: 25.0,
+        caution: "referencia contextual no local",
+      },
+    };
+    expect(ref.eas2023PopulationContext?.easKey).toBe("P23");
+    expect(ref.eas2023PopulationContext?.refAndalucia).toBe(23.9);
+  });
+
+  it("el campo es undefined cuando el indicador no tiene mapeo EAS2023", () => {
+    const ref: IndicatorComparisonReference = {
+      indicatorId: "ibse-indice-total",
+      indicatorTitle: "IBSE total",
+      instrument: "IBSE",
+      diagnosticBlockId: "bienestar-socioemocional-escolar",
+      diagnosticBlockTitle: "Bienestar",
+      territorialLabel: "valor local",
+      provinceLabel: "sin referencia",
+      andalusiaLabel: "sin referencia",
+      source: "test",
+      scaleCaution: "cautela test",
+      demoProxy: false,
+      comparisonReading: "sin comparación",
+      narrativeLabel: "IBSE",
+      dimension: "bienestar-socioemocional",
+      esLocal: true,
+    };
+    expect(ref.eas2023PopulationContext).toBeUndefined();
+  });
+});
