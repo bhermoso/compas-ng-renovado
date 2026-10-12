@@ -1,6 +1,11 @@
 import type { AUDITCAggregates } from "../../domain/auditc";
 import { getMethodologicalModule } from "../../domain/methodology";
 import { splitRow } from "../csv-utils/splitRow";
+import {
+  buildAgeSexObserved,
+  type AgeBand,
+  type AgeSexObservedResult,
+} from "../sam/buildAgeSexObserved";
 
 // ── Configuración derivada de AUDITC_MODULE ───────────────────────────────────
 // Los campos canónicos se obtienen del módulo metodológico (adapters.redcap.columns).
@@ -34,10 +39,28 @@ const EMPTY_AGGREGATES: AUDITCAggregates = {
   nScore0: 0, nScore1to3: 0, nScore4to7: 0, nScore8to12: 0,
 };
 
+/** Opciones demográficas opcionales para el parser.
+ *  Solo se calculan si el CSV contiene las columnas `sexo` y `anio_nacimiento`.
+ *  Si no se proporcionan, la salida es idéntica a la versión sin opciones.
+ */
+export interface AUDITCCSVParseOptions {
+  ageBands: AgeBand[];
+  /** Año de referencia para calcular la edad. Por defecto: año actual. */
+  referenceYear?: number;
+}
+
 export interface AUDITCCSVParseResult {
   aggregates: AUDITCAggregates;
   methodologicalCautions: string[];
   warnings: string[];
+  /**
+   * Distribución observada edad×sexo de la muestra.
+   * Solo presente si el CSV incluye columnas `sexo` y `anio_nacimiento`
+   * Y se pasaron `ageBands` en las opciones.
+   * Para usarla con enrichWithRepresentativeness se requiere además que
+   * PopulationReference.ageSexMatrix esté disponible en la referencia poblacional.
+   */
+  ageSexObserved?: AgeSexObservedResult;
 }
 
 function parseItem(raw: string | undefined): number | null {
@@ -102,7 +125,10 @@ function buildCautions(aggregates: AUDITCAggregates): string[] {
   return cautions;
 }
 
-export function parseAUDITCCSV(csvText: string): AUDITCCSVParseResult {
+export function parseAUDITCCSV(
+  csvText: string,
+  options?: AUDITCCSVParseOptions
+): AUDITCCSVParseResult {
   const lines = csvText.split(/\r?\n/).filter((l) => l.trim().length > 0);
 
   if (lines.length < 2) {
@@ -117,6 +143,11 @@ export function parseAUDITCCSV(csvText: string): AUDITCCSVParseResult {
   const idxQ1 = header.indexOf(COL_Q1);
   const idxQ2 = header.indexOf(COL_Q2);
   const idxQ3 = header.indexOf(COL_Q3);
+
+  // Columnas demográficas opcionales: presentes en exports REDCap completos.
+  const idxSexo = header.indexOf("sexo");
+  const idxAnio = header.indexOf("anio_nacimiento");
+  const hasDemographics = idxSexo !== -1 && idxAnio !== -1;
 
   const warnings: string[] = [];
   if (idxQ1 === -1) warnings.push(`Columna "${COL_Q1}" no encontrada.`);
@@ -135,6 +166,7 @@ export function parseAUDITCCSV(csvText: string): AUDITCCSVParseResult {
   let scoreSum = 0;
   let nPositive = 0;
   let nScore0 = 0, nScore1to3 = 0, nScore4to7 = 0, nScore8to12 = 0;
+  const demographicRows: Array<{ sex?: string; birthYear?: number }> = [];
 
   for (let i = 1; i < lines.length; i++) {
     const row = splitRow(lines[i]);
@@ -143,6 +175,15 @@ export function parseAUDITCCSV(csvText: string): AUDITCCSVParseResult {
     const q1 = idxQ1 !== -1 ? parseItem(row[idxQ1]) : null;
     const q2 = idxQ2 !== -1 ? parseItem(row[idxQ2]) : null;
     const q3 = idxQ3 !== -1 ? parseItem(row[idxQ3]) : null;
+
+    if (hasDemographics && options?.ageBands) {
+      const rawAnio = row[idxAnio]?.trim();
+      const birthYear = rawAnio ? parseInt(rawAnio, 10) : undefined;
+      demographicRows.push({
+        sex: row[idxSexo]?.trim() || undefined,
+        birthYear: birthYear !== undefined && Number.isFinite(birthYear) ? birthYear : undefined,
+      });
+    }
 
     if (q1 === null || q2 === null || q3 === null) {
       missing++;
@@ -174,5 +215,11 @@ export function parseAUDITCCSV(csvText: string): AUDITCCSVParseResult {
     nScore8to12,
   };
 
-  return { aggregates, methodologicalCautions: buildCautions(aggregates), warnings };
+  let ageSexObserved: AgeSexObservedResult | undefined;
+  if (hasDemographics && options?.ageBands && demographicRows.length > 0) {
+    const refYear = options.referenceYear ?? new Date().getFullYear();
+    ageSexObserved = buildAgeSexObserved(demographicRows, refYear, options.ageBands);
+  }
+
+  return { aggregates, methodologicalCautions: buildCautions(aggregates), warnings, ageSexObserved };
 }
