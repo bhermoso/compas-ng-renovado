@@ -2,6 +2,23 @@
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: #172033;
   background: #f7f8fc;
+
+  /* Paleta institucional — VISUAL-CONTRACT §2 */
+  /* Gradiente COMPÁS (6 pasos) */
+  --azul:     #0074c8;
+  --cyan:     #00acd9;
+  --verde:    #94d40b;
+  --amarillo: #ffb61b;
+  --naranja:  #ff6600;
+  --rojo:     #dc143c;
+
+  /* Neutros slate */
+  --fondo-principal:   #f8fafc;
+  --fondo-secundario:  #f1f5f9;
+  --borde:             #e2e8f0;
+  --texto-principal:   #1e293b;
+  --texto-secundario:  #64748b;
+  --blanco:            #ffffff;
 }
 
 body {
