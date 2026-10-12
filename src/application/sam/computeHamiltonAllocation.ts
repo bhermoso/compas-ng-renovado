@@ -4,7 +4,13 @@
  * Afijación proporcional con método de restos mayores (Hamilton / largest remainder).
  * Dado un desglose de población por celdas (ageSexMatrix) y un N teórico entero,
  * distribuye N exactamente entre las celdas proporcionalmente al peso poblacional
- * de cada una, asignando los enteros restantes a las celdas con mayor parte decimal.
+ * de cada una, asignando los enteros restantes a las celdas con mayor resto entero.
+ *
+ * Aritmética entera: la cuota y el resto se calculan con división y módulo enteros
+ *   cuota_i = Math.floor(pop_i × N / total)
+ *   resto_i  = (pop_i × N) % total          ← entero, sin error de coma flotante
+ * Esto evita ambigüedad en la comparación de restos cuando dos semi-celdas tienen
+ * valores muy cercanos, y es exacto para pop_i × N < 2^53 (valores SAM realistas).
  *
  * Propiedad garantizada: sum(male + female) de todas las CeldaAsignada === N.
  *
@@ -68,37 +74,32 @@ export function computeHamiltonAllocation(
     };
   }
 
-  // Construimos la lista de semi-celdas con su cuota exacta (real).
+  // Construimos la lista de semi-celdas con cuota y resto enteros.
   type SemiCell = {
     bandIdx: number;
     sex: "male" | "female";
     population: number;
-    quota: number;      // parte entera
-    remainder: number;  // parte decimal
-    allocated: number;  // resultado final
+    quota: number;     // cuota base: Math.floor(pop × N / total)
+    remainder: number; // resto entero: (pop × N) % total  (0 … total-1)
+    allocated: number; // resultado final
   };
 
   const semis: SemiCell[] = [];
   for (let i = 0; i < ageSexMatrix.length; i++) {
     for (const sex of ["male", "female"] as const) {
       const pop = ageSexMatrix[i][sex];
-      const exact = (pop / populationTotal) * nTheoretical;
-      semis.push({
-        bandIdx: i,
-        sex,
-        population: pop,
-        quota: Math.floor(exact),
-        remainder: exact - Math.floor(exact),
-        allocated: Math.floor(exact),
-      });
+      const prod = pop * nTheoretical; // entero exacto para pop×N < 2^53
+      const quota = Math.floor(prod / populationTotal);
+      const remainder = prod % populationTotal; // resto entero, comparación exacta
+      semis.push({ bandIdx: i, sex, population: pop, quota, remainder, allocated: quota });
     }
   }
 
-  // Cuántas unidades quedan por repartir tras asignar los enteros inferiores.
+  // Cuántas unidades quedan por repartir tras asignar las cuotas base.
   const assigned = semis.reduce((s, sc) => s + sc.quota, 0);
   let remaining = nTheoretical - assigned;
 
-  // Repartir los restos en orden decreciente de parte decimal (largest remainder).
+  // Repartir los restos en orden decreciente de resto entero (largest remainder).
   // Empate: orden de aparición (estable).
   const byRemainder = semis
     .map((sc, idx) => ({ idx, remainder: sc.remainder }))

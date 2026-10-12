@@ -3,9 +3,8 @@
  *
  * Pieza 3: computeCellRepresentativeness.
  *
- * Los casos de prueba provienen de analisis/F5/01-sam.md § "Casos de prueba de
- * representatividad" (NO se lee depurado/). Son 4 casos de 2 bandas × 2 sexos
- * = 4 semi-celdas, con aritmética exacta y verificable a mano.
+ * Los casos de prueba son 4 casos de 2 bandas × 2 sexos = 4 semi-celdas,
+ * con aritmética exacta y verificable a mano (autocontenidos en este fichero).
  *
  * Algoritmo verificado:
  *   pct[s][g] = celda[s][g] / total × 100   (% sobre total de ambos sexos)

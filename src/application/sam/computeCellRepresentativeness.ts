@@ -4,18 +4,17 @@
  * Evalúa la representatividad demográfica de la muestra conseguida respecto
  * a la muestra teórica (afijación Hamilton), celda a celda.
  *
- * Algoritmo (fuente: depurado/auditoria_sam_tripiramide_ibse.txt:16-72,
- * reproducido en analisis/F5/01-sam.md § Casos de prueba):
+ * Algoritmo (autocontenido):
  *
  *   pct[s][g] = (celda[s][g] / total) × 100   ← % sobre el total de ambos sexos
  *   diff_pct  = pct_conseguido − pct_teorico
- *   MAE       = media(|diff_pct|) sobre todas las semi-celdas
+ *   MAE       = media(|diff_pct|) sobre semi-celdas evaluables
  *   pctDentro = % de semi-celdas con |diff_pct| ≤ tolerance (inclusivo)
  *
  * Las etiquetas (alta/moderada/baja) son CONVENCIÓN, no umbral canónico.
  * Se exponen como parámetro QualityThresholds para que el equipo pueda
  * ajustarlos sin tocar el algoritmo. Los valores por defecto (1,5 / 3,5)
- * provienen del histórico (auditoria_sam:52) y se documentan como tal.
+ * son convención de control de calidad estadístico; se documentan y parametrizan.
  *
  * Celda con población teórica cero: diff_pct se reporta como null (no evaluable).
  */

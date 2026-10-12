@@ -138,3 +138,75 @@ describe("computeHamiltonAllocation — casos borde", () => {
     expect(resultBands).toEqual(inputBands);
   });
 });
+
+// ── Test con cifras grandes (escala ciudad) ────────────────────────────────────
+//
+// Total = 500.000 adultos, N = 385 (Cochran 95 % ±5 % sobre ~15.000).
+// Con aritmética entera: resto_i = (pop_i × 385) % 500.000 — exacto.
+// Con coma flotante: los restos de 65+/female (0,86) y 45-64/male (0,85) difieren
+// en 0,01 pp; la comparación entera (430.000 vs 425.000) es inequívoca.
+//
+// Valores esperados calculados y verificados con Node.js (autocontenidos):
+//   band 16-44: male=125000→96, female=120000→92
+//   band 45-64: male=105000→81, female=110000→85
+//   band 65+:   male= 22000→17, female= 18000→14
+//   sum = 385 ✓
+describe("computeHamiltonAllocation — cifras grandes (escala ciudad)", () => {
+  const CITY_MATRIX: AgeSexCell[] = [
+    { ageBand: "16-44", male: 125_000, female: 120_000 },
+    { ageBand: "45-64", male: 105_000, female: 110_000 },
+    { ageBand: "65+",   male:  22_000, female:  18_000 },
+  ];
+  const N = 385;
+
+  it("suma exacta = N = 385", () => {
+    const r = computeHamiltonAllocation(CITY_MATRIX, N);
+    expect(r.checksum).toBe(N);
+  });
+
+  it("asignación correcta por banda verificada con restos enteros", () => {
+    const r = computeHamiltonAllocation(CITY_MATRIX, N);
+
+    const band1644 = r.cells.find((c) => c.ageBand === "16-44")!;
+    expect(band1644.male).toBe(96);
+    expect(band1644.female).toBe(92);
+
+    const band4564 = r.cells.find((c) => c.ageBand === "45-64")!;
+    expect(band4564.male).toBe(81);
+    expect(band4564.female).toBe(85);
+
+    const band65 = r.cells.find((c) => c.ageBand === "65+")!;
+    expect(band65.male).toBe(17);
+    expect(band65.female).toBe(14);
+  });
+
+  it("las 4 unidades extra van a las celdas de mayor resto entero", () => {
+    // Restos enteros: 65+/male=470000 > 65+/female=430000 > 45-64/male=425000
+    //   > 45-64/female=350000 > 16-44/female=200000 > 16-44/male=125000.
+    // Las celdas que reciben +1 son las primeras 4: 65+, 45-64 (ambos sexos).
+    const r = computeHamiltonAllocation(CITY_MATRIX, N);
+    const band65 = r.cells.find((c) => c.ageBand === "65+")!;
+    const band4564 = r.cells.find((c) => c.ageBand === "45-64")!;
+    const band1644 = r.cells.find((c) => c.ageBand === "16-44")!;
+
+    // 65+ recibió +1 en ambos sexos (restos 470000 y 430000)
+    expect(band65.male   - Math.floor(22_000 * N / 500_000)).toBe(1);
+    expect(band65.female - Math.floor(18_000 * N / 500_000)).toBe(1);
+    // 45-64 recibió +1 en ambos sexos (restos 425000 y 350000)
+    expect(band4564.male   - Math.floor(105_000 * N / 500_000)).toBe(1);
+    expect(band4564.female - Math.floor(110_000 * N / 500_000)).toBe(1);
+    // 16-44 no recibió extras (restos 200000 y 125000, fuera del top-4)
+    expect(band1644.male   - Math.floor(125_000 * N / 500_000)).toBe(0);
+    expect(band1644.female - Math.floor(120_000 * N / 500_000)).toBe(0);
+  });
+
+  it("todas las celdas son enteros no negativos (cifras grandes)", () => {
+    const r = computeHamiltonAllocation(CITY_MATRIX, N);
+    for (const c of r.cells) {
+      expect(Number.isInteger(c.male)).toBe(true);
+      expect(Number.isInteger(c.female)).toBe(true);
+      expect(c.male).toBeGreaterThanOrEqual(0);
+      expect(c.female).toBeGreaterThanOrEqual(0);
+    }
+  });
+});
