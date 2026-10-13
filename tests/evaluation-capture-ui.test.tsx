@@ -10,7 +10,6 @@ import { DefinitiveActionPlanPreview } from "../src/ui/components/DefinitiveActi
 import { generateMonitoringDraft } from "../src/application/monitoring/MonitoringEngine";
 import { generateAgendaDraft } from "../src/application/agenda/AgendaEngine";
 import type { MonitoringDraft } from "../src/application/monitoring/MonitoringEngine";
-import type { PLSEvaluationFramework } from "../src/domain/health-plan";
 import {
   ZAIDIN_AGING_PROPOSAL,
   createZaidinFinalActionPlanDraft,
