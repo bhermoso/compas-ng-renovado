@@ -1,6 +1,15 @@
 import type { IBSEAggregates } from "../../domain/ibse";
 import { getMethodologicalModule } from "../../domain/methodology";
 import { splitRow } from "../csv-utils/splitRow";
+import {
+  buildAgeSexObserved,
+  type AgeBand,
+  type AgeSexObservedResult,
+} from "../sam/buildAgeSexObserved";
+
+// Nota: las columnas `sexo` y `edad` del export REDCap IBSE NO están en el mapeo
+// del adaptador redcap de ibse.ts (que solo mapea puntuaciones calculadas). Se leen
+// directamente por nombre de cabecera: "sexo" y "edad".
 
 const IBSE_MODULE_ID = "ibse";
 
@@ -32,13 +41,33 @@ const EMPTY_AGGREGATES: IBSEAggregates = {
   meanFactorPersona: 0,
 };
 
+/** Opciones demográficas opcionales para el parser IBSE.
+ *  Solo se calculan si el CSV contiene las columnas `sexo` y `edad`
+ *  (leídas por nombre de cabecera; no están en el adaptador REDCap).
+ *  Sin opciones o sin esas columnas, la salida es idéntica a la versión sin opciones.
+ *  No se pasa referenceYear porque IBSE exporta `edad` como años cumplidos directamente.
+ */
+export interface IBSECSVParseOptions {
+  ageBands: AgeBand[];
+}
+
 export interface IBSECSVParseResult {
   aggregates: IBSEAggregates;
   methodologicalCautions: string[];
   warnings: string[];
+  /**
+   * Distribución observada edad×sexo de la muestra.
+   * Solo presente si el CSV incluye columnas `sexo` y `edad`
+   * Y se pasaron `ageBands` en las opciones.
+   * Solo incluye filas con monitor_ibse_complete=2 (misma exclusión que los agregados).
+   */
+  ageSexObserved?: AgeSexObservedResult;
 }
 
-export function parseIBSECSV(csvText: string): IBSECSVParseResult {
+export function parseIBSECSV(
+  csvText: string,
+  options?: IBSECSVParseOptions
+): IBSECSVParseResult {
   const lines = csvText.split(/\r?\n/).filter((l) => l.trim().length > 0);
 
   if (lines.length < 2) {
@@ -61,6 +90,11 @@ export function parseIBSECSV(csvText: string): IBSECSVParseResult {
     completed:       header.indexOf(COLS.completed),
   };
 
+  // Columnas demográficas: leídas por nombre de cabecera (no en el adaptador REDCap).
+  const idxSexo = header.indexOf("sexo");
+  const idxEdad = header.indexOf("edad");
+  const hasDemographics = idxSexo !== -1 && idxEdad !== -1;
+
   const missing = Object.entries(idx)
     .filter(([, v]) => v === -1)
     .map(([k]) => k);
@@ -76,6 +110,7 @@ export function parseIBSECSV(csvText: string): IBSECSVParseResult {
   let sumSituacion = 0;
   let sumControl = 0;
   let sumPersona = 0;
+  const demographicRows: Array<{ sex?: string; age?: number }> = [];
 
   for (let i = 1; i < lines.length; i++) {
     const row = splitRow(lines[i]);
@@ -83,6 +118,16 @@ export function parseIBSECSV(csvText: string): IBSECSVParseResult {
 
     if (idx.completed !== -1 && row[idx.completed] !== COLS.completedValue) {
       continue;
+    }
+
+    // Recoger datos demográficos solo de filas completas (misma exclusión que los agregados).
+    if (hasDemographics && options?.ageBands) {
+      const rawEdad = row[idxEdad]?.trim();
+      const parsedAge = rawEdad ? parseInt(rawEdad, 10) : undefined;
+      demographicRows.push({
+        sex: row[idxSexo]?.trim() || undefined,
+        age: parsedAge !== undefined && Number.isFinite(parsedAge) ? parsedAge : undefined,
+      });
     }
 
     const total     = parseFloat(row[idx.total]           ?? "");
@@ -126,6 +171,24 @@ export function parseIBSECSV(csvText: string): IBSECSVParseResult {
     cautions.push("Los resultados son medias de la muestra disponible, no estimaciones poblacionales.");
   }
 
+  let ageSexObserved: AgeSexObservedResult | undefined;
+  if (hasDemographics && options?.ageBands && demographicRows.length > 0) {
+    // referenceYear=0 porque IBSE exporta edad directa (no año de nacimiento).
+    ageSexObserved = buildAgeSexObserved(demographicRows, 0, options.ageBands);
+    const bd = ageSexObserved.unassignableBreakdown;
+    const unassigned = ageSexObserved.unassignableCount;
+    if (unassigned > 0) {
+      const parts: string[] = [];
+      if (bd.noSex > 0) parts.push(`${bd.noSex} sin sexo reconocible`);
+      if (bd.noAge > 0) parts.push(`${bd.noAge} con edad no numérica`);
+      if (bd.noBirthYear > 0) parts.push(`${bd.noBirthYear} sin edad`);
+      if (bd.outOfBand > 0) parts.push(`${bd.outOfBand} con edad fuera de bandas`);
+      warnings.push(
+        `Distribución edad×sexo: ${unassigned} de ${demographicRows.length} registros no asignados a celda (${parts.join("; ")}).`
+      );
+    }
+  }
+
   return {
     aggregates: {
       n,
@@ -138,5 +201,6 @@ export function parseIBSECSV(csvText: string): IBSECSVParseResult {
     },
     methodologicalCautions: cautions,
     warnings,
+    ageSexObserved,
   };
 }
