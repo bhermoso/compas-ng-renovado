@@ -183,3 +183,106 @@ describe("buildAgeSexObserved — casos de borde globales", () => {
     );
   });
 });
+
+// ── Pieza 1: ruta age directo ────────────────────────────────────────────────
+
+// Bandas que mezclan rango escolar (13-18) con adultos (19-88), como el IBSE real.
+const BANDS_IBSE: AgeBand[] = [
+  { label: "13-18", min: 13, max: 18 },
+  { label: "19-29", min: 19, max: 29 },
+  { label: "30-39", min: 30, max: 39 },
+  { label: "40-88", min: 40, max: 88 },
+];
+
+describe("buildAgeSexObserved — age directo (sin referenceYear)", () => {
+  it("fila con age asigna correctamente sin usar referenceYear", () => {
+    const rows = [
+      { sex: "1", age: 22 },  // male → 19-29
+      { sex: "2", age: 15 },  // female → 13-18
+    ];
+    // referenceYear=0 porque age es directo; no se usa.
+    const result = buildAgeSexObserved(rows, 0, BANDS_IBSE);
+    expect(result.assignedCount).toBe(2);
+    expect(result.cells.find((c) => c.ageBand === "19-29")!.male).toBe(1);
+    expect(result.cells.find((c) => c.ageBand === "13-18")!.female).toBe(1);
+  });
+
+  it("age prevalece sobre birthYear cuando ambos presentes", () => {
+    // age=22 (19-29), birthYear=1980 con ref=2024 daría edad 44 (40-88).
+    const rows = [{ sex: "1", age: 22, birthYear: 1980 }];
+    const result = buildAgeSexObserved(rows, 2024, BANDS_IBSE);
+    expect(result.assignedCount).toBe(1);
+    expect(result.cells.find((c) => c.ageBand === "19-29")!.male).toBe(1);
+    expect(result.cells.find((c) => c.ageBand === "40-88")!.male).toBe(0);
+  });
+
+  it("age negativa → outOfBand (no corregida)", () => {
+    const rows = [{ sex: "2", age: -5 }];
+    const result = buildAgeSexObserved(rows, 0, BANDS_IBSE);
+    expect(result.unassignableBreakdown.outOfBand).toBe(1);
+    expect(result.assignedCount).toBe(0);
+  });
+
+  it("age=1993 (captura incorrecta de año en lugar de edad) → outOfBand declarado", () => {
+    const rows = [{ sex: "1", age: 1993 }];
+    const result = buildAgeSexObserved(rows, 0, BANDS_IBSE);
+    expect(result.unassignableBreakdown.outOfBand).toBe(1);
+    expect(result.assignedCount).toBe(0);
+  });
+
+  it("age=NaN → noAge++ (campo presente pero valor no finito)", () => {
+    const rows = [{ sex: "1", age: NaN }];
+    const result = buildAgeSexObserved(rows, 0, BANDS_IBSE);
+    expect(result.unassignableBreakdown.noAge).toBe(1);
+    expect(result.assignedCount).toBe(0);
+  });
+
+  it("age en el límite inferior exacto de banda → asignada", () => {
+    const rows = [{ sex: "2", age: 13 }];
+    const result = buildAgeSexObserved(rows, 0, BANDS_IBSE);
+    expect(result.assignedCount).toBe(1);
+    expect(result.cells.find((c) => c.ageBand === "13-18")!.female).toBe(1);
+  });
+
+  it("age en el límite superior exacto de banda → asignada", () => {
+    const rows = [{ sex: "1", age: 18 }];
+    const result = buildAgeSexObserved(rows, 0, BANDS_IBSE);
+    expect(result.assignedCount).toBe(1);
+    expect(result.cells.find((c) => c.ageBand === "13-18")!.male).toBe(1);
+  });
+
+  it("age justo fuera del límite superior → outOfBand", () => {
+    const rows = [{ sex: "2", age: 89 }];  // max banda = 88
+    const result = buildAgeSexObserved(rows, 0, BANDS_IBSE);
+    expect(result.unassignableBreakdown.outOfBand).toBe(1);
+  });
+
+  it("mezcla escolar+adultos: cada participante cae en su banda", () => {
+    const rows = [
+      { sex: "1", age: 14 },  // 13-18
+      { sex: "2", age: 18 },  // 13-18 (límite)
+      { sex: "1", age: 25 },  // 19-29
+      { sex: "2", age: 45 },  // 40-88
+      { sex: "1", age: 1993 }, // outOfBand
+    ];
+    const result = buildAgeSexObserved(rows, 0, BANDS_IBSE);
+    expect(result.assignedCount).toBe(4);
+    expect(result.unassignableBreakdown.outOfBand).toBe(1);
+    expect(result.cells.find((c) => c.ageBand === "13-18")!.male).toBe(1);
+    expect(result.cells.find((c) => c.ageBand === "13-18")!.female).toBe(1);
+    expect(result.cells.find((c) => c.ageBand === "19-29")!.male).toBe(1);
+    expect(result.cells.find((c) => c.ageBand === "40-88")!.female).toBe(1);
+  });
+
+  it("noAge cuenta independiente de noBirthYear (ruta age vs ruta birthYear)", () => {
+    const rows = [
+      { sex: "1", age: NaN },   // noAge
+      { sex: "2" },             // noBirthYear (no hay ni age ni birthYear)
+    ];
+    const result = buildAgeSexObserved(rows, 0, BANDS_IBSE);
+    expect(result.unassignableBreakdown.noAge).toBe(1);
+    expect(result.unassignableBreakdown.noBirthYear).toBe(1);
+    expect(result.assignedCount).toBe(0);
+    expect(result.unassignableCount).toBe(2);
+  });
+});

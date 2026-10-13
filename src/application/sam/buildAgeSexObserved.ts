@@ -1,8 +1,10 @@
 // Convenciones:
-// - edad = referenceYear - birthYear (diferencia de años calendario)
+// - edad = referenceYear - birthYear (diferencia de años calendario), O bien age directo
 // - pertenencia exacta [min, max]; si no cae en ninguna banda → outOfBand
-// - sin dato: respondiente sin sexo reconocible, sin birthYear, o fuera de todas las
-//   bandas → no asignable. Se cuenta y declara; nunca se imputa.
+// - sin dato: respondiente sin sexo reconocible, sin dato de edad (birthYear ni age), o fuera
+//   de todas las bandas → no asignable. Se cuenta y declara; nunca se imputa.
+// - noAge: campo age presente pero valor no finito (NaN, Infinity). Distinto de noBirthYear
+//   (birthYear ausente o no numérico cuando no se usa age).
 
 import type { AgeSexCell } from "../../domain/sam/PopulationReference";
 
@@ -20,8 +22,10 @@ export interface AgeSexObservedResult {
   unassignableBreakdown: {
     /** Sexo ausente, vacío o con código no reconocible (incluye 3 y 4 en GES). */
     noSex: number;
-    /** Sexo presente pero birthYear ausente o no numérico. */
+    /** Sexo presente pero birthYear ausente o no numérico (solo cuando se usa la ruta birthYear). */
     noBirthYear: number;
+    /** Sexo presente, campo age definido pero valor no finito (NaN, Infinity). */
+    noAge: number;
     /** Ambos datos presentes pero la edad calculada cae fuera de todas las bandas. */
     outOfBand: number;
   };
@@ -49,14 +53,20 @@ function findBand(age: number, bands: AgeBand[]): number {
 /**
  * Construye la distribución observada por celda edad×sexo a partir de datos individuales.
  *
- * @param rows           Registros individuales con sexo y año de nacimiento opcionales.
- * @param referenceYear  Año de referencia para calcular la edad (referenceYear - birthYear).
+ * Dos vías de obtener la edad:
+ * - `age` directo (años cumplidos, entero): se usa tal cual, sin referenceYear.
+ * - `birthYear` + referenceYear: se calcula como referenceYear - birthYear.
+ * Si ambos campos están presentes, `age` prevalece y birthYear se ignora.
+ *
+ * @param rows           Registros individuales con sexo y datos de edad opcionales.
+ * @param referenceYear  Año de referencia para la ruta birthYear. Ignorado cuando la fila
+ *                       aporta `age` directamente; puede pasarse 0 si todas las filas usan age.
  * @param ageBands       Bandas de edad en orden canónico; deben coincidir con las de
  *                       PopulationReference.ageSexMatrix para poder llamar a
  *                       enrichWithRepresentativeness.
  */
 export function buildAgeSexObserved(
-  rows: ReadonlyArray<{ sex?: string; birthYear?: number }>,
+  rows: ReadonlyArray<{ sex?: string; birthYear?: number; age?: number }>,
   referenceYear: number,
   ageBands: AgeBand[]
 ): AgeSexObservedResult {
@@ -68,6 +78,7 @@ export function buildAgeSexObserved(
   let assignedCount = 0;
   let noSex = 0;
   let noBirthYear = 0;
+  let noAge = 0;
   let outOfBand = 0;
 
   for (const row of rows) {
@@ -77,17 +88,29 @@ export function buildAgeSexObserved(
       continue;
     }
 
-    if (
-      row.birthYear === undefined ||
-      row.birthYear === null ||
-      !Number.isFinite(row.birthYear)
-    ) {
-      noBirthYear++;
-      continue;
+    let effectiveAge: number;
+
+    if (row.age !== undefined && row.age !== null) {
+      // Ruta age directo: no se usa referenceYear.
+      if (!Number.isFinite(row.age)) {
+        noAge++;
+        continue;
+      }
+      effectiveAge = row.age;
+    } else {
+      // Ruta birthYear: requiere referenceYear.
+      if (
+        row.birthYear === undefined ||
+        row.birthYear === null ||
+        !Number.isFinite(row.birthYear)
+      ) {
+        noBirthYear++;
+        continue;
+      }
+      effectiveAge = referenceYear - row.birthYear;
     }
 
-    const age = referenceYear - row.birthYear;
-    const bandIdx = findBand(age, ageBands);
+    const bandIdx = findBand(effectiveAge, ageBands);
     if (bandIdx === -1) {
       outOfBand++;
       continue;
@@ -102,11 +125,11 @@ export function buildAgeSexObserved(
     return { ageBand: band.label, male: c.male, female: c.female };
   });
 
-  const unassignableCount = noSex + noBirthYear + outOfBand;
+  const unassignableCount = noSex + noBirthYear + noAge + outOfBand;
   return {
     cells,
     assignedCount,
     unassignableCount,
-    unassignableBreakdown: { noSex, noBirthYear, outOfBand },
+    unassignableBreakdown: { noSex, noBirthYear, noAge, outOfBand },
   };
 }
