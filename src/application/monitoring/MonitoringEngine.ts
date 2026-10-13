@@ -1,4 +1,5 @@
 import type { AgendaDraft } from "../agenda";
+import type { PLSEvaluationFramework } from "../../domain/health-plan";
 
 export type MonitoringStatus =
   | "pending-validation"
@@ -21,6 +22,25 @@ export interface MonitoringDraft {
   trackedItems: MonitoringItem[];
   cautions: string[];
   requiresHumanValidation: true;
+  /** Marco mínimo que hará evaluable el futuro PLS. Gate G-PLS-10. */
+  evaluationFramework?: PLSEvaluationFramework;
+}
+
+/** Valida que el marco de evaluación tenga responsable nominal y al menos una
+ *  pregunta de evaluación (PM-8 / G-PLS-10). Devuelve los mensajes de error;
+ *  vacío = válido. */
+export function validatePLSEvaluationFramework(
+  framework: PLSEvaluationFramework | undefined
+): string[] {
+  if (!framework) return ["El marco de evaluación no está definido."];
+  const errors: string[] = [];
+  if (!framework.evaluationResponsible.trim()) {
+    errors.push("El responsable de evaluación debe ser una persona nominada (PM-8).");
+  }
+  if (!framework.evaluationQuestions.some((q) => q.trim())) {
+    errors.push("El marco de evaluación debe incluir al menos una pregunta de evaluación (G-PLS-10).");
+  }
+  return errors;
 }
 
 export function generateMonitoringDraft(

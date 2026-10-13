@@ -172,6 +172,19 @@ function workspace(): MunicipalityWorkspace {
   ]});
 }
 
+const evalFramework: import("../src/domain/health-plan").PLSEvaluationFramework = {
+ evaluationQuestions: ["¿Se redujo la soledad no deseada entre las personas mayores?"],
+ evaluationMoments: ["Año 2 del plan"],
+ evaluationResponsible: "Técnica de Salud Pública del Distrito Zaidín",
+ baselineNote: "Línea base: encuesta de soledad 2026",
+};
+
+const unaddressedNeed: import("../src/domain/health-plan").UnaddressedNeed = {
+ id: "n-salud-mental",
+ title: "Salud mental en jóvenes",
+ justification: "Prioridad reconocida pero fuera del alcance de este ciclo por falta de capacidad técnica.",
+};
+
 describe("Compilación inicial del Plan Local de Salud", () => {
  it("integra el Perfil completo y solo el último Plan validado del municipio, sin exigir actuaciones", () => {
   const ws = workspace();
@@ -234,5 +247,35 @@ describe("Compilación inicial del Plan Local de Salud", () => {
   const pdf = buildPSLCPdf(result.document);
   expect(pdf.getNumberOfPages()).toBeGreaterThan(1);
   expect(pdf.output()).toContain("intervenciones comunitarias");
+ });
+
+ it("sin marco de evaluación ni necesidades no priorizadas incluye los avisos de pendiente", () => {
+  const result = compileInitialLocalHealthPlan(workspace(), false);
+  expect(result.ok).toBe(true);
+  if (!result.ok) return;
+  const text = JSON.stringify(result.document);
+  expect(text).toContain("Pendiente de definir el marco de seguimiento y evaluación.");
+  expect(text).toContain("Pendiente de documentar las necesidades no priorizadas");
+ });
+
+ it("con marco de evaluación incluye el aviso de disponibilidad y omite el de pendiente", () => {
+  const ws = workspace();
+  ws.validatedActionPlans![1] = { ...ws.validatedActionPlans![1], evaluationFramework: evalFramework };
+  const result = compileInitialLocalHealthPlan(ws, false);
+  expect(result.ok).toBe(true);
+  if (!result.ok) return;
+  const text = JSON.stringify(result.document);
+  expect(text).toContain("El marco de evaluación disponible");
+  expect(text).not.toContain("Pendiente de definir el marco de seguimiento y evaluación.");
+ });
+
+ it("con necesidades no priorizadas documentadas omite el aviso de pendiente", () => {
+  const ws = workspace();
+  ws.validatedActionPlans![1] = { ...ws.validatedActionPlans![1], unaddressedNeeds: [unaddressedNeed] };
+  const result = compileInitialLocalHealthPlan(ws, false);
+  expect(result.ok).toBe(true);
+  if (!result.ok) return;
+  const text = JSON.stringify(result.document);
+  expect(text).not.toContain("Pendiente de documentar las necesidades no priorizadas");
  });
 });
