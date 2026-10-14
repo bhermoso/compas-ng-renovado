@@ -19,6 +19,7 @@
   --texto-principal:   #1e293b;
   --texto-secundario:  #526070;
   --texto-terciario:   #64748b;
+  --tinta-azul:        #172033;
   --blanco:            #ffffff;
 }
 
@@ -182,7 +183,7 @@ h3 {
   border-radius: 6px;
   padding: 13px 14px;
   background: var(--blanco);
-  color: #172033;
+  color: var(--tinta-azul);
 }
 
 .document-form button {
@@ -226,7 +227,7 @@ h3 {
   border-radius: 10px;
   padding: 14px 16px;
   background: var(--blanco);
-  color: #172033;
+  color: var(--tinta-azul);
   resize: vertical;
   margin-bottom: 20px;
   box-sizing: border-box;
@@ -793,7 +794,7 @@ h3 {
   font-size: 1.05rem;
   font-weight: 900;
   letter-spacing: -0.04em;
-  color: #172033;
+  color: var(--tinta-azul);
   display: flex;
   align-items: baseline;
   gap: 6px;
@@ -813,7 +814,7 @@ h3 {
   font-size: 0.58rem;
   font-weight: 900;
   letter-spacing: 0.14em;
-  background: #172033;
+  background: var(--tinta-azul);
   color: var(--blanco);
   padding: 2px 6px;
   border-radius: 4px;
@@ -853,7 +854,7 @@ h3 {
 
 .app-nav__tab:hover {
   background: var(--fondo-secundario);
-  color: #172033;
+  color: var(--tinta-azul);
 }
 
 .app-nav__tab--active {
@@ -991,7 +992,7 @@ h3 {
   font-size: 1.65rem;
   font-weight: 700;
   letter-spacing: -0.035em;
-  color: #172033;
+  color: var(--tinta-azul);
 }
 
 .compas-landing__workspace-btn {
@@ -1166,7 +1167,7 @@ h3 {
   display: inline-flex;
   align-items: center;
   padding: 5px 12px;
-  background: #172033;
+  background: var(--tinta-azul);
   color: var(--blanco);
   font-size: 0.72rem;
   font-weight: 900;
@@ -1181,7 +1182,7 @@ h3 {
   font-size: clamp(1.15rem, 2.6vw, 1.9rem);
   font-weight: 700;
   letter-spacing: -0.03em;
-  color: #172033;
+  color: var(--tinta-azul);
   margin: 18px 0 0;
   line-height: 1.25;
   max-width: 720px;
@@ -1349,7 +1350,7 @@ h3 {
 .home-mission__statement {
   font-size: clamp(1.05rem, 2.1vw, 1.35rem);
   font-weight: 500;
-  color: #172033;
+  color: var(--tinta-azul);
   line-height: 1.65;
   margin: 0;
   letter-spacing: -0.01em;
@@ -1419,7 +1420,7 @@ h3 {
   font-size: clamp(1.25rem, 2.5vw, 1.75rem);
   font-weight: 700;
   letter-spacing: -0.03em;
-  color: #172033;
+  color: var(--tinta-azul);
   margin: 0 0 40px;
 }
 
@@ -1504,7 +1505,7 @@ h3 {
   font-size: clamp(1.25rem, 2.5vw, 1.75rem);
   font-weight: 700;
   letter-spacing: -0.03em;
-  color: #172033;
+  color: var(--tinta-azul);
   margin: 0 0 36px;
 }
 
@@ -1659,7 +1660,7 @@ h3 {
 
 .app-nav__municipality-name {
   font-weight: 700;
-  color: #172033;
+  color: var(--tinta-azul);
   white-space: nowrap;
 }
 
@@ -1753,7 +1754,7 @@ h3 {
 .municipality-selector__option-name {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #172033;
+  color: var(--tinta-azul);
 }
 
 .municipality-selector__option--active .municipality-selector__option-name {
@@ -1814,7 +1815,7 @@ h3 {
   font-size: 1.65rem;
   font-weight: 700;
   letter-spacing: -0.04em;
-  color: #172033;
+  color: var(--tinta-azul);
   margin: 0 0 6px;
 }
 
@@ -1842,7 +1843,7 @@ h3 {
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: -0.01em;
-  color: #172033;
+  color: var(--tinta-azul);
   margin: 0 0 12px;
   text-transform: uppercase;
   font-size: 0.78rem;
@@ -1872,7 +1873,7 @@ h3 {
 }
 
 .municipality-selector__cancel:hover {
-  color: #172033;
+  color: var(--tinta-azul);
 }
 
 .municipality-add {
@@ -1907,7 +1908,7 @@ h3 {
   font: inherit;
   font-size: 0.88rem;
   background: #fff;
-  color: #172033;
+  color: var(--tinta-azul);
 }
 
 .municipality-add__input--sm {
@@ -1960,7 +1961,7 @@ h3 {
   font-size: 1.65rem;
   font-weight: 700;
   letter-spacing: -0.035em;
-  color: #172033;
+  color: var(--tinta-azul);
   margin: 6px 0 6px;
 }
 
@@ -2755,7 +2756,7 @@ h3 {
 .workflow-step__title {
   font-size: 0.92rem;
   font-weight: 700;
-  color: #172033;
+  color: var(--tinta-azul);
   margin: 0 0 8px;
   line-height: 1.3;
 }
@@ -2892,7 +2893,7 @@ h3 {
 }
 
 .inv-item--present .inv-item__label {
-  color: #172033;
+  color: var(--tinta-azul);
 }
 
 .inv-item--absent .inv-item__label {
@@ -2917,7 +2918,7 @@ h3 {
 }
 
 .inv-counts strong {
-  color: #172033;
+  color: var(--tinta-azul);
   font-weight: 700;
 }
 
@@ -3068,7 +3069,7 @@ h3 {
   border-radius: 6px;
   padding: 13px 14px;
   background: var(--blanco);
-  color: #172033;
+  color: var(--tinta-azul);
   font: inherit;
   align-self: flex-start;
 }
@@ -3231,7 +3232,7 @@ h3 {
 }
 
 .tp-topic--selected .tp-topic__label {
-  color: #172033;
+  color: var(--tinta-azul);
   font-weight: 600;
 }
 
@@ -3338,7 +3339,7 @@ h3 {
   font-size: 2rem;
   font-weight: 900;
   letter-spacing: -0.05em;
-  color: #172033;
+  color: var(--tinta-azul);
   line-height: 1;
 }
 
@@ -3371,7 +3372,7 @@ h3 {
 .hr-viewer__title {
   font-size: 1.4rem;
   letter-spacing: -0.03em;
-  color: #172033;
+  color: var(--tinta-azul);
   margin: 6px 0 0;
   line-height: 1.3;
 }
@@ -3416,7 +3417,7 @@ h3 {
 }
 
 .hr-viewer__author-entry strong {
-  color: #172033;
+  color: var(--tinta-azul);
   font-size: 0.9rem;
 }
 
@@ -3477,7 +3478,7 @@ h3 {
 .hr-viewer__section-title {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #172033;
+  color: var(--tinta-azul);
   letter-spacing: -0.02em;
   margin: 0 0 20px;
 }
@@ -3494,7 +3495,7 @@ h3 {
 }
 
 .hr-viewer__section-html strong {
-  color: #172033;
+  color: var(--tinta-azul);
 }
 
 .hr-viewer__section-html table {
@@ -3522,7 +3523,7 @@ h3 {
 .hr-viewer__section-html h2 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #172033;
+  color: var(--tinta-azul);
   margin: 18px 0 10px;
   letter-spacing: -0.02em;
 }
@@ -3673,7 +3674,7 @@ h3 {
   font-size: 1.35rem;
   font-weight: 700;
   letter-spacing: -0.03em;
-  color: #172033;
+  color: var(--tinta-azul);
   line-height: 1.25;
   margin: 0 0 10px;
 }
@@ -3704,7 +3705,7 @@ h3 {
 
 .tp-modal__close:hover {
   background: var(--fondo-secundario);
-  color: #172033;
+  color: var(--tinta-azul);
 }
 
 /* Barra de contador */
@@ -3870,7 +3871,7 @@ h3 {
 
 .tp-modal__btn-cancel:hover {
   background: var(--fondo-secundario);
-  color: #172033;
+  color: var(--tinta-azul);
 }
 
 .tp-modal__btn-save {
@@ -4064,7 +4065,7 @@ h3 {
 .tp-study__file {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #172033;
+  color: var(--tinta-azul);
 }
 
 .tp-study__counts {
@@ -4124,7 +4125,7 @@ h3 {
 }
 
 .tp-ranking__row--top5 .tp-ranking__label {
-  color: #172033;
+  color: var(--tinta-azul);
   font-weight: 600;
 }
 
@@ -4149,7 +4150,7 @@ h3 {
 .tp-ranking__votes {
   text-align: right;
   font-weight: 700;
-  color: #172033;
+  color: var(--tinta-azul);
   white-space: nowrap;
 }
 
@@ -4183,7 +4184,7 @@ h3 {
   border: 0;
   border-radius: 12px;
   padding: 11px 22px;
-  background: #172033;
+  background: var(--tinta-azul);
   color: var(--blanco);
   font: inherit;
   font-size: 0.88rem;
@@ -7124,7 +7125,7 @@ h3 {
   padding-top: 9px;
   padding-bottom: 9px;
   font-weight: 600;
-  color: #172033;
+  color: var(--tinta-azul);
   border-bottom: 1px solid var(--borde);
 }
 
@@ -7135,7 +7136,7 @@ h3 {
 }
 
 .study-bar-row--total .study-bar-row__label {
-  color: #172033;
+  color: var(--tinta-azul);
 }
 
 .study-bar-row__track-cell {
@@ -7163,7 +7164,7 @@ h3 {
 }
 
 .study-bar-row--total .study-bar-fill {
-  background: #172033;
+  background: var(--tinta-azul);
 }
 
 /* Marcas de umbral sobre la barra */
@@ -7193,7 +7194,7 @@ h3 {
 
 .study-bar-row--total .study-bar-row__value {
   font-weight: 700;
-  color: #172033;
+  color: var(--tinta-azul);
 }
 
 .study-bar-row__level {
@@ -8813,7 +8814,7 @@ h3 {
   font-weight: 700;
   letter-spacing: -0.04em;
   margin: 0 0 28px;
-  color: #172033;
+  color: var(--tinta-azul);
 }
 
 .ekc-panel__empty-note {
@@ -8844,7 +8845,7 @@ h3 {
 .ekc-nivel__chip {
   font-size: 0.84rem;
   font-weight: 700;
-  color: #172033;
+  color: var(--tinta-azul);
   border: 1px solid #c9d6e6;
   background: var(--blanco);
   padding: 3px 10px;
@@ -8854,7 +8855,7 @@ h3 {
 .ekc-nivel__chip--vacio              { color: var(--texto-terciario); background: var(--fondo-principal); font-weight: 400; font-style: italic; }
 .ekc-nivel__chip--en-construccion    { color: #1e3a5f; }
 .ekc-nivel__chip--cobertura-minima   { color: #1e3a5f; border-color: var(--azul); }
-.ekc-nivel__chip--estructuralmente-completo { color: #172033; border-color: var(--texto-secundario); background: #f4f7fb; font-weight: 800; }
+.ekc-nivel__chip--estructuralmente-completo { color: var(--tinta-azul); border-color: var(--texto-secundario); background: #f4f7fb; font-weight: 800; }
 
 .ekc-nivel__meta {
   margin-left: auto;
@@ -8891,7 +8892,7 @@ h3 {
 
 .ekc-conteos__val {
   font-weight: 700;
-  color: #172033;
+  color: var(--tinta-azul);
   width: 8%;
   text-align: right;
   padding-right: 20px !important;
@@ -8917,7 +8918,7 @@ h3 {
   margin: 0 0 12px;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #172033;
+  color: var(--tinta-azul);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -8932,7 +8933,7 @@ h3 {
 }
 
 .ekc-cobertura__estado--ok {
-  color: #172033;
+  color: var(--tinta-azul);
   background: #f4f7fb;
   border-color: #c9d6e6;
 }
@@ -8970,7 +8971,7 @@ h3 {
 .ekc-criterio--ok    .ekc-criterio__mark { color: var(--texto-secundario); }
 .ekc-criterio--pending .ekc-criterio__mark { color: #c9d6e6; }
 
-.ekc-criterio--ok    .ekc-criterio__desc { color: #172033; }
+.ekc-criterio--ok    .ekc-criterio__desc { color: var(--tinta-azul); }
 .ekc-criterio--pending .ekc-criterio__desc { color: var(--texto-secundario); }
 
 /* ── Alertas ─────────────────────────────────────────────────────── */
@@ -9037,7 +9038,7 @@ h3 {
 }
 
 .ekc-alerta__desc {
-  color: #172033;
+  color: var(--tinta-azul);
   line-height: 1.5;
 }
 
@@ -9101,7 +9102,7 @@ h3 {
 }
 
 .ekc-spaces-row__name {
-  color: #172033;
+  color: var(--tinta-azul);
   font-weight: 500;
 }
 
@@ -9119,7 +9120,7 @@ h3 {
 .ekc-coverage--vacio              { color: var(--texto-terciario); }
 .ekc-coverage--iniciado           { color: var(--texto-secundario); }
 .ekc-coverage--pendiente-revision { color: var(--texto-secundario); font-style: italic; }
-.ekc-coverage--desarrollado       { color: #172033; font-weight: 700; }
+.ekc-coverage--desarrollado       { color: var(--tinta-azul); font-weight: 700; }
 
 @media (max-width: 640px) {
   .ekc-alerta {
@@ -9156,7 +9157,7 @@ h3 {
 
 .ekc-hip-add-btn:hover {
   background: var(--blanco);
-  color: #172033;
+  color: var(--tinta-azul);
 }
 
 .ekc-hip-empty {
@@ -9254,7 +9255,7 @@ h3 {
 .ekc-hip-item__enunciado {
   margin: 0 0 8px;
   font-size: 0.92rem;
-  color: #172033;
+  color: var(--tinta-azul);
   line-height: 1.55;
 }
 
@@ -9330,7 +9331,7 @@ h3 {
 
 .ekc-hip-item__btn:hover {
   background: var(--blanco);
-  color: #172033;
+  color: var(--tinta-azul);
   border-color: var(--texto-secundario);
 }
 
@@ -9485,7 +9486,7 @@ h3 {
 .ekc-interp-item__enunciado {
   margin: 0 0 6px;
   font-size: 0.92rem;
-  color: #172033;
+  color: var(--tinta-azul);
   line-height: 1.55;
 }
 
@@ -9541,7 +9542,7 @@ h3 {
 
 .ekc-interp-item__btn:hover {
   background: var(--blanco);
-  color: #172033;
+  color: var(--tinta-azul);
   border-color: var(--azul);
 }
 
@@ -9567,7 +9568,7 @@ h3 {
   margin: 0;
   font-size: 0.85rem;
   font-weight: 700;
-  color: #172033;
+  color: var(--tinta-azul);
 }
 
 .ekc-interp-form__note {
@@ -9613,7 +9614,7 @@ h3 {
   border-radius: 5px;
   padding: 8px 10px;
   background: var(--blanco);
-  color: #172033;
+  color: var(--tinta-azul);
   font-size: 0.88rem;
 }
 
@@ -9626,7 +9627,7 @@ h3 {
   border-radius: 5px;
   padding: 8px 10px;
   background: var(--blanco);
-  color: #172033;
+  color: var(--tinta-azul);
   font-size: 0.88rem;
   line-height: 1.55;
   resize: vertical;
@@ -9723,7 +9724,7 @@ h3 {
 
 .ekc-q-add-btn:hover {
   background: var(--blanco);
-  color: #172033;
+  color: var(--tinta-azul);
 }
 
 .ekc-q-empty {
@@ -9811,7 +9812,7 @@ h3 {
 .ekc-q-item__formulacion {
   margin: 0 0 6px;
   font-size: 0.92rem;
-  color: #172033;
+  color: var(--tinta-azul);
   line-height: 1.55;
   font-style: italic;
 }
@@ -9890,7 +9891,7 @@ h3 {
 
 .ekc-q-item__btn:hover {
   background: var(--blanco);
-  color: #172033;
+  color: var(--tinta-azul);
   border-color: var(--texto-secundario);
 }
 
@@ -9931,7 +9932,7 @@ h3 {
 .ekc-syn-text {
   margin: 0 0 12px;
   font-size: 0.92rem;
-  color: #172033;
+  color: var(--tinta-azul);
   line-height: 1.7;
   white-space: pre-wrap;
 }
