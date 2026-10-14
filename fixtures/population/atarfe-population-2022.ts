@@ -18,9 +18,9 @@ import type { PopulationReference } from "../../src/domain/sam";
 // afijación Hamilton no puede ejecutarse para este municipio.
 // Principio: celda sin dato = no evaluable; no se estima ni se redondea a 50/50.
 //
-// Nota IBSE: el instrumento IBSE es de base escolar (niños). Su población de
-// referencia es la población en edad escolar, no la adulta. No usar este
-// fixture para IBSE sin adaptar el ageGroupLabel y populationTotal.
+// Nota IBSE: esta referencia (≥16 años, EAS) es coherente con muestras IBSE de
+// sampleScope "16-plus". El IBSE de Atarfe cubre participantes adultos (muestra
+// real: 13–88 años). Para muestras de menores de 16, usar atarfe-under16-population-2025.
 export const ATARFE_POPULATION_2022: PopulationReference = {
   municipalityId: "18022",
   municipalityCode: "18022",
