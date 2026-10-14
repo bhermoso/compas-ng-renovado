@@ -1,6 +1,7 @@
 import type { PopulationReference } from "../../domain/sam";
 import { ATARFE_POPULATION_2022 } from "../../../fixtures/population/atarfe-population-2022";
 import { ATARFE_UNDER16_POPULATION_2025 } from "../../../fixtures/population/atarfe-under16-population-2025";
+import { ATARFE_POPULATION_2025 } from "../../../fixtures/population/atarfe-population-2025";
 
 export interface PopulationReferenceSet {
   /** Adultos ≥16 años — instrumentos EAS y muestras IBSE de 16 o más. */
@@ -12,6 +13,12 @@ export interface PopulationReferenceSet {
    * muestra mixta sin desglose etario válido.
    */
   minor?: PopulationReference;
+  /**
+   * Referencia poblacional de TODAS las edades (padrón completo con desglose
+   * quinquenal edad×sexo). Habilita afijación Hamilton y representatividad por celda.
+   * No sustituye ni altera las claves adult/minor.
+   */
+  allAges?: PopulationReference;
 }
 
 // Conjunto INMUTABLE de referencias de Atarfe. Un mismo objeto congelado se
@@ -22,6 +29,7 @@ export interface PopulationReferenceSet {
 const ATARFE_REFERENCE_SET: PopulationReferenceSet = Object.freeze({
   adult: ATARFE_POPULATION_2022,
   minor: ATARFE_UNDER16_POPULATION_2025,
+  allAges: ATARFE_POPULATION_2025,
 });
 
 /**
