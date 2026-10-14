@@ -14,9 +14,9 @@
  *
  * Propiedad garantizada: sum(male + female) de todas las CeldaAsignada === N.
  *
- * Fuente del método: historico/index.html:51545-51560 — sam_generarPiramideTeorica /
- * compas_hamilton. Método estándar de teoría de representación proporcional,
- * sin umbral ni peso heurístico.
+ * Método: afijación proporcional de Hamilton (mayores restos). Aritmética entera
+ * exacta; sin umbral ni peso heurístico. Estándar de teoría de representación
+ * proporcional.
  *
  * Celdas con población total cero: se asignan 0 observaciones. No se estima nada.
  * N < número de celdas con población: las primeras celdas (por orden de peso
