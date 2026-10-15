@@ -62,3 +62,6 @@ audit.mjs
 
 # Local IECA source package/material
 /docs/source-material/ieca/
+
+# Temporary preview and screenshots
+tmp/

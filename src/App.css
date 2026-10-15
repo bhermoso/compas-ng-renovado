@@ -11325,3 +11325,63 @@ h3 {
 .documentation-dialog li { margin: 1rem 0; }
 .documentation-dialog small { display: block; overflow-wrap: anywhere; color: #536271; }
 .documentation-text { white-space: pre-wrap; }
+
+/* ===== P5B: InstitutionalLogoBand ===== */
+.ilogo-band {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+}
+
+.ilogo-band__img {
+  height: 40px;
+  max-width: 180px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* ===== P5B: LocalHealthCyclePhaseStrip ===== */
+.lhcps {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--borde);
+  background: var(--blanco);
+}
+
+.lhcps__phase {
+  flex: 1;
+  padding: 0.65rem 0.5rem;
+  border-top: 3px solid transparent;
+  border-right: 1px solid var(--borde);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.lhcps__phase:last-child {
+  border-right: none;
+}
+
+.lhcps__num {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-secundario);
+}
+
+.lhcps__title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--texto-principal);
+}
+
+.lhcps__desc {
+  font-size: 0.72rem;
+  color: var(--texto-secundario);
+  line-height: 1.4;
+}
