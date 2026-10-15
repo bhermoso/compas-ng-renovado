@@ -1,0 +1,16 @@
+{
+  "municipalityId": "atarfe",
+  "name": "Atarfe",
+  "province": "Granada",
+  "status": "pilot",
+  "branding": {
+    "territorialType": "municipal",
+    "logos": [
+      "consejeria",
+      "distrito-sanitario",
+      "relas",
+      "violencia-genero",
+      "rasselh"
+    ]
+  }
+}
