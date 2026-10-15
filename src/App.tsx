@@ -1,5 +1,6 @@
 import { InitialLocalHealthPlanPanel } from "./ui/components/InitialLocalHealthPlanPanel";
 import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
+import { InstitutionalLogoBand } from "./ui/components/InstitutionalLogoBand";
 import { replaceZaidinFinalDraft } from "./application/workspace/replaceZaidinFinalDraft";
 import { processPdfHealthReport } from './application/health-report/ProcessPdfHealthReport';
 import { extractPdfText } from './infrastructure/pdf/extractPdfText';
@@ -3364,6 +3365,11 @@ export default function App() {
                 <p className="home-cover__subtitle">
                   Herramienta en desarrollo para la planificación local en salud
                 </p>
+
+                {/* Franja de logos institucionales */}
+                <InstitutionalLogoBand
+                  ids={["consejeria", "distrito-sanitario", "relas", "rasselh"]}
+                />
               </div>
             </div>
 
