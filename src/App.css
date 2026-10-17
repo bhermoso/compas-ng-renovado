@@ -11440,3 +11440,17 @@ h3 {
   .home-mission__inner { grid-template-columns: minmax(0, 1fr); gap: 24px; }
   .home-mission__context { padding-left: 16px; }
 }
+
+@media (max-width: 480px) {
+  /* Selector de municipio: nombre truncado con elipsis, sin ensanchar la página */
+  .app-nav__municipality-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Franja de fases lhpc: min-width:0 habilita el overflow-x:auto ya existente
+     en .lhpc__phases; reducir padding para no malgastar 96 px en gutters */
+  .lhpc__inner { padding: 10px 16px; }
+  .lhpc__phases { min-width: 0; }
+}
