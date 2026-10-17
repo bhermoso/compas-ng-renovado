@@ -279,7 +279,7 @@ export function SF12Panel({ sf12Study, municipalityName }: SF12PanelProps) {
           <p className="study-report__algo-note">
             Nota: PCS12_SP y MCS12_SP son puntuaciones pre-calculadas por la EAS aplicando
             los coeficientes factoriales de la norma española (Vilagut et al. 2008).
-            COMPÁS NG las consume directamente sin recalcular desde los 12 ítems.
+            COMPÁS las consume directamente sin recalcular desde los 12 ítems.
           </p>
         </div>
       </details>

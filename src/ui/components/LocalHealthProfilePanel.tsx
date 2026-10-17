@@ -8,7 +8,7 @@ export function LocalHealthProfilePanel() {
         </div>
         <p className="panel-note">
           El Perfil de Salud Local (PSL) es el activo canónico, persistente y
-          versionado que COMPÁS NG genera a partir de toda la evidencia disponible
+          versionado que COMPÁS genera a partir de toda la evidencia disponible
           del municipio. Fundamenta la priorización y el Plan Local de Salud sin
           sustituir los documentos fuente originales.
         </p>
@@ -29,7 +29,7 @@ export function LocalHealthProfilePanel() {
           <p className="psl-feature__desc">
             Representa el conocimiento oficial del municipio sobre su situación de
             salud en un momento dado. No es un informe narrativo ni un PDF: es un
-            objeto de dominio generado y gestionado por COMPÁS NG.
+            objeto de dominio generado y gestionado por COMPÁS.
           </p>
         </div>
         <div className="psl-feature">
@@ -52,7 +52,7 @@ export function LocalHealthProfilePanel() {
           <p className="psl-feature__title">Validación humana obligatoria</p>
           <p className="psl-feature__desc">
             El sistema genera el PSL automáticamente en estado de borrador. Solo
-            el técnico responsable puede validarlo. COMPÁS NG nunca auto-valida
+            el técnico responsable puede validarlo. COMPÁS nunca auto-valida
             un PSL ni lo convierte en canónico sin intervención explícita.
           </p>
         </div>

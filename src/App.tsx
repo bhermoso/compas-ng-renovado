@@ -203,14 +203,14 @@ const TERRITORIAL_TYPE_LABEL: Record<string, string> = {
 // ── Municipios de demostración ───────────────────────────────
 
 const DEMO_MUNICIPALITIES: CreateMunicipalityContextInput[] = [
-  { id: "alfacar",        name: "Alfacar",              province: "Granada", ineCode: "18011", createdBy: "COMPÁS NG" },
-  { id: "atarfe",         name: "Atarfe",              province: "Granada", ineCode: "18022", createdBy: "COMPÁS NG" },
-  { id: "churriana",      name: "Churriana de la Vega", province: "Granada", ineCode: "18062", createdBy: "COMPÁS NG" },
-  { id: "fuente-vaqueros", name: "Fuente Vaqueros",      province: "Granada", ineCode: "18079", createdBy: "COMPÁS NG" },
+  { id: "alfacar",        name: "Alfacar",              province: "Granada", ineCode: "18011", createdBy: "COMPÁS" },
+  { id: "atarfe",         name: "Atarfe",              province: "Granada", ineCode: "18022", createdBy: "COMPÁS" },
+  { id: "churriana",      name: "Churriana de la Vega", province: "Granada", ineCode: "18062", createdBy: "COMPÁS" },
+  { id: "fuente-vaqueros", name: "Fuente Vaqueros",      province: "Granada", ineCode: "18079", createdBy: "COMPÁS" },
   // Distrito inframunicipal — sin código INE propio. BADEA solo como contexto de Granada capital (18087).
-  { id: "granada-zaidin", name: "Granada-Zaidín",       province: "Granada", territorialType: "distrito", createdBy: "COMPÁS NG" },
-  { id: "loja",            name: "Loja",                  province: "Granada", ineCode: "18122", createdBy: "COMPÁS NG" },
-  { id: "zagra",          name: "Zagra",               province: "Granada", ineCode: "18913", createdBy: "COMPÁS NG" },
+  { id: "granada-zaidin", name: "Granada-Zaidín",       province: "Granada", territorialType: "distrito", createdBy: "COMPÁS" },
+  { id: "loja",            name: "Loja",                  province: "Granada", ineCode: "18122", createdBy: "COMPÁS" },
+  { id: "zagra",          name: "Zagra",               province: "Granada", ineCode: "18913", createdBy: "COMPÁS" },
 ];
 const DEMO_MUNICIPALITY_IDS = DEMO_MUNICIPALITIES.map((municipality) => municipality.id);
 
@@ -2518,7 +2518,7 @@ export default function App() {
         kind: "other",
         title: "Priorización temática — Selección manual",
         source: {
-          system: "Selección manual COMPÁS NG",
+          system: "Selección manual COMPÁS",
           collectedAt: new Date().toISOString(),
         },
         tags: [THEMATIC_PRIORITISATION_DOCUMENT_TAG],
@@ -3136,7 +3136,7 @@ export default function App() {
         <div className="app-nav__bar" />
         <div className="app-nav__inner">
           <span className="app-nav__brand">
-            COMPÁS <span className="app-nav__brand-ng">NG</span>
+            COMPÁS
           </span>
           <div className="app-nav__tabs">
             {NAV_ITEMS.map((item, index) => (
@@ -3355,7 +3355,6 @@ export default function App() {
                 {/* Marca — el único foco visual */}
                 <div className="home-cover__brand">
                   <h1 className="home-cover__wordmark">COMPÁS</h1>
-                  <span className="home-cover__ng">NG</span>
                 </div>
 
                 {/* Regla de identidad — franja canónica bajo la marca */}
@@ -3493,7 +3492,7 @@ export default function App() {
 
                 {/* Zona 2: Salidas — documentos que genera COMPÁS */}
                 <div className="home-outputs">
-                  <p className="home-section-eyebrow">Documentos que produce COMPÁS NG</p>
+                  <p className="home-section-eyebrow">Documentos que produce COMPÁS</p>
                   <div className="home-products__list">
                     <div className="home-product home-product--1">
                       <p className="home-product__name">Perfil de Salud Local</p>

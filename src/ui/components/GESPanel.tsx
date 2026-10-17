@@ -321,7 +321,7 @@ export function GESPanel({
         </div>
         <p className="panel-note">
           Diseña encuestas de salud, genera diccionarios REDCap y especificaciones metodológicas
-          a partir de los instrumentos del catálogo COMPÁS NG.
+          a partir de los instrumentos del catálogo COMPÁS.
         </p>
       </div>
 
@@ -719,7 +719,7 @@ export function GESPanel({
                     <p className="ges-export-card__name">Especificación metodológica (TXT)</p>
                     <p className="ges-export-card__desc">
                       Documento de referencia con instrumentos, tiempos estimados, advertencias
-                      metodológicas, bibliografía y compatibilidad con COMPÁS NG.
+                      metodológicas, bibliografía y compatibilidad con COMPÁS.
                     </p>
                     <button
                       type="button"
@@ -1013,7 +1013,7 @@ function LibraryCard({ mod }: LibraryCardProps) {
           {/* Estudio complementario */}
           {study && (
             <div className="ges-lib-section">
-              <p className="ges-lib-label">Estudio complementario en COMPÁS NG</p>
+              <p className="ges-lib-label">Estudio complementario en COMPÁS</p>
               <p>
                 {study}
                 {atoms !== undefined && ` · Genera ${atoms} EvidenceAtom${atoms !== 1 ? "s" : ""} al importar`}

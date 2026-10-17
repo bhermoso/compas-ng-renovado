@@ -157,7 +157,7 @@ export function ThematicPrioritisationModal({
           </p>
           <p className="tp-modal__import-desc">
             Carga la exportación CSV del formulario{" "}
-            <code>papeleta_pri_tematica</code>. COMPÁS NG calculará el
+            <code>papeleta_pri_tematica</code>. COMPÁS calculará el
             ranking y propondrá el Top&nbsp;5 como lectura informativa.
           </p>
 

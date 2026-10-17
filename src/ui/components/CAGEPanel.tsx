@@ -285,7 +285,7 @@ export function CAGEPanel({ cageStudy, municipalityName }: CAGEPanelProps) {
             <dt>Fuente</dt><dd>EAS: campos derivados CAGE_R y CAGE</dd>
           </dl>
           <p className="study-report__algo-note">
-            COMPÁS NG no tiene acceso a los 4 ítems originales del CAGE (Ewing, 1984):
+            COMPÁS no tiene acceso a los 4 ítems originales del CAGE (Ewing, 1984):
             consume los campos derivados CAGE_R (positivo/negativo) y CAGE (nivel 1–4)
             que produce la EAS. La codificación EAS puede diferir de otras clasificaciones
             CAGE publicadas.

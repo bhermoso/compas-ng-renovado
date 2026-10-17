@@ -71,7 +71,7 @@ export function DeliberativePrioritySelectionPanel({
       <h2>Selección de prioridades</h2>
       <p className="panel-note">
         La lectura estratégica aporta candidaturas y la participación ciudadana aporta conocimiento independiente.
-        COMPÁS NG no cruza ni selecciona automáticamente: el Grupo Motor decide, motiva y deja
+        COMPÁS no cruza ni selecciona automáticamente: el Grupo Motor decide, motiva y deja
         constancia de cómo influyó la ciudadanía.
       </p>
 
