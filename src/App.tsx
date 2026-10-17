@@ -3368,7 +3368,7 @@ export default function App() {
 
                 {/* Franja de logos institucionales */}
                 <InstitutionalLogoBand
-                  ids={["consejeria", "distrito-sanitario", "relas", "rasselh"]}
+                  ids={["consejeria", "distrito-sanitario", "relas"]}
                 />
               </div>
             </div>
