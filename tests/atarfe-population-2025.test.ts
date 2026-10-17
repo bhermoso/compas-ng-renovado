@@ -103,7 +103,7 @@ describe("ATARFE_POPULATION_2025 — concordancia con CSV fuente", () => {
     }
   );
 
-  it.skipIf(csvAvailable)(
+  it.skip(
     "CSV fuente no disponible — test de concordancia omitido",
     () => {
       // Si el CSV no existe, se omite con mensaje claro.
