@@ -15,9 +15,11 @@ import type { PREDIMEDStudy } from "../../domain/predimed";
 import type { SF12Study } from "../../domain/sf12";
 import type { SuenoStudy } from "../../domain/sueno";
 import type { CAGEStudy } from "../../domain/cage";
-import type { PopulationReference } from "../../domain/sam/PopulationReference";
+import type { AgeSexCell, PopulationReference } from "../../domain/sam/PopulationReference";
 import type { SampleQualityAssessment } from "../../domain/sam/SampleQualityAssessment";
 import { computeSampleQualityAssessment } from "./computeSampleQualityAssessment";
+import { computeHamiltonAllocation } from "./computeHamiltonAllocation";
+import { computeCellRepresentativeness } from "./computeCellRepresentativeness";
 
 // ── EAS — Encuesta Andaluza de Salud (adultos ≥16) ──────────────────────────
 
@@ -215,4 +217,45 @@ export function assessIBSEStudySAM(
     evaluable: false,
     notEvaluableReason: "Discriminador de muestra desconocido (dato legacy): no evaluable por estrato.",
   };
+}
+
+// ── Representatividad demográfica (Hamilton + desviaciones por celda) ─────────
+//
+// Solo actúa cuando PopulationReference.ageSexMatrix está disponible Y se
+// aporta la distribución observada por celda (ageSexObserved). En su ausencia,
+// el flujo Cochran + cobertura global no se modifica.
+
+/**
+ * Enriquece un SampleQualityAssessment existente con la evaluación de
+ * representatividad demográfica por celda (edad × sexo).
+ *
+ * @param assessment    Dictamen SAM ya calculado (Cochran + cobertura).
+ * @param ageSexObserved  Distribución observada por celda en la muestra.
+ *   Debe tener el mismo número de bandas y el mismo orden que
+ *   assessment.populationReference.ageSexMatrix.
+ * @returns  El mismo dictamen enriquecido con `representativeness`.
+ *   Si ageSexMatrix no está en la referencia, devuelve el dictamen sin cambios.
+ */
+export function enrichWithRepresentativeness(
+  assessment: SampleQualityAssessment,
+  ageSexObserved: AgeSexCell[]
+): SampleQualityAssessment {
+  const matrix = assessment.populationReference.ageSexMatrix;
+  if (matrix === undefined) {
+    return assessment;
+  }
+
+  const theoretical = computeHamiltonAllocation(matrix, assessment.nTheoretical);
+  const achieved = ageSexObserved.map((c) => ({
+    ageBand: c.ageBand,
+    male: c.male,
+    female: c.female,
+  }));
+
+  const representativeness = computeCellRepresentativeness(
+    theoretical.cells,
+    achieved
+  );
+
+  return { ...assessment, representativeness };
 }
