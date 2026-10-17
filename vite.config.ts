@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  base: '/COMPAS_NG/',
+  base: '/compas-ng-renovado/',
   // Puerto fijo: si 5173 está ocupado, `npm run dev` falla en lugar de saltar
   // a 5174. localStorage se aísla por origen (puerto incluido); un salto
   // silencioso de puerto hace que el expediente municipal "desaparezca"
