@@ -11435,3 +11435,8 @@ h3 {
   /* Etiqueta de logo: permitir salto de línea */
   .ilogo-band__label { white-space: normal; }
 }
+
+@media (max-width: 480px) {
+  .home-mission__inner { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .home-mission__context { padding-left: 16px; }
+}
