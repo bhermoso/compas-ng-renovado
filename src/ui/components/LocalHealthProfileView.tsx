@@ -277,7 +277,7 @@ function PSLChapterEditor({ chapter, label, onSave }: PSLChapterEditorProps) {
           </div>
         ) : (
           <div className="psl-doc-scaffold-block">
-            <ScaffoldBadge text="Propuesta asistida por COMPÁS NG · Pendiente de revisión técnica" />
+            <ScaffoldBadge text="Propuesta asistida por COMPÁS · Pendiente de revisión técnica" />
             {stripBrackets(chapter.content) && (
               <p className="psl-doc-scaffold-block__content">
                 {stripBrackets(chapter.content)}
@@ -974,7 +974,7 @@ export function LocalHealthProfileView({
         <div className="psl-doc-header__gradient" />
         <div className="psl-doc-header__body">
           <p className="psl-doc-header__meta">
-            <span className="psl-doc-compas-brand">COMPÁS NG</span>
+            <span className="psl-doc-compas-brand">COMPÁS</span>
             {" · Planificación local de salud · Junta de Andalucía"}
           </p>
           <h1 className="psl-doc-header__municipality">{municipalityName}</h1>
@@ -1590,7 +1590,7 @@ export function LocalHealthProfileView({
           />
         ) : (
           <div className="psl-doc-scaffold-block">
-            <ScaffoldBadge text="Propuesta asistida por COMPÁS NG · Pendiente de revisión técnica" />
+            <ScaffoldBadge text="Propuesta asistida por COMPÁS · Pendiente de revisión técnica" />
             {stripBrackets(psl.cierreInterpretativo.content) && (
               <p className="psl-doc-scaffold-block__content">
                 {stripBrackets(psl.cierreInterpretativo.content)}

@@ -77,7 +77,7 @@ export default function CoordinatorPreview() {
   const current = sections[section];
   return <main className="coord-preview">
     <div className="coord-notice" role="note">Prototipo de coordinación · Sin autenticación ni datos personales · No es un acceso privado</div>
-    <header className="coord-header"><strong>COMPÁS NG</strong><span>Plan de Salud de El Zaidín · 2027–2030</span></header>
+    <header className="coord-header"><strong>COMPÁS</strong><span>Plan de Salud de El Zaidín · 2027–2030</span></header>
     {!entered ? <section className="coord-entry">
       <p className="coord-kicker">Acceso de ejemplo · Coordinación territorial</p>
       <h1>Tu espacio de coordinación del Zaidín</h1>
