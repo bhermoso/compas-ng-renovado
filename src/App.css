@@ -11396,3 +11396,42 @@ h3 {
   color: var(--texto-secundario);
   line-height: 1.4;
 }
+/* ── Responsive 400 px: home en una columna ───────────────────── */
+@media (max-width: 480px) {
+  /* Compensar el padding de 24 px del app-shell en lugar de 48 px.
+     Sin este ajuste las secciones full-bleed sobresalen 24 px por lado. */
+  .home-cover { margin: -24px -24px 0; }
+  .home-mission,
+  .home-process,
+  .home-products { margin: 0 -24px; }
+
+  /* Reducir padding interior al mínimo de 16 px de gutter */
+  .home-cover__inner  { padding: 32px 16px 0; }
+  .home-mission__inner{ padding: 32px 16px 40px; }
+  .home-process__inner{ padding: 32px 16px 40px; }
+  .home-products__inner{ padding: 32px 16px 48px; }
+
+  /* Regla de marca: no sobrepasar el ancho disponible */
+  .home-cover__rule { max-width: 100%; }
+
+  /* Ciclo de seis pasos: 2 columnas en lugar de 6 */
+  .home-process__cycle { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+
+  /* Tablas: apilar nombre y descripción en una columna */
+  .home-product { grid-template-columns: 1fr; gap: 4px; }
+  .home-source  { grid-template-columns: 1fr; gap: 4px; }
+
+  /* min-width: 0 en hijos flex/grid con texto */
+  .home-cover__brand,
+  .home-cover__wordmark,
+  .home-source__name,
+  .home-source__desc,
+  .home-product__name,
+  .home-product__desc { min-width: 0; }
+
+  /* Barra de navegación: contener en su propio scroll */
+  .app-nav__municipality-row { overflow-x: auto; }
+
+  /* Etiqueta de logo: permitir salto de línea */
+  .ilogo-band__label { white-space: normal; }
+}
