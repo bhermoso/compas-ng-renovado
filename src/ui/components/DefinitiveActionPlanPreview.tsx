@@ -5,17 +5,185 @@ import {
   buildDefinitiveActionPlanProjection,
   pendingPreparationDecisionCount,
   resolvedPlanDecisionText,
+  type DefinitiveActionPlanModuleProjection,
 } from "../../domain/action-plan-catalog/DefinitiveActionPlanProjection";
 import { buildActionPlanTraceability } from "../../domain/action-plan-catalog/ActionPlanTraceability";
 import type { PlanPreparationDraft } from "../../domain/action-plan-catalog/PlanPreparationDraft";
 import type { IndicatorWorksheet } from "../../domain/action-plan-catalog/IndicatorWorksheet";
 import { compareActionPlanNotation, thematicBlockNameFor } from "../../domain/action-plan-catalog/PlanPreparationDraft";
 import type { ActionPlanTraceabilityLink } from "../../domain/action-plan-catalog/ActionPlanTraceability";
+import { validateActionPlanUnaddressedNeeds } from "../../application/action-plan/ActionPlanEngine";
+import type { UnaddressedNeed } from "../../domain/health-plan";
 
 function fichaStatusLabel(status: ActionPlanTraceabilityLink["indicatorFichaStatus"]): string {
   if (status === "missing") return "ficha pendiente";
   if (status === "draft") return "ficha abierta sin actuaciones";
   return "ficha con actuaciones vinculadas";
+}
+
+function UnaddressedNeedsEditor({
+  active,
+  onDraftChange,
+}: {
+  active: DefinitiveActionPlanModuleProjection[];
+  onDraftChange: (draft: PlanPreparationDraft) => void;
+}) {
+  const targetItem = active.find((item) => item.draft);
+  const currentNeeds = targetItem?.draft?.unaddressedNeeds;
+
+  const [newId, setNewId] = useState("");
+  const [newTitle, setNewTitle] = useState("");
+  const [newJustification, setNewJustification] = useState("");
+  const [message, setMessage] = useState("");
+
+  if (!targetItem?.draft) return null;
+  const draft = targetItem.draft;
+
+  function handleNoneLeft() {
+    onDraftChange({ ...draft, unaddressedNeeds: [] });
+    setMessage("Registrado: ninguna necesidad quedó fuera del Plan de Acción.");
+  }
+
+  function handleAddNeed() {
+    const need: UnaddressedNeed = {
+      id: newId.trim(),
+      title: newTitle.trim(),
+      justification: newJustification.trim(),
+    };
+    const errors = validateActionPlanUnaddressedNeeds([need]);
+    if (errors.length > 0) {
+      setMessage(errors[0]);
+      return;
+    }
+    const needs = [
+      ...(currentNeeds ?? []).filter((n) => n.id !== need.id),
+      need,
+    ];
+    onDraftChange({ ...draft, unaddressedNeeds: needs });
+    setNewId("");
+    setNewTitle("");
+    setNewJustification("");
+    setMessage("Necesidad registrada.");
+  }
+
+  function handleRemoveNeed(id: string) {
+    onDraftChange({
+      ...draft,
+      unaddressedNeeds: (currentNeeds ?? []).filter((n) => n.id !== id),
+    });
+  }
+
+  const noneLeft = currentNeeds !== undefined && currentNeeds.length === 0;
+
+  return (
+    <section
+      className="card"
+      aria-label="Necesidades no priorizadas (G-PLS-7)"
+      style={{ marginTop: "1.5rem" }}
+    >
+      <h3 style={{ marginTop: 0 }}>Necesidades no priorizadas · G-PLS-7</h3>
+      <p className="panel-note">
+        El PLS debe documentar qué necesidades identificadas en el diagnóstico
+        no han sido seleccionadas en este ciclo, con su justificación. Si todas
+        las necesidades quedaron incluidas, usa el botón correspondiente.
+      </p>
+
+      {noneLeft ? (
+        <p style={{ fontWeight: 600, color: "var(--texto-principal)" }}>
+          Registrado: ninguna necesidad identificada quedó fuera del Plan de Acción.
+        </p>
+      ) : currentNeeds && currentNeeds.length > 0 ? (
+        <ul style={{ padding: 0, listStyle: "none", margin: "0 0 0.75rem" }}>
+          {currentNeeds.map((need) => (
+            <li
+              key={need.id}
+              style={{
+                borderBottom: "1px solid var(--borde)",
+                padding: "0.5rem 0",
+                display: "flex",
+                gap: "0.75rem",
+                alignItems: "flex-start",
+              }}
+            >
+              <div style={{ flex: 1 }}>
+                <strong>{need.title}</strong>
+                {need.sourceAreaId && (
+                  <span style={{ marginLeft: "0.5rem", fontSize: "0.8rem", color: "var(--texto-secundario)" }}>
+                    ({need.sourceAreaId})
+                  </span>
+                )}
+                <p style={{ margin: "0.2rem 0 0", fontSize: "0.875rem", color: "var(--texto-secundario)" }}>
+                  {need.justification}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleRemoveNeed(need.id)}
+                style={{ fontSize: "0.8rem", flexShrink: 0 }}
+              >
+                Eliminar
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : currentNeeds === undefined ? (
+        <p className="panel-note">
+          Pendiente de documentar. Usa el formulario o declara que todas están incluidas.
+        </p>
+      ) : null}
+
+      <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", flexWrap: "wrap" }}>
+        <button type="button" onClick={handleNoneLeft}>
+          Ninguna necesidad quedó fuera
+        </button>
+      </div>
+
+      <fieldset style={{ border: "1px solid var(--borde)", borderRadius: "4px", padding: "0.75rem" }}>
+        <legend style={{ fontWeight: 600, fontSize: "0.875rem", padding: "0 0.25rem" }}>
+          Añadir necesidad no priorizada
+        </legend>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+          <label style={{ display: "flex", flexDirection: "column", gap: "0.2rem", fontSize: "0.875rem" }}>
+            Identificador único
+            <input
+              value={newId}
+              onChange={(e) => setNewId(e.target.value)}
+              placeholder="p.ej. n-salud-mental"
+              style={{ padding: "0.35rem 0.5rem", border: "1px solid var(--borde)", borderRadius: "4px" }}
+            />
+          </label>
+          <label style={{ display: "flex", flexDirection: "column", gap: "0.2rem", fontSize: "0.875rem" }}>
+            Título de la necesidad
+            <input
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              placeholder="Necesidad identificada en el diagnóstico"
+              style={{ padding: "0.35rem 0.5rem", border: "1px solid var(--borde)", borderRadius: "4px" }}
+            />
+          </label>
+          <label style={{ display: "flex", flexDirection: "column", gap: "0.2rem", fontSize: "0.875rem" }}>
+            Justificación de la no priorización
+            <textarea
+              value={newJustification}
+              onChange={(e) => setNewJustification(e.target.value)}
+              placeholder="Por qué no se aborda en este ciclo"
+              rows={2}
+              style={{ padding: "0.35rem 0.5rem", border: "1px solid var(--borde)", borderRadius: "4px", resize: "vertical" }}
+            />
+          </label>
+          <button type="button" onClick={handleAddNeed} style={{ alignSelf: "flex-start" }}>
+            Añadir necesidad
+          </button>
+        </div>
+      </fieldset>
+
+      {message && (
+        <p role="status" style={{ marginTop: "0.5rem", fontSize: "0.875rem" }}>
+          {message}
+        </p>
+      )}
+    </section>
+  );
 }
 
 function countLabel(count: number, singular: string, plural: string): string {
@@ -40,9 +208,10 @@ function groupTraceabilityByBlock(links: ActionPlanTraceabilityLink[]): Array<{
   return Array.from(byBlock.values());
 }
 
-export function DefinitiveActionPlanPreview({municipalityId, modules, drafts, worksheets = [], validatedActionPlans, onValidatePlan}: {
+export function DefinitiveActionPlanPreview({municipalityId, modules, drafts, worksheets = [], validatedActionPlans, onValidatePlan, onDraftChange}: {
   validatedActionPlans?: import("../../domain/action-plan-catalog/PlanDocument").PlanDocument[];
   onValidatePlan?: (document: import("../../domain/action-plan-catalog/PlanDocument").PlanDocument) => boolean;
+  onDraftChange?: (draft: PlanPreparationDraft) => void;
   municipalityId: string;
   modules: ActionPlanCatalogModule[];
   drafts?: PlanPreparationDraft[];
@@ -86,6 +255,9 @@ export function DefinitiveActionPlanPreview({municipalityId, modules, drafts, wo
 
   return <section className="workspace-panel pcm-definitive-plan" aria-label={`Plan de Acción resultante · ${municipalityName}`}>
     <PlanDocumentActions key={municipalityId} municipalityId={municipalityId} active={active} versions={validatedActionPlans} worksheets={worksheets} onValidate={onValidatePlan}/>
+    {onDraftChange && active.some((item) => item.draft) && (
+      <UnaddressedNeedsEditor active={active} onDraftChange={onDraftChange} />
+    )}
     <div className="pcm-module__header">
       <div>
         <p className="eyebrow">Vista consolidada del borrador territorial</p>
