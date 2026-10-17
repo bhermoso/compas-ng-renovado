@@ -29,6 +29,7 @@ import {
   ANDALUSIA_REFERENCE_VALUE_BY_INDICATOR,
   ANDALUSIA_REFERENCE_LABEL,
 } from "../eas-references/andalusiaReferenceContract";
+import { getEAS2023ContextForIndicator } from "../eas-references/eas2023References";
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 
@@ -73,6 +74,19 @@ export interface IndicatorComparisonReference {
   esLocal: boolean;
   /** Tamaño de muestra válida del estudio, si el agregado lo expone. */
   sampleSize?: number;
+  /**
+   * Contexto de población general EAS 2023 para indicadores sin referencia
+   * provincial metodológicamente equivalente (provincial="ninguna").
+   * NO es una referencia equivalente al instrumento; es prevalencia poblacional
+   * de Granada/Andalucía de un tema relacionado. Siempre etiquetada "no local".
+   */
+  eas2023PopulationContext?: {
+    easKey: string;
+    topic: string;
+    refAndalucia: number;
+    refGranada: number;
+    caution: string;
+  };
 }
 
 export interface IndicatorReferencesCoverage {
@@ -712,6 +726,20 @@ export function buildIndicatorComparisonReferences(
           ref.andalusiaReference,
           ref.unit
         )}.`;
+    }
+    // Contexto de población EAS 2023 para indicadores sin referencia provincial
+    // equivalente (provincial="ninguna"). Instrumento y variable EAS son distintos;
+    // se expone solo como contexto epidemiológico "no local", no como comparación
+    // metodológicamente equivalente.
+    const eas2023Ctx = getEAS2023ContextForIndicator(spec.id);
+    if (eas2023Ctx !== undefined) {
+      ref.eas2023PopulationContext = {
+        easKey: eas2023Ctx.easKey,
+        topic: eas2023Ctx.topic,
+        refAndalucia: eas2023Ctx.refAndalucia,
+        refGranada: eas2023Ctx.refGranada,
+        caution: eas2023Ctx.caution,
+      };
     }
     references.push(ref);
   }
