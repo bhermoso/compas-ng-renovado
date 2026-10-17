@@ -5,6 +5,7 @@ import type {
 } from "../epvsa";
 import type { StrategicElement } from "../../domain/strategy";
 import type { LocalHealthProfile } from "../../domain/health-profile";
+import type { UnaddressedNeed } from "../../domain/health-plan";
 
 // ── PSL Reference ─────────────────────────────────────────────────────────
 // Snapshot del estado del PSL en el momento en que se generó el plan.
@@ -76,6 +77,20 @@ export interface ActionPlanDraft {
   indicators: ActionPlanIndicator[];
   cautions: string[];
   requiresHumanValidation: true;
+  /** Necesidades diagnosticadas que quedan fuera de este ciclo y su justificación. Gate G-PLS-7. */
+  unaddressedNeeds?: UnaddressedNeed[];
+}
+
+/** Valida que cada necesidad no priorizada tenga id, título y justificación no vacíos.
+ *  Una lista vacía es válida: significa que ninguna necesidad quedó fuera. */
+export function validateActionPlanUnaddressedNeeds(needs: UnaddressedNeed[]): string[] {
+  const errors: string[] = [];
+  for (const need of needs) {
+    if (!need.id.trim()) errors.push(`Necesidad sin identificador: "${need.title}".`);
+    if (!need.title.trim()) errors.push(`Necesidad sin título (id: ${need.id}).`);
+    if (!need.justification.trim()) errors.push(`Necesidad "${need.title}" sin justificación.`);
+  }
+  return errors;
 }
 
 // ── Keyword map for cross-framework thematic matching ─────────────────────
