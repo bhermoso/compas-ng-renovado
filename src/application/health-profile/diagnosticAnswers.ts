@@ -52,6 +52,11 @@ import {
   buildUGCAssistanceQuestions,
 } from "../ugc-clinical-assistance";
 import { territorialLexicon, type TerritorialLexicon } from "./territorialGrammar";
+import {
+  buildAntecedents,
+  excludeHistoricalSources,
+  type CanonicalAntecedents,
+} from "./antecedents";
 
 // ── Tipos de la capa ──────────────────────────────────────────────────────────
 
@@ -108,6 +113,11 @@ export interface SpaceKnowledge {
 }
 
 export interface DiagnosticAnswers {
+  /**
+   * Fuentes de ciclos anteriores declarados por el equipo técnico. Ausente cuando
+   * el expediente no declara ninguna: la ausencia deja el Perfil como estaba.
+   */
+  antecedentes?: CanonicalAntecedents;
   /** Conocimiento del técnico agrupado por espacio funcional. */
   porEspacio: Partial<Record<ProfileSpace, SpaceKnowledge>>;
   healthReport: HealthReportReading;
@@ -686,7 +696,14 @@ function knowledgeBySpace(
 export function buildDiagnosticAnswers(
   input: BuildDiagnosticAnswersInput
 ): DiagnosticAnswers {
-  const { workspace } = input;
+  // La lectura actual no usa las fuentes de ciclos anteriores; estas se presentan
+  // aparte como antecedentes.
+  const { workspace: fullWorkspace } = input;
+  const workspace = excludeHistoricalSources(fullWorkspace);
+  const antecedentes = buildAntecedents(
+    fullWorkspace.repository.documents,
+    fullWorkspace.evidenceStore.atoms
+  );
   const salutogenica = buildSalutogenicReading(input.assets);
   const senalesPresentes = detectarSenales(workspace)
     .filter((s) => s.presente)
@@ -700,6 +717,7 @@ export function buildDiagnosticAnswers(
   const eracisContexto = getEracisMunicipalContext(workspace.municipality.identity.id);
 
   return {
+    ...(antecedentes !== undefined ? { antecedentes } : {}),
     porEspacio: knowledgeBySpace(workspace.perfilLocalDeSalud),
     healthReport: readHealthReport(workspace),
     determinantes: inferSocialEpidemiologyDeterminants(

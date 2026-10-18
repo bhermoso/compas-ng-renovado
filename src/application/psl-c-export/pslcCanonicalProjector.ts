@@ -174,6 +174,21 @@ export function projectCanonicalToDocumentModel(
     });
   }
 
+  if (reading.antecedents !== undefined) {
+    const a = reading.antecedents;
+    sections.push({
+      sectionId: "antecedents",
+      title: a.title,
+      level: 1,
+      paragraphs: [
+        a.temporalCaution,
+        ...a.sources.map(
+          (s) => `${s.title} (${s.cycleLabel}). ${[...s.items, ...s.gaps].join(" ")}`
+        ),
+      ],
+    });
+  }
+
   if (reading.diagnosticSynthesis !== null) {
     const synthesis = reading.diagnosticSynthesis;
     sections.push({

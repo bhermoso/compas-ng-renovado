@@ -62,6 +62,7 @@ import {
 import {
   computePerfilEpistemicMetrics,
   buildDiagnosticAnswers,
+  excludeHistoricalSources,
   serializeValidatedAnswers,
   parseValidatedAnswersSnapshot,
   selectDocumentPreviewContext,
@@ -80,12 +81,15 @@ import type { PerfilLocalDeSalud } from "./domain/health-profile";
 function buildWorkspaceDiagnosticAnswers(
   workspace: MunicipalityWorkspace
 ): DiagnosticAnswers {
+  // Las listas salen solo de las fuentes del ciclo actual; los antecedentes los
+  // calcula buildDiagnosticAnswers con el expediente completo.
+  const current = excludeHistoricalSources(workspace);
   return buildDiagnosticAnswers({
     workspace,
-    determinantTitles: workspace.evidenceStore.atoms
+    determinantTitles: current.evidenceStore.atoms
       .filter((a) => a.kind === "determinant")
       .map((a) => a.title),
-    assets: workspace.evidenceStore.atoms
+    assets: current.evidenceStore.atoms
       .filter((a) => a.kind === "asset")
       .map((a) => ({ title: a.title, content: a.content })),
   });

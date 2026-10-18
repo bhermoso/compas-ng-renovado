@@ -4,7 +4,7 @@ import type { CompasPipelineResult, PipelineTraceItem, PipelineStatus } from "..
 import type { LT1Result } from "../lt1";
 import type { OITResult } from "../oit";
 import type { LocalHealthProfile } from "../../domain/health-profile";
-import { buildLocalHealthProfile } from "../health-profile";
+import { buildLocalHealthProfile, excludeHistoricalSources } from "../health-profile";
 import type { PrioritizationResult } from "../prioritization";
 import { generatePrioritization } from "../prioritization";
 import type { EPVSATranslationResult } from "../epvsa";
@@ -99,8 +99,13 @@ export interface CreateMunicipalityRuntimeInput {
 export function createMunicipalityRuntime(
   input: CreateMunicipalityRuntimeInput
 ): MunicipalityRuntime {
+  // La cadena analítica (integridad, MIT, PSL) trabaja sobre las fuentes del ciclo
+  // actual: las que el equipo técnico declaró históricas se presentan aparte, como
+  // antecedentes. Sin ciclos declarados, `analytical` es el mismo expediente.
+  const analytical = excludeHistoricalSources(input.workspace);
+
   // ── Nivel 1: integridad del EvidenceStore
-  const integrityGuard = runEvidenceStoreIntegrityGuard(input.workspace.evidenceStore);
+  const integrityGuard = runEvidenceStoreIntegrityGuard(analytical.evidenceStore);
 
   // Marcos interpretativos — cargados una sola vez y compartidos
   // por el MIT (interpretación territorial) y el motor de acción (ActionPlan).
@@ -159,7 +164,7 @@ export function createMunicipalityRuntime(
         mit,
         reconciliacion,
         oitParaDecision,
-        workspace: input.workspace,
+        workspace: analytical,
       });
 
   // Detectar si la evidencia cambió desde la validación del PSL.

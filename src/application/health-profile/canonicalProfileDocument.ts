@@ -25,6 +25,7 @@ import type {
 } from "../../domain/health-profile";
 import type { PSLCSealedCanonicalDocument } from "../../domain/health-profile-artifact";
 import type { DiagnosticAnswers } from "./diagnosticAnswers";
+import type { CanonicalAntecedents } from "./antecedents";
 import type {
   ProfileIntegratedEditorialHeader,
   ProfileIntegratedEditorialOverviewMessage,
@@ -226,6 +227,12 @@ export interface CanonicalEditorialView {
   /** Ranking de peso textual del Informe (visualización de la lectura). null si no hay Informe. */
   informeSignalRanking: CanonicalInformeRanking | null;
   territorialReadings: ProfileIntegratedEditorialReadingBlock[];
+  /**
+   * Fuentes de ciclos anteriores declarados. La clave no existe cuando el
+   * expediente no declara ninguna, de modo que los documentos y sellos previos
+   * quedan idénticos.
+   */
+  antecedents?: CanonicalAntecedents;
   interpretation: IntegratedInterpretation;
   diagnosticSynthesis: ProfileIntegratedDiagnosticSynthesis | null;
   tracerTable: TrazadorRow[];
@@ -272,6 +279,7 @@ export interface SealedCanonicalProfileDocumentV2 {
     overview: ProfileIntegratedEditorialOverviewMessage[];
     sourceBlocks: ProfileIntegratedEditorialSourceBlock[];
     territorialReadings: ProfileIntegratedEditorialReadingBlock[];
+    antecedents?: CanonicalAntecedents;
     interpretation: IntegratedInterpretation;
     diagnosticSynthesis?: ProfileIntegratedDiagnosticSynthesis | null;
     tracerTable: TrazadorRow[];
@@ -326,6 +334,7 @@ export type CanonicalReadingSectionId =
   | "informe-ranking"
   | "pending-declaration"
   | "territorial-readings"
+  | "antecedents"
   | "diagnostic-synthesis"
   | "tracer-table"
   | "principal-signals"
@@ -348,6 +357,7 @@ export const CANONICAL_READING_ORDER = [
   "informe-ranking",
   "pending-declaration",
   "territorial-readings",
+  "antecedents",
   "diagnostic-synthesis",
   "tracer-table",
   "principal-signals",
@@ -594,6 +604,9 @@ export function buildCanonicalEditorialView(
     sourceBlocks: ov.sourceBlocks,
     informeSignalRanking,
     territorialReadings,
+    ...(ctx.answers.antecedentes !== undefined
+      ? { antecedents: ctx.answers.antecedentes }
+      : {}),
     interpretation: ov.interpretation,
     diagnosticSynthesis:
       readingStatus === "integrated" ? ov.diagnosticSynthesis : null,
@@ -797,6 +810,7 @@ export function normalizeSealedCanonicalProfileDocument(
       sourceBlocks: ev.sourceBlocks,
       informeSignalRanking: ev.informeSignalRanking ?? null,
       territorialReadings: ev.territorialReadings,
+      ...(ev.antecedents !== undefined ? { antecedents: ev.antecedents } : {}),
       interpretation: ev.interpretation,
       diagnosticSynthesis: ev.diagnosticSynthesis,
       tracerTable: ev.tracerTable,

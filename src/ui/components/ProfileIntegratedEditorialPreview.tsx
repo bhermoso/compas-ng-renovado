@@ -248,6 +248,32 @@ export function ProfileIntegratedEditorialPreview({
         </section>
       ) : null}
 
+      {/* ── Antecedentes de ciclos anteriores ───────────────────────────────
+          Solo cuando el equipo técnico ha declarado fuentes históricas, como el
+          proyector. No forman parte de la lectura actual. */}
+      {"antecedents" in view && view.antecedents !== undefined ? (
+        <section className="pie-doc-section" aria-labelledby="pie-antecedents-title">
+          <h3 id="pie-antecedents-title" className="pie-section__title">
+            {view.antecedents.title}
+          </h3>
+          <p className="pie-agenda-intro">{view.antecedents.temporalCaution}</p>
+          {view.antecedents.sources.map((source) => (
+            <article key={source.documentId} className="pie-hilo">
+              <header className="pie-hilo__header">
+                <h4 className="pie-hilo__title">{source.title}</h4>
+                <span className="pie-hilo__status">{source.cycleLabel}</span>
+              </header>
+              {source.items.map((item) => (
+                <p key={item} className="pie-hilo__reading">{item}</p>
+              ))}
+              {source.gaps.map((gap) => (
+                <p key={gap} className="pie-hilo__context">{gap}</p>
+              ))}
+            </article>
+          ))}
+        </section>
+      ) : null}
+
       {/* ── Síntesis interpretativa ────────────────────────────────────────
           Capa conclusiva derivada de los hilos N3: declara tesis, peso,
           cautela y preguntas de contraste. No formula medidas ni sustituye la

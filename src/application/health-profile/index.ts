@@ -1,4 +1,11 @@
 export type { BuildLocalHealthProfileInput } from "./buildLocalHealthProfile";
+export {
+  ANTECEDENTS_TITLE,
+  buildAntecedents,
+  excludeHistoricalSources,
+  isHistoricalDocument,
+} from "./antecedents";
+export type { AntecedentSource, CanonicalAntecedents } from "./antecedents";
 export { buildLocalHealthProfile, hasPSLHumanContent } from "./buildLocalHealthProfile";
 
 export { populatePSLFromPerfil } from "./populatePSLFromPerfil";
