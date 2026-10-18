@@ -25,6 +25,9 @@ interface DocumentIngestionPanelProps {
   onProcessDocument: () => void;
   /** Registra el documento solo como referencia: sin texto y sin átomos de evidencia. */
   onRegisterReference?: () => void;
+  /** El equipo técnico declara que el texto son respuestas abiertas numeradas de un cuestionario. */
+  declaresOpenAnswers?: boolean;
+  onDeclaresOpenAnswersChange?: (value: boolean) => void;
   onLoadHealthReport?: (file: File) => void;
   /** Carga de archivo DOCX/PDF para tipos documentales no-IS (strategic-framework, territorial-documentation, qualitative-material). */
   onLoadDocumentFile?: (file: File) => void;
@@ -46,6 +49,8 @@ export function DocumentIngestionPanel({
   onPlainTextChange,
   onProcessDocument,
   onRegisterReference,
+  declaresOpenAnswers,
+  onDeclaresOpenAnswersChange,
   onLoadHealthReport,
   onLoadDocumentFile,
   isLoadingDocumentFile,
@@ -360,6 +365,20 @@ export function DocumentIngestionPanel({
           </p>
 
           {/* Vía A: subir documento DOCX/PDF */}
+          {onDeclaresOpenAnswersChange !== undefined && (
+            <label className="docx-upload__option">
+              <input
+                type="checkbox"
+                checked={declaresOpenAnswers === true}
+                onChange={(event) => onDeclaresOpenAnswersChange(event.target.checked)}
+              />
+              <span>
+                El documento contiene respuestas abiertas numeradas de un cuestionario. Cada respuesta
+                completa se registrará como una unidad, sin clasificarla por temas. Lo que no sean respuestas
+                (tablas, muestra, cifras) no se atomiza y se conserva íntegro en el documento.
+              </span>
+            </label>
+          )}
           <DocumentFileUpload id="td-file-input" label="Subir documento (.docx o .pdf)" accept=".docx,.pdf" isLoading={isLoadingDocumentFile === true} message={documentFileMessage} onFile={onLoadDocumentFile} />
 
           {/* Vía B: pegar texto */}
@@ -435,6 +454,20 @@ export function DocumentIngestionPanel({
           </p>
 
           {/* Vía A: subir documento DOCX/PDF */}
+          {onDeclaresOpenAnswersChange !== undefined && (
+            <label className="docx-upload__option">
+              <input
+                type="checkbox"
+                checked={declaresOpenAnswers === true}
+                onChange={(event) => onDeclaresOpenAnswersChange(event.target.checked)}
+              />
+              <span>
+                El documento contiene respuestas abiertas numeradas de un cuestionario. Cada respuesta
+                completa se registrará como una unidad, sin clasificarla por temas. Lo que no sean respuestas
+                (tablas, muestra, cifras) no se atomiza y se conserva íntegro en el documento.
+              </span>
+            </label>
+          )}
           <DocumentFileUpload id="qm-file-input" label="Subir acta o documento (.docx o .pdf)" accept=".docx,.pdf" isLoading={isLoadingDocumentFile === true} message={documentFileMessage} onFile={onLoadDocumentFile} />
 
           {/* Vía B: pegar texto */}

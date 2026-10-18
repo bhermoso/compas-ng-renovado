@@ -5,7 +5,10 @@ import {
   type MunicipalDocumentRepository,
 } from "../../domain/repository";
 import type { EvidenceStore } from "../../domain/evidence";
-import { transformDocumentToEvidence } from "../evidence-pipeline";
+import {
+  transformDocumentToEvidence,
+  type DeclaredDocumentStructure,
+} from "../evidence-pipeline";
 
 export interface IngestManualDocumentInput {
   documentId?: string;
@@ -18,6 +21,8 @@ export interface IngestManualDocumentInput {
   sourceFileName?: string;
   /** Descripción del sistema de origen. Por defecto "Entrada manual inicial". */
   sourceSystem?: string;
+  /** Estructura del texto declarada por el equipo técnico. */
+  structure?: DeclaredDocumentStructure;
 }
 
 export interface IngestManualDocumentResult {
@@ -64,6 +69,7 @@ export function ingestManualDocument(
     store: input.evidenceStore,
     document: registeredDocument,
     plainText: cleanText,
+    structure: input.structure,
   });
 
   return {

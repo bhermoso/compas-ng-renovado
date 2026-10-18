@@ -550,6 +550,7 @@ export default function App() {
   }, [workspace, pendingSeedId]);
 
   const [title, setTitle] = useState("");
+  const [declaresOpenAnswers, setDeclaresOpenAnswers] = useState(false);
   const [plainText, setPlainText] = useState("");
   const [kind, setKind] = useState<DocumentKind>("territorial-documentation");
   const [lastProcessedDocument, setLastProcessedDocument] =
@@ -1253,6 +1254,7 @@ export default function App() {
       kind,
       title,
       plainText,
+      structure: declaresOpenAnswers ? "open-answers" : undefined,
     });
 
     if (result === null) return;
@@ -1267,6 +1269,7 @@ export default function App() {
     setLastAtomCount(result.atomsCreated);
     setTitle("");
     setPlainText("");
+    setDeclaresOpenAnswers(false);
   }
 
   function handleRegisterDocumentReference() {
@@ -1513,6 +1516,7 @@ export default function App() {
             sourceFileName: file.name,
             sourceSystem: isDocx ? "Archivo DOCX cargado" : "Texto extraído de PDF, con marcas de página",
             documentId,
+            structure: declaresOpenAnswers ? "open-answers" : undefined,
           });
 
           if (result === null) return prev;
@@ -1521,7 +1525,9 @@ export default function App() {
             setLastProcessedDocument(result.document);
             setLastAtomCount(result.atomsCreated);
             setDocumentFileMessage(
-              `Carga completada: «${docTitle}» se ha registrado desde el archivo. No necesitas rellenar el cuadro de texto. ${result.atomsCreated} unidades de evidencia extraídas.`
+              declaresOpenAnswers && result.atomsCreated === 0
+                ? `«${docTitle}» se ha registrado desde el archivo, pero no se encontraron respuestas abiertas numeradas (1, 2, 3…) bajo una pregunta. No se ha creado ninguna unidad de evidencia; el texto se conserva íntegro.`
+                : `Carga completada: «${docTitle}» se ha registrado desde el archivo. No necesitas rellenar el cuadro de texto. ${result.atomsCreated} unidades de evidencia extraídas.`
             );
           });
 
@@ -1604,6 +1610,7 @@ export default function App() {
       );
     } finally {
       setIsLoadingDocumentFile(false);
+      setDeclaresOpenAnswers(false);
     }
   }
 
@@ -3791,6 +3798,8 @@ export default function App() {
               onPlainTextChange={setPlainText}
               onProcessDocument={handleProcessDocument}
               onRegisterReference={handleRegisterDocumentReference}
+              declaresOpenAnswers={declaresOpenAnswers}
+              onDeclaresOpenAnswersChange={setDeclaresOpenAnswers}
               onLoadHealthReport={handleLoadHealthReport}
               onLoadDocumentFile={handleLoadDocumentFile}
               isLoadingDocumentFile={isLoadingDocumentFile}
@@ -3914,6 +3923,8 @@ export default function App() {
               onPlainTextChange={setPlainText}
               onProcessDocument={handleProcessDocument}
               onRegisterReference={handleRegisterDocumentReference}
+              declaresOpenAnswers={declaresOpenAnswers}
+              onDeclaresOpenAnswersChange={setDeclaresOpenAnswers}
               onLoadHealthReport={handleLoadHealthReport}
               onLoadDocumentFile={handleLoadDocumentFile}
               isLoadingDocumentFile={isLoadingDocumentFile}

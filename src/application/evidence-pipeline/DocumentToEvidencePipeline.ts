@@ -8,11 +8,20 @@ import {
   type EvidenceAtom,
   type EvidenceAtomKind,
 } from "../../domain/evidence";
+import { extractNumberedOpenAnswers } from "./numberedOpenAnswers";
+
+/**
+ * Estructura que el equipo técnico declara para el texto del documento.
+ * - `open-answers`: respuestas abiertas numeradas de un cuestionario; cada
+ *   respuesta completa es una unidad y no se clasifica por palabras clave.
+ */
+export type DeclaredDocumentStructure = "open-answers";
 
 export interface TransformDocumentToEvidenceInput {
   store: EvidenceStore;
   document: MunicipalDocument;
   plainText: string;
+  structure?: DeclaredDocumentStructure;
 }
 
 export interface TransformDocumentToEvidenceResult {
@@ -172,11 +181,89 @@ function transformCommunityAssets(
   return { store, atomsCreated };
 }
 
+function transformOpenAnswers(
+  input: TransformDocumentToEvidenceInput
+): TransformDocumentToEvidenceResult {
+  const parsed = extractNumberedOpenAnswers(input.plainText);
+  // Si el texto no tiene la estructura declarada, no se atomiza por líneas:
+  // sería volver a la clasificación heurística que se quiso evitar.
+  if (parsed === null) return { store: input.store, atomsCreated: [] };
+
+  const now = new Date().toISOString();
+  const origin = mapDocumentKindToEvidenceOrigin(input.document.kind);
+  let store = input.store;
+  const atomsCreated: EvidenceAtom[] = [];
+  let sequence = 0;
+
+  parsed.groups.forEach((group, groupIndex) => {
+    group.answers.forEach((answer) => {
+      sequence += 1;
+      const atom = createEvidenceAtom({
+        id: `${input.document.id}-atom-${sequence}`,
+        municipalityId: input.store.municipalityId,
+        kind: "participation",
+        title: `Respuesta ${answer.number} · pregunta ${groupIndex + 1}`,
+        content: answer.text,
+        provenance: {
+          origin,
+          documentId: input.document.id,
+          sourceLabel: input.document.title,
+          field: group.question,
+          ...(answer.page !== undefined ? { page: answer.page } : {}),
+          extractedAt: now,
+        },
+        methodology: {
+          description:
+            "Respuesta abierta numerada, transcrita tal como figura en el documento. Cada respuesta completa es una unidad; no se clasifica por temas.",
+          limitations: [
+            "Persona respondente no identificada.",
+            "Representatividad no declarada en el texto extraído.",
+            "No establece causalidad ni prioriza automáticamente.",
+          ],
+          requiresHumanValidation: true,
+        },
+        tags: [input.document.kind, "participation", "open-answer"],
+      });
+      store = addEvidenceAtom(store, atom);
+      atomsCreated.push(atom);
+    });
+  });
+
+  sequence += 1;
+  const caution = createEvidenceAtom({
+    id: `${input.document.id}-atom-${sequence}`,
+    municipalityId: input.store.municipalityId,
+    kind: "methodological-caution",
+    title: "Alcance de la extracción de respuestas abiertas",
+    content: `Se extrajeron ${parsed.totalAnswers} respuestas abiertas en ${parsed.groups.length} ${parsed.groups.length === 1 ? "pregunta" : "preguntas"}. El resto del texto (tablas de datos, muestra, cifras) no se atomizó y permanece íntegro en el documento.`,
+    provenance: {
+      origin,
+      documentId: input.document.id,
+      sourceLabel: input.document.title,
+      extractedAt: now,
+    },
+    methodology: {
+      description: "Recuento de lo extraído por estructura, sin interpretación.",
+      limitations: ["Las respuestas se numeran como figuran en el documento."],
+      requiresHumanValidation: true,
+    },
+    tags: [input.document.kind, "methodological-caution"],
+  });
+  store = addEvidenceAtom(store, caution);
+  atomsCreated.push(caution);
+
+  return { store, atomsCreated };
+}
+
 export function transformDocumentToEvidence(
   input: TransformDocumentToEvidenceInput
 ): TransformDocumentToEvidenceResult {
   if (input.document.canGenerateEvidence === false) {
     return { store: input.store, atomsCreated: [] };
+  }
+
+  if (input.structure === "open-answers") {
+    return transformOpenAnswers(input);
   }
 
   if (input.document.kind === "community-asset") {

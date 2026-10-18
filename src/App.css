@@ -3186,6 +3186,19 @@ h3 {
   cursor: not-allowed;
 }
 
+.docx-upload__option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--texto-secundario);
+}
+
+.docx-upload__option input {
+  margin-top: 3px;
+}
+
 .doc-cycle {
   display: flex;
   flex-direction: column;
