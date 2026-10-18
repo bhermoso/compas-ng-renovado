@@ -59,7 +59,7 @@ export interface IBSECSVParseResult {
    * Distribución observada edad×sexo de la muestra.
    * Solo presente si el CSV incluye columnas `sexo` y `edad`
    * Y se pasaron `ageBands` en las opciones.
-   * Solo incluye filas con monitor_ibse_complete=2 (misma exclusión que los agregados).
+   * Solo incluye filas válidas: monitor_ibse_complete=2 y puntuaciones numéricas (misma exclusión que los agregados; suma nValid).
    */
   ageSexObserved?: AgeSexObservedResult;
 }
@@ -120,16 +120,6 @@ export function parseIBSECSV(
       continue;
     }
 
-    // Recoger datos demográficos solo de filas completas (misma exclusión que los agregados).
-    if (hasDemographics && options?.ageBands) {
-      const rawEdad = row[idxEdad]?.trim();
-      const parsedAge = rawEdad ? parseInt(rawEdad, 10) : undefined;
-      demographicRows.push({
-        sex: row[idxSexo]?.trim() || undefined,
-        age: parsedAge !== undefined && Number.isFinite(parsedAge) ? parsedAge : undefined,
-      });
-    }
-
     const total     = parseFloat(row[idx.total]           ?? "");
     const vinculo   = parseFloat(row[idx.factorVinculo]   ?? "");
     const situacion = parseFloat(row[idx.factorSituacion] ?? "");
@@ -141,6 +131,18 @@ export function parseIBSECSV(
       isNaN(situacion) || isNaN(control) || isNaN(persona)
     ) {
       continue;
+    }
+
+    // Recoger datos demográficos solo de filas válidas: completas y con todas las
+    // puntuaciones numéricas (misma exclusión que los agregados, de modo que el recuento
+    // por edad y sexo suma nValid).
+    if (hasDemographics && options?.ageBands) {
+      const rawEdad = row[idxEdad]?.trim();
+      const parsedAge = rawEdad ? parseInt(rawEdad, 10) : undefined;
+      demographicRows.push({
+        sex: row[idxSexo]?.trim() || undefined,
+        age: parsedAge !== undefined && Number.isFinite(parsedAge) ? parsedAge : undefined,
+      });
     }
 
     nValid++;

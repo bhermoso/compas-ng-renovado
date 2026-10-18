@@ -82,11 +82,19 @@ export type SampleAssessmentResult =
       reasons: string[];
     };
 
+/**
+ * Cota de validez del dato, no un criterio estadístico: una edad por encima de
+ * este valor no es una edad (p. ej. un año de nacimiento escrito en el campo de
+ * edad) y la banda abierta («100+») no la absorbe. Esos registros se declaran como
+ * fuera de banda y no se corrigen ni se imputan.
+ */
+export const MAX_VALID_AGE = 120;
+
 export function parseAgeBandLabel(label: string): AgeBand | null {
   const range = /^(\d+)\s*-\s*(\d+)$/.exec(label.trim());
   if (range) return { label, min: Number(range[1]), max: Number(range[2]) };
   const open = /^(\d+)\s*\+$/.exec(label.trim());
-  if (open) return { label, min: Number(open[1]), max: Number.POSITIVE_INFINITY };
+  if (open) return { label, min: Number(open[1]), max: MAX_VALID_AGE };
   return null;
 }
 

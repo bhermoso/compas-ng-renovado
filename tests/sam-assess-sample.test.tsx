@@ -8,6 +8,7 @@ import { readFileSync } from "node:fs";
 import {
   assessSample,
   parseAgeBandLabel,
+  MAX_VALID_AGE,
   restrictReferenceToAgeRange,
   type SampleRecord,
 } from "../src/application/sam/assessSample";
@@ -34,8 +35,21 @@ const render = (r: ReturnType<typeof assessSample>) =>
 describe("parseAgeBandLabel", () => {
   it("reconoce rangos y bandas abiertas", () => {
     expect(parseAgeBandLabel("15-19")).toMatchObject({ min: 15, max: 19 });
-    expect(parseAgeBandLabel("100+")).toMatchObject({ min: 100, max: Infinity });
+    expect(parseAgeBandLabel("100+")).toMatchObject({ min: 100, max: MAX_VALID_AGE });
     expect(parseAgeBandLabel("adultos")).toBeNull();
+  });
+});
+
+describe("edades que no son edades", () => {
+  it("una edad de 1993 no se asigna a la banda abierta y se declara fuera de banda", () => {
+    const r = assessSample({
+      instrumentId: "t",
+      municipalityId: "atarfe",
+      records: [...recordsProportional(), { sex: "1", age: 1993 }],
+    });
+    if (r.status !== "evaluable") throw new Error("debía ser evaluable");
+    expect(r.observed!.unassignableBreakdown.outOfBand).toBe(1);
+    expect(r.observed!.cells.find((c) => c.ageBand === "100+")!.male).toBe(0);
   });
 });
 

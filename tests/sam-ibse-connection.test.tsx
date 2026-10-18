@@ -70,6 +70,23 @@ describe("assessSample con recuento agregado (observedCells)", () => {
   });
 });
 
+describe("el recuento por edad y sexo del IBSE suma los registros válidos", () => {
+  it("una fila completa sin puntuaciones numéricas no entra en el recuento", () => {
+    const csv = [
+      HEADER,
+      "1,2,70,70,70,70,70,1,30",
+      "2,2,,70,70,70,70,2,31", // completa pero sin puntuación total: no válida
+      "3,0,70,70,70,70,70,2,32", // incompleta
+      "4,2,60,60,60,60,60,2,1993", // edad que no es edad
+    ].join("\n");
+    const p = parseIBSECSV(csv, { ageBands: BANDS });
+    expect(p.aggregates.nValid).toBe(2);
+    expect(p.ageSexObserved!.assignedCount).toBe(1);
+    expect(p.ageSexObserved!.unassignableBreakdown.outOfBand).toBe(1);
+    expect(p.ageSexObserved!.assignedCount + p.ageSexObserved!.unassignableCount).toBe(p.aggregates.nValid);
+  });
+});
+
 describe("persistencia del recuento edad×sexo del IBSE", () => {
   const parsed = parseIBSECSV(csvAdults(), { ageBands: BANDS });
   const study = createIBSEStudy({
