@@ -4,3 +4,4 @@ export * from "./SAMAssessmentToEvidenceAtom";
 export * from "./populationReferenceRegistry";
 export * from "./buildAgeSexObserved";
 export * from "./assessSample";
+export * from "./ageBandsForMunicipality";

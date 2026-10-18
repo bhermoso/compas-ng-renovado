@@ -11,6 +11,16 @@ export interface ThematicTopicVoteResult {
   rank: number;           // Posición en el ranking (1 = más votado)
 }
 
+/**
+ * Distribución observada edad×sexo de las papeletas completas, solo cuando el
+ * export aporta las columnas `sexo` y `edad`. Nunca se deriva ni se imputa.
+ */
+export interface ThematicAgeSexObserved {
+  cells: Array<{ ageBand: string; male: number; female: number }>;
+  assignedCount: number;
+  unassignableCount: number;
+}
+
 export interface ThematicPrioritisationStudy {
   municipalityId: string;
   sourceFileName: string;
@@ -19,5 +29,6 @@ export interface ThematicPrioritisationStudy {
   completeRecords: number;        // Solo papeleta_pri_tematica_complete === "2"
   ranking: ThematicTopicVoteResult[];  // 10 temas ordenados de más a menos votado
   topFiveTopicIds: string[];      // IDs de los 5 temas más votados
+  ageSexObserved?: ThematicAgeSexObserved;  // Edad×sexo de las papeletas completas, si el export lo aporta
   methodologicalCautions: string[];
 }

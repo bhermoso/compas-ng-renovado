@@ -93,7 +93,7 @@ import {
   createHealthReportDocumentFromPdf,
 } from "./application/health-report";
 import { parseIBSECSV, ibseStudyToEvidenceAtoms } from "./application/ibse";
-import { getPopulationReferenceSet, parseAgeBandLabel } from "./application/sam";
+import { ageBandsForMunicipality } from "./application/sam";
 import { createIBSEStudy } from "./domain/ibse";
 import { parseDUKECSV, dukeStudyToEvidenceAtoms } from "./application/duke";
 import { createDUKEStudy } from "./domain/duke";
@@ -167,6 +167,7 @@ import {
   ActivosSaludPanel,
   LocalHealthProfileView,
   ThematicPrioritisationPanel,
+  CitizenParticipationSummary,
   ThematicPrioritisationModal,
   PipelineTracePanel,
   LT1Panel,
@@ -1632,15 +1633,12 @@ export default function App() {
     setIsLoadingIBSE(true);
     try {
       const text = await file.text();
-      // Bandas de edad del padrón del municipio (si existe): permiten recoger la
-      // distribución edad×sexo del CSV. Sin padrón desglosado no se recoge nada.
-      const sexAgeBands = (getPopulationReferenceSet(workspace.municipality.identity.id)
-        .allAges?.ageSexMatrix ?? [])
-        .map((cell) => parseAgeBandLabel(cell.ageBand))
-        .filter((band): band is NonNullable<typeof band> => band !== null);
+      // Bandas de edad para recoger la distribución edad×sexo del CSV: las del padrón del
+      // municipio si existe; si no, las quinquenales estándar (solo descriptivas).
+      const sexAgeBands = ageBandsForMunicipality(workspace.municipality.identity.id);
       const { aggregates, methodologicalCautions, warnings, ageSexObserved } = parseIBSECSV(
         text,
-        sexAgeBands.length > 0 ? { ageBands: sexAgeBands } : undefined
+        { ageBands: sexAgeBands }
       );
       const documentId = crypto.randomUUID();
       await saveOriginalFile(workspace.municipality.identity.id, documentId, file);
@@ -2590,7 +2588,14 @@ export default function App() {
     setIsImportingTP(true);
     try {
       const text = await file.text();
-      const { partialStudy, warnings } = parseThematicPrioritisationCSV(text, file.name);
+      // Bandas de edad para recoger la distribución edad×sexo del CSV: las del padrón del
+      // municipio si existe; si no, las quinquenales estándar (solo descriptivas).
+      const tpAgeBands = ageBandsForMunicipality(workspace.municipality.identity.id);
+      const { partialStudy, warnings } = parseThematicPrioritisationCSV(
+        text,
+        file.name,
+        { ageBands: tpAgeBands }
+      );
       const documentId = crypto.randomUUID();
       await saveOriginalFile(workspace.municipality.identity.id, documentId, file);
       const study: ThematicPrioritisationStudy = {
@@ -3919,6 +3924,11 @@ export default function App() {
               }
               onOpen={handleOpenThematicModal}
             />
+            <CitizenParticipationSummary
+              study={runtime.workspace.thematicPrioritisationStudy}
+              municipalityId={runtime.workspace.municipality.identity.id}
+              municipalityName={runtime.workspace.municipality.identity.name}
+            />
           </>
         )}
 
@@ -3969,6 +3979,11 @@ export default function App() {
                 runtime.workspace.thematicPrioritisation?.selectedTopicIds ?? []
               }
               onOpen={handleOpenThematicModal}
+            />
+            <CitizenParticipationSummary
+              study={runtime.workspace.thematicPrioritisationStudy}
+              municipalityId={runtime.workspace.municipality.identity.id}
+              municipalityName={runtime.workspace.municipality.identity.name}
             />
             <DeliberativePrioritySelectionPanel
               key={`${runtime.lectura.id}-${workspace.deliberativePrioritySelection?.id ?? "pending"}`}

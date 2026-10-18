@@ -3,6 +3,10 @@
   ThematicTopicVoteResult,
 } from "../../domain/thematic-prioritisation";
 import { splitRow } from "../csv-utils/splitRow";
+import {
+  buildAgeSexObserved,
+  type AgeBand,
+} from "../sam/buildAgeSexObserved";
 
 // Mapeo canónico columna REDCap → ID del dominio COMPÁS NG.
 // Fuente: PriorizacinCiudadanaZagra_DataDictionary_2026-06-20.csv
@@ -22,6 +26,14 @@ const COLUMN_MAP: { column: string; topicId: string; label: string }[] = [
 const COMPLETE_COL = "papeleta_pri_tematica_complete";
 const COMPLETE_VAL = "2";
 
+/**
+ * Opciones demográficas opcionales. Las columnas `sexo` y `edad` se leen por nombre
+ * de cabecera. Sin opciones o sin esas columnas, la salida no incluye `ageSexObserved`.
+ */
+export interface ThematicPrioritisationCSVParseOptions {
+  ageBands: AgeBand[];
+}
+
 export interface ThematicPrioritisationCSVParseResult {
   // Todos los campos excepto municipalityId e importedAt, que se asignan en App
   partialStudy: Omit<ThematicPrioritisationStudy, "municipalityId" | "importedAt">;
@@ -30,7 +42,8 @@ export interface ThematicPrioritisationCSVParseResult {
 
 export function parseThematicPrioritisationCSV(
   csvText: string,
-  sourceFileName: string
+  sourceFileName: string,
+  options?: ThematicPrioritisationCSVParseOptions
 ): ThematicPrioritisationCSVParseResult {
   const text = csvText.replace(/^\uFEFF/, ""); // eliminar BOM
   const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
@@ -73,6 +86,11 @@ export function parseThematicPrioritisationCSV(
     };
   }
 
+  const idxSexo = header.indexOf("sexo");
+  const idxEdad = header.indexOf("edad");
+  const hasDemographics = idxSexo !== -1 && idxEdad !== -1;
+  const demographicRows: Array<{ sex?: string; age?: number }> = [];
+
   let total = 0;
   let complete = 0;
   const voteCounts: Record<string, number> = {};
@@ -85,6 +103,15 @@ export function parseThematicPrioritisationCSV(
     const isComplete = completeIdx === -1 || row[completeIdx] === COMPLETE_VAL;
     if (!isComplete) continue;
     complete++;
+
+    if (hasDemographics && options?.ageBands) {
+      const rawEdad = row[idxEdad]?.trim();
+      const parsedAge = rawEdad ? parseInt(rawEdad, 10) : undefined;
+      demographicRows.push({
+        sex: row[idxSexo]?.trim() || undefined,
+        age: parsedAge !== undefined && Number.isFinite(parsedAge) ? parsedAge : undefined,
+      });
+    }
 
     for (const { column, index } of colIndices) {
       if (index !== -1 && row[index] === "1") {
@@ -134,6 +161,26 @@ export function parseThematicPrioritisationCSV(
     );
   }
 
+  let ageSexObserved: ThematicPrioritisationStudy["ageSexObserved"];
+  if (hasDemographics && options?.ageBands && demographicRows.length > 0) {
+    const observed = buildAgeSexObserved(demographicRows, 0, options.ageBands);
+    ageSexObserved = {
+      cells: observed.cells,
+      assignedCount: observed.assignedCount,
+      unassignableCount: observed.unassignableCount,
+    };
+    if (observed.unassignableCount > 0) {
+      const b = observed.unassignableBreakdown;
+      const parts: string[] = [];
+      if (b.noSex > 0) parts.push(`${b.noSex} sin sexo reconocible`);
+      if (b.noAge + b.noBirthYear > 0) parts.push(`${b.noAge + b.noBirthYear} sin edad`);
+      if (b.outOfBand > 0) parts.push(`${b.outOfBand} con edad fuera de bandas`);
+      warnings.push(
+        `Distribución edad×sexo: ${observed.unassignableCount} de ${demographicRows.length} papeletas no asignadas a celda (${parts.join("; ")}).`
+      );
+    }
+  }
+
   return {
     partialStudy: {
       sourceFileName,
@@ -141,6 +188,7 @@ export function parseThematicPrioritisationCSV(
       completeRecords: complete,
       ranking,
       topFiveTopicIds,
+      ...(ageSexObserved !== undefined && { ageSexObserved }),
       methodologicalCautions: cautions,
     },
     warnings,

@@ -214,6 +214,26 @@ export function parseWorkspaceJSON(
       if (!sane) delete parsed.ibseStudy.ageSexObserved;
     }
 
+    // Idem para la distribución edad×sexo de la priorización temática.
+    if (parsed.thematicPrioritisationStudy && parsed.thematicPrioritisationStudy.ageSexObserved !== undefined) {
+      const o = parsed.thematicPrioritisationStudy.ageSexObserved;
+      const sane =
+        o !== null &&
+        typeof o === "object" &&
+        Array.isArray(o.cells) &&
+        o.cells.every(
+          (c: unknown) =>
+            c !== null &&
+            typeof c === "object" &&
+            typeof (c as { ageBand?: unknown }).ageBand === "string" &&
+            Number.isInteger((c as { male?: unknown }).male) &&
+            (c as { male: number }).male >= 0 &&
+            Number.isInteger((c as { female?: unknown }).female) &&
+            (c as { female: number }).female >= 0
+        );
+      if (!sane) delete parsed.thematicPrioritisationStudy.ageSexObserved;
+    }
+
     if (parsed.dukeStudy && !Array.isArray(parsed.dukeStudy.methodologicalCautions)) {
       parsed.dukeStudy.methodologicalCautions = [];
     }
