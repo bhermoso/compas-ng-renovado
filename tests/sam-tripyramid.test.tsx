@@ -97,6 +97,12 @@ describe("SamTriPyramid", () => {
     expect("notEvaluable" in buildSamTriPyramidRows(tampered)).toBe(true);
   });
 
+  it("una desviación que redondea a cero no lleva signo", () => {
+    const a = enrichWithRepresentativeness(base({ ...REF, ageSexMatrix: MATRIX }), OBSERVED);
+    const html = renderToStaticMarkup(createElement(SamTriPyramid, { assessment: a }));
+    expect(html).not.toMatch(/[−+]0,0 pp/);
+  });
+
   it("no usa colores literales en el CSS del componente", async () => {
     const { readFileSync } = await import("node:fs");
     const css = readFileSync("src/ui/components/SamTriPyramid.css", "utf8");

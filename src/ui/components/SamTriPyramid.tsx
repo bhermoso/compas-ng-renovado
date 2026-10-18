@@ -18,13 +18,13 @@ export interface SamTriPyramidProps {
 const fmtInt = (n: number) => n.toLocaleString("es-ES");
 const fmtPct = (n: number) =>
   n.toLocaleString("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-const fmtPp = (n: number | null) =>
-  n === null
-    ? "no evaluable"
-    : `${n > 0 ? "+" : n < 0 ? "−" : ""}${Math.abs(n).toLocaleString("es-ES", {
-        minimumFractionDigits: 1,
-        maximumFractionDigits: 1,
-      })} pp`;
+const fmtPp = (n: number | null) => {
+  if (n === null) return "no evaluable";
+  const abs = Math.abs(n).toLocaleString("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const rounded = Math.round(Math.abs(n) * 10) / 10;
+  const sign = rounded === 0 ? "" : n > 0 ? "+" : "−";
+  return `${sign}${abs} pp`;
+};
 
 const QUALITY_LABEL = { alta: "alta", moderada: "moderada", baja: "baja" } as const;
 
