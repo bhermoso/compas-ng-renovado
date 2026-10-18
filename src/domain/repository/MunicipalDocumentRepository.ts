@@ -56,6 +56,18 @@ export type DocumentContentMode =
   | "atomized"
   | "reference-only";
 
+/**
+ * Ciclo diagnóstico al que pertenece la fuente. Lo declara el equipo técnico:
+ * nunca se infiere del texto. Un documento sin `cycle` tiene periodo no declarado.
+ */
+export type DocumentCycleStatus = "current" | "historical";
+
+export interface DocumentCycle {
+  status: DocumentCycleStatus;
+  /** Año de referencia de la fuente, declarado por el equipo técnico. */
+  referenceYear?: number;
+}
+
 export interface MunicipalDocument {
   id: DocumentId;
   municipalityId: MunicipalityId;
@@ -73,6 +85,7 @@ export interface MunicipalDocument {
   /** Unidad de Gestión Clínica de origen, cuando aplica (p. ej. "Zaidín Sur"). */
   ugc?: string;
   contentMode?: DocumentContentMode;
+  cycle?: DocumentCycle;
   createdAt: string;
   updatedAt: string;
 }
@@ -101,6 +114,7 @@ export interface AddMunicipalDocumentInput {
   territorialScale?: DocumentTerritorialScale;
   ugc?: string;
   contentMode?: DocumentContentMode;
+  cycle?: DocumentCycle;
 }
 
 function defaultCanGenerateEvidence(kind: DocumentKind): boolean {
@@ -142,6 +156,7 @@ export function addMunicipalDocument(
     territorialScale: input.territorialScale,
     ugc: input.ugc,
     contentMode: input.contentMode,
+    ...(input.cycle !== undefined ? { cycle: input.cycle } : {}),
     createdAt: now,
     updatedAt: now,
   };
@@ -151,6 +166,31 @@ export function addMunicipalDocument(
     documents: [...repository.documents, document],
     updatedAt: now,
   };
+}
+
+/** Declara (o retira, con `undefined`) el ciclo de un documento. No toca sus átomos. */
+export function setMunicipalDocumentCycle(
+  repository: MunicipalDocumentRepository,
+  documentId: DocumentId,
+  cycle: DocumentCycle | undefined
+): MunicipalDocumentRepository {
+  const now = new Date().toISOString();
+  return {
+    ...repository,
+    documents: repository.documents.map((doc) => {
+      if (doc.id !== documentId) return doc;
+      const { cycle: _previous, ...rest } = doc;
+      void _previous;
+      return { ...rest, ...(cycle !== undefined ? { cycle } : {}), updatedAt: now };
+    }),
+    updatedAt: now,
+  };
+}
+
+export function describeDocumentCycle(cycle: DocumentCycle | undefined): string {
+  if (cycle === undefined) return "Ciclo no declarado";
+  const year = cycle.referenceYear !== undefined ? ` · ${cycle.referenceYear}` : "";
+  return cycle.status === "current" ? `Ciclo actual${year}` : `Ciclo histórico${year}`;
 }
 
 // Para tipos documentales canónicos (una sola versión activa por municipio):

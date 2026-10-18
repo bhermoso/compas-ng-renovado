@@ -23,6 +23,8 @@ interface DocumentIngestionPanelProps {
   onTitleChange: (title: string) => void;
   onPlainTextChange: (plainText: string) => void;
   onProcessDocument: () => void;
+  /** Registra el documento solo como referencia: sin texto y sin átomos de evidencia. */
+  onRegisterReference?: () => void;
   onLoadHealthReport?: (file: File) => void;
   /** Carga de archivo DOCX/PDF para tipos documentales no-IS (strategic-framework, territorial-documentation, qualitative-material). */
   onLoadDocumentFile?: (file: File) => void;
@@ -43,6 +45,7 @@ export function DocumentIngestionPanel({
   onTitleChange,
   onPlainTextChange,
   onProcessDocument,
+  onRegisterReference,
   onLoadHealthReport,
   onLoadDocumentFile,
   isLoadingDocumentFile,
@@ -51,6 +54,10 @@ export function DocumentIngestionPanel({
   const hasTitle = title.trim().length > 0;
   const hasText = plainText.trim().length > 0;
   const canSubmit = hasTitle && hasText;
+  // Los tipos canónicos (activos, Localiza Salud) tienen una sola versión activa:
+  // no se registran como referencia suelta.
+  const canRegisterReference =
+    onRegisterReference !== undefined && kind !== "community-asset" && kind !== "localiza-salud";
 
   const hint =
     !hasTitle && !hasText
@@ -157,6 +164,17 @@ export function DocumentIngestionPanel({
             >
               Registrar extracto
             </button>
+            {canRegisterReference && (
+              <button
+                type="button"
+                className="document-form__reference"
+                onClick={onRegisterReference}
+                disabled={!hasTitle}
+                title="Registra el documento sin texto: no genera evidencia."
+              >
+                Registrar solo como referencia
+              </button>
+            )}
           </div>
           {!canSubmit && <p className="ingestion-hint">{submissionHint}</p>}
           {lastProcessedDocument && lastProcessedDocument.kind === "strategic-framework" && (
@@ -213,6 +231,17 @@ export function DocumentIngestionPanel({
             >
               Registrar documento
             </button>
+            {canRegisterReference && (
+              <button
+                type="button"
+                className="document-form__reference"
+                onClick={onRegisterReference}
+                disabled={!hasTitle}
+                title="Registra el documento sin texto: no genera evidencia."
+              >
+                Registrar solo como referencia
+              </button>
+            )}
           </div>
           {!canSubmit && <p className="ingestion-hint">{submissionHint}</p>}
           {lastProcessedDocument && lastProcessedDocument.kind === "complementary-study" && (
@@ -281,6 +310,17 @@ export function DocumentIngestionPanel({
             >
               Registrar activos
             </button>
+            {canRegisterReference && (
+              <button
+                type="button"
+                className="document-form__reference"
+                onClick={onRegisterReference}
+                disabled={!hasTitle}
+                title="Registra el documento sin texto: no genera evidencia."
+              >
+                Registrar solo como referencia
+              </button>
+            )}
           </div>
           {!canSubmit && <p className="ingestion-hint">{submissionHint}</p>}
           {lastProcessedDocument && lastProcessedDocument.kind === "localiza-salud" && (
@@ -344,6 +384,17 @@ export function DocumentIngestionPanel({
             >
               Registrar documentación
             </button>
+            {canRegisterReference && (
+              <button
+                type="button"
+                className="document-form__reference"
+                onClick={onRegisterReference}
+                disabled={!hasTitle}
+                title="Registra el documento sin texto: no genera evidencia."
+              >
+                Registrar solo como referencia
+              </button>
+            )}
           </div>
           {!canSubmit && <p className="ingestion-hint">{submissionHint}</p>}
           {lastProcessedDocument && lastProcessedDocument.kind === "territorial-documentation" && (
@@ -408,6 +459,17 @@ export function DocumentIngestionPanel({
             >
               Registrar material cualitativo
             </button>
+            {canRegisterReference && (
+              <button
+                type="button"
+                className="document-form__reference"
+                onClick={onRegisterReference}
+                disabled={!hasTitle}
+                title="Registra el documento sin texto: no genera evidencia."
+              >
+                Registrar solo como referencia
+              </button>
+            )}
           </div>
           {!canSubmit && <p className="ingestion-hint">{submissionHint}</p>}
           {lastProcessedDocument && lastProcessedDocument.kind === "qualitative-material" && (
@@ -466,6 +528,17 @@ export function DocumentIngestionPanel({
             >
               Registrar evidencia longitudinal
             </button>
+            {canRegisterReference && (
+              <button
+                type="button"
+                className="document-form__reference"
+                onClick={onRegisterReference}
+                disabled={!hasTitle}
+                title="Registra el documento sin texto: no genera evidencia."
+              >
+                Registrar solo como referencia
+              </button>
+            )}
           </div>
           {!canSubmit && <p className="ingestion-hint">{submissionHint}</p>}
           {lastProcessedDocument && lastProcessedDocument.kind === "longitudinal-evidence" && (
@@ -514,6 +587,17 @@ export function DocumentIngestionPanel({
             >
               Registrar documento
             </button>
+            {canRegisterReference && (
+              <button
+                type="button"
+                className="document-form__reference"
+                onClick={onRegisterReference}
+                disabled={!hasTitle}
+                title="Registra el documento sin texto: no genera evidencia."
+              >
+                Registrar solo como referencia
+              </button>
+            )}
           </div>
 
           {!canSubmit && (

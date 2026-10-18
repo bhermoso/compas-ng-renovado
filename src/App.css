@@ -3186,6 +3186,47 @@ h3 {
   cursor: not-allowed;
 }
 
+.doc-cycle {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.doc-cycle__label {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--texto-secundario);
+}
+
+.doc-cycle__fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.doc-cycle__fields select,
+.doc-cycle__fields input {
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  padding: 6px 10px;
+  background: var(--blanco);
+  color: var(--tinta-azul);
+  font: inherit;
+  font-size: 0.85rem;
+}
+
+.doc-cycle__fields input {
+  width: 6rem;
+}
+
+.document-form__reference {
+  background: var(--blanco);
+  color: var(--azul-profundo);
+  border: 1px solid var(--azul-profundo);
+}
+
 .docx-upload__status {
   margin: 0;
   padding: 10px 12px;

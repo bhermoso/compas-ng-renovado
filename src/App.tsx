@@ -19,10 +19,12 @@ import type { PlanPreparationDraft } from "./domain/action-plan-catalog/PlanPrep
 import { worksheetKey, type IndicatorWorksheet } from "./domain/action-plan-catalog/IndicatorWorksheet";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  type DocumentCycle,
   type DocumentKind,
   type MunicipalDocument,
   type MunicipalDocumentRepository,
   addMunicipalDocument,
+  setMunicipalDocumentCycle,
   replaceMunicipalDocumentByKind,
   removeMunicipalDocument,
 } from "./domain/repository";
@@ -1265,6 +1267,37 @@ export default function App() {
     setLastAtomCount(result.atomsCreated);
     setTitle("");
     setPlainText("");
+  }
+
+  function handleRegisterDocumentReference() {
+    const cleanTitle = title.trim();
+    if (cleanTitle === "" || kind === "community-asset" || kind === "localiza-salud") return;
+    const documentId = crypto.randomUUID();
+    setWorkspace((prev) => ({
+      ...prev,
+      repository: addMunicipalDocument(prev.repository, {
+        id: documentId,
+        kind,
+        title: cleanTitle,
+        source: {
+          system: "Registro manual — referencia sin texto",
+          collectedAt: new Date().toISOString(),
+        },
+        canGenerateEvidence: false,
+        contentMode: "reference-only",
+        tags: [kind],
+      }),
+      updatedAt: new Date().toISOString(),
+    }));
+    setTitle("");
+  }
+
+  function handleSetDocumentCycle(documentId: string, cycle: DocumentCycle | undefined) {
+    setWorkspace((prev) => ({
+      ...prev,
+      repository: setMunicipalDocumentCycle(prev.repository, documentId, cycle),
+      updatedAt: new Date().toISOString(),
+    }));
   }
 
   async function handleLoadHealthReport(file: File): Promise<void> {
@@ -3740,6 +3773,7 @@ export default function App() {
               libraryDocuments={compasDocumentLibrary}
               libraryMessage={documentLibraryMessage}
               onAssignLibraryDocument={handleAssignLibraryDocument}
+              onSetDocumentCycle={handleSetDocumentCycle}
             />
 
             {/* ── BLOQUE 4: Añadir o sustituir fuentes ── */}
@@ -3756,6 +3790,7 @@ export default function App() {
               onTitleChange={setTitle}
               onPlainTextChange={setPlainText}
               onProcessDocument={handleProcessDocument}
+              onRegisterReference={handleRegisterDocumentReference}
               onLoadHealthReport={handleLoadHealthReport}
               onLoadDocumentFile={handleLoadDocumentFile}
               isLoadingDocumentFile={isLoadingDocumentFile}
@@ -3878,6 +3913,7 @@ export default function App() {
               onTitleChange={setTitle}
               onPlainTextChange={setPlainText}
               onProcessDocument={handleProcessDocument}
+              onRegisterReference={handleRegisterDocumentReference}
               onLoadHealthReport={handleLoadHealthReport}
               onLoadDocumentFile={handleLoadDocumentFile}
               isLoadingDocumentFile={isLoadingDocumentFile}

@@ -1,9 +1,11 @@
 import { FrameworkReference } from "./FrameworkReference";
 import { DocumentReference } from "./Documentation";
 import type {
+  DocumentCycle,
   MunicipalDocument,
   MunicipalDocumentRepository,
 } from "../../domain/repository";
+import { DocumentCycleControl } from "./DocumentCycleControl";
 import {
   libraryDocumentAssignmentId,
   type CompasLibraryDocument,
@@ -57,14 +59,17 @@ interface DocumentRepositoryPanelProps {
   libraryDocuments?: CompasLibraryDocument[];
   libraryMessage?: string | null;
   onAssignLibraryDocument?: (document: CompasLibraryDocument) => void;
+  onSetDocumentCycle?: (documentId: string, cycle: DocumentCycle | undefined) => void;
 }
 
 function DocumentRow({
   document,
   onDelete,
+  onSetCycle,
 }: {
   document: MunicipalDocument;
   onDelete?: (documentId: string) => void;
+  onSetCycle?: (documentId: string, cycle: DocumentCycle | undefined) => void;
 }) {
   return (
     <article
@@ -79,6 +84,12 @@ function DocumentRow({
         <h3><DocumentReference documentId={document.id}>{document.title}</DocumentReference></h3>
         {document.source.system && (
           <p className="doc-repo__source">{document.source.system}</p>
+        )}
+        {onSetCycle && (
+          <DocumentCycleControl
+            cycle={document.cycle}
+            onChange={(cycle) => onSetCycle(document.id, cycle)}
+          />
         )}
       </div>
       <div className="doc-repo__actions">
@@ -181,6 +192,7 @@ export function DocumentRepositoryPanel({
   libraryDocuments,
   libraryMessage,
   onAssignLibraryDocument,
+  onSetDocumentCycle,
 }: DocumentRepositoryPanelProps) {
   // Solo muestra "otras fuentes documentales" — las capas 1–3 (Informe de Salud,
   // Estudios complementarios, Activos para la salud) tienen sus propios paneles.
@@ -213,7 +225,7 @@ export function DocumentRepositoryPanel({
           <p>Consulta los originales, el texto conservado y las referencias del informe de salud, los estudios y los activos. Las demás fuentes y los marcos estratégicos se listan en sus apartados, más abajo. <strong>Registrar un documento no implica conservar su archivo ni aprobarlo.</strong></p>
           <p>Los archivos que incorpores se conservan en este navegador. <strong>Para trasladarlos a otro equipo,</strong> utiliza «Copias y recuperación del trabajo» y descarga la copia con originales.</p>
           <details><summary>Abrir catálogo · {catalogDocs.length} {catalogDocs.length === 1 ? "documento" : "documentos"}</summary>
-            <div className="document-list">{catalogDocs.map(document=><DocumentRow key={document.id} document={document} onDelete={onDelete}/>)}</div>
+            <div className="document-list">{catalogDocs.map(document=><DocumentRow key={document.id} document={document} onDelete={onDelete} onSetCycle={onSetDocumentCycle}/>)}</div>
           </details>
         </section>
       )}
@@ -303,7 +315,7 @@ export function DocumentRepositoryPanel({
         ) : (
           <div className="document-list">
             {otherDocs.map((document) => (
-              <DocumentRow key={document.id} document={document} onDelete={onDelete} />
+              <DocumentRow key={document.id} document={document} onDelete={onDelete} onSetCycle={onSetDocumentCycle} />
             ))}
           </div>
         )}
@@ -328,7 +340,7 @@ export function DocumentRepositoryPanel({
           </div>
           <div className="document-list">
             {strategicDocs.map((document) => (
-              <DocumentRow key={document.id} document={document} onDelete={onDelete} />
+              <DocumentRow key={document.id} document={document} onDelete={onDelete} onSetCycle={onSetDocumentCycle} />
             ))}
           </div>
         </section>
