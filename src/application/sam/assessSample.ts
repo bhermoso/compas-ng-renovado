@@ -125,13 +125,14 @@ export function restrictReferenceToAgeRange(
     return { reason: `Ninguna banda del padrón cae dentro de ${range.min}-${range.max} años.` };
   }
   const total = kept.reduce((s, c) => s + c.male + c.female, 0);
-  const to = Number.isFinite(range.max) ? String(range.max) : "+";
+  const first = kept[0].ageBand;
+  const last = kept[kept.length - 1].ageBand;
   return {
     reference: {
       ...ref,
-      source: `${ref.source} — bandas completas de ${range.min} a ${to} años`,
+      source: `${ref.source} — bandas completas de ${first} a ${last}`,
       populationTotal: total,
-      ageGroupLabel: `${range.min}-${to} años`,
+      ageGroupLabel: `bandas ${first} a ${last}`,
       ageSexMatrix: kept,
     },
   };

@@ -85,7 +85,15 @@ describe("CitizenParticipationSummary", () => {
     expect(h).toContain("No evaluable: no hay padrón");
     expect(h).toContain("Participantes por banda de edad y sexo");
     expect(h).not.toContain("sam-tripyramid");
-    expect(h).toContain("no se pueden asignar");
+    expect(h).toContain("papeletas no se pueden asignar");
+  });
+
+  it("una sola papeleta no asignable se redacta en singular", () => {
+    const base = study("zagra");
+    const s = { ...base, ageSexObserved: { ...base.ageSexObserved!, unassignableCount: 1 } };
+    const h = html("zagra", s);
+    expect(h).toContain("1 papeleta no se puede asignar");
+    expect(h).not.toContain("1 papeletas");
   });
 
   it("si el CSV no traía edad y sexo lo declara", () => {

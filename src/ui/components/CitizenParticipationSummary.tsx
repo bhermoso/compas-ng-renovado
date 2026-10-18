@@ -96,7 +96,10 @@ export function CitizenParticipationSummary({
           </div>
           {observed.unassignableCount > 0 && (
             <p className="citizen-summary__hint">
-              {fmtInt(observed.unassignableCount)} papeletas no se pueden asignar a una celda (sexo o edad no reconocibles) y no figuran en la tabla. No se imputan.
+              {observed.unassignableCount === 1
+                ? "1 papeleta no se puede asignar a una celda"
+                : `${fmtInt(observed.unassignableCount)} papeletas no se pueden asignar a una celda`}{" "}
+              (sexo o edad no reconocibles) y no figuran en la tabla. No se imputan.
             </p>
           )}
         </>
