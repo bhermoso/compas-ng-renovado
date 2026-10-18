@@ -193,6 +193,12 @@ export function DocumentRepositoryPanel({
   const strategicDocs = sortWithinCategory(
     repository.documents.filter((d) => getCategory(d) === "strategic-input")
   );
+  // Cada documento aparece en un solo lugar: el catálogo recoge solo los que no
+  // se listan en "Otras fuentes documentales" ni en "Marcos estratégicos".
+  const catalogDocs = repository.documents.filter((d) => {
+    const category = getCategory(d);
+    return category !== "other-source" && category !== "strategic-input";
+  });
   const libraryGroups = new Map<string, CompasLibraryDocument[]>();
   for (const item of libraryDocuments ?? []) {
     const key = item.sourceMunicipalityName;
@@ -201,14 +207,16 @@ export function DocumentRepositoryPanel({
 
   return (
     <>
-      <section className="workspace-panel">
-        <h2>Todos los documentos del expediente</h2>
-        <p>Consulta los originales, el texto conservado y las referencias de todas las categorías. <strong>Registrar un documento no implica conservar su archivo ni aprobarlo.</strong></p>
-        <p>Los archivos que incorpores se conservan en este navegador. <strong>Para trasladarlos a otro equipo,</strong> utiliza «Copias y recuperación del trabajo» y descarga la copia con originales.</p>
-        <details><summary>Abrir catálogo completo · {repository.documents.length} documentos</summary>
-          <div className="document-list">{repository.documents.map(document=><DocumentRow key={document.id} document={document} onDelete={onDelete}/>)}</div>
-        </details>
-      </section>
+      {catalogDocs.length > 0 && (
+        <section className="workspace-panel">
+          <h2>Informe, estudios y activos del expediente</h2>
+          <p>Consulta los originales, el texto conservado y las referencias del informe de salud, los estudios y los activos. Las demás fuentes y los marcos estratégicos se listan en sus apartados, más abajo. <strong>Registrar un documento no implica conservar su archivo ni aprobarlo.</strong></p>
+          <p>Los archivos que incorpores se conservan en este navegador. <strong>Para trasladarlos a otro equipo,</strong> utiliza «Copias y recuperación del trabajo» y descarga la copia con originales.</p>
+          <details><summary>Abrir catálogo · {catalogDocs.length} {catalogDocs.length === 1 ? "documento" : "documentos"}</summary>
+            <div className="document-list">{catalogDocs.map(document=><DocumentRow key={document.id} document={document} onDelete={onDelete}/>)}</div>
+          </details>
+        </section>
+      )}
 
       {libraryDocuments !== undefined && libraryDocuments.length > 0 && (
         <section className="workspace-panel">

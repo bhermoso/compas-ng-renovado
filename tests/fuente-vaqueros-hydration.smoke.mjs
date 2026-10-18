@@ -34,7 +34,7 @@ try {
     if (visit === 0) await page.goto(url); else await page.reload();
     await page.getByRole("button", { name: "2 Diagnóstico territorial", exact: true }).click();
     await page.getByRole("heading", { name: "Fuente Vaqueros", exact: true }).waitFor();
-    await page.getByText("Abrir catálogo completo · 1 documentos", { exact: true }).waitFor({ timeout: 15000 });
+    await page.getByRole("heading", { name: "Otras fuentes documentales1" }).waitFor({ timeout: 15000 });
     await page.waitForFunction(() => {
       const raw = localStorage.getItem("compas-ng:workspace:fuente-vaqueros");
       if (!raw) return false;

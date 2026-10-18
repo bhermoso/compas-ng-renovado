@@ -18,7 +18,12 @@ describe('Acceso a documentos del repositorio', () => {
   const html = renderToStaticMarkup(<DocumentRepositoryPanel repository={repository}/>);
   expect(html.match(/Descargar PDF original/g)?.length).toBeGreaterThanOrEqual(4);
   expect(html).toContain('Abrir en nueva pestaña');
-  expect(html).toContain('Todos los documentos del expediente');
+  expect(html).not.toContain('Todos los documentos del expediente');
+  expect(html).toContain('Otras fuentes documentales');
+ });
+ it('lista cada documento en un solo lugar',()=>{
+  const html = renderToStaticMarkup(<DocumentRepositoryPanel repository={repository}/>);
+  for (const document of repository.documents) expect(html.split(`>${document.title}</h3>`).length - 1).toBe(1);
  });
  it('nombra de forma inequívoca el Informe de Salud descargable desde el Perfil', () => {
   const report = repository.documents.find(d => d.kind === 'health-report')!;
