@@ -1,3 +1,4 @@
+import { DocumentFileUpload } from "./DocumentFileUpload";
 import { FrameworkReference } from "./FrameworkReference";
 import type {
   DocumentKind,
@@ -100,34 +101,7 @@ export function DocumentIngestionPanel({
             ))}
           </select>
 
-          <div className="docx-upload__zone">
-            <label htmlFor="hr-file-input" className="docx-upload__label">
-              Cargar Informe de Salud (.docx / .doc / .pdf)
-            </label>
-            <input
-              id="hr-file-input"
-              type="file"
-              accept=".docx,.doc,.pdf"
-              disabled={isLoadingHealthReport === true}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file !== undefined && onLoadHealthReport !== undefined) {
-                  onLoadHealthReport(file);
-                }
-                e.target.value = "";
-              }}
-              className="docx-upload__input"
-            />
-          </div>
-
-          {isLoadingHealthReport === true && (
-            <p className="ingestion-hint">Procesando informe…</p>
-          )}
-          {healthReportMessage !== undefined &&
-            healthReportMessage !== null &&
-            isLoadingHealthReport !== true && (
-              <p className="panel-note">{healthReportMessage}</p>
-            )}
+          <DocumentFileUpload id="hr-file-input" label="Cargar Informe de Salud (.docx / .doc / .pdf)" accept=".docx,.doc,.pdf" isLoading={isLoadingHealthReport === true} message={healthReportMessage} onFile={onLoadHealthReport} />
         </div>
       ) : isStrategicFramework ? (
         /* ── Carga de marcos estratégicos y normativos ── */
@@ -156,33 +130,7 @@ export function DocumentIngestionPanel({
           </p>
 
           {/* Vía A: subir documento completo (DOCX y PDF → extraen texto cuando está disponible) */}
-          <div className="docx-upload__zone">
-            <label htmlFor="sf-file-input" className="docx-upload__label">
-              Subir documento (.docx o .pdf)
-            </label>
-            <input
-              id="sf-file-input"
-              type="file"
-              accept=".docx,.pdf"
-              disabled={isLoadingDocumentFile === true}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file !== undefined && onLoadDocumentFile !== undefined) {
-                  onLoadDocumentFile(file);
-                }
-                e.target.value = "";
-              }}
-              className="docx-upload__input"
-            />
-          </div>
-          {isLoadingDocumentFile === true && (
-            <p className="ingestion-hint">Procesando documento…</p>
-          )}
-          {documentFileMessage !== undefined &&
-            documentFileMessage !== null &&
-            isLoadingDocumentFile !== true && (
-              <p className="panel-note">{documentFileMessage}</p>
-            )}
+          <DocumentFileUpload id="sf-file-input" label="Subir documento (.docx o .pdf)" accept=".docx,.pdf" isLoading={isLoadingDocumentFile === true} message={documentFileMessage} onFile={onLoadDocumentFile} />
 
           {/* Vía B: pegar extracto analítico (genera prioridades estratégicas) */}
           <p className="ingestion-hint">
@@ -372,33 +320,7 @@ export function DocumentIngestionPanel({
           </p>
 
           {/* Vía A: subir documento DOCX/PDF */}
-          <div className="docx-upload__zone">
-            <label htmlFor="td-file-input" className="docx-upload__label">
-              Subir documento (.docx o .pdf)
-            </label>
-            <input
-              id="td-file-input"
-              type="file"
-              accept=".docx,.pdf"
-              disabled={isLoadingDocumentFile === true}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file !== undefined && onLoadDocumentFile !== undefined) {
-                  onLoadDocumentFile(file);
-                }
-                e.target.value = "";
-              }}
-              className="docx-upload__input"
-            />
-          </div>
-          {isLoadingDocumentFile === true && (
-            <p className="ingestion-hint">Procesando documento…</p>
-          )}
-          {documentFileMessage !== undefined &&
-            documentFileMessage !== null &&
-            isLoadingDocumentFile !== true && (
-              <p className="panel-note">{documentFileMessage}</p>
-            )}
+          <DocumentFileUpload id="td-file-input" label="Subir documento (.docx o .pdf)" accept=".docx,.pdf" isLoading={isLoadingDocumentFile === true} message={documentFileMessage} onFile={onLoadDocumentFile} />
 
           {/* Vía B: pegar texto */}
           <p className="ingestion-hint">Alternativa manual opcional: pega el contenido directamente:</p>
@@ -462,33 +384,7 @@ export function DocumentIngestionPanel({
           </p>
 
           {/* Vía A: subir documento DOCX/PDF */}
-          <div className="docx-upload__zone">
-            <label htmlFor="qm-file-input" className="docx-upload__label">
-              Subir acta o documento (.docx o .pdf)
-            </label>
-            <input
-              id="qm-file-input"
-              type="file"
-              accept=".docx,.pdf"
-              disabled={isLoadingDocumentFile === true}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file !== undefined && onLoadDocumentFile !== undefined) {
-                  onLoadDocumentFile(file);
-                }
-                e.target.value = "";
-              }}
-              className="docx-upload__input"
-            />
-          </div>
-          {isLoadingDocumentFile === true && (
-            <p className="ingestion-hint">Procesando documento…</p>
-          )}
-          {documentFileMessage !== undefined &&
-            documentFileMessage !== null &&
-            isLoadingDocumentFile !== true && (
-              <p className="panel-note">{documentFileMessage}</p>
-            )}
+          <DocumentFileUpload id="qm-file-input" label="Subir acta o documento (.docx o .pdf)" accept=".docx,.pdf" isLoading={isLoadingDocumentFile === true} message={documentFileMessage} onFile={onLoadDocumentFile} />
 
           {/* Vía B: pegar texto */}
           <p className="ingestion-hint">Alternativa manual opcional: pega el contenido directamente:</p>
