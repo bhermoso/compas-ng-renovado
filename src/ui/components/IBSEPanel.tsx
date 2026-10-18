@@ -5,6 +5,7 @@ import {
   assessIBSEStudySAM,
   getPopulationReferenceSet,
 } from "../../application/sam";
+import { SamObservedAssessment } from "./SamObservedAssessment";
 import type { SampleQualityLevel, SampleQualityAssessment } from "../../domain/sam";
 
 interface IBSEPanelProps {
@@ -308,6 +309,16 @@ export function IBSEPanel({ ibseStudy, municipalityName }: IBSEPanelProps) {
           </p>
         )}
       </section>
+
+      {/* REPRESENTATIVIDAD POR EDAD Y SEXO (SAM) */}
+      <SamObservedAssessment
+        municipalityId={ibseStudy.municipalityId}
+        instrumentId="ibse"
+        title={`IBSE — ${mun}`}
+        observed={ibseStudy.ageSexObserved?.cells}
+        missingReason="El estudio no conserva la edad y el sexo de los participantes: el CSV importado no incluía las columnas «sexo» y «edad», o el municipio no tenía padrón por edad y sexo en el momento de importarlo."
+        defaultFromAge={ibseStudy.sampleScope === "16-plus" ? 20 : 0}
+      />
 
       {/* LÍNEAS DE OBSERVACIÓN */}
       {note?.implications && (

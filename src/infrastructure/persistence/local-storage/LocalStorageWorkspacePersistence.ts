@@ -193,6 +193,27 @@ export function parseWorkspaceJSON(
       delete parsed.ibseStudy.strataCounts;
     }
 
+    // Distribución edad×sexo del IBSE (campo opcional y aditivo): si existe pero no
+    // tiene forma válida, se descarta; nunca se repara ni se completa.
+    if (parsed.ibseStudy && parsed.ibseStudy.ageSexObserved !== undefined) {
+      const o = parsed.ibseStudy.ageSexObserved;
+      const sane =
+        o !== null &&
+        typeof o === "object" &&
+        Array.isArray(o.cells) &&
+        o.cells.every(
+          (c: unknown) =>
+            c !== null &&
+            typeof c === "object" &&
+            typeof (c as { ageBand?: unknown }).ageBand === "string" &&
+            Number.isInteger((c as { male?: unknown }).male) &&
+            (c as { male: number }).male >= 0 &&
+            Number.isInteger((c as { female?: unknown }).female) &&
+            (c as { female: number }).female >= 0
+        );
+      if (!sane) delete parsed.ibseStudy.ageSexObserved;
+    }
+
     if (parsed.dukeStudy && !Array.isArray(parsed.dukeStudy.methodologicalCautions)) {
       parsed.dukeStudy.methodologicalCautions = [];
     }

@@ -93,6 +93,7 @@ import {
   createHealthReportDocumentFromPdf,
 } from "./application/health-report";
 import { parseIBSECSV, ibseStudyToEvidenceAtoms } from "./application/ibse";
+import { getPopulationReferenceSet, parseAgeBandLabel } from "./application/sam";
 import { createIBSEStudy } from "./domain/ibse";
 import { parseDUKECSV, dukeStudyToEvidenceAtoms } from "./application/duke";
 import { createDUKEStudy } from "./domain/duke";
@@ -1631,13 +1632,30 @@ export default function App() {
     setIsLoadingIBSE(true);
     try {
       const text = await file.text();
-      const { aggregates, methodologicalCautions, warnings } = parseIBSECSV(text);
+      // Bandas de edad del padrón del municipio (si existe): permiten recoger la
+      // distribución edad×sexo del CSV. Sin padrón desglosado no se recoge nada.
+      const sexAgeBands = (getPopulationReferenceSet(workspace.municipality.identity.id)
+        .allAges?.ageSexMatrix ?? [])
+        .map((cell) => parseAgeBandLabel(cell.ageBand))
+        .filter((band): band is NonNullable<typeof band> => band !== null);
+      const { aggregates, methodologicalCautions, warnings, ageSexObserved } = parseIBSECSV(
+        text,
+        sexAgeBands.length > 0 ? { ageBands: sexAgeBands } : undefined
+      );
       const documentId = crypto.randomUUID();
       await saveOriginalFile(workspace.municipality.identity.id, documentId, file);
       const study = createIBSEStudy({
         municipalityId: workspace.municipality.identity.id,
         sourceFileName: file.name,
         aggregates,
+        ageSexObserved:
+          ageSexObserved === undefined
+            ? undefined
+            : {
+                cells: ageSexObserved.cells,
+                assignedCount: ageSexObserved.assignedCount,
+                unassignableCount: ageSexObserved.unassignableCount,
+              },
         methodologicalCautions,
       });
       const ibseAtoms = attachDocumentIdToAtoms(

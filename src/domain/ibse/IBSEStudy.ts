@@ -33,6 +33,16 @@ export interface IBSEStrataCounts {
   plus16?: IBSEStratumCount;
 }
 
+/**
+ * Distribución observada edad×sexo, solo cuando el export aporta las columnas
+ * `sexo` y `edad`. Nunca se deriva ni se imputa: su ausencia significa "no disponible".
+ */
+export interface IBSEAgeSexObserved {
+  cells: Array<{ ageBand: string; male: number; female: number }>;
+  assignedCount: number;
+  unassignableCount: number;
+}
+
 export interface IBSEStudy {
   id: string;
   municipalityId: MunicipalityId;
@@ -42,6 +52,8 @@ export interface IBSEStudy {
   sampleScope: IBSESampleScope;
   /** Recuentos por estrato, solo si el export los aporta. */
   strataCounts?: IBSEStrataCounts;
+  /** Distribución observada edad×sexo, si el export la aporta. */
+  ageSexObserved?: IBSEAgeSexObserved;
   methodologicalCautions: string[];
   exportedAt?: string;
   createdAt: string;
@@ -55,6 +67,7 @@ export interface CreateIBSEStudyInput {
   /** Universo etario de la muestra. Por defecto "unknown" (compatibilidad legacy). */
   sampleScope?: IBSESampleScope;
   strataCounts?: IBSEStrataCounts;
+  ageSexObserved?: IBSEAgeSexObserved;
   methodologicalCautions: string[];
   exportedAt?: string;
 }
@@ -69,6 +82,7 @@ export function createIBSEStudy(input: CreateIBSEStudyInput): IBSEStudy {
     // Sin discriminador explícito, el estudio NO afirma ser escolar: "unknown".
     sampleScope: input.sampleScope ?? "unknown",
     strataCounts: input.strataCounts,
+    ageSexObserved: input.ageSexObserved,
     methodologicalCautions: input.methodologicalCautions,
     exportedAt: input.exportedAt,
     createdAt: now,

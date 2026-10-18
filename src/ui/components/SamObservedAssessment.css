@@ -1,0 +1,7 @@
+.sam-observed { margin: 20px 0; }
+.sam-observed__range { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 10px 12px; border: 1px solid var(--borde); border-radius: 6px; background: var(--fondo-secundario); font-size: .9rem; color: var(--texto-principal); }
+.sam-observed__legend { font-weight: 600; flex-basis: 100%; }
+.sam-observed__range label { display: inline-flex; align-items: center; gap: 6px; }
+.sam-observed__range select { padding: 4px 8px; border: 1px solid var(--borde); border-radius: 4px; background: var(--blanco); color: var(--texto-principal); }
+.sam-observed__hint { flex-basis: 100%; font-size: .85rem; color: var(--texto-secundario); }
+.sam-observed .sam-panel { margin-top: 12px; }

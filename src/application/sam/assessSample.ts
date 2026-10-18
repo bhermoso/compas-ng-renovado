@@ -48,6 +48,12 @@ export interface SampleInput {
   nObserved?: number;
   /** Registros individuales, para evaluar la representatividad por edad y sexo. */
   records?: ReadonlyArray<SampleRecord>;
+  /**
+   * Recuento ya agregado por banda de edad y sexo (alternativa a `records`).
+   * Con `ageRange`, las bandas fuera del rango se excluyen y se declaran, y el
+   * tamaño evaluado es el de las bandas conservadas.
+   */
+  observedCells?: ReadonlyArray<AgeSexCell>;
   /** Año de referencia para la ruta `birthYear`. */
   referenceYear?: number;
   /** Referencia explícita. Si falta, se toma del registro del municipio según `universe`. */
@@ -141,6 +147,48 @@ function resolveReference(
   return { reference: base };
 }
 
+const fmt = (n: number) => n.toLocaleString("es-ES");
+
+/**
+ * Alinea el recuento observado con las bandas del padrón de referencia, por
+ * etiqueta. Las bandas observadas que el padrón no incluye (p. ej. por un rango
+ * de edad) se excluyen y se declaran. Si al padrón le falta alguna banda en lo
+ * observado, no hay comparación posible: no se rellenan ceros.
+ */
+function alignObservedCells(
+  observed: ReadonlyArray<AgeSexCell>,
+  matrix: AgeSexCell[] | undefined
+):
+  | { cells: AgeSexCell[]; retainedTotal: number; excludedTotal: number; excludedBands: string[] }
+  | { reason: string } {
+  if (!matrix) {
+    return { reason: "El padrón de referencia no está desglosado por edad y sexo." };
+  }
+  const byLabel = new Map(observed.map((c) => [c.ageBand, c]));
+  const cells: AgeSexCell[] = [];
+  for (const m of matrix) {
+    const o = byLabel.get(m.ageBand);
+    if (!o) {
+      return {
+        reason: `Las bandas de edad de la muestra no coinciden con las del padrón (falta ${m.ageBand}).`,
+      };
+    }
+    cells.push({ ageBand: m.ageBand, male: o.male, female: o.female });
+  }
+  const kept = new Set(matrix.map((m) => m.ageBand));
+  const excluded = observed.filter((c) => !kept.has(c.ageBand));
+  const retainedTotal = cells.reduce((s, c) => s + c.male + c.female, 0);
+  if (retainedTotal <= 0) {
+    return { reason: "Ningún participante cae dentro de las bandas comparadas." };
+  }
+  return {
+    cells,
+    retainedTotal,
+    excludedTotal: excluded.reduce((s, c) => s + c.male + c.female, 0),
+    excludedBands: excluded.filter((c) => c.male + c.female > 0).map((c) => c.ageBand),
+  };
+}
+
 export function assessSample(input: SampleInput): SampleAssessmentResult {
   const resolved = resolveReference(input);
   if ("reason" in resolved) {
@@ -148,7 +196,16 @@ export function assessSample(input: SampleInput): SampleAssessmentResult {
   }
   const reference = resolved.reference;
 
-  const nObserved = input.nObserved ?? input.records?.length;
+  const aligned = input.observedCells
+    ? alignObservedCells(input.observedCells, reference.ageSexMatrix)
+    : undefined;
+  if (aligned && "reason" in aligned) {
+    return { status: "not-evaluable", reasons: [aligned.reason] };
+  }
+
+  const nObserved = aligned
+    ? aligned.retainedTotal
+    : input.nObserved ?? input.records?.length;
   if (nObserved === undefined || !Number.isFinite(nObserved) || nObserved <= 0) {
     return {
       status: "not-evaluable",
@@ -165,6 +222,16 @@ export function assessSample(input: SampleInput): SampleAssessmentResult {
 
   const notes: string[] = [];
   const matrix = reference.ageSexMatrix;
+
+  if (aligned) {
+    if (aligned.excludedTotal > 0) {
+      notes.push(
+        `${fmt(aligned.excludedTotal)} participantes de bandas de edad fuera del rango comparado (${aligned.excludedBands.join(", ")}) quedan fuera de este dictamen. El tamaño evaluado es el de las bandas conservadas (${fmt(aligned.retainedTotal)}).`
+      );
+    }
+    assessment = enrichWithRepresentativeness(assessment, aligned.cells);
+    return { status: "evaluable", assessment, notes };
+  }
 
   if (!matrix) {
     return {
