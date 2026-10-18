@@ -6,7 +6,8 @@
 import { describe, it, expect } from "vitest";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { SamTriPyramid, buildSamTriPyramidRows } from "../src/ui/components/SamTriPyramid";
+import { SamTriPyramid } from "../src/ui/components/SamTriPyramid";
+import { buildSamTriPyramidRows } from "../src/ui/components/samTriPyramidRows";
 import { enrichWithRepresentativeness } from "../src/application/sam/assessStudies";
 import { computeSampleQualityAssessment } from "../src/application/sam/computeSampleQualityAssessment";
 import type { AgeSexCell, PopulationReference } from "../src/domain/sam/PopulationReference";
