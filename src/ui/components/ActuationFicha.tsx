@@ -207,10 +207,12 @@ export function ActuationFicha({ actuation, worksheets, onSave, onClose }: Props
       <details>
         <summary>Resultado</summary>
         <p className="ficha-hint">Lo registra el equipo. El sistema no calcula cumplimiento ni etiqueta resultados.</p>
-        {linked
-          ? <ReadOnly label="Resultado consolidado del indicador" value={reading.consolidatedResult} hint="Se lee de la consolidación del Plan de Acción." />
-          : textInput("result", "indicatorValueReached", "Valor del indicador alcanzado")}
-        {textInput("result", "observedResult", "Resultado observado", true)}
+        <p className="ficha-hint">Aquí se anota lo que esta actuación puede contar por sí misma. El resultado del indicador se consolida en el Plan de Acción y no se reparte entre actuaciones: no se sabe en qué medida contribuyó cada una.</p>
+        {linked && reading.linkedIndicator && (
+          <ReadOnly label="Indicador al que declara contribuir" value={`${reading.linkedIndicator.code} · ${reading.linkedIndicator.name}`} hint="Su resultado se consulta en el Plan de Acción." />
+        )}
+        {textInput("result", "deliveredOutput", "Lo realizado (según su registro propio)", true)}
+        {textInput("result", "observedResult", "Resultado observado de la actuación", true)}
         {textInput("result", "verificationSource", "Fuente de verificación")}
         {textInput("result", "barriers", "Barreras", true)}
         {textInput("result", "facilitators", "Facilitadores", true)}

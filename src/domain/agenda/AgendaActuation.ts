@@ -119,7 +119,8 @@ export interface ActuationTracking {
 }
 
 export interface ActuationResult {
-  indicatorValueReached?: string;
+  /** Lo realizado según el registro propio de la actuación (sesiones, personas, asistencias). No es el valor de ningún indicador. */
+  deliveredOutput?: string;
   observedResult?: string;
   verificationSource?: string;
   barriers?: string;

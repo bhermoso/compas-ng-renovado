@@ -230,8 +230,8 @@ export interface ActuationPlanReading {
   population?: string;
   schedule?: string;
   resources?: string;
-  /** Último resultado consolidado del indicador, tal como lo registró la persona responsable. */
-  consolidatedResult?: string;
+  /** Indicador al que la actuación declara contribuir. El resultado del indicador se consolida en el plan y no se atribuye a la actuación. */
+  linkedIndicator?: { code: string; name: string };
   planEditHint?: string;
 }
 
@@ -259,7 +259,6 @@ export function readActuation(
     return { orphan: true, name: "Actuación que ya no figura en el Plan de Acción" };
   }
   const v = action.values;
-  const reviewed = [...sheet.consolidations].reverse().find((c) => clean(c.values.result));
   return {
     orphan: false,
     name: clean(v.name) || "Actuación pendiente de nombrar",
@@ -268,7 +267,7 @@ export function readActuation(
     population: clean(v.population) || undefined,
     schedule: clean(v.schedule) || undefined,
     resources: clean(v.resources) || undefined,
-    consolidatedResult: reviewed ? clean(reviewed.values.result) : undefined,
+    linkedIndicator: { code: sheet.context.indicatorCode, name: sheet.context.indicator },
     planEditHint: "Se edita en el Plan de Acción.",
   };
 }

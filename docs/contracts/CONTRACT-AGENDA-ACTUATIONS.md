@@ -35,13 +35,13 @@ En un registro vinculado, los datos que el plan ya recoge se leen del plan y no 
 | Población | población, colectivo, etapa de vida, grupos de edad, participantes previstos y alcanzados, mujeres, hombres, otro o no consta, número de sesiones |
 | Responsables | responsable, organización, entidad responsable, persona referente, contacto, profesionales, entidades colaboradoras, asociaciones implicadas, activos comunitarios |
 | Seguimiento | estado, prioridad, fecha prevista y real, recursos, evidencia, observaciones |
-| Resultado | valor del indicador alcanzado, resultado observado, fuente de verificación, barreras, facilitadores, aprendizajes, decisión para el siguiente ciclo |
+| Resultado | lo realizado según su registro propio, resultado observado de la actuación, fuente de verificación, barreras, facilitadores, aprendizajes, decisión para el siguiente ciclo |
 
 En un registro manual solo el nombre es obligatorio. En uno vinculado el nombre procede del plan. Un campo vacío se muestra como «sin dato». No se rellena ni se aproxima.
 
 ## 6. Bloque de resultado
 
-1. Vive en el registro de agenda y se guarda en el expediente, que se sincroniza con Firebase. No hay copia en seguimiento ni en evaluación. El valor del indicador no se escribe aquí en las actuaciones vinculadas: se lee de la consolidación del plan.
+1. Vive en el registro de agenda y se guarda en el expediente, que se sincroniza con Firebase. No hay copia en seguimiento ni en evaluación. El valor de un indicador no se escribe ni se muestra en la actuación: se consolida en el Plan de Acción por indicador. No se conoce en qué medida contribuyó cada actuación, y la agenda no lo atribuye. La actuación registra lo que puede contar por sí misma (realización) y el indicador al que declara contribuir.
 2. Lo rellena el equipo. El sistema no calcula cumplimiento, no puntúa y no etiqueta resultados.
 3. La decisión para el siguiente ciclo es una decisión humana: mantener, modificar, escalar, suspender, evaluar más o no decidido.
 4. Los participantes por sexo y grupos de edad son recuentos declarados. Si se usan para evaluar representatividad, se hace con SAM (`CONTRACT-DYNAMIC-TRIPYRAMID`).

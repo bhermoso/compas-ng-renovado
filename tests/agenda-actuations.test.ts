@@ -62,9 +62,14 @@ describe("volcado desde el plan", () => {
 describe("lectura del plan", () => {
   const ws = [sheet()];
   const linked = importActuationsFromPlan([], { municipalityId: "m", worksheets: ws, now: NOW, newId: id }).list;
-  it("lee nombre, responsable, calendario y resultado consolidado del plan", () => {
+  it("lee nombre, responsable, calendario e indicador vinculado del plan", () => {
     const r = readActuation(linked[0], ws);
-    expect(r).toMatchObject({ orphan: false, name: "Paseos", responsible: "Distrito", schedule: "mensual", consolidatedResult: "42 %" });
+    expect(r).toMatchObject({ orphan: false, name: "Paseos", responsible: "Distrito", schedule: "mensual", linkedIndicator: expect.objectContaining({ code: expect.any(String) }) });
+  });
+  it("no atribuye a la actuación el resultado consolidado del indicador", () => {
+    const r = readActuation(linked[0], ws);
+    expect(JSON.stringify(r)).not.toContain("42 %");
+    expect(r.linkedIndicator).toEqual({ code: "I1", name: "i" });
   });
   it("si la actuación ya no está en el plan, lo declara y no inventa", () => {
     const r = readActuation(linked[0], []);
