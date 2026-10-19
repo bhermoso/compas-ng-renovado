@@ -55,6 +55,7 @@ import {
 } from "./appWorkspaceHydration";
 import { createMunicipalityRuntime } from "./application/runtime";
 import { ingestManualDocument, extractDocxText, removeEquivalentStrategicFramework } from "./application/document-ingestion";
+import { assetEntriesOfDocument } from "./application/evidence-pipeline";
 import {
   assignLibraryDocumentToWorkspace,
   collectCompasDocumentLibrary,
@@ -3648,9 +3649,7 @@ export default function App() {
               const assetDocs = docs.filter(
                 (d) => d.kind === "community-asset" || d.kind === "localiza-salud"
               );
-              const assetNames = assetDocs.flatMap((d) =>
-                (d.sourceText ?? "").split("\n").map((s) => s.trim()).filter(Boolean)
-              );
+              const assetNames = assetDocs.flatMap(assetEntriesOfDocument);
               const assetCount = assetNames.length;
 
               // Capa 4: Otras fuentes documentales (excluye capas 1–3).
