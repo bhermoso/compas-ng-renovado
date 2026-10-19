@@ -98,7 +98,7 @@ Registro de actuaciones por cuatro entornos (sanitario, comunitario, educativo, 
 
 **Productores:** equipo técnico (alta manual); volcado desde las actuaciones del Plan de Acción vigente.
 **Consumidores:** vista Agenda, vista Evaluación.
-**Relacionado con:** CONTRACT-ACTION-PLAN-CATALOG, CONTRACT-INSTITUTIONAL-LIFECYCLE, CONTRACT-DYNAMIC-TRIPYRAMID.
+**Relacionado con:** CONTRACT-ACTION-PLAN-CATALOG, CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT, CONTRACT-INSTITUTIONAL-LIFECYCLE, CONTRACT-DYNAMIC-TRIPYRAMID.
 
 ---
 
@@ -221,7 +221,7 @@ Contrato del Plan Local de Salud (PLS) como documento institucional definitivo. 
 
 **Productores:** `LocalHealthPlanCompiler` (tipos de dominio en Sprint 2.3; implementación del compilador pendiente).
 **Consumidores:** Equipo técnico, corporación municipal, Distrito Sanitario, Junta de Andalucía.
-**Relacionado con:** CONTRACT-MIT-PSL, CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER, CONTRACT-DELIBERATIVE-PRIORITISATION, CONTRACT-ACTION-PLAN-CATALOG, CONTRACT-MTE, CONTRACT-COMPILER (reserva histórica), CONTRACT-LOCAL-HEALTH-PLAN-COMPILER.
+**Relacionado con:** CONTRACT-MIT-PSL, CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER, CONTRACT-DELIBERATIVE-PRIORITISATION, CONTRACT-ACTION-PLAN-CATALOG, CONTRACT-AGENDA-ACTUATIONS, CONTRACT-MTE, CONTRACT-COMPILER (reserva histórica), CONTRACT-LOCAL-HEALTH-PLAN-COMPILER.
 
 ---
 

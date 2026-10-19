@@ -70,8 +70,8 @@ Debe mostrar, como mínimo:
   evaluación y aprobación.
 
 Las actuaciones, fichas, responsables, plazos y recursos son opcionales en el
-esbozo. Pasan a ser obligatorios al cerrar el Plan de Acción y al solicitar la
-compilación del `LocalHealthPlanDocument`.
+esbozo. Pasan a ser obligatorios al solicitar la compilación del
+`LocalHealthPlanDocument`, en la sección VIII (no en el Plan de Acción).
 
 **Invariantes del esbozo:**
 
@@ -99,13 +99,19 @@ El PLS es un único documento que integra todas las etapas del proceso de planif
 | IV | **Diagnóstico territorial — referencia al PSL-C** | Sí | El PLS no reproduce el diagnóstico; incluye o referencia el PSL-C compilado como capítulo propio. El PSL-C es la parte diagnóstica del PLS. |
 | V | **Priorización** | Sí | Candidaturas técnicas (sistema), priorización ciudadana (proceso participativo), deliberación y consenso del Grupo Motor (humano), prioridades seleccionadas. Incluye obligatoriamente las necesidades identificadas pero no priorizadas, con justificación. |
 | VI | **Articulación institucional** | Sí; canónica cuando consume `LecturaEstrategicaLocal` del MTE / provisional si usa un fallback EPVSA anterior | Correspondencias entre prioridades y marcos estratégicos (EPVSA, ESCA, RELAS, PEM, PSMA). Distinción entre actuaciones SSPA-garantizadas y actuaciones municipales nuevas. |
-| VII | **Plan de Acción** | Sí | Objetivos (general y específico), actuaciones, indicadores con tiempo cero y meta, responsables nominados, plazos reales, recursos asignados. Validado por el Grupo Motor. |
-| VIII | **Agenda de implementación** | Sí | Distribución temporal validada por ciclos municipales reales, no la trimestrización orientativa del sistema. Responsables y condiciones de ejecución por ítem. |
+| VII | **Plan de Acción** | Sí | Líneas estratégicas, objetivos (general y específico) e indicadores con definición de medición, tiempo cero y meta. No contiene actuaciones (ver §3.1 bis). Validado por el Grupo Motor. |
+| VIII | **Actuaciones y agenda de implementación** | Sí | Actuaciones registradas por entornos (sanitario, comunitario, educativo, laboral), con responsables nominados, plazos reales y recursos asignados, y su distribución temporal validada por ciclos municipales reales, no la trimestrización orientativa del sistema. Instrumento separado del Plan de Acción (`CONTRACT-AGENDA-ACTUATIONS`). |
 | IX | **Marco de seguimiento** | Sí | Ítems de seguimiento con estados iniciales, responsable de medición, periodicidad y umbral de alerta. Marco de evaluación: preguntas de evaluación, momentos de medición, responsable. |
 | X | **Marco de gobernanza** | Sí | Composición del Grupo Motor, Mesa de participación ciudadana, Comisión de seguimiento. Periodicidad de sesiones, resolución de conflictos, comunicación pública. |
 | XI | **Memoria del proceso** | Condicional | Registro narrativo del proceso participativo: quién participó, qué se discutió, cómo se alcanzaron los acuerdos. Responsabilidad humana exclusiva. El sistema puede albergar sus documentos en el Repositorio Documental. No compilada por el sistema. |
 | XII | **Anexos metodológicos** | Condicional | Fichas de indicadores completas, notas metodológicas, tabla de estudios complementarios utilizados, advertencias de integridad del EvidenceStore. Compilados desde los metadatos del PSL y del EvidenceStore. |
 | AN | **Nota de aprobación institucional** | Sí | Fecha de aprobación, órgano que la aprueba (pleno, junta de gobierno, otro), acta o referencia al acta. Acto humano externo al sistema. COMPÁS NG registra la aprobación; no la produce. |
+
+### 3.1 bis Plan de Acción y actuaciones: dos instrumentos — actualización autorizada 2026-10-19
+
+El Plan de Acción es la planificación estratégica territorial: líneas estratégicas, objetivos e indicadores con su definición de medición. Las actuaciones (programas, talleres, charlas, caminatas…) y las agendas anuales son el instrumento de ejecución y se registran en la agenda, separada del Plan de Acción. Las actuaciones alimentan el resultado del indicador, pero no se sabe en qué medida contribuye cada una: el resultado se consolida por indicador y no se atribuye a actuaciones concretas. Este criterio difiere del de la guía rápida de planes locales de salud de la Junta de Andalucía (2014), que sitúa acciones y agendas anuales dentro del Plan de Acción.
+
+Transición, sin pérdida de funcionalidad: hasta que se adapte el compilador, las fichas de actuación que ya existen en la ficha de cada indicador (`WorksheetAction`: actividades, entregas de datos, descarga Word) siguen funcionando como instrumento de recogida de datos del indicador, y el gate G-PLS-5 no cambia. La adaptación del compilador y de la exportación a la sección VIII queda pendiente y se hace sin retirar ninguna función existente.
 
 ### 3.2 Resumen Ejecutivo — posición y naturaleza
 
