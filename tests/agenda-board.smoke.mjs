@@ -26,7 +26,7 @@ await step("alta", async () => {
   await page.getByPlaceholder("Nombre de la actuación").fill("Taller de marcha");
   await page.getByRole("button", { name: "Crear", exact: true }).click();
   await page.getByRole("button", { name: "Guardar ficha" }).waitFor({ timeout: 5000 });
-  await page.getByRole("button", { name: "Cerrar sin guardar" }).click();
+  await page.getByRole("button", { name: "Cerrar", exact: true }).click();
 });
 console.log("tarjetas:", await page.locator("[data-actuation-id]").count());
 await step("arrastre", async () => {
@@ -41,6 +41,38 @@ await step("evaluación", async () => {
   await page.getByText("Taller de marcha").first().waitFor({ timeout: 5000 });
   await page.getByRole("button", { name: "Abrir ficha" }).click();
   await page.getByRole("button", { name: "Guardar ficha" }).waitFor({ timeout: 5000 });
+});
+// Aviso de cambios sin guardar, guardado y persistencia tras recargar
+await step("dirty", async () => {
+  await page.getByLabel("Nombre", { exact: true }).fill("Taller de marcha nórdica");
+  await page.getByText("Hay cambios sin guardar.").waitFor({ timeout: 3000 });
+  await page.getByRole("button", { name: "Cerrar sin guardar" }).click();
+  await page.getByRole("button", { name: "Descartar cambios y cerrar" }).waitFor({ timeout: 3000 });
+  await page.getByRole("button", { name: "Seguir editando" }).click();
+  await page.getByRole("button", { name: "Guardar ficha" }).click();
+  await page.getByText("Sin cambios pendientes.").waitFor({ timeout: 3000 });
+});
+await step("recarga", async () => {
+  await page.waitForTimeout(1500);
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await page.locator(".app-nav__tab", { hasText: "Agenda" }).click({ timeout: 20000 });
+  await page.getByText("Taller de marcha nórdica").first().waitFor({ timeout: 8000 });
+});
+console.log("persiste tras recargar, en laboral:", await page.locator(".agenda-column--laboral [data-actuation-id]").count());
+// Filtro y deshacer
+await step("filtro", async () => {
+  await page.getByPlaceholder(/Buscar por nombre/).fill("zzz-no-existe");
+  await page.getByText(/0 de 1 actuaciones/).waitFor({ timeout: 3000 });
+  await page.getByRole("button", { name: "Quitar filtros" }).click();
+  await page.getByPlaceholder(/Buscar por nombre/).fill("NORDICA");
+  await page.getByText(/1 de 1 actuaciones/).waitFor({ timeout: 3000 });
+  await page.getByRole("button", { name: "Quitar filtros" }).click();
+});
+await step("eliminar-deshacer", async () => {
+  await page.getByRole("button", { name: "Eliminar", exact: true }).click();
+  await page.getByRole("button", { name: "Eliminar de verdad" }).click();
+  await page.getByRole("button", { name: "Deshacer" }).click();
+  await page.getByText("Taller de marcha nórdica").first().waitFor({ timeout: 3000 });
 });
 await page.screenshot({ path: "/tmp/agenda-e2e.png", fullPage: true });
 console.log("OK; errores de página:", JSON.stringify(errs));

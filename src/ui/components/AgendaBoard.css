@@ -38,3 +38,6 @@
 .ficha-warning { margin: 8px 0; padding: 6px 10px; border-left: 3px solid var(--amarillo); background: var(--fondo-secundario); font-size: .85rem; }
 .ficha-field-row { display: flex; flex-wrap: wrap; gap: 12px; }
 @media (max-width: 720px) { .agenda-board { grid-template-columns: repeat(5, 200px); } }
+.agenda-filters { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 4px 0 12px; }
+.agenda-filters input[type="search"] { min-width: 18rem; max-width: 100%; }
+.agenda-undo { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }

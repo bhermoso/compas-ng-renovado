@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import type { IndicatorWorksheet } from "../../domain/action-plan-catalog/IndicatorWorksheet";
 import {
-  ACTUATION_STATUS_LABEL, AGENDA_SETTINGS, AGENDA_SETTING_LABEL,
+  ACTUATION_STATUSES, ACTUATION_STATUS_LABEL, AGENDA_SETTINGS, AGENDA_SETTING_LABEL,
   type AgendaActuation, type AgendaSetting,
 } from "../../domain/agenda/AgendaActuation";
 import {
@@ -36,6 +36,9 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
   const [dragOver, setDragOver] = useState<Column | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"" | AgendaActuation["tracking"]["status"]>("");
+  const [undo, setUndo] = useState<{ list: AgendaActuation[]; name: string } | null>(null);
   const dragId = useRef<string | null>(null);
 
   const board = useMemo(() => buildActuationBoard(actuations), [actuations]);
@@ -50,6 +53,7 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
   const dropOn = (column: Column, event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     setDragOver(null);
+    if (filtering) return;
     const id = dragId.current ?? event.dataTransfer.getData("text/plain");
     dragId.current = null;
     if (!id) return;
@@ -70,7 +74,7 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
         key={a.id}
         className={`agenda-card${r.orphan ? " agenda-card--orphan" : ""}`}
         data-actuation-id={a.id}
-        draggable
+        draggable={!filtering}
         onDragStart={(e) => { dragId.current = a.id; e.dataTransfer.setData("text/plain", a.id); e.dataTransfer.effectAllowed = "move"; }}
         onDragEnd={() => { dragId.current = null; setDragOver(null); }}
       >
@@ -93,7 +97,7 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
           {!a.linkedAction && <button type="button" onClick={() => onChange(duplicateManualActuation(actuations, a.id, newId(), now()))}>Duplicar</button>}
           {confirmDelete === a.id ? (
             <>
-              <button type="button" className="agenda-danger" onClick={() => { onChange(removeActuation(actuations, a.id)); setConfirmDelete(null); if (openId === a.id) setOpenId(undefined); }}>Eliminar de verdad</button>
+              <button type="button" className="agenda-danger" onClick={() => { setUndo({ list: [...actuations], name: r.name }); onChange(removeActuation(actuations, a.id)); setConfirmDelete(null); if (openId === a.id) setOpenId(undefined); }}>Eliminar de verdad</button>
               <button type="button" onClick={() => setConfirmDelete(null)}>Cancelar</button>
             </>
           ) : (
@@ -104,7 +108,17 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
     );
   };
 
-  const items = (c: Column) => (c === "unassigned" ? board.unassigned : board.columns[c]);
+  const norm = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  const filtering = query.trim() !== "" || statusFilter !== "";
+  const matches = (a: AgendaActuation) => {
+    if (statusFilter && a.tracking.status !== statusFilter) return false;
+    const q = norm(query.trim());
+    if (!q) return true;
+    const r = readActuation(a, worksheets);
+    return norm([r.name, r.description, r.responsible, r.population, a.identification.program, a.identification.mainTopic].filter(Boolean).join(" ")).includes(q);
+  };
+  const allItems = (c: Column) => (c === "unassigned" ? board.unassigned : board.columns[c]);
+  const items = (c: Column) => allItems(c).filter(matches);
 
   return (
     <section className="workspace-panel agenda">
@@ -146,7 +160,27 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
         </button>
         {pendingFromPlan === 0 && <span className="panel-note">{listPlanActions(worksheets).length === 0 ? "El Plan de Acción aún no tiene actuaciones." : "Todas las actuaciones del plan están ya en la agenda."}</span>}
       </div>
-      {message && <p role="status" className="panel-note">{message}</p>}
+      <div className="agenda-filters" role="search">
+        <label><span className="agenda-sr">Buscar actuaciones</span>
+          <input type="search" value={query} placeholder="Buscar por nombre, responsable, población…" onChange={(e) => setQuery(e.target.value)} />
+        </label>
+        <label><span className="agenda-sr">Filtrar por estado</span>
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}>
+            <option value="">Todos los estados</option>
+            {ACTUATION_STATUSES.map((s) => <option key={s} value={s}>{ACTUATION_STATUS_LABEL[s]}</option>)}
+          </select>
+        </label>
+        {filtering && <button type="button" onClick={() => { setQuery(""); setStatusFilter(""); }}>Quitar filtros</button>}
+        {filtering && <span className="panel-note" role="status">{COLUMNS.reduce((n, c) => n + items(c.key).length, 0)} de {actuations.length} actuaciones. Con filtro activo, mueve las tarjetas con el selector de entorno.</span>}
+      </div>
+      {message && <p role="status" aria-live="polite" className="panel-note">{message}</p>}
+      {undo && (
+        <p role="status" className="panel-note agenda-undo">
+          «{undo.name}» eliminada.{" "}
+          <button type="button" onClick={() => { onChange(undo.list); setUndo(null); setMessage("Eliminación deshecha."); }}>Deshacer</button>{" "}
+          <button type="button" onClick={() => setUndo(null)}>Descartar aviso</button>
+        </p>
+      )}
 
       <div className="agenda-board">
         {COLUMNS.map(({ key, label }) => (
@@ -157,9 +191,9 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
             onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDragOver(null); }}
             onDrop={(e) => dropOn(key, e)}
           >
-            <header><h3>{label}</h3><span className="agenda-count">{items(key).length}</span></header>
+            <header><h3>{label}</h3><span className="agenda-count">{filtering ? `${items(key).length}/${allItems(key).length}` : items(key).length}</span></header>
             <div className="agenda-column__body">
-              {items(key).length === 0 && <p className="agenda-empty">Sin actuaciones</p>}
+              {items(key).length === 0 && <p className="agenda-empty">{filtering && allItems(key).length > 0 ? "Ninguna coincide con el filtro" : "Sin actuaciones"}</p>}
               {items(key).map(card)}
             </div>
           </div>

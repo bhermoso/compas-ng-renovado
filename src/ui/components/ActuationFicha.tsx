@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { IndicatorWorksheet } from "../../domain/action-plan-catalog/IndicatorWorksheet";
 import {
   ACTIVITY_TYPES, ACTIVITY_TYPE_LABEL, ACTUATION_PRIORITIES, ACTUATION_STATUSES, ACTUATION_STATUS_LABEL,
@@ -63,6 +63,15 @@ export function ActuationFicha({ actuation, worksheets, onSave, onClose }: Props
       value={((draft[block] as Record<string, string[] | undefined>)[key] ?? []).join("\n")}
       onChange={(e) => set(block, { [key]: toList(e.target.value) } as never)} />);
 
+  const comparable = (a: AgendaActuation) => JSON.stringify({ ...a, updatedAt: "", order: 0 });
+  const dirty = comparable(draft) !== comparable(actuation);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ""; };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
   const missingName = !linked && !(draft.name ?? "").trim();
   const unknownSum = (() => {
     const p = draft.population;
@@ -84,10 +93,18 @@ export function ActuationFicha({ actuation, worksheets, onSave, onClose }: Props
         </div>
         <div className="ficha-actions">
           <button type="button" disabled={missingName} onClick={() => onSave(draft)}>Guardar ficha</button>
-          <button type="button" className="ficha-secondary" onClick={onClose}>Cerrar sin guardar</button>
+          {dirty && confirmDiscard ? (
+            <>
+              <button type="button" className="ficha-secondary" onClick={onClose}>Descartar cambios y cerrar</button>
+              <button type="button" className="ficha-secondary" onClick={() => setConfirmDiscard(false)}>Seguir editando</button>
+            </>
+          ) : (
+            <button type="button" className="ficha-secondary" onClick={() => (dirty ? setConfirmDiscard(true) : onClose())}>{dirty ? "Cerrar sin guardar" : "Cerrar"}</button>
+          )}
         </div>
       </header>
 
+      <p className="ficha-hint" role="status" aria-live="polite">{dirty ? "Hay cambios sin guardar." : "Sin cambios pendientes."}</p>
       {missingName && <p className="ficha-warning" role="status">El nombre es obligatorio.</p>}
       {reading.orphan && (
         <p className="ficha-warning" role="status">
