@@ -27,6 +27,17 @@ try {
  await page.getByRole('button',{name:'Reactivar acceso',exact:true}).waitFor();
  await page.getByRole('button',{name:'Abrir COMPAS completo'}).click();assert.equal(await page.title(),'full-app');
  await page.getByLabel('Plan de salud').selectOption('atarfe');await page.getByRole('button',{name:'Abrir plan seleccionado',exact:true}).click();assert.equal(await page.title(),'atarfe');
+ // Alta de espacio con desplegables: sin escribir identificador; el municipio creado sale de la lista y entra en «Plan de salud».
+ await page.getByLabel('Tipo de ámbito').selectOption('municipio');
+ const before=await page.getByLabel(/Municipio de Granada/).locator('option').count();
+ assert.equal(await page.getByLabel(/Municipio de Granada/).locator('option[value="18022"]').count(),0);
+ await page.getByLabel(/Municipio de Granada/).selectOption('18079');
+ await page.getByText('identificador').first().waitFor();
+ assert.equal(await page.getByLabel('Identificador del ámbito').count(),0);
+ await page.getByRole('button',{name:'Crear espacio territorial'}).click();
+ await page.getByText(/Espacio territorial creado/).waitFor();
+ assert.equal(await page.getByLabel(/Municipio de Granada/).locator('option').count(),before-1);
+ assert.equal(await page.getByLabel('Plan de salud').locator('option[value="fuente-vaqueros"]').count(),1);
  await page.screenshot({path:'/tmp/compas-admin-panel.png',fullPage:true});
  await page.goto(`${base}/COMPAS_NG/`);
  await page.getByRole('link',{name:'Administración',exact:true}).waitFor();
