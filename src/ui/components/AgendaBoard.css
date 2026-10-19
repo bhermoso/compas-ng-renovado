@@ -1,0 +1,39 @@
+.agenda-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 12px 0; }
+.agenda-new { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.agenda-new input { min-width: 16rem; }
+.agenda-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.agenda-board { display: grid; grid-template-columns: repeat(5, minmax(200px, 1fr)); gap: 12px; overflow-x: auto; padding-bottom: 8px; }
+.agenda-column { min-width: 0; background: var(--fondo-secundario); border: 1px solid var(--borde); border-top: 4px solid var(--texto-terciario); border-radius: 6px; display: flex; flex-direction: column; }
+.agenda-column--sanitario { border-top-color: var(--azul); }
+.agenda-column--comunitario { border-top-color: var(--verde); }
+.agenda-column--educativo { border-top-color: var(--amarillo); }
+.agenda-column--laboral { border-top-color: var(--naranja); }
+.agenda-column--over { outline: 2px dashed var(--azul); outline-offset: -4px; }
+.agenda-column header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; }
+.agenda-column h3 { margin: 0; font-size: .9rem; font-weight: 600; color: var(--texto-principal); }
+.agenda-count { font-size: .8rem; color: var(--texto-secundario); font-variant-numeric: tabular-nums; }
+.agenda-column__body { display: flex; flex-direction: column; gap: 8px; padding: 0 8px 10px; min-height: 80px; }
+.agenda-empty { margin: 0; font-size: .8rem; color: var(--texto-secundario); }
+.agenda-card { background: var(--blanco); border: 1px solid var(--borde); border-radius: 6px; padding: 8px 10px; cursor: grab; min-width: 0; }
+.agenda-card:active { cursor: grabbing; }
+.agenda-card--orphan { border-style: dashed; }
+.agenda-card__title { display: block; width: 100%; background: none; border: 0; padding: 0; text-align: left; font: inherit; font-weight: 600; color: var(--texto-principal); cursor: pointer; overflow-wrap: anywhere; }
+.agenda-card__meta { display: flex; flex-wrap: wrap; gap: 4px 8px; margin: 4px 0; font-size: .75rem; color: var(--texto-secundario); }
+.agenda-card__warn { margin: 4px 0; font-size: .75rem; color: var(--texto-principal); border-left: 3px solid var(--amarillo); padding-left: 6px; }
+.agenda-card__tools { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: .75rem; }
+.agenda-card__tools select { max-width: 100%; font-size: .75rem; }
+.agenda-danger { color: var(--rojo); }
+.ficha { margin-top: 16px; padding: 16px; border: 1px solid var(--borde); border-radius: 6px; background: var(--blanco); color: var(--texto-principal); }
+.ficha-header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; }
+.ficha-header h3 { margin: 0 0 4px; }
+.ficha-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+.ficha details { margin: 12px 0; border-top: 1px solid var(--borde); padding-top: 8px; }
+.ficha summary { cursor: pointer; font-weight: 600; margin-bottom: 8px; }
+.ficha-field { display: flex; flex-direction: column; gap: 2px; margin: 8px 0; max-width: 46rem; }
+.ficha-field input, .ficha-field textarea, .ficha-field select { font: inherit; max-width: 100%; }
+.ficha-label { font-size: .8rem; color: var(--texto-secundario); }
+.ficha-field--read .ficha-read-value { padding: 4px 8px; background: var(--fondo-secundario); border-radius: 4px; overflow-wrap: anywhere; }
+.ficha-hint { font-size: .75rem; color: var(--texto-secundario); margin: 2px 0; }
+.ficha-warning { margin: 8px 0; padding: 6px 10px; border-left: 3px solid var(--amarillo); background: var(--fondo-secundario); font-size: .85rem; }
+.ficha-field-row { display: flex; flex-wrap: wrap; gap: 12px; }
+@media (max-width: 720px) { .agenda-board { grid-template-columns: repeat(5, 240px); } }

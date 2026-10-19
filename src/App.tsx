@@ -202,7 +202,10 @@ import {
   PerfilLocalDeSaludPanel,
   PerfilFuentesPanel,
   LocalHealthPlanOutline,
+  AgendaBoard,
+  AgendaResultSummary,
 } from "./ui/components";
+import type { AgendaActuation } from "./domain/agenda/AgendaActuation";
 import "./App.css";
 
 // ── Tipos de ámbito territorial ──────────────────────────────
@@ -291,7 +294,7 @@ function slugifyMunicipalityId(name: string): string {
 
 // ── Tipos y constantes de módulo ─────────────────────────────
 
-type AppView = "inicio" | "repositorio" | "analisis" | "psl" | "priorizacion" | "lectura" | "plan" | "plan-local" | "evaluacion" | "ges";
+type AppView = "inicio" | "repositorio" | "analisis" | "psl" | "priorizacion" | "lectura" | "plan" | "plan-local" | "agenda" | "evaluacion" | "ges";
 
 const NAV_ITEMS: { id: AppView; label: string }[] = [
   { id: "inicio",        label: "Inicio" },
@@ -300,6 +303,7 @@ const NAV_ITEMS: { id: AppView; label: string }[] = [
   { id: "priorizacion",  label: "Priorización" },
   { id: "plan",          label: "Plan de Acción" },
   { id: "plan-local",    label: "Plan Local de Salud" },
+  { id: "agenda",        label: "Agenda" },
   { id: "evaluacion",    label: "Evaluación" },
   { id: "ges",           label: "Gestor de Encuestas" },
 ];
@@ -448,6 +452,7 @@ function loadPersistedWorkspacesForLibrary(
 
 export default function App() {
   const [view, setViewState] = useState<AppView>("inicio");
+  const [agendaFocusId, setAgendaFocusId] = useState<string | undefined>(undefined);
   const preparationDirtyRef = useRef(false);
   const onPreparationDirtyChange = useCallback((dirty: boolean) => { preparationDirtyRef.current = dirty; }, []);
   function canLeavePreparation() {
@@ -1254,6 +1259,10 @@ export default function App() {
         updatedAt: new Date().toISOString(),
       };
     });
+  }, [setWorkspace]);
+
+  const handleAgendaChange = useCallback((next: AgendaActuation[]) => {
+    setWorkspace((prev) => ({ ...prev, agendaActuations: next, updatedAt: new Date().toISOString() }));
   }, [setWorkspace]);
 
   const handleSaveActionPlanModuleReview = useCallback((review: MunicipalActionPlanModuleReview): readonly string[] => {
@@ -3343,7 +3352,7 @@ export default function App() {
                     ? "app-nav__tab app-nav__tab--active"
                     : "app-nav__tab"
                 }
-                onClick={() => setView(item.id)}
+                onClick={() => { setAgendaFocusId(undefined); setView(item.id); }}
               >
                 <span className="app-nav__step-num">{index + 1}</span>
                 {item.label}
@@ -4261,6 +4270,19 @@ export default function App() {
           </>
         )}
 
+        {/* ── Agenda de actuaciones por entornos (registro de trabajo; sin condicionar a PSL validado: decisión provisional) */}
+        {view === "agenda" && (
+          <AgendaBoard
+            key={`${municipality.id}-${agendaFocusId ?? ""}`}
+            municipalityId={municipality.id}
+            municipalityName={municipality.name}
+            actuations={workspace.agendaActuations ?? []}
+            worksheets={workspace.indicatorWorksheets ?? []}
+            onChange={handleAgendaChange}
+            focusId={agendaFocusId}
+          />
+        )}
+
         {/* ── ⑨ Evaluación — espacio canónico (pendiente de implementación) */}
         {view === "evaluacion" && (
           <section className="workspace-panel">
@@ -4275,6 +4297,11 @@ export default function App() {
               Este espacio estará disponible cuando el Plan Local de Salud se encuentre en
               fase de seguimiento y evaluación.
             </p>
+            <AgendaResultSummary
+              actuations={workspace.agendaActuations ?? []}
+              worksheets={workspace.indicatorWorksheets ?? []}
+              onOpen={(id) => { setAgendaFocusId(id); setView("agenda"); }}
+            />
           </section>
         )}
 
