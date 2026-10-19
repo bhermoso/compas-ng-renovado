@@ -54,7 +54,7 @@ Contrato de `EvidenceAtom`, `EvidenceStore` y `EvidenceStoreIntegrityGuard`. Def
 
 **Productores:** Parsers de estudios complementarios, cargadores del selector documental.
 **Consumidores:** MIT, PSL.
-**Relacionado con:** CONTRACT-COMPLEMENTARY-STUDIES, CONTRACT-EVIDENCE-QUALITY, CONTRACT-MIT-PSL.
+**Relacionado con:** CONTRACT-COMPLEMENTARY-STUDIES, CONTRACT-EVIDENCE-QUALITY, CONTRACT-MIT-PSL, CONTRACT-EVIDENCE-GROUPING.
 
 ---
 
@@ -88,6 +88,17 @@ Define las cuatro dimensiones de calidad de la evidencia: documental, muestral, 
 **Productores:** Parsers de estudios (calculan confianza), CONTRACT-DYNAMIC-TRIPYRAMID (calidad muestral futura).
 **Consumidores:** MIT (priorización por confianza), PSL (validación de capítulos).
 **Relacionado con:** CONTRACT-EVIDENCE, CONTRACT-DYNAMIC-TRIPYRAMID.
+
+---
+
+### CONTRACT-EVIDENCE-GROUPING
+**Estado:** CONCEPTUAL — creado 2026-10-19
+
+Vista de presentación que agrupa los átomos en ocho dimensiones rotuladas «marco propio de COMPÁS», sin pesos ni puntuaciones. No sustituye las familias de evidencia del Art. 7 de la metodología. Declara vacía la dimensión sin dato en NG (Cuadro de Mando Integral) y deja «sin asignar» lo que no encaja (activos).
+
+**Productores:** `groupEvidenceByTaxonomy` (función pura).
+**Consumidores:** ninguno todavía.
+**Relacionado con:** CONTRACT-EVIDENCE, CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.
 
 ---
 
