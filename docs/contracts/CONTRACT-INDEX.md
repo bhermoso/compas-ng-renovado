@@ -87,7 +87,18 @@ Define las cuatro dimensiones de calidad de la evidencia: documental, muestral, 
 
 **Productores:** Parsers de estudios (calculan confianza), CONTRACT-DYNAMIC-TRIPYRAMID (calidad muestral futura).
 **Consumidores:** MIT (priorización por confianza), PSL (validación de capítulos).
-**Relacionado con:** CONTRACT-EVIDENCE, CONTRACT-DYNAMIC-TRIPYRAMID.
+**Relacionado con:** CONTRACT-EVIDENCE, CONTRACT-DYNAMIC-TRIPYRAMID, CONTRACT-SAM-ANY-SAMPLE.
+
+---
+
+### CONTRACT-SAM-ANY-SAMPLE
+**Estado:** VIGENTE (entrada genérica) — creado 2026-10-19
+
+Obliga a evaluar con `assessSample` toda muestra con sexo y edad, sea cual sea la herramienta que la produce. Fija las condiciones de evaluabilidad (sin padrón verificado no hay estimación ni imputación), lo que aporta cada productor y el estado de vinculación de cada uno (IBSE y priorización ciudadana vinculados; Gestor de Encuestas y CSV manual pendientes).
+
+**Productores:** IBSE, priorización ciudadana; pendientes Gestor de Encuestas y CSV manual.
+**Consumidores:** Tripirámide SAM, Perfil de Salud Local.
+**Relacionado con:** CONTRACT-DYNAMIC-TRIPYRAMID, CONTRACT-EVIDENCE-QUALITY.
 
 ---
 
