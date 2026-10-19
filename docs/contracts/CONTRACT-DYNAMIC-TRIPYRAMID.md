@@ -240,6 +240,8 @@ SAM (Sistema de Ajuste Muestral) es la capacidad metodológica transversal de ev
 
 La Tripirámide Dinámica es la representación visual y documental de los resultados de SAM.
 
+La aplicación de SAM a cualquier muestra con sexo y edad, sea cual sea su origen, está fijada en `CONTRACT-SAM-ANY-SAMPLE`.
+
 **Arquitectura futura (no implementada):** SAM alimentará la Tripirámide; la Tripirámide informará al EvidenceStore a través de átomos `kind: "sample-quality"`. Esta integración está reservada para cuando se implemente la visualización y la generación de EvidenceAtoms desde SAM.
 
 **Estado actual (Producto 2 implementado):** el motor SAM produce `SampleQualityAssessment` como objeto canónico. No genera EvidenceAtom. La integración con la Tripirámide visual y con el EvidenceStore es arquitectura futura.
