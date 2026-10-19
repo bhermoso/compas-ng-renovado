@@ -1,10 +1,11 @@
+import { useEffect, useState } from "react";
 import type { SampleQualityAssessment } from "../../domain/sam";
 import { buildSamTriPyramidRows, type SamTriPyramidRow as Row } from "./samTriPyramidRows";
 import "./SamTriPyramid.css";
 
 /**
  * Tripirámide SAM: población, afijación ideal (Hamilton) y muestra conseguida,
- * por banda de edad y sexo. Solo presentación: no calcula representatividad,
+ * superpuestas en una sola pirámide por banda de edad y sexo. Solo presentación: no calcula representatividad,
  * la consume de `SampleQualityAssessment.representativeness`.
  *
  * Si falta el padrón por edad y sexo, o la muestra no tiene edad y sexo,
@@ -28,45 +29,84 @@ const fmtPp = (n: number | null) => {
 
 const QUALITY_LABEL = { alta: "alta", moderada: "moderada", baja: "baja" } as const;
 
-function Pyramid({
-  title,
-  rows,
-  pick,
-  max,
-  kind,
-}: {
-  title: string;
-  rows: Row[];
-  pick: (r: Row) => { male: number; female: number };
-  max: number;
-  kind: "pop" | "ideal" | "achieved";
-}) {
+type Phase = "static" | "reset" | "play";
+
+/** La animación se omite si la persona usuaria pide menos movimiento. */
+function canAnimate(): boolean {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
+  return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+/**
+ * Una sola pirámide con tres capas superpuestas por fila: población (trama),
+ * afijación ideal (translúcida) y muestra conseguida (sólida). Cada capa se
+ * dibuja como porcentaje de su propio total. Al mostrarse, las capas crecen en
+ * ese orden; sin movimiento reducido, se muestran ya completas.
+ */
+function SuperposedPyramid({ rows, max }: { rows: Row[]; max: number }) {
+  const [phase, setPhase] = useState<Phase>(() => (canAnimate() ? "reset" : "static"));
+
+  useEffect(() => {
+    if (phase !== "reset") return;
+    const id = window.requestAnimationFrame(() => setPhase("play"));
+    return () => window.cancelAnimationFrame(id);
+  }, [phase]);
+
+  const grow = (pct: number) => (phase === "reset" ? 0 : (pct / max) * 100);
+  const layer = (kind: "pop" | "ideal" | "achieved", pct: number, side: "male" | "female", index: number) => (
+    <span
+      className={`sam-tripyramid__layer sam-tripyramid__layer--${kind} sam-tripyramid__layer--${side}`}
+      data-animated={phase === "play" ? "true" : undefined}
+      style={{
+        width: `${grow(pct)}%`,
+        ...(phase === "play"
+          ? { transitionDelay: `${(kind === "pop" ? 0 : kind === "ideal" ? 1 : 2) * 450 + index * 40}ms` }
+          : {}),
+      }}
+    />
+  );
+
   return (
-    <figure className={`sam-tripyramid__pyramid sam-tripyramid__pyramid--${kind}`}>
-      <figcaption>{title}</figcaption>
+    <figure className="sam-tripyramid__pyramid">
+      <figcaption>Población, afijación ideal y muestra conseguida</figcaption>
+      <ul className="sam-tripyramid__legend" aria-label="Capas de la pirámide">
+        <li><span className="sam-tripyramid__swatch sam-tripyramid__swatch--pop" aria-hidden="true" /> Población (trama)</li>
+        <li><span className="sam-tripyramid__swatch sam-tripyramid__swatch--ideal" aria-hidden="true" /> Afijación ideal (translúcida)</li>
+        <li><span className="sam-tripyramid__swatch sam-tripyramid__swatch--achieved" aria-hidden="true" /> Muestra conseguida (sólida)</li>
+      </ul>
       <div className="sam-tripyramid__axis" aria-hidden="true">
         <span>Hombres</span>
         <span>Mujeres</span>
       </div>
       <ol className="sam-tripyramid__bars">
-        {[...rows].reverse().map((r) => {
-          const v = pick(r);
-          return (
-            <li
-              key={r.ageBand}
-              aria-label={`${r.ageBand} años: hombres ${fmtPct(v.male)} %, mujeres ${fmtPct(v.female)} %`}
-            >
-              <span className="sam-tripyramid__side sam-tripyramid__side--male">
-                <span className="sam-tripyramid__bar" style={{ width: `${(v.male / max) * 100}%` }} />
-              </span>
-              <span className="sam-tripyramid__band">{r.ageBand}</span>
-              <span className="sam-tripyramid__side sam-tripyramid__side--female">
-                <span className="sam-tripyramid__bar" style={{ width: `${(v.female / max) * 100}%` }} />
-              </span>
-            </li>
-          );
-        })}
+        {[...rows].reverse().map((r, index) => (
+          <li
+            key={r.ageBand}
+            aria-label={
+              `${r.ageBand} años. Hombres: población ${fmtInt(r.popMale)}, ideal ${fmtInt(r.idealMale)}, ` +
+              `conseguida ${fmtPct(r.pctAchieved.male)} %. Mujeres: población ${fmtInt(r.popFemale)}, ideal ${fmtInt(r.idealFemale)}, ` +
+              `conseguida ${fmtPct(r.pctAchieved.female)} %.`
+            }
+          >
+            <span className="sam-tripyramid__side sam-tripyramid__side--male">
+              {layer("pop", r.pctPop.male, "male", index)}
+              {layer("ideal", r.pctIdeal.male, "male", index)}
+              {layer("achieved", r.pctAchieved.male, "male", index)}
+            </span>
+            <span className="sam-tripyramid__band">{r.ageBand}</span>
+            <span className="sam-tripyramid__side sam-tripyramid__side--female">
+              {layer("pop", r.pctPop.female, "female", index)}
+              {layer("ideal", r.pctIdeal.female, "female", index)}
+              {layer("achieved", r.pctAchieved.female, "female", index)}
+            </span>
+          </li>
+        ))}
       </ol>
+      {canAnimate() && (
+        <button type="button" className="sam-tripyramid__replay" onClick={() => setPhase("reset")}>
+          Repetir animación
+        </button>
+      )}
     </figure>
   );
 }
@@ -112,13 +152,9 @@ export function SamTriPyramid({ assessment }: SamTriPyramidProps) {
       <h3>{heading}</h3>
       <p className="sam-tripyramid__source">
         Población: {ref.source}. Muestra teórica: {fmtInt(assessment.nTheoretical)}; muestra conseguida:{" "}
-        {fmtInt(assessment.nObserved)}. Cada pirámide muestra el porcentaje de cada celda sobre su propio total.
+        {fmtInt(assessment.nObserved)}. Cada capa muestra el porcentaje de cada celda sobre su propio total.
       </p>
-      <div className="sam-tripyramid__pyramids">
-        <Pyramid title="Población" rows={rows} pick={(r) => r.pctPop} max={max} kind="pop" />
-        <Pyramid title="Afijación ideal" rows={rows} pick={(r) => r.pctIdeal} max={max} kind="ideal" />
-        <Pyramid title="Muestra conseguida" rows={rows} pick={(r) => r.pctAchieved} max={max} kind="achieved" />
-      </div>
+      <SuperposedPyramid rows={rows} max={max} />
 
       <p className="sam-tripyramid__summary">
         Error absoluto medio: {fmtPp(rep.maePp).replace(/^\+/, "")}. Celdas dentro de ±{fmtPp(rep.tolerancePp).replace(/^\+/, "")}:{" "}

@@ -1,13 +1,15 @@
 # CONTRACT-DYNAMIC-TRIPYRAMID
 
 > Contrato de la Tripirámide Dinámica y del Sistema de Ajuste Muestral (SAM).
-> Versión 2.0 — Producto 2 — 2026-06-29
+> Versión 2.1 — Producto 2 — 2026-10-19
+>
+> Enmienda 2.1 (decisión del autor, 2026-10-19): la Tripirámide se representa como una sola pirámide con tres capas superpuestas y **se anima**. Sustituye a la versión 2.0, que excluía las animaciones piramidales. Se mantiene la exclusión del semáforo.
 
 ---
 
 ## Estado
 
-**Motor SAM implementado y parcialmente integrado en panel IBSE. Visualización (Tripirámide) pendiente.**
+**Motor SAM implementado e integrado en panel IBSE y en el resumen de participación ciudadana. Visualización (Tripirámide superpuesta y animada) implementada (enmienda 2.1).**
 
 El núcleo de cálculo de SAM (motor + integración) está implementado en:
 - `src/domain/sam/` — `PopulationReference`, `SampleQualityAssessment`, `CochranParams`
@@ -30,7 +32,7 @@ están presentes, se muestran AMBOS dictámenes (menores de 16 con la referencia
 Para municipios sin referencia verificada (p. ej. Granada-Zaidín), muestra dictamen heurístico
 simplificado con nota explícita.
 
-**Pendiente:** visualización UI (Tripirámide visual), generación de `EvidenceAtom kind="sample-quality"`,
+**Pendiente:** generación de `EvidenceAtom kind="sample-quality"`,
 persistencia en workspace, estratificación, ponderación, desplazamiento, comparación longitudinal,
 referencias para municipios distintos de Atarfe.
 
@@ -40,7 +42,7 @@ referencias para municipios distintos de Atarfe.
 
 La Tripirámide Dinámica es el instrumento metodológico para evaluar la calidad muestral de los estudios complementarios en el contexto de la planificación local de salud.
 
-No es un dashboard. No produce animaciones. Es un documento institucional que muestra la relación entre tres magnitudes y extrae conclusiones sobre la fiabilidad del dato.
+No es un dashboard. Es un documento institucional que muestra la relación entre tres magnitudes y extrae conclusiones sobre la fiabilidad del dato. Su representación gráfica es animada (ver «Representación visual institucional»).
 
 ---
 
@@ -217,15 +219,17 @@ interface DynamicTripyramidResult {
 
 La Tripirámide se representa como un documento con:
 
-1. **Tabla de tres niveles**: Población / Muestra teórica / Muestra observada.
-2. **Barra de cobertura**: porcentaje observado/teórico, sin animación.
+1. **Pirámide superpuesta y animada** (enmienda 2.1). Una sola pirámide por sexo y banda de edad, con tres capas superpuestas desde el mismo eje: población (trama), afijación ideal (translúcida) y muestra conseguida (sólida). Cada capa se dibuja como porcentaje de su propio total. Al mostrarse, las capas crecen en ese orden: población, afijación ideal, muestra conseguida. La persona usuaria puede repetir la animación. Con la preferencia de movimiento reducido del sistema, o sin posibilidad de animar, la pirámide se muestra completa y sin transición. La distinción entre capas no depende solo del color (trama, translucidez y relleno sólido) y la leyenda las nombra.
+2. **Tabla de detalle** por banda de edad y sexo: población, afijación ideal y desviación en puntos porcentuales.
 3. **Calidad resultante**: etiqueta `alta / media / baja` con su criterio explícito.
 4. **Cautelas**: lista de advertencias metodológicas.
 5. **Recordatorio institucional**: "La decisión territorial corresponde siempre al equipo técnico."
 
+**Alcance de la animación:** presenta una muestra ya recogida. No representa la recogida en vivo de respuestas, que queda fuera del alcance actual de COMPÁS NG.
+
 **No se utilizará:**
-- Animaciones piramidales.
-- Dashboards con indicadores de semáforo.
+- Dashboards con indicadores de semáforo. Los umbrales de color del histórico no son datos con fuente y no se portan.
+- Animaciones que simulen datos que no existen: la animación solo hace crecer capas hasta valores ya calculados.
 - Inferencias automáticas a partir de la calidad muestral.
 
 ---

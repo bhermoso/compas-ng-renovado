@@ -44,12 +44,15 @@ const base = (ref: PopulationReference) =>
   });
 
 describe("SamTriPyramid", () => {
-  it("con padrón y muestra por edad y sexo dibuja tres pirámides y el detalle", () => {
+  it("con padrón y muestra por edad y sexo dibuja una pirámide con tres capas por fila y el detalle", () => {
     const a = enrichWithRepresentativeness(base({ ...REF, ageSexMatrix: MATRIX }), OBSERVED);
     const html = render(a);
-    expect(html).toContain("Población");
-    expect(html).toContain("Afijación ideal");
-    expect(html).toContain("Muestra conseguida");
+    expect(html).toContain("Población (trama)");
+    expect(html).toContain("Afijación ideal (translúcida)");
+    expect(html).toContain("Muestra conseguida (sólida)");
+    expect((html.match(/<figure/g) ?? []).length).toBe(1);
+    // 4 bandas × 2 sexos × 3 capas
+    expect((html.match(/sam-tripyramid__layer sam-tripyramid__layer--(pop|ideal|achieved)/g) ?? []).length).toBe(24);
     expect(html).toContain("16-29");
     expect(html).toContain("Requiere validación humana");
     expect(html).not.toContain("No evaluable");
@@ -101,6 +104,21 @@ describe("SamTriPyramid", () => {
     const a = enrichWithRepresentativeness(base({ ...REF, ageSexMatrix: MATRIX }), OBSERVED);
     const html = renderToStaticMarkup(createElement(SamTriPyramid, { assessment: a }));
     expect(html).not.toMatch(/[−+]0,0 pp/);
+  });
+
+  it("sin animación disponible las capas se muestran completas y sin transición", () => {
+    const a = enrichWithRepresentativeness(base({ ...REF, ageSexMatrix: MATRIX }), OBSERVED);
+    const html = render(a);
+    expect(html).not.toContain("data-animated");
+    expect(html).not.toMatch(/width:0%/);
+    expect(html).not.toContain("Repetir animación");
+  });
+
+  it("el CSS anima el ancho de las capas y lo desactiva con movimiento reducido", async () => {
+    const { readFileSync } = await import("node:fs");
+    const css = readFileSync("src/ui/components/SamTriPyramid.css", "utf8");
+    expect(css).toMatch(/\[data-animated="true"\] \{ transition: width/);
+    expect(css).toMatch(/prefers-reduced-motion: reduce/);
   });
 
   it("no usa colores literales en el CSS del componente", async () => {
