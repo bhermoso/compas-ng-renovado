@@ -1,11 +1,15 @@
-import {useEffect,useState} from 'react';
+import {useEffect,useMemo,useState} from 'react';
+import {allMunicipalities,availableMunicipalities,buildSpace,districtsOf,groupSpaces,municipalityDisplayName,spaceAlreadyExists,SPACE_TYPE_LABEL,type SpaceInput} from '../../application/territory/territorialSpaceForm';
 import type {RelasClient} from '../../infrastructure/relas/RelasClient';
 import {accessError,createTerritorialAccount,createTerritorialSpace,listTerritorialSpaces,listManagedAccounts,saveManagedAccess,type ManagedAccount,type NewAccount,type TerritorialSpace} from '../../infrastructure/relas/AdminAccounts';
 const project='https://console.firebase.google.com/project/compas-98dd7';
 export default function AdministrationPanel({client,onOpenApp,onOpenScope}:{client:RelasClient;onOpenApp:()=>void;onOpenScope:(scope:string)=>void}) {
  const [selectedScope,setSelectedScope]=useState('granada-zaidin');
  const [spaces,setSpaces]=useState<TerritorialSpace[]>([]);
- const [spaceName,setSpaceName]=useState('Granada · Zaidín');const [spaceId,setSpaceId]=useState('granada-zaidin');const [spaceType,setSpaceType]=useState<TerritorialSpace['type']>('distrito-municipal');
+ const [spaceType,setSpaceType]=useState<TerritorialSpace['type']>('municipio');const [ineCode,setIneCode]=useState('');const [districtName,setDistrictName]=useState('');const [mancName,setMancName]=useState('');
+ const pending=useMemo(()=>availableMunicipalities(spaces),[spaces]);const everyMunicipality=useMemo(()=>allMunicipalities(),[]);
+ const input:SpaceInput|undefined=spaceType==='municipio'?(ineCode?{kind:'municipio',ineCode}:undefined):spaceType==='distrito-municipal'?(ineCode?{kind:'distrito-municipal',ineCode,districtName}:undefined):{kind:'mancomunidad',name:mancName};
+ const candidate=input?buildSpace(input):undefined;const duplicate=!!candidate&&spaceAlreadyExists(spaces,candidate);const knownDistricts=spaceType==='distrito-municipal'&&ineCode?districtsOf(spaces,ineCode):[];
  const [email,setEmail]=useState('');const [role,setRole]=useState<'coordinator'|'reader'>('coordinator');
  const [accounts,setAccounts]=useState<ManagedAccount[]>([]);const [busy,setBusy]=useState(false);const [message,setMessage]=useState('');
  const [created,setCreated]=useState<(NewAccount&{scope:string;role:'coordinator'|'reader';granted:boolean})>();
@@ -24,17 +28,21 @@ export default function AdministrationPanel({client,onOpenApp,onOpenScope}:{clie
  return <>
   <div className="admin-banner"><strong>Administración general</strong><p>Tú conservas el control de todos los planes. Los accesos de cada responsable no pueden modificar tu cuenta ni tus permisos.</p></div>
   <section className="admin-section"><h2>Espacios territoriales</h2><p>Crea un espacio independiente para cada municipio, mancomunidad o distrito municipal. Tú puedes acceder a todos. Cada responsable recibe únicamente el ámbito que le asignes.</p>
-   {spaces.length>0&&<ul>{spaces.map(s=><li key={s.id}><strong>{s.name}</strong> · {s.type.replaceAll('-',' ')} · <code>{s.id}</code></li>)}</ul>}
-   <form onSubmit={async e=>{e.preventDefault();setBusy(true);setMessage('Creando espacio…');try{const space={id:spaceId,name:spaceName.trim(),type:spaceType};await createTerritorialSpace(client,space);setSpaces(rows=>[...rows,space]);setSelectedScope(space.id);setMessage('Espacio territorial creado. Ya puedes asignar su responsable.');}catch(error){setMessage(accessError(error));}finally{setBusy(false);}}}>
-    <label>Nombre del ámbito<input required maxLength={200} disabled={busy} value={spaceName} onChange={e=>{setSpaceName(e.target.value);setSpaceId(e.target.value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80));}}/></label>
-    <label>Tipo de ámbito<select disabled={busy} value={spaceType} onChange={e=>setSpaceType(e.target.value as typeof spaceType)}><option value="municipio">Municipio</option><option value="mancomunidad">Mancomunidad</option><option value="distrito-municipal">Distrito municipal</option></select></label>
-    <label>Identificador del ámbito<input required pattern="[a-z0-9][a-z0-9-]{0,79}" disabled={busy} value={spaceId} onChange={e=>setSpaceId(e.target.value)}/></label>
-    <button disabled={busy||!spaceName.trim()||!spaceId}>Crear espacio territorial</button>
+   {groupSpaces(spaces).map(g=><div key={g.type}><h3>{g.label} ({g.spaces.length})</h3><ul>{g.spaces.map(x=><li key={x.id}><strong>{x.name}</strong> · <code>{x.id}</code></li>)}</ul></div>)}
+   <form onSubmit={async e=>{e.preventDefault();if(!candidate||duplicate)return;setBusy(true);setMessage('Creando espacio…');try{await createTerritorialSpace(client,candidate);setSpaces(rows=>[...rows,candidate]);setSelectedScope(candidate.id);setIneCode('');setDistrictName('');setMancName('');setMessage('Espacio territorial creado. Ya aparece en todos los desplegables y puedes asignar su responsable.');}catch(error){setMessage(accessError(error));}finally{setBusy(false);}}}>
+    <label>Tipo de ámbito<select disabled={busy} value={spaceType} onChange={e=>{setSpaceType(e.target.value as typeof spaceType);setIneCode('');setDistrictName('');setMancName('');}}>{(Object.keys(SPACE_TYPE_LABEL) as TerritorialSpace['type'][]).map(t=><option key={t} value={t}>{SPACE_TYPE_LABEL[t]}</option>)}</select></label>
+    {spaceType==='municipio'&&<label>Municipio de Granada ({pending.length} sin espacio)<select disabled={busy} value={ineCode} onChange={e=>setIneCode(e.target.value)}><option value="">Elige un municipio</option>{pending.map(m=><option key={m.ineCode} value={m.ineCode}>{municipalityDisplayName(m.ineName)}</option>)}</select></label>}
+    {spaceType==='distrito-municipal'&&<><label>Municipio al que pertenece<select disabled={busy} value={ineCode} onChange={e=>setIneCode(e.target.value)}><option value="">Elige un municipio</option>{everyMunicipality.map(m=><option key={m.ineCode} value={m.ineCode}>{municipalityDisplayName(m.ineName)}</option>)}</select></label>
+     {knownDistricts.length>0&&<p>Distritos ya creados: {knownDistricts.map(d=>d.name).join(', ')}.</p>}
+     <label>Nombre del distrito<input disabled={busy||!ineCode} maxLength={120} value={districtName} onChange={e=>setDistrictName(e.target.value)}/></label></>}
+    {spaceType==='mancomunidad'&&<label>Nombre de la mancomunidad<input disabled={busy} maxLength={200} value={mancName} onChange={e=>setMancName(e.target.value)}/></label>}
+    {candidate&&<p>Se creará: <strong>{candidate.name}</strong> · identificador <code>{candidate.id}</code>{duplicate&&<> · <strong>ya existe</strong></>}</p>}
+    <button disabled={busy||!candidate||duplicate}>Crear espacio territorial</button>
    </form>
   </section>
   <section className="admin-section"><h2>Crear acceso para un plan de salud</h2><p>Indica el correo de la persona responsable y su plan. COMPAS creará una contraseña aleatoria y la mostrará una sola vez. Para entrar, la persona usará como usuario ese correo y como contraseña la contraseña generada que le entregues. La cuenta de coordinación podrá consultar y editar su borrador compartido; sus cambios quedarán como propuestas pendientes de revisión administrativa.</p>
    <form onSubmit={async e=>{e.preventDefault();setBusy(true);setMessage('Creando cuenta…');try{const account={...await createTerritorialAccount(client,email),scope:selectedScope,role};setCreated({...account,granted:false});await grant(account);}catch(error){setMessage(accessError(error));}finally{setBusy(false);}}}>
-    <label>Plan de salud<select disabled={busy||!!created} value={selectedScope} onChange={e=>setSelectedScope(e.target.value)}>{spaces.length===0&&<option value="">Crea primero el espacio territorial</option>}{spaces.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></label>
+    <label>Plan de salud<select disabled={busy||!!created} value={selectedScope} onChange={e=>setSelectedScope(e.target.value)}>{spaces.length===0&&<option value="">Crea primero el espacio territorial</option>}{groupSpaces(spaces).map(g=><optgroup key={g.type} label={g.label}>{g.spaces.map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</optgroup>)}</select></label>
     <label>Usuario: correo de la persona responsable<input disabled={busy||!!created} required type="email" autoComplete="off" value={email} onChange={e=>setEmail(e.target.value)}/></label>
     <label>Permiso<select disabled={busy||!!created} value={role} onChange={e=>setRole(e.target.value as typeof role)}><option value="coordinator">Coordinación: consultar y editar borradores</option><option value="reader">Consulta: solo lectura</option></select></label>
     <button disabled={busy||!!created||!email||!spaces.some(s=>s.id===selectedScope)}>Crear usuario, contraseña y acceso</button>
