@@ -128,3 +128,35 @@ describe("SamTriPyramid", () => {
     expect(css).not.toMatch(/\brgba?\(/);
   });
 });
+
+describe("SamTriPyramid · recuento progresivo", () => {
+  const mk = (observed: AgeSexCell[], n: number) =>
+    enrichWithRepresentativeness(
+      computeSampleQualityAssessment({
+        instrumentId: "t", municipalityId: "18022", nObserved: n,
+        populationReference: { ...REF, ageSexMatrix: MATRIX },
+      }),
+      observed
+    );
+  const idealWidths = (html: string) =>
+    [...html.matchAll(/sam-tripyramid__layer--ideal[^"]*"[^>]*style="width:([\d.]+)%/g)].map((m) => Number(m[1]));
+
+  it("muestra el avance n de N y la afijación ideal escalada por n/N", () => {
+    const a = mk(OBSERVED, 120);
+    const html = render(a);
+    expect(html).toContain("Recuento:");
+    const p = Math.min(a.nObserved / a.nTheoretical, 1);
+    expect(html).toContain(`value="${Math.round(p * 100)}"`);
+    const full = idealWidths(render({ ...a, nObserved: a.nTheoretical }));
+    const part = idealWidths(html);
+    expect(p).toBeGreaterThan(0);
+    expect(p).toBeLessThan(1);
+    expect(part.length).toBe(8);
+    part.forEach((w, i) => expect(w).toBeCloseTo(full[i] * p, 0));
+  });
+
+  it("con el recuento completo la afijación ideal llega al 100 %", () => {
+    const a = mk(OBSERVED, 120);
+    expect(render({ ...a, nObserved: a.nTheoretical })).toContain('value="100"');
+  });
+});

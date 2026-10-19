@@ -43,7 +43,7 @@ function canAnimate(): boolean {
  * dibuja como porcentaje de su propio total. Al mostrarse, las capas crecen en
  * ese orden; sin movimiento reducido, se muestran ya completas.
  */
-function SuperposedPyramid({ rows, max }: { rows: Row[]; max: number }) {
+function SuperposedPyramid({ rows, max, progress }: { rows: Row[]; max: number; progress: number }) {
   const [phase, setPhase] = useState<Phase>(() => (canAnimate() ? "reset" : "static"));
 
   useEffect(() => {
@@ -53,7 +53,10 @@ function SuperposedPyramid({ rows, max }: { rows: Row[]; max: number }) {
   }, [phase]);
 
   const grow = (pct: number) => (phase === "reset" ? 0 : (pct / max) * 100);
-  const layer = (kind: "pop" | "ideal" | "achieved", pct: number, side: "male" | "female", index: number) => (
+  // La afijación ideal se muestra a la medida del recuento: ideal × (n / N).
+  const layer = (kind: "pop" | "ideal" | "achieved", rawPct: number, side: "male" | "female", index: number) => {
+    const pct = kind === "ideal" ? rawPct * progress : rawPct;
+    return (
     <span
       className={`sam-tripyramid__layer sam-tripyramid__layer--${kind} sam-tripyramid__layer--${side}`}
       data-animated={phase === "play" ? "true" : undefined}
@@ -64,7 +67,8 @@ function SuperposedPyramid({ rows, max }: { rows: Row[]; max: number }) {
           : {}),
       }}
     />
-  );
+    );
+  };
 
   return (
     <figure className="sam-tripyramid__pyramid">
@@ -146,6 +150,7 @@ export function SamTriPyramid({ assessment }: SamTriPyramidProps) {
     ])
   );
   const ref = assessment.populationReference;
+  const progress = assessment.nTheoretical > 0 ? Math.min(assessment.nObserved / assessment.nTheoretical, 1) : 1;
 
   return (
     <section className="sam-tripyramid" aria-label={heading}>
@@ -154,7 +159,18 @@ export function SamTriPyramid({ assessment }: SamTriPyramidProps) {
         Población: {ref.source}. Muestra teórica: {fmtInt(assessment.nTheoretical)}; muestra conseguida:{" "}
         {fmtInt(assessment.nObserved)}. Cada capa muestra el porcentaje de cada celda sobre su propio total.
       </p>
-      <SuperposedPyramid rows={rows} max={max} />
+      <div className="sam-tripyramid__progress">
+        <progress
+          value={Math.round(progress * 100)}
+          max={100}
+          aria-label="Avance del recuento sobre la muestra teórica"
+        />
+        <span data-sam-progress-text>
+          Recuento: {fmtInt(assessment.nObserved)} de {fmtInt(assessment.nTheoretical)}{" "}
+          ({Math.round(progress * 100)} %). La afijación ideal se dibuja a la medida del recuento.
+        </span>
+      </div>
+      <SuperposedPyramid rows={rows} max={max} progress={progress} />
 
       <p className="sam-tripyramid__summary">
         Error absoluto medio: {fmtPp(rep.maePp).replace(/^\+/, "")}. Celdas dentro de ±{fmtPp(rep.tolerancePp).replace(/^\+/, "")}:{" "}
