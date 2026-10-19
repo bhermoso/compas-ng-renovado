@@ -67,6 +67,30 @@ function isLocalizaSaludHeaderLine(line: string): boolean {
   return LOCALIZA_HEADER_FIRST_FIELDS.has(firstField);
 }
 
+/**
+ * Filas de recurso de un listado de Localiza Salud. En un listado tabular se
+ * excluyen el rótulo («Listado de recursos») y la fila de cabeceras, que no son
+ * recursos. Si el texto no es tabular se conservan todas las líneas.
+ */
+export function localizaSaludResourceLines(text: string): string[] {
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const isTabular = (line: string) => line.includes("\t") || line.includes("|");
+  if (!lines.some(isTabular)) return lines;
+  return lines.filter((line) => isTabular(line) && !isLocalizaSaludHeaderLine(line));
+}
+
+/** Entradas de activo que el expediente conserva de un documento de activos. */
+export function assetEntriesOfDocument(
+  document: Pick<MunicipalDocument, "kind" | "sourceText">
+): string[] {
+  const text = document.sourceText ?? "";
+  if (document.kind === "localiza-salud") return localizaSaludResourceLines(text);
+  return text.split("\n").map((s) => s.trim()).filter(Boolean);
+}
+
 interface AssetBlock {
   name: string;
   content: string;
@@ -276,7 +300,7 @@ export function transformDocumentToEvidence(
     .filter(Boolean);
 
   const lines = input.document.kind === "localiza-salud"
-    ? rawLines.filter((line) => !isLocalizaSaludHeaderLine(line))
+    ? localizaSaludResourceLines(input.plainText)
     : rawLines;
 
   let store = input.store;

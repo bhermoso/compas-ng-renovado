@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { MunicipalDocumentRepository } from "../../domain/repository";
+import { assetEntriesOfDocument } from "../../application/evidence-pipeline/DocumentToEvidencePipeline";
 
 interface ActivosSaludPanelProps {
   repository: MunicipalDocumentRepository;
@@ -12,9 +13,7 @@ export function ActivosSaludPanel({ repository, onDeleteDocument }: ActivosSalud
   const assetDocs = repository.documents.filter(
     (d) => d.kind === "community-asset" || d.kind === "localiza-salud"
   );
-  const assetNames = assetDocs.flatMap((d) =>
-    (d.sourceText ?? "").split("\n").map((s) => s.trim()).filter(Boolean)
-  );
+  const assetNames = assetDocs.flatMap(assetEntriesOfDocument);
 
   return (
     <section className="workspace-panel activos-panel">
