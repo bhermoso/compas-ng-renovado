@@ -153,9 +153,18 @@ import {
 import { loadMunicipalitySeed } from "./infrastructure/seeds";
 import { createBrowserRelasClient } from "./infrastructure/relas/BrowserRelasClient";
 import {
+  clearRemoteTombstone,
+  deleteRemoteWorkspace,
+  hasRemoteWorkspace,
+  readRemoteTombstones,
   readRemoteWorkspace,
   saveRemoteWorkspace,
 } from "./infrastructure/relas/RemoteWorkspace";
+import { RemoteSyncPanel } from "./ui/components/RemoteSyncPanel";
+import { syncRemoteCatalog } from "./application/remote-catalog/syncRemoteCatalog";
+import { loadLocalWorkspaces } from "./infrastructure/persistence/local-workspaces";
+import { listTerritorialSpaces } from "./infrastructure/relas/AdminAccounts";
+import { readAccessProfile } from "./infrastructure/relas/RelasClient";
 
 import { compileLocalHealthProfile } from "./application/health-profile-compiler";
 import { readSealedCanonicalDocument } from "./application/psl-c-canonical";
@@ -754,6 +763,92 @@ export default function App() {
     };
   }, [workspace.municipality.identity.id]);
 
+  // Catálogo de expedientes: al abrir con sesión de administración se descartan
+  // los eliminados en otro equipo, se incorporan los que solo existen en Firebase
+  // y se suben los de este navegador que Firebase aún no tiene.
+  const catalogIdsRef = useRef<ReadonlySet<string>>(new Set());
+  const activeIdRef = useRef("");
+  useEffect(() => {
+    if (remoteClient.auth.currentUser === null) return;
+    let cancelled = false;
+    void (async () => {
+      const profile = await readAccessProfile(remoteClient);
+      if (!profile.administrator || cancelled) return;
+      const result = await syncRemoteCatalog({
+        listScopes: () => listTerritorialSpaces(remoteClient),
+        listTombstones: () => readRemoteTombstones(remoteClient),
+        hasRemoteWorkspace: (id) => hasRemoteWorkspace(remoteClient, id),
+        readRemoteContext: async (id) => {
+          const remote = await readRemoteWorkspace(remoteClient, id);
+          if (remote === null) return null;
+          const identity = remote.municipality.identity;
+          return {
+            id: identity.id,
+            name: identity.name,
+            province: identity.province,
+            ineCode: identity.ineCode,
+            territorialType: identity.territorialType,
+            createdBy: remote.municipality.metadata.createdBy,
+          };
+        },
+        uploadWorkspace: (ws) => saveRemoteWorkspace(remoteClient, ws),
+        localWorkspaces: loadLocalWorkspaces,
+        localCatalogIds: () => catalogIdsRef.current,
+        isEmptyWorkspace: isEmptyWorkspaceForPersistenceGuard,
+        discardLocal: async (id) => {
+          locallyDeletedWorkspaceIdsRef.current.add(id);
+          localStorage.setItem(
+            DELETED_MUNICIPALITIES_KEY,
+            JSON.stringify([...locallyDeletedWorkspaceIdsRef.current])
+          );
+          clearWorkspaceFromLocalStorage(id);
+          await clearWorkspaceFromIndexedDB(id);
+          await deleteOriginalFilesForMunicipality(id).catch(() => 0);
+        },
+      });
+      if (cancelled) return;
+      if (result.discarded.includes(activeIdRef.current)) {
+        window.location.reload();
+        return;
+      }
+      if (result.discarded.length > 0 || result.adopted.length > 0) {
+        setCustomMunicipalities((current) => {
+          const next = sanitizeCustomMunicipalities(
+            [
+              ...current.filter((m) => !result.discarded.includes(m.id)),
+              ...result.adopted,
+            ],
+            DEMO_MUNICIPALITY_IDS
+          );
+          try {
+            localStorage.setItem(CUSTOM_MUNICIPALITIES_KEY, JSON.stringify(next));
+          } catch {
+            // El catálogo se reconstruye desde Firebase en la siguiente apertura.
+          }
+          return next;
+        });
+      }
+      const parts = [
+        result.uploaded.length > 0 && `subidos a Firebase: ${result.uploaded.join(", ")}`,
+        result.adopted.length > 0 && `incorporados desde Firebase: ${result.adopted.map((m) => m.id).join(", ")}`,
+        result.discarded.length > 0 && `retirados (eliminados en otro equipo): ${result.discarded.join(", ")}`,
+        result.errors.length > 0 && `con error: ${result.errors.map((e) => `${e.id} (${e.message})`).join("; ")}`,
+      ].filter(Boolean);
+      if (parts.length > 0) {
+        setRemotePersistenceMessage(`Sincronización con Firebase — ${parts.join(" · ")}.`);
+      }
+    })().catch((error: unknown) => {
+      if (!cancelled) {
+        setRemotePersistenceMessage(
+          `No se pudo sincronizar el catálogo con Firebase: ${error instanceof Error ? error.message : "error desconocido"}`
+        );
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [remoteClient]);
+
   // En una sesión autenticada, Firestore es la copia compartida entre
   // navegadores y equipos. La comparación por updatedAt impide que una copia
   // remota antigua sustituya trabajo local más reciente.
@@ -1209,6 +1304,8 @@ export default function App() {
       .filter((municipality) => !readDeletedMunicipalityIds().includes(municipality.id)),
     [customMunicipalities]
   );
+  catalogIdsRef.current = new Set(allMunicipalities.map((m) => m.id));
+  activeIdRef.current = municipality.id;
   const compasDocumentLibrary = useMemo(
     () =>
       collectCompasDocumentLibrary(
@@ -3121,6 +3218,9 @@ export default function App() {
       readDeletedMunicipalityIds().filter((deletedId) => deletedId !== id)
     ));
     locallyDeletedWorkspaceIdsRef.current.delete(id);
+    if (remoteClient.auth.currentUser !== null) {
+      void clearRemoteTombstone(remoteClient, id).catch(() => undefined);
+    }
 
     const existing = allMunicipalities.find((m) => m.id === id);
     if (existing) {
@@ -3156,6 +3256,13 @@ export default function App() {
     if (allMunicipalities.length < 2) {
       throw new Error("Añade otro ámbito antes de eliminar el último expediente abierto.");
     }
+
+    // Firebase es la copia de custodia: se elimina primero allí. Si falla, no se
+    // toca nada en local y el expediente sigue completo.
+    if (remoteClient.auth.currentUser === null) {
+      throw new Error("Abre sesión para eliminar también la copia de Firebase.");
+    }
+    const remoteDeletion = await deleteRemoteWorkspace(remoteClient, municipalityId);
 
     locallyDeletedWorkspaceIdsRef.current.add(municipalityId);
     try {
@@ -3203,7 +3310,7 @@ export default function App() {
 
     setPersistenceMessage(
       indexedDbCleared && originalsCleared
-        ? `Expediente de ${input.name} eliminado de este navegador. Originales borrados: ${deletedOriginals}.`
+        ? `Expediente de ${input.name} eliminado de Firebase${remoteDeletion.deleted ? "" : " (no había copia remota)"} y de este navegador. Originales locales borrados: ${deletedOriginals}.`
         : `El expediente de ${input.name} se ha retirado, pero su limpieza local está incompleta. Almacenamiento ampliado: ${indexedDbCleared ? "borrado" : "pendiente"}; originales: ${originalsCleared ? "borrados" : "pendientes"}.`
     );
   }
@@ -3215,6 +3322,7 @@ export default function App() {
       {municipalityToDelete && <DeleteWorkspaceDialog
         name={municipalityToDelete.name}
         discardDraft={preparationDirtyRef.current && municipalityToDelete.id === municipality.id}
+        remoteSession={remoteClient.auth.currentUser !== null}
         onCancel={() => setMunicipalityToDelete(null)}
         onConfirm={() => handleDeleteMunicipality(municipalityToDelete.id, municipalityToDelete)}
       />}
@@ -3305,6 +3413,7 @@ export default function App() {
             {remotePersistenceMessage}
           </div>
         )}
+        <RemoteSyncPanel client={remoteClient} />
 
         {/* Selector de municipio (se muestra sobre cualquier vista) */}
         {showMunicipalitySelector && (
