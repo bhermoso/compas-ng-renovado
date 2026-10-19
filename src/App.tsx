@@ -152,9 +152,11 @@ import {
 import { loadMunicipalitySeed } from "./infrastructure/seeds";
 import { createBrowserRelasClient } from "./infrastructure/relas/BrowserRelasClient";
 import {
+  deleteRemoteWorkspace,
   readRemoteWorkspace,
   saveRemoteWorkspace,
 } from "./infrastructure/relas/RemoteWorkspace";
+import { RemoteSyncPanel } from "./ui/components/RemoteSyncPanel";
 
 import { compileLocalHealthProfile } from "./application/health-profile-compiler";
 import { readSealedCanonicalDocument } from "./application/psl-c-canonical";
@@ -3156,6 +3158,13 @@ export default function App() {
       throw new Error("Añade otro ámbito antes de eliminar el último expediente abierto.");
     }
 
+    // Firebase es la copia de custodia: se elimina primero allí. Si falla, no se
+    // toca nada en local y el expediente sigue completo.
+    if (remoteClient.auth.currentUser === null) {
+      throw new Error("Abre sesión para eliminar también la copia de Firebase.");
+    }
+    const remoteDeletion = await deleteRemoteWorkspace(remoteClient, municipalityId);
+
     locallyDeletedWorkspaceIdsRef.current.add(municipalityId);
     try {
       localStorage.setItem(DELETED_MUNICIPALITIES_KEY, JSON.stringify(
@@ -3202,7 +3211,7 @@ export default function App() {
 
     setPersistenceMessage(
       indexedDbCleared && originalsCleared
-        ? `Expediente de ${input.name} eliminado de este navegador. Originales borrados: ${deletedOriginals}.`
+        ? `Expediente de ${input.name} eliminado de Firebase${remoteDeletion.deleted ? "" : " (no había copia remota)"} y de este navegador. Originales locales borrados: ${deletedOriginals}.`
         : `El expediente de ${input.name} se ha retirado, pero su limpieza local está incompleta. Almacenamiento ampliado: ${indexedDbCleared ? "borrado" : "pendiente"}; originales: ${originalsCleared ? "borrados" : "pendientes"}.`
     );
   }
@@ -3214,6 +3223,7 @@ export default function App() {
       {municipalityToDelete && <DeleteWorkspaceDialog
         name={municipalityToDelete.name}
         discardDraft={preparationDirtyRef.current && municipalityToDelete.id === municipality.id}
+        remoteSession={remoteClient.auth.currentUser !== null}
         onCancel={() => setMunicipalityToDelete(null)}
         onConfirm={() => handleDeleteMunicipality(municipalityToDelete.id, municipalityToDelete)}
       />}
@@ -3304,6 +3314,7 @@ export default function App() {
             {remotePersistenceMessage}
           </div>
         )}
+        <RemoteSyncPanel client={remoteClient} />
 
         {/* Selector de municipio (se muestra sobre cualquier vista) */}
         {showMunicipalitySelector && (

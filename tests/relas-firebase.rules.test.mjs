@@ -145,3 +145,16 @@ test('Firestore rechaza manifiestos y fragmentos que falsean autoría o municipi
  await assertFails(setDoc(doc(db('coord'),workspaceManifestPath),{...manifest('coord'),municipalityId:'atarfe'}));
  await assertFails(setDoc(doc(db('coord'),workspaceChunkPath),{...chunk('other')}));
 });
+
+test('solo administración general elimina el manifiesto; coordinación retira fragmentos; consulta no borra',async()=>{
+ await owner();
+ await assertSucceeds(setDoc(doc(db('coord'),workspaceChunkPath),chunk('coord')));
+ await assertSucceeds(setDoc(doc(db('coord'),workspaceManifestPath),manifest('coord')));
+ await assertFails(deleteDoc(doc(db('reader'),workspaceChunkPath)));
+ await assertFails(deleteDoc(doc(db('reader'),workspaceManifestPath)));
+ await assertFails(deleteDoc(doc(db('coord'),workspaceManifestPath)));
+ await assertSucceeds(deleteDoc(doc(db('coord'),workspaceChunkPath)));
+ await assertSucceeds(setDoc(doc(db('coord'),workspaceChunkPath),chunk('coord')));
+ await assertSucceeds(deleteDoc(doc(db('owner'),workspaceChunkPath)));
+ await assertSucceeds(deleteDoc(doc(db('owner'),workspaceManifestPath)));
+});

@@ -117,12 +117,12 @@ service cloud.firestore {
   match /relas_scopes/{scope}/workspace/current {
    allow read: if member(scope);
    allow create, update: if canWriteScope(scope) && validWorkspaceManifest(scope);
-   allow delete: if false;
+   allow delete: if isAdministrator();
   }
   match /relas_scopes/{scope}/workspace_versions/{snapshotId}/chunks/{chunkId} {
    allow read: if member(scope);
    allow create, update: if canWriteScope(scope) && validWorkspaceChunk();
-   allow delete: if false;
+   allow delete: if canWriteScope(scope);
   }
   match /relas_scopes/{scope}/drafts/{moduleId} {
    allow read: if member(scope);

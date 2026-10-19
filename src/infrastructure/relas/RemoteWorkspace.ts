@@ -1,5 +1,6 @@
 import {
   collection,
+  deleteDoc,
   doc,
   getDocFromServer,
   getDocs,
@@ -8,7 +9,11 @@ import {
 } from "firebase/firestore";
 import type { MunicipalityWorkspace } from "../../domain/workspace";
 import { parseWorkspaceJSON } from "../persistence/local-storage";
-import { readMembership, type RelasClient } from "./RelasClient";
+import {
+  readAccessProfile,
+  readMembership,
+  type RelasClient,
+} from "./RelasClient";
 
 const REMOTE_WORKSPACE_SCHEMA = "compas-workspace-chunks/v1";
 const CHUNK_SIZE = 180_000;
@@ -114,6 +119,7 @@ export async function saveRemoteWorkspace(
   const raw = JSON.stringify(workspace);
   const chunks = splitText(raw);
   const id = snapshotId();
+  const previous = await readManifest(client, workspace.municipality.identity.id);
   for (let start = 0; start < chunks.length; start += MAX_BATCH_WRITES) {
     const batch = writeBatch(client.db);
     chunks
@@ -161,4 +167,129 @@ export async function saveRemoteWorkspace(
     { ...manifest, savedAt: serverTimestamp() }
   );
   await batch.commit();
+  // La copia anterior ya no es la vigente: se retira para que Firebase no
+  // acumule una copia completa por cada guardado. Un fallo aquí no invalida
+  // el guardado, que ya está confirmado.
+  if (previous !== null && previous.snapshotId !== id) {
+    await deleteSnapshotChunks(
+      client,
+      workspace.municipality.identity.id,
+      previous
+    ).catch(() => undefined);
+  }
+}
+
+async function readManifest(
+  client: RelasClient,
+  municipalityId: string
+): Promise<RemoteWorkspaceManifest | null> {
+  const snapshot = await getDocFromServer(
+    doc(client.db, "relas_scopes", municipalityId, "workspace", "current")
+  );
+  if (!snapshot.exists()) return null;
+  const data = snapshot.data() as RemoteWorkspaceManifest;
+  return data.schema === REMOTE_WORKSPACE_SCHEMA &&
+    typeof data.snapshotId === "string" &&
+    Number.isInteger(data.chunkCount)
+    ? data
+    : null;
+}
+
+async function deleteSnapshotChunks(
+  client: RelasClient,
+  municipalityId: string,
+  manifest: RemoteWorkspaceManifest
+): Promise<void> {
+  for (let start = 0; start < manifest.chunkCount; start += MAX_BATCH_WRITES) {
+    const batch = writeBatch(client.db);
+    for (
+      let index = start;
+      index < Math.min(start + MAX_BATCH_WRITES, manifest.chunkCount);
+      index++
+    ) {
+      batch.delete(
+        doc(
+          client.db,
+          "relas_scopes",
+          municipalityId,
+          "workspace_versions",
+          manifest.snapshotId,
+          "chunks",
+          String(index).padStart(6, "0")
+        )
+      );
+    }
+    await batch.commit();
+  }
+}
+
+/**
+ * Elimina de Firebase el expediente de un ámbito: primero los fragmentos de la
+ * copia vigente y, solo cuando ya no queda ninguno, el manifiesto. Si algo
+ * falla, el manifiesto permanece y el expediente sigue siendo recuperable.
+ * Solo el administrador general puede ejecutarlo.
+ *
+ * Límite verificado en el cliente web: no se pueden enumerar copias anteriores
+ * huérfanas (creadas antes de la limpieza automática); solo se retira la vigente.
+ */
+export async function deleteRemoteWorkspace(
+  client: RelasClient,
+  municipalityId: string
+): Promise<{ deleted: boolean }> {
+  if (!client.auth.currentUser) {
+    throw new Error("Inicia sesión para eliminar el expediente de Firebase.");
+  }
+  const profile = await readAccessProfile(client);
+  if (!profile.administrator) {
+    throw new Error(
+      "Solo el administrador general puede eliminar un expediente de Firebase."
+    );
+  }
+  const manifest = await readManifest(client, municipalityId);
+  if (manifest === null) return { deleted: false };
+  await deleteSnapshotChunks(client, municipalityId, manifest);
+  await deleteDoc(
+    doc(client.db, "relas_scopes", municipalityId, "workspace", "current")
+  );
+  return { deleted: true };
+}
+
+export type RemoteUploadOutcome =
+  | "subido"
+  | "ya-actualizado"
+  | "remoto-mas-reciente"
+  | "error";
+
+/**
+ * Sube a Firebase los expedientes que existen en este navegador. No sustituye
+ * una copia remota más reciente: se compara `updatedAt` antes de cada subida.
+ */
+export async function uploadLocalWorkspaces(
+  client: RelasClient,
+  workspaces: MunicipalityWorkspace[],
+  onProgress?: (id: string, outcome: RemoteUploadOutcome, detail?: string) => void
+): Promise<Record<string, RemoteUploadOutcome>> {
+  const result: Record<string, RemoteUploadOutcome> = {};
+  for (const workspace of workspaces) {
+    const id = workspace.municipality.identity.id;
+    let outcome: RemoteUploadOutcome;
+    let detail: string | undefined;
+    try {
+      const remote = await readRemoteWorkspace(client, id);
+      if (remote !== null && remote.updatedAt > workspace.updatedAt) {
+        outcome = "remoto-mas-reciente";
+      } else if (remote !== null && remote.updatedAt === workspace.updatedAt) {
+        outcome = "ya-actualizado";
+      } else {
+        await saveRemoteWorkspace(client, workspace);
+        outcome = "subido";
+      }
+    } catch (error) {
+      outcome = "error";
+      detail = error instanceof Error ? error.message : undefined;
+    }
+    result[id] = outcome;
+    onProgress?.(id, outcome, detail);
+  }
+  return result;
 }
