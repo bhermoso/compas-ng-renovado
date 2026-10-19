@@ -9,7 +9,7 @@ import {
   validatePlanDocumentForLocalHealthPlan,
 } from "../src/domain/action-plan-catalog/PlanDocument";
 import { createIndicatorWorksheet } from "../src/domain/action-plan-catalog/IndicatorWorksheet";
-import { buildPlanWord,buildPlanPdf,planDocumentParagraphs } from "../src/application/action-plan/exportPlanDocument";
+import { buildPlanWord,buildPlanPdf,planDocumentParagraphs,planActionParagraphs,planActuationParagraphs } from "../src/application/action-plan/exportPlanDocument";
 function fixture(){
  const draft:PlanPreparationDraft={municipalityId:"granada-zaidin",moduleId:module.id,version:module.version,updatedAt:"2026-09-16",decisions:{}};
  const put=(id:string,text:string)=>{draft.decisions[id]={status:"included",sourceText:text};};
@@ -117,8 +117,16 @@ describe("Versiones documentales del Plan",()=>{
   expect(JSON.stringify(doc)).toContain("Actuación conectada");
   expect(JSON.stringify(doc)).not.toContain("Cambio posterior sin validar");
   const texts=planDocumentParagraphs(doc).map(p=>p.text).join("\n");
-  expect(texts).toContain("Mapa de vínculos, fichas y seguimiento");
+  expect(texts).toContain("Mapa de vínculos del Plan de Acción");
   expect(texts).toContain("Actuación conectada");
   expect(texts).toContain("Taller inicial");
+  // El Plan de Acción no incluye actuaciones; estas viven en su propia sección.
+  const action=planActionParagraphs(doc).map(p=>p.text).join("\n");
+  expect(action).not.toContain("Actuación conectada");
+  expect(action).not.toContain("Taller inicial");
+  const actuations=planActuationParagraphs(doc).map(p=>p.text).join("\n");
+  expect(actuations).toContain("Actuaciones y agenda de implementación");
+  expect(actuations).toContain("Actuación conectada");
+  expect(actuations).toContain("Taller inicial");
  });
 });

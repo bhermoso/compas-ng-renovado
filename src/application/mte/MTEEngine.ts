@@ -1,4 +1,5 @@
 import type { LocalHealthProfile, PSLAreaIntervencion } from "../../domain/health-profile";
+import { profileCanFeedDownstream } from "../../domain/quality/ProfileValidationCriterion";
 import type {
   EscenarioEstrategico,
   LecturaEstrategicaLocal,
@@ -150,12 +151,14 @@ export function translate(
     return { ok: false, violations: ["G-MTE-3: FrameworkProvider no disponible"] };
   }
 
-  // G-MTE-1: PSL en estado que permite traducción
-  if (psl.status !== "validated" && psl.status !== "approved") {
+  // G-MTE-1: el PSL debe ser el Perfil vigente. La validación técnica ya no es
+  // requisito: se informa como criterio de calidad («Perfil validado»,
+  // CONTRACT-PROFILE-VALIDATION-QUALITY). Solo un Perfil retirado no se traduce.
+  if (!profileCanFeedDownstream(psl.status)) {
     return {
       ok: false,
       violations: [
-        `G-MTE-1: PSL en estado "${psl.status}"; se requiere "validated" o "approved"`,
+        `G-MTE-1: PSL en estado "${psl.status}"; un Perfil sustituido o archivado no es el Perfil vigente`,
       ],
     };
   }

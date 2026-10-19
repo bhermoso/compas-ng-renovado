@@ -113,6 +113,17 @@ Vista de presentación que agrupa los átomos en ocho dimensiones rotuladas «ma
 
 ---
 
+### CONTRACT-PROFILE-VALIDATION-QUALITY
+**Estado:** CONCEPTUAL — creado 2026-10-19
+
+La validación del Perfil pasa de restricción a criterio de calidad. Informa y se declara en las salidas; solo un Perfil sustituido o archivado deja de alimentar pasos posteriores. El ciclo de vida interno del Perfil no cambia.
+
+**Productores:** `assessProfileValidation`, `profileCanFeedDownstream`.
+**Consumidores:** MTE (G-MTE-1), runtime del municipio, compilación inicial del PLS, validación formal (FVAL-01), vistas de lectura y plan.
+**Relacionado con:** CONTRACT-MTE, CONTRACT-INSTITUTIONAL-LIFECYCLE, CONTRACT-LOCAL-HEALTH-PLAN-COMPILER, CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT, CONTRACT-MIT-PSL.
+
+---
+
 ### CONTRACT-AGENDA-ACTUATIONS
 **Estado:** CONCEPTUAL — creado 2026-10-19
 
@@ -243,7 +254,7 @@ Contrato del Plan Local de Salud (PLS) como documento institucional definitivo. 
 
 **Productores:** `LocalHealthPlanCompiler` (tipos de dominio en Sprint 2.3; implementación del compilador pendiente).
 **Consumidores:** Equipo técnico, corporación municipal, Distrito Sanitario, Junta de Andalucía.
-**Relacionado con:** CONTRACT-MIT-PSL, CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER, CONTRACT-DELIBERATIVE-PRIORITISATION, CONTRACT-ACTION-PLAN-CATALOG, CONTRACT-AGENDA-ACTUATIONS, CONTRACT-MTE, CONTRACT-COMPILER (reserva histórica), CONTRACT-LOCAL-HEALTH-PLAN-COMPILER.
+**Relacionado con:** CONTRACT-MIT-PSL, CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER, CONTRACT-DELIBERATIVE-PRIORITISATION, CONTRACT-ACTION-PLAN-CATALOG, CONTRACT-AGENDA-ACTUATIONS, CONTRACT-PROFILE-VALIDATION-QUALITY, CONTRACT-MTE, CONTRACT-COMPILER (reserva histórica), CONTRACT-LOCAL-HEALTH-PLAN-COMPILER.
 
 ---
 
@@ -255,7 +266,7 @@ Contrato del `LocalHealthPlanCompiler`. Define cómo se produce el `LocalHealthP
 **Productores:** `LocalHealthPlanCompiler` (pendiente de implementar; tipos de dominio en Sprint 2.3).
 **Consumidores:** Equipo técnico, UI (exportación futura DOCX/PDF/HTML).
 **Tipos:** `src/domain/health-plan/LocalHealthPlanDocument.ts`, `src/domain/compilation/CompilationManifest.ts`.
-**Relacionado con:** CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT, CONTRACT-MIT-PSL, CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER, CONTRACT-DELIBERATIVE-PRIORITISATION, CONTRACT-ACTION-PLAN-CATALOG, CONTRACT-MTE, CONTRACT-COMPILER (reserva histórica), CONTRACT-INSTITUTIONAL-LIFECYCLE.
+**Relacionado con:** CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT, CONTRACT-MIT-PSL, CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER, CONTRACT-DELIBERATIVE-PRIORITISATION, CONTRACT-ACTION-PLAN-CATALOG, CONTRACT-PROFILE-VALIDATION-QUALITY, CONTRACT-MTE, CONTRACT-COMPILER (reserva histórica), CONTRACT-INSTITUTIONAL-LIFECYCLE.
 **Prerequisitos satisfechos (Sprint 2):** actor model `approved` implementado (CONTRACT-INSTITUTIONAL-LIFECYCLE); validación formal del Nivel 3 implementada (`FormalValidationRecord`, `createFormalValidation.ts`).
 **Prerequisitos pendientes:** implementación completa del `LocalHealthPlanCompiler`. El soporte de dominio, captura UI y transporte documental para G-PLS-7 y G-PLS-10 existe desde 2026-09-24 (`PlanPreparationPanel` → `PlanPreparationDraft` → `PlanDocument`). Ver §16 de este contrato.
 
@@ -270,7 +281,7 @@ Contrato del modelo canónico de ciclos de vida institucional de los objetos de 
 
 **Productores:** `src/application/institutional-lifecycle/approvePSL.ts`, `createFormalValidation.ts`.
 **Consumidores:** `handleApprovePSL` y `handleFormalValidation` en `src/App.tsx`; paneles `PSLApproveAction` y `FormalValidationForm`; `LocalHealthPlanCompiler` (futuro: gates G-PLS-1, G-PLS-5, G-PLS-6).
-**Relacionado con:** CONTRACT-MIT-PSL (PSL y sus 6 estados), CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER (gate G-LHC-1), CONTRACT-LOCAL-HEALTH-PLAN-COMPILER (gates G-PLS-1, G-PLS-5, G-PLS-6), CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT (aprobación institucional del PLS), CONTRACT-AGENDA-ACTUATIONS.
+**Relacionado con:** CONTRACT-MIT-PSL (PSL y sus 6 estados), CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER (gate G-LHC-1), CONTRACT-LOCAL-HEALTH-PLAN-COMPILER (gates G-PLS-1, G-PLS-5, G-PLS-6), CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT (aprobación institucional del PLS), CONTRACT-AGENDA-ACTUATIONS, CONTRACT-PROFILE-VALIDATION-QUALITY (FVAL-01).
 
 ---
 
@@ -351,7 +362,7 @@ Contrato canónico del Motor de Traducción Estratégica. Supersede `CONTRACT-ST
 
 **Productores:** Motor de Traducción Estratégica (`MTE`), `FrameworkProvider`.
 **Consumidores:** Selección deliberativa, Producto 6/Plan de Acción, futuro compilador del PLS.
-**Relacionado con:** CONTRACT-MIT-PSL, CONTRACT-STRATEGIC-SCENARIO, CONTRACT-DELIBERATIVE-PRIORITISATION, CONTRACT-ACTION-PLAN-CATALOG, CONTRACT-STRATEGIC-TRANSLATION (archivado).
+**Relacionado con:** CONTRACT-MIT-PSL, CONTRACT-STRATEGIC-SCENARIO, CONTRACT-DELIBERATIVE-PRIORITISATION, CONTRACT-ACTION-PLAN-CATALOG, CONTRACT-PROFILE-VALIDATION-QUALITY (G-MTE-1), CONTRACT-STRATEGIC-TRANSLATION (archivado).
 
 ---
 

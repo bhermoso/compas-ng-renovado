@@ -302,10 +302,18 @@ describe("validateCreateFormalValidation", () => {
     expect(validateCreateFormalValidation(BASE_FVAL)).toHaveLength(0);
   });
 
-  it("FVAL-01: PSL en estado 'generated' → violación", () => {
+  it("FVAL-01: PSL en estado 'generated' → SIN violación (la validación del Perfil es criterio de calidad)", () => {
     const v = validateCreateFormalValidation({
       ...BASE_FVAL,
       psl: validatedPSL({ status: "generated" }),
+    });
+    expect(v.some((x) => x.code === "FVAL-01")).toBe(false);
+  });
+
+  it("FVAL-01: PSL archivado → violación", () => {
+    const v = validateCreateFormalValidation({
+      ...BASE_FVAL,
+      psl: validatedPSL({ status: "archived" }),
     });
     expect(v.some((x) => x.code === "FVAL-01")).toBe(true);
   });
