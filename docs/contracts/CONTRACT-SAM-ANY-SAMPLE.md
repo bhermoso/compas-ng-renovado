@@ -27,7 +27,7 @@ Toda muestra que COMPÁS produzca o importe y que incluya sexo y edad de las per
 
 ## 5. Padrón de referencia
 
-Un municipio entra en el registro (`populationReferenceRegistry`) solo con una fuente verificada: tabla, fecha y suma auditada contra el total publicado. Hoy: Atarfe, y Fuente Vaqueros en la rama del padrón 2025 pendiente de fusión. La ausencia de entrada significa que SAM no puede ejecutarse para ese municipio, y así se declara.
+Un municipio entra en el registro (`populationReferenceRegistry`) solo con una fuente verificada: tabla, fecha y suma auditada contra el total publicado. Hoy: Atarfe y Fuente Vaqueros (padrón INE 2025). La ausencia de entrada significa que SAM no puede ejecutarse para ese municipio, y así se declara.
 
 ## 6. Estado de la vinculación (verificado en el código el 2026-10-19)
 
