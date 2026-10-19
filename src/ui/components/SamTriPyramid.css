@@ -32,3 +32,5 @@
 .sam-tripyramid__table caption { text-align: left; font-weight: 600; padding-bottom: 4px; }
 .sam-tripyramid__table th, .sam-tripyramid__table td { padding: 3px 10px; border-bottom: 1px solid var(--borde); text-align: right; font-variant-numeric: tabular-nums; }
 .sam-tripyramid__table th[scope="row"], .sam-tripyramid__table thead th:first-child { text-align: left; }
+.sam-tripyramid__progress { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin: 8px 0; font-size: .85rem; }
+.sam-tripyramid__progress progress { width: 180px; max-width: 100%; accent-color: var(--azul); }
