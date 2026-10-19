@@ -10912,7 +10912,8 @@ h3 {
   .pcm-definitive-plan > .panel-note,
   .pcm-definitive-plan > p,
   .pcm-generated-plan > p[role="status"],
-  .pcm-generated-plan .status-pill {
+  .pcm-generated-plan .status-pill,
+  .pcm-generated-plan .pcm-preview-ficha {
     display: none !important;
   }
 
