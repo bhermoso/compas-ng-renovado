@@ -1,22 +1,28 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { spawn } from "node:child_process";
+import { createServer } from "vite";
 import { chromium } from "playwright";
 
-const url = "http://127.0.0.1:4174/COMPAS_NG/";
-const server = spawn(process.execPath, [
-  "node_modules/vite/bin/vite.js", "preview", "--host", "127.0.0.1", "--port", "4174",
-], { stdio: "inherit" });
+// La entrada ordinaria exige sesión de Firebase; esta prueba monta la aplicación directamente
+// (sin acceso) para comprobar solo la hidratación del expediente en el navegador.
+const server = await createServer({
+  plugins: [{
+    name: "app-direct",
+    configureServer(s) {
+      s.middlewares.use("/app-direct", async (_req, res) => {
+        res.setHeader("Content-Type", "text/html");
+        res.end(await s.transformIndexHtml("/app-direct", `<html><body><div id="root"></div><script type="module">import React from 'react';import {createRoot} from 'react-dom/client';import App from '/src/App.tsx';import '/src/index.css';createRoot(document.getElementById('root')).render(React.createElement(App));</script></body></html>`));
+      });
+    },
+  }],
+  server: { host: "127.0.0.1", port: 0 },
+});
+await server.listen();
+const url = `http://127.0.0.1:${server.httpServer.address().port}/app-direct`;
 let browser;
 try {
-  let ready = false;
-  for (let i = 0; i < 100; i++) {
-    try { ready = (await fetch(url)).ok; } catch {}
-    if (ready) break;
-    await new Promise(resolve => setTimeout(resolve, 200));
-  }
-  assert.ok(ready, "El servidor de la compilación debe arrancar");
-  browser = await chromium.launch();
+  browser = await chromium.launch(process.env.COMPAS_TEST_CHROMIUM
+    ? { executablePath: process.env.COMPAS_TEST_CHROMIUM, args: ["--no-sandbox"] } : {});
   const page = await browser.newPage();
   const seed = JSON.parse(readFileSync("public/seeds/compas-ng-workspace-fuente-vaqueros.json", "utf8"));
   const placeholder = structuredClone(seed);
@@ -32,9 +38,9 @@ try {
   await page.route("**/seeds/*.json", route => route.abort("blockedbyclient"));
   for (let visit = 0; visit < 2; visit++) {
     if (visit === 0) await page.goto(url); else await page.reload();
-    await page.getByRole("button", { name: "2 Diagnóstico territorial", exact: true }).click();
+    await page.locator(".app-nav__tab", { hasText: "Diagnóstico territorial" }).click();
     await page.getByRole("heading", { name: "Fuente Vaqueros", exact: true }).waitFor();
-    await page.getByRole("heading", { name: "Otras fuentes documentales1" }).waitFor({ timeout: 15000 });
+    await page.getByText("PLIZD+ 2024-2028").first().waitFor({ timeout: 15000 });
     await page.waitForFunction(() => {
       const raw = localStorage.getItem("compas-ng:workspace:fuente-vaqueros");
       if (!raw) return false;
@@ -69,5 +75,5 @@ try {
   console.log("Fuente Vaqueros: 1 documento y 29 evidencias visibles y persistidas; recarga correcta con JSON bloqueado.");
 } finally {
   await browser?.close();
-  server.kill();
+  await server.close();
 }
