@@ -15,6 +15,16 @@ import type { ActionPlanTraceabilityLink } from "../../domain/action-plan-catalo
 import { validateActionPlanUnaddressedNeeds } from "../../application/action-plan/ActionPlanEngine";
 import type { UnaddressedNeed } from "../../domain/health-plan";
 
+/** Abre la ficha del indicador (y los desplegables que la contienen) y la muestra. */
+function openIndicatorFicha(indicatorCode: string) {
+  const target = document.getElementById(`ficha-${indicatorCode}`);
+  if (!target) return;
+  for (let node: HTMLElement | null = target; node; node = node.parentElement) {
+    if (node instanceof HTMLDetailsElement) node.open = true;
+  }
+  target.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 function fichaStatusLabel(status: ActionPlanTraceabilityLink["indicatorFichaStatus"]): string {
   if (status === "missing") return "ficha pendiente";
   if (status === "draft") return "ficha abierta sin actuaciones";
@@ -403,6 +413,13 @@ export function DefinitiveActionPlanPreview({municipalityId, modules, drafts, wo
                     return <li key={`${row.specific.code}-${row.specific.indicator.code}`} className="pcm-specific">
                       <p><strong>Objetivo específico · {row.specific.displayCode ?? row.specific.code}</strong> · {objectiveText} {row.objectiveDecision?.status === "modified" && <span className="status-pill">Modificado</span>}</p>
                       {row.indicatorIncluded ? <p className="pcm-preview-indicator"><strong>Indicador · {row.specific.indicator.code}</strong> · {indicatorText} {row.indicatorDecision?.status === "modified" && <span className="status-pill">Modificado</span>}</p> : <p className="panel-note">Indicador todavía no seleccionado para este objetivo.</p>}
+                      {row.indicatorIncluded && (() => {
+                        const link = traceability.find((item) => item.indicatorCode === row.specific.indicator.code);
+                        return link ? <p className="panel-note pcm-preview-ficha">
+                          Ficha del indicador: {fichaStatusLabel(link.indicatorFichaStatus)} · {countLabel(link.actionCards.length, "actuación", "actuaciones")}.{" "}
+                          <button type="button" className="pcm-preview-ficha__open" onClick={() => openIndicatorFicha(row.specific.indicator.code)}>Abrir ficha</button>
+                        </p> : null;
+                      })()}
                     </li>;
                   })}
                 </ol>

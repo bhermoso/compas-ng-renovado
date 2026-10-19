@@ -243,7 +243,7 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
      return <section className="pcm-specific" key={specific.code}>
       <h3>Objetivo específico · {specific.displayCode ?? specific.code}</h3><p><ProposalText text={visibleSpecific}/></p>
       {control(specific.code, sourceSpecific, [module.id, general.code])}
-      <details className="pcm-sheet"><summary>Indicador y ficha · {indicator.code}</summary>
+      <details className="pcm-sheet" id={`ficha-${indicator.code}`}><summary>Indicador y ficha · {indicator.code}</summary>
        <p>{visibleIndicator}</p>
        <p className="panel-note">Indicador vigente del territorio. Su ficha técnica puede seguir desarrollándose sin alterar el texto fuente histórico.</p>
        {control(indicator.code, sourceIndicator, [module.id, general.code, specific.code])}
