@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { loadAllWorkspacesFromIndexedDB } from "../../infrastructure/persistence/indexed-db-workspace";
-import { parseWorkspaceJSON } from "../../infrastructure/persistence/local-storage";
+import { loadLocalWorkspaces } from "../../infrastructure/persistence/local-workspaces";
 import type { RelasClient } from "../../infrastructure/relas/RelasClient";
 import {
   uploadLocalWorkspaces,
   type RemoteUploadOutcome,
 } from "../../infrastructure/relas/RemoteWorkspace";
-import type { MunicipalityWorkspace } from "../../domain/workspace";
 
 const LABEL: Record<RemoteUploadOutcome, string> = {
   subido: "subido",
@@ -15,27 +13,6 @@ const LABEL: Record<RemoteUploadOutcome, string> = {
   error: "error",
 };
 
-async function localWorkspaces(): Promise<MunicipalityWorkspace[]> {
-  const byId = new Map<string, MunicipalityWorkspace>();
-  for (const stored of await loadAllWorkspacesFromIndexedDB()) {
-    byId.set(stored.municipality.identity.id, stored);
-  }
-  try {
-    for (let index = 0; index < localStorage.length; index++) {
-      const key = localStorage.key(index);
-      if (key === null || !key.startsWith("compas-ng:workspace:")) continue;
-      const raw = localStorage.getItem(key);
-      const parsed = raw ? parseWorkspaceJSON(raw) : null;
-      if (parsed === null) continue;
-      const id = parsed.municipality.identity.id;
-      const current = byId.get(id);
-      if (!current || parsed.updatedAt > current.updatedAt) byId.set(id, parsed);
-    }
-  } catch {
-    // localStorage no disponible: se usa solo el almacenamiento ampliado.
-  }
-  return Array.from(byId.values());
-}
 
 /**
  * Sin sesión: avisa de que el trabajo solo está en este navegador.
@@ -59,7 +36,7 @@ export function RemoteSyncPanel({ client }: { client: RelasClient }) {
     setBusy(true);
     setLines([]);
     try {
-      const workspaces = await localWorkspaces();
+      const workspaces = await loadLocalWorkspaces();
       if (workspaces.length === 0) {
         setLines(["No hay expedientes guardados en este navegador."]);
         return;

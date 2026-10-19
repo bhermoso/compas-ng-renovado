@@ -16,6 +16,7 @@ vi.mock("firebase/firestore", () => ({
       .filter(([k]) => k.startsWith(`${r.path}/`))
       .map(([k, v]) => ({ id: k.split("/").pop(), data: () => v })),
   }),
+  setDoc: async (r: { path: string }, data: Record<string, unknown>) => { store.set(r.path, data); },
   deleteDoc: async (r: { path: string }) => { store.delete(r.path); },
   writeBatch: () => {
     const ops: Array<() => void> = [];
@@ -71,7 +72,7 @@ describe("expediente remoto: ciclo de vida", () => {
   it("eliminar retira fragmentos y manifiesto", async () => {
     await saveRemoteWorkspace(client, workspace("fv", "2026-10-19T10:00:00.000Z"));
     expect(await deleteRemoteWorkspace(client, "fv")).toEqual({ deleted: true });
-    expect(store.size).toBe(0);
+    expect([...store.keys()].sort()).toEqual(["compas_deleted_scopes/fv", "relas_scopes/fv"]);
     expect(await deleteRemoteWorkspace(client, "fv")).toEqual({ deleted: false });
   });
 
@@ -79,7 +80,8 @@ describe("expediente remoto: ciclo de vida", () => {
     await saveRemoteWorkspace(client, workspace("fv", "2026-10-19T10:00:00.000Z"));
     administrator = false;
     await expect(deleteRemoteWorkspace(client, "fv")).rejects.toThrow(/administrador general/);
-    expect(store.size).toBe(2);
+    expect([...store.keys()].some((k) => k.startsWith("compas_deleted_scopes"))).toBe(false);
+    expect(store.has("relas_scopes/fv/workspace/current")).toBe(true);
   });
 
   it("la subida masiva no sustituye una copia remota más reciente", async () => {

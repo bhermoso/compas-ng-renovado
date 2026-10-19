@@ -5,6 +5,7 @@ import {
   getDocFromServer,
   getDocs,
   serverTimestamp,
+  setDoc,
   writeBatch,
 } from "firebase/firestore";
 import type { MunicipalityWorkspace } from "../../domain/workspace";
@@ -116,6 +117,7 @@ export async function saveRemoteWorkspace(
   if (role === "reader") {
     throw new Error("La cuenta tiene acceso de consulta y no puede guardar.");
   }
+  await ensureRemoteScope(client, workspace).catch(() => undefined);
   const raw = JSON.stringify(workspace);
   const chunks = splitText(raw);
   const id = snapshotId();
@@ -245,6 +247,9 @@ export async function deleteRemoteWorkspace(
       "Solo el administrador general puede eliminar un expediente de Firebase."
     );
   }
+  // La lápida va primero: si el borrado se interrumpe, ningún equipo repone
+  // el expediente a medio eliminar.
+  await writeRemoteTombstone(client, municipalityId);
   const manifest = await readManifest(client, municipalityId);
   if (manifest === null) return { deleted: false };
   await deleteSnapshotChunks(client, municipalityId, manifest);
@@ -252,6 +257,65 @@ export async function deleteRemoteWorkspace(
     doc(client.db, "relas_scopes", municipalityId, "workspace", "current")
   );
   return { deleted: true };
+}
+
+const SCOPE_TYPES = ["municipio", "mancomunidad", "distrito-municipal"] as const;
+
+/** Crea el registro del ámbito si no existe (lo exige el listado de administración). */
+export async function ensureRemoteScope(
+  client: RelasClient,
+  workspace: MunicipalityWorkspace
+): Promise<void> {
+  const user = client.auth.currentUser;
+  if (!user) throw new Error("Inicia sesión para registrar el ámbito.");
+  const identity = workspace.municipality.identity;
+  const ref = doc(client.db, "relas_scopes", identity.id);
+  if ((await getDocFromServer(ref)).exists()) return;
+  const type = (SCOPE_TYPES as readonly string[]).includes(
+    identity.territorialType ?? ""
+  )
+    ? identity.territorialType
+    : "municipio";
+  await setDoc(ref, {
+    name: identity.name,
+    type,
+    createdBy: user.uid,
+    createdAt: serverTimestamp(),
+  });
+}
+
+/** Lista de ámbitos eliminados: evita que otro equipo reponga un expediente retirado. */
+export async function readRemoteTombstones(
+  client: RelasClient
+): Promise<Set<string>> {
+  const rows = await getDocs(collection(client.db, "compas_deleted_scopes"));
+  return new Set(rows.docs.map((row) => row.id));
+}
+
+export async function writeRemoteTombstone(
+  client: RelasClient,
+  municipalityId: string
+): Promise<void> {
+  const user = client.auth.currentUser;
+  if (!user) throw new Error("Inicia sesión para registrar la eliminación.");
+  await setDoc(doc(client.db, "compas_deleted_scopes", municipalityId), {
+    deletedBy: user.uid,
+    deletedAt: serverTimestamp(),
+  });
+}
+
+export async function clearRemoteTombstone(
+  client: RelasClient,
+  municipalityId: string
+): Promise<void> {
+  await deleteDoc(doc(client.db, "compas_deleted_scopes", municipalityId));
+}
+
+export async function hasRemoteWorkspace(
+  client: RelasClient,
+  municipalityId: string
+): Promise<boolean> {
+  return (await readManifest(client, municipalityId)) !== null;
 }
 
 export type RemoteUploadOutcome =

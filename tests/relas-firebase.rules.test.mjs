@@ -158,3 +158,13 @@ test('solo administración general elimina el manifiesto; coordinación retira f
  await assertSucceeds(deleteDoc(doc(db('owner'),workspaceChunkPath)));
  await assertSucceeds(deleteDoc(doc(db('owner'),workspaceManifestPath)));
 });
+
+test('lápidas de ámbitos eliminados: solo administración general las escribe y las lista',async()=>{
+ await owner();
+ const tomb=`compas_deleted_scopes/${scope}`;
+ await assertSucceeds(setDoc(doc(db('owner'),tomb),{deletedBy:'owner',deletedAt:serverTimestamp()}));
+ await assertFails(setDoc(doc(db('coord'),tomb),{deletedBy:'coord',deletedAt:serverTimestamp()}));
+ await assertSucceeds(getDoc(doc(db('coord'),tomb)));
+ await assertFails(getDoc(doc(db('other'),tomb)));
+ await assertSucceeds(deleteDoc(doc(db('owner'),tomb)));
+});

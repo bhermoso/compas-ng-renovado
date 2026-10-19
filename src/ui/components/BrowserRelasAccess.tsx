@@ -11,7 +11,7 @@ const FullApp=lazy(()=>import('../../App'));
 
 export default function BrowserRelasAccess(){
  const view=new URLSearchParams(window.location.search).get('vista');
- const adminEntry=view==='administracion';const appEntry=view==='app';
+ const adminEntry=view==='administracion';const appEntry=!adminEntry;
  const client=useMemo(()=>createBrowserRelasClient(),[]);
  const [profile,setProfile]=useState<AccessProfile>();const [scope,setScope]=useState<string>();const [busy,setBusy]=useState(true);const [fullApp,setFullApp]=useState(appEntry);
  useEffect(()=>client.auth.onAuthStateChanged(user=>{
