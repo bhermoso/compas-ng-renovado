@@ -287,6 +287,7 @@ export function DefinitiveActionPlanPreview({municipalityId, modules, drafts, wo
           <span className="status-pill">{linkedActionCards} fichas · {linkedActivities} actividades</span>
         </div>
         <p className="panel-note">Cada rama conserva la cadena línea estratégica → bloque → objetivo → indicador → ficha → actuación → actividades y entregas. Si falta una pieza, se declara como pendiente.</p>
+        <p className="panel-note">Las fichas de actuación se muestran aquí como fuente de datos del indicador. El resultado de cada indicador no se atribuye a actuaciones concretas, y la gestión de las actuaciones y de las agendas anuales se hace en la vista Agenda, separada del Plan de Acción.</p>
         <div className="pcm-operational-tree" aria-label="Árbol operativo de actividades vinculadas a objetivos e indicadores">
           {active.map(({ module, moduleDecision }) => {
             const moduleLinks = traceability.filter((link) => link.moduleId === module.id);

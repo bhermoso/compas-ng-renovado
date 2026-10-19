@@ -97,3 +97,7 @@ revisiones se conservan como referencia formal anterior. No se traslada aprobaci
 entre versiones ni se aplica esta redacción local a otros municipios. La adopción
 formal de la nueva versión requiere una integración posterior explícita; esta
 entrega habilita preparación y revisión metodológica, no aprobación automática.
+
+## 8. Actuaciones fuera del Plan de Acción — actualización autorizada 2026-10-19
+
+El Plan de Acción lo componen líneas estratégicas, objetivos e indicadores. Las actuaciones y las agendas anuales son un instrumento separado (`CONTRACT-AGENDA-ACTUATIONS`). Las fichas de actuación de la ficha del indicador se conservan como instrumento de recogida de datos para consolidar el indicador; no convierten las actuaciones en parte del Plan de Acción ni permiten atribuirles una parte del resultado del indicador. No se retira ninguna función.
