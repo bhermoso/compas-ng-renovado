@@ -2,7 +2,7 @@
 .agenda-new { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .agenda-new input { min-width: 16rem; }
 .agenda-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.agenda-board { display: grid; grid-template-columns: repeat(5, minmax(200px, 1fr)); gap: 12px; overflow-x: auto; padding-bottom: 8px; }
+.agenda-board { display: grid; grid-template-columns: repeat(5, minmax(150px, 1fr)); gap: 12px; overflow-x: auto; padding-bottom: 8px; }
 .agenda-column { min-width: 0; background: var(--fondo-secundario); border: 1px solid var(--borde); border-top: 4px solid var(--texto-terciario); border-radius: 6px; display: flex; flex-direction: column; }
 .agenda-column--sanitario { border-top-color: var(--azul); }
 .agenda-column--comunitario { border-top-color: var(--verde); }
@@ -10,6 +10,7 @@
 .agenda-column--laboral { border-top-color: var(--naranja); }
 .agenda-column--over { outline: 2px dashed var(--azul); outline-offset: -4px; }
 .agenda-column header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; }
+.agenda-column header { flex-wrap: wrap; }
 .agenda-column h3 { margin: 0; font-size: .9rem; font-weight: 600; color: var(--texto-principal); }
 .agenda-count { font-size: .8rem; color: var(--texto-secundario); font-variant-numeric: tabular-nums; }
 .agenda-column__body { display: flex; flex-direction: column; gap: 8px; padding: 0 8px 10px; min-height: 80px; }
@@ -36,4 +37,4 @@
 .ficha-hint { font-size: .75rem; color: var(--texto-secundario); margin: 2px 0; }
 .ficha-warning { margin: 8px 0; padding: 6px 10px; border-left: 3px solid var(--amarillo); background: var(--fondo-secundario); font-size: .85rem; }
 .ficha-field-row { display: flex; flex-wrap: wrap; gap: 12px; }
-@media (max-width: 720px) { .agenda-board { grid-template-columns: repeat(5, 240px); } }
+@media (max-width: 720px) { .agenda-board { grid-template-columns: repeat(5, 200px); } }
