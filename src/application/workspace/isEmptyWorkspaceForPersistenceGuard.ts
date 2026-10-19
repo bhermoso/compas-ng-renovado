@@ -45,6 +45,7 @@ export function isEmptyWorkspaceForPersistenceGuard(
     (workspace.actionPlanModuleReviews?.length ?? 0) === 0 &&
     (workspace.planPreparationDrafts?.length ?? 0) === 0 &&
     (workspace.indicatorWorksheets?.length ?? 0) === 0 &&
+    (workspace.agendaActuations?.length ?? 0) === 0 &&
     (workspace.historialEstadosTerritorial?.length ?? 0) === 0 &&
     workspace.validatedPSL === undefined &&
     (workspace.compiledProfiles?.length ?? 0) === 0 &&

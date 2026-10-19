@@ -91,6 +91,17 @@ Define las cuatro dimensiones de calidad de la evidencia: documental, muestral, 
 
 ---
 
+### CONTRACT-AGENDA-ACTUATIONS
+**Estado:** CONCEPTUAL — creado 2026-10-19
+
+Registro de actuaciones por cuatro entornos (sanitario, comunitario, educativo, laboral) con ficha completa por bloques, alta manual y volcado desde el Plan de Acción. El bloque de resultado vive en el expediente y alimenta agenda y seguimiento y evaluación sin duplicarse. El sistema no genera actuaciones, trimestres ni prioridades.
+
+**Productores:** equipo técnico (alta manual); volcado desde las actuaciones del Plan de Acción vigente.
+**Consumidores:** vista Agenda, vista Evaluación.
+**Relacionado con:** CONTRACT-ACTION-PLAN-CATALOG, CONTRACT-INSTITUTIONAL-LIFECYCLE, CONTRACT-DYNAMIC-TRIPYRAMID.
+
+---
+
 ### CONTRACT-SOURCE-CAPABILITY-MATRIX
 **Estado:** VIGENTE — creado 2026-09-24
 
@@ -237,7 +248,7 @@ Contrato del modelo canónico de ciclos de vida institucional de los objetos de 
 
 **Productores:** `src/application/institutional-lifecycle/approvePSL.ts`, `createFormalValidation.ts`.
 **Consumidores:** `handleApprovePSL` y `handleFormalValidation` en `src/App.tsx`; paneles `PSLApproveAction` y `FormalValidationForm`; `LocalHealthPlanCompiler` (futuro: gates G-PLS-1, G-PLS-5, G-PLS-6).
-**Relacionado con:** CONTRACT-MIT-PSL (PSL y sus 6 estados), CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER (gate G-LHC-1), CONTRACT-LOCAL-HEALTH-PLAN-COMPILER (gates G-PLS-1, G-PLS-5, G-PLS-6), CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT (aprobación institucional del PLS).
+**Relacionado con:** CONTRACT-MIT-PSL (PSL y sus 6 estados), CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER (gate G-LHC-1), CONTRACT-LOCAL-HEALTH-PLAN-COMPILER (gates G-PLS-1, G-PLS-5, G-PLS-6), CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT (aprobación institucional del PLS), CONTRACT-AGENDA-ACTUATIONS.
 
 ---
 
@@ -261,7 +272,7 @@ Contrato del catálogo temático del Plan de Acción. Define módulos reutilizab
 
 **Productores:** Catálogo de módulos de Plan de Acción, preparación territorial (`planPreparationDrafts`).
 **Consumidores:** UI de preparación del Plan, fichas de indicadores y actuaciones, proyección del Plan de Acción resultante.
-**Relacionado con:** CONTRACT-DELIBERATIVE-PRIORITISATION, CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT.
+**Relacionado con:** CONTRACT-DELIBERATIVE-PRIORITISATION, CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT, CONTRACT-AGENDA-ACTUATIONS.
 
 ---
 
@@ -296,7 +307,7 @@ Define el Sistema de Ajuste Muestral (SAM) como capacidad metodológica transver
 
 **Productores:** `computeSampleQualityAssessment()` (motor puro); `assess*Study()` (capa de integración); `populationReferenceRegistry.ts` (lookup de referencias).
 **Consumidores:** `IBSEPanel` (dictamen SAM cuando ref. disponible). EvidenceStore (futuro: átomos `kind: "sample-quality"`), `SamObservedAssessment` (Tripirámide superpuesta y animada, en IBSE y en el resumen de participación ciudadana).
-**Relacionado con:** CONTRACT-EVIDENCE-QUALITY, CONTRACT-EVIDENCE, CONTRACT-COMPLEMENTARY-STUDIES.
+**Relacionado con:** CONTRACT-EVIDENCE-QUALITY, CONTRACT-EVIDENCE, CONTRACT-COMPLEMENTARY-STUDIES, CONTRACT-AGENDA-ACTUATIONS.
 
 ---
 

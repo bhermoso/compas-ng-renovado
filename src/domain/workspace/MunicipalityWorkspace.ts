@@ -1,3 +1,4 @@
+import type { AgendaActuation } from "../agenda/AgendaActuation";
 import type { PlanDocument } from "../action-plan-catalog/PlanDocument";
 import type { PlanPreparationDraft } from "../action-plan-catalog/PlanPreparationDraft";
 import type { IndicatorWorksheet } from "../action-plan-catalog/IndicatorWorksheet";
@@ -85,6 +86,8 @@ export interface MunicipalityWorkspace {
   /** Human-authored collection sheets; drafts, never diagnostic evidence or approvals. */
   planPreparationDrafts?: PlanPreparationDraft[];
   indicatorWorksheets?: IndicatorWorksheet[];
+  /** Agenda de actuaciones por entornos (CONTRACT-AGENDA-ACTUATIONS). Se guarda con el expediente. */
+  agendaActuations?: AgendaActuation[];
   /**
    * Historial de snapshots del Estado Territorial Evolutivo.
    * Acumulativo: cada versión de la evidencia produce una entrada nueva.
