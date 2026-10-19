@@ -702,7 +702,8 @@ export function buildDiagnosticAnswers(
   const workspace = excludeHistoricalSources(fullWorkspace);
   const antecedentes = buildAntecedents(
     fullWorkspace.repository.documents,
-    fullWorkspace.evidenceStore.atoms
+    fullWorkspace.evidenceStore.atoms,
+    fullWorkspace.repository.conciliations
   );
   const salutogenica = buildSalutogenicReading(input.assets);
   const senalesPresentes = detectarSenales(workspace)

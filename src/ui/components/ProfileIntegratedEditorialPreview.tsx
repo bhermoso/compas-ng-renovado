@@ -1,3 +1,4 @@
+import { conciliationParagraph } from "../../application/health-profile/antecedents";
 import type {
   ProfileIntegratedEditorialView,
   CanonicalEditorialView,
@@ -270,6 +271,9 @@ export function ProfileIntegratedEditorialPreview({
                 <p key={gap} className="pie-hilo__context">{gap}</p>
               ))}
             </article>
+          ))}
+          {view.antecedents.conciliations?.map((c) => (
+            <p key={c.id} className="pie-hilo__context">{conciliationParagraph(c)}</p>
           ))}
         </section>
       ) : null}

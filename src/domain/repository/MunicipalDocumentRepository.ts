@@ -68,6 +68,31 @@ export interface DocumentCycle {
   referenceYear?: number;
 }
 
+/**
+ * Conciliación declarada por el equipo técnico entre una fuente de ciclo
+ * histórico y una de ciclo actual sobre la misma pregunta o indicador. No se
+ * genera ni se propone automáticamente: cada entrada es una decisión humana.
+ */
+export type ConciliationRelation = "convergence" | "divergence" | "not-comparable";
+
+export interface ConciliationSide {
+  documentId: DocumentId;
+  /** Qué dice la fuente sobre el asunto, redactado por el equipo técnico. */
+  statement: string;
+}
+
+export interface CycleConciliation {
+  id: string;
+  /** Pregunta o indicador que ambas fuentes comparten. */
+  topic: string;
+  relation: ConciliationRelation;
+  historical: ConciliationSide;
+  current: ConciliationSide;
+  /** Nota del equipo técnico; en una divergencia, la contradicción no se resuelve aquí. */
+  note?: string;
+  declaredAt: string;
+}
+
 export interface MunicipalDocument {
   id: DocumentId;
   municipalityId: MunicipalityId;
@@ -93,6 +118,8 @@ export interface MunicipalDocument {
 export interface MunicipalDocumentRepository {
   municipalityId: MunicipalityId;
   documents: MunicipalDocument[];
+  /** Ausente mientras el equipo técnico no declare ninguna conciliación. */
+  conciliations?: CycleConciliation[];
   createdAt: string;
   updatedAt: string;
 }
@@ -184,6 +211,35 @@ export function setMunicipalDocumentCycle(
       return { ...rest, ...(cycle !== undefined ? { cycle } : {}), updatedAt: now };
     }),
     updatedAt: now,
+  };
+}
+
+export function addCycleConciliation(
+  repository: MunicipalDocumentRepository,
+  conciliation: Omit<CycleConciliation, "declaredAt">
+): MunicipalDocumentRepository {
+  const now = new Date().toISOString();
+  return {
+    ...repository,
+    conciliations: [
+      ...(repository.conciliations ?? []),
+      { ...conciliation, declaredAt: now },
+    ],
+    updatedAt: now,
+  };
+}
+
+export function removeCycleConciliation(
+  repository: MunicipalDocumentRepository,
+  conciliationId: string
+): MunicipalDocumentRepository {
+  const rest = (repository.conciliations ?? []).filter((c) => c.id !== conciliationId);
+  const { conciliations: _previous, ...base } = repository;
+  void _previous;
+  return {
+    ...base,
+    ...(rest.length > 0 ? { conciliations: rest } : {}),
+    updatedAt: new Date().toISOString(),
   };
 }
 

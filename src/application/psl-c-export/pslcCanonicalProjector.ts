@@ -23,6 +23,7 @@ import type {
   CanonicalEditorialView,
   CanonicalTechnicalSpace,
 } from "../health-profile";
+import { conciliationParagraph } from "../health-profile/antecedents";
 import type { PSLCDocumentModel, PSLCDocumentSection } from "./pslcDocumentModel";
 import { pslcDocxFileName } from "./pslcDocumentModel";
 
@@ -185,6 +186,7 @@ export function projectCanonicalToDocumentModel(
         ...a.sources.map(
           (s) => `${s.title} (${s.cycleLabel}). ${[...s.items, ...s.gaps].join(" ")}`
         ),
+        ...(a.conciliations ?? []).map(conciliationParagraph),
       ],
     });
   }

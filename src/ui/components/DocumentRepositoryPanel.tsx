@@ -1,11 +1,13 @@
 import { FrameworkReference } from "./FrameworkReference";
 import { DocumentReference } from "./Documentation";
 import type {
+  CycleConciliation,
   DocumentCycle,
   MunicipalDocument,
   MunicipalDocumentRepository,
 } from "../../domain/repository";
 import { DocumentCycleControl } from "./DocumentCycleControl";
+import { CycleConciliationPanel } from "./CycleConciliationPanel";
 import {
   libraryDocumentAssignmentId,
   type CompasLibraryDocument,
@@ -60,6 +62,8 @@ interface DocumentRepositoryPanelProps {
   libraryMessage?: string | null;
   onAssignLibraryDocument?: (document: CompasLibraryDocument) => void;
   onSetDocumentCycle?: (documentId: string, cycle: DocumentCycle | undefined) => void;
+  onAddConciliation?: (conciliation: Omit<CycleConciliation, "declaredAt">) => void;
+  onRemoveConciliation?: (conciliationId: string) => void;
 }
 
 function DocumentRow({
@@ -193,6 +197,8 @@ export function DocumentRepositoryPanel({
   libraryMessage,
   onAssignLibraryDocument,
   onSetDocumentCycle,
+  onAddConciliation,
+  onRemoveConciliation,
 }: DocumentRepositoryPanelProps) {
   // Solo muestra "otras fuentes documentales" — las capas 1–3 (Informe de Salud,
   // Estudios complementarios, Activos para la salud) tienen sus propios paneles.
@@ -228,6 +234,10 @@ export function DocumentRepositoryPanel({
             <div className="document-list">{catalogDocs.map(document=><DocumentRow key={document.id} document={document} onDelete={onDelete} onSetCycle={onSetDocumentCycle}/>)}</div>
           </details>
         </section>
+      )}
+
+      {onAddConciliation && onRemoveConciliation && (
+        <CycleConciliationPanel repository={repository} onAdd={onAddConciliation} onRemove={onRemoveConciliation} />
       )}
 
       {libraryDocuments !== undefined && libraryDocuments.length > 0 && (

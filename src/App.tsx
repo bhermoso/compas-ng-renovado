@@ -19,12 +19,15 @@ import type { PlanPreparationDraft } from "./domain/action-plan-catalog/PlanPrep
 import { worksheetKey, type IndicatorWorksheet } from "./domain/action-plan-catalog/IndicatorWorksheet";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  type CycleConciliation,
   type DocumentCycle,
   type DocumentKind,
   type MunicipalDocument,
   type MunicipalDocumentRepository,
   addMunicipalDocument,
   setMunicipalDocumentCycle,
+  addCycleConciliation,
+  removeCycleConciliation,
   replaceMunicipalDocumentByKind,
   removeMunicipalDocument,
 } from "./domain/repository";
@@ -1303,6 +1306,22 @@ export default function App() {
     setWorkspace((prev) => ({
       ...prev,
       repository: setMunicipalDocumentCycle(prev.repository, documentId, cycle),
+      updatedAt: new Date().toISOString(),
+    }));
+  }
+
+  function handleAddConciliation(conciliation: Omit<CycleConciliation, "declaredAt">) {
+    setWorkspace((prev) => ({
+      ...prev,
+      repository: addCycleConciliation(prev.repository, conciliation),
+      updatedAt: new Date().toISOString(),
+    }));
+  }
+
+  function handleRemoveConciliation(conciliationId: string) {
+    setWorkspace((prev) => ({
+      ...prev,
+      repository: removeCycleConciliation(prev.repository, conciliationId),
       updatedAt: new Date().toISOString(),
     }));
   }
@@ -3785,6 +3804,8 @@ export default function App() {
               libraryMessage={documentLibraryMessage}
               onAssignLibraryDocument={handleAssignLibraryDocument}
               onSetDocumentCycle={handleSetDocumentCycle}
+              onAddConciliation={handleAddConciliation}
+              onRemoveConciliation={handleRemoveConciliation}
             />
 
             {/* ── BLOQUE 4: Añadir o sustituir fuentes ── */}

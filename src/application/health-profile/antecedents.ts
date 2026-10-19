@@ -10,6 +10,8 @@
 import type { EvidenceAtom } from "../../domain/evidence";
 import {
   describeDocumentCycle,
+  type ConciliationRelation,
+  type CycleConciliation,
   type MunicipalDocument,
 } from "../../domain/repository";
 import type { MunicipalityWorkspace } from "../../domain/workspace";
@@ -26,11 +28,81 @@ export interface AntecedentSource {
   gaps: string[];
 }
 
+/** Conciliación declarada por el equipo técnico, ya resuelta a texto. */
+export interface AntecedentConciliation {
+  id: string;
+  topic: string;
+  relationLabel: string;
+  historical: { sourceTitle: string; cycleLabel: string; statement: string };
+  current: { sourceTitle: string; cycleLabel: string; statement: string };
+  note?: string;
+}
+
 export interface CanonicalAntecedents {
   kind: "antecedents";
   title: string;
   temporalCaution: string;
   sources: AntecedentSource[];
+  /** Ausente mientras el equipo técnico no declare conciliaciones válidas. */
+  conciliations?: AntecedentConciliation[];
+}
+
+const RELATION_LABEL: Record<ConciliationRelation, string> = {
+  convergence: "Convergencia declarada por el equipo técnico",
+  divergence: "Divergencia declarada por el equipo técnico, sin resolver",
+  "not-comparable": "Declarada no comparable por el equipo técnico",
+};
+
+/** Texto único de una conciliación: pantalla, DOCX y PDF lo comparten. */
+export function conciliationParagraph(c: AntecedentConciliation): string {
+  return (
+    `${c.topic}. ${c.relationLabel}. ` +
+    `${c.historical.sourceTitle} (${c.historical.cycleLabel}): ${c.historical.statement} ` +
+    `${c.current.sourceTitle} (${c.current.cycleLabel}): ${c.current.statement}` +
+    (c.note !== undefined && c.note.trim().length > 0 ? ` Nota del equipo técnico: ${c.note.trim()}` : "")
+  );
+}
+
+function resolveConciliations(
+  documents: readonly MunicipalDocument[],
+  conciliations: readonly CycleConciliation[]
+): { valid: AntecedentConciliation[]; omitted: number } {
+  const byId = new Map(documents.map((d) => [d.id, d] as const));
+  const valid: AntecedentConciliation[] = [];
+  let omitted = 0;
+  for (const c of conciliations) {
+    const h = byId.get(c.historical.documentId);
+    const a = byId.get(c.current.documentId);
+    if (
+      h === undefined ||
+      a === undefined ||
+      h.cycle?.status !== "historical" ||
+      a.cycle?.status !== "current" ||
+      c.topic.trim() === "" ||
+      c.historical.statement.trim() === "" ||
+      c.current.statement.trim() === ""
+    ) {
+      omitted += 1;
+      continue;
+    }
+    valid.push({
+      id: c.id,
+      topic: c.topic.trim(),
+      relationLabel: RELATION_LABEL[c.relation],
+      historical: {
+        sourceTitle: h.title,
+        cycleLabel: describeDocumentCycle(h.cycle),
+        statement: c.historical.statement.trim(),
+      },
+      current: {
+        sourceTitle: a.title,
+        cycleLabel: describeDocumentCycle(a.cycle),
+        statement: c.current.statement.trim(),
+      },
+      ...(c.note !== undefined && c.note.trim() !== "" ? { note: c.note.trim() } : {}),
+    });
+  }
+  return { valid, omitted };
 }
 
 export const ANTECEDENTS_TITLE = "Antecedentes de ciclos anteriores";
@@ -146,7 +218,8 @@ function yearsLabel(documents: MunicipalDocument[]): string {
 
 export function buildAntecedents(
   documents: readonly MunicipalDocument[],
-  atoms: readonly EvidenceAtom[]
+  atoms: readonly EvidenceAtom[],
+  declaredConciliations: readonly CycleConciliation[] = []
 ): CanonicalAntecedents | undefined {
   const historical = documents.filter(isHistoricalDocument);
   if (historical.length === 0) return undefined;
@@ -170,12 +243,23 @@ export function buildAntecedents(
       )
     );
 
+  const { valid, omitted } = resolveConciliations(documents, declaredConciliations);
+  const comparisonClause =
+    valid.length > 0
+      ? "Las comparaciones con el ciclo actual que figuran abajo las declaró el equipo técnico; el Perfil no las genera."
+      : "Este apartado no compara con el ciclo actual.";
+  const omittedClause =
+    omitted > 0
+      ? ` ${omitted} ${omitted === 1 ? "conciliación declarada no se muestra" : "conciliaciones declaradas no se muestran"} porque el ciclo de alguna de sus fuentes ya no coincide con el declarado al registrarla.`
+      : "";
+
   return {
     kind: "antecedents",
     title: ANTECEDENTS_TITLE,
     temporalCaution:
       `Las fuentes de este apartado pertenecen a un ciclo anterior (${yearsLabel(historical)}). ` +
-      `${currentClause} Lo que recogen no describe la situación presente y este apartado no lo compara con ella.`,
+      `${currentClause} Lo que recogen no describe la situación presente. ${comparisonClause}${omittedClause}`,
     sources,
+    ...(valid.length > 0 ? { conciliations: valid } : {}),
   };
 }
