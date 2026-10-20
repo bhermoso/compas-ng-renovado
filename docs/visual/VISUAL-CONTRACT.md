@@ -101,6 +101,27 @@ bordes decorativos de fichas técnicas e informes institucionales.
 **Uso prohibido:** fondos de pantalla completa, fondos de cards, elementos interactivos,
 textos, iconos.
 
+**Excepción de marca (enmienda 2026-10-20, decisión del autor):** el gradiente institucional
+puede aplicarse al texto del **wordmark «COMPÁS»** de la portada y de las portadas de
+documentos institucionales. Es la herencia visual del COMPÁS histórico (COMPAS-RESCATE-20260514)
+que el autor decide conservar como firma de marca.
+
+- Alcance: solo el wordmark. Ningún otro texto (subtítulos, encabezados, cuerpo, etiquetas,
+  botones, enlaces) lleva gradiente.
+- Composición del wordmark: mayúsculas, peso semibold–bold, espaciado de letras amplio y la
+  misma familia sans del resto de la interfaz. No es una fuente decorativa.
+- Legibilidad: el wordmark es un logotipo, no texto informativo. El nombre sigue siendo texto
+  real en el documento (accesible a lectores de pantalla y copiable). El ámbar y el lima del
+  gradiente tienen contraste bajo sobre blanco; por eso la excepción no se extiende a texto
+  que deba leerse.
+- Esta excepción no modifica §6: no autoriza gradientes de fondo, tipografía editorial ni
+  varios colores de acento en componentes de datos. Las barras por fase de la portada
+  (un color por columna, solo en el borde) ya cumplen «un acento por componente» y no
+  requieren excepción.
+- Logos institucionales: este contrato no autoriza su uso. Su publicación depende de la
+  autorización registrada en `logoRegistry` (estado `CONFIRMADA`) y de los ficheros originales
+  oficiales.
+
 ### Colores primarios
 
 | Token | Valor | Uso |
@@ -474,3 +495,5 @@ En caso de tensión entre principios visuales y principios semánticos, el caso 
 *Revisado: 2026-06-27 — Sprint 0 cierre definitivo: §0 Referencias institucionales
 (NHS Health Profiles, REDCap); §11 Evolución LocalHealthPlanningCycle; §12 Componentes
 pendientes de integración; §10 renumerado §13.*
+*Revisado: 2026-10-20 — §2: excepción de marca para el wordmark «COMPÁS» (gradiente en el texto del
+logotipo, sin extenderse a otros textos).*

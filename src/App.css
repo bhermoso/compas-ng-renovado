@@ -1279,11 +1279,27 @@ h3 {
 }
 
 .home-cover__wordmark {
-  font-size: clamp(5.5rem, 10.5vw, 9.5rem);
-  font-weight: 900;
-  letter-spacing: -0.065em;
-  line-height: 0.88;
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  line-height: 1;
+  /* Excepción de marca (VISUAL-CONTRACT §2): gradiente institucional solo en el logotipo.
+     `color` queda como respaldo si el navegador no soporta background-clip: text. */
   color: var(--azul);
+  background: linear-gradient(
+    90deg,
+    var(--azul) 0%,
+    var(--cyan) 20%,
+    var(--verde) 40%,
+    var(--amarillo) 60%,
+    var(--naranja) 80%,
+    var(--rojo) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
   margin: 0;
   max-width: none;
 }
