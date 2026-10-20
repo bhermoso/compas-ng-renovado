@@ -3,6 +3,9 @@ import type { AgendaActuation, AgendaSetting } from "../../domain/agenda/AgendaA
 import {
   HISTORIC_ACTUATIONS, HISTORIC_CATALOG_SOURCE, HISTORIC_PROGRAMS,
 } from "../../domain/agenda/historicActuationCatalog";
+import {
+  HISTORIC_DETAILED_ACTUATIONS, HISTORIC_DETAILED_SOURCE,
+} from "../../domain/agenda/historicDetailedActuations";
 import { emptyResult, emptyTracking } from "./agendaActuations";
 
 /**
@@ -16,7 +19,7 @@ const norm = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCa
 /** Plantillas del catálogo heredado del histórico. Siempre las mismas; no se editan. */
 export function historicTemplates(): ActuationTemplate[] {
   const programs = new Map(HISTORIC_PROGRAMS.map((p) => [p.code, p]));
-  return HISTORIC_ACTUATIONS.map((a) => {
+  const catalog: ActuationTemplate[] = HISTORIC_ACTUATIONS.map((a) => {
     const program = programs.get(a.programCode);
     return {
       id: `historico:${a.code}`,
@@ -27,6 +30,26 @@ export function historicTemplates(): ActuationTemplate[] {
       sourceLabel: HISTORIC_CATALOG_SOURCE,
     };
   });
+  // Fichas completas del histórico. Son plantillas aparte: su código no coincide con el del catálogo.
+  const detailed: ActuationTemplate[] = HISTORIC_DETAILED_ACTUATIONS.map((a) => ({
+    id: `historico:${a.key}`,
+    origin: "historico" as const,
+    name: a.name,
+    program: a.program,
+    sourceLabel: HISTORIC_DETAILED_SOURCE,
+    description: a.description,
+    population: a.population,
+    lifeStage: a.lifeStage,
+    suggestedSetting: a.suggestedSetting,
+    epvsaLine: a.epvsaLine,
+    epvsaObjective: a.epvsaObjective,
+    indicator: a.indicator,
+    resources: a.resources,
+    professionals: a.professionals,
+    frequency: a.frequency,
+    evidenceBase: a.evidenceBase,
+  }));
+  return [...catalog, ...detailed];
 }
 
 export interface TemplateFilter {
@@ -86,10 +109,22 @@ export function instantiateTemplate(
         activityType: template.activityType,
         mainTopic: opt(template.mainTopic),
       },
-      strategic: {},
-      population: { collective: opt(template.collective), lifeStage: opt(template.lifeStage), ageGroups: opt(template.ageGroups) },
-      responsibles: {},
-      tracking: emptyTracking(),
+      strategic: {
+        framework: opt(template.epvsaLine || template.epvsaObjective ? "EPVSA" : undefined),
+        line: opt(template.epvsaLine),
+        objective: opt(template.epvsaObjective),
+        // El indicador de la plantilla es solo referencia: no se copia, porque la relación con el
+        // indicador se establece en el Plan de Acción (CONTRACT-ACTUATION-TEMPLATES §4).
+        frequency: opt(template.frequency),
+      },
+      population: {
+        population: opt(template.population),
+        collective: opt(template.collective),
+        lifeStage: opt(template.lifeStage),
+        ageGroups: opt(template.ageGroups),
+      },
+      responsibles: { professionals: opt(template.professionals) },
+      tracking: { ...emptyTracking(), resources: opt(template.resources) },
       result: emptyResult(),
       createdAt: input.now,
       updatedAt: input.now,

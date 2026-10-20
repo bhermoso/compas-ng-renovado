@@ -60,6 +60,8 @@ export function ActuationTemplatePicker({ own, onUse, onRemoveOwn, onClose }: Pr
               <strong>{t.name}</strong>
               <small>{t.code ? `${t.code} · ` : ""}{t.program ?? ""}{t.origin === "propia" ? " · propia" : " · heredada del histórico"}</small>
               {t.description && <small>{t.description}</small>}
+              {t.indicator && <small>Indicador que le atribuía el histórico (solo referencia): {t.indicator}</small>}
+              {t.evidenceBase && <small>Base citada por la fuente: {t.evidenceBase}</small>}
             </div>
             <div className="agenda-templates__actions">
               <button type="button" onClick={() => onUse(t)}>Usar y adaptar</button>
