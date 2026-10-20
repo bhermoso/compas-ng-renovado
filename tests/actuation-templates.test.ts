@@ -9,12 +9,42 @@ const NOW = "2026-10-20T10:00:00.000Z";
 
 describe("repositorio de actuaciones-tipo", () => {
   it("incorpora el catálogo heredado completo: 125 actuaciones en 15 programas, rotuladas como heredadas", () => {
-    const all = historicTemplates();
+    const all = historicTemplates().filter((t) => t.code);
     expect(all).toHaveLength(125);
     expect(new Set(all.map((t) => t.program)).size).toBe(15);
     expect(all.every((t) => t.origin === "historico" && t.sourceLabel.includes("no verificado"))).toBe(true);
     expect(all.find((t) => t.code === "P01-A21")?.name).toContain("Puntos Vuela");
     expect(all.find((t) => t.code === "P03-A09")?.name).toContain("GRUSE");
+  });
+
+  it("incorpora las 32 fichas completas del histórico, sin código, sin meta y sin asignar nada por sí solas", () => {
+    const fichas = historicTemplates().filter((t) => !t.code);
+    expect(fichas).toHaveLength(32);
+    expect(fichas.every((t) => t.origin === "historico" && /no verificad/.test(t.sourceLabel))).toBe(true);
+    expect(fichas.every((t) => t.name && t.description && t.indicator && t.suggestedSetting)).toBe(true);
+    // No se importan trimestre, prioridad, año, meta, responsable ni organización.
+    for (const f of fichas) {
+      for (const k of ["quarter", "trimestre", "priority", "prioridad", "year", "anio", "target", "meta", "responsible", "organisation"]) {
+        expect(Object.keys(f), `${f.name}.${k}`).not.toContain(k);
+      }
+    }
+    expect(new Set(fichas.map((t) => t.id)).size).toBe(32);
+  });
+
+  it("adaptar una ficha completa copia lo descriptivo y deja el entorno sin asignar", () => {
+    const t = historicTemplates().find((x) => x.name === "Prescripción de ejercicio físico desde atención primaria")!;
+    expect(t.suggestedSetting).toBe("sanitario");
+    const a = instantiateTemplate([], t, { id: "f1", municipalityId: "zagra", now: NOW })[0];
+    expect(a.setting).toBeNull();
+    expect(a.strategic.mainIndicator).toBeUndefined();
+    expect(a.strategic.framework).toBe("EPVSA");
+    expect(a.strategic.target).toBeUndefined();
+    expect(a.tracking.resources).toBe(t.resources);
+    expect(a.tracking.priority).toBeUndefined();
+    expect(a.identification.quarter).toBeUndefined();
+    expect(a.responsibles.responsible).toBeUndefined();
+    expect(a.tracking.evidence).toBeUndefined();
+    expect(a.population.population).toBe(t.population);
   });
 
   it("busca sin tildes y filtra por programa y origen", () => {

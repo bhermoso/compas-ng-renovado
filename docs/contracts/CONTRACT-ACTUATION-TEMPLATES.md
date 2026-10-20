@@ -9,7 +9,7 @@ Evitar redactar desde cero las actuaciones que se repiten entre municipios. Una 
 
 ## 2. Actuación-tipo
 
-Recoge solo lo descriptivo y transferible: nombre, código, programa, descripción, tipo de actividad, tema principal, colectivo, etapa vital y grupos de edad. Puede llevar una sugerencia de entorno.
+Recoge solo lo descriptivo y transferible: nombre, código, programa, descripción, tipo de actividad, tema principal, colectivo, etapa vital y grupos de edad. Puede llevar una sugerencia de entorno. Las fichas heredadas pueden llevar además población, línea y objetivo EPVSA atribuidos, recursos, profesionales y frecuencia; al adaptar, esos campos se copian a la actuación, que los edita.
 
 No recoge lo propio del municipio: fechas, responsables, contacto, entidades colaboradoras, participantes, recursos, evidencias ni resultados. Esos datos se rellenan al adaptar.
 
@@ -18,6 +18,7 @@ No recoge lo propio del municipio: fechas, responsables, contacto, entidades col
 | Origen | Contenido | Estado de la fuente |
 |---|---|---|
 | `historico` | 125 actuaciones en 15 programas, tomadas del repo histórico (COMPAS-RESCATE-20260514, `index.html:18390–19014`). Solo código y nombre. | Heredado, **no verificado**. Contrastado con `08_Lineas_EPVSA_02abril24.pdf`: 124 de 125 nombres no aparecen en su texto. Se rotula así en la interfaz. |
+| `historico` (fichas) | 32 actuaciones con ficha completa, constante `ACTUACIONES_PADUL_2026` del histórico (`index.html:24458–25626`), redactadas para la agenda de Pádul 2026. Conservan descripción, población, etapa de vida, línea y objetivo EPVSA atribuidos, recursos, profesionales, frecuencia, indicador (solo referencia) y base de evidencia citada (solo se muestra). | Heredado, **no verificado**. No se importan trimestre, prioridad, año, meta, responsable ni organización. Su código «codigoEPVSA» no coincide con el del catálogo de 125 (el mismo código designa otra actuación), por eso no se usa como identificador. «Entorno» pasa solo como sugerencia. Son plantillas aparte del catálogo. |
 | `propia` | Creadas por el equipo desde la ficha de una actuación («Guardar como actuación-tipo»). | Autoría humana del equipo; consta el municipio de origen. |
 
 El catálogo heredado se ofrece como punto de partida y no como referencia con fuente. Su campo «ámbito» del histórico no asigna entorno. GRAFA, los talleres de los CPA y las actividades de los Puntos Vuela no figuran en él como actuaciones-tipo (solo «Colaboración con Puntos Vuela (Guadalinfo)», `P01-A21`, y «Grupos Socioeducativos (GRUSE)», `P03-A09`): las aporta el equipo.
@@ -26,7 +27,7 @@ El catálogo heredado se ofrece como punto de partida y no como referencia con f
 
 - **Adaptar copia, no enlaza.** Usar una plantilla crea una actuación nueva. La plantilla no cambia al editar la actuación, y la actuación guarda `templateRef` (id, origen, nombre) solo como referencia de procedencia.
 - **El entorno lo decide una persona.** La actuación entra «sin asignar»; la sugerencia de entorno no se aplica sola.
-- **Sin atribución de resultados.** La plantilla no declara indicador ni contribución. Esa relación se establece en el Plan de Acción y no se reparte entre actuaciones.
+- **Sin atribución de resultados.** (Las fichas heredadas muestran el indicador que el histórico les atribuía como referencia; no se copia a la actuación.) La plantilla no declara indicador ni contribución. Esa relación se establece en el Plan de Acción y no se reparte entre actuaciones.
 - **El catálogo heredado no se edita.** Para modificar una de sus actuaciones, se adapta y se guarda como propia.
 - **Lo propio de cada municipio no sale de su expediente.** Al guardar como actuación-tipo se descartan fechas, responsables, participantes y resultados (I-ACT-TPL-2).
 

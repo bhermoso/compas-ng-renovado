@@ -23,6 +23,18 @@ export interface ActuationTemplate {
   ageGroups?: string;
   /** Sugerencia de entorno. No se aplica sola: lo decide una persona. */
   suggestedSetting?: AgendaSetting;
+  /** Población a la que se dirige, tal como la describe la fuente. */
+  population?: string;
+  /** Línea y objetivo de la EPVSA que la fuente atribuye a la actuación. No verificados. */
+  epvsaLine?: string;
+  epvsaObjective?: string;
+  /** Indicador que la fuente atribuía. Solo referencia visible: no se copia a la actuación. */
+  indicator?: string;
+  resources?: string;
+  professionals?: string;
+  frequency?: string;
+  /** Base de evidencia citada por la fuente. Solo se muestra; no se copia a la actuación. */
+  evidenceBase?: string;
   createdAt?: string;
   updatedAt?: string;
 }

@@ -19,8 +19,15 @@ const page = await b.newPage({ viewport: { width: 1400, height: 900 } });
 const step = async (n, f) => { try { await f(); } catch (e) { console.log("FALLO en", n, String(e.message).split("\n")[0]); await page.screenshot({ path: "/tmp/templates-fail.png" }); await b.close(); await server.close(); process.exit(1); } };
 await page.goto(`${base}/app-direct`, { waitUntil: "domcontentloaded" });
 await step("nav", async () => { await page.locator(".app-nav__tab", { hasText: "Agenda" }).click({ timeout: 20000 }); });
-await step("abrir repositorio", async () => { await page.getByRole("button", { name: "Desde actuación-tipo" }).click(); await page.getByText("125 actuaciones-tipo").waitFor({ timeout: 5000 }); });
-await step("buscar GRUSE", async () => { await page.getByPlaceholder(/Buscar: GRUSE/).fill("gruse"); await page.getByText("1 actuaciones-tipo").waitFor({ timeout: 3000 }); });
+await step("abrir repositorio", async () => { await page.getByRole("button", { name: "Desde actuación-tipo" }).click(); await page.getByText("157 actuaciones-tipo").waitFor({ timeout: 5000 }); });
+await step("buscar GRUSE", async () => { await page.getByPlaceholder(/Buscar: GRUSE/).fill("gruse"); await page.getByText(/^\d+ actuaciones-tipo/).waitFor({ timeout: 3000 }); });
+await step("ficha completa heredada", async () => {
+  await page.getByPlaceholder(/Buscar: GRUSE/).fill("Consejo dietético estructurado");
+  await page.getByText("Base citada por la fuente:").first().waitFor({ timeout: 3000 });
+  await page.getByText(/Indicador que le atribuía el histórico/).first().waitFor({ timeout: 3000 });
+  await page.getByPlaceholder(/Buscar: GRUSE/).fill("gruse");
+  await page.getByText(/^\d+ actuaciones-tipo/).waitFor({ timeout: 3000 });
+});
 await step("usar y adaptar", async () => {
   await page.getByRole("button", { name: "Usar y adaptar" }).click();
   await page.getByRole("button", { name: "Guardar ficha" }).waitFor({ timeout: 5000 });
