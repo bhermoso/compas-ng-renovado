@@ -3405,6 +3405,7 @@ export default function App() {
           pslIsStale={runtime.pslIsStale}
           pslCompiled={(runtime.workspace.compiledProfiles?.length ?? 0) > 0}
           thematicPrioritisationDone={runtime.workspace.thematicPrioritisation !== undefined}
+          agendaCount={workspace.agendaActuations?.length ?? 0}
           onNavigate={(v) => setView(v as AppView)}
         />
       )}
