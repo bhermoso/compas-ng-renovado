@@ -139,6 +139,8 @@ export interface AgendaActuation {
   origin: "manual" | "action-plan";
   /** Identifica la actuación del plan: clave de la ficha del indicador y id de la actuación. */
   linkedAction?: { worksheetKey: string; actionId: string };
+  /** Plantilla de la que se partió, si la hay. Es una referencia: la actuación es una copia adaptada. */
+  templateRef?: import("./ActuationTemplate").ActuationTemplateRef;
   /** Nombre. En un registro vinculado se lee del plan y este campo queda vacío. */
   name?: string;
   identification: ActuationIdentification;

@@ -88,6 +88,8 @@ export interface MunicipalityWorkspace {
   indicatorWorksheets?: IndicatorWorksheet[];
   /** Agenda de actuaciones por entornos (CONTRACT-AGENDA-ACTUATIONS). Se guarda con el expediente. */
   agendaActuations?: AgendaActuation[];
+  /** Actuaciones-tipo propias de este expediente (CONTRACT-ACTUATION-TEMPLATES). */
+  actuationTemplates?: import("../agenda/ActuationTemplate").ActuationTemplate[];
   /**
    * Historial de snapshots del Estado Territorial Evolutivo.
    * Acumulativo: cada versión de la evidencia produce una entrada nueva.

@@ -41,3 +41,11 @@
 .agenda-filters { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 4px 0 12px; }
 .agenda-filters input[type="search"] { min-width: 18rem; max-width: 100%; }
 .agenda-undo { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+
+.agenda-templates { border: 1px solid var(--borde); border-radius: 8px; padding: 12px 16px; margin: 8px 0 12px; background: var(--fondo-principal); }
+.agenda-templates__header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.agenda-templates__list { list-style: none; margin: 0; padding: 0; max-height: 360px; overflow: auto; display: grid; gap: 6px; }
+.agenda-templates__item { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 8px 10px; border: 1px solid var(--borde); border-radius: 6px; }
+.agenda-templates__item > div:first-child { display: grid; gap: 2px; min-width: 0; flex: 1 1 260px; }
+.agenda-templates__item small { color: var(--texto-secundario); }
+.agenda-templates__actions { display: flex; gap: 6px; flex-wrap: wrap; }

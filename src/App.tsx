@@ -1262,6 +1262,10 @@ export default function App() {
     });
   }, [setWorkspace]);
 
+  const handleActuationTemplatesChange = useCallback((next: import("./domain/agenda/ActuationTemplate").ActuationTemplate[]) => {
+    setWorkspace((prev) => ({ ...prev, actuationTemplates: next, updatedAt: new Date().toISOString() }));
+  }, [setWorkspace]);
+
   const handleAgendaChange = useCallback((next: AgendaActuation[]) => {
     setWorkspace((prev) => ({ ...prev, agendaActuations: next, updatedAt: new Date().toISOString() }));
   }, [setWorkspace]);
@@ -4341,6 +4345,8 @@ export default function App() {
             actuations={workspace.agendaActuations ?? []}
             worksheets={workspace.indicatorWorksheets ?? []}
             onChange={handleAgendaChange}
+            templates={workspace.actuationTemplates ?? []}
+            onTemplatesChange={handleActuationTemplatesChange}
             focusId={agendaFocusId}
           />
         )}
