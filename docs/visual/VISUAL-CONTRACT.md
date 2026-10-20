@@ -120,7 +120,12 @@ que el autor decide conservar como firma de marca.
   requieren excepción.
 - Logos institucionales: este contrato no autoriza su uso. Su publicación depende de la
   autorización registrada en `logoRegistry` (estado `CONFIRMADA`) y de los ficheros originales
-  oficiales.
+  oficiales. El 2026-10-20 el autor confirma en chat la caja de cinco logos del COMPÁS histórico
+  en la portada; los ficheros actuales son provisionales (baja resolución) hasta tener los
+  originales.
+- Botones secundarios: fondo blanco, borde fino y borde izquierdo de 3 px en azul institucional
+  (herencia del histórico). Un solo acento por botón; no se aplica a botones primarios, de
+  peligro ni a los que se presentan como enlace.
 
 ### Colores primarios
 
