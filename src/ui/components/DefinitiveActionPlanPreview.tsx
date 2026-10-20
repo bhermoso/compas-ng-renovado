@@ -278,14 +278,14 @@ export function DefinitiveActionPlanPreview({municipalityId, modules, drafts, wo
     <p className="panel-note">Esta vista utiliza únicamente los elementos marcados como <strong>Incluir</strong> o <strong>Modificar</strong>. Los modificados conservan su redacción territorial; los excluidos no se incorporan.</p>
     {active.length === 0 ? <p>No hay todavía líneas con decisiones territoriales. Selecciona o modifica elementos para construir el Plan de Acción.</p> : <>
       <p><strong>{selectedObjectives}</strong> objetivos específicos seleccionados · <strong>{selectedIndicators}</strong> indicadores seleccionados.</p>
-      <section className="pcm-traceability-map" aria-label="Mapa de vínculos del Plan de Acción">
-        <div className="pcm-module__header">
-          <div>
-            <p className="eyebrow">Mapa de vínculos</p>
-            <h3>Árbol operativo de objetivos, indicadores y actividades</h3>
-          </div>
+      <details className="pcm-traceability-map" aria-label="Mapa de vínculos del Plan de Acción">
+        <summary className="pcm-module__header pcm-fold-summary">
+          <span>
+            <span className="eyebrow">Mapa de vínculos</span>
+            <strong>Árbol operativo de objetivos, indicadores y actividades</strong>
+          </span>
           <span className="status-pill">{linkedActionCards} fichas · {linkedActivities} actividades</span>
-        </div>
+        </summary>
         <p className="panel-note">Cada rama conserva la cadena línea estratégica → bloque → objetivo → indicador → ficha → actuación → actividades y entregas. Si falta una pieza, se declara como pendiente.</p>
         <p className="panel-note">Las fichas de actuación se muestran aquí como fuente de datos del indicador. El resultado de cada indicador no se atribuye a actuaciones concretas, y la gestión de las actuaciones y de las agendas anuales se hace en la vista Agenda, separada del Plan de Acción.</p>
         <div className="pcm-operational-tree" aria-label="Árbol operativo de actividades vinculadas a objetivos e indicadores">
@@ -302,7 +302,7 @@ export function DefinitiveActionPlanPreview({municipalityId, modules, drafts, wo
               </div>
               <p className="pcm-tree-strategic"><strong>Objetivo estratégico:</strong> {resolvedPlanDecisionText(moduleDecision, module.strategicObjective)}</p>
               {groupTraceabilityByBlock(moduleLinks).map((block) => (
-                <details className="pcm-tree-block" key={block.code} open>
+                <details className="pcm-tree-block" key={block.code}>
                   <summary>
                     <span>{block.name}</span>
                     <small>{block.links.length} indicador{block.links.length === 1 ? "" : "es"}</small>
@@ -378,7 +378,7 @@ export function DefinitiveActionPlanPreview({municipalityId, modules, drafts, wo
             {link.pendingSummary.length > 0 ? <p className="panel-note">Pendiente: {link.pendingSummary.join("; ")}</p> : <p className="panel-note">Fichas registradas sin campos obligatorios pendientes.</p>}
           </article>)}
         </div>
-      </section>
+      </details>
       {pending > 0 && <div className="phase-blocked-notice"><strong>Versión todavía no cerrable</strong><p>Quedan {pending} elementos pendientes dentro de las líneas que ya estás trabajando. Puedes ver el resultado actual, pero conviene resolverlos antes de declarar el Plan definitivo.</p></div>}
       <div className="backup-panel__actions pcm-generation-actions">
         <button type="button" disabled={!hasSelectableContent} onClick={generatePlan}>Generar Plan de Acción</button>
