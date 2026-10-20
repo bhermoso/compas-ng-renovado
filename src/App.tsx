@@ -453,7 +453,7 @@ function loadPersistedWorkspacesForLibrary(
 export default function App() {
   const [view, setViewState] = useState<AppView>("inicio");
   const [agendaFocusId, setAgendaFocusId] = useState<string | undefined>(undefined);
-  const [planTab, setPlanTab] = useState<"lineas" | "resultante" | "prioridades" | "borrador">("lineas");
+  const [planTab, setPlanTab] = useState<"lineas" | "resultante" | "lectura" | "prioridades" | "borrador">("lineas");
   const preparationDirtyRef = useRef(false);
   const onPreparationDirtyChange = useCallback((dirty: boolean) => { preparationDirtyRef.current = dirty; }, []);
   function canLeavePreparation() {
@@ -3407,7 +3407,8 @@ export default function App() {
       )}
 
       <main className="app-shell">
-        <details><summary>Copias y recuperación del trabajo</summary><BackupPanel workspace={workspace} ready={pendingSeedId === null && pendingMigration === null} /></details>
+        <div className="app-status-strip">
+        <details className="app-status-strip__tool"><summary>Copias y recuperación del trabajo</summary><BackupPanel workspace={workspace} ready={pendingSeedId === null && pendingMigration === null} /></details>
         {persistenceMessage !== null && (
           <div className="app-persistence-warning" role="alert">
             {persistenceMessage}
@@ -3419,6 +3420,7 @@ export default function App() {
           </div>
         )}
         <RemoteSyncPanel client={remoteClient} />
+        </div>
 
         {/* Selector de municipio (se muestra sobre cualquier vista) */}
         {showMunicipalitySelector && (
@@ -4160,7 +4162,8 @@ export default function App() {
               {([
                 ["lineas", "Líneas e indicadores"],
                 ["resultante", "Plan resultante"],
-                ["prioridades", "Lectura y prioridades"],
+                ["lectura", "Lectura estratégica"],
+                ["prioridades", "Participación y prioridades"],
                 ["borrador", "Borrador de actuaciones"],
               ] as const).map(([id, label]) => (
                 <button key={id} type="button" role="tab" aria-selected={planTab === id}
@@ -4218,9 +4221,13 @@ export default function App() {
             />
             </>
             )}
-            {planTab === "prioridades" && (
+            {planTab === "lectura" && (
             <>
             <LecturaEstrategicaView lectura={runtime.lectura} />
+            </>
+            )}
+            {planTab === "prioridades" && (
+            <>
             <div className="repo-section-divider">
               <span className="repo-section-divider__text">Participación ciudadana</span>
             </div>
