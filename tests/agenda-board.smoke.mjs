@@ -14,7 +14,7 @@ const server = await createServer({
 });
 await server.listen();
 const base = `http://127.0.0.1:${server.httpServer.address().port}`;
-const b = await chromium.launch({ executablePath: process.env.CH, headless: true, args: ["--no-sandbox"] });
+const b = await chromium.launch({ executablePath: process.env.CH ?? process.env.COMPAS_TEST_CHROMIUM, headless: true, args: ["--no-sandbox"] });
 const page = await b.newPage({ viewport: { width: 1400, height: 900 } });
 const errs = []; page.on("pageerror", e => errs.push(e.message));
 const step = async (n, f) => { try { await f(); } catch (e) { console.log("FALLO en", n, String(e.message).split("\n")[0]); await page.screenshot({ path: "/tmp/agenda-fail.png" }); await b.close(); await server.close(); process.exit(1); } };
@@ -36,10 +36,12 @@ await step("arrastre", async () => {
 console.log("comunitario:", await page.locator(".agenda-column--comunitario [data-actuation-id]").count(), "| sin asignar:", await page.locator(".agenda-column--unassigned [data-actuation-id]").count());
 await step("selector", async () => { await page.getByLabel("Entorno de Taller de marcha").selectOption("laboral"); });
 console.log("laboral:", await page.locator(".agenda-column--laboral [data-actuation-id]").count());
-await step("evaluación", async () => {
+await step("evaluación sin agenda", async () => {
   await page.locator(".app-nav__tab", { hasText: "Evaluación" }).click();
-  await page.getByText("Taller de marcha").first().waitFor({ timeout: 5000 });
-  await page.getByRole("button", { name: "Abrir ficha" }).click();
+  await page.getByRole("heading", { name: /Evaluación del Plan Local de Salud/ }).waitFor({ timeout: 5000 });
+  if (await page.getByText("Taller de marcha").count()) throw new Error("la vista Evaluación no debe mostrar la agenda");
+  await page.locator(".app-nav__tab", { hasText: "Agenda" }).click();
+  await page.locator("[data-actuation-id]").first().getByRole("button").first().click();
   await page.getByRole("button", { name: "Guardar ficha" }).waitFor({ timeout: 5000 });
 });
 // Aviso de cambios sin guardar, guardado y persistencia tras recargar
