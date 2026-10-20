@@ -11567,3 +11567,17 @@ h3 {
 .pcm-fold-summary::-webkit-details-marker { display: none; }
 .pcm-fold-summary > span:first-child { display: flex; flex-direction: column; gap: 2px; }
 .pcm-fold-summary strong { color: var(--tinta-azul); }
+
+/* Plan de Acción compacto: ayudas plegadas, decisiones en línea */
+.pcm-guidance-fold > summary, .pcm-help-fold > summary, .pcm-fold-block > summary { cursor: pointer; color: var(--azul); font-weight: 600; padding: 4px 0; }
+.pcm-guidance-fold, .pcm-help-fold { margin: 4px 0 8px; }
+.pcm-fold-block { margin: 12px 0; border-top: 1px solid var(--borde); padding-top: 8px; }
+.pcm-fold-block > summary small { color: var(--texto-secundario); font-weight: 400; margin-left: 8px; }
+.pcm-line-fold .pcm-editorial-header .eyebrow, .pcm-line-fold .pcm-editorial-header h2 { display: none; }
+.pcm-line-fold .pcm-editorial-header { margin-bottom: 8px; }
+.pcm-preparation .pcm-guidance { margin: 8px 0; padding: 10px 14px; }
+.pcm-preparation .pcm-decision { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.pcm-preparation .pcm-decision label { display: flex; align-items: center; gap: 8px; }
+.pcm-preparation .pcm-decision select { width: auto; min-width: 120px; }
+.pcm-preparation .pcm-decision textarea { width: 100%; }
+.pcm-catalog-header { padding-block: 10px; }

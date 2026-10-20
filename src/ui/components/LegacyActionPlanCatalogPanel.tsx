@@ -309,11 +309,13 @@ export function LegacyActionPlanCatalogPanel(props: LegacyActionPlanCatalogPanel
       <section className="workspace-panel pcm-catalog-header">
         <p className="eyebrow">Catálogo RELAS de Plan de Acción</p>
         <h2>Líneas estratégicas disponibles</h2>
+        <details className="pcm-help-fold"><summary>Cómo funciona</summary>
         <p className="panel-note">
           {directTerritorialEdit
             ? "Selecciona, excluye o modifica líneas, objetivos e indicadores. Al marcar Modificar, la nueva redacción queda guardada como texto vigente de este expediente territorial; la aprobación del Grupo Motor es una fase institucional distinta."
             : "Prepara tu selección de líneas, objetivos e indicadores en el borrador. La aprobación formal es posterior: la revisión se habilita solo cuando el Grupo Motor relaciona una línea con una prioridad seleccionada. Cada indicador dispone de una ficha cumplimentable con actuaciones y entregas de datos, preparable como borrador."}
         </p>
+        </details>
       </section>
       {props.onDraftChange && ACTION_PLAN_CATALOG.map(original => {
         const module = props.municipalityId === "granada-zaidin" && original.id === ZAIDIN_AGING_PROPOSAL.id ? ZAIDIN_AGING_PROPOSAL : original;

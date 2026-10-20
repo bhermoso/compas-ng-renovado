@@ -4148,11 +4148,13 @@ export default function App() {
             <section className="workspace-panel">
               <p className="eyebrow">Plan Local de Salud 2027–2030</p>
               <h2>Plan de Acción</h2>
+              <details className="pcm-help-fold"><summary>Cadena canónica</summary>
               <p className="panel-note">
-                Cadena canónica: Lectura Estratégica Local, selección deliberativa del
+                Lectura Estratégica Local, selección deliberativa del
                 Grupo Motor y propuesta técnica del Plan de Acción. El sistema aporta candidaturas;
                 no selecciona prioridades ni adopta compromisos municipales.
               </p>
+              </details>
             </section>
             <div className="plan-tabs" role="tablist" aria-label="Secciones del Plan de Acción">
               {([

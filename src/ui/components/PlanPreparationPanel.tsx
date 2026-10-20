@@ -221,10 +221,12 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
    <h2>{module.title}</h2>
    <p className="pcm-provenance">{module.sourceLabel}<br /><span>Versión de referencia · {module.sourceDate}</span></p>
   </header>
+  <details className="pcm-guidance-fold"><summary>Cómo revisar y editar</summary>
   <aside className="pcm-guidance" aria-label="Cómo revisar la propuesta">
    <p><strong>{directTerritorialEdit ? "Edición directa del territorio" : canReview ? "Edición y revisión administrativa" : "Cómo revisar el Plan"}</strong></p>
    {directTerritorialEdit ? <><p>Selecciona, excluye o modifica objetivos e indicadores. Cuando modificas una redacción, <strong>ese texto pasa a ser el vigente para este territorio</strong>; no queda pendiente de una revisión administrativa posterior.</p><p>La eventual aprobación del Grupo Motor es una fase distinta y posterior.</p></> : canReview ? <><p>Puedes modificar directamente cualquier objetivo o indicador y guardar la nueva redacción como texto consolidado.</p><p>La consolidación administrativa <strong>no constituye aprobación del Grupo Motor</strong>.</p></> : <><p>Selecciona y modifica los elementos del Plan.</p><p>Estas elecciones <strong>no constituyen aprobación del Grupo Motor</strong>.</p></>}
   </aside>
+  </details>
   <section className="pcm-strategic" aria-label="Objetivo estratégico vigente">
    <h3>{directTerritorialEdit ? "Objetivo estratégico vigente" : "Objetivo estratégico propuesto"}</h3>
    <p><ProposalText text={canReview ? consolidatedText(module.id, revised ? plainProposalText(proposalStrategicText) : module.strategicObjective) : territorialText(module.id, revised ? proposalStrategicText : module.strategicObjective)}/></p>
@@ -261,6 +263,7 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
     })}
    </details>;
   })}
+  <details className="pcm-fold-block"><summary><strong>Cierre para el Plan Local de Salud</strong> <small>necesidades no priorizadas y marco de evaluación</small></summary>
   <section className="pcm-pls-readiness" aria-label="Cierre para el Plan Local de Salud">
    <h3>Cierre para el Plan Local de Salud</h3>
    <label><input type="checkbox" checked={draft?.unaddressedNeeds?.length === 0} disabled={!canEditProposal} onChange={e => emitDraftPatch({unaddressedNeeds: e.target.checked ? [] : undefined})}/> Todas las necesidades diagnosticadas quedan incorporadas al Plan de Acción</label>
@@ -273,6 +276,7 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
     <label>Nota sobre línea base<textarea aria-label="Nota sobre línea base" rows={2} disabled={!canEditProposal} value={draft?.evaluationFramework?.baselineNote ?? ""} onChange={e => updateEvaluationFramework({baselineNote: e.target.value})}/></label>
    </fieldset>
   </section>
+  </details>
   <p role="status">{persistenceMessage ?? (directTerritorialEdit ? (draft ? "Cambios consolidados en el expediente de este territorio." : "Sin cambios territoriales guardados. Las modificaciones se guardan directamente en este expediente.") : (draft ? "Borrador guardado en este navegador. Para cambiar de equipo, conserva y traslada el expediente." : "Sin elecciones guardadas. Los cambios se guardan en este navegador."))}</p>
  </details>
  </article>;
