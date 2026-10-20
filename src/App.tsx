@@ -203,7 +203,6 @@ import {
   PerfilFuentesPanel,
   LocalHealthPlanOutline,
   AgendaBoard,
-  AgendaResultSummary,
 } from "./ui/components";
 import type { AgendaActuation } from "./domain/agenda/AgendaActuation";
 import "./App.css";
@@ -4365,11 +4364,6 @@ export default function App() {
               Este espacio estará disponible cuando el Plan Local de Salud se encuentre en
               fase de seguimiento y evaluación.
             </p>
-            <AgendaResultSummary
-              actuations={workspace.agendaActuations ?? []}
-              worksheets={workspace.indicatorWorksheets ?? []}
-              onOpen={(id) => { setAgendaFocusId(id); setView("agenda"); }}
-            />
           </section>
         )}
 
