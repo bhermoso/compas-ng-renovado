@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  historicTemplates, instantiateTemplate, listTemplates, removeOwnTemplate, templateFromActuation,
+  catalogAmbitos, epvsaCatalogTree, historicTemplates, instantiateTemplate, listTemplates, removeOwnTemplate, templateFromActuation,
   templatePrograms, upsertOwnTemplate,
 } from "../src/application/agenda/actuationTemplates";
 import { addManualActuation, duplicateManualActuation, updateActuationBlock } from "../src/application/agenda/agendaActuations";
@@ -103,5 +103,38 @@ describe("repositorio de actuaciones-tipo", () => {
   it("duplicar conserva la referencia a la plantilla", () => {
     const list = instantiateTemplate([], historicTemplates()[0], { id: "a1", municipalityId: "zagra", now: NOW });
     expect(duplicateManualActuation(list, "a1", "a2", NOW)[1].templateRef?.id).toBe(historicTemplates()[0].id);
+  });
+
+  it("ordena el catálogo por línea estratégica y programa con sus objetivos vinculados", () => {
+    const tree = epvsaCatalogTree();
+    expect(tree.map((l) => l.code)).toEqual(["LE1", "LE2", "LE3", "LE4"]);
+    expect(tree.map((l) => l.programs.length)).toEqual([12, 1, 1, 1]);
+    expect(tree.flatMap((l) => l.programs.flatMap((p) => p.templates))).toHaveLength(125);
+    const p01 = tree[0].programs[0];
+    expect(p01.code).toBe("P01");
+    expect(p01.templates).toHaveLength(26);
+    expect(p01.objectiveCodes).toEqual(["OE 1.1", "OE 1.2", "OE 1.3", "OE 1.4", "OE 1.5", "OE 1.6", "OE 1.7"]);
+    expect(tree[0].objectives).toHaveLength(7);
+    expect(catalogAmbitos()).toContain("Comunitario");
+  });
+
+  it("filtra el catálogo por línea, ámbito, programa y texto", () => {
+    expect(epvsaCatalogTree({ lineCode: "LE3" })).toHaveLength(1);
+    const sanitario = epvsaCatalogTree({ ambito: "Sanitario" }).flatMap((l) => l.programs);
+    expect(sanitario.length).toBeGreaterThan(0);
+    expect(sanitario.every((p) => p.ambito === "Sanitario")).toBe(true);
+    expect(epvsaCatalogTree({ programCode: "P04" })[0].programs.map((p) => p.code)).toEqual(["P04"]);
+    const found = epvsaCatalogTree({ query: "Consolidación de la Red local" }).flatMap((l) => l.programs.flatMap((p) => p.templates));
+    expect(found.map((t) => t.code)).toEqual(["P01-A01"]);
+  });
+
+  it("al añadir una actuación del catálogo queda indicada la línea EPVSA y no el objetivo ni el entorno", () => {
+    const t = historicTemplates().find((x) => x.code === "P01-A01")!;
+    expect(t.epvsaLine).toMatch(/^LE1 · /);
+    const a = instantiateTemplate([], t, { id: "a1", municipalityId: "zagra", now: NOW })[0];
+    expect(a.strategic.framework).toBe("EPVSA");
+    expect(a.strategic.line).toMatch(/^LE1 · /);
+    expect(a.strategic.objective).toBeUndefined();
+    expect(a.setting).toBeNull();
   });
 });

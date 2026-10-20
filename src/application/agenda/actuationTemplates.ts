@@ -6,6 +6,9 @@ import {
 import {
   HISTORIC_DETAILED_ACTUATIONS, HISTORIC_DETAILED_SOURCE,
 } from "../../domain/agenda/historicDetailedActuations";
+import {
+  HISTORIC_LINES, HISTORIC_PROGRAM_LINKS, type HistoricLine,
+} from "../../domain/agenda/historicEpvsaStructure";
 import { emptyResult, emptyTracking } from "./agendaActuations";
 
 /**
@@ -15,6 +18,12 @@ import { emptyResult, emptyTracking } from "./agendaActuations";
 
 const clean = (value: string | undefined): string => value?.trim() ?? "";
 const norm = (t: string) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
+const lineByCode = new Map<string, HistoricLine>(HISTORIC_LINES.map((l) => [l.code, l]));
+function lineLabel(code: string | undefined): string | undefined {
+  const line = code ? lineByCode.get(code) : undefined;
+  return line ? `${line.code} · ${line.name}` : undefined;
+}
 
 /** Plantillas del catálogo heredado del histórico. Siempre las mismas; no se editan. */
 export function historicTemplates(): ActuationTemplate[] {
@@ -28,6 +37,8 @@ export function historicTemplates(): ActuationTemplate[] {
       code: a.code,
       program: program ? `${program.code} · ${program.shortName || program.name}` : a.programCode,
       sourceLabel: HISTORIC_CATALOG_SOURCE,
+      // La línea se deduce del programa (vínculo único en el histórico). El objetivo no: el programa se vincula a varios.
+      epvsaLine: lineLabel(HISTORIC_PROGRAM_LINKS[a.programCode]?.lineCode),
     };
   });
   // Fichas completas del histórico. Son plantillas aparte: su código no coincide con el del catálogo.
@@ -67,6 +78,58 @@ export function listTemplates(own: readonly ActuationTemplate[], filter: Templat
     if (!q) return true;
     return norm([t.name, t.code, t.program, t.description, t.mainTopic, t.collective].filter(Boolean).join(" ")).includes(q);
   });
+}
+
+export interface CatalogFilter {
+  query?: string;
+  lineCode?: string;
+  ambito?: string;
+  programCode?: string;
+}
+export interface CatalogProgramNode {
+  code: string;
+  name: string;
+  shortName: string;
+  ambito: string;
+  objectiveCodes: readonly string[];
+  templates: ActuationTemplate[];
+}
+export interface CatalogLineNode {
+  code: string;
+  name: string;
+  objectives: HistoricLine["objectives"];
+  programs: CatalogProgramNode[];
+}
+
+/** Ámbitos presentes en el catálogo heredado, en orden de aparición. */
+export function catalogAmbitos(): string[] {
+  return Array.from(new Set(HISTORIC_PROGRAMS.map((p) => p.ambito)));
+}
+
+/**
+ * Catálogo heredado por línea estratégica → programa → actuaciones-tipo (solo las 125 con código).
+ * Solo estructura de clasificación: no asigna entorno, meta, prioridad ni responsable.
+ */
+export function epvsaCatalogTree(filter: CatalogFilter = {}): CatalogLineNode[] {
+  const q = norm(clean(filter.query));
+  const all = historicTemplates().filter((t) => t.code);
+  return HISTORIC_LINES.filter((l) => !filter.lineCode || l.code === filter.lineCode).map((line) => {
+    const programs: CatalogProgramNode[] = [];
+    for (const code of line.programCodes) {
+      const program = HISTORIC_PROGRAMS.find((p) => p.code === code);
+      if (!program) continue;
+      if (filter.ambito && program.ambito !== filter.ambito) continue;
+      if (filter.programCode && program.code !== filter.programCode) continue;
+      const templates = all.filter((t) => t.code?.startsWith(`${code}-`)).filter((t) =>
+        !q || norm([t.name, t.code, program.name, program.shortName].join(" ")).includes(q));
+      if (q && !templates.length) continue;
+      programs.push({
+        code, name: program.name, shortName: program.shortName, ambito: program.ambito,
+        objectiveCodes: HISTORIC_PROGRAM_LINKS[code]?.objectiveCodes ?? [], templates,
+      });
+    }
+    return { code: line.code, name: line.name, objectives: line.objectives, programs };
+  }).filter((l) => l.programs.length > 0);
 }
 
 export function templatePrograms(own: readonly ActuationTemplate[]): string[] {
