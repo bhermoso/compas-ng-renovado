@@ -9,6 +9,9 @@ import {
   listPlanActions, moveActuation, readActuation, removeActuation,
 } from "../../application/agenda/agendaActuations";
 import { ActuationFicha } from "./ActuationFicha";
+import { ActuationTemplatePicker } from "./ActuationTemplatePicker";
+import type { ActuationTemplate } from "../../domain/agenda/ActuationTemplate";
+import { instantiateTemplate, removeOwnTemplate, templateFromActuation, upsertOwnTemplate } from "../../application/agenda/actuationTemplates";
 import "./AgendaBoard.css";
 
 interface Props {
@@ -17,6 +20,9 @@ interface Props {
   actuations: readonly AgendaActuation[];
   worksheets: readonly IndicatorWorksheet[];
   onChange: (next: AgendaActuation[]) => void;
+  /** Actuaciones-tipo propias de este expediente. */
+  templates?: readonly ActuationTemplate[];
+  onTemplatesChange?: (next: ActuationTemplate[]) => void;
   /** Abre esta ficha al montar (p. ej. desde la vista de Evaluación). */
   focusId?: string;
 }
@@ -29,7 +35,8 @@ const COLUMNS: { key: Column; label: string }[] = [
 const toSetting = (c: Column): AgendaSetting | null => (c === "unassigned" ? null : c);
 const newId = () => `act-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 
-export function AgendaBoard({ municipalityId, municipalityName, actuations, worksheets, onChange, focusId }: Props) {
+export function AgendaBoard({ municipalityId, municipalityName, actuations, worksheets, onChange, templates = [], onTemplatesChange, focusId }: Props) {
+  const [picking, setPicking] = useState(false);
   const [openId, setOpenId] = useState<string | undefined>(focusId);
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");
@@ -151,6 +158,7 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
         ) : (
           <button type="button" onClick={() => setCreating(true)}>Nueva actuación</button>
         )}
+        <button type="button" aria-expanded={picking} onClick={() => setPicking((v) => !v)}>Desde actuación-tipo</button>
         <button type="button" disabled={pendingFromPlan === 0} onClick={() => {
           const out = importActuationsFromPlan(actuations, { municipalityId, worksheets, now: now(), newId });
           onChange(out.list);
@@ -173,6 +181,20 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
         {filtering && <button type="button" onClick={() => { setQuery(""); setStatusFilter(""); }}>Quitar filtros</button>}
         {filtering && <span className="panel-note" role="status">{COLUMNS.reduce((n, c) => n + items(c.key).length, 0)} de {actuations.length} actuaciones. Con filtro activo, mueve las tarjetas con el selector de entorno.</span>}
       </div>
+      {picking && (
+        <ActuationTemplatePicker
+          own={templates}
+          onClose={() => setPicking(false)}
+          onRemoveOwn={(id) => onTemplatesChange?.(removeOwnTemplate(templates, id))}
+          onUse={(template) => {
+            const next = instantiateTemplate(actuations, template, { id: newId(), municipalityId, now: now() });
+            onChange(next);
+            setPicking(false);
+            setOpenId(next[next.length - 1].id);
+            setMessage(`Actuación creada a partir de «${template.name}». Adáptala a ${municipalityName}.`);
+          }}
+        />
+      )}
       {message && <p role="status" aria-live="polite" className="panel-note">{message}</p>}
       {undo && (
         <p role="status" className="panel-note agenda-undo">
@@ -206,6 +228,12 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
           actuation={opened}
           worksheets={worksheets}
           onClose={() => setOpenId(undefined)}
+          onSaveAsTemplate={onTemplatesChange ? (a, name) => {
+            const tpl = templateFromActuation(a, name, { id: `tipo-${newId()}`, municipalityName, now: now() });
+            if (!tpl) return;
+            onTemplatesChange(upsertOwnTemplate(templates, tpl));
+            setMessage(`«${tpl.name}» guardada como actuación-tipo propia.`);
+          } : undefined}
           onSave={(next) => {
             const moved = next.setting !== opened.setting;
             let list = actuations.map((a) => (a.id === next.id ? { ...next, setting: opened.setting, order: opened.order, updatedAt: now() } : a));

@@ -12,6 +12,8 @@ interface Props {
   worksheets: readonly IndicatorWorksheet[];
   onSave: (next: AgendaActuation) => void;
   onClose: () => void;
+  /** Guarda la actuación como actuación-tipo propia (solo lo descriptivo). */
+  onSaveAsTemplate?: (actuation: AgendaActuation, name: string) => void;
 }
 
 type Block = "identification" | "strategic" | "population" | "responsibles" | "tracking" | "result";
@@ -38,8 +40,9 @@ function ReadOnly({ label, value, hint }: { label: string; value?: string; hint?
   );
 }
 
-export function ActuationFicha({ actuation, worksheets, onSave, onClose }: Props) {
+export function ActuationFicha({ actuation, worksheets, onSave, onClose, onSaveAsTemplate }: Props) {
   const [draft, setDraft] = useState<AgendaActuation>(actuation);
+  const [templateName, setTemplateName] = useState<string | null>(null);
   const reading = readActuation(actuation, worksheets);
   const linked = Boolean(actuation.linkedAction);
   const set = <B extends Block>(block: B, patch: Partial<AgendaActuation[B]>) =>
@@ -105,6 +108,25 @@ export function ActuationFicha({ actuation, worksheets, onSave, onClose }: Props
       </header>
 
       <p className="ficha-hint" role="status" aria-live="polite">{dirty ? "Hay cambios sin guardar." : "Sin cambios pendientes."}</p>
+      {actuation.templateRef && (
+        <p className="ficha-hint">
+          Adaptada de la actuación-tipo «{actuation.templateRef.name}»{actuation.templateRef.origin === "historico" ? " (catálogo heredado del histórico, no verificado)" : " (propia)"}. Los cambios de esta ficha no modifican la plantilla.
+        </p>
+      )}
+      {onSaveAsTemplate && !linked && (
+        templateName === null ? (
+          <button type="button" className="ficha-secondary" onClick={() => setTemplateName(draft.name ?? "")}>Guardar como actuación-tipo</button>
+        ) : (
+          <form className="agenda-new" onSubmit={(e) => { e.preventDefault(); if (!templateName.trim()) return; onSaveAsTemplate(draft, templateName); setTemplateName(null); }}>
+            <label><span className="agenda-sr">Nombre de la actuación-tipo</span>
+              <input autoFocus type="text" value={templateName} placeholder="Nombre de la actuación-tipo" onChange={(e) => setTemplateName(e.target.value)} />
+            </label>
+            <button type="submit" disabled={!templateName.trim()}>Guardar actuación-tipo</button>
+            <button type="button" onClick={() => setTemplateName(null)}>Cancelar</button>
+            <span className="ficha-hint">Solo se guarda lo descriptivo: sin fechas, responsables, participantes ni resultados.</span>
+          </form>
+        )
+      )}
       {missingName && <p className="ficha-warning" role="status">El nombre es obligatorio.</p>}
       {reading.orphan && (
         <p className="ficha-warning" role="status">

@@ -124,14 +124,25 @@ La validación del Perfil pasa de restricción a criterio de calidad. Informa y 
 
 ---
 
+### CONTRACT-ACTUATION-TEMPLATES
+**Estado:** CONCEPTUAL — creado 2026-10-20
+
+Repositorio de actuaciones-tipo para la agenda: plantillas descriptivas (sin fechas, responsables ni resultados) que se adaptan a cada municipio por copia. Origen heredado del histórico (125 actuaciones, no verificado) y propias del equipo. Compartirlas entre municipios queda como decisión pendiente.
+
+**Productores:** equipo técnico (actuaciones-tipo propias); catálogo heredado del histórico.
+**Consumidores:** vista Agenda.
+**Relacionado con:** CONTRACT-AGENDA-ACTUATIONS, CONTRACT-ACTION-PLAN-CATALOG.
+
+---
+
 ### CONTRACT-AGENDA-ACTUATIONS
 **Estado:** CONCEPTUAL — creado 2026-10-19
 
 Registro de actuaciones por cuatro entornos (sanitario, comunitario, educativo, laboral) con ficha completa por bloques, alta manual y volcado desde el Plan de Acción. El bloque de resultado vive en el expediente y alimenta agenda y seguimiento y evaluación sin duplicarse. El sistema no genera actuaciones, trimestres ni prioridades.
 
-**Productores:** equipo técnico (alta manual); volcado desde las actuaciones del Plan de Acción vigente.
+**Productores:** equipo técnico (alta manual); volcado desde las actuaciones del Plan de Acción vigente; repositorio de actuaciones-tipo.
 **Consumidores:** vista Agenda, vista Evaluación.
-**Relacionado con:** CONTRACT-ACTION-PLAN-CATALOG, CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT, CONTRACT-INSTITUTIONAL-LIFECYCLE, CONTRACT-DYNAMIC-TRIPYRAMID.
+**Relacionado con:** CONTRACT-ACTION-PLAN-CATALOG, CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT, CONTRACT-INSTITUTIONAL-LIFECYCLE, CONTRACT-DYNAMIC-TRIPYRAMID, CONTRACT-ACTUATION-TEMPLATES.
 
 ---
 
