@@ -11552,3 +11552,18 @@ h3 {
   .lhpc__inner { padding: 10px 16px; }
   .lhpc__phases { min-width: 0; }
 }
+
+/* Plan de Acción: secciones en pestañas y líneas plegadas */
+.plan-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 12px; border-bottom: 1px solid var(--borde); }
+.plan-tabs__tab { border: 1px solid var(--borde); border-bottom: 0; border-radius: 8px 8px 0 0; background: var(--fondo-principal); color: var(--tinta-azul); padding: 8px 14px; font-weight: 600; cursor: pointer; }
+.plan-tabs__tab--active { background: var(--superficie, var(--fondo-principal)); color: var(--azul); box-shadow: inset 0 -2px 0 var(--azul); }
+.pcm-line-fold > summary { cursor: pointer; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; list-style: none; }
+.pcm-line-fold > summary::-webkit-details-marker { display: none; }
+.pcm-line-fold > summary::before { content: "▸"; color: var(--azul); }
+.pcm-line-fold[open] > summary::before { content: "▾"; }
+.pcm-line-fold__summary strong { font-size: 1.1rem; color: var(--tinta-azul); }
+.pcm-line-fold__summary small { color: var(--tinta-azul); flex-basis: 100%; }
+.pcm-fold-summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.pcm-fold-summary::-webkit-details-marker { display: none; }
+.pcm-fold-summary > span:first-child { display: flex; flex-direction: column; gap: 2px; }
+.pcm-fold-summary strong { color: var(--tinta-azul); }

@@ -208,7 +208,14 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
   </div>;
  }
 
+ const specificCount = module.generalObjectives.reduce((sum, general) => sum + general.specificObjectives.length, 0);
  return <article className="workspace-panel pcm-preparation">
+  <details className="pcm-line-fold">
+  <summary className="pcm-line-fold__summary">
+   <span className="eyebrow">Línea estratégica</span>
+   <strong>{module.title}</strong>
+   <small>{module.generalObjectives.length} objetivos generales · {specificCount} objetivos específicos e indicadores</small>
+  </summary>
   <header className="pcm-editorial-header">
    <p className="eyebrow">{directTerritorialEdit ? "Plan de Acción · edición territorial directa" : "Preparación del Plan · borrador editable"}</p>
    <h2>{module.title}</h2>
@@ -227,7 +234,7 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
    const block = proposalBlocks.find(b => b.code === general.code);
    const sourceGeneral = general.title;
    const visibleGeneral = canReview ? consolidatedText(general.code, sourceGeneral) : territorialText(general.code, (revised ? block?.text : undefined) ?? sourceGeneral);
-   return <details className="pcm-general" key={general.code} open>
+   return <details className="pcm-general" key={general.code}>
     <summary>{(revised ? block?.name : undefined) ?? `${general.code} · ${visibleGeneral}`}</summary>
     <p><strong>Objetivo general:</strong> <ProposalText text={visibleGeneral}/></p>
     {control(general.code, sourceGeneral, [module.id], !finalApprovedText)}
@@ -267,5 +274,6 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
    </fieldset>
   </section>
   <p role="status">{persistenceMessage ?? (directTerritorialEdit ? (draft ? "Cambios consolidados en el expediente de este territorio." : "Sin cambios territoriales guardados. Las modificaciones se guardan directamente en este expediente.") : (draft ? "Borrador guardado en este navegador. Para cambiar de equipo, conserva y traslada el expediente." : "Sin elecciones guardadas. Los cambios se guardan en este navegador."))}</p>
+ </details>
  </article>;
 }

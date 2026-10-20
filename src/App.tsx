@@ -453,6 +453,7 @@ function loadPersistedWorkspacesForLibrary(
 export default function App() {
   const [view, setViewState] = useState<AppView>("inicio");
   const [agendaFocusId, setAgendaFocusId] = useState<string | undefined>(undefined);
+  const [planTab, setPlanTab] = useState<"lineas" | "resultante" | "prioridades" | "borrador">("lineas");
   const preparationDirtyRef = useRef(false);
   const onPreparationDirtyChange = useCallback((dirty: boolean) => { preparationDirtyRef.current = dirty; }, []);
   function canLeavePreparation() {
@@ -4153,6 +4154,70 @@ export default function App() {
                 no selecciona prioridades ni adopta compromisos municipales.
               </p>
             </section>
+            <div className="plan-tabs" role="tablist" aria-label="Secciones del Plan de Acción">
+              {([
+                ["lineas", "Líneas e indicadores"],
+                ["resultante", "Plan resultante"],
+                ["prioridades", "Lectura y prioridades"],
+                ["borrador", "Borrador de actuaciones"],
+              ] as const).map(([id, label]) => (
+                <button key={id} type="button" role="tab" aria-selected={planTab === id}
+                  className={`plan-tabs__tab${planTab === id ? " plan-tabs__tab--active" : ""}`}
+                  onClick={() => setPlanTab(id)}>{label}</button>
+              ))}
+            </div>
+            {planTab === "lineas" && (
+            <>
+            <ActionPlanCatalogPanel
+              section="lineas"
+              municipalityId={workspace.municipality.identity.id}
+              lectura={runtime.lectura}
+              selection={workspace.deliberativePrioritySelection}
+              eligibleModules={runtime.eligibleActionPlanModules}
+              reviews={workspace.actionPlanModuleReviews ?? []}
+              validatedActionPlans={workspace.validatedActionPlans ?? []}
+              onValidatePlan={(document) => {
+                if (document.municipalityId !== workspace.municipality.identity.id) return false;
+                const next = {...workspace, validatedActionPlans: [...(workspace.validatedActionPlans ?? []), document], updatedAt: new Date().toISOString()};
+                if (!saveWorkspaceToLocalStorage(next)) return false;
+                setWorkspace(next);
+                return true;
+              }}
+              drafts={workspace.planPreparationDrafts ?? []}
+              onDraftChange={handlePlanPreparationChange}
+              worksheets={workspace.indicatorWorksheets ?? []}
+              onWorksheetChange={handleIndicatorWorksheetChange}
+              onSave={handleSaveActionPlanModuleReview}
+            />
+            </>
+            )}
+            {planTab === "resultante" && (
+            <>
+            <ActionPlanCatalogPanel
+              section="resultante"
+              municipalityId={workspace.municipality.identity.id}
+              lectura={runtime.lectura}
+              selection={workspace.deliberativePrioritySelection}
+              eligibleModules={runtime.eligibleActionPlanModules}
+              reviews={workspace.actionPlanModuleReviews ?? []}
+              validatedActionPlans={workspace.validatedActionPlans ?? []}
+              onValidatePlan={(document) => {
+                if (document.municipalityId !== workspace.municipality.identity.id) return false;
+                const next = {...workspace, validatedActionPlans: [...(workspace.validatedActionPlans ?? []), document], updatedAt: new Date().toISOString()};
+                if (!saveWorkspaceToLocalStorage(next)) return false;
+                setWorkspace(next);
+                return true;
+              }}
+              drafts={workspace.planPreparationDrafts ?? []}
+              onDraftChange={handlePlanPreparationChange}
+              worksheets={workspace.indicatorWorksheets ?? []}
+              onWorksheetChange={handleIndicatorWorksheetChange}
+              onSave={handleSaveActionPlanModuleReview}
+            />
+            </>
+            )}
+            {planTab === "prioridades" && (
+            <>
             <LecturaEstrategicaView lectura={runtime.lectura} />
             <div className="repo-section-divider">
               <span className="repo-section-divider__text">Participación ciudadana</span>
@@ -4176,26 +4241,10 @@ export default function App() {
               isStale={runtime.prioritySelectionIsStale}
               onSave={handleSaveDeliberativePrioritySelection}
             />
-            <ActionPlanCatalogPanel
-              municipalityId={workspace.municipality.identity.id}
-              lectura={runtime.lectura}
-              selection={workspace.deliberativePrioritySelection}
-              eligibleModules={runtime.eligibleActionPlanModules}
-              reviews={workspace.actionPlanModuleReviews ?? []}
-              validatedActionPlans={workspace.validatedActionPlans ?? []}
-              onValidatePlan={(document) => {
-                if (document.municipalityId !== workspace.municipality.identity.id) return false;
-                const next = {...workspace, validatedActionPlans: [...(workspace.validatedActionPlans ?? []), document], updatedAt: new Date().toISOString()};
-                if (!saveWorkspaceToLocalStorage(next)) return false;
-                setWorkspace(next);
-                return true;
-              }}
-              drafts={workspace.planPreparationDrafts ?? []}
-              onDraftChange={handlePlanPreparationChange}
-              worksheets={workspace.indicatorWorksheets ?? []}
-              onWorksheetChange={handleIndicatorWorksheetChange}
-              onSave={handleSaveActionPlanModuleReview}
-            />
+            </>
+            )}
+            {planTab === "borrador" && (
+            <>
             {runtime.pai ? (
               <PAIView pai={runtime.pai} />
             ) : (
@@ -4208,6 +4257,8 @@ export default function App() {
                   </p>
                 </div>
               </section>
+            )}
+            </>
             )}
             </>
           ) : (
@@ -4223,7 +4274,15 @@ export default function App() {
                   </p>
                 </div>
               </section>
+              <div className="plan-tabs" role="tablist" aria-label="Secciones del Plan de Acción">
+                {([["lineas", "Líneas e indicadores"], ["resultante", "Plan resultante"]] as const).map(([id, label]) => (
+                  <button key={id} type="button" role="tab" aria-selected={(planTab === "resultante" ? "resultante" : "lineas") === id}
+                    className={`plan-tabs__tab${(planTab === "resultante" ? "resultante" : "lineas") === id ? " plan-tabs__tab--active" : ""}`}
+                    onClick={() => setPlanTab(id)}>{label}</button>
+                ))}
+              </div>
               <ActionPlanCatalogPanel
+                section={planTab === "resultante" ? "resultante" : "lineas"}
                 municipalityId={workspace.municipality.identity.id}
                 eligibleModules={[]}
                 reviews={workspace.actionPlanModuleReviews ?? []}
