@@ -34,6 +34,8 @@ export interface LocalHealthPlanningCycleProps {
   thematicPrioritisationDone: boolean;
   /** Seleccion deliberativa del Grupo Motor ya adoptada; opcional hasta consolidar App.tsx. */
   prioritySelectionDone?: boolean;
+  /** Actuaciones registradas en la agenda (instrumento de la fase Implantación). */
+  agendaCount?: number;
   onNavigate?: (view: AppViewId) => void;
 }
 
@@ -59,6 +61,7 @@ function derivePhases({
   pslCompiled,
   thematicPrioritisationDone,
   prioritySelectionDone = false,
+  agendaCount = 0,
 }: LocalHealthPlanningCycleProps): CyclePhase[] {
   const pslReady = (pslStatus === "validated" || pslStatus === "approved") && !pslIsStale;
   const pslStaleNote = pslIsStale ? "La evidencia ha cambiado" : undefined;
@@ -118,10 +121,11 @@ function derivePhases({
   }
 
   // 5 - Implantacion
-  const implantationPhase: PhaseStatus = prioritySelectionDone ? "pending" : "blocked";
-  const implantationNote = prioritySelectionDone
-    ? "Pendiente de cierre operativo"
-    : "Requiere priorización adoptada";
+  // La agenda es el instrumento de la fase y es un registro de trabajo: no se condiciona a la priorización.
+  const implantationPhase: PhaseStatus = agendaCount > 0 ? "current" : "pending";
+  const implantationNote = agendaCount > 0
+    ? `${agendaCount} ${agendaCount === 1 ? "actuación registrada" : "actuaciones registradas"} en la agenda`
+    : "Registra actuaciones en la agenda";
 
   // 6 - Evaluacion
   const evaluationPhase: PhaseStatus = prioritySelectionDone ? "pending" : "blocked";
@@ -168,7 +172,7 @@ function derivePhases({
       label:         "Implantación",
       status:        implantationPhase,
       note:          implantationNote,
-      navigateTo:    implantationPhase !== "blocked" ? "plan-local" : undefined,
+      navigateTo:    "agenda",
       scopeBoundary: true,
     },
     {
