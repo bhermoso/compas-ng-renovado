@@ -11581,3 +11581,11 @@ h3 {
 .pcm-preparation .pcm-decision select { width: auto; min-width: 120px; }
 .pcm-preparation .pcm-decision textarea { width: 100%; }
 .pcm-catalog-header { padding-block: 10px; }
+
+/* Barra de estado compacta: copias, guardado y Firebase en una sola franja */
+.app-status-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-bottom: 8px; font-size: 0.85rem; }
+.app-status-strip > * { margin: 0; }
+.app-status-strip .app-persistence-warning { padding: 4px 10px; border-radius: 999px; font-size: 0.82rem; }
+.app-status-strip__tool > summary { cursor: pointer; color: var(--texto-secundario); }
+.app-status-strip details[open] { flex-basis: 100%; }
+.app-status-strip details.app-persistence-warning[open] { border-radius: 8px; padding: 8px 12px; }
