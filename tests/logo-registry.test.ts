@@ -15,8 +15,8 @@ describe("logoRegistry", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it("ningún logo es publicable por defecto (todos PENDIENTE)", () => {
-    expect(getPublishableLogos()).toHaveLength(0);
+  it("los cinco logos de la caja del histórico están confirmados por el autor", () => {
+    expect(getPublishableLogos()).toHaveLength(5);
   });
 
   it("getAllLogos devuelve los 5 logos", () => {
@@ -33,7 +33,7 @@ describe("logoRegistry", () => {
       expect(logo.source, `${logo.id}.source`).toBeTruthy();
       expect(Array.isArray(logo.usageScope), `${logo.id}.usageScope`).toBe(true);
       expect(logo.usageScope.length, `${logo.id}.usageScope`).toBeGreaterThan(0);
-      expect(logo.authorization, `${logo.id}.authorization`).toBe("PENDIENTE");
+      expect(logo.authorization, `${logo.id}.authorization`).toBe("CONFIRMADA");
     }
   });
 

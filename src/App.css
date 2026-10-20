@@ -11605,3 +11605,45 @@ h3 {
 .app-status-strip__tool > summary { cursor: pointer; color: var(--texto-secundario); }
 .app-status-strip details[open] { flex-basis: 100%; }
 .app-status-strip details.app-persistence-warning[open] { border-radius: 8px; padding: 8px 12px; }
+
+/* ===== Identidad COMPÁS: caja de logos de portada (herencia del histórico) ===== */
+.ilogo-band--cover {
+  gap: 1.25rem 2rem;
+  margin-top: 1.75rem;
+  padding-bottom: 2.5rem;
+}
+/* Proporciones de la caja del histórico (consejería 170, distrito 140, RELAS 150, violencia 120, RASSELH 140),
+   a ~0,55 de escala. */
+.ilogo-band--cover .ilogo-band__img { max-width: 280px; }
+.ilogo-band--cover .ilogo-band__img--consejeria { height: 94px; }
+.ilogo-band--cover .ilogo-band__img--distrito-sanitario { height: 77px; }
+.ilogo-band--cover .ilogo-band__img--relas { height: 83px; }
+.ilogo-band--cover .ilogo-band__img--violencia-genero { height: 66px; }
+.ilogo-band--cover .ilogo-band__img--rasselh { height: 77px; }
+@media (max-width: 640px) {
+  .ilogo-band--cover { gap: 1rem 1.25rem; padding-bottom: 1.75rem; }
+  .ilogo-band--cover .ilogo-band__img { max-width: 44%; }
+  .ilogo-band--cover .ilogo-band__img--consejeria { height: 64px; }
+  .ilogo-band--cover .ilogo-band__img--distrito-sanitario { height: 52px; }
+  .ilogo-band--cover .ilogo-band__img--relas { height: 56px; }
+  .ilogo-band--cover .ilogo-band__img--violencia-genero { height: 44px; }
+  .ilogo-band--cover .ilogo-band__img--rasselh { height: 52px; }
+}
+
+/* ===== Identidad COMPÁS: botones secundarios (herencia del histórico) =====
+   Fondo blanco, borde fino y borde izquierdo de 3 px en azul institucional.
+   Un solo acento por botón (VISUAL-CONTRACT §4). No afecta a botones primarios,
+   de peligro ni a los que se presentan como enlace. */
+.ges-btn--secondary,
+.psl-chapter-editor__edit-btn,
+.psl-chapter-editor__cancel-btn,
+.tp-modal__btn-cancel,
+.ekc-hip-item__btn,
+.ekc-q-item__btn,
+.ekc-q-add-btn,
+.ekc-interp-item__btn,
+.ekc-interp-add-btn {
+  background: var(--blanco);
+  border-left: 3px solid var(--azul);
+  border-radius: 4px;
+}
