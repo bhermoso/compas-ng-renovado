@@ -11647,3 +11647,20 @@ h3 {
   border-left: 3px solid var(--azul);
   border-radius: 4px;
 }
+
+/* Fase Implantar de la portada: acceso directo a la agenda (botón secundario COMPÁS). */
+.home-process__open {
+  margin-top: 10px;
+  padding: 4px 12px;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--texto-principal);
+  background: var(--blanco);
+  border: 1px solid var(--borde);
+  border-left: 3px solid var(--azul);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.home-process__open:hover { background: var(--fondo-secundario); }
+.home-process__open:focus-visible { outline: 3px solid var(--azul); outline-offset: 2px; }

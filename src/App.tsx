@@ -3640,11 +3640,18 @@ export default function App() {
                   </div>
                   <div className="home-process__phase home-process__phase--5">
                     <span className="home-process__ordinal">05</span>
-                    <span className="home-process__verb">Elaborar</span>
+                    <span className="home-process__verb">Implantar</span>
                     <p className="home-process__desc">
-                      Plan Local de Salud: diagnóstico, priorización y plan
-                      compilados como documento institucional.
+                      Agenda de actuaciones del plan, organizadas por entorno
+                      y con ficha propia.
                     </p>
+                    <button
+                      type="button"
+                      className="home-process__open"
+                      onClick={() => setView("agenda")}
+                    >
+                      Abrir la agenda
+                    </button>
                   </div>
                   <div className="home-process__phase home-process__phase--6">
                     <span className="home-process__ordinal">06</span>
