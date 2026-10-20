@@ -17,6 +17,7 @@ import type {
   FormalValidationRecord,
   InstitutionalActorRole,
 } from "../../domain/institutional-lifecycle";
+import { assessProfileValidation, profileCanFeedDownstream } from "../../domain/quality/ProfileValidationCriterion";
 import { LEVEL3_FORMAL_VALIDATION_PERMISSION } from "../../domain/institutional-lifecycle";
 
 // ── Tipos públicos ─────────────────────────────────────────────────────────────
@@ -47,10 +48,12 @@ export function validateCreateFormalValidation(
   const violations: FormalValidationViolation[] = [];
   const { psl, validatedBy, validatedByRole } = input;
 
-  if (psl.status !== "validated" && psl.status !== "approved") {
+  // FVAL-01: el PSL debe ser el Perfil vigente. La validación técnica del Perfil
+  // ya no es requisito; se registra como criterio de calidad en el registro.
+  if (!profileCanFeedDownstream(psl.status)) {
     violations.push({
       code: "FVAL-01",
-      message: `Solo pueden validarse formalmente borradores de un PSL en estado "validated" o "approved". Estado actual: "${psl.status}".`,
+      message: `No pueden validarse formalmente borradores de un PSL sustituido o archivado. Estado actual: "${psl.status}".`,
     });
   }
 
@@ -93,6 +96,7 @@ export function createFormalValidation(
     validatedByRole,
     externalReference,
     validationNotes,
+    profileValidationAtValidation: (({ level, met }) => ({ level, met }))(assessProfileValidation(psl.status, false)),
   };
 
   return { ok: true, record };

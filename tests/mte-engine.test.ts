@@ -169,28 +169,24 @@ const AREA_PARTICIPACION: PSLAreaIntervencion = {
 
 describe("Bloque 1 — Gates contractuales", () => {
 
-  describe("G-MTE-1: PSL en estado no permitido", () => {
-    it("PSL 'generated' → { ok: false } con violación G-MTE-1", () => {
+  describe("G-MTE-1: Perfil retirado (la validación ya no es requisito)", () => {
+    it("PSL 'generated' → { ok: true }: la validación se informa como criterio de calidad", () => {
       const psl = buildPSL({ status: "generated" });
       const result = translate(psl, providerTest, NOW);
-      expect(result.ok).toBe(false);
-      if (!result.ok) {
-        expect(result.violations[0]).toContain("G-MTE-1");
-        expect(result.violations[0]).toContain("generated");
-      }
+      expect(result.ok).toBe(true);
     });
 
-    it("PSL 'review' → { ok: false } con violación G-MTE-1", () => {
+    it("PSL 'review' → { ok: true }", () => {
       const psl = buildPSL({ status: "review" });
       const result = translate(psl, providerTest, NOW);
-      expect(result.ok).toBe(false);
-      if (!result.ok) expect(result.violations[0]).toContain("G-MTE-1");
+      expect(result.ok).toBe(true);
     });
 
     it("PSL 'superseded' → { ok: false } con violación G-MTE-1", () => {
       const psl = buildPSL({ status: "superseded" });
       const result = translate(psl, providerTest, NOW);
       expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.violations[0]).toContain("G-MTE-1");
     });
 
     it("PSL 'archived' → { ok: false } con violación G-MTE-1", () => {

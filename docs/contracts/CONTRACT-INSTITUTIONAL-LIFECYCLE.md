@@ -90,6 +90,8 @@ La validación formal es un `FormalValidationRecord` almacenado en `workspace.fo
 
 Un borrador del Nivel 3 está formalmente validado cuando el Grupo Motor lo ha revisado, deliberado y adoptado explícitamente como base para la planificación formal del municipio.
 
+Criterio FVAL-01 (modificado 2026-10-19, `CONTRACT-PROFILE-VALIDATION-QUALITY`): la validación formal ya no exige un Perfil validado. Se rechaza solo cuando el Perfil está sustituido o archivado. El registro guarda el nivel del criterio «Perfil validado» en `profileValidationAtValidation` (opcional).
+
 La validación formal NO implica:
 - Que el borrador queda congelado (sigue siendo efímero).
 - Que el contenido no pueda revisarse (la validación puede rehacerse).

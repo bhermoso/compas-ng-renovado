@@ -207,14 +207,40 @@ describe("Compilación inicial del Plan Local de Salud", () => {
  });
  it("bloquea fuentes ausentes, obsoletas, de otra versión o sin documento sellado", () => {
   const ws = workspace();
-  expect(compileInitialLocalHealthPlan(ws, true).ok).toBe(false);
-  expect(compileInitialLocalHealthPlan({...ws, validatedPSL: undefined}, false).ok).toBe(false);
+  // Sin Plan de Acción validado no hay documento.
   expect(compileInitialLocalHealthPlan({...ws, validatedActionPlans: []}, false).ok).toBe(false);
-  expect(compileInitialLocalHealthPlan({...ws, compiledProfiles: [atarfe.v2]}, false).ok).toBe(false);
-  expect(compileInitialLocalHealthPlan({...ws, compiledProfiles: [{...zaidin.v2, sourcePSLVersion: "anterior"}]}, false).ok).toBe(false);
+  // Un Perfil compilado sin documento sellado es un fallo de integridad y bloquea.
   expect(compileInitialLocalHealthPlan({...ws, compiledProfiles: [{...zaidin.v2, canonicalDocument: undefined}]}, false).ok).toBe(false);
+ });
+ it("la validación del Perfil es criterio de calidad, no requisito", () => {
+  const ws = workspace();
+  // Validación desactualizada: compila y lo declara.
+  const stale = compileInitialLocalHealthPlan(ws, true);
+  expect(stale.ok).toBe(true);
+  if (stale.ok) {
+   expect(stale.profileValidation).toMatchObject({ level: "validated-stale", met: false });
+   expect(JSON.stringify(stale.document)).toContain("Criterio de calidad «Perfil validado»: no cumplido");
+  }
+  // Sin Perfil validado: compila sin sección de Perfil y lo declara.
+  const none = compileInitialLocalHealthPlan({...ws, validatedPSL: undefined}, false);
+  expect(none.ok).toBe(true);
+  if (none.ok) {
+   expect(none.profileValidation).toMatchObject({ level: "not-validated", met: false });
+   expect(JSON.stringify(none.document)).toContain("Perfil de Salud Local no compilado en esta versión");
+  }
+  // Perfil compilado de otra versión o modificado después: no se usa y se declara sin compilar.
+  for (const changed of [
+   {...ws, compiledProfiles: [atarfe.v2]},
+   {...ws, compiledProfiles: [{...zaidin.v2, sourcePSLVersion: "anterior"}]},
+  ]) {
+   const r = compileInitialLocalHealthPlan(changed, false);
+   expect(r.ok).toBe(true);
+   if (r.ok) expect(JSON.stringify(r.document)).toContain("Perfil sin compilar");
+  }
   ws.validatedPSL!.cierreInterpretativo.content += " Nueva revisión";
-  expect(compileInitialLocalHealthPlan(ws, false).ok).toBe(false);
+  const edited = compileInitialLocalHealthPlan(ws, false);
+  expect(edited.ok).toBe(true);
+  if (edited.ok) expect(JSON.stringify(edited.document)).toContain("Perfil sin compilar");
  });
  it("permite un Perfil aprobado después de compilarlo sin alterar el diagnóstico", () => {
   const ws = workspace();
@@ -232,9 +258,12 @@ describe("Compilación inicial del Plan Local de Salud", () => {
   const enabled = renderToStaticMarkup(<InitialLocalHealthPlanPanel workspace={workspace()} pslIsStale={false} />);
   expect(enabled).toContain("Generar borrador del Plan Local de Salud");
   expect(enabled).not.toContain('disabled=""');
-  const blocked = renderToStaticMarkup(<InitialLocalHealthPlanPanel workspace={workspace()} pslIsStale />);
-  expect(blocked).toContain('disabled=""');
-  expect(blocked).toContain("sus fuentes han cambiado");
+  const stale = renderToStaticMarkup(<InitialLocalHealthPlanPanel workspace={workspace()} pslIsStale />);
+  expect(stale).not.toContain('disabled=""');
+  expect(stale).toContain("Criterio de calidad «Perfil validado»: no cumplido");
+  expect(stale).toContain("sus fuentes han cambiado");
+  const noPlan = renderToStaticMarkup(<InitialLocalHealthPlanPanel workspace={{...workspace(), validatedActionPlans: []}} pslIsStale={false} />);
+  expect(noPlan).toContain('disabled=""');
  });
  it("produce vista, Word y PDF desde el mismo modelo completo", async () => {
   const result = compileInitialLocalHealthPlan(workspace(), false);

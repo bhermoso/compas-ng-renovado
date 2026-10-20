@@ -1301,11 +1301,6 @@ export default function App() {
     (runtime.oit.opportunities.length === 1 &&
       runtime.oit.opportunities[0].id === "oit-expand-evidence-base");
 
-  // PSL validado o aprobado: requisito para que el Nivel 3 (Plan, Agenda, Seguimiento) sea accesible.
-  // El estado "approved" es institucionalmente superior a "validated" y también habilita el Nivel 3.
-  const pslValidated =
-    (runtime.psl.status === "validated" || runtime.psl.status === "approved") &&
-    !runtime.pslIsStale;
   const municipality = runtime.workspace.municipality.identity;
 
   const allMunicipalities = useMemo(
@@ -4133,15 +4128,14 @@ export default function App() {
               <p className="eyebrow">Producto 5 · Motor de Traducción Estratégica</p>
               <h2>Lectura Estratégica Local</h2>
               <p className="panel-note">
-                La Lectura Estratégica Local se genera automáticamente cuando el Perfil de Salud
-                Local está validado. Navega a "Perfil de Salud Local" y valida el PSL para
-                activar este producto.
+                La Lectura Estratégica Local se genera automáticamente a partir del Perfil de Salud
+                Local vigente. Si el Perfil está sustituido o archivado, o aún no hay evidencia
+                suficiente, no se genera.
               </p>
-              {pslValidated === false && (
-                <p className="panel-note">
-                  El PSL está en estado "{runtime.psl.status}". Se requiere "validated" o "approved".
-                </p>
-              )}
+              <p className="panel-note" role="status">
+                Criterio de calidad «Perfil validado»: {runtime.profileValidation.met ? "cumplido" : "no cumplido"}.{" "}
+                {runtime.profileValidation.detail}
+              </p>
             </section>
           )
         )}

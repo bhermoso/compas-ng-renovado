@@ -111,7 +111,7 @@ El PLS es un único documento que integra todas las etapas del proceso de planif
 
 El Plan de Acción es la planificación estratégica territorial: líneas estratégicas, objetivos e indicadores con su definición de medición. Las actuaciones (programas, talleres, charlas, caminatas…) y las agendas anuales son el instrumento de ejecución y se registran en la agenda, separada del Plan de Acción. Las actuaciones alimentan el resultado del indicador, pero no se sabe en qué medida contribuye cada una: el resultado se consolida por indicador y no se atribuye a actuaciones concretas. Este criterio difiere del de la guía rápida de planes locales de salud de la Junta de Andalucía (2014), que sitúa acciones y agendas anuales dentro del Plan de Acción.
 
-Transición, sin pérdida de funcionalidad: hasta que se adapte el compilador, las fichas de actuación que ya existen en la ficha de cada indicador (`WorksheetAction`: actividades, entregas de datos, descarga Word) siguen funcionando como instrumento de recogida de datos del indicador, y el gate G-PLS-5 no cambia. La adaptación del compilador y de la exportación a la sección VIII queda pendiente y se hace sin retirar ninguna función existente.
+Sin pérdida de funcionalidad: las fichas de actuación de cada indicador (`WorksheetAction`: actividades, entregas de datos, descarga Word) siguen funcionando. En el documento compilado (`compileInitialLocalHealthPlan`) y en la exportación, el Plan de Acción (`planActionParagraphs`) no incluye actuaciones; estas se agrupan en la sección «Actuaciones y agenda de implementación» (`planActuationParagraphs`). El gate G-PLS-5 no cambia.
 
 ### 3.2 Resumen Ejecutivo — posición y naturaleza
 

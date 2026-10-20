@@ -164,9 +164,14 @@ describe("Bloque 1 — Gates con datos reales de Atarfe", () => {
     expect(result.ok).toBe(true);
   });
 
-  it("G-MTE-1: PSL no validado (generado) → { ok: false }", () => {
+  it("G-MTE-1: PSL no validado (generado) → { ok: true } (criterio de calidad, no requisito)", () => {
     const pslNoValidado = { ...PSL_ATARFE, status: "generated" as const };
     const result = translate(pslNoValidado, providerAtarfe, NOW_TEST);
+    expect(result.ok).toBe(true);
+  });
+
+  it("G-MTE-1: PSL archivado → { ok: false }", () => {
+    const result = translate({ ...PSL_ATARFE, status: "archived" as const }, providerAtarfe, NOW_TEST);
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.violations[0]).toContain("G-MTE-1");
   });

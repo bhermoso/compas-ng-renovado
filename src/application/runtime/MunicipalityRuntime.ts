@@ -1,4 +1,5 @@
 import { profileSourceChanged } from '../health-profile/profileSourceChanged';
+import { assessProfileValidation, profileCanFeedDownstream, type ProfileValidationCriterion } from '../../domain/quality/ProfileValidationCriterion';
 import type { MunicipalityWorkspace } from "../../domain/workspace";
 import type { CompasPipelineResult, PipelineTraceItem, PipelineStatus } from "../../domain/pipeline";
 import type { LT1Result } from "../lt1";
@@ -65,6 +66,8 @@ export interface MunicipalityRuntime {
   psl: LocalHealthProfile;
   // true si psl.status === "validated" pero la evidencia ha cambiado desde la validación.
   pslIsStale: boolean;
+  // Criterio de calidad «Perfil validado»: informa, no bloquea.
+  profileValidation: ProfileValidationCriterion;
 
   // Nivel 3 — Capa de Decisión (alimentada exclusivamente por el PSL)
   prioritization: PrioritizationResult;
@@ -74,7 +77,7 @@ export interface MunicipalityRuntime {
   monitoring: MonitoringDraft;
 
   // Producto 5 — Motor de Traducción Estratégica
-  // Disponible solo cuando el PSL está validado o aprobado.
+  // Disponible con cualquier Perfil vigente; la validación se informa en `profileValidation`.
   lectura: LecturaEstrategicaLocal | undefined;
 
   // Una selección previa queda obsoleta si cambia el PSL, el MTE o la
@@ -181,9 +184,9 @@ export function createMunicipalityRuntime(
   const monitoring = generateMonitoringDraft(agenda);
 
   // ── Producto 5 — Motor de Traducción Estratégica
-  // Solo cuando el PSL está validado/aprobado y no está desactualizado.
-  const pslListoParaMTE =
-    (psl.status === "validated" || psl.status === "approved") && !pslIsStale;
+  // La validación del Perfil no es requisito: se informa como criterio de calidad.
+  const profileValidation = assessProfileValidation(psl.status, pslIsStale);
+  const pslListoParaMTE = profileCanFeedDownstream(psl.status);
 
   let lectura: LecturaEstrategicaLocal | undefined;
   if (pslListoParaMTE) {
@@ -229,6 +232,7 @@ export function createMunicipalityRuntime(
     oit,
     psl,
     pslIsStale,
+    profileValidation,
     pipeline: buildPipelineTrace(input.workspace, integrityGuard, mit, reconciliacion, {
       prioritization,
       epvsa,

@@ -120,7 +120,7 @@ El MTE **no puede** recibir ni acceder a:
 
 | Gate | Condición | Tipo | Resultado si no se cumple |
 |---|---|---|---|
-| **G-MTE-1** | `psl.status === "validated" \|\| "approved"` | Bloqueante | `{ ok: false, violations: [G-MTE-1] }` |
+| **G-MTE-1** | `psl.status` distinto de `superseded` y `archived` (la validación es criterio de calidad, no requisito: `CONTRACT-PROFILE-VALIDATION-QUALITY`) | Bloqueante | `{ ok: false, violations: [G-MTE-1] }` |
 | **G-MTE-2** | `psl.areasDeIntervencion.length >= 1` | No bloqueante | Artefacto generado con `escenarios: []`; `hasTranslatableContent: false` |
 | **G-MTE-3** | `frameworkProvider` disponible y operativo | Bloqueante | `{ ok: false, violations: [G-MTE-3] }` |
 
@@ -280,8 +280,8 @@ Para que el Producto 5 pueda considerarse certificado, deben cumplirse
 |---|---|
 | TypeScript `--noEmit` sin errores | Build |
 | Todos los tests anteriores pasan sin regresión | Suite completa |
-| G-MTE-1: PSL `generated` → `{ ok: false }` | Test unitario |
-| G-MTE-1: PSL `validated` → `{ ok: true }` | Test unitario |
+| G-MTE-1: PSL `superseded` o `archived` → `{ ok: false }` | Test unitario |
+| G-MTE-1: PSL `generated` o `validated` → `{ ok: true }` | Test unitario |
 | G-MTE-1: PSL `approved` → `{ ok: true }` | Test unitario |
 | G-MTE-2: sin áreas → `hasTranslatableContent: false` | Test unitario |
 | `requiresHumanValidation: true` en artefacto | Test tipado |

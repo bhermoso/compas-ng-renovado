@@ -48,6 +48,11 @@ export interface FormalValidationRecord {
   // ── Notas y observaciones ─────────────────────────────────────────────────
   validationNotes?: string;
   // Síntesis de lo acordado, modificaciones solicitadas o condiciones de validación.
+
+  // ── Criterio de calidad «Perfil validado» en el momento de validar ────────
+  // La validación del Perfil no es requisito de la validación formal: se anota
+  // aquí como criterio de calidad (CONTRACT-PROFILE-VALIDATION-QUALITY).
+  profileValidationAtValidation?: { level: string; met: boolean };
 }
 
 /**

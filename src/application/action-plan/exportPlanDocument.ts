@@ -1,8 +1,14 @@
 import { Document, HeadingLevel, Packer, Paragraph, TextRun } from "docx";
 import { jsPDF } from "jspdf";
 import type { PlanDocument } from "../../domain/action-plan-catalog/PlanDocument";
-export function planDocumentParagraphs(plan: PlanDocument) {
- const paragraphs = [
+type PlanParagraph = { text: string; heading?: boolean };
+
+const fichaStatusText = (status: string) =>
+ status === "missing" ? "pendiente" : status === "draft" ? "abierta" : "registrada";
+
+/** Plan de Acción: líneas, objetivos, indicadores y su medición. No incluye actuaciones. */
+export function planActionParagraphs(plan: PlanDocument): PlanParagraph[] {
+ const paragraphs: PlanParagraph[] = [
   {text:"Plan de Acción",heading:true},
   {text:"Ámbito: "+(plan.municipalityId==="granada-zaidin"?"Granada-Zaidín":plan.municipalityId)},
   {text:plan.status==="validated"?"Versión validada técnicamente":"BORRADOR — sin validar"},
@@ -29,36 +35,57 @@ export function planDocumentParagraphs(plan: PlanDocument) {
   );
  }
  if (plan.traceabilityLinks?.length) {
-  paragraphs.push({ text: "Mapa de vínculos, fichas y seguimiento", heading: true });
+  paragraphs.push({ text: "Mapa de vínculos del Plan de Acción", heading: true });
   for (const link of plan.traceabilityLinks) {
    paragraphs.push({
     text: [
      `${link.moduleTitle} → ${link.thematicBlock} → ${link.objectiveCode} → ${link.indicatorCode}`,
      `Indicador del Plan de Acción: ${link.indicatorTitle}`,
-     `Ficha del indicador: ${
-      link.indicatorFichaStatus === "missing"
-       ? "pendiente"
-       : link.indicatorFichaStatus === "draft"
-        ? "abierta sin actuaciones vinculadas"
-        : "con actuaciones vinculadas"
-     }. Actuaciones: ${link.actionCards.length}. Actividades: ${link.actionCards.reduce((total, action) => total + action.activities.length, 0)}. Entregas: ${link.actionCards.reduce((total, action) => total + action.deliveryCount, 0)}. Consolidaciones: ${link.consolidationCount}.`,
-     link.pendingSummary.length ? `Pendiente: ${link.pendingSummary.join("; ")}` : "Sin campos obligatorios pendientes en las fichas registradas.",
+     `Ficha del indicador: ${fichaStatusText(link.indicatorFichaStatus)}.`,
     ].join("\n"),
    });
-   for (const action of link.actionCards) {
-    paragraphs.push({
-     text: [
-      `Ficha de actuación: ${action.name}`,
-      `Responsable: ${action.owner}. Calendario: ${action.schedule}. Recursos: ${action.resources}.`,
-      `Contribución: ${action.contribution}`,
-      `Datos/fuentes: ${action.requestedData} · ${action.source}`,
-      `Actividades: ${action.activities.length ? action.activities.map((activity) => `${activity.name} (${activity.status})`).join("; ") : "pendientes"}`,
-     ].join("\n"),
-    });
-   }
   }
  }
  return paragraphs;
+}
+
+/**
+ * Actuaciones y agenda de implementación: instrumento de ejecución, separado del Plan
+ * de Acción (CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT §3.1 bis). Las fichas de actuación se
+ * conservan aquí como fuente de datos de cada indicador. Devuelve vacío si no hay vínculos.
+ */
+export function planActuationParagraphs(plan: PlanDocument, options: { heading?: boolean } = {}): PlanParagraph[] {
+ const links = plan.traceabilityLinks ?? [];
+ if (!links.length) return [];
+ const paragraphs: PlanParagraph[] = [];
+ if (options.heading !== false) paragraphs.push({ text: "Actuaciones y agenda de implementación", heading: true });
+ paragraphs.push({ text: "Las actuaciones son el instrumento de ejecución y no forman parte del Plan de Acción. Alimentan el resultado de cada indicador, que se consolida por indicador y no se atribuye a actuaciones concretas." });
+ for (const link of links) {
+  paragraphs.push({
+   text: [
+    `${link.objectiveCode} → ${link.indicatorCode}: ${link.indicatorTitle}`,
+    `Ficha del indicador: ${fichaStatusText(link.indicatorFichaStatus)}. Actuaciones: ${link.actionCards.length}. Actividades: ${link.actionCards.reduce((total, action) => total + action.activities.length, 0)}. Entregas: ${link.actionCards.reduce((total, action) => total + action.deliveryCount, 0)}. Consolidaciones: ${link.consolidationCount}.`,
+    link.pendingSummary.length ? `Pendiente: ${link.pendingSummary.join("; ")}` : "Sin campos obligatorios pendientes en las fichas registradas.",
+   ].join("\n"),
+  });
+  for (const action of link.actionCards) {
+   paragraphs.push({
+    text: [
+     `Ficha de actuación: ${action.name}`,
+     `Responsable: ${action.owner}. Calendario: ${action.schedule}. Recursos: ${action.resources}.`,
+     `Contribución: ${action.contribution}`,
+     `Datos/fuentes: ${action.requestedData} · ${action.source}`,
+     `Actividades: ${action.activities.length ? action.activities.map((activity) => `${activity.name} (${activity.status})`).join("; ") : "pendientes"}`,
+    ].join("\n"),
+   });
+  }
+ }
+ return paragraphs;
+}
+
+/** Documento completo para Word y PDF: primero el Plan de Acción, después las actuaciones como parte separada. */
+export function planDocumentParagraphs(plan: PlanDocument): PlanParagraph[] {
+ return [...planActionParagraphs(plan), ...planActuationParagraphs(plan)];
 }
 export function buildPlanWord(plan: PlanDocument) {
  return new Document({creator:"COMPÁS NG",title:"Plan de Acción",styles:{default:{document:{run:{font:"Arial",size:22},paragraph:{spacing:{after:140}}}}},

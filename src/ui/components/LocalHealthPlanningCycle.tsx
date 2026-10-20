@@ -107,8 +107,9 @@ function derivePhases({
   }
 
   // 4 - Plan de accion
+  // «Perfil validado» es criterio de calidad, no requisito: la fase no se bloquea por él.
   let planPhase: PhaseStatus;
-  if (!pslReady) {
+  if (!pslHasEvidence && !prioritySelectionDone) {
     planPhase = "blocked";
   } else if (prioritySelectionDone) {
     planPhase = "current";
