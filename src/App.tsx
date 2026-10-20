@@ -3396,8 +3396,8 @@ export default function App() {
         </div>}
       </nav>
 
-      {/* Ciclo de Planificación Local — oculto en inicio, visible en vistas operativas */}
-      {view !== "inicio" && (
+      {/* Ciclo de Planificación Local — visible en todas las vistas: Implantación (agenda) no exige datos previos */}
+      {(
         <LocalHealthPlanningCycle
           healthReportLoaded={runtime.workspace.healthReport !== undefined}
           pslHasEvidence={runtime.psl.totalEvidenceAtoms > 0}
