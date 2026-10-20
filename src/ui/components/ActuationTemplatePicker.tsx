@@ -91,7 +91,7 @@ export function ActuationTemplatePicker({ own, onUse, onRemoveOwn, onClose }: Pr
         <>
           <p className="panel-note" role="status">
             {treeCount} actuaciones-tipo del catálogo EPVSA en {tree.reduce((n, l) => n + l.programs.length, 0)} programas.
-            Clasificación heredada del histórico, no verificada contra la EPVSA. Al añadir se abre la ficha para adaptarla; la línea queda
+            Líneas y objetivos contrastados con el documento de la EPVSA; programas y actuaciones heredados del histórico, no verificados. Al añadir se abre la ficha para adaptarla; la línea queda
             indicada y el objetivo lo eliges tú.
           </p>
           <div className="agenda-catalog">
