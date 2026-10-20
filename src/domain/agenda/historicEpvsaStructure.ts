@@ -3,9 +3,14 @@
  * (COMPAS-RESCATE-20260514, constante ESTRUCTURA_EPVSA, index.html:18252 en el commit 58be063):
  * 4 líneas, sus objetivos estratégicos, y el vínculo de cada programa con su línea y sus objetivos.
  *
- * Estado de la fuente: heredado, NO verificado contra la EPVSA (igual que el catálogo de actuaciones).
- * Es referencia de clasificación, no dato local ni evidencia del diagnóstico. Generado a partir del
- * histórico; no editar a mano salvo para corregir un texto.
+ * Verificación contra la fuente (docs/source-material/strategic-frameworks/08_Lineas_EPVSA_02abril24.pdf):
+ *  - Las 4 líneas coinciden literalmente con el documento (LE 1 a LE 4).
+ *  - Los objetivos OE 1.1 a OE 1.7 coinciden literalmente. Los de OE 2.1, OE 3.1 y OE 4.1 del histórico estaban
+ *    resumidos y no coincidían: aquí se usa el texto del documento.
+ *  - Los programas (P01 a P15), su ámbito, su vínculo con la línea y con los objetivos, y las 125 actuaciones NO figuran
+ *    en el documento: siguen siendo heredados, no verificados.
+ * Es referencia de clasificación, no dato local ni evidencia del diagnóstico. Generado a partir del histórico;
+ * solo se corrigieron los tres textos indicados.
  */
 export interface HistoricObjective {
   readonly code: string;
@@ -46,7 +51,7 @@ export const HISTORIC_LINES: readonly HistoricLine[] = [
     sourceLine: 18814,
     programCodes: ["P13"],
     objectives: [
-      { code: "OE 2.1", name: "Incrementar el número de empresas que favorezcan en sus estrategias corporativas la adquisición y mantenimiento de hábitos saludables por parte de la ciudadanía" },
+      { code: "OE 2.1", name: "Incrementar el número de empresas con productos o actividades de consumo, que se comprometan a crear condiciones que favorezcan los hábitos saludables, así como un consumo justo y sostenible entre la población." },
     ],
   },
   {
@@ -55,7 +60,7 @@ export const HISTORIC_LINES: readonly HistoricLine[] = [
     sourceLine: 18882,
     programCodes: ["P14"],
     objectives: [
-      { code: "OE 3.1", name: "Incrementar la difusión de información veraz sobre hábitos saludables dirigida a la ciudadanía" },
+      { code: "OE 3.1", name: "Incrementar y favorecer la difusión de información sobre hábitos saludables, con contenidos relevantes, veraces y accesibles." },
     ],
   },
   {
@@ -64,7 +69,7 @@ export const HISTORIC_LINES: readonly HistoricLine[] = [
     sourceLine: 18954,
     programCodes: ["P15"],
     objectives: [
-      { code: "OE 4.1", name: "Incrementar la formación de profesionales y la investigación e innovación en el ámbito de la promoción de hábitos saludables" },
+      { code: "OE 4.1", name: "Incrementar la formación y la investigación en el área de la promoción de hábitos saludables." },
     ],
   },
 ]
