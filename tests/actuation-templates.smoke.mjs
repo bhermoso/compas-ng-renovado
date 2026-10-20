@@ -19,7 +19,18 @@ const page = await b.newPage({ viewport: { width: 1400, height: 900 } });
 const step = async (n, f) => { try { await f(); } catch (e) { console.log("FALLO en", n, String(e.message).split("\n")[0]); await page.screenshot({ path: "/tmp/templates-fail.png" }); await b.close(); await server.close(); process.exit(1); } };
 await page.goto(`${base}/app-direct`, { waitUntil: "domcontentloaded" });
 await step("nav", async () => { await page.locator(".app-nav__tab", { hasText: "Agenda" }).click({ timeout: 20000 }); });
-await step("abrir repositorio", async () => { await page.getByRole("button", { name: "Desde actuación-tipo" }).click(); await page.getByText("157 actuaciones-tipo").waitFor({ timeout: 5000 }); });
+await step("abrir repositorio", async () => { await page.getByRole("button", { name: "Desde actuación-tipo" }).click(); await page.getByText(/125 actuaciones-tipo del catálogo EPVSA en 15 programas/).waitFor({ timeout: 5000 }); });
+await step("catálogo por línea y programa", async () => {
+  await page.locator(".agenda-catalog__line > summary").first().click();
+  await page.locator(".agenda-catalog__program > summary").first().click();
+  await page.getByText("Objetivos estratégicos vinculados:").first().waitFor({ timeout: 3000 });
+  await page.getByRole("button", { name: /Añadir a agenda: Consolidación de la Red local/ }).waitFor({ timeout: 3000 });
+  await page.getByLabel("Filtrar por línea estratégica").selectOption("LE3");
+  await page.getByText(/8 actuaciones-tipo del catálogo EPVSA en 1 programas/).waitFor({ timeout: 3000 });
+  await page.getByLabel("Filtrar por línea estratégica").selectOption("");
+  await page.getByRole("button", { name: /Lista \(incluye fichas completas y propias\)/ }).click();
+  await page.getByText("157 actuaciones-tipo").waitFor({ timeout: 3000 });
+});
 await step("buscar GRUSE", async () => { await page.getByPlaceholder(/Buscar: GRUSE/).fill("gruse"); await page.getByText(/^\d+ actuaciones-tipo/).waitFor({ timeout: 3000 }); });
 await step("ficha completa heredada", async () => {
   await page.getByPlaceholder(/Buscar: GRUSE/).fill("Consejo dietético estructurado");
@@ -45,6 +56,7 @@ await step("guardar como tipo", async () => {
 await step("aparece en propias", async () => {
   await page.getByRole("button", { name: "Cerrar", exact: true }).click();
   await page.getByRole("button", { name: "Desde actuación-tipo" }).click();
+  await page.getByRole("button", { name: /Lista \(incluye/ }).click();
   await page.getByLabel("Filtrar por origen").selectOption("propia");
   await page.getByText("1 actuaciones-tipo").waitFor({ timeout: 3000 });
   await page.getByText("GRUSE mujeres (propia)").first().waitFor({ timeout: 3000 });
@@ -54,6 +66,7 @@ await step("persiste", async () => {
   await page.reload({ waitUntil: "domcontentloaded" });
   await page.locator(".app-nav__tab", { hasText: "Agenda" }).click({ timeout: 20000 });
   await page.getByRole("button", { name: "Desde actuación-tipo" }).click();
+  await page.getByRole("button", { name: /Lista \(incluye/ }).click();
   await page.getByLabel("Filtrar por origen").selectOption("propia");
   await page.getByText("GRUSE mujeres (propia)").first().waitFor({ timeout: 5000 });
 });

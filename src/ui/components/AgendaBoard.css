@@ -49,3 +49,10 @@
 .agenda-templates__item > div:first-child { display: grid; gap: 2px; min-width: 0; flex: 1 1 260px; }
 .agenda-templates__item small { color: var(--texto-secundario); }
 .agenda-templates__actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* Catálogo EPVSA por línea → programa → actuaciones */
+.agenda-catalog { display: grid; gap: 8px; }
+.agenda-catalog__line, .agenda-catalog__program { border: 1px solid var(--borde); border-radius: 6px; padding: 6px 10px; background: var(--blanco); }
+.agenda-catalog__line > summary, .agenda-catalog__program > summary { cursor: pointer; }
+.agenda-catalog__program { margin-top: 6px; border-left: 3px solid var(--azul); }
+.agenda-catalog__objectives { margin: 6px 0; font-size: 0.9em; }

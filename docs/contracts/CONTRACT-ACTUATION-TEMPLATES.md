@@ -21,6 +21,10 @@ No recoge lo propio del municipio: fechas, responsables, contacto, entidades col
 | `historico` (fichas) | 32 actuaciones con ficha completa, constante `ACTUACIONES_PADUL_2026` del histórico (`index.html:24458–25626`), redactadas para la agenda de Pádul 2026. Conservan descripción, población, etapa de vida, línea y objetivo EPVSA atribuidos, recursos, profesionales, frecuencia, indicador (solo referencia) y base de evidencia citada (solo se muestra). | Heredado, **no verificado**. No se importan trimestre, prioridad, año, meta, responsable ni organización. Su código «codigoEPVSA» no coincide con el del catálogo de 125 (el mismo código designa otra actuación), por eso no se usa como identificador. «Entorno» pasa solo como sugerencia. Son plantillas aparte del catálogo. |
 | `propia` | Creadas por el equipo desde la ficha de una actuación («Guardar como actuación-tipo»). | Autoría humana del equipo; consta el municipio de origen. |
 
+### Catálogo por línea y programa
+
+El catálogo heredado de 125 actuaciones se ofrece también ordenado por línea estratégica → programa → actuación (vista «Catálogo EPVSA por línea y programa» del repositorio), con filtros de línea, ámbito, programa y texto. La estructura (4 líneas, 15 programas, ámbito y objetivos estratégicos vinculados a cada programa) procede de `ESTRUCTURA_EPVSA` del histórico (`index.html:18252`, commit 58be063) y es heredada, **no verificada** contra la EPVSA. Al añadir una actuación del catálogo, la ficha queda indicada con el marco EPVSA y la línea del programa (vínculo único en la fuente). No se rellena el objetivo, porque el programa se vincula a varios, ni el entorno. Es clasificación, no atribución de resultados ni dato local.
+
 El catálogo heredado se ofrece como punto de partida y no como referencia con fuente. Su campo «ámbito» del histórico no asigna entorno. GRAFA, los talleres de los CPA y las actividades de los Puntos Vuela no figuran en él como actuaciones-tipo (solo «Colaboración con Puntos Vuela (Guadalinfo)», `P01-A21`, y «Grupos Socioeducativos (GRUSE)», `P03-A09`): las aporta el equipo.
 
 ## 4. Reglas
