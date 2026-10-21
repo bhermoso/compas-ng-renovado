@@ -300,7 +300,7 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
           >
             <header><h3>{label}</h3><span className="agenda-count">{filtering ? `${items(key).length}/${allItems(key).length}` : items(key).length}</span></header>
             <div className="agenda-column__body">
-              {items(key).length === 0 && <p className="agenda-empty"><span aria-hidden="true">📭</span> {filtering && allItems(key).length > 0 ? "Ninguna coincide con el filtro" : "Sin actuaciones. Arrastra aquí una tarjeta o crea una nueva."}</p>}
+              {items(key).length === 0 && <p className="agenda-empty">{filtering && allItems(key).length > 0 ? "Ninguna coincide con el filtro" : "Sin actuaciones. Arrastra aquí una tarjeta o crea una nueva."}</p>}
               {items(key).map(card)}
             </div>
           </div>
