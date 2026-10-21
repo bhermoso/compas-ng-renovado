@@ -1,13 +1,17 @@
 import { useState } from "react";
 import type { MunicipalDocumentRepository } from "../../domain/repository";
+import type { EvidenceAtom } from "../../domain/evidence";
+import { readLocalizaAssets } from "../../application/localiza-assets";
 import { assetEntriesOfDocument } from "../../application/evidence-pipeline/DocumentToEvidencePipeline";
 
 interface ActivosSaludPanelProps {
   repository: MunicipalDocumentRepository;
   onDeleteDocument?: (documentId: string) => void;
+  /** Átomos del expediente: permiten leer cada activo de Localiza por separado. */
+  atoms?: ReadonlyArray<EvidenceAtom>;
 }
 
-export function ActivosSaludPanel({ repository, onDeleteDocument }: ActivosSaludPanelProps) {
+export function ActivosSaludPanel({ repository, onDeleteDocument, atoms = [] }: ActivosSaludPanelProps) {
   const [showList, setShowList] = useState(false);
 
   const assetDocs = repository.documents.filter(
@@ -70,8 +74,26 @@ export function ActivosSaludPanel({ repository, onDeleteDocument }: ActivosSalud
             </ul>
           )}
 
-          {assetDocs.map((doc) => (
+          {assetDocs.map((doc) => {
+            const structured = readLocalizaAssets(
+              atoms.filter((a) => a.provenance?.documentId === doc.id),
+              repository.assetValidations
+            ).records;
+            return (
             <div key={doc.id} className="activos-source">
+              {structured.length > 0 && (
+                <ul className="activos-list">
+                  {structured.map((r) => (
+                    <li key={r.atomId} className="activos-list__item">
+                      <strong>{r.nombre}</strong>
+                      {" · "}
+                      {r.estado === "validado" ? "Validado (declarado por el equipo técnico)" : "Registrado en Localiza"}
+                      {r.tematicas.length > 0 && <> · Temáticas: {r.tematicas.join(", ")}</>}
+                      {r.poblacionDestinataria.length > 0 && <> · Población: {r.poblacionDestinataria.join(", ")}</>}
+                    </li>
+                  ))}
+                </ul>
+              )}
               <span className="activos-source__label">
                 Fuente: {doc.title}
               </span>
@@ -93,7 +115,8 @@ export function ActivosSaludPanel({ repository, onDeleteDocument }: ActivosSalud
                 </button>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </section>
