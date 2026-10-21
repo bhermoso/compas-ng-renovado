@@ -48,7 +48,7 @@ describe("derivación de unidades de lectura", () => {
     expect(porTema.get("actividad-fisica")?.crossing).toBe("voz-y-activo-registrado");
     expect(porTema.get("sueno-descanso")?.crossing).toBe("voz-sin-activo-registrado");
     expect(d.units.map((u) => u.topicId).sort()).toEqual(["actividad-fisica", "sueno-descanso"]);
-    expect(d.units.every((u) => u.documentedNeed === "pendiente-de-correspondencia-con-el-informe")).toBe(true);
+    expect(d.units.every((u) => u.documentedNeed === "no-disponible-solo-presencia-textual")).toBe(true);
   });
 
   it("activo con correspondencia validada y sin voz: unidad «activo registrado sin voz»", () => {
@@ -80,5 +80,32 @@ describe("derivación de unidades de lectura", () => {
     const a = deriveReadingUnits({ assets: [asset("a", "A", ["Actividad física"])], study: study({ "actividad-fisica": 4 }) });
     const b = deriveReadingUnits({ assets: [asset("b", "B", ["Alimentación saludable"])], study: study({ alimentacion: 4 }) });
     expect(a.units.map((u) => u.topicId)).not.toEqual(b.units.map((u) => u.topicId));
+  });
+
+  it("el Informe se añade como plano a una unidad ya sostenida, con su estatuto de presencia textual", () => {
+    const d = deriveReadingUnits({
+      assets: [asset("a1", "Club de marcha", ["Actividad física"])],
+      informeSignals: [{ dimension: "actividad física y sedentarismo", menciones: 7 }],
+    });
+    const u = d.units.find((x) => x.topicId === "actividad-fisica")!;
+    expect(u.informe).toEqual({ dimensions: [{ dimension: "actividad física y sedentarismo", menciones: 7 }], status: "presencia-textual" });
+  });
+
+  it("un tema tratado solo por el Informe no crea unidad", () => {
+    const d = deriveReadingUnits({
+      assets: [],
+      informeSignals: [{ dimension: "consumos de tabaco y alcohol", menciones: 3 }],
+    });
+    expect(d.units).toHaveLength(0);
+    expect(d.topicsOnlyInInforme).toEqual(["tabaco-alcohol-drogas"]);
+    expect(d.topicsWithoutSource).not.toContain("tabaco-alcohol-drogas");
+  });
+
+  it("una dimensión sin correspondencia validada no se asocia a ningún tema", () => {
+    const d = deriveReadingUnits({
+      assets: [asset("a1", "Club de marcha", ["Actividad física"])],
+      informeSignals: [{ dimension: "envejecimiento y dependencia", menciones: 20 }],
+    });
+    expect(d.units.find((x) => x.topicId === "actividad-fisica")?.informe).toBeNull();
   });
 });
