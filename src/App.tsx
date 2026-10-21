@@ -295,15 +295,15 @@ function slugifyMunicipalityId(name: string): string {
 
 type AppView = "inicio" | "repositorio" | "analisis" | "psl" | "priorizacion" | "lectura" | "plan" | "plan-local" | "agenda" | "evaluacion" | "ges";
 
-const NAV_ITEMS: { id: AppView; label: string }[] = [
+const NAV_ITEMS: { id: AppView; label: string; phase?: string }[] = [
   { id: "inicio",        label: "Inicio" },
-  { id: "repositorio",   label: "Diagnóstico territorial" },
-  { id: "psl",           label: "Perfil de Salud Local" },
-  { id: "priorizacion",  label: "Priorización" },
-  { id: "plan",          label: "Plan de Acción" },
+  { id: "repositorio",   label: "Diagnóstico territorial", phase: "01" },
+  { id: "psl",           label: "Perfil de Salud Local", phase: "02" },
+  { id: "priorizacion",  label: "Priorización", phase: "03" },
+  { id: "plan",          label: "Plan de Acción", phase: "04" },
   { id: "plan-local",    label: "Plan Local de Salud" },
-  { id: "agenda",        label: "Implantación" },
-  { id: "evaluacion",    label: "Evaluación" },
+  { id: "agenda",        label: "Implantación", phase: "05" },
+  { id: "evaluacion",    label: "Evaluación", phase: "06" },
   { id: "ges",           label: "Gestor de Encuestas" },
 ];
 // Vistas eliminadas de la navegación principal pero accesibles para desarrollo:
@@ -3342,7 +3342,7 @@ export default function App() {
             COMPÁS
           </span>
           <div className="app-nav__tabs">
-            {NAV_ITEMS.map((item, index) => (
+            {NAV_ITEMS.map((item) => (
               <button
                 key={item.id}
                 type="button"
@@ -3353,7 +3353,7 @@ export default function App() {
                 }
                 onClick={() => { setAgendaFocusId(undefined); setView(item.id); }}
               >
-                <span className="app-nav__step-num">{index + 1}</span>
+                {item.phase && <span className="app-nav__phase" aria-hidden="true">{item.phase}</span>}
                 {item.label}
               </button>
             ))}
