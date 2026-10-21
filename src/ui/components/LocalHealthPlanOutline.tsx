@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { AGENDA_SETTING_LABEL, ACTUATION_STATUS_LABEL, type AgendaActuation } from "../../domain/agenda/AgendaActuation";
 import { LOCAL_HEALTH_PLAN_OUTLINE_STATUS } from "../../domain/health-plan";
 import { ACTION_PLAN_CATALOG } from "../../domain/action-plan-catalog";
 import {
@@ -21,10 +22,16 @@ interface LocalHealthPlanOutlineProps {
   pslCompiled: boolean;
   selectedPriorities?: string[];
   drafts?: PlanPreparationDraft[];
+  /** Actuaciones registradas en la agenda de Implantación (registro de trabajo, no validado). */
+  agendaActuations?: readonly AgendaActuation[];
 }
 
 const PSL_STATUS_LABEL: Record<string, string> = {
   draft: "Perfil en elaboración",
+  generated: "Perfil generado, sin revisión humana",
+  review: "Perfil en revisión técnica",
+  superseded: "Perfil sustituido por una versión posterior",
+  archived: "Perfil archivado",
   validated: "Perfil validado técnicamente",
   approved: "Perfil aprobado institucionalmente",
 };
@@ -38,6 +45,7 @@ export function LocalHealthPlanOutline({
   pslCompiled,
   selectedPriorities = [],
   drafts = [],
+  agendaActuations = [],
 }: LocalHealthPlanOutlineProps) {
   const modules = useMemo(
     () => ACTION_PLAN_CATALOG.map((module) =>
@@ -150,12 +158,31 @@ export function LocalHealthPlanOutline({
 
       <section className="pie-doc-section">
         <h3>5. Actuaciones y agenda de implementación</h3>
-        <p><strong>Actuaciones pendientes de registro.</strong></p>
-        <p className="panel-note">
-          En la fase siguiente se recogerán las actuaciones reales y se vincularán con los
-          indicadores, objetivos y líneas correspondientes. A partir de ellas se completarán
-          responsables, calendario, recursos y agenda anual.
-        </p>
+        {agendaActuations.length === 0 ? (
+          <>
+            <p><strong>Actuaciones pendientes de registro.</strong></p>
+            <p className="panel-note">
+              En la fase siguiente se recogerán las actuaciones reales y se vincularán con los
+              indicadores, objetivos y líneas correspondientes. A partir de ellas se completarán
+              responsables, calendario, recursos y agenda anual.
+            </p>
+          </>
+        ) : (
+          <>
+            <p>
+              <strong>{agendaActuations.length} {agendaActuations.length === 1 ? "actuación registrada" : "actuaciones registradas"}</strong>{" "}
+              en la agenda de Implantación. Es un registro de trabajo del equipo: no está validado ni vinculado todavía a objetivos e indicadores del Plan de Acción.
+            </p>
+            <ul>
+              {[...agendaActuations].sort((a, b) => (a.setting ?? "~").localeCompare(b.setting ?? "~") || a.order - b.order).map((a) => (
+                <li key={a.id}>
+                  {a.name ?? "Actuación vinculada al Plan de Acción"} · {a.setting ? AGENDA_SETTING_LABEL[a.setting] : "Sin entorno asignado"} · {ACTUATION_STATUS_LABEL[a.tracking.status]}
+                  {a.identification.year ? ` · ${a.identification.quarter && a.identification.quarter !== "anual" ? `${a.identification.quarter} ` : ""}${a.identification.year}` : ""}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
       </section>
 
       <section className="pie-doc-section">

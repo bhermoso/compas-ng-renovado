@@ -4340,6 +4340,7 @@ export default function App() {
               .filter((topic) => workspace.thematicPrioritisation?.selectedTopicIds.includes(topic.id))
               .map((topic) => topic.label)}
             drafts={workspace.planPreparationDrafts ?? []}
+            agendaActuations={workspace.agendaActuations ?? []}
           />
           </>
         )}
