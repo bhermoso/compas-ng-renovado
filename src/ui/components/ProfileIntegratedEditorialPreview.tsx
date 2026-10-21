@@ -195,6 +195,32 @@ export function ProfileIntegratedEditorialPreview({
         </section>
       ) : null}
 
+      {/* ── Lectura por tema ───────────────────────────────────────────────
+          Unidades derivadas del expediente (capacidad, voz e Informe). Solo
+          cuando alguna fuente sostiene un tema, como el proyector. */}
+      {"readingUnits" in view && view.readingUnits !== undefined ? (
+        <section className="pie-doc-section" aria-labelledby="pie-reading-units-title">
+          <h3 id="pie-reading-units-title" className="pie-section__title">
+            {view.readingUnits.title}
+          </h3>
+          <p className="pie-agenda-intro">{view.readingUnits.intro}</p>
+          {view.readingUnits.units.map((unit) => (
+            <article key={unit.topicId} className="pie-hilo">
+              <header className="pie-hilo__header">
+                <h4 className="pie-hilo__title">{unit.label}</h4>
+              </header>
+              {unit.lines.map((line) => (
+                <p key={line} className="pie-hilo__reading">{line}</p>
+              ))}
+              <p className="pie-hilo__context">{unit.crossingStatement}</p>
+            </article>
+          ))}
+          {view.readingUnits.gaps.map((gap) => (
+            <p key={gap} className="pie-hilo__context">{gap}</p>
+          ))}
+        </section>
+      ) : null}
+
       {/* ── Lectura integrada del territorio ────────────────────────────────
           Solo cuando hay hilos territoriales, como el proyector: en el caso
           pendiente se rinde «Lectura territorial pendiente» en su lugar (no un
