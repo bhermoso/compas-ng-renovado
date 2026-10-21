@@ -1,7 +1,7 @@
 # CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY
 
 > Contrato metodológico canónico del Perfil de Salud Local (PSL) en COMPÁS NG.
-> Versión 1.4 — 2026-10-21 (historial en el registro de revisiones)
+> Versión 1.5 — 2026-10-21 (historial en el registro de revisiones)
 > Estado: VIGENTE
 >
 > Este contrato define qué debe ser metodológicamente un Perfil de Salud Local,
@@ -394,6 +394,17 @@ La cadena metodológica del Perfil es:
 
 El Perfil llega hasta las orientaciones técnicas. La priorización corresponde al Grupo Motor y las actuaciones operativas al Plan de Acción y al Plan Local de Salud. La frontera entre Perfil y Plan no es un muro: toda actuación posterior debe poder derivarse de las orientaciones y conclusiones del Perfil, y toda orientación y conclusión debe poder trazarse hasta la evidencia que la sostiene.
 
+### Art. 16 ter. Conclusiones y orientaciones como menú elegible
+
+Las conclusiones y las orientaciones técnicas del Perfil se presentan al equipo técnico como un menú de propuestas. El equipo elige cuáles asume y descarta las demás.
+
+1. **Propuesta.** El sistema genera cada propuesta a partir de las relaciones y lecturas declaradas (Art. 8 bis, 9 ter). Cada una lleva su texto, su tipo (conclusión u orientación), la evidencia o relación de la que deriva y su grado de sustento. Ninguna nace elegida: el sistema puede ordenar las propuestas, pero no marca ninguna.
+2. **Elección.** El equipo técnico elige o descarta cada propuesta, con su autoría y la fecha. Puede ajustar la redacción de una propuesta elegida, que conserva el vínculo con la evidencia de origen. El descarte admite un motivo, que se recomienda registrar.
+3. **Lo que entra en el Perfil.** Solo las propuestas elegidas figuran en el cuerpo del Perfil canónico, y lo hacen igual en pantalla, visor, DOCX, PDF e impresión (Art. 17 bis). Las descartadas no se muestran en el cuerpo, pero se conservan en el registro del expediente: no se borran.
+4. **Resolución previa a la versión institucional.** El Perfil no puede generarse como documento institucional mientras queden propuestas sin resolver. En borrador, las pendientes se muestran como tales.
+5. **Coherencia.** Descartar una propuesta no suprime la evidencia ni la lectura integrada de las que deriva. Si dos propuestas elegidas se contradicen, el Perfil lo declara (Art. 14).
+6. **Elegir no es priorizar.** La elección es una validación técnica de lo que el Perfil afirma y orienta. La priorización entre necesidades sigue siendo deliberación del Grupo Motor (Art. 3).
+
 ### Art. 17. Autoría, validación y responsabilidad técnica
 
 El Perfil tiene un responsable técnico con nombre y cargo identificables. Esta identificación es una garantía institucional, no una formalidad.
@@ -654,6 +665,12 @@ Toda orientación técnica tiene autoría humana validada, cita las conclusiones
 
 *Consecuencia si se viola:* el sistema emite como orientación del Perfil un texto que nadie ha validado, o el Perfil invade el Plan de Acción.
 
+**I-LHPM-16 — Menú elegible, sin elección por defecto**
+
+Toda conclusión y orientación del cuerpo del Perfil ha sido elegida por una persona del equipo técnico, con autoría y fecha. Ninguna propuesta se considera elegida por omisión y las descartadas se conservan en el registro (Art. 16 ter).
+
+*Consecuencia si se viola:* el sistema publica como conclusión del Perfil lo que nadie ha asumido, o se pierde la traza de lo descartado.
+
 ## Relaciones con otros contratos
 
 | Contrato | Tipo de relación |
@@ -678,6 +695,7 @@ Toda orientación técnica tiene autoría humana validada, cita las conclusiones
 | 2026-09-24 | 1.2 | Localiza Salud queda fijada como fuente principal/preferente para activos del Perfil, con otras fuentes como apoyo contextual o pendiente de reconciliación | COMPÁS NG |
 | 2026-10-21 | 1.3 | Unidades de lectura derivadas del expediente (Art. 4 bis), estatuto de activos candidatos frente a Localiza y patrones de cruce (Art. 9 bis); invariantes I-LHPM-11 e I-LHPM-12. Decisión del autor | COMPÁS NG |
 | 2026-10-21 | 1.4 | El Perfil concluye y orienta; no decide (Art. 3, 7 quater, 16, 16 bis, I-LHPM-9). Nuevo tipo de afirmación «Orientación técnica» (Art. 8). Relaciones determinante-problema con sustento y grados (Art. 8 bis). Conexión determinante-activo declarada y transición déficit-salutogénesis (Art. 9 ter). Invariantes I-LHPM-13 a 15. Decisión del autor | COMPÁS NG |
+| 2026-10-21 | 1.5 | Conclusiones y orientaciones como menú elegible por el equipo técnico: propuesta, elección o descarte con autoría y fecha, solo las elegidas entran en el cuerpo; sin elección por defecto (Art. 16 ter, I-LHPM-16). Decisión del autor | COMPÁS NG |
 
 ---
 
