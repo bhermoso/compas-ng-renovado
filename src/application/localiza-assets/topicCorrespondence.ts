@@ -67,7 +67,7 @@ export const TOPIC_CORRESPONDENCE: readonly TopicCorrespondenceEntry[] = [
     "Incluye a las personas trans. La violencia de género se entiende solo respecto de las mujeres y no se asigna a esta temática (declaración del autor)."
   ),
   validada("Prevención del suicidio", ["bienestar-emocional"], "Tema de la papeleta: bienestar emocional y salud mental."),
-  propuesta("Naturaleza", ["medioambiente"], "Equivalencia parcial; el autor decide."),
+  validada("Naturaleza", ["medioambiente"], "Medioambiente, salud medioambiental y One Health (declaración del autor)."),
   propuesta("Participación y acción comunitaria", []),
   propuesta("Cultura y ocio", []),
   propuesta("Envejecimiento activo", [], "Población o tema del Informe, no de la papeleta."),

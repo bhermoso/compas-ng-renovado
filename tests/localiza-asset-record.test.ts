@@ -88,6 +88,7 @@ describe("tabla de correspondencia de temas", () => {
       "Salud sexual y reproductiva",
       "Género/identidad",
       "Prevención del suicidio",
+      "Naturaleza",
     ]);
   });
 
@@ -103,7 +104,6 @@ describe("tabla de correspondencia de temas", () => {
       "sueno-descanso",
       "tabaco-alcohol-drogas",
       "violencia-genero",
-      "medioambiente",
       "accidentes",
     ]);
   });
