@@ -1,7 +1,7 @@
 # CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY
 
 > Contrato metodológico canónico del Perfil de Salud Local (PSL) en COMPÁS NG.
-> Versión 1.0 — 2026-07-03
+> Versión 1.4 — 2026-10-21 (historial en el registro de revisiones)
 > Estado: VIGENTE
 >
 > Este contrato define qué debe ser metodológicamente un Perfil de Salud Local,
@@ -60,7 +60,9 @@ El Perfil pertenece a la etapa de síntesis diagnóstica. Las etapas de prioriza
 | **Planificación** | ¿Qué se va a hacer, cómo, quién y cuándo? | Plan de Acción / PLS |
 | **Decisión** | ¿La corporación asume el plan como compromiso institucional? | PLS aprobado |
 
-El Perfil puede ofrecer candidaturas técnicas de intervención como salida de la interpretación territorial. No puede seleccionar prioridades. No puede asignar líneas estratégicas. No puede prescribir actuaciones. No puede sustituir la deliberación del Grupo Motor.
+El Perfil concluye y orienta. No decide. Formula orientaciones técnicas derivadas de sus conclusiones (Art. 7 quater): qué contrastar, qué capacidades conectar o reforzar, qué lagunas cubrir, qué determinantes explorar. No selecciona prioridades, no asigna líneas estratégicas, no fija actuaciones operativas (responsable, plazo, recurso, indicador de ejecución), no asume compromisos y no sustituye la deliberación del Grupo Motor.
+
+La orientación técnica propone, la priorización elige, el Plan de Acción concreta y la decisión compromete.
 
 La mezcla de estas etapas en el contenido del Perfil es un defecto metodológico grave que invalida el diagnóstico como base de planificación.
 
@@ -170,19 +172,22 @@ Solo pueden pasar a la sección de áreas de intervención del Perfil los aspect
 
 ### Art. 7 quater. Capítulo VI — Cierre interpretativo
 
-El Capítulo VI del Perfil es el **Cierre interpretativo**. No es "Recomendaciones" ni "Plan de acción".
+El Capítulo VI del Perfil es el **Cierre interpretativo y orientaciones técnicas**. No es "Plan de acción".
 
 El cierre interpretativo establece:
 - Qué comprensión del territorio emerge del conjunto del diagnóstico.
 - Qué tensiones o patrones deben contrastarse con el Grupo Motor.
 - Qué capacidades territoriales pueden sostener el proceso comunitario.
 - Qué incertidumbres deben quedar explícitas antes de la priorización.
+- Qué orientaciones técnicas se derivan de las conclusiones (Art. 8, tipo «Orientación técnica»).
 
-El Capítulo VI no formula actuaciones, no establece compromisos, no prescribe intervenciones. La formulación de recomendaciones operativas pertenece al Plan de Acción / Plan Local de Salud, que es un producto distinto del Perfil. El Perfil termina cuando el territorio queda comprendido.
+Cada orientación cita las conclusiones de las que deriva y el grado de sustento de las relaciones en que se apoya (Art. 8 bis). Solo las relaciones de grado 1 y 2 pueden sostener una orientación.
+
+El Capítulo VI no establece compromisos, no selecciona prioridades y no fija actuaciones operativas (responsable, plazo, recurso, indicador de ejecución). Esa concreción pertenece al Plan de Acción / Plan Local de Salud, que es un producto distinto del Perfil. El Perfil termina cuando el territorio queda comprendido y orientado.
 
 ### Art. 8. Tipos de afirmación
 
-El Perfil opera con exactamente siete tipos de afirmación. Toda afirmación incluida en el Perfil debe ser clasificable en uno de estos tipos. Si no puede clasificarse, debe revisarse antes de incluirse.
+El Perfil opera con exactamente ocho tipos de afirmación. Toda afirmación incluida en el Perfil debe ser clasificable en uno de estos tipos. Si no puede clasificarse, debe revisarse antes de incluirse.
 
 **Hecho:** afirmación que describe un dato observado, con fuente identificada y trazable.
 *Ejemplo: "El 32,8 % de la muestra adulta declara sueño de duración insuficiente (Sueño-EAS, n=152 válidos)."*
@@ -192,6 +197,9 @@ El Perfil opera con exactamente siete tipos de afirmación. Toda afirmación inc
 
 **Hipótesis:** afirmación sobre relaciones causales o patrones no demostrados en la evidencia disponible, formulada como posibilidad para orientar la planificación.
 *Ejemplo: "Es posible que la dispersión geográfica de las pedanías esté relacionada con la escasez de activos comunitarios en esas zonas."*
+
+**Orientación técnica:** afirmación propositiva derivada de una o varias conclusiones, que indica qué conviene contrastar, explorar, conectar, reforzar o cubrir. Requiere autoría humana explícita, cita las conclusiones de las que deriva y el grado de sustento de la relación en que se apoya (Art. 8 bis). No fija responsable, plazo ni recurso.
+*Ejemplo: "Si el Grupo Motor confirma la soledad no deseada como problema, la lectura orienta a explorar su conexión con los activos de participación declarados por el equipo técnico."*
 
 **Percepción:** afirmación que recoge el conocimiento experiencial de actores del territorio, sin pretensión de validación cuantitativa.
 *Ejemplo: "Las personas mayores del municipio señalan el transporte como barrera principal de acceso a los servicios de salud."*
@@ -206,6 +214,20 @@ El Perfil opera con exactamente siete tipos de afirmación. Toda afirmación inc
 *Ejemplo: "La comparación entre el bienestar socioemocional escolar y los determinantes socioeconómicos requiere una discusión deliberativa que el Grupo Motor debe abordar en la etapa de priorización."*
 
 El Perfil declara siempre el tipo de afirmación que realiza. Las interpretaciones no se presentan como hechos. Las hipótesis no se presentan como interpretaciones. Las lagunas no se ocultan.
+
+### Art. 8 bis. Relaciones entre determinantes y problemas de salud
+
+El Perfil puede formular relaciones entre potenciales determinantes y problemas de salud del territorio. Toda relación es una hipótesis (Art. 8) y cumple estas condiciones:
+
+1. **Sustento declarado.** Cada relación cita su base: estudio, guía, encuesta o tabla, con año, población y escala. Una relación sin fuente verificable no entra como relación; puede figurar como laguna («relación plausible sin fuente verificada») para contraste con el Grupo Motor.
+2. **Grado de sustento, declarado en cada relación.**
+   - *Grado 1 — Observada en el territorio:* ambos extremos constan en la evidencia local del mismo ciclo. Describe coexistencia, no causa.
+   - *Grado 2 — Documentada en referencia externa:* la relación procede de una fuente de ámbito superior o de la literatura, con fuente verificable (por ejemplo, valores de la Encuesta Andaluza de Salud para Andalucía o Granada), etiquetada «no local». No sustituye el dato municipal.
+   - *Grado 3 — Plausible, sin sustento verificado:* se marca «no verificado». No sostiene ninguna orientación.
+3. **Lenguaje proporcionado al sustento.** «Se asocia con», «coexiste con» o «es compatible con». «Causa», «provoca» o «explica» solo cuando la fuente citada demuestra causalidad y así lo dice.
+4. **Tabla declarada.** Las relaciones elegibles proceden de una tabla versionada y validada por una persona, como las correspondencias del Art. 4 bis. El sistema no infiere relaciones por coincidencia de términos en un texto.
+5. **Escala.** Una asociación observada en un ámbito superior no se atribuye al municipio ni a las personas que lo habitan; se declara la escala (Art. 13).
+6. **Contraevidencia.** Si consta evidencia que contradice la relación, se declara junto a ella (Art. 14).
 
 ### Art. 9. Activos para la salud con rango equivalente a los déficits
 
@@ -241,6 +263,15 @@ La coincidencia entre un candidato y Localiza la declara una persona.
 | Voz sin contraste | La comunidad lo señala y el Informe no lo trata | Que el Informe lo contradiga |
 
 Las conclusiones del Perfil se formulan por patrón. Siguen siendo conclusiones, no recomendaciones (Art. 16 bis).
+
+### Art. 9 ter. Conexión entre determinantes y activos: de lo deficitario a lo salutogénico
+
+La lectura de cada problema o determinante se acompaña de su lectura de capacidad: los factores y activos que sostienen la salud frente a ese problema o determinante, o la declaración expresa de que no hay activo registrado. No se redacta un párrafo de déficit sin su contraparte.
+
+1. **Conexión declarada.** La conexión entre un activo y un determinante o tema la declara el equipo técnico, por activo, con el tema, la justificación, la autoría y la fecha. Es independiente de las temáticas de Localiza Salud, que no se modifican. El sistema no la infiere de las palabras del nombre o la descripción del activo.
+2. **Estatuto.** La conexión es una interpretación de capacidad: qué puede sostener el activo. Su efecto sobre el determinante es una hipótesis salvo que se cite evidencia (Art. 8 bis).
+3. **Patrones de cruce.** A los del Art. 9 bis se suman: determinante o problema con activo conectado; determinante o problema sin activo conectado; activo conectado a un determinante sin problema documentado. Cada patrón se declara como tal y ninguno se resuelve por analogía.
+4. **Orden de lectura.** Se mantiene el del Art. 4 bis: primero lo que sostiene la salud, después lo que se sabe del problema y su escala, después la voz de la comunidad y por último lo que falta.
 
 ### Art. 10. Participación como evidencia
 
@@ -338,12 +369,12 @@ Las líneas estratégicas de la ESCA definen la orientación del sistema sanitar
 
 ### Art. 16. No automatización de decisiones
 
-Ningún output generado automáticamente por el sistema puede presentarse en el Perfil como decisión territorial, como prioridad seleccionada o como recomendación de actuación.
+Ningún output generado automáticamente por el sistema puede presentarse en el Perfil como decisión territorial, como prioridad seleccionada ni como orientación técnica sin validación humana explícita.
 
 El sistema genera:
 - Organización de la evidencia en el EvidenceStore.
 - Síntesis de patrones emergentes en la interpretación territorial.
-- Candidaturas técnicas de intervención como propuesta para el equipo.
+- Propuestas de orientación técnica para que el equipo las valide, las matice o las descarte.
 - Andamiaje de capítulos para redacción humana.
 
 El cuerpo diagnóstico del Perfil es compilado, trazable y no editable libremente. Su autoridad metodológica depende de que pueda reconstruirse la cadena que va desde la fuente hasta la afirmación. La autoría humana no reescribe el diagnóstico como texto libre: lo interpreta, lo matiza y lo asume en los espacios de cierre y enriquecimiento previstos.
@@ -359,9 +390,9 @@ Los capítulos de conclusiones y cierre interpretativo del Perfil son siempre de
 
 La cadena metodológica del Perfil es:
 
-`evidencia → lectura integrada → conclusiones → | frontera de planificación | → recomendaciones`
+`evidencia → lectura integrada → conclusiones → orientaciones técnicas → | frontera de decisión | → priorización → Plan de Acción`
 
-El Perfil llega hasta las conclusiones. Las recomendaciones pertenecen al Plan de Acción y al Plan Local de Salud. La frontera entre Perfil y Plan no es un muro: toda recomendación posterior debe poder derivarse limpiamente de las conclusiones del Perfil, y toda conclusión debe poder trazarse hasta la evidencia que la sostiene.
+El Perfil llega hasta las orientaciones técnicas. La priorización corresponde al Grupo Motor y las actuaciones operativas al Plan de Acción y al Plan Local de Salud. La frontera entre Perfil y Plan no es un muro: toda actuación posterior debe poder derivarse de las orientaciones y conclusiones del Perfil, y toda orientación y conclusión debe poder trazarse hasta la evidencia que la sostiene.
 
 ### Art. 17. Autoría, validación y responsabilidad técnica
 
@@ -569,11 +600,11 @@ Pantalla, visor, impresión, DOCX y PDF son representaciones del mismo documento
 
 ---
 
-**I-LHPM-9 — Frontera entre conclusiones y recomendaciones**
+**I-LHPM-9 — Frontera entre orientaciones y decisión**
 
-El Perfil llega hasta conclusiones. Las recomendaciones pertenecen al Plan de Acción, pero deben derivarse limpiamente de las conclusiones del Perfil y estas de la evidencia.
+El Perfil concluye y orienta; no decide. La priorización es del Grupo Motor y las actuaciones operativas (responsable, plazo, recurso, indicador) del Plan de Acción, que deben derivarse de las conclusiones y orientaciones del Perfil, y estas de la evidencia.
 
-*Consecuencia si se viola:* el Perfil prescribe actuaciones o el Plan formula recomendaciones sin base diagnóstica trazable.
+*Consecuencia si se viola:* el Perfil selecciona prioridades o fija actuaciones, o el Plan formula actuaciones sin base diagnóstica trazable.
 
 *Fuente:* Art. 16 bis; CONTRACT-ACTION-PLAN.
 
@@ -605,6 +636,24 @@ Un recurso que no consta en Localiza Salud no se presenta como activo del Perfil
 
 ---
 
+**I-LHPM-13 — Relaciones con sustento declarado**
+
+Toda relación entre determinante y problema declara fuente, año, escala y grado de sustento (Art. 8 bis). Ninguna se infiere por coincidencia de términos. Solo las de grado 1 y 2 sostienen una orientación.
+
+*Consecuencia si se viola:* el Perfil presenta como relación lo que es una conjetura, o un valor externo sustituye al dato municipal.
+
+**I-LHPM-14 — Conexión activo-determinante declarada**
+
+La conexión entre un activo y un determinante la declara una persona del equipo técnico, con justificación, autoría y fecha. No altera las temáticas de Localiza Salud y no se infiere del texto del activo (Art. 9 ter).
+
+*Consecuencia si se viola:* el Perfil atribuye a un activo una capacidad que nadie ha afirmado.
+
+**I-LHPM-15 — Orientación con autoría y derivación**
+
+Toda orientación técnica tiene autoría humana validada, cita las conclusiones de las que deriva y no fija responsable, plazo ni recurso (Art. 8, 16).
+
+*Consecuencia si se viola:* el sistema emite como orientación del Perfil un texto que nadie ha validado, o el Perfil invade el Plan de Acción.
+
 ## Relaciones con otros contratos
 
 | Contrato | Tipo de relación |
@@ -628,6 +677,7 @@ Un recurso que no consta en Localiza Salud no se presenta como activo del Perfil
 | 2026-07-14 | 1.1 | Saneamiento de gobernanza: regla N+1, priorización ciudadana como evidencia, cadena del conocimiento, modelo canónico único y autoría humana acotada | COMPÁS NG gobernanza |
 | 2026-09-24 | 1.2 | Localiza Salud queda fijada como fuente principal/preferente para activos del Perfil, con otras fuentes como apoyo contextual o pendiente de reconciliación | COMPÁS NG |
 | 2026-10-21 | 1.3 | Unidades de lectura derivadas del expediente (Art. 4 bis), estatuto de activos candidatos frente a Localiza y patrones de cruce (Art. 9 bis); invariantes I-LHPM-11 e I-LHPM-12. Decisión del autor | COMPÁS NG |
+| 2026-10-21 | 1.4 | El Perfil concluye y orienta; no decide (Art. 3, 7 quater, 16, 16 bis, I-LHPM-9). Nuevo tipo de afirmación «Orientación técnica» (Art. 8). Relaciones determinante-problema con sustento y grados (Art. 8 bis). Conexión determinante-activo declarada y transición déficit-salutogénesis (Art. 9 ter). Invariantes I-LHPM-13 a 15. Decisión del autor | COMPÁS NG |
 
 ---
 
