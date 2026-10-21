@@ -11664,3 +11664,18 @@ h3 {
 }
 .home-process__open:hover { background: var(--fondo-secundario); }
 .home-process__open:focus-visible { outline: 3px solid var(--azul); outline-offset: 2px; }
+
+/* Móvil: nada fuerza el ancho de la página (inspección 2026-10-21) */
+@media (max-width: 720px) {
+  .diag-status { grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); }
+  .diag-status__item, .diag-status__label, .diag-status__value { min-width: 0; overflow-wrap: anywhere; }
+  .document-list { grid-template-columns: minmax(0, 1fr); }
+  .document-row, .document-access, .document-access__attach { min-width: 0; max-width: 100%; }
+  .document-access__attach input { width: 100%; max-width: 100%; box-sizing: border-box; }
+  .diag-continue__inner { min-width: 0; flex-wrap: wrap; gap: 12px; }
+  .diag-continue__btn { max-width: 100%; white-space: normal; }
+  .docx-upload__kind { max-width: 100%; min-width: 0; }
+  .document-form { grid-template-columns: minmax(0, 1fr); }
+  .document-form > * { min-width: 0; max-width: 100%; }
+  .document-form button, .ekc-q-add-btn, .ekc-interp-add-btn { max-width: 100%; white-space: normal; }
+}
