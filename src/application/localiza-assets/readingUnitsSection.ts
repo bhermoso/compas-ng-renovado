@@ -1,0 +1,123 @@
+/**
+ * Sección «Lectura por tema» del documento canónico del Perfil.
+ *
+ * Proyección textual de `deriveReadingUnits`: cada frase enuncia un hecho del
+ * expediente (cuántas papeletas, cuántos activos, qué dimensión del Informe) o
+ * una laguna. No valora la importancia de un tema ni recomienda actuaciones, y
+ * el Informe consta por presencia textual, no como necesidad documentada.
+ *
+ * La clave es opcional en el documento: si no hay ninguna unidad, no existe, de
+ * modo que los documentos y sellos de expedientes sin estas fuentes no cambian.
+ */
+
+import { THEMATIC_TOPICS } from "../../domain/thematic-prioritisation";
+import type { CapacityVoiceCrossing, ReadingUnitsDerivation } from "./readingUnits";
+
+export const READING_UNITS_TITLE = "Lectura por tema: capacidad, voz e Informe";
+
+export const READING_UNITS_INTRO =
+  "Cada tema figura porque al menos una fuente del expediente lo sostiene. Se cruzan lo que consta en Localiza Salud, " +
+  "lo que la ciudadanía señaló en la priorización temática y lo que trata el Informe de Salud. El cruce describe qué " +
+  "fuentes hay y cuáles faltan; no valora la importancia de cada tema ni recomienda actuaciones.";
+
+export interface CanonicalReadingUnit {
+  topicId: string;
+  label: string;
+  crossing: CapacityVoiceCrossing;
+  /** Qué dice cada fuente sobre el tema, en frases de hecho. */
+  lines: string[];
+  /** Qué fuentes se cruzan en esta unidad y qué significa el cruce. */
+  crossingStatement: string;
+}
+
+export interface CanonicalReadingUnits {
+  title: string;
+  intro: string;
+  units: CanonicalReadingUnit[];
+  /** Lagunas y exclusiones declaradas. */
+  gaps: string[];
+}
+
+const MAX_NAMED_ASSETS = 5;
+
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+const decimal = (n: number) => String(n).replace(".", ",");
+const labelOf = (id: string) => THEMATIC_TOPICS.find((t) => t.id === id)?.label ?? id;
+
+function crossingStatement(crossing: CapacityVoiceCrossing, voiceSourceAvailable: boolean): string {
+  switch (crossing) {
+    case "voz-y-activo-registrado":
+      return "La ciudadanía lo señaló y Localiza registra activos con correspondencia validada.";
+    case "voz-sin-activo-registrado":
+      return "La ciudadanía lo señaló y Localiza no registra activos con correspondencia validada: es una laguna del mapa de activos, no la ausencia del recurso.";
+    case "activo-registrado-sin-voz":
+      return voiceSourceAvailable
+        ? "Localiza registra activos y la ciudadanía no marcó este tema en la priorización."
+        : "Localiza registra activos; no consta priorización ciudadana temática.";
+  }
+}
+
+export function buildCanonicalReadingUnits(
+  derivation: ReadingUnitsDerivation,
+  unstructuredAssets: number
+): CanonicalReadingUnits | undefined {
+  if (derivation.units.length === 0) return undefined;
+
+  const units: CanonicalReadingUnit[] = derivation.units.map((u) => {
+    const lines: string[] = [];
+    if (u.voice !== null) {
+      lines.push(
+        `Priorización ciudadana: ${u.voice.votes} de ${u.voice.completeRecords} papeletas completas ` +
+          `(${decimal(u.voice.pct)} %), posición ${u.voice.rank} de ${THEMATIC_TOPICS.length}.`
+      );
+    }
+    const assets = u.capacity.assets;
+    if (assets.length > 0) {
+      const named = assets.slice(0, MAX_NAMED_ASSETS).map((a) => a.nombre).join("; ");
+      const more = assets.length > MAX_NAMED_ASSETS ? ` y ${assets.length - MAX_NAMED_ASSETS} más` : "";
+      lines.push(
+        `Localiza Salud: ${plural(assets.length, "activo", "activos")} con correspondencia validada (${named}${more}).`
+      );
+    }
+    lines.push(
+      u.informe !== null
+        ? `Informe de Salud: trata el tema por presencia textual (${u.informe.dimensions
+            .map((d) => `${d.dimension}: ${plural(d.menciones, "mención", "menciones")}`)
+            .join("; ")}); no equivale a necesidad documentada ni a prevalencia.`
+        : "Informe de Salud: ninguna dimensión con correspondencia validada a este tema."
+    );
+    return {
+      topicId: u.topicId,
+      label: u.label,
+      crossing: u.crossing,
+      lines,
+      crossingStatement: crossingStatement(u.crossing, derivation.voiceSourceAvailable),
+    };
+  });
+
+  const gaps: string[] = [];
+  if (!derivation.voiceSourceAvailable) {
+    gaps.push("No consta priorización ciudadana temática en el expediente: el plano de voz es una laguna (Art. 10).");
+  }
+  if (derivation.topicsOnlyInInforme.length > 0) {
+    gaps.push(
+      `Temas que solo trata el Informe (presencia textual), sin unidad propia: ${derivation.topicsOnlyInInforme.map(labelOf).join("; ")}.`
+    );
+  }
+  if (derivation.topicsWithoutSource.length > 0) {
+    gaps.push(`Temas sin fuente en el expediente: ${derivation.topicsWithoutSource.map(labelOf).join("; ")}.`);
+  }
+  const sinCorrespondencia = derivation.assetsWithoutValidatedCorrespondence.length;
+  if (sinCorrespondencia > 0) {
+    gaps.push(
+      `${plural(sinCorrespondencia, "activo", "activos")} de Localiza sin correspondencia validada de tema: no cuenta${sinCorrespondencia === 1 ? "" : "n"} en ninguna unidad.`
+    );
+  }
+  if (unstructuredAssets > 0) {
+    gaps.push(
+      `${plural(unstructuredAssets, "activo", "activos")} sin la estructura de una fila de Localiza: no se cruza${unstructuredAssets === 1 ? "" : "n"}.`
+    );
+  }
+
+  return { title: READING_UNITS_TITLE, intro: READING_UNITS_INTRO, units, gaps };
+}

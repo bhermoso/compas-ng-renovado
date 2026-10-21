@@ -23,6 +23,12 @@
  *     no se atomiza ni se modifica (D-HR-01 intacta).
  */
 
+import {
+  buildCanonicalReadingUnits,
+  deriveReadingUnits,
+  readLocalizaAssets,
+  type CanonicalReadingUnits,
+} from "../localiza-assets";
 import type { MunicipalityWorkspace } from "../../domain/workspace";
 import type {
   PerfilLocalDeSalud,
@@ -126,6 +132,8 @@ export interface DiagnosticAnswers {
   /** Señales presentes en la evidencia (para redactar la situación de salud). */
   senalesPresentes: string[];
   salutogenica: SalutogenicReading;
+  /** Lectura por tema (capacidad, voz e Informe). Ausente si ninguna fuente sostiene un tema. */
+  lecturaPorTema?: CanonicalReadingUnits;
   /** Lectura sustantiva de los estudios complementarios (bloques diagnósticos). */
   estudios: ComplementaryStudiesReading;
   /** Referencias comparativas por indicador (valor demo, provincial, Andalucía). */
@@ -716,6 +724,18 @@ export function buildDiagnosticAnswers(
       .map((a) => a.title);
   const desigualdadTerritorial = buildTerritorialInequalityReading(workspace);
   const eracisContexto = getEracisMunicipalContext(workspace.municipality.identity.id);
+  const sanitaria = buildHealthReportSanitaryReading(workspace.healthReport);
+  const activosLocaliza = readLocalizaAssets(
+    workspace.evidenceStore.atoms.filter((a) => a.kind === "asset")
+  );
+  const lecturaPorTema = buildCanonicalReadingUnits(
+    deriveReadingUnits({
+      assets: activosLocaliza.records,
+      study: workspace.thematicPrioritisationStudy ?? null,
+      informeSignals: sanitaria.senales,
+    }),
+    activosLocaliza.unstructured.length
+  );
 
   return {
     ...(antecedentes !== undefined ? { antecedentes } : {}),
@@ -729,12 +749,13 @@ export function buildDiagnosticAnswers(
     ),
     senalesPresentes,
     salutogenica,
+    ...(lecturaPorTema !== undefined ? { lecturaPorTema } : {}),
     estudios: buildComplementaryStudiesReading({ workspace, indicatorTitles }),
     referencias: buildIndicatorComparisonReferences({ workspace, indicatorTitles }),
     badeaContexto: getBadeaMunicipalContext(workspace.municipality.identity.id),
     desigualdadTerritorial,
     eracisContexto,
-    sanitaria: buildHealthReportSanitaryReading(workspace.healthReport),
+    sanitaria,
     ugcAssistanceQuestions: buildUGCAssistanceQuestions(
       buildUGCClinicalAssistanceReading(workspace)
     ),

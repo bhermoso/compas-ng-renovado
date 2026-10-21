@@ -153,6 +153,20 @@ export function projectCanonicalToDocumentModel(
     });
   }
 
+  if (reading.readingUnits !== undefined) {
+    const r = reading.readingUnits;
+    sections.push({
+      sectionId: "reading-units",
+      title: r.title,
+      level: 1,
+      paragraphs: [
+        r.intro,
+        ...r.units.map((u) => `${u.label}. ${u.lines.join(" ")} ${u.crossingStatement}`),
+        ...r.gaps,
+      ],
+    });
+  }
+
   if (reading.territorialReadings.length > 0) {
     // El aviso de no exhaustividad encabeza la lectura, igual que en pantalla:
     // proyección mecánica del campo canónico `interpretation.nonExhaustiveNotice`,
