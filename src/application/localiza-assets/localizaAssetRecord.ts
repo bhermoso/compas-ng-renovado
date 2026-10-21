@@ -14,6 +14,7 @@
  */
 
 import type { EvidenceAtom } from "../../domain/evidence";
+import type { AssetValidationDeclaration } from "../../domain/repository/MunicipalDocumentRepository";
 
 export const LOCALIZA_ASSET_FIELD_COUNT = 8;
 
@@ -30,7 +31,9 @@ export interface LocalizaAssetRecord {
   municipio: string;
   localidad: string;
   /** Estado en la cadena del Art. 9 bis: consta en Localiza Salud. */
-  estado: "registrado-en-localiza";
+  estado: "registrado-en-localiza" | "validado";
+  /** Presente solo si el equipo técnico declaró la validación. */
+  validacion?: { criterios: string; declaradaPor: string; fecha?: string };
 }
 
 export interface UnstructuredAsset {
@@ -83,14 +86,34 @@ function isRecord(x: LocalizaAssetRecord | UnstructuredAsset): x is LocalizaAsse
 
 /** Lee los átomos de tipo activo; los que no tienen la forma esperada quedan aparte. */
 export function readLocalizaAssets(
-  atoms: ReadonlyArray<Pick<EvidenceAtom, "id" | "kind" | "title" | "content">>
+  atoms: ReadonlyArray<Pick<EvidenceAtom, "id" | "kind" | "title" | "content" | "documentId">>,
+  validations: ReadonlyArray<AssetValidationDeclaration> = []
 ): LocalizaAssetReading {
   const records: LocalizaAssetRecord[] = [];
   const unstructured: UnstructuredAsset[] = [];
   for (const atom of atoms) {
     if (atom.kind !== "asset") continue;
     const parsed = parseLocalizaAssetAtom(atom);
-    if (isRecord(parsed)) records.push(parsed);
+    if (isRecord(parsed)) {
+      const v = validations.find(
+        (d) =>
+          d.documentId === atom.documentId &&
+          (d.atomIds === undefined || d.atomIds.includes(atom.id))
+      );
+      records.push(
+        v === undefined
+          ? parsed
+          : {
+              ...parsed,
+              estado: "validado",
+              validacion: {
+                criterios: `${v.criteria.title}. ${v.criteria.version}`,
+                declaradaPor: v.declaredBy,
+                ...(v.validatedOn !== undefined ? { fecha: v.validatedOn } : {}),
+              },
+            }
+      );
+    }
     else unstructured.push(parsed);
   }
   return { records, unstructured };

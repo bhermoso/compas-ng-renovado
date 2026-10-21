@@ -93,6 +93,26 @@ export interface CycleConciliation {
   declaredAt: string;
 }
 
+/**
+ * Validación de activos declarada por la persona validadora del equipo técnico.
+ * Localiza Salud no exporta el estado de validación: lo declara el equipo, con el
+ * documento de criterios aplicado. No se infiere del contenido del activo.
+ */
+export interface AssetValidationDeclaration {
+  id: string;
+  /** Documento de Localiza Salud cuyos activos se declaran validados. */
+  documentId: DocumentId;
+  /** Átomos concretos validados; ausente = todos los activos del documento. */
+  atomIds?: string[];
+  criteria: { title: string; version: string };
+  /** Quién valida (perfil validador). */
+  declaredBy: string;
+  /** Fecha de la validación, declarada (AAAA-MM-DD). */
+  validatedOn?: string;
+  note?: string;
+  declaredAt: string;
+}
+
 export interface MunicipalDocument {
   id: DocumentId;
   municipalityId: MunicipalityId;
@@ -120,6 +140,8 @@ export interface MunicipalDocumentRepository {
   documents: MunicipalDocument[];
   /** Ausente mientras el equipo técnico no declare ninguna conciliación. */
   conciliations?: CycleConciliation[];
+  /** Ausente mientras el equipo técnico no declare ninguna validación de activos. */
+  assetValidations?: AssetValidationDeclaration[];
   createdAt: string;
   updatedAt: string;
 }
@@ -323,4 +345,33 @@ export function getValidatedDocuments(
   return repository.documents.filter(
     (document) => document.status === "validated"
   );
+}
+
+export function addAssetValidation(
+  repository: MunicipalDocumentRepository,
+  validation: Omit<AssetValidationDeclaration, "declaredAt">
+): MunicipalDocumentRepository {
+  const now = new Date().toISOString();
+  return {
+    ...repository,
+    assetValidations: [
+      ...(repository.assetValidations ?? []),
+      { ...validation, declaredAt: now },
+    ],
+    updatedAt: now,
+  };
+}
+
+export function removeAssetValidation(
+  repository: MunicipalDocumentRepository,
+  validationId: string
+): MunicipalDocumentRepository {
+  const rest = (repository.assetValidations ?? []).filter((v) => v.id !== validationId);
+  const { assetValidations: _previous, ...base } = repository;
+  void _previous;
+  return {
+    ...base,
+    ...(rest.length > 0 ? { assetValidations: rest } : {}),
+    updatedAt: new Date().toISOString(),
+  };
 }
