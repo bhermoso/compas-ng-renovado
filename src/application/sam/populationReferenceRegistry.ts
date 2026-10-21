@@ -3,6 +3,7 @@ import { ATARFE_POPULATION_2022 } from "../../../fixtures/population/atarfe-popu
 import { ATARFE_UNDER16_POPULATION_2025 } from "../../../fixtures/population/atarfe-under16-population-2025";
 import { ATARFE_POPULATION_2025 } from "../../../fixtures/population/atarfe-population-2025";
 import { FUENTE_VAQUEROS_POPULATION_2025 } from "../../../fixtures/population/fuente-vaqueros-population-2025";
+import { ZAGRA_POPULATION_2016 } from "../../../fixtures/population/zagra-population-2016";
 
 export interface PopulationReferenceSet {
   /** Adultos ≥16 años — instrumentos EAS y muestras IBSE de 16 o más. */
@@ -38,6 +39,11 @@ const FUENTE_VAQUEROS_REFERENCE_SET: PopulationReferenceSet = Object.freeze({
   allAges: FUENTE_VAQUEROS_POPULATION_2025,
 });
 
+// Zagra: solo padrón de todas las edades (IECA, 2016). No hay referencia adulta ni de menores.
+const ZAGRA_REFERENCE_SET: PopulationReferenceSet = Object.freeze({
+  allAges: ZAGRA_POPULATION_2016,
+});
+
 /**
  * Alias de municipio → clave canónica del registro. Permite que distintas formas
  * de identificar al mismo municipio (id del expediente y código INE) resuelvan el
@@ -46,6 +52,7 @@ const FUENTE_VAQUEROS_REFERENCE_SET: PopulationReferenceSet = Object.freeze({
 const MUNICIPALITY_ALIASES: Readonly<Record<string, string>> = {
   atarfe: "18022",
   "fuente-vaqueros": "18079",
+  zagra: "18913",
 };
 
 /**
@@ -58,6 +65,7 @@ const MUNICIPALITY_ALIASES: Readonly<Record<string, string>> = {
 const REGISTRY: Readonly<Record<string, PopulationReferenceSet>> = {
   "18022": ATARFE_REFERENCE_SET,
   "18079": FUENTE_VAQUEROS_REFERENCE_SET,
+  "18913": ZAGRA_REFERENCE_SET,
 };
 
 /**
