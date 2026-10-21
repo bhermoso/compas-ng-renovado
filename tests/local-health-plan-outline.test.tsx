@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { ACTION_PLAN_CATALOG } from "../src/domain/action-plan-catalog";
 import type { PlanPreparationDraft } from "../src/domain/action-plan-catalog/PlanPreparationDraft";
+import { addManualActuation } from "../src/application/agenda/agendaActuations";
 import { LocalHealthPlanOutline } from "../src/ui/components/LocalHealthPlanOutline";
 
 describe("Esbozo del Plan Local de Salud", () => {
@@ -39,5 +40,25 @@ describe("Esbozo del Plan Local de Salud", () => {
     expect(html).toContain(specific.displayCode ?? specific.code);
     expect(html).toContain("Actuaciones pendientes de registro");
     expect(html).toContain("Borrador evolutivo");
+  });
+
+  const render = (props: Record<string, unknown>) => renderToStaticMarkup(
+    <LocalHealthPlanOutline municipalityId="granada-zaidin" municipalityName="Granada-Zaidín" province="Granada" pslStatus="review" pslCompiled {...props} />
+  );
+
+  it("traduce el estado del Perfil en lugar de mostrar el valor interno", () => {
+    const html = render({});
+    expect(html).toContain("Perfil en revisión técnica");
+    expect(html).not.toContain("Estado:</strong> review");
+  });
+
+  it("lista las actuaciones de la agenda en la sección 5 sin presentarlas como validadas", () => {
+    const list = addManualActuation([], { id: "a", municipalityId: "granada-zaidin", name: "Paseos saludables", setting: "comunitario", now: "2026-10-21T00:00:00.000Z" });
+    const html = render({ agendaActuations: list });
+    expect(html).toContain("1 actuación registrada");
+    expect(html).toContain("Paseos saludables");
+    expect(html).toContain("Entorno comunitario");
+    expect(html).toContain("no está validado");
+    expect(html).not.toContain("Actuaciones pendientes de registro");
   });
 });
