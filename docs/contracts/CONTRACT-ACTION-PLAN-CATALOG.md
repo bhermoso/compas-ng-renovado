@@ -101,3 +101,14 @@ entrega habilita preparación y revisión metodológica, no aprobación automát
 ## 8. Actuaciones fuera del Plan de Acción — actualización autorizada 2026-10-19
 
 El Plan de Acción lo componen líneas estratégicas, objetivos e indicadores. Las actuaciones y las agendas anuales son un instrumento separado (`CONTRACT-AGENDA-ACTUATIONS`). Las fichas de actuación de la ficha del indicador se conservan como instrumento de recogida de datos para consolidar el indicador; no convierten las actuaciones en parte del Plan de Acción ni permiten atribuirles una parte del resultado del indicador. No se retira ninguna función.
+
+## 9. La EPVSA como módulo y ampliación del catálogo — actualización autorizada 2026-10-21
+
+Decisiones del autor (2026-10-21):
+
+- **La EPVSA es un módulo más.** Sus líneas, objetivos específicos e indicadores entran en el catálogo del Plan de Acción como módulo, con la misma versión, procedencia y cautelas que los demás. Su fuente es `08_Lineas_EPVSA_02abril24.pdf`. El módulo no se rellena con el registro actual de marcos estratégicos, cuyos nombres y objetivos no coinciden con ese documento (decisión pendiente del autor).
+- **Ampliación.** Pueden añadirse módulos (por ejemplo, otras líneas temáticas), objetivos, indicadores y actuaciones-tipo vinculadas. Solo el autor lo hace. Cada ampliación conserva versión y procedencia.
+- **Dónde vive lo añadido.** En el expediente de cada municipio, con su copia en Firebase. El catálogo del código no se modifica desde la aplicación.
+- **Vínculos.** Se establecen por código estable de módulo, objetivo e indicador. Valen las reglas de elegibilidad de §3 y las de vínculo potencial y real de `CONTRACT-ACTUATION-TEMPLATES` §4 bis.
+- **Qué no cambia.** Las actuaciones siguen fuera del Plan de Acción (§8). Ver las actuaciones-tipo vinculadas a un objetivo no las incorpora al Plan, ni a la agenda, ni asigna parte del resultado del indicador. El sistema no genera ni sugiere actuaciones.
+
