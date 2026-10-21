@@ -105,6 +105,7 @@ export function DocumentIngestionPanel({
             value={kind}
             onChange={(event) => onKindChange(event.target.value as DocumentKind)}
             className="docx-upload__kind"
+            aria-label="Tipo de documento"
           >
             {documentKinds.map((option) => (
               <option key={option.value} value={option.value}>
@@ -122,6 +123,7 @@ export function DocumentIngestionPanel({
             value={kind}
             onChange={(event) => onKindChange(event.target.value as DocumentKind)}
             className="docx-upload__kind"
+            aria-label="Tipo de documento"
           >
             {documentKinds.map((option) => (
               <option key={option.value} value={option.value}>
@@ -151,6 +153,7 @@ export function DocumentIngestionPanel({
           </p>
           <textarea
             value={plainText}
+            aria-label="Contenido del documento pegado como texto"
             onChange={(event) => onPlainTextChange(event.target.value)}
             placeholder="Pega aquí el extracto del marco estratégico. Ejemplo: Línea 1 EPVSA — Alimentación saludable y actividad física."
             rows={6}
@@ -158,6 +161,7 @@ export function DocumentIngestionPanel({
           <div className="document-form">
             <input
               value={title}
+              aria-label="Título y fuente del documento"
               onChange={(event) => onTitleChange(event.target.value)}
               placeholder="Título del marco (ej. EPVSA 2024–2030, Guías RELAS, En Buena Edad…)"
             />
@@ -199,6 +203,7 @@ export function DocumentIngestionPanel({
             value={kind}
             onChange={(event) => onKindChange(event.target.value as DocumentKind)}
             className="docx-upload__kind"
+            aria-label="Tipo de documento"
           >
             {documentKinds.map((option) => (
               <option key={option.value} value={option.value}>
@@ -218,6 +223,7 @@ export function DocumentIngestionPanel({
           </p>
           <textarea
             value={plainText}
+            aria-label="Contenido del documento pegado como texto"
             onChange={(event) => onPlainTextChange(event.target.value)}
             placeholder="Pega el contenido del documento complementario genérico (no instrumentos EAS)."
             rows={6}
@@ -225,6 +231,7 @@ export function DocumentIngestionPanel({
           <div className="document-form">
             <input
               value={title}
+              aria-label="Título y fuente del documento"
               onChange={(event) => onTitleChange(event.target.value)}
               placeholder="Título del documento o fuente (obligatorio)"
             />
@@ -266,6 +273,7 @@ export function DocumentIngestionPanel({
             value={kind}
             onChange={(event) => onKindChange(event.target.value as DocumentKind)}
             className="docx-upload__kind"
+            aria-label="Tipo de documento"
           >
             {documentKinds.map((option) => (
               <option key={option.value} value={option.value}>
@@ -293,6 +301,7 @@ export function DocumentIngestionPanel({
           </p>
           <textarea
             value={plainText}
+            aria-label="Contenido del documento pegado como texto"
             onChange={(event) => onPlainTextChange(event.target.value)}
             placeholder={
               "Centro Participación Activa Mayores Zaidín | Talleres deportivos y socioculturales para mayores\n" +
@@ -304,6 +313,7 @@ export function DocumentIngestionPanel({
           <div className="document-form">
             <input
               value={title}
+              aria-label="Título y fuente del documento"
               onChange={(event) => onTitleChange(event.target.value)}
               placeholder="Título del listado (ej. Localiza Salud — Granada-Zaidín 2023)"
             />
@@ -345,6 +355,7 @@ export function DocumentIngestionPanel({
             value={kind}
             onChange={(event) => onKindChange(event.target.value as DocumentKind)}
             className="docx-upload__kind"
+            aria-label="Tipo de documento"
           >
             {documentKinds.map((option) => (
               <option key={option.value} value={option.value}>
@@ -385,6 +396,7 @@ export function DocumentIngestionPanel({
           <p className="ingestion-hint">Alternativa manual opcional: pega el contenido directamente:</p>
           <textarea
             value={plainText}
+            aria-label="Contenido del documento pegado como texto"
             onChange={(event) => onPlainTextChange(event.target.value)}
             placeholder={"Pega aquí el contenido del Informe Vigía, diagnóstico de barrio u otra fuente territorial.\nEjemplo: La zona básica de salud presenta una tasa de envejecimiento del 22 %, superior a la media provincial."}
             rows={7}
@@ -392,6 +404,7 @@ export function DocumentIngestionPanel({
           <div className="document-form">
             <input
               value={title}
+              aria-label="Título y fuente del documento"
               onChange={(event) => onTitleChange(event.target.value)}
               placeholder="Título y fuente (ej. Informe Vigía Zaidín Centro Este — 2023)"
             />
@@ -433,6 +446,7 @@ export function DocumentIngestionPanel({
             value={kind}
             onChange={(event) => onKindChange(event.target.value as DocumentKind)}
             className="docx-upload__kind"
+            aria-label="Tipo de documento"
           >
             {documentKinds.map((option) => (
               <option key={option.value} value={option.value}>
@@ -474,6 +488,7 @@ export function DocumentIngestionPanel({
           <p className="ingestion-hint">Alternativa manual opcional: pega el contenido directamente:</p>
           <textarea
             value={plainText}
+            aria-label="Contenido del documento pegado como texto"
             onChange={(event) => onPlainTextChange(event.target.value)}
             placeholder={"Pega aquí el contenido del acta, formulario de necesidades sentidas, resumen de grupo focal…\nEjemplo: El grupo identificó el aislamiento de personas mayores como problema principal de salud en el barrio."}
             rows={7}
@@ -481,6 +496,7 @@ export function DocumentIngestionPanel({
           <div className="document-form">
             <input
               value={title}
+              aria-label="Título y fuente del documento"
               onChange={(event) => onTitleChange(event.target.value)}
               placeholder="Título y fuente (ej. Acta 1 Grupo Motor Granada-Zaidín — marzo 2024)"
             />
@@ -522,6 +538,7 @@ export function DocumentIngestionPanel({
             value={kind}
             onChange={(event) => onKindChange(event.target.value as DocumentKind)}
             className="docx-upload__kind"
+            aria-label="Tipo de documento"
           >
             {documentKinds.map((option) => (
               <option key={option.value} value={option.value}>
@@ -543,6 +560,7 @@ export function DocumentIngestionPanel({
           </p>
           <textarea
             value={plainText}
+            aria-label="Contenido del documento pegado como texto"
             onChange={(event) => onPlainTextChange(event.target.value)}
             placeholder={"Pega aquí la evidencia comparativa o la serie histórica relevante.\nEjemplo: Tasa de mortalidad evitable 2018–2023 — Zona básica Zaidín Sur: evolución descendente del 12 % al 9 %."}
             rows={8}
@@ -550,6 +568,7 @@ export function DocumentIngestionPanel({
           <div className="document-form">
             <input
               value={title}
+              aria-label="Título y fuente del documento"
               onChange={(event) => onTitleChange(event.target.value)}
               placeholder="Título y período (ej. Evolución indicadores salud Zaidín 2018–2023)"
             />
@@ -589,6 +608,7 @@ export function DocumentIngestionPanel({
         <>
           <textarea
             value={plainText}
+            aria-label="Contenido del documento pegado como texto"
             onChange={(event) => onPlainTextChange(event.target.value)}
             placeholder="Pega aquí el contenido del documento municipal. Cada párrafo o línea no vacía se convertirá en una unidad de evidencia estructurada."
             rows={9}
@@ -608,6 +628,7 @@ export function DocumentIngestionPanel({
 
             <input
               value={title}
+              aria-label="Título y fuente del documento"
               onChange={(event) => onTitleChange(event.target.value)}
               placeholder="Título del documento o fuente (obligatorio)"
             />
