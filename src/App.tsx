@@ -450,7 +450,14 @@ function loadPersistedWorkspacesForLibrary(
 // ── Componente principal ─────────────────────────────────────
 
 export default function App() {
-  const [view, setViewState] = useState<AppView>("inicio");
+  const [view, setViewState] = useState<AppView>(() => {
+    // Enlaces desde el Aula: abrir sólo una fase existente, sin seleccionar
+    // ni reemplazar automáticamente el expediente municipal del usuario.
+    const requested = new URLSearchParams(window.location.search).get("fase");
+    return NAV_ITEMS.some(item => item.id === requested)
+      ? requested as AppView
+      : "inicio";
+  });
   const [agendaFocusId, setAgendaFocusId] = useState<string | undefined>(undefined);
   const [planTab, setPlanTab] = useState<"lineas" | "resultante" | "lectura" | "prioridades" | "borrador">("lineas");
   const preparationDirtyRef = useRef(false);
