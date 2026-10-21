@@ -7,11 +7,14 @@
  * validada (capacidad). Los temas sin ninguna fuente no generan unidad: se
  * devuelven como lagunas.
  *
- * Esta versión cruza dos planos, capacidad y voz. El plano de necesidad
- * documentada (Informe y estudios) queda declarado como pendiente: sus temas
- * no tienen todavía tabla de correspondencia, y sin ella no se emparejan. Por
- * eso aquí no se emite ninguno de los cuatro patrones del Art. 9 bis, que
- * requieren los tres planos; se emite el cruce de los dos disponibles.
+ * Cruza capacidad y voz, y añade el plano del Informe cuando consta. Una
+ * dimensión del Informe solo se asocia a un tema por una correspondencia
+ * validada. Sin lectura estructurada de autoría, el Informe consta por
+ * presencia textual (recuento de términos), que no es necesidad documentada ni
+ * prevalencia ni prioridad: por eso aquí no se emite ninguno de los cuatro
+ * patrones del Art. 9 bis, que requieren necesidad documentada. El Informe no
+ * crea unidades por sí solo: un tema tratado solo por el Informe se devuelve
+ * aparte.
  *
  * Sin umbrales ni puntuaciones. Solo se cuentan correspondencias validadas.
  */
@@ -21,6 +24,7 @@ import {
   type ThematicPrioritisationStudy,
 } from "../../domain/thematic-prioritisation";
 import type { LocalizaAssetRecord } from "./localizaAssetRecord";
+import { validatedInformeCorrespondence } from "./informeTopicCorrespondence";
 import { validatedCorrespondence } from "./topicCorrespondence";
 
 export type CapacityVoiceCrossing =
@@ -42,14 +46,23 @@ export interface ReadingUnitCapacity {
   assets: Array<{ atomId: string; nombre: string; tematicas: string[] }>;
 }
 
+export interface ReadingUnitInforme {
+  /** Dimensiones del Informe con correspondencia validada a este tema. */
+  dimensions: Array<{ dimension: string; menciones: number }>;
+  /** Estatuto del plano: solo presencia textual. */
+  status: "presencia-textual";
+}
+
 export interface ReadingUnit {
   topicId: string;
   label: string;
   voice: ReadingUnitVoice | null;
   capacity: ReadingUnitCapacity;
   crossing: CapacityVoiceCrossing;
-  /** El plano de necesidad documentada aún no se cruza (sin tabla del Informe). */
-  documentedNeed: "pendiente-de-correspondencia-con-el-informe";
+  /** El Informe trata el tema (presencia textual), o null si no consta. */
+  informe: ReadingUnitInforme | null;
+  /** Necesidad documentada: pendiente mientras el Informe conste solo por presencia textual. */
+  documentedNeed: "no-disponible-solo-presencia-textual";
 }
 
 export interface ReadingUnitsDerivation {
@@ -58,6 +71,8 @@ export interface ReadingUnitsDerivation {
   topicsWithoutSource: string[];
   /** Activos cuyas temáticas no tienen correspondencia validada: no cuentan en ninguna unidad. */
   assetsWithoutValidatedCorrespondence: Array<{ atomId: string; nombre: string; tematicas: string[] }>;
+  /** Temas que solo trata el Informe (presencia textual): no generan unidad. */
+  topicsOnlyInInforme: string[];
   /** Si no hay estudio de priorización, el plano de voz es una laguna del expediente. */
   voiceSourceAvailable: boolean;
 }
@@ -65,6 +80,8 @@ export interface ReadingUnitsDerivation {
 export function deriveReadingUnits(input: {
   assets: ReadonlyArray<LocalizaAssetRecord>;
   study?: ThematicPrioritisationStudy | null;
+  /** Señales de la lectura del Informe (`HealthReportSanitaryReading.senales`). */
+  informeSignals?: ReadonlyArray<{ dimension: string; menciones: number }>;
 }): ReadingUnitsDerivation {
   const topicsByTematica = new Map<string, readonly string[]>(
     validatedCorrespondence().map((e) => [e.localizaTematica, e.topicIds])
@@ -87,18 +104,32 @@ export function deriveReadingUnits(input: {
     }
   }
 
+  const mencionesPorDimension = new Map((input.informeSignals ?? []).map((s) => [s.dimension, s.menciones]));
+  const informeByTopic = new Map<string, Array<{ dimension: string; menciones: number }>>();
+  for (const e of validatedInformeCorrespondence()) {
+    const menciones = mencionesPorDimension.get(e.informeDimension);
+    if (menciones === undefined) continue;
+    for (const id of e.topicIds) {
+      const list = informeByTopic.get(id) ?? [];
+      list.push({ dimension: e.informeDimension, menciones });
+      informeByTopic.set(id, list);
+    }
+  }
+
   const study = input.study ?? null;
   const voiceByTopic = new Map(study?.ranking.map((r) => [r.topicId, r]) ?? []);
 
   const units: ReadingUnit[] = [];
   const topicsWithoutSource: string[] = [];
+  const topicsOnlyInInforme: string[] = [];
 
   for (const topic of THEMATIC_TOPICS) {
     const vote = voiceByTopic.get(topic.id);
     const assets = capacityByTopic.get(topic.id) ?? [];
     const hasVoice = vote !== undefined && vote.votes > 0;
+    const informeDims = informeByTopic.get(topic.id) ?? [];
     if (!hasVoice && assets.length === 0) {
-      topicsWithoutSource.push(topic.id);
+      (informeDims.length > 0 ? topicsOnlyInInforme : topicsWithoutSource).push(topic.id);
       continue;
     }
     const crossing: CapacityVoiceCrossing = hasVoice
@@ -121,13 +152,15 @@ export function deriveReadingUnits(input: {
           : null,
       capacity: { assets },
       crossing,
-      documentedNeed: "pendiente-de-correspondencia-con-el-informe",
+      informe: informeDims.length > 0 ? { dimensions: informeDims, status: "presencia-textual" } : null,
+      documentedNeed: "no-disponible-solo-presencia-textual",
     });
   }
 
   return {
     units,
     topicsWithoutSource,
+    topicsOnlyInInforme,
     assetsWithoutValidatedCorrespondence: withoutCorrespondence,
     voiceSourceAvailable: study !== null,
   };
