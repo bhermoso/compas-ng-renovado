@@ -43,7 +43,7 @@ export interface ReadingUnitVoice {
 
 export interface ReadingUnitCapacity {
   /** Activos de Localiza con correspondencia validada a este tema. */
-  assets: Array<{ atomId: string; nombre: string; tematicas: string[] }>;
+  assets: Array<{ atomId: string; nombre: string; tematicas: string[]; estado: LocalizaAssetRecord["estado"] }>;
 }
 
 export interface ReadingUnitInforme {
@@ -99,7 +99,7 @@ export function deriveReadingUnits(input: {
     }
     for (const id of topics) {
       const list = capacityByTopic.get(id) ?? [];
-      list.push({ atomId: asset.atomId, nombre: asset.nombre, tematicas: asset.tematicas });
+      list.push({ atomId: asset.atomId, nombre: asset.nombre, tematicas: asset.tematicas, estado: asset.estado });
       capacityByTopic.set(id, list);
     }
   }
