@@ -113,6 +113,24 @@ export interface AssetValidationDeclaration {
   declaredAt: string;
 }
 
+/**
+ * Decisión del equipo técnico sobre una propuesta de conclusión u orientación del
+ * Perfil (CONTRACT-LHPM v1.5, Art. 16 ter). El registro es acumulativo: una
+ * decisión posterior sobre la misma propuesta sustituye a la anterior a efectos
+ * de lectura, pero la anterior se conserva.
+ */
+export interface ProposalDecision {
+  proposalId: string;
+  decision: "elegida" | "descartada";
+  decidedBy: string;
+  /** Fecha y hora de la decisión (ISO 8601). */
+  decidedAt: string;
+  /** Motivo, recomendado sobre todo en los descartes. */
+  motivo?: string;
+  /** Redacción ajustada por el equipo; ausente = texto propuesto. */
+  textoAjustado?: string;
+}
+
 export interface MunicipalDocument {
   id: DocumentId;
   municipalityId: MunicipalityId;
@@ -142,6 +160,8 @@ export interface MunicipalDocumentRepository {
   conciliations?: CycleConciliation[];
   /** Ausente mientras el equipo técnico no declare ninguna validación de activos. */
   assetValidations?: AssetValidationDeclaration[];
+  /** Historial de decisiones sobre propuestas del Perfil; ausente mientras no haya ninguna. */
+  proposalDecisions?: ProposalDecision[];
   createdAt: string;
   updatedAt: string;
 }
@@ -372,6 +392,17 @@ export function removeAssetValidation(
   return {
     ...base,
     ...(rest.length > 0 ? { assetValidations: rest } : {}),
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+export function addProposalDecision(
+  repository: MunicipalDocumentRepository,
+  decision: ProposalDecision
+): MunicipalDocumentRepository {
+  return {
+    ...repository,
+    proposalDecisions: [...(repository.proposalDecisions ?? []), decision],
     updatedAt: new Date().toISOString(),
   };
 }
