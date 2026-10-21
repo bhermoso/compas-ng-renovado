@@ -86,7 +86,7 @@ function isRecord(x: LocalizaAssetRecord | UnstructuredAsset): x is LocalizaAsse
 
 /** Lee los átomos de tipo activo; los que no tienen la forma esperada quedan aparte. */
 export function readLocalizaAssets(
-  atoms: ReadonlyArray<Pick<EvidenceAtom, "id" | "kind" | "title" | "content" | "documentId">>,
+  atoms: ReadonlyArray<Pick<EvidenceAtom, "id" | "kind" | "title" | "content" | "provenance">>,
   validations: ReadonlyArray<AssetValidationDeclaration> = []
 ): LocalizaAssetReading {
   const records: LocalizaAssetRecord[] = [];
@@ -97,7 +97,7 @@ export function readLocalizaAssets(
     if (isRecord(parsed)) {
       const v = validations.find(
         (d) =>
-          d.documentId === atom.documentId &&
+          d.documentId === atom.provenance?.documentId &&
           (d.atomIds === undefined || d.atomIds.includes(atom.id))
       );
       records.push(

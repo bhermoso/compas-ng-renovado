@@ -8,8 +8,8 @@ import {
 
 const row = (n: string) => [n, "desc", "Cualquiera", "Toda la población", "Actividad física", "Zagra", "Zagra", ""].join("\t");
 const atoms = [
-  { id: "a1", kind: "asset" as const, title: "A1", content: row("A1"), documentId: "doc-loc" },
-  { id: "a2", kind: "asset" as const, title: "A2", content: row("A2"), documentId: "doc-otro" },
+  { id: "a1", kind: "asset" as const, title: "A1", content: row("A1"), provenance: { origin: "localiza-salud", documentId: "doc-loc", extractedAt: "x" } },
+  { id: "a2", kind: "asset" as const, title: "A2", content: row("A2"), provenance: { origin: "localiza-salud", documentId: "doc-otro", extractedAt: "x" } },
 ];
 const criteria = { title: "Criterios", version: "Versión 9 de junio de 2026" };
 
@@ -30,7 +30,7 @@ describe("activos validados (declaración del equipo técnico)", () => {
 
   it("atomIds restringe la declaración a esos activos", () => {
     const r = readLocalizaAssets(
-      [{ ...atoms[1], documentId: "doc-loc" }, { ...atoms[0] }],
+      [{ ...atoms[1], provenance: { origin: "localiza-salud", documentId: "doc-loc", extractedAt: "x" } }, { ...atoms[0] }],
       [{ id: "v1", documentId: "doc-loc", atomIds: ["a1"], criteria, declaredBy: "V", declaredAt: "x" }]
     );
     expect(r.records.map((x) => x.estado)).toEqual(["registrado-en-localiza", "validado"]);
