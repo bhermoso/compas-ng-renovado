@@ -1,6 +1,6 @@
 # COMPÁS NG — Contrato del repositorio de actuaciones-tipo
 
-> Estado: CONCEPTUAL. Fecha: 2026-10-20.
+> Estado: CONCEPTUAL. Fecha: 2026-10-20. Actualizado 2026-10-21 (§4 bis).
 > Petición del autor (2026-10-20): hay actuaciones comunes o muy parecidas entre municipios (GRAFA, GRUSE, talleres de los CPA, actividades de los Puntos Vuela). Debe existir un repositorio de actuaciones-tipo que se pueda modificar y adaptar a cada municipio.
 
 ## 1. Propósito
@@ -31,9 +31,19 @@ El catálogo heredado se ofrece como punto de partida y no como referencia con f
 
 - **Adaptar copia, no enlaza.** Usar una plantilla crea una actuación nueva. La plantilla no cambia al editar la actuación, y la actuación guarda `templateRef` (id, origen, nombre) solo como referencia de procedencia.
 - **El entorno lo decide una persona.** La actuación entra «sin asignar»; la sugerencia de entorno no se aplica sola.
-- **Sin atribución de resultados.** (Las fichas heredadas muestran el indicador que el histórico les atribuía como referencia; no se copia a la actuación.) La plantilla no declara indicador ni contribución. Esa relación se establece en el Plan de Acción y no se reparte entre actuaciones.
+- **Sin atribución de resultados.** (Las fichas heredadas muestran el indicador que el histórico les atribuía como referencia; no se copia a la actuación.) La plantilla no declara contribución ni resultado. Puede declarar un objetivo y un indicador como orientación, en forma de vínculo potencial (§4 bis). La relación real entre una actuación y un indicador se establece en el Plan de Acción y no se reparte entre actuaciones.
 - **El catálogo heredado no se edita.** Para modificar una de sus actuaciones, se adapta y se guarda como propia.
 - **Lo propio de cada municipio no sale de su expediente.** Al guardar como actuación-tipo se descartan fechas, responsables, participantes y resultados (I-ACT-TPL-2).
+
+## 4 bis. Vínculo potencial y vínculo real — actualización autorizada 2026-10-21
+
+Decisión del autor (2026-10-21): una actuación-tipo puede indicar a qué objetivo específico, y a qué indicador de ese objetivo, suele orientarse. Es una hipótesis de diseño del catálogo y no un hecho sobre ningún municipio.
+
+- **Vínculo potencial.** Pertenece a la actuación-tipo. Se identifica por códigos estables del marco (marco, objetivo, indicador opcional), no por coincidencia de texto. Conserva origen y fecha. No indica contribución, magnitud ni resultado. En el catálogo heredado no existe: las atribuciones del histórico siguen siendo «no verificado» y no se convierten en vínculos.
+- **Vínculo real.** Pertenece a la actuación del municipio y se establece en el Plan de Acción, por decisión del equipo. Usar una plantilla no lo crea. Cuando la actuación se adopta desde un objetivo del Plan, el vínculo potencial puede ofrecerse como punto de partida, y la persona lo acepta o no.
+- **Quién edita.** Solo el autor crea, modifica o retira vínculos potenciales. El resto del equipo los consulta y puede proponer cambios fuera de la herramienta.
+- **Dónde viven.** Los vínculos potenciales de las actuaciones-tipo propias se guardan en el expediente, con su copia en Firebase (§5). Compartirlos entre municipios sigue pendiente.
+- **Qué no hace el sistema.** No sugiere actuaciones a partir de un indicador ni de un diagnóstico. Muestra las que el autor vinculó, cuando la persona consulta ese objetivo.
 
 ## 5. Dónde viven
 
@@ -52,3 +62,4 @@ El catálogo heredado se ofrece como punto de partida y no como referencia con f
 - **I-ACT-TPL-2:** una actuación-tipo propia no contiene fechas, responsables, contacto, participantes, evidencias ni resultados.
 - **I-ACT-TPL-3:** el origen y el estado de la fuente se muestran siempre; lo heredado se rotula «no verificado».
 - **I-ACT-TPL-4:** ninguna plantilla asigna entorno, trimestre ni prioridad por sí sola.
+- **I-ACT-TPL-5:** un vínculo potencial es una orientación declarada por el autor; no es contribución, no se convierte en vínculo real sin decisión del equipo y no se infiere por texto.

@@ -127,7 +127,7 @@ La validación del Perfil pasa de restricción a criterio de calidad. Informa y 
 ### CONTRACT-ACTUATION-TEMPLATES
 **Estado:** CONCEPTUAL — creado 2026-10-20
 
-Repositorio de actuaciones-tipo para la agenda: plantillas descriptivas (sin fechas, responsables ni resultados) que se adaptan a cada municipio por copia. Origen heredado del histórico (125 actuaciones, no verificado) y propias del equipo. Compartirlas entre municipios queda como decisión pendiente.
+Repositorio de actuaciones-tipo para la agenda: plantillas descriptivas (sin fechas, responsables ni resultados) que se adaptan a cada municipio por copia. Origen heredado del histórico (125 actuaciones, no verificado) y propias del equipo. Desde 2026-10-21 pueden llevar un vínculo potencial a objetivo e indicador, editable solo por el autor (§4 bis, I-ACT-TPL-5). Compartirlas entre municipios queda como decisión pendiente.
 
 **Productores:** equipo técnico (actuaciones-tipo propias); catálogo heredado del histórico.
 **Consumidores:** vista Agenda.
@@ -312,7 +312,7 @@ Contrato de la cadena canónica vigente para producir borradores técnicos del P
 ### CONTRACT-ACTION-PLAN-CATALOG
 **Estado:** VIGENTE
 
-Contrato del catálogo temático del Plan de Acción. Define módulos reutilizables, elegibilidad por selección deliberativa, revisión humana por elemento, trazabilidad y preparación editable previa. Desde la actualización de 2026-09-09, permite preparar y revisar la propuesta Zaidín en cuatro bloques sin trasladar aprobación formal entre versiones.
+Contrato del catálogo temático del Plan de Acción. Define módulos reutilizables, elegibilidad por selección deliberativa, revisión humana por elemento, trazabilidad y preparación editable previa. Desde la actualización de 2026-09-09, permite preparar y revisar la propuesta Zaidín en cuatro bloques sin trasladar aprobación formal entre versiones. Desde 2026-10-21 (§9) la EPVSA entra como módulo más y el catálogo es ampliable por el autor, en el expediente.
 
 **Productores:** Catálogo de módulos de Plan de Acción, preparación territorial (`planPreparationDrafts`).
 **Consumidores:** UI de preparación del Plan, fichas de indicadores y actuaciones, proyección del Plan de Acción resultante.
