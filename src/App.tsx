@@ -3948,6 +3948,7 @@ export default function App() {
             />
             <ActivosSaludPanel
               repository={runtime.workspace.repository}
+              atoms={runtime.workspace.evidenceStore.atoms}
               onDeleteDocument={handleDeleteDocument}
             />
             <DocumentRepositoryPanel
