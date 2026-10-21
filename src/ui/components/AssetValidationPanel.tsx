@@ -55,7 +55,7 @@ export function AssetValidationPanel({ repository, onAdd, onRemove }: AssetValid
       <h2 id="asset-validation-title">Activos validados</h2>
       <p>
         Declara aquí que los activos de un documento de Localiza Salud han sido validados por una persona con
-        perfil validador, con los {ASSET_CRITERIA.title.toLowerCase()} ({ASSET_CRITERIA.version.toLowerCase()}).
+        perfil validador, con el documento «{ASSET_CRITERIA.title}» ({ASSET_CRITERIA.version}).
         El sistema no comprueba los criterios: registra la declaración y el Perfil la cita como tal. Las
         temáticas de Localiza no se modifican.
       </p>
