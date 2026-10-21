@@ -167,8 +167,8 @@ describe("interfaz del IBSE", () => {
   });
 
   it("para un municipio sin padrón desglosado, no evaluable", () => {
-    expect(getPopulationReferenceSet("zagra").allAges).toBeUndefined();
-    const s = createIBSEStudy({ municipalityId: "zagra", sourceFileName: "x", aggregates: AGG, ageSexObserved: { cells: [{ ageBand: "0-4", male: 1, female: 1 }], assignedCount: 2, unassignableCount: 0 }, methodologicalCautions: [] });
+    expect(getPopulationReferenceSet("loja").allAges).toBeUndefined();
+    const s = createIBSEStudy({ municipalityId: "loja", sourceFileName: "x", aggregates: AGG, ageSexObserved: { cells: [{ ageBand: "0-4", male: 1, female: 1 }], assignedCount: 2, unassignableCount: 0 }, methodologicalCautions: [] });
     expect(html(s)).toContain("No hay padrón por edad y sexo verificado");
   });
 });

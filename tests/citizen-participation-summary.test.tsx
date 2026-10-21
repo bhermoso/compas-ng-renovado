@@ -35,7 +35,7 @@ describe("parseThematicPrioritisationCSV con edad y sexo", () => {
   });
 
   it("con bandas recoge solo papeletas completas y declara las no asignables", () => {
-    const r = parseThematicPrioritisationCSV(CSV, "x.csv", { ageBands: ageBandsForMunicipality("zagra") });
+    const r = parseThematicPrioritisationCSV(CSV, "x.csv", { ageBands: ageBandsForMunicipality("loja") });
     const o = r.partialStudy.ageSexObserved!;
     expect(o.assignedCount).toBe(3);
     expect(o.unassignableCount).toBe(2);
@@ -54,10 +54,11 @@ describe("parseThematicPrioritisationCSV con edad y sexo", () => {
 describe("ageBandsForMunicipality", () => {
   it("usa las bandas del padrón si existe y las quinquenales estándar si no", () => {
     expect(ageBandsForMunicipality("atarfe").length).toBe(21);
-    const std = ageBandsForMunicipality("zagra");
+    const std = ageBandsForMunicipality("loja");
     expect(std.length).toBe(21);
     expect(std[0].label).toBe("0-4");
     expect(std[20].label).toBe("100+");
+    expect(ageBandsForMunicipality("zagra").length).toBe(18);
   });
 });
 
@@ -80,8 +81,8 @@ describe("CitizenParticipationSummary", () => {
     expect(h).toContain("Rango de edad del padrón");
   });
 
-  it("sin padrón (Zagra) muestra solo el recuento y declara no evaluable, sin estimar", () => {
-    const h = html("zagra");
+  it("sin padrón (Loja) muestra solo el recuento y declara no evaluable, sin estimar", () => {
+    const h = html("loja");
     expect(h).toContain("No evaluable: no hay padrón");
     expect(h).toContain("Participantes por banda de edad y sexo");
     expect(h).not.toContain("sam-tripyramid");
@@ -89,16 +90,16 @@ describe("CitizenParticipationSummary", () => {
   });
 
   it("una sola papeleta no asignable se redacta en singular", () => {
-    const base = study("zagra");
+    const base = study("loja");
     const s = { ...base, ageSexObserved: { ...base.ageSexObserved!, unassignableCount: 1 } };
-    const h = html("zagra", s);
+    const h = html("loja", s);
     expect(h).toContain("1 papeleta no se puede asignar");
     expect(h).not.toContain("1 papeletas");
   });
 
   it("si el CSV no traía edad y sexo lo declara", () => {
-    const s = { ...study("zagra"), ageSexObserved: undefined };
-    expect(html("zagra", s)).toContain("no incluía las columnas");
+    const s = { ...study("loja"), ageSexObserved: undefined };
+    expect(html("loja", s)).toContain("no incluía las columnas");
   });
 
   it("el CSS no usa colores literales", () => {
