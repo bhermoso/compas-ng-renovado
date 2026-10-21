@@ -3,7 +3,7 @@ import { ATARFE_POPULATION_2022 } from "../../../fixtures/population/atarfe-popu
 import { ATARFE_UNDER16_POPULATION_2025 } from "../../../fixtures/population/atarfe-under16-population-2025";
 import { ATARFE_POPULATION_2025 } from "../../../fixtures/population/atarfe-population-2025";
 import { FUENTE_VAQUEROS_POPULATION_2025 } from "../../../fixtures/population/fuente-vaqueros-population-2025";
-import { ZAGRA_POPULATION_2016 } from "../../../fixtures/population/zagra-population-2016";
+import { ZAGRA_POPULATION_2025 } from "../../../fixtures/population/zagra-population-2025";
 
 export interface PopulationReferenceSet {
   /** Adultos ≥16 años — instrumentos EAS y muestras IBSE de 16 o más. */
@@ -39,9 +39,9 @@ const FUENTE_VAQUEROS_REFERENCE_SET: PopulationReferenceSet = Object.freeze({
   allAges: FUENTE_VAQUEROS_POPULATION_2025,
 });
 
-// Zagra: solo padrón de todas las edades (IECA, 2016). No hay referencia adulta ni de menores.
+// Zagra: solo padrón de todas las edades (INE, 2025). No hay referencia adulta ni de menores.
 const ZAGRA_REFERENCE_SET: PopulationReferenceSet = Object.freeze({
-  allAges: ZAGRA_POPULATION_2016,
+  allAges: ZAGRA_POPULATION_2025,
 });
 
 /**
