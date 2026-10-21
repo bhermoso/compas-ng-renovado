@@ -11,6 +11,7 @@ import {
 import { ActuationFicha } from "./ActuationFicha";
 import { ActuationTemplatePicker } from "./ActuationTemplatePicker";
 import type { ActuationTemplate } from "../../domain/agenda/ActuationTemplate";
+import { agendaToCsv } from "../../application/agenda/agendaCsv";
 import { findHistoricAgendas, importHistoricAgenda, type HistoricAgendaSource } from "../../application/agenda/historicAgendaImport";
 import { instantiateTemplate, removeOwnTemplate, templateFromActuation, upsertOwnTemplate } from "../../application/agenda/actuationTemplates";
 import "./AgendaBoard.css";
@@ -150,7 +151,7 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
       <div className="panel-header">
         <div>
           <p className="eyebrow">Implantación · {municipalityName}</p>
-          <h2>Agenda anual de actuaciones</h2>
+          <h2>Agenda anual · {municipalityName} {yearFilter || "2026-2030"}</h2>
         </div>
         <p className="panel-note">
           Registro de trabajo del equipo técnico. Cada actuación pertenece a un entorno que decide una persona:
@@ -213,6 +214,14 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
         }}>
           Traer actuaciones del Plan de Acción{pendingFromPlan > 0 ? ` (${pendingFromPlan})` : ""}
         </button>
+        <button type="button" disabled={actuations.length === 0} onClick={() => {
+          const blob = new Blob([agendaToCsv(actuations, worksheets)], { type: "text/csv;charset=utf-8" });
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(blob);
+          link.download = `agenda_${municipalityId}_${now().slice(0, 10)}.csv`;
+          document.body.appendChild(link); link.click(); link.remove();
+          setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+        }}>Exportar CSV</button>
         <button type="button" onClick={() => histFile.current?.click()}>Importar agenda del histórico (.json)</button>
         <input ref={histFile} type="file" accept=".json,application/json" hidden aria-label="Copia .json del COMPÁS histórico" onChange={(e) => {
           const file = e.target.files?.[0];
