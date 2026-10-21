@@ -11,6 +11,7 @@ import {
 import { ActuationFicha } from "./ActuationFicha";
 import { ActuationTemplatePicker } from "./ActuationTemplatePicker";
 import type { ActuationTemplate } from "../../domain/agenda/ActuationTemplate";
+import { findHistoricAgendas, importHistoricAgenda, type HistoricAgendaSource } from "../../application/agenda/historicAgendaImport";
 import { instantiateTemplate, removeOwnTemplate, templateFromActuation, upsertOwnTemplate } from "../../application/agenda/actuationTemplates";
 import "./AgendaBoard.css";
 
@@ -47,6 +48,9 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
   const [statusFilter, setStatusFilter] = useState<"" | AgendaActuation["tracking"]["status"]>("");
   const [undo, setUndo] = useState<{ list: AgendaActuation[]; name: string } | null>(null);
   const dragId = useRef<string | null>(null);
+  const histFile = useRef<HTMLInputElement | null>(null);
+  const [histSources, setHistSources] = useState<HistoricAgendaSource[]>([]);
+  const [histPick, setHistPick] = useState(0);
 
   const board = useMemo(() => buildActuationBoard(actuations), [actuations]);
   const pendingFromPlan = useMemo(
@@ -166,6 +170,34 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
         }}>
           Traer actuaciones del Plan de Acción{pendingFromPlan > 0 ? ` (${pendingFromPlan})` : ""}
         </button>
+        <button type="button" onClick={() => histFile.current?.click()}>Importar agenda del histórico (.json)</button>
+        <input ref={histFile} type="file" accept=".json,application/json" hidden aria-label="Copia .json del COMPÁS histórico" onChange={(e) => {
+          const file = e.target.files?.[0];
+          e.target.value = "";
+          if (!file) return;
+          void file.text().then((text) => {
+            const found = findHistoricAgendas(text);
+            if (found.length === 0) { setHistSources([]); setMessage("El fichero no contiene ninguna agenda del COMPÁS histórico (ruta estrategias/…/municipios/…/agendas)."); return; }
+            setHistSources(found); setHistPick(0); setMessage(null);
+          });
+        }} />
+        {histSources.length > 0 && (
+          <span className="agenda-import">
+            <label><span className="agenda-sr">Agenda a importar</span>
+              <select value={histPick} onChange={(e) => setHistPick(Number(e.target.value))}>
+                {histSources.map((h, i) => <option key={i} value={i}>{(h.municipality || "Agenda del fichero")} · {h.actuations.length} actuaciones</option>)}
+              </select>
+            </label>
+            <button type="button" onClick={() => {
+              const src = histSources[histPick];
+              const out = importHistoricAgenda(actuations, src.actuations, { municipalityId, now: now(), newId });
+              onChange(out.list);
+              setHistSources([]);
+              setMessage(`${out.report.added} actuaciones importadas del histórico${out.report.skipped ? `; ${out.report.skipped} sin nombre, no importadas` : ""}. ${out.report.unmapped.length ? `Valores que NG no representa (${out.report.unmapped.length}) se han dejado vacíos o pasado a notas.` : ""} Se añaden a las existentes; revisa entornos y datos.`);
+            }}>Importar</button>
+            <button type="button" onClick={() => setHistSources([])}>Cancelar</button>
+          </span>
+        )}
         {pendingFromPlan === 0 && <span className="panel-note">{listPlanActions(worksheets).length === 0 ? "El Plan de Acción aún no tiene actuaciones." : "Todas las actuaciones del plan están ya en la agenda."}</span>}
       </div>
       <div className="agenda-filters" role="search">
