@@ -18,7 +18,7 @@ import { TAXONOMIA_SANITARIA } from "../health-profile/healthReportSanitaryReadi
 import { THEMATIC_TOPICS } from "../../domain/thematic-prioritisation";
 import type { CorrespondenceStatus } from "./topicCorrespondence";
 
-export const INFORME_CORRESPONDENCE_VERSION = "0.1.0";
+export const INFORME_CORRESPONDENCE_VERSION = "0.2.0";
 
 export interface InformeTopicCorrespondenceEntry {
   /** Dimensión sanitaria tal como la nombra la lectura del Informe. */
@@ -41,11 +41,26 @@ const propuesta = (
   ...(note ? { note } : {}),
 });
 
+/** Validación del autor, 2026-10-21. */
+const VALIDADA_POR_EL_AUTOR = { person: "Blas Ramón Hermoso Rico", date: "2026-10-21" } as const;
+
+const validada = (
+  informeDimension: string,
+  topicIds: readonly string[],
+  note?: string
+): InformeTopicCorrespondenceEntry => ({
+  informeDimension,
+  topicIds,
+  status: "validada",
+  validatedBy: VALIDADA_POR_EL_AUTOR,
+  ...(note ? { note } : {}),
+});
+
 export const INFORME_TOPIC_CORRESPONDENCE: readonly InformeTopicCorrespondenceEntry[] = [
-  propuesta("salud mental y malestar emocional", ["bienestar-emocional"]),
-  propuesta("consumos de tabaco y alcohol", ["tabaco-alcohol-drogas"], "La papeleta incluye además vapeadores y otras drogas."),
-  propuesta("alimentación, sobrepeso y obesidad", ["alimentacion"]),
-  propuesta("actividad física y sedentarismo", ["actividad-fisica"]),
+  validada("salud mental y malestar emocional", ["bienestar-emocional"]),
+  validada("consumos de tabaco y alcohol", ["tabaco-alcohol-drogas"], "La papeleta incluye además vapeadores y otras drogas."),
+  validada("alimentación, sobrepeso y obesidad", ["alimentacion"]),
+  validada("actividad física y sedentarismo", ["actividad-fisica"]),
   propuesta("mortalidad y esperanza de vida", [], "Sin tema de papeleta."),
   propuesta("cáncer y tumores", [], "Sin tema de papeleta."),
   propuesta("enfermedades crónicas (diabetes, hipertensión, cardiovascular)", [], "Sin tema de papeleta."),

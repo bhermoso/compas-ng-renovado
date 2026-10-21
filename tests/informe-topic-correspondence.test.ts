@@ -21,12 +21,27 @@ describe("correspondencia Informe ↔ papeleta", () => {
     for (const e of INFORME_TOPIC_CORRESPONDENCE) for (const id of e.topicIds) expect(ids.has(id)).toBe(true);
   });
 
-  it("nace sin validar: hasta que una persona la valide, ningún tema cuenta como tratado por el Informe", () => {
+  it("solo cuenta lo validado por una persona, con nombre y fecha", () => {
     for (const e of INFORME_TOPIC_CORRESPONDENCE) {
-      expect(e.status).toBe("propuesta");
-      expect(e.validatedBy).toBeNull();
+      if (e.status === "validada") expect(e.validatedBy).toEqual({ person: "Blas Ramón Hermoso Rico", date: "2026-10-21" });
+      else expect(e.validatedBy).toBeNull();
     }
-    expect(validatedInformeCorrespondence()).toHaveLength(0);
-    expect(papeletaTopicsWithoutInformeDimension()).toHaveLength(THEMATIC_TOPICS.length);
+    expect(validatedInformeCorrespondence().map((e) => e.informeDimension)).toEqual([
+      "salud mental y malestar emocional",
+      "consumos de tabaco y alcohol",
+      "alimentación, sobrepeso y obesidad",
+      "actividad física y sedentarismo",
+    ]);
+  });
+
+  it("señala los temas de la papeleta que el Informe no trata", () => {
+    expect(papeletaTopicsWithoutInformeDimension()).toEqual([
+      "pantallas-redes",
+      "sueno-descanso",
+      "sexualidad-salud",
+      "violencia-genero",
+      "medioambiente",
+      "accidentes",
+    ]);
   });
 });
