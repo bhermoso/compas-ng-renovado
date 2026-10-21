@@ -73,23 +73,34 @@ describe("tabla de correspondencia de temas", () => {
 
   it("solo apunta a temas existentes de la papeleta", () => {
     const ids = new Set(THEMATIC_TOPICS.map((t) => t.id));
-    for (const e of TOPIC_CORRESPONDENCE) if (e.topicId !== null) expect(ids.has(e.topicId)).toBe(true);
+    for (const e of TOPIC_CORRESPONDENCE) for (const id of e.topicIds) expect(ids.has(id)).toBe(true);
   });
 
-  it("nace sin validar: ninguna entrada es utilizable hasta que una persona la valide", () => {
+  it("solo es utilizable lo que una persona ha validado, con nombre y fecha", () => {
     for (const e of TOPIC_CORRESPONDENCE) {
-      expect(e.status).toBe("propuesta");
-      expect(e.validatedBy).toBeNull();
+      if (e.status === "validada") expect(e.validatedBy).toEqual({ person: "Blas Ramón Hermoso Rico", date: "2026-10-21" });
+      else expect(e.validatedBy).toBeNull();
     }
-    expect(validatedCorrespondence()).toHaveLength(0);
+    expect(validatedCorrespondence().map((e) => e.localizaTematica)).toEqual([
+      "Alimentación saludable",
+      "Actividad física",
+      "Bienestar emocional",
+      "Salud sexual y reproductiva",
+      "Género/identidad",
+    ]);
   });
 
-  it("señala los temas de la papeleta sin temática de Localiza", () => {
+  it("Género/identidad corresponde a tres temas, no a uno", () => {
+    const e = TOPIC_CORRESPONDENCE.find((x) => x.localizaTematica === "Género/identidad")!;
+    expect([...e.topicIds].sort()).toEqual(["bienestar-emocional", "sexualidad-salud", "violencia-genero"]);
+  });
+
+  it("las propuestas pendientes no cuentan como cobertura", () => {
     expect(papeletaTopicsWithoutLocalizaTematica()).toEqual([
       "pantallas-redes",
       "sueno-descanso",
       "tabaco-alcohol-drogas",
-      "violencia-genero",
+      "medioambiente",
       "accidentes",
     ]);
   });
