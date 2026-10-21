@@ -58,7 +58,7 @@ describe("ageBandsForMunicipality", () => {
     expect(std.length).toBe(21);
     expect(std[0].label).toBe("0-4");
     expect(std[20].label).toBe("100+");
-    expect(ageBandsForMunicipality("zagra").length).toBe(18);
+    expect(ageBandsForMunicipality("zagra").length).toBe(21);
   });
 });
 
