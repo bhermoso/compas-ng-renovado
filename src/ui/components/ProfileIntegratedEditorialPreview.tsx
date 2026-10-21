@@ -204,6 +204,9 @@ export function ProfileIntegratedEditorialPreview({
             {view.readingUnits.title}
           </h3>
           <p className="pie-agenda-intro">{view.readingUnits.intro}</p>
+          {view.readingUnits.assetsSummary !== undefined ? (
+            <p className="pie-hilo__context">{view.readingUnits.assetsSummary}</p>
+          ) : null}
           {view.readingUnits.units.map((unit) => (
             <article key={unit.topicId} className="pie-hilo">
               <header className="pie-hilo__header">

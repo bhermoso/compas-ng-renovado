@@ -161,6 +161,7 @@ export function projectCanonicalToDocumentModel(
       level: 1,
       paragraphs: [
         r.intro,
+        ...(r.assetsSummary !== undefined ? [r.assetsSummary] : []),
         ...r.units.map((u) => `${u.label}. ${u.lines.join(" ")} ${u.crossingStatement}`),
         ...r.gaps,
       ],

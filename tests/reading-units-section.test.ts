@@ -26,9 +26,9 @@ describe("sección «Lectura por tema»", () => {
     const s = buildCanonicalReadingUnits(d, 0)!;
     const af = s.units.find((u) => u.topicId === "actividad-fisica")!;
     expect(af.lines[0]).toBe("Priorización ciudadana: 6 de 10 papeletas completas (60 %), posición 1 de 10.");
-    expect(af.lines[1]).toContain("1 activo con correspondencia validada (Club de marcha)");
+    expect(af.lines[1]).toContain("1 activo con temática correspondiente a este tema (Club de marcha)");
     expect(af.lines[2]).toContain("presencia textual (actividad física y sedentarismo: 7 menciones)");
-    expect(af.crossingStatement).toContain("Localiza registra activos");
+    expect(af.crossingStatement).toContain("Localiza registra activos con temática correspondiente");
     const sueno = s.units.find((u) => u.topicId === "sueno-descanso")!;
     expect(sueno.crossingStatement).toContain("laguna del mapa de activos, no la ausencia del recurso");
     expect(JSON.stringify(s)).not.toMatch(/se recomienda|debería|prioridad alta|urgente/i);
@@ -38,7 +38,7 @@ describe("sección «Lectura por tema»", () => {
     const d = deriveReadingUnits({ assets: [asset("a1", "Huerto", ["Alimentación saludable"]), asset("a2", "Peña", ["Cultura y ocio"])] });
     const s = buildCanonicalReadingUnits(d, 2)!;
     expect(s.gaps.join(" ")).toContain("No consta priorización ciudadana temática");
-    expect(s.gaps.join(" ")).toContain("1 activo de Localiza sin correspondencia validada");
+    expect(s.gaps.join(" ")).toContain("1 activo de Localiza cuya temática no corresponde a ningún tema de la priorización (Peña: Cultura y ocio)");
     expect(s.gaps.join(" ")).toContain("2 activos sin la estructura de una fila de Localiza");
   });
 
@@ -46,5 +46,14 @@ describe("sección «Lectura por tema»", () => {
     const a = buildCanonicalReadingUnits(deriveReadingUnits({ assets: [asset("a", "A", ["Actividad física"])] }), 0)!;
     const b = buildCanonicalReadingUnits(deriveReadingUnits({ assets: [asset("b", "B", ["Alimentación saludable"])] }), 0)!;
     expect(a.units.map((u) => u.topicId)).not.toEqual(b.units.map((u) => u.topicId));
+  });
+
+  it("indica cuántos activos se leyeron en total y que los recuentos por tema no se suman", () => {
+    const d = deriveReadingUnits({
+      assets: [asset("a1", "ZAHRA", ["Actividad física", "Bienestar emocional"]), asset("a2", "Punto", ["Otros"])],
+    });
+    const s = buildCanonicalReadingUnits(d, 0)!;
+    expect(s.assetsSummary).toContain("2 activos leídos en el expediente");
+    expect(s.assetsSummary).toContain("no se suman");
   });
 });

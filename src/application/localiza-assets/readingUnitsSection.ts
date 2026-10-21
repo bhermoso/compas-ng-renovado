@@ -33,6 +33,8 @@ export interface CanonicalReadingUnit {
 export interface CanonicalReadingUnits {
   title: string;
   intro: string;
+  /** Recuento total de activos de Localiza leídos en el expediente. */
+  assetsSummary?: string;
   units: CanonicalReadingUnit[];
   /** Lagunas y exclusiones declaradas. */
   gaps: string[];
@@ -47,13 +49,13 @@ const labelOf = (id: string) => THEMATIC_TOPICS.find((t) => t.id === id)?.label 
 function crossingStatement(crossing: CapacityVoiceCrossing, voiceSourceAvailable: boolean): string {
   switch (crossing) {
     case "voz-y-activo-registrado":
-      return "La ciudadanía lo señaló y Localiza registra activos con correspondencia validada.";
+      return "La ciudadanía lo señaló y Localiza registra activos con temática correspondiente a este tema.";
     case "voz-sin-activo-registrado":
-      return "La ciudadanía lo señaló y Localiza no registra activos con correspondencia validada: es una laguna del mapa de activos, no la ausencia del recurso.";
+      return "La ciudadanía lo señaló y Localiza no registra activos con temática correspondiente a este tema: es una laguna del mapa de activos, no la ausencia del recurso.";
     case "activo-registrado-sin-voz":
       return voiceSourceAvailable
-        ? "Localiza registra activos y la ciudadanía no marcó este tema en la priorización."
-        : "Localiza registra activos; no consta priorización ciudadana temática.";
+        ? "Localiza registra activos con temática correspondiente y la ciudadanía no marcó este tema en la priorización."
+        : "Localiza registra activos con temática correspondiente; no consta priorización ciudadana temática.";
   }
 }
 
@@ -76,7 +78,7 @@ export function buildCanonicalReadingUnits(
       const named = assets.slice(0, MAX_NAMED_ASSETS).map((a) => a.nombre).join("; ");
       const more = assets.length > MAX_NAMED_ASSETS ? ` y ${assets.length - MAX_NAMED_ASSETS} más` : "";
       lines.push(
-        `Localiza Salud: ${plural(assets.length, "activo", "activos")} con correspondencia validada (${named}${more}).`
+        `Localiza Salud: ${plural(assets.length, "activo", "activos")} con temática correspondiente a este tema (${named}${more}).`
       );
     }
     lines.push(
@@ -107,10 +109,12 @@ export function buildCanonicalReadingUnits(
   if (derivation.topicsWithoutSource.length > 0) {
     gaps.push(`Temas sin fuente en el expediente: ${derivation.topicsWithoutSource.map(labelOf).join("; ")}.`);
   }
-  const sinCorrespondencia = derivation.assetsWithoutValidatedCorrespondence.length;
-  if (sinCorrespondencia > 0) {
+  const sinCorrespondencia = derivation.assetsWithoutValidatedCorrespondence;
+  if (sinCorrespondencia.length > 0) {
     gaps.push(
-      `${plural(sinCorrespondencia, "activo", "activos")} de Localiza sin correspondencia validada de tema: no cuenta${sinCorrespondencia === 1 ? "" : "n"} en ninguna unidad.`
+      `${plural(sinCorrespondencia.length, "activo", "activos")} de Localiza cuya temática no corresponde a ningún tema de la priorización ` +
+        `(${sinCorrespondencia.map((a) => `${a.nombre}: ${a.tematicas.join(", ") || "sin temática"}`).join("; ")}): ` +
+        `no cuenta${sinCorrespondencia.length === 1 ? "" : "n"} en ninguna unidad.`
     );
   }
   if (unstructuredAssets > 0) {
@@ -119,5 +123,21 @@ export function buildCanonicalReadingUnits(
     );
   }
 
-  return { title: READING_UNITS_TITLE, intro: READING_UNITS_INTRO, units, gaps };
+  const leidos = new Set<string>([
+    ...derivation.units.flatMap((u) => u.capacity.assets.map((a) => a.atomId)),
+    ...derivation.assetsWithoutValidatedCorrespondence.map((a) => a.atomId),
+  ]).size;
+  const assetsSummary =
+    leidos > 0
+      ? `Localiza Salud: ${plural(leidos, "activo leído", "activos leídos")} en el expediente. ` +
+        `Un activo cuenta en cada tema que le corresponda según sus temáticas de Localiza, por lo que los recuentos por tema no se suman.`
+      : undefined;
+
+  return {
+    title: READING_UNITS_TITLE,
+    intro: READING_UNITS_INTRO,
+    ...(assetsSummary !== undefined ? { assetsSummary } : {}),
+    units,
+    gaps,
+  };
 }
