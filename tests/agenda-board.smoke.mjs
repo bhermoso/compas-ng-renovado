@@ -19,8 +19,9 @@ const page = await b.newPage({ viewport: { width: 1400, height: 900 } });
 const errs = []; page.on("pageerror", e => errs.push(e.message));
 const step = async (n, f) => { try { await f(); } catch (e) { console.log("FALLO en", n, String(e.message).split("\n")[0]); await page.screenshot({ path: "/tmp/agenda-fail.png" }); await b.close(); await server.close(); process.exit(1); } };
 await page.goto(`${base}/app-direct`, { waitUntil: "domcontentloaded" });
-await step("nav", async () => { await page.locator(".app-nav__tab", { hasText: "Agenda" }).click({ timeout: 20000 }); });
-await step("vista", async () => { await page.getByRole("heading", { name: /Agenda de actuaciones/ }).waitFor({ timeout: 10000 }); });
+await step("nav", async () => { await page.locator(".app-nav__tab", { hasText: "Implantación" }).click({ timeout: 20000 }); });
+console.log("pestaña activa tras abrir Implantación:", JSON.stringify(await page.locator(".app-nav__tab--active").allInnerTexts()));
+await step("vista", async () => { await page.getByRole("heading", { name: /Agenda anual de actuaciones/ }).waitFor({ timeout: 10000 }); });
 await step("alta", async () => {
   await page.getByRole("button", { name: "Nueva actuación" }).click();
   await page.getByPlaceholder("Nombre de la actuación").fill("Taller de marcha");
@@ -40,7 +41,7 @@ await step("evaluación sin agenda", async () => {
   await page.locator(".app-nav__tab", { hasText: "Evaluación" }).click();
   await page.getByRole("heading", { name: /Evaluación del Plan Local de Salud/ }).waitFor({ timeout: 5000 });
   if (await page.getByText("Taller de marcha").count()) throw new Error("la vista Evaluación no debe mostrar la agenda");
-  await page.locator(".app-nav__tab", { hasText: "Agenda" }).click();
+  await page.locator(".app-nav__tab", { hasText: "Implantación" }).click();
   await page.locator("[data-actuation-id]").first().getByRole("button").first().click();
   await page.getByRole("button", { name: "Guardar ficha" }).waitFor({ timeout: 5000 });
 });
@@ -57,7 +58,7 @@ await step("dirty", async () => {
 await step("recarga", async () => {
   await page.waitForTimeout(1500);
   await page.reload({ waitUntil: "domcontentloaded" });
-  await page.locator(".app-nav__tab", { hasText: "Agenda" }).click({ timeout: 20000 });
+  await page.locator(".app-nav__tab", { hasText: "Implantación" }).click({ timeout: 20000 });
   await page.getByText("Taller de marcha nórdica").first().waitFor({ timeout: 8000 });
 });
 console.log("persiste tras recargar, en laboral:", await page.locator(".agenda-column--laboral [data-actuation-id]").count());
@@ -71,6 +72,7 @@ await step("filtro", async () => {
   await page.getByRole("button", { name: "Quitar filtros" }).click();
 });
 await step("eliminar-deshacer", async () => {
+  await page.locator(".agenda-menu > summary").first().click();
   await page.getByRole("button", { name: "Eliminar", exact: true }).click();
   await page.getByRole("button", { name: "Eliminar de verdad" }).click();
   await page.getByRole("button", { name: "Deshacer" }).click();
@@ -88,5 +90,8 @@ await step("importar-historico", async () => {
   console.log("importadas: OK");
 });
 await page.screenshot({ path: "/tmp/agenda-e2e.png", fullPage: true });
+await page.setViewportSize({ width: 390, height: 844 });
+await page.screenshot({ path: "/tmp/agenda-movil.png", fullPage: true });
+console.log("desborde horizontal a 390 px:", await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1));
 console.log("OK; errores de página:", JSON.stringify(errs));
 await b.close(); await server.close();

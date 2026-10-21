@@ -302,7 +302,7 @@ const NAV_ITEMS: { id: AppView; label: string }[] = [
   { id: "priorizacion",  label: "Priorización" },
   { id: "plan",          label: "Plan de Acción" },
   { id: "plan-local",    label: "Plan Local de Salud" },
-  { id: "agenda",        label: "Agenda" },
+  { id: "agenda",        label: "Implantación" },
   { id: "evaluacion",    label: "Evaluación" },
   { id: "ges",           label: "Gestor de Encuestas" },
 ];
@@ -4356,6 +4356,7 @@ export default function App() {
             templates={workspace.actuationTemplates ?? []}
             onTemplatesChange={handleActuationTemplatesChange}
             focusId={agendaFocusId}
+            onGoToPlan={() => setView("plan")}
           />
         )}
 
