@@ -21,7 +21,7 @@ const step = async (n, f) => { try { await f(); } catch (e) { console.log("FALLO
 await page.goto(`${base}/app-direct`, { waitUntil: "domcontentloaded" });
 await step("nav", async () => { await page.locator(".app-nav__tab", { hasText: "Implantación" }).click({ timeout: 20000 }); });
 console.log("pestaña activa tras abrir Implantación:", JSON.stringify(await page.locator(".app-nav__tab--active").allInnerTexts()));
-await step("vista", async () => { await page.getByRole("heading", { name: /Agenda anual de actuaciones/ }).waitFor({ timeout: 10000 }); });
+await step("vista", async () => { await page.getByRole("heading", { name: /Agenda anual · / }).waitFor({ timeout: 10000 }); });
 await step("alta", async () => {
   await page.getByRole("button", { name: "Nueva actuación" }).click();
   await page.getByPlaceholder("Nombre de la actuación").fill("Taller de marcha");
