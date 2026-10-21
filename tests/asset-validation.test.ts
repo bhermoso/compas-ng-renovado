@@ -44,6 +44,14 @@ describe("activos validados (declaración del equipo técnico)", () => {
     expect(s?.assetsSummary).toContain("declarado como validado");
     const none = buildCanonicalReadingUnits(deriveReadingUnits({ assets: records }), 0);
     expect(none?.assetsSummary).not.toContain("validado");
+    const line = s?.units[0].lines.find((l) => l.startsWith("Localiza Salud"));
+    expect(line).toContain("2 activos (1 declarado validado) con temática");
+    const solo = readLocalizaAssets([atoms[0]], [{ id: "v1", documentId: "doc-loc", criteria, declaredBy: "V", declaredAt: "x" }]).records;
+    const l1 = buildCanonicalReadingUnits(deriveReadingUnits({ assets: solo }), 0, 1)?.units[0].lines.find((l) => l.startsWith("Localiza Salud"));
+    expect(l1).toContain("1 activo validado con temática");
+    const sinDecl = readLocalizaAssets(atoms).records;
+    const l2 = buildCanonicalReadingUnits(deriveReadingUnits({ assets: sinDecl }), 0)?.units[0].lines.find((l) => l.startsWith("Localiza Salud"));
+    expect(l2).not.toContain("validado");
   });
 
   it("añadir y retirar deja el repositorio sin la clave", () => {

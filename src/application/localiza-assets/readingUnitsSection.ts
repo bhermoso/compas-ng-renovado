@@ -46,6 +46,16 @@ const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one :
 const decimal = (n: number) => String(n).replace(".", ",");
 const labelOf = (id: string) => THEMATIC_TOPICS.find((t) => t.id === id)?.label ?? id;
 
+/** Recuento con el estado declarado: «validado» solo si el equipo técnico lo declaró. */
+function assetCountLabel(assets: ReadonlyArray<{ estado: string }>): string {
+  const validated = assets.filter((a) => a.estado === "validado").length;
+  if (validated === 0) return plural(assets.length, "activo", "activos");
+  if (validated === assets.length) {
+    return plural(assets.length, "activo validado", "activos validados");
+  }
+  return `${plural(assets.length, "activo", "activos")} (${plural(validated, "declarado validado", "declarados validados")})`;
+}
+
 function crossingStatement(crossing: CapacityVoiceCrossing, voiceSourceAvailable: boolean): string {
   switch (crossing) {
     case "voz-y-activo-registrado":
@@ -79,7 +89,7 @@ export function buildCanonicalReadingUnits(
       const named = assets.slice(0, MAX_NAMED_ASSETS).map((a) => a.nombre).join("; ");
       const more = assets.length > MAX_NAMED_ASSETS ? ` y ${assets.length - MAX_NAMED_ASSETS} más` : "";
       lines.push(
-        `Localiza Salud: ${plural(assets.length, "activo", "activos")} con temática correspondiente a este tema (${named}${more}).`
+        `Localiza Salud: ${assetCountLabel(assets)} con temática correspondiente a este tema (${named}${more}).`
       );
     }
     lines.push(
