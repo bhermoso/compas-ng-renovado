@@ -80,6 +80,16 @@ Un Perfil es singular cuando:
 
 Un Perfil que podría intercambiarse con el de otro municipio sin que ningún lector lo notara no ha cumplido su función metodológica.
 
+### Art. 4 bis. Unidades de lectura derivadas del expediente
+
+Las unidades en que el Perfil organiza su lectura integrada se derivan del expediente del municipio. No proceden de una lista de temas fija ni del índice del Informe de Salud.
+
+1. **Existencia.** Una unidad existe cuando al menos una fuente del expediente la sostiene: una prioridad ciudadana, un problema documentado en el Informe o en los estudios, o un grupo de activos. Sin fuente, no hay unidad.
+2. **Temas como coordenadas.** Los temas de salud (los de la papeleta de priorización temática y los que añada el Informe) sirven para situar y cruzar fuentes. No determinan qué unidades se escriben.
+3. **Tres planos.** Cada unidad cruza capacidad (activos), necesidad documentada (Informe y estudios) y voz (priorización ciudadana y material cualitativo). Un plano sin fuente se declara como laguna (Art. 8), no se rellena.
+4. **Correspondencia declarada.** La relación entre temas del Informe, temas de la priorización y ámbitos de activos consta en una tabla declarada, versionada y validada por una persona. Ningún emparejamiento se infiere del texto.
+5. **Orden de la lectura dentro de la unidad:** lo que sostiene la salud, lo que se sabe del problema y su escala, lo que dice la comunidad, lo que falta saber y lo que queda para la priorización.
+
 ### Art. 5. Perfil como explicación territorial
 
 El Perfil no es la acumulación de datos: es su explicación. La diferencia entre acumular y explicar es la distinción entre el EvidenceStore —que contiene los datos— y el Perfil —que los organiza en una lectura con sentido.
@@ -208,6 +218,29 @@ La descripción de activos obedece a las mismas exigencias de trazabilidad que c
 Cuando exista o pueda obtenerse Localiza Salud, esta será la fuente principal/preferente para el mapa de activos del Perfil. Otras fuentes -ERACIS, documentación territorial, material cualitativo, diagnósticos de programas, memorias participativas o informes institucionales- pueden aportar indicios sobre capacidades del territorio, pero no sustituyen Localiza Salud: deben declararse como complementarias, contextuales o pendientes de reconciliación.
 
 Un Perfil que solo diagnostica déficits viola su función metodológica.
+
+### Art. 9 bis. Estatuto de los activos y patrones de cruce
+
+**Estatuto.** Solo cuenta como activo del Perfil el que consta en Localiza Salud. Un mapa previo de recursos (guía local, anexo de un perfil anterior, memoria participativa) no está validado: se conserva como candidato y sigue tres estados, cada paso con decisión humana:
+
+| Estado | Entra en la lectura | Presentación |
+|---|---|---|
+| Candidato previo, sin coincidencia en Localiza | No | Lista de revisión, «pendiente de reconciliación» |
+| Revisado y registrado en Localiza Salud | Sí | Activo con fuente Localiza |
+| Validado | Sí | Activo validado |
+
+La coincidencia entre un candidato y Localiza la declara una persona.
+
+**Patrones de cruce.** Cada unidad declara qué combinación de planos sostiene la evidencia, sin umbrales ni puntuaciones:
+
+| Patrón | Afirma | No afirma |
+|---|---|---|
+| Correspondencia | Necesidad documentada, activo registrado y voz coinciden | Que el activo funcione, llegue o se use |
+| Activo sin necesidad documentada | Capacidad no puesta en relación con un problema por el diagnóstico | Que no exista necesidad |
+| Necesidad sin activo registrado | El mapa de activos no la cubre | Que el activo no exista: es una laguna del mapa, no un hallazgo |
+| Voz sin contraste | La comunidad lo señala y el Informe no lo trata | Que el Informe lo contradiga |
+
+Las conclusiones del Perfil se formulan por patrón. Siguen siendo conclusiones, no recomendaciones (Art. 16 bis).
 
 ### Art. 10. Participación como evidencia
 
@@ -554,6 +587,22 @@ La salida interpretativa COMPÁS y la salida comparativa breve tipo OHID/Fingert
 
 *Fuente:* Arts. 17 bis y 17 ter; CONTRACT-NHS-HEALTH-PROFILE §0.
 
+**I-LHPM-11 — Unidades derivadas del expediente**
+
+El Perfil no contiene unidades de lectura que ninguna fuente del expediente sostenga, ni omite una unidad sostenida por una fuente. Dos municipios con expedientes distintos no producen el mismo conjunto de unidades por construcción.
+
+*Consecuencia si se viola:* el Perfil vuelve a ser intercambiable entre municipios (Art. 4) y la ausencia de evidencia se presenta como lectura.
+
+*Fuente:* Arts. 4 y 4 bis.
+
+**I-LHPM-12 — Activos validados frente a candidatos**
+
+Un recurso que no consta en Localiza Salud no se presenta como activo del Perfil ni se cuenta en la lectura. «Necesidad sin activo registrado» se refiere al mapa de Localiza y nunca se formula como inexistencia del recurso.
+
+*Consecuencia si se viola:* un mapa sin validar pasa por evidencia, o una laguna del mapa se lee como ausencia de capacidad comunitaria.
+
+*Fuente:* Arts. 9 y 9 bis.
+
 ---
 
 ## Relaciones con otros contratos
@@ -578,6 +627,7 @@ La salida interpretativa COMPÁS y la salida comparativa breve tipo OHID/Fingert
 | 2026-07-03 | 1.0 | Creación inicial | COMPÁS NG Sprint 2 |
 | 2026-07-14 | 1.1 | Saneamiento de gobernanza: regla N+1, priorización ciudadana como evidencia, cadena del conocimiento, modelo canónico único y autoría humana acotada | COMPÁS NG gobernanza |
 | 2026-09-24 | 1.2 | Localiza Salud queda fijada como fuente principal/preferente para activos del Perfil, con otras fuentes como apoyo contextual o pendiente de reconciliación | COMPÁS NG |
+| 2026-10-21 | 1.3 | Unidades de lectura derivadas del expediente (Art. 4 bis), estatuto de activos candidatos frente a Localiza y patrones de cruce (Art. 9 bis); invariantes I-LHPM-11 e I-LHPM-12. Decisión del autor | COMPÁS NG |
 
 ---
 
