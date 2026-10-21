@@ -572,12 +572,14 @@ un `authorshipNote` que recuerda la obligación de autoría humana. Solo cuando
 el equipo técnico redacta y guarda su propio texto, el estado pasa a `"authored"`.
 El sistema nunca promueve automáticamente de `"scaffold"` a `"authored"`.
 
-**Invariante terminológico — El PSL concluye, pero no recomienda.**
+**Invariante terminológico — El PSL concluye y orienta, pero no decide.**
 El Capítulo V formula conclusiones diagnósticas. El Capítulo VI cierra la
-lectura interpretativa documentando alcance y limitaciones. Ningún capítulo del
-PSL formula recomendaciones ni orientaciones estratégicas. Las recomendaciones
-pertenecen al Motor de Traducción Estratégica (Producto 5) y al Plan de Acción
-(Producto 6).
+lectura interpretativa documentando alcance y limitaciones y recoge las
+orientaciones técnicas que el equipo elige del menú de propuestas
+(CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY v1.5, Art. 16 ter). Ningún capítulo
+del PSL selecciona prioridades ni formula actuaciones operativas (responsable,
+plazo, recurso). Las actuaciones pertenecen al Motor de Traducción Estratégica
+(Producto 5) y al Plan de Acción (Producto 6).
 
 **I-PSL-4 — La deliberación del capítulo VII nunca es generada por el sistema**
 

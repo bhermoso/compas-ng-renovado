@@ -82,19 +82,22 @@ const FORBIDDEN_WRITING_PATTERNS: Array<{
 }> = [
   {
     id: "recomendacion",
-    motivo: "El Perfil concluye, no recomienda (las recomendaciones son del Plan de Acción).",
+    motivo:
+      "El cuerpo compilado del Perfil no recomienda: las orientaciones técnicas entran solo por el menú elegible, con autoría y fecha (Art. 16 ter, CONTRACT-LHPM v1.5).",
     pattern:
       /se recomienda|recomendamos|es recomendable|debe implantarse|debe ponerse en marcha|proponemos|se propone implantar/i,
   },
   {
     id: "actuacion-programa",
-    motivo: "Actuaciones, programas y objetivos estratégicos pertenecen a fases posteriores.",
+    motivo:
+      "Las actuaciones operativas, los programas y los objetivos estratégicos pertenecen al Plan de Acción (Art. 3, CONTRACT-LHPM v1.5).",
     pattern:
       /programa de intervención|actuaciones previstas|objetivo estratégico|línea estratégica|objetivo operativo|cartera de servicios propuesta/i,
   },
   {
     id: "causalidad-falsa",
-    motivo: "Solo mecanismos e hipótesis plausibles; nunca causalidad demostrada sin sustento.",
+    motivo:
+      "Toda relación entre determinante y problema es una hipótesis con fuente y grado de sustento declarados; la causalidad solo se afirma si la fuente citada la demuestra (Art. 8 bis).",
     pattern:
       /demuestra que|queda demostrado|causa directa|relación causal confirmada|prueba de forma concluyente/i,
   },

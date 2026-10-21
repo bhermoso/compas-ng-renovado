@@ -279,7 +279,7 @@ El Producto 3 se considera completo cuando:
 | D3-02 | Integración de `SampleQualityAssessment` en PSL (opción A o B) | Implementación pendiente | Cautelas metodológicas de calidad muestral en PSL |
 | D3-03 | Handler UI de transición PSL `validated` → `approved` | Implementación UI | Acceso al compilador del Producto 7 (PLS) |
 | ~~D3-04~~ | ~~Datos de referencia Granada/Andalucía en paneles EAS~~ | **RECLASIFICADO 2026-06-30**: los valores de referencia ya existen en el sistema para DUKE (EAS Granada, 49,2), PREDIMED (EAS Granada, 7,6) y SF-12 (España, 50±10). La deuda no es de disponibilidad de datos sino de wiring al compilador → trasladada a D4-01 en `CONTRACT-NHS-HEALTH-PROFILE`. | D3-04 cerrado |
-| ~~D3-05~~ | ~~Capítulo VI "Recomendaciones" contradice la regla "el PSL concluye, pero no recomienda"~~ | **RESUELTO 2026-06-30**: `recomendaciones` eliminado del modelo; Cap. VI reemplazado por `cierreInterpretativo`; gates G-LHC-3 y G-LHC-7 actualizados. | — |
+| ~~D3-05~~ | ~~Capítulo VI "Recomendaciones" contradice la regla "el PSL concluye, pero no recomienda"~~ | **RESUELTO 2026-06-30**: `recomendaciones` eliminado del modelo; Cap. VI reemplazado por `cierreInterpretativo`; gates G-LHC-3 y G-LHC-7 actualizados. Superado en parte por CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY v1.4/v1.5 (2026-10-21): el Perfil concluye y orienta, no decide; las orientaciones técnicas entran por el menú elegible (Art. 16 ter). El modelo y los gates no se han alineado todavía. | — |
 
 ---
 
