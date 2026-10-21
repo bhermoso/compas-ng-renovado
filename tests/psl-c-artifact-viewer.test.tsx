@@ -274,7 +274,7 @@ describe("visor PSL-C — documento institucional renderizado", () => {
     // GOV-SALIDA-01 (institutionalBoundary en el visor): en la vista canónica
     // sellada, la frontera se rinde COMPLETA (enunciado + consenso) y se
     // distingue con su marca propia (`pslc-viewer__frontera`), como en la ruta
-    // legacy. Invariante ejecutable: el Perfil concluye, no recomienda (Art. 16 bis).
+    // legacy. Invariante ejecutable: el cuerpo compilado no recomienda; las orientaciones entran por el menú elegible (Art. 16 ter).
     const answers = buildDiagnosticAnswers({
       workspace: ws,
       determinantTitles: [],

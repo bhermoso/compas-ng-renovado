@@ -6,8 +6,10 @@
  * los capítulos del borrador institucional del Perfil.
  *
  * Reglas de producto que este módulo garantiza:
- *  - El Perfil concluye, pero no recomienda: ningún capítulo formula
- *    actuaciones, programas ni objetivos estratégicos.
+ *  - El Perfil concluye y orienta, pero no decide (CONTRACT-LHPM v1.5): el
+ *    cuerpo compilado no formula recomendaciones; las orientaciones técnicas
+ *    entran por el menú elegible (Art. 16 ter) y ningún capítulo fija
+ *    actuaciones operativas, programas ni objetivos estratégicos.
  *  - La evidencia se selecciona y comenta, no se vuelca íntegra.
  *  - Las ausencias (determinantes, desagregaciones) se declaran como
  *    incertidumbres del diagnóstico, nunca se rellenan con contenido inventado.

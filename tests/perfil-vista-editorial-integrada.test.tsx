@@ -796,7 +796,7 @@ describe("render — perfil de salud local canónico", () => {
     // GOV-SALIDA-01 (borrador vivo): la frontera se rinde EN VIVO —mismo marcado y
     // origen (`buildInstitutionalBoundary(psl.priorizacion)`) que la vista
     // canónica— para que el autor la vea antes de compilar. El enunciado de
-    // frontera es fijo (el Perfil concluye, no recomienda); el consenso refleja la
+    // frontera es fijo (el Perfil concluye y orienta, no decide; v1.5); el consenso refleja la
     // priorización viva.
     expect(proposalHtml).toContain("Frontera institucional");
     expect(proposalHtml).toContain("no formula recomendaciones");
