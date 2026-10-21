@@ -87,12 +87,14 @@ describe("tabla de correspondencia de temas", () => {
       "Bienestar emocional",
       "Salud sexual y reproductiva",
       "Género/identidad",
+      "Prevención del suicidio",
     ]);
   });
 
-  it("Género/identidad corresponde a tres temas, no a uno", () => {
+  it("Género/identidad corresponde a bienestar emocional y salud sexual, y no a violencia de género", () => {
     const e = TOPIC_CORRESPONDENCE.find((x) => x.localizaTematica === "Género/identidad")!;
-    expect([...e.topicIds].sort()).toEqual(["bienestar-emocional", "sexualidad-salud", "violencia-genero"]);
+    expect([...e.topicIds].sort()).toEqual(["bienestar-emocional", "sexualidad-salud"]);
+    expect(e.topicIds).not.toContain("violencia-genero");
   });
 
   it("las propuestas pendientes no cuentan como cobertura", () => {
@@ -100,6 +102,7 @@ describe("tabla de correspondencia de temas", () => {
       "pantallas-redes",
       "sueno-descanso",
       "tabaco-alcohol-drogas",
+      "violencia-genero",
       "medioambiente",
       "accidentes",
     ]);

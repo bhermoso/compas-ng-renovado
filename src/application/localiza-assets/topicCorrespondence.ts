@@ -63,10 +63,10 @@ export const TOPIC_CORRESPONDENCE: readonly TopicCorrespondenceEntry[] = [
   validada("Salud sexual y reproductiva", ["sexualidad-salud"]),
   validada(
     "Género/identidad",
-    ["violencia-genero", "bienestar-emocional", "sexualidad-salud"],
-    "Correspondencia múltiple declarada por el autor: no se reduce a violencia de género."
+    ["bienestar-emocional", "sexualidad-salud"],
+    "Incluye a las personas trans. La violencia de género se entiende solo respecto de las mujeres y no se asigna a esta temática (declaración del autor)."
   ),
-  propuesta("Prevención del suicidio", ["bienestar-emocional"], "Subtema; el autor decide si se agrupa."),
+  validada("Prevención del suicidio", ["bienestar-emocional"], "Tema de la papeleta: bienestar emocional y salud mental."),
   propuesta("Naturaleza", ["medioambiente"], "Equivalencia parcial; el autor decide."),
   propuesta("Participación y acción comunitaria", []),
   propuesta("Cultura y ocio", []),
