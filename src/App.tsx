@@ -20,6 +20,7 @@ import { worksheetKey, type IndicatorWorksheet } from "./domain/action-plan-cata
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   type CycleConciliation,
+  type AssetValidationDeclaration,
   type DocumentCycle,
   type DocumentKind,
   type MunicipalDocument,
@@ -27,6 +28,8 @@ import {
   addMunicipalDocument,
   setMunicipalDocumentCycle,
   addCycleConciliation,
+  addAssetValidation,
+  removeAssetValidation,
   removeCycleConciliation,
   replaceMunicipalDocumentByKind,
   removeMunicipalDocument,
@@ -1435,6 +1438,22 @@ export default function App() {
     setWorkspace((prev) => ({
       ...prev,
       repository: removeCycleConciliation(prev.repository, conciliationId),
+      updatedAt: new Date().toISOString(),
+    }));
+  }
+
+  function handleAddAssetValidation(validation: Omit<AssetValidationDeclaration, "declaredAt">) {
+    setWorkspace((prev) => ({
+      ...prev,
+      repository: addAssetValidation(prev.repository, validation),
+      updatedAt: new Date().toISOString(),
+    }));
+  }
+
+  function handleRemoveAssetValidation(validationId: string) {
+    setWorkspace((prev) => ({
+      ...prev,
+      repository: removeAssetValidation(prev.repository, validationId),
       updatedAt: new Date().toISOString(),
     }));
   }
@@ -3940,6 +3959,8 @@ export default function App() {
               onSetDocumentCycle={handleSetDocumentCycle}
               onAddConciliation={handleAddConciliation}
               onRemoveConciliation={handleRemoveConciliation}
+              onAddAssetValidation={handleAddAssetValidation}
+              onRemoveAssetValidation={handleRemoveAssetValidation}
             />
 
             {/* ── BLOQUE 4: Añadir o sustituir fuentes ── */}

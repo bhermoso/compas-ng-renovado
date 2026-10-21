@@ -2,12 +2,14 @@ import { FrameworkReference } from "./FrameworkReference";
 import { DocumentReference } from "./Documentation";
 import type {
   CycleConciliation,
+  AssetValidationDeclaration,
   DocumentCycle,
   MunicipalDocument,
   MunicipalDocumentRepository,
 } from "../../domain/repository";
 import { DocumentCycleControl } from "./DocumentCycleControl";
 import { CycleConciliationPanel } from "./CycleConciliationPanel";
+import { AssetValidationPanel } from "./AssetValidationPanel";
 import {
   libraryDocumentAssignmentId,
   type CompasLibraryDocument,
@@ -64,6 +66,8 @@ interface DocumentRepositoryPanelProps {
   onSetDocumentCycle?: (documentId: string, cycle: DocumentCycle | undefined) => void;
   onAddConciliation?: (conciliation: Omit<CycleConciliation, "declaredAt">) => void;
   onRemoveConciliation?: (conciliationId: string) => void;
+  onAddAssetValidation?: (validation: Omit<AssetValidationDeclaration, "declaredAt">) => void;
+  onRemoveAssetValidation?: (validationId: string) => void;
 }
 
 function DocumentRow({
@@ -199,6 +203,8 @@ export function DocumentRepositoryPanel({
   onSetDocumentCycle,
   onAddConciliation,
   onRemoveConciliation,
+  onAddAssetValidation,
+  onRemoveAssetValidation,
 }: DocumentRepositoryPanelProps) {
   // Solo muestra "otras fuentes documentales" — las capas 1–3 (Informe de Salud,
   // Estudios complementarios, Activos para la salud) tienen sus propios paneles.
@@ -238,6 +244,10 @@ export function DocumentRepositoryPanel({
 
       {onAddConciliation && onRemoveConciliation && (
         <CycleConciliationPanel repository={repository} onAdd={onAddConciliation} onRemove={onRemoveConciliation} />
+      )}
+
+      {onAddAssetValidation && onRemoveAssetValidation && (
+        <AssetValidationPanel repository={repository} onAdd={onAddAssetValidation} onRemove={onRemoveAssetValidation} />
       )}
 
       {libraryDocuments !== undefined && libraryDocuments.length > 0 && (

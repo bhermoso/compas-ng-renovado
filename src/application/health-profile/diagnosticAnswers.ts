@@ -726,7 +726,8 @@ export function buildDiagnosticAnswers(
   const eracisContexto = getEracisMunicipalContext(workspace.municipality.identity.id);
   const sanitaria = buildHealthReportSanitaryReading(workspace.healthReport);
   const activosLocaliza = readLocalizaAssets(
-    workspace.evidenceStore.atoms.filter((a) => a.kind === "asset")
+    workspace.evidenceStore.atoms.filter((a) => a.kind === "asset"),
+    fullWorkspace.repository.assetValidations
   );
   const lecturaPorTema = buildCanonicalReadingUnits(
     deriveReadingUnits({
@@ -734,7 +735,8 @@ export function buildDiagnosticAnswers(
       study: workspace.thematicPrioritisationStudy ?? null,
       informeSignals: sanitaria.senales,
     }),
-    activosLocaliza.unstructured.length
+    activosLocaliza.unstructured.length,
+    activosLocaliza.records.filter((r) => r.estado === "validado").length
   );
 
   return {

@@ -61,7 +61,8 @@ function crossingStatement(crossing: CapacityVoiceCrossing, voiceSourceAvailable
 
 export function buildCanonicalReadingUnits(
   derivation: ReadingUnitsDerivation,
-  unstructuredAssets: number
+  unstructuredAssets: number,
+  validatedAssets = 0
 ): CanonicalReadingUnits | undefined {
   if (derivation.units.length === 0) return undefined;
 
@@ -129,7 +130,10 @@ export function buildCanonicalReadingUnits(
   ]).size;
   const assetsSummary =
     leidos > 0
-      ? `Localiza Salud: ${plural(leidos, "activo leído", "activos leídos")} en el expediente. ` +
+      ? `Localiza Salud: ${plural(leidos, "activo leído", "activos leídos")} en el expediente` +
+        (validatedAssets > 0
+          ? `, de los cuales ${validatedAssets} ${validatedAssets === 1 ? "consta declarado" : "constan declarados"} como validado${validatedAssets === 1 ? "" : "s"} por el equipo técnico con los criterios de registro y validación de activos para la salud en Andalucía. `
+          : `. `) +
         `Un activo cuenta en cada tema que le corresponda según sus temáticas de Localiza, por lo que los recuentos por tema no se suman.`
       : undefined;
 
