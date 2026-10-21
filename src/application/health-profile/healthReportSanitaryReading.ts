@@ -88,7 +88,7 @@ export interface HealthReportSanitaryReading {
 }
 
 // Taxonomía sanitaria conservadora: dimensión → términos (sin acentos).
-const TAXONOMIA_SANITARIA: Array<{ dimension: string; terminos: string[] }> = [
+export const TAXONOMIA_SANITARIA: Array<{ dimension: string; terminos: string[] }> = [
   { dimension: "mortalidad y esperanza de vida", terminos: ["mortalidad", "esperanza de vida"] },
   { dimension: "cáncer y tumores", terminos: ["cancer", "tumores", "tumor"] },
   {
