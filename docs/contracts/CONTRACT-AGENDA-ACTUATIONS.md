@@ -59,3 +59,7 @@ Persona referente y contacto son datos personales de terceros. Son opcionales. L
 ## 9. Qué no se porta del histórico
 
 Las actuaciones precargadas (con entorno, trimestre y prioridad ya puestos) y el reparto de trimestres por orden. Eran propuestas de EPVSA, no datos del municipio.
+
+## Importación desde el COMPÁS histórico — actualización autorizada 2026-10-21
+
+La agenda puede traerse de la copia `.json` del monolito (ruta `estrategias/<estrategia>/municipios/<municipio>/agendas`). La importación solo traduce campos: añade actuaciones sin sustituir ni borrar las existentes, no infiere entorno, trimestre ni prioridad (un valor no válido queda vacío) y deja el valor de indicador alcanzado del histórico como nota, sin tratarlo como resultado. Lo importado es registro de trabajo no verificado; la persona revisa entornos y datos.

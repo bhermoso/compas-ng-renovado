@@ -18,6 +18,7 @@ describe("AgendaBoard", () => {
     for (const c of ["Sin asignar", "Entorno sanitario", "Entorno laboral"]) expect(html).toContain(c);
     expect(html).toContain("El Plan de Acción aún no tiene actuaciones.");
     expect(html).toContain("Nueva actuación");
+    expect(html).toContain("Importar agenda del histórico (.json)");
   });
   it("coloca la tarjeta en su entorno con selector de teclado", () => {
     const html = renderToStaticMarkup(createElement(AgendaBoard, {

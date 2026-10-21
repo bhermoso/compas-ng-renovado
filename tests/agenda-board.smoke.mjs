@@ -76,6 +76,17 @@ await step("eliminar-deshacer", async () => {
   await page.getByRole("button", { name: "Deshacer" }).click();
   await page.getByText("Taller de marcha nórdica").first().waitFor({ timeout: 3000 });
 });
+await step("importar-historico", async () => {
+  const copia = { estrategias: { "es-andalucia-epvsa": { municipios: { Prueba: { agendas: {
+    1: { id: 1, nombre: "Actuación del histórico A", entorno: "educativo", estado: "en ejecucion", trimestre: "T3", orden: 1 },
+    2: { id: 2, nombre: "Actuación del histórico B", entorno: "sanitario", estado: "finalizada", orden: 2 } } } } } } };
+  await page.locator("input[type=file][aria-label^='Copia .json']").setInputFiles({ name: "copia.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify(copia)) });
+  await page.getByRole("button", { name: "Importar", exact: true }).click({ timeout: 5000 });
+  await page.getByText(/2 actuaciones importadas del histórico/).waitFor({ timeout: 3000 });
+  if ((await page.locator(".agenda-column--educativo [data-actuation-id]").count()) !== 1) throw new Error("A no está en educativo");
+  if ((await page.locator(".agenda-column--sanitario [data-actuation-id]").count()) !== 1) throw new Error("B no está en sanitario");
+  console.log("importadas: OK");
+});
 await page.screenshot({ path: "/tmp/agenda-e2e.png", fullPage: true });
 console.log("OK; errores de página:", JSON.stringify(errs));
 await b.close(); await server.close();

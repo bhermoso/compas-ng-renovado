@@ -56,3 +56,5 @@
 .agenda-catalog__line > summary, .agenda-catalog__program > summary { cursor: pointer; }
 .agenda-catalog__program { margin-top: 6px; border-left: 3px solid var(--azul); }
 .agenda-catalog__objectives { margin: 6px 0; font-size: 0.9em; }
+
+.agenda-import { display: inline-flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
