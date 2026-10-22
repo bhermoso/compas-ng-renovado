@@ -17,7 +17,7 @@ const noop = () => undefined;
 const render = (initiallyOpen: boolean) =>
   renderToStaticMarkup(
     createElement(ProposalReviewMode, {
-      proposals, authored, decisions, onDecide: noop, onAdd: noop, onRemove: noop, relations: [], onDeclareRelation: noop, initiallyOpen,
+      proposals, authored, decisions, onDecide: noop, onAdd: noop, onRemove: noop, relations: [], axes: [], onDeclareAxis: noop, onDeclareRelation: noop, initiallyOpen,
     })
   );
 
