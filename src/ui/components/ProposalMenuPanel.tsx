@@ -60,9 +60,9 @@ export function ProposalMenuPanel({ proposals, decisions, onDecide }: ProposalMe
 
   return (
     <section className="workspace-panel" aria-labelledby="proposal-menu-title">
-      <h2 id="proposal-menu-title">Conclusiones propuestas</h2>
+      <h2 id="proposal-menu-title">Conclusiones y orientaciones propuestas</h2>
       <p>
-        Cada propuesta deriva de la «Lectura por tema». El sistema no elige ninguna: elige o descarta
+        Las propuestas derivan de la «Lectura por tema» o las ha redactado el equipo técnico, con la evidencia que citan. Nadie elige por omisión: elige o descarta
         cada una una persona del equipo técnico, con su autoría y fecha. Las descartadas se conservan en
         el registro. Estado: {resolution.elegidas.length} elegidas · {resolution.descartadas.length}{" "}
         descartadas · {resolution.pendientes.length} pendientes. La versión institucional exige que no
@@ -78,7 +78,24 @@ export function ProposalMenuPanel({ proposals, decisions, onDecide }: ProposalMe
           return (
             <li key={id} className="document-row">
               <div>
-                <p className="document-kind">{STATE_LABEL[r.state]}</p>
+                <p className="document-kind">
+                  {STATE_LABEL[r.state]} · {r.proposal.kind === "conclusion" ? "Conclusión" : "Orientación técnica"} ·{" "}
+                  {r.proposal.origin === "equipo" ? "redactada por el equipo técnico" : "propuesta por el sistema"}
+                  {r.proposal.derivedFrom.sustento !== undefined
+                    ? ` · sustento de grado ${r.proposal.derivedFrom.sustento}`
+                    : ""}
+                </p>
+                {r.proposal.origin === "equipo" && (
+                  <>
+                    <p>Evidencia citada:</p>
+                    <ul>
+                      {r.proposal.derivedFrom.evidence.map((e) => (
+                        <li key={e}>{e}</li>
+                      ))}
+                    </ul>
+                    {r.proposal.cautelas !== undefined && <p>Salvedades: {r.proposal.cautelas}</p>}
+                  </>
+                )}
                 <label>
                   Redacción
                   <textarea
