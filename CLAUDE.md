@@ -7,10 +7,10 @@ La única verdad es: el código, el historial Git, los contratos en docs/contrac
 Producto prioritario: el Perfil de Salud Local — documento científico, editorial e institucional de referencia. Toda decisión se justifica contra una pregunta: ¿acerca esto al Perfil a su forma definitiva? Si la respuesta no es claramente afirmativa, detente y explica por qué antes de tocar código.
 
 ## Doctrina vigente (commit 298f195, no reabrir)
-- Contrato rector: docs/contracts/CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md v1.1
+- Contrato rector: docs/contracts/CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md (versión vigente en el propio contrato)
 - Regla N+1 (Art. 7 bis A / I-LHPM-7): Informe solo no es Perfil. Perfil = Informe + al menos una de: estudios complementarios, activos, priorización ciudadana.
 - Modelo canónico único (Art. 17 bis / I-LHPM-8): pantalla, visor, DOCX, PDF e impresión son el mismo documento. Ninguna representación puede divergir.
-- Cadena (Art. 16 bis / I-LHPM-9): evidencia, lectura integrada, conclusiones, frontera, recomendaciones (Plan de Acción). El Perfil concluye, no recomienda.
+- Cadena (Art. 16 bis / I-LHPM-9): evidencia, lectura integrada, conclusiones, frontera, recomendaciones (Plan de Acción). El Perfil concluye y orienta técnicamente; las actuaciones, prioridades y recomendaciones son del Plan de Acción.
 - Autoría acotada (Art. 16): el cuerpo diagnóstico es compilado y trazable, no editable a mano. La autoría humana vive en el cierre interpretativo y el enriquecimiento.
 - El NHS es representación derivada del conocimiento del Perfil, con estatuto de producto propio por audiencia. No puede ser segunda fuente de verdad.
 
