@@ -9,6 +9,7 @@
  */
 
 import type { ProposalDecision } from "../../domain/repository";
+import type { StatementType } from "../../domain/statements/statementTypes";
 
 export type ProposalKind = "conclusion" | "orientation";
 
@@ -20,6 +21,8 @@ export interface Proposal {
   id: string;
   kind: ProposalKind;
   text: string;
+  /** Tipo de afirmación (Art. 8); ausente = sin clasificar. */
+  tipo?: StatementType;
   /** Quién propone: el sistema (por defecto) o el equipo técnico (Art. 16 ter 1 bis). */
   origin?: "sistema" | "equipo";
   /** Salvedades declaradas por quien propone. */

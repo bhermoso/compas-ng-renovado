@@ -1,3 +1,4 @@
+import type { StatementType } from "../statements/statementTypes";
 import type { MunicipalityId } from "../municipality";
 
 export type DocumentId = string;
@@ -141,6 +142,8 @@ export interface AuthoredProposal {
   id: string;
   kind: "conclusion" | "orientation";
   text: string;
+  /** Tipo de afirmación (Art. 8); obligatorio al registrar, ausente en registros anteriores a v1.7. */
+  tipo?: StatementType;
   /** Evidencia citada: obligatoria; cada línea lleva documento y localización. */
   evidence: string[];
   /** Orientación: ids de las propuestas de conclusión de las que deriva. */

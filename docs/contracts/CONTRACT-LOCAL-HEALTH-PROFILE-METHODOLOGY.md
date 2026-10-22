@@ -1,7 +1,7 @@
 # CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY
 
 > Contrato metodológico canónico del Perfil de Salud Local (PSL) en COMPÁS NG.
-> Versión 1.7 — 2026-10-22 (historial en el registro de revisiones)
+> Versión 1.7.1 — 2026-10-22 (historial en el registro de revisiones)
 > Estado: VIGENTE
 >
 > Este contrato define qué debe ser metodológicamente un Perfil de Salud Local,
@@ -241,15 +241,15 @@ El Perfil puede formular relaciones entre potenciales determinantes y problemas 
 
 Cada frase del cuerpo del Perfil es una afirmación con los campos siguientes: tipo (Art. 8), texto, evidencia con localización, origen (compilada por el sistema desde átomos, o redactada por el equipo técnico), afirmaciones de las que deriva, grado de sustento cuando se apoya en una relación (Art. 8 bis) y, si requiere elección, su estado (Art. 16 ter). La evidencia es obligatoria; solo la cautela y la laguna pueden limitarse a remitir a otra afirmación.
 
-La lectura de cada unidad (Art. 4 bis) recorre cinco pasos. Cada paso admite solo ciertos tipos y tiene una prohibición propia.
+La conclusión no es un tipo más: es el paso en que las afirmaciones de los pasos anteriores se resumen o se interpretan, y sus afirmaciones son de los tipos que ese paso admite. La lectura de cada unidad (Art. 4 bis) recorre cinco pasos. Cada paso admite solo ciertos tipos y tiene una prohibición propia.
 
 | Paso | Tipos que admite | Prohibido |
 |---|---|---|
-| Describir | hecho, laguna | cifra sin año y fuente; dato aproximado; sustituir el dato local por el de otro ámbito |
-| Analizar | hecho, cautela, laguna | umbral sin fuente; presentar una referencia no local como dato municipal |
-| Inferir | interpretación, hipótesis | causalidad sin grado 1 o 2; sostener una orientación con una relación de grado 3 |
-| Concluir | conclusión | conclusión sin evidencia citada |
-| Orientar | orientación técnica | responsable, plazo, recurso o indicador de ejecución; decidir prioridades |
+| Describir | hecho, percepción, laguna | cifra sin año y fuente; dato aproximado; sustituir el dato local por el de otro ámbito |
+| Analizar | hecho, percepción, cautela, laguna | umbral sin fuente; presentar una referencia no local como dato municipal |
+| Inferir | interpretación, hipótesis, cautela | causalidad sin grado 1 o 2; sostener una orientación con una relación de grado 3 |
+| Concluir | hecho, interpretación, laguna | conclusión sin evidencia citada |
+| Orientar | orientación técnica, decisión posterior, cautela | responsable, plazo, recurso o indicador de ejecución; decidir prioridades |
 
 1. **Referencias no locales.** Las referencias de ámbito autonómico o provincial (por ejemplo, la Encuesta Andaluza de Salud) entran en el paso de análisis solo como referencia comparativa rotulada «no local», con encuesta, año y tabla. Nunca sustituyen el dato municipal.
 2. **Tabla de relaciones.** Las relaciones del paso de inferencia constan en una tabla declarada y versionada, con su grado y su fuente. La valida una persona del equipo técnico, y cada versión lleva su autoría y su fecha.
@@ -741,6 +741,7 @@ Las conclusiones y las orientaciones técnicas cierran el Perfil y no se present
 | 2026-10-21 | 1.5 | Conclusiones y orientaciones como menú elegible por el equipo técnico: propuesta, elección o descarte con autoría y fecha, solo las elegidas entran en el cuerpo; sin elección por defecto (Art. 16 ter, I-LHPM-16). Decisión del autor | COMPÁS NG |
 | 2026-10-22 | 1.6 | Propuestas redactadas por el equipo técnico en el cierre interpretativo, con evidencia citada, sin elección por defecto (Art. 16 ter 1 bis). Decisión del autor | COMPÁS NG |
 | 2026-10-22 | 1.7 | La afirmación como unidad y la cadena de lectura en cinco pasos (Art. 8 ter); ejes de lectura declarados (Art. 4 ter); interpretaciones e hipótesis en el menú, ubicación final de conclusiones y orientaciones y modo de revisión sobre el mismo documento (Art. 16 ter, 7 y 8). Invariantes I-LHPM-17 e I-LHPM-18. Decisión del autor | COMPÁS NG |
+| 2026-10-22 | 1.7.1 | Corrección de la tabla del Art. 8 ter: «conclusión» no es un tipo del Art. 8 sino un paso; se fijan los tipos que admite cada paso, tal como los implementa el modelo de afirmación | COMPÁS NG |
 
 ---
 
