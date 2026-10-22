@@ -20,6 +20,10 @@ export interface Proposal {
   id: string;
   kind: ProposalKind;
   text: string;
+  /** Quién propone: el sistema (por defecto) o el equipo técnico (Art. 16 ter 1 bis). */
+  origin?: "sistema" | "equipo";
+  /** Salvedades declaradas por quien propone. */
+  cautelas?: string;
   derivedFrom: {
     /** Átomos de evidencia o ids de lectura de los que deriva. */
     evidence: string[];

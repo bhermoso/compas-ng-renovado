@@ -131,6 +131,28 @@ export interface ProposalDecision {
   textoAjustado?: string;
 }
 
+/**
+ * Propuesta de conclusión u orientación redactada por el equipo técnico en el
+ * cierre interpretativo (CONTRACT-LHPM v1.6, Art. 16 ter 1 bis). Entra en el
+ * mismo menú que las propuestas del sistema y no nace elegida.
+ */
+export interface AuthoredProposal {
+  /** Identificador estable elegido por quien redacta (p. ej. "C1", "O1"). */
+  id: string;
+  kind: "conclusion" | "orientation";
+  text: string;
+  /** Evidencia citada: obligatoria; cada línea lleva documento y localización. */
+  evidence: string[];
+  /** Orientación: ids de las propuestas de conclusión de las que deriva. */
+  conclusionIds?: string[];
+  /** Grado de sustento de la relación (Art. 8 bis), cuando la propuesta se apoya en una. */
+  sustento?: 1 | 2 | 3;
+  /** Salvedades que el equipo declara (límites de la lectura). */
+  cautelas?: string;
+  authoredBy: string;
+  authoredAt: string;
+}
+
 export interface MunicipalDocument {
   id: DocumentId;
   municipalityId: MunicipalityId;
@@ -162,6 +184,8 @@ export interface MunicipalDocumentRepository {
   assetValidations?: AssetValidationDeclaration[];
   /** Historial de decisiones sobre propuestas del Perfil; ausente mientras no haya ninguna. */
   proposalDecisions?: ProposalDecision[];
+  /** Propuestas redactadas por el equipo técnico; ausente mientras no haya ninguna. */
+  authoredProposals?: AuthoredProposal[];
   createdAt: string;
   updatedAt: string;
 }
@@ -403,6 +427,33 @@ export function addProposalDecision(
   return {
     ...repository,
     proposalDecisions: [...(repository.proposalDecisions ?? []), decision],
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+export function addAuthoredProposal(
+  repository: MunicipalDocumentRepository,
+  proposal: AuthoredProposal
+): MunicipalDocumentRepository {
+  // Mismo id = nueva redacción de la misma propuesta: sustituye a la anterior.
+  const others = (repository.authoredProposals ?? []).filter((p) => p.id !== proposal.id);
+  return {
+    ...repository,
+    authoredProposals: [...others, proposal],
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+export function removeAuthoredProposal(
+  repository: MunicipalDocumentRepository,
+  proposalId: string
+): MunicipalDocumentRepository {
+  const rest = (repository.authoredProposals ?? []).filter((p) => p.id !== proposalId);
+  const { authoredProposals: _previous, ...base } = repository;
+  void _previous;
+  return {
+    ...base,
+    ...(rest.length > 0 ? { authoredProposals: rest } : {}),
     updatedAt: new Date().toISOString(),
   };
 }

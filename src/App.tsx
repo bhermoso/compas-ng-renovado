@@ -1,4 +1,4 @@
-import { buildReadingUnitProposals } from "./application/proposals";
+import { authoredToProposals, buildReadingUnitProposals } from "./application/proposals";
 import { InitialLocalHealthPlanPanel } from "./ui/components/InitialLocalHealthPlanPanel";
 import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
 import { InstitutionalLogoBand } from "./ui/components/InstitutionalLogoBand";
@@ -23,6 +23,7 @@ import {
   type CycleConciliation,
   type AssetValidationDeclaration,
   type ProposalDecision,
+  type AuthoredProposal,
   type DocumentCycle,
   type DocumentKind,
   type MunicipalDocument,
@@ -32,6 +33,8 @@ import {
   addCycleConciliation,
   addAssetValidation,
   addProposalDecision,
+  addAuthoredProposal,
+  removeAuthoredProposal,
   removeAssetValidation,
   removeCycleConciliation,
   replaceMunicipalDocumentByKind,
@@ -191,6 +194,7 @@ import {
   EstudiosComplementariosPanel,
   ActivosSaludPanel,
   ProposalMenuPanel,
+  AuthoredProposalPanel,
   LocalHealthProfileView,
   ThematicPrioritisationPanel,
   CitizenParticipationSummary,
@@ -1442,6 +1446,22 @@ export default function App() {
     setWorkspace((prev) => ({
       ...prev,
       repository: removeCycleConciliation(prev.repository, conciliationId),
+      updatedAt: new Date().toISOString(),
+    }));
+  }
+
+  function handleAddAuthoredProposal(proposal: Omit<AuthoredProposal, "authoredAt">) {
+    setWorkspace((prev) => ({
+      ...prev,
+      repository: addAuthoredProposal(prev.repository, { ...proposal, authoredAt: new Date().toISOString() }),
+      updatedAt: new Date().toISOString(),
+    }));
+  }
+
+  function handleRemoveAuthoredProposal(proposalId: string) {
+    setWorkspace((prev) => ({
+      ...prev,
+      repository: removeAuthoredProposal(prev.repository, proposalId),
       updatedAt: new Date().toISOString(),
     }));
   }
@@ -4064,8 +4084,16 @@ export default function App() {
               });
               return (
                 <>
+                <AuthoredProposalPanel
+                  proposals={workspace.repository.authoredProposals ?? []}
+                  onAdd={handleAddAuthoredProposal}
+                  onRemove={handleRemoveAuthoredProposal}
+                />
                 <ProposalMenuPanel
-                  proposals={buildReadingUnitProposals(previewContext.previewAnswers.lecturaPorTema)}
+                  proposals={[
+                    ...buildReadingUnitProposals(previewContext.previewAnswers.lecturaPorTema),
+                    ...authoredToProposals(workspace.repository.authoredProposals ?? []),
+                  ]}
                   decisions={workspace.repository.proposalDecisions ?? []}
                   onDecide={handleProposalDecision}
                 />
