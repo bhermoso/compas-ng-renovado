@@ -26,6 +26,8 @@ export interface CanonicalReadingUnit {
   crossing: CapacityVoiceCrossing;
   /** Qué dice cada fuente sobre el tema, en frases de hecho. */
   lines: string[];
+  /** Eje de lectura declarado: quién lo declaró y su definición (Art. 4 ter). */
+  axis?: { definition: string; declaredBy: string; declaredOn: string; version: number };
   /** Qué fuentes se cruzan en esta unidad y qué significa el cruce. */
   crossingStatement: string;
 }
@@ -62,6 +64,10 @@ function crossingStatement(crossing: CapacityVoiceCrossing, voiceSourceAvailable
       return "La ciudadanía lo señaló y Localiza registra activos con temática correspondiente a este tema.";
     case "voz-sin-activo-registrado":
       return "La ciudadanía lo señaló y Localiza no registra activos con temática correspondiente a este tema: es una laguna del mapa de activos, no la ausencia del recurso.";
+    case "eje-con-activo-registrado":
+      return "Eje declarado por el equipo técnico: Localiza registra activos con las temáticas que el equipo conectó con el eje. La priorización ciudadana no recoge este eje.";
+    case "eje-sin-activo-registrado":
+      return "Eje declarado por el equipo técnico: el Informe trata sus dimensiones y Localiza no registra activos con las temáticas que el equipo conectó con el eje: es una laguna del mapa de activos, no la ausencia del recurso. La priorización ciudadana no recoge este eje.";
     case "activo-registrado-sin-voz":
       return voiceSourceAvailable
         ? "Localiza registra activos con temática correspondiente y la ciudadanía no marcó este tema en la priorización."
@@ -78,6 +84,11 @@ export function buildCanonicalReadingUnits(
 
   const units: CanonicalReadingUnit[] = derivation.units.map((u) => {
     const lines: string[] = [];
+    if (u.axis !== undefined) {
+      lines.push(
+        `Eje de lectura declarado por ${u.axis.declaredBy} el ${u.axis.declaredOn} (versión ${u.axis.version}): ${u.axis.definition}`
+      );
+    }
     if (u.voice !== null) {
       lines.push(
         `Priorización ciudadana: ${u.voice.votes} de ${u.voice.completeRecords} papeletas completas ` +
@@ -97,18 +108,24 @@ export function buildCanonicalReadingUnits(
         ? `Informe de Salud: trata el tema por presencia textual (${u.informe.dimensions
             .map((d) => `${d.dimension}: ${plural(d.menciones, "mención", "menciones")}`)
             .join("; ")}); no equivale a necesidad documentada ni a prevalencia.`
-        : "Informe de Salud: ninguna dimensión con correspondencia validada a este tema."
+        : u.axis !== undefined
+          ? "Informe de Salud: ninguna de las dimensiones del eje consta en la lectura del Informe."
+          : "Informe de Salud: ninguna dimensión con correspondencia validada a este tema."
     );
     return {
       topicId: u.topicId,
       label: u.label,
       crossing: u.crossing,
+      ...(u.axis !== undefined ? { axis: u.axis } : {}),
       lines,
       crossingStatement: crossingStatement(u.crossing, derivation.voiceSourceAvailable),
     };
   });
 
   const gaps: string[] = [];
+  if (derivation.axesWithoutSource.length > 0) {
+    gaps.push(`Ejes declarados sin ninguna fuente en el expediente, sin unidad propia: ${derivation.axesWithoutSource.join("; ")}.`);
+  }
   if (!derivation.voiceSourceAvailable) {
     gaps.push("No consta priorización ciudadana temática en el expediente: el plano de voz es una laguna (Art. 10).");
   }

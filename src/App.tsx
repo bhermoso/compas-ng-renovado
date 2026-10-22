@@ -35,6 +35,8 @@ import {
   addProposalDecision,
   addAuthoredProposal,
   addRelationDeclaration,
+  addReadingAxisDeclaration,
+  type ReadingAxisDeclaration,
   type RelationDeclaration,
   removeAuthoredProposal,
   removeAssetValidation,
@@ -1455,6 +1457,14 @@ export default function App() {
     setWorkspace((prev) => ({
       ...prev,
       repository: addAuthoredProposal(prev.repository, { ...proposal, authoredAt: new Date().toISOString() }),
+      updatedAt: new Date().toISOString(),
+    }));
+  }
+
+  function handleDeclareAxis(axis: Omit<ReadingAxisDeclaration, "version" | "declaredAt">) {
+    setWorkspace((prev) => ({
+      ...prev,
+      repository: addReadingAxisDeclaration(prev.repository, axis),
       updatedAt: new Date().toISOString(),
     }));
   }
@@ -4106,6 +4116,8 @@ export default function App() {
                       onAdd={handleAddAuthoredProposal}
                       onRemove={handleRemoveAuthoredProposal}
                       relations={workspace.repository.relationDeclarations ?? []}
+                      axes={workspace.repository.readingAxes ?? []}
+                      onDeclareAxis={handleDeclareAxis}
                       onDeclareRelation={handleDeclareRelation}
                     />
                   }

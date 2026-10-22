@@ -26,6 +26,7 @@
 import {
   buildCanonicalReadingUnits,
   deriveReadingUnits,
+  currentAxes,
   readLocalizaAssets,
   type CanonicalReadingUnits,
 } from "../localiza-assets";
@@ -737,6 +738,7 @@ export function buildDiagnosticAnswers(
       assets: activosLocaliza.records,
       study: workspace.thematicPrioritisationStudy ?? null,
       informeSignals: sanitaria.senales,
+      axes: currentAxes(fullWorkspace.repository.readingAxes),
     }),
     activosLocaliza.unstructured.length,
     activosLocaliza.records.filter((r) => r.estado === "validado").length

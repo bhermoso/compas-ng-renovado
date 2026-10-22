@@ -26,11 +26,15 @@ import {
 import type { LocalizaAssetRecord } from "./localizaAssetRecord";
 import { validatedInformeCorrespondence } from "./informeTopicCorrespondence";
 import { validatedCorrespondence } from "./topicCorrespondence";
+import { axisTopicId } from "./readingAxes";
+import type { ReadingAxisDeclaration } from "../../domain/repository";
 
 export type CapacityVoiceCrossing =
   | "voz-y-activo-registrado"
   | "voz-sin-activo-registrado"
-  | "activo-registrado-sin-voz";
+  | "activo-registrado-sin-voz"
+  | "eje-con-activo-registrado"
+  | "eje-sin-activo-registrado";
 
 export interface ReadingUnitVoice {
   votes: number;
@@ -61,6 +65,8 @@ export interface ReadingUnit {
   crossing: CapacityVoiceCrossing;
   /** El Informe trata el tema (presencia textual), o null si no consta. */
   informe: ReadingUnitInforme | null;
+  /** Eje de lectura declarado por una persona (Art. 4 ter); ausente en las unidades de tema. */
+  axis?: { definition: string; declaredBy: string; declaredOn: string; version: number };
   /** Necesidad documentada: pendiente mientras el Informe conste solo por presencia textual. */
   documentedNeed: "no-disponible-solo-presencia-textual";
 }
@@ -73,6 +79,8 @@ export interface ReadingUnitsDerivation {
   assetsWithoutValidatedCorrespondence: Array<{ atomId: string; nombre: string; tematicas: string[] }>;
   /** Temas que solo trata el Informe (presencia textual): no generan unidad. */
   topicsOnlyInInforme: string[];
+  /** Ejes declarados sin ninguna fuente en el expediente (ni Informe ni activos): no generan unidad (Art. 4 bis.1). */
+  axesWithoutSource: string[];
   /** Si no hay estudio de priorización, el plano de voz es una laguna del expediente. */
   voiceSourceAvailable: boolean;
 }
@@ -82,6 +90,8 @@ export function deriveReadingUnits(input: {
   study?: ThematicPrioritisationStudy | null;
   /** Señales de la lectura del Informe (`HealthReportSanitaryReading.senales`). */
   informeSignals?: ReadonlyArray<{ dimension: string; menciones: number }>;
+  /** Ejes de lectura vigentes declarados por el equipo técnico (Art. 4 ter). */
+  axes?: ReadonlyArray<ReadingAxisDeclaration>;
 }): ReadingUnitsDerivation {
   const topicsByTematica = new Map<string, readonly string[]>(
     validatedCorrespondence().map((e) => [e.localizaTematica, e.topicIds])
@@ -157,8 +167,40 @@ export function deriveReadingUnits(input: {
     });
   }
 
+  const axesWithoutSource: string[] = [];
+  for (const axis of input.axes ?? []) {
+    const tematicas = new Set(axis.localizaTematicas);
+    const assets = input.assets
+      .filter((a) => a.tematicas.some((t) => tematicas.has(t)))
+      .map((a) => ({ atomId: a.atomId, nombre: a.nombre, tematicas: a.tematicas, estado: a.estado }));
+    const dimensions = axis.informeDimensions.flatMap((d) => {
+      const menciones = mencionesPorDimension.get(d);
+      return menciones === undefined ? [] : [{ dimension: d, menciones }];
+    });
+    if (assets.length === 0 && dimensions.length === 0) {
+      axesWithoutSource.push(axis.label);
+      continue;
+    }
+    units.push({
+      topicId: axisTopicId(axis.id),
+      label: axis.label,
+      voice: null,
+      capacity: { assets },
+      crossing: assets.length > 0 ? "eje-con-activo-registrado" : "eje-sin-activo-registrado",
+      informe: dimensions.length > 0 ? { dimensions, status: "presencia-textual" } : null,
+      axis: {
+        definition: axis.definition,
+        declaredBy: axis.declaredBy,
+        declaredOn: axis.declaredAt.slice(0, 10),
+        version: axis.version,
+      },
+      documentedNeed: "no-disponible-solo-presencia-textual",
+    });
+  }
+
   return {
     units,
+    axesWithoutSource,
     topicsWithoutSource,
     topicsOnlyInInforme,
     assetsWithoutValidatedCorrespondence: withoutCorrespondence,

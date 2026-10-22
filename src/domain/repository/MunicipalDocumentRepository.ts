@@ -133,6 +133,24 @@ export interface ProposalDecision {
 }
 
 /**
+ * Eje de lectura declarado por el equipo técnico (CONTRACT-LHPM v1.7, Art. 4 ter):
+ * agrupación de evidencia sobre un tema que el Informe trata y la papeleta no
+ * recoge. Registro acumulativo: la última versión de cada eje es la vigente.
+ */
+export interface ReadingAxisDeclaration {
+  id: string;
+  version: number;
+  label: string;
+  definition: string;
+  /** Dimensiones sanitarias del Informe que agrupa. */
+  informeDimensions: string[];
+  /** Temáticas de Localiza cuyos activos declara el equipo conectados con el eje. */
+  localizaTematicas: string[];
+  declaredBy: string;
+  declaredAt: string;
+}
+
+/**
  * Relación entre un determinante y un problema de salud, declarada por el equipo
  * técnico (CONTRACT-LHPM v1.7, Arts. 8 bis y 8 ter 2). El registro es acumulativo:
  * cada cambio es una versión nueva con su autoría y fecha; la última de cada
@@ -220,6 +238,8 @@ export interface MunicipalDocumentRepository {
   authoredProposals?: AuthoredProposal[];
   /** Historial de declaraciones de relaciones determinante-problema; ausente mientras no haya ninguna. */
   relationDeclarations?: RelationDeclaration[];
+  /** Historial de ejes de lectura declarados; ausente mientras no haya ninguno. */
+  readingAxes?: ReadingAxisDeclaration[];
   createdAt: string;
   updatedAt: string;
 }
@@ -504,6 +524,19 @@ export function addRelationDeclaration(
       ...history,
       { ...declaration, version, declaredAt: new Date().toISOString() },
     ],
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+export function addReadingAxisDeclaration(
+  repository: MunicipalDocumentRepository,
+  axis: Omit<ReadingAxisDeclaration, "version" | "declaredAt">
+): MunicipalDocumentRepository {
+  const history = repository.readingAxes ?? [];
+  const version = history.filter((a) => a.id === axis.id).length + 1;
+  return {
+    ...repository,
+    readingAxes: [...history, { ...axis, version, declaredAt: new Date().toISOString() }],
     updatedAt: new Date().toISOString(),
   };
 }
