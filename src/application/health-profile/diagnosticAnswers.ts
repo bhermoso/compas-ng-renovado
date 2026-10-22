@@ -739,6 +739,7 @@ export function buildDiagnosticAnswers(
       study: workspace.thematicPrioritisationStudy ?? null,
       informeSignals: sanitaria.senales,
       axes: currentAxes(fullWorkspace.repository.readingAxes),
+      figures: fullWorkspace.repository.figures,
     }),
     activosLocaliza.unstructured.length,
     activosLocaliza.records.filter((r) => r.estado === "validado").length

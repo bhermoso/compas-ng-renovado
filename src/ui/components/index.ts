@@ -52,3 +52,4 @@ export { AuthoredProposalPanel } from "./AuthoredProposalPanel";
 export { ProposalReviewMode } from "./ProposalReviewMode";
 export { RelationTablePanel } from "./RelationTablePanel";
 export { ReadingAxisPanel } from "./ReadingAxisPanel";
+export { FigureImportPanel } from "./FigureImportPanel";

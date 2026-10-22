@@ -27,7 +27,7 @@ import type { LocalizaAssetRecord } from "./localizaAssetRecord";
 import { validatedInformeCorrespondence } from "./informeTopicCorrespondence";
 import { validatedCorrespondence } from "./topicCorrespondence";
 import { axisTopicId } from "./readingAxes";
-import type { ReadingAxisDeclaration } from "../../domain/repository";
+import type { FigureRecord, ReadingAxisDeclaration } from "../../domain/repository";
 
 export type CapacityVoiceCrossing =
   | "voz-y-activo-registrado"
@@ -65,6 +65,8 @@ export interface ReadingUnit {
   crossing: CapacityVoiceCrossing;
   /** El Informe trata el tema (presencia textual), o null si no consta. */
   informe: ReadingUnitInforme | null;
+  /** Cifras con procedencia de las dimensiones de esta unidad (paso «describir»). */
+  cifras: FigureRecord[];
   /** Eje de lectura declarado por una persona (Art. 4 ter); ausente en las unidades de tema. */
   axis?: { definition: string; declaredBy: string; declaredOn: string; version: number };
   /** Necesidad documentada: pendiente mientras el Informe conste solo por presencia textual. */
@@ -79,6 +81,8 @@ export interface ReadingUnitsDerivation {
   assetsWithoutValidatedCorrespondence: Array<{ atomId: string; nombre: string; tematicas: string[] }>;
   /** Temas que solo trata el Informe (presencia textual): no generan unidad. */
   topicsOnlyInInforme: string[];
+  /** Cifras importadas cuya dimensión no corresponde a ninguna unidad (o que no declaran dimensión): no se muestran en ninguna. */
+  figuresWithoutUnit: Array<{ dimension: string; n: number }>;
   /** Ejes declarados sin ninguna fuente en el expediente (ni Informe ni activos): no generan unidad (Art. 4 bis.1). */
   axesWithoutSource: string[];
   /** Si no hay estudio de priorización, el plano de voz es una laguna del expediente. */
@@ -92,6 +96,8 @@ export function deriveReadingUnits(input: {
   informeSignals?: ReadonlyArray<{ dimension: string; menciones: number }>;
   /** Ejes de lectura vigentes declarados por el equipo técnico (Art. 4 ter). */
   axes?: ReadonlyArray<ReadingAxisDeclaration>;
+  /** Cifras con procedencia importadas en el expediente. */
+  figures?: ReadonlyArray<FigureRecord>;
 }): ReadingUnitsDerivation {
   const topicsByTematica = new Map<string, readonly string[]>(
     validatedCorrespondence().map((e) => [e.localizaTematica, e.topicIds])
@@ -125,6 +131,19 @@ export function deriveReadingUnits(input: {
       informeByTopic.set(id, list);
     }
   }
+
+  const figures = input.figures ?? [];
+  const usedFigureIds = new Set<string>();
+  const figuresFor = (dimensions: ReadonlyArray<string>): FigureRecord[] => {
+    const set = new Set(dimensions);
+    const out = figures.filter((f) => f.dimension !== undefined && set.has(f.dimension));
+    for (const f of out) usedFigureIds.add(f.id);
+    return out;
+  };
+  const dimensionsOfTopic = (topicId: string): string[] =>
+    validatedInformeCorrespondence()
+      .filter((e) => e.topicIds.includes(topicId))
+      .map((e) => e.informeDimension);
 
   const study = input.study ?? null;
   const voiceByTopic = new Map(study?.ranking.map((r) => [r.topicId, r]) ?? []);
@@ -163,6 +182,7 @@ export function deriveReadingUnits(input: {
       capacity: { assets },
       crossing,
       informe: informeDims.length > 0 ? { dimensions: informeDims, status: "presencia-textual" } : null,
+      cifras: figuresFor(dimensionsOfTopic(topic.id)),
       documentedNeed: "no-disponible-solo-presencia-textual",
     });
   }
@@ -177,7 +197,8 @@ export function deriveReadingUnits(input: {
       const menciones = mencionesPorDimension.get(d);
       return menciones === undefined ? [] : [{ dimension: d, menciones }];
     });
-    if (assets.length === 0 && dimensions.length === 0) {
+    const cifras = figuresFor(axis.informeDimensions);
+    if (assets.length === 0 && dimensions.length === 0 && cifras.length === 0) {
       axesWithoutSource.push(axis.label);
       continue;
     }
@@ -188,6 +209,7 @@ export function deriveReadingUnits(input: {
       capacity: { assets },
       crossing: assets.length > 0 ? "eje-con-activo-registrado" : "eje-sin-activo-registrado",
       informe: dimensions.length > 0 ? { dimensions, status: "presencia-textual" } : null,
+      cifras,
       axis: {
         definition: axis.definition,
         declaredBy: axis.declaredBy,
@@ -198,8 +220,16 @@ export function deriveReadingUnits(input: {
     });
   }
 
+  const orphan = new Map<string, number>();
+  for (const f of figures) {
+    if (usedFigureIds.has(f.id)) continue;
+    const key = f.dimension ?? "sin dimensión declarada";
+    orphan.set(key, (orphan.get(key) ?? 0) + 1);
+  }
+
   return {
     units,
+    figuresWithoutUnit: [...orphan.entries()].map(([dimension, n]) => ({ dimension, n })),
     axesWithoutSource,
     topicsWithoutSource,
     topicsOnlyInInforme,

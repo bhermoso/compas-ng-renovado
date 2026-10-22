@@ -1,4 +1,5 @@
 import { authoredToProposals, buildReadingUnitProposals } from "./application/proposals";
+import type { FigureInput } from "./application/figures";
 import { InitialLocalHealthPlanPanel } from "./ui/components/InitialLocalHealthPlanPanel";
 import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
 import { InstitutionalLogoBand } from "./ui/components/InstitutionalLogoBand";
@@ -36,6 +37,7 @@ import {
   addAuthoredProposal,
   addRelationDeclaration,
   addReadingAxisDeclaration,
+  addFigures,
   type ReadingAxisDeclaration,
   type RelationDeclaration,
   removeAuthoredProposal,
@@ -1457,6 +1459,14 @@ export default function App() {
     setWorkspace((prev) => ({
       ...prev,
       repository: addAuthoredProposal(prev.repository, { ...proposal, authoredAt: new Date().toISOString() }),
+      updatedAt: new Date().toISOString(),
+    }));
+  }
+
+  function handleImportFigures(figures: FigureInput[]) {
+    setWorkspace((prev) => ({
+      ...prev,
+      repository: addFigures(prev.repository, figures),
       updatedAt: new Date().toISOString(),
     }));
   }
@@ -4116,6 +4126,8 @@ export default function App() {
                       onAdd={handleAddAuthoredProposal}
                       onRemove={handleRemoveAuthoredProposal}
                       relations={workspace.repository.relationDeclarations ?? []}
+                      figures={workspace.repository.figures ?? []}
+                      onImportFigures={handleImportFigures}
                       axes={workspace.repository.readingAxes ?? []}
                       onDeclareAxis={handleDeclareAxis}
                       onDeclareRelation={handleDeclareRelation}
