@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { AuthoredProposal, RelationDeclaration } from "../../domain/repository";
 import { currentRelations } from "../../application/relations";
+import { draftOrientationFromRelation } from "../../application/proposals";
 import { tipoForAuthored, validateAuthoredProposal } from "../../application/proposals";
 import { STEP_ALLOWED_TYPES, type StatementType } from "../../domain/statements/statementTypes";
 
@@ -146,6 +147,19 @@ export function AuthoredProposalPanel({ proposals, relations = [], onAdd, onRemo
               </option>
             ))}
           </select>
+          {relationId !== "" && draftOrientationFromRelation(relations, relationId) !== null && (
+            <button
+              type="button"
+              onClick={() => {
+                const d = draftOrientationFromRelation(relations, relationId);
+                if (d === null) return;
+                setText(d.text);
+                if (evidence.trim() === "") setEvidence(d.evidence.join("\n"));
+              }}
+            >
+              Partir del borrador de la relación
+            </button>
+          )}
         </label>
       )}
       <label>
