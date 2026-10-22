@@ -3,6 +3,7 @@ import {
   authoredProposalId,
   authoredToProposals,
   resolveProposals,
+  tipoForAuthored,
   validateAuthoredProposal,
   validateDecision,
 } from "../src/application/proposals";
@@ -59,5 +60,11 @@ describe("propuestas del equipo técnico", () => {
     expect(r2.authoredProposals).toHaveLength(1);
     expect(r2.authoredProposals![0]!.text).toBe("Nueva redacción.");
     expect(removeAuthoredProposal(r2, "C1").authoredProposals).toBeUndefined();
+  });
+
+  it("una orientación siempre se registra como «orientacion»; una conclusión, con el tipo elegido", () => {
+    expect(tipoForAuthored("orientation", "")).toBe("orientacion");
+    expect(tipoForAuthored("conclusion", "")).toBeUndefined();
+    expect(tipoForAuthored("conclusion", "laguna")).toBe("laguna");
   });
 });
