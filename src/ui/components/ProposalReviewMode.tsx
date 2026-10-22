@@ -1,8 +1,10 @@
 import { useState } from "react";
-import type { AuthoredProposal, ProposalDecision, ReadingAxisDeclaration, RelationDeclaration } from "../../domain/repository";
+import type { AuthoredProposal, FigureRecord, ProposalDecision, ReadingAxisDeclaration, RelationDeclaration } from "../../domain/repository";
 import { resolveProposals, type Proposal } from "../../application/proposals";
 import { AuthoredProposalPanel } from "./AuthoredProposalPanel";
 import { ProposalMenuPanel } from "./ProposalMenuPanel";
+import { FigureImportPanel } from "./FigureImportPanel";
+import type { FigureInput } from "../../application/figures";
 import { ReadingAxisPanel } from "./ReadingAxisPanel";
 import { RelationTablePanel } from "./RelationTablePanel";
 
@@ -14,6 +16,8 @@ interface ProposalReviewModeProps {
   onAdd: (proposal: Omit<AuthoredProposal, "authoredAt">) => void;
   onRemove: (proposalId: string) => void;
   relations: ReadonlyArray<RelationDeclaration>;
+  figures: ReadonlyArray<FigureRecord>;
+  onImportFigures: (figures: FigureInput[]) => void;
   axes: ReadonlyArray<ReadingAxisDeclaration>;
   onDeclareAxis: (axis: Omit<ReadingAxisDeclaration, "version" | "declaredAt">) => void;
   onDeclareRelation: (relation: Omit<RelationDeclaration, "version" | "declaredAt">) => void;
@@ -35,6 +39,8 @@ export function ProposalReviewMode({
   onAdd,
   onRemove,
   relations,
+  figures,
+  onImportFigures,
   axes,
   onDeclareAxis,
   onDeclareRelation,
@@ -56,6 +62,7 @@ export function ProposalReviewMode({
       {open && (
         <>
           <ProposalMenuPanel proposals={proposals} decisions={decisions} onDecide={onDecide} />
+          <FigureImportPanel figures={figures} onImport={onImportFigures} />
           <ReadingAxisPanel history={axes} onDeclare={onDeclareAxis} />
           <RelationTablePanel history={relations} onDeclare={onDeclareRelation} />
           <AuthoredProposalPanel proposals={authored} relations={relations} onAdd={onAdd} onRemove={onRemove} />

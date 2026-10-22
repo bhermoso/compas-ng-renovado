@@ -12,6 +12,7 @@
 
 import { THEMATIC_TOPICS } from "../../domain/thematic-prioritisation";
 import type { CapacityVoiceCrossing, ReadingUnitsDerivation } from "./readingUnits";
+import { groupFigures } from "../figures";
 
 export const READING_UNITS_TITLE = "Lectura por tema: capacidad, voz e Informe";
 
@@ -112,6 +113,9 @@ export function buildCanonicalReadingUnits(
           ? "Informe de Salud: ninguna de las dimensiones del eje consta en la lectura del Informe."
           : "Informe de Salud: ninguna dimensión con correspondencia validada a este tema."
     );
+    for (const g of groupFigures(u.cifras)) {
+      lines.push(`Cifra, ${g.indicador}: ${g.texto}. Fuente: ${g.fuentes.join("; ")}.`);
+    }
     return {
       topicId: u.topicId,
       label: u.label,
@@ -123,6 +127,13 @@ export function buildCanonicalReadingUnits(
   });
 
   const gaps: string[] = [];
+  if (derivation.figuresWithoutUnit.length > 0) {
+    gaps.push(
+      `Cifras importadas que no corresponden a ninguna unidad y no se muestran: ${derivation.figuresWithoutUnit
+        .map((g) => `${g.dimension} (${plural(g.n, "cifra", "cifras")})`)
+        .join("; ")}. Para mostrarlas, el equipo técnico puede declarar un eje de lectura (Art. 4 ter).`
+    );
+  }
   if (derivation.axesWithoutSource.length > 0) {
     gaps.push(`Ejes declarados sin ninguna fuente en el expediente, sin unidad propia: ${derivation.axesWithoutSource.join("; ")}.`);
   }

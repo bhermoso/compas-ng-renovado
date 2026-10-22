@@ -133,6 +133,41 @@ export interface ProposalDecision {
 }
 
 /**
+ * Cifra con procedencia (CONTRACT-LHPM v1.7, Art. 8 ter, paso «describir»): un valor
+ * literal de una fuente, con año, territorio, escala y localización. No es una
+ * estimación: el valor se conserva tal como consta en la fuente. Registro propio del
+ * expediente, separado de los átomos de evidencia.
+ */
+export type FigureScale = "municipio" | "distrito" | "provincia" | "andalucia" | "espana" | "otra";
+
+export interface FigureRecord {
+  /** Identificador estable; importar el mismo id sustituye la cifra. */
+  id: string;
+  indicador: string;
+  /** Valor literal de la fuente (texto), p. ej. «218,28» o «aumentada significativamente». */
+  valor: string;
+  unidad?: string;
+  /** Año o periodo literal, o «no consta». */
+  anio: string;
+  territorio: string;
+  escala: FigureScale;
+  /** Dimensión sanitaria del Informe a la que se asocia, cuando la hay. */
+  dimension?: string;
+  /** Cifras del mismo indicador que se muestran juntas (local y referencias). */
+  grupo?: string;
+  fuente: {
+    tipo: "informe-de-salud" | "ieca-badea" | "ieca-sima" | "ine" | "otra";
+    titulo: string;
+    pagina?: string;
+    consulta?: string;
+    consultadoEl?: string;
+  };
+  nota?: string;
+  importedBy: string;
+  importedAt: string;
+}
+
+/**
  * Eje de lectura declarado por el equipo técnico (CONTRACT-LHPM v1.7, Art. 4 ter):
  * agrupación de evidencia sobre un tema que el Informe trata y la papeleta no
  * recoge. Registro acumulativo: la última versión de cada eje es la vigente.
@@ -240,6 +275,8 @@ export interface MunicipalDocumentRepository {
   relationDeclarations?: RelationDeclaration[];
   /** Historial de ejes de lectura declarados; ausente mientras no haya ninguno. */
   readingAxes?: ReadingAxisDeclaration[];
+  /** Cifras con procedencia importadas; ausente mientras no haya ninguna. */
+  figures?: FigureRecord[];
   createdAt: string;
   updatedAt: string;
 }
@@ -539,4 +576,16 @@ export function addReadingAxisDeclaration(
     readingAxes: [...history, { ...axis, version, declaredAt: new Date().toISOString() }],
     updatedAt: new Date().toISOString(),
   };
+}
+
+/** Añade o sustituye cifras por id. */
+export function addFigures(
+  repository: MunicipalDocumentRepository,
+  figures: ReadonlyArray<Omit<FigureRecord, "importedAt">>
+): MunicipalDocumentRepository {
+  if (figures.length === 0) return repository;
+  const now = new Date().toISOString();
+  const incoming = new Map(figures.map((f) => [f.id, { ...f, importedAt: now }]));
+  const kept = (repository.figures ?? []).filter((f) => !incoming.has(f.id));
+  return { ...repository, figures: [...kept, ...incoming.values()], updatedAt: now };
 }
