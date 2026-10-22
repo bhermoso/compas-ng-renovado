@@ -36,6 +36,8 @@ export interface Proposal {
     conclusionIds?: string[];
     /** Grado de sustento de la relación; ausente cuando la propuesta no se apoya en una. */
     sustento?: SustentoGrade;
+    /** Relación de la tabla en que se apoya (Art. 8 ter 2). */
+    relationId?: string;
   };
 }
 

@@ -17,6 +17,8 @@ export interface ChosenItem {
   texto: string;
   evidencia: string[];
   sustento?: SustentoGrade;
+  /** Relación de la tabla en que se apoya. */
+  relacion?: string;
   cautelas?: string;
   /** Orientación: etiquetas de las conclusiones de las que deriva. */
   derivaDe?: string[];
@@ -43,6 +45,7 @@ export function buildChosenClosing(
     texto: r.finalText,
     evidencia: r.proposal.derivedFrom.evidence,
     ...(r.proposal.derivedFrom.sustento !== undefined ? { sustento: r.proposal.derivedFrom.sustento } : {}),
+    ...(r.proposal.derivedFrom.relationId !== undefined ? { relacion: r.proposal.derivedFrom.relationId } : {}),
     ...(r.proposal.cautelas !== undefined ? { cautelas: r.proposal.cautelas } : {}),
     ...(r.proposal.derivedFrom.conclusionIds !== undefined
       ? { derivaDe: r.proposal.derivedFrom.conclusionIds.map((id) => labelOf.get(id) ?? id) }

@@ -133,6 +133,33 @@ export interface ProposalDecision {
 }
 
 /**
+ * Relación entre un determinante y un problema de salud, declarada por el equipo
+ * técnico (CONTRACT-LHPM v1.7, Arts. 8 bis y 8 ter 2). El registro es acumulativo:
+ * cada cambio es una versión nueva con su autoría y fecha; la última de cada
+ * relación es la vigente y las anteriores se conservan.
+ */
+export interface RelationDeclaration {
+  /** Identificador estable (p. ej. «R1»). */
+  id: string;
+  /** Número de versión de esta relación; lo asigna el repositorio. */
+  version: number;
+  determinant: { label: string; evidence: string[] };
+  problem: { label: string; evidence: string[] };
+  /** Grado de sustento (Art. 8 bis): 1 ambos extremos locales, 2 fuente externa verificable, 3 plausible. */
+  grade: 1 | 2 | 3;
+  /** Por qué ese grado. */
+  basis: string;
+  /** Obligatoria en grado 2: la fuente externa verificable. */
+  source?: { title: string; year: string; scale: string };
+  /** Lo que falta para sostener más (límites, desfases). */
+  missing?: string;
+  /** «propuesta» hasta que una persona del equipo la valida. */
+  status: "propuesta" | "validada";
+  declaredBy: string;
+  declaredAt: string;
+}
+
+/**
  * Propuesta de conclusión u orientación redactada por el equipo técnico en el
  * cierre interpretativo (CONTRACT-LHPM v1.6, Art. 16 ter 1 bis). Entra en el
  * mismo menú que las propuestas del sistema y no nace elegida.
@@ -146,6 +173,8 @@ export interface AuthoredProposal {
   tipo?: StatementType;
   /** Evidencia citada: obligatoria; cada línea lleva documento y localización. */
   evidence: string[];
+  /** Relación de la tabla (id) en la que se apoya; fija el grado de sustento. */
+  relationId?: string;
   /** Orientación: ids de las propuestas de conclusión de las que deriva. */
   conclusionIds?: string[];
   /** Grado de sustento de la relación (Art. 8 bis), cuando la propuesta se apoya en una. */
@@ -189,6 +218,8 @@ export interface MunicipalDocumentRepository {
   proposalDecisions?: ProposalDecision[];
   /** Propuestas redactadas por el equipo técnico; ausente mientras no haya ninguna. */
   authoredProposals?: AuthoredProposal[];
+  /** Historial de declaraciones de relaciones determinante-problema; ausente mientras no haya ninguna. */
+  relationDeclarations?: RelationDeclaration[];
   createdAt: string;
   updatedAt: string;
 }
@@ -457,6 +488,22 @@ export function removeAuthoredProposal(
   return {
     ...base,
     ...(rest.length > 0 ? { authoredProposals: rest } : {}),
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+export function addRelationDeclaration(
+  repository: MunicipalDocumentRepository,
+  declaration: Omit<RelationDeclaration, "version" | "declaredAt">
+): MunicipalDocumentRepository {
+  const history = repository.relationDeclarations ?? [];
+  const version = history.filter((r) => r.id === declaration.id).length + 1;
+  return {
+    ...repository,
+    relationDeclarations: [
+      ...history,
+      { ...declaration, version, declaredAt: new Date().toISOString() },
+    ],
     updatedAt: new Date().toISOString(),
   };
 }

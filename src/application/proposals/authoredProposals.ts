@@ -6,6 +6,8 @@
 
 import type { AuthoredProposal } from "../../domain/repository";
 import { STEP_ALLOWED_TYPES } from "../../domain/statements/statementTypes";
+import { sustentoFromRelation } from "../relations";
+import type { RelationDeclaration } from "../../domain/repository";
 import { checkOrientationText, stableProposalId, type Proposal } from "./proposals";
 
 export function authoredProposalId(a: Pick<AuthoredProposal, "kind" | "id">): string {
@@ -24,7 +26,8 @@ export function tipoForAuthored(
 /** Problemas que impiden registrar la propuesta; vacío = admisible. */
 export function validateAuthoredProposal(
   a: Omit<AuthoredProposal, "authoredAt">,
-  existing: ReadonlyArray<AuthoredProposal> = []
+  existing: ReadonlyArray<AuthoredProposal> = [],
+  relations?: ReadonlyArray<RelationDeclaration>
 ): string[] {
   const problems: string[] = [];
   if (a.id.trim() === "") problems.push("Falta el identificador de la propuesta.");
@@ -50,7 +53,15 @@ export function validateAuthoredProposal(
         problems.push(`La conclusión «${c}» no está registrada.`);
       }
     }
-    if (a.sustento === undefined) problems.push("Una orientación declara el grado de sustento de su relación.");
+    if (a.relationId !== undefined) {
+      const s = sustentoFromRelation(relations, a.relationId);
+      if (!s.ok) problems.push(...s.problems);
+      else if (a.sustento !== s.grade) {
+        problems.push(`El sustento declarado no coincide con el grado de la relación «${a.relationId}» (${s.grade}).`);
+      }
+    } else if (a.sustento === undefined) {
+      problems.push("Una orientación declara el grado de sustento de su relación.");
+    }
     for (const id of checkOrientationText(a.text)) {
       problems.push(`La orientación fija una actuación operativa (${id}); corresponde al Plan de Acción.`);
     }
@@ -73,6 +84,7 @@ export function authoredToProposals(list: ReadonlyArray<AuthoredProposal>): Prop
         ? { conclusionIds: a.conclusionIds.map((c) => authoredProposalId({ kind: "conclusion", id: c })) }
         : {}),
       ...(a.sustento !== undefined ? { sustento: a.sustento } : {}),
+      ...(a.relationId !== undefined ? { relationId: a.relationId } : {}),
     },
   }));
 }

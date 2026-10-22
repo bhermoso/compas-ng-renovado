@@ -1,5 +1,6 @@
 import { useState } from "react";
-import type { AuthoredProposal } from "../../domain/repository";
+import type { AuthoredProposal, RelationDeclaration } from "../../domain/repository";
+import { currentRelations } from "../../application/relations";
 import { tipoForAuthored, validateAuthoredProposal } from "../../application/proposals";
 import { STEP_ALLOWED_TYPES, type StatementType } from "../../domain/statements/statementTypes";
 
@@ -16,6 +17,7 @@ const TYPE_LABEL: Record<StatementType, string> = {
 
 interface AuthoredProposalPanelProps {
   proposals: ReadonlyArray<AuthoredProposal>;
+  relations?: ReadonlyArray<RelationDeclaration>;
   onAdd: (proposal: Omit<AuthoredProposal, "authoredAt">) => void;
   onRemove: (proposalId: string) => void;
 }
@@ -25,13 +27,14 @@ interface AuthoredProposalPanelProps {
  * el equipo redacta conclusiones y orientaciones citando la evidencia. Registrar una
  * propuesta no la elige: pasa al menú, donde se elige o se descarta.
  */
-export function AuthoredProposalPanel({ proposals, onAdd, onRemove }: AuthoredProposalPanelProps) {
+export function AuthoredProposalPanel({ proposals, relations = [], onAdd, onRemove }: AuthoredProposalPanelProps) {
   const [id, setId] = useState("");
   const [kind, setKind] = useState<"conclusion" | "orientation">("conclusion");
   const [tipo, setTipo] = useState<"" | StatementType>("");
   const [text, setText] = useState("");
   const [evidence, setEvidence] = useState("");
   const [conclusionIds, setConclusionIds] = useState<string[]>([]);
+  const [relationId, setRelationId] = useState("");
   const [sustento, setSustento] = useState<"" | "1" | "2" | "3">("");
   const [cautelas, setCautelas] = useState("");
   const [author, setAuthor] = useState("");
@@ -47,11 +50,12 @@ export function AuthoredProposalPanel({ proposals, onAdd, onRemove }: AuthoredPr
       text: text.trim(),
       evidence: evidence.split("\n").map((l) => l.trim()).filter((l) => l !== ""),
       ...(kind === "orientation" ? { conclusionIds } : {}),
+      ...(kind === "orientation" && relationId !== "" ? { relationId } : {}),
       ...(sustento !== "" ? { sustento: Number(sustento) as 1 | 2 | 3 } : {}),
       ...(cautelas.trim() !== "" ? { cautelas: cautelas.trim() } : {}),
       authoredBy: author.trim(),
     };
-    const found = validateAuthoredProposal(candidate, proposals);
+    const found = validateAuthoredProposal(candidate, proposals, relations);
     setProblems(found);
     if (found.length > 0) return;
     onAdd(candidate);
@@ -61,6 +65,7 @@ export function AuthoredProposalPanel({ proposals, onAdd, onRemove }: AuthoredPr
     setEvidence("");
     setConclusionIds([]);
     setSustento("");
+    setRelationId("");
     setCautelas("");
   }
 
@@ -122,6 +127,26 @@ export function AuthoredProposalPanel({ proposals, onAdd, onRemove }: AuthoredPr
             </label>
           ))}
         </fieldset>
+      )}
+      {kind === "orientation" && (
+        <label>
+          Relación de la tabla en que se apoya
+          <select
+            value={relationId}
+            onChange={(e) => {
+              setRelationId(e.target.value);
+              const r = currentRelations(relations).find((x) => x.id === e.target.value);
+              if (r !== undefined) setSustento(String(r.grade) as "1" | "2" | "3");
+            }}
+          >
+            <option value="">Ninguna (declaro el grado a mano)</option>
+            {currentRelations(relations).map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.id} · grado {r.grade} · {r.status}
+              </option>
+            ))}
+          </select>
+        </label>
       )}
       <label>
         Grado de sustento de la relación (Art. 8 bis)
