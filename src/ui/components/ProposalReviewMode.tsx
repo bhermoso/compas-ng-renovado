@@ -1,8 +1,9 @@
 import { useState } from "react";
-import type { AuthoredProposal, ProposalDecision } from "../../domain/repository";
+import type { AuthoredProposal, ProposalDecision, RelationDeclaration } from "../../domain/repository";
 import { resolveProposals, type Proposal } from "../../application/proposals";
 import { AuthoredProposalPanel } from "./AuthoredProposalPanel";
 import { ProposalMenuPanel } from "./ProposalMenuPanel";
+import { RelationTablePanel } from "./RelationTablePanel";
 
 interface ProposalReviewModeProps {
   proposals: ReadonlyArray<Proposal>;
@@ -11,6 +12,8 @@ interface ProposalReviewModeProps {
   onDecide: (decision: ProposalDecision) => void;
   onAdd: (proposal: Omit<AuthoredProposal, "authoredAt">) => void;
   onRemove: (proposalId: string) => void;
+  relations: ReadonlyArray<RelationDeclaration>;
+  onDeclareRelation: (relation: Omit<RelationDeclaration, "version" | "declaredAt">) => void;
   /** Para pruebas de renderizado: el modo arranca abierto. */
   initiallyOpen?: boolean;
 }
@@ -28,6 +31,8 @@ export function ProposalReviewMode({
   onDecide,
   onAdd,
   onRemove,
+  relations,
+  onDeclareRelation,
   initiallyOpen = false,
 }: ProposalReviewModeProps) {
   const [open, setOpen] = useState(initiallyOpen);
@@ -46,7 +51,8 @@ export function ProposalReviewMode({
       {open && (
         <>
           <ProposalMenuPanel proposals={proposals} decisions={decisions} onDecide={onDecide} />
-          <AuthoredProposalPanel proposals={authored} onAdd={onAdd} onRemove={onRemove} />
+          <RelationTablePanel history={relations} onDeclare={onDeclareRelation} />
+          <AuthoredProposalPanel proposals={authored} relations={relations} onAdd={onAdd} onRemove={onRemove} />
         </>
       )}
     </section>

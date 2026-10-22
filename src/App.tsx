@@ -34,6 +34,8 @@ import {
   addAssetValidation,
   addProposalDecision,
   addAuthoredProposal,
+  addRelationDeclaration,
+  type RelationDeclaration,
   removeAuthoredProposal,
   removeAssetValidation,
   removeCycleConciliation,
@@ -1453,6 +1455,14 @@ export default function App() {
     setWorkspace((prev) => ({
       ...prev,
       repository: addAuthoredProposal(prev.repository, { ...proposal, authoredAt: new Date().toISOString() }),
+      updatedAt: new Date().toISOString(),
+    }));
+  }
+
+  function handleDeclareRelation(relation: Omit<RelationDeclaration, "version" | "declaredAt">) {
+    setWorkspace((prev) => ({
+      ...prev,
+      repository: addRelationDeclaration(prev.repository, relation),
       updatedAt: new Date().toISOString(),
     }));
   }
@@ -4095,6 +4105,8 @@ export default function App() {
                       onDecide={handleProposalDecision}
                       onAdd={handleAddAuthoredProposal}
                       onRemove={handleRemoveAuthoredProposal}
+                      relations={workspace.repository.relationDeclarations ?? []}
+                      onDeclareRelation={handleDeclareRelation}
                     />
                   }
                   psl={runtime.psl}

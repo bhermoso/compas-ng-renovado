@@ -321,7 +321,7 @@ export function projectCanonicalToDocumentModel(
           o.texto,
           [
             o.derivaDe !== undefined && o.derivaDe.length > 0 ? `Deriva de: ${o.derivaDe.join(", ")}.` : "",
-            o.sustento !== undefined ? `Sustento de grado ${o.sustento}.` : "",
+            o.sustento !== undefined ? `Sustento de grado ${o.sustento}${o.relacion !== undefined ? ` (relación ${o.relacion})` : ""}.` : "",
             o.cautelas !== undefined ? `Salvedades: ${o.cautelas}` : "",
           ]
             .filter((x) => x !== "")
