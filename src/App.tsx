@@ -193,8 +193,7 @@ import {
   HealthReportViewer,
   EstudiosComplementariosPanel,
   ActivosSaludPanel,
-  ProposalMenuPanel,
-  AuthoredProposalPanel,
+  ProposalReviewMode,
   LocalHealthProfileView,
   ThematicPrioritisationPanel,
   CitizenParticipationSummary,
@@ -4084,20 +4083,20 @@ export default function App() {
               });
               return (
                 <>
-                <AuthoredProposalPanel
-                  proposals={workspace.repository.authoredProposals ?? []}
-                  onAdd={handleAddAuthoredProposal}
-                  onRemove={handleRemoveAuthoredProposal}
-                />
-                <ProposalMenuPanel
-                  proposals={[
-                    ...buildReadingUnitProposals(previewContext.previewAnswers.lecturaPorTema),
-                    ...authoredToProposals(workspace.repository.authoredProposals ?? []),
-                  ]}
-                  decisions={workspace.repository.proposalDecisions ?? []}
-                  onDecide={handleProposalDecision}
-                />
                 <LocalHealthProfileView
+                  reviewSlot={
+                    <ProposalReviewMode
+                      proposals={[
+                        ...buildReadingUnitProposals(previewContext.previewAnswers.lecturaPorTema),
+                        ...authoredToProposals(workspace.repository.authoredProposals ?? []),
+                      ]}
+                      authored={workspace.repository.authoredProposals ?? []}
+                      decisions={workspace.repository.proposalDecisions ?? []}
+                      onDecide={handleProposalDecision}
+                      onAdd={handleAddAuthoredProposal}
+                      onRemove={handleRemoveAuthoredProposal}
+                    />
+                  }
                   psl={runtime.psl}
                   previewPSL={previewContext.previewPSL}
                   isValidatedPreview={previewContext.isValidatedPreview}

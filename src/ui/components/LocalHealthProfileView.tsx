@@ -1,5 +1,5 @@
 import { DocumentReference } from "./Documentation";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { LocalHealthProfile, PSLScaffoldChapter } from "../../domain/health-profile";
 import type { LocalHealthProfileArtifact } from "../../domain/health-profile-artifact";
 import {
@@ -84,6 +84,8 @@ interface LocalHealthProfileViewProps {
   onEditCierreInterpretativo?: (content: string) => void;
   onDocumentarDeliberacion?: (nota: string) => void;
   onCompile?: () => void;
+  /** Modo de revisión de conclusiones y orientaciones; se sitúa tras la vista editorial (Art. 16 ter 8). */
+  reviewSlot?: ReactNode;
   onApprove?: (approvedBy: string, role: "coordination" | "group-motor", approvingBody: string) => void;
 }
 
@@ -913,6 +915,7 @@ export function LocalHealthProfileView({
   onEditCierreInterpretativo,
   onDocumentarDeliberacion,
   onCompile,
+  reviewSlot,
   onApprove,
 }: LocalHealthProfileViewProps) {
   // CONV-A · el gate que puede ocultar/modificar la previsualización documental se
@@ -1099,6 +1102,8 @@ export function LocalHealthProfileView({
           <ProfileIntegratedEditorialPreview view={integratedEditorialView} />
         </>
       )}
+
+      {reviewSlot}
 
       <ProfileStateMap
         hasIntegratedReading={!isEmpty && integratedEditorialView !== null}

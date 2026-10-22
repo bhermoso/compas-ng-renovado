@@ -49,3 +49,4 @@ export * from "./LocalHealthPlanOutline";
 export * from "./AgendaBoard";
 export * from "./AgendaResultSummary";
 export { AuthoredProposalPanel } from "./AuthoredProposalPanel";
+export { ProposalReviewMode } from "./ProposalReviewMode";
