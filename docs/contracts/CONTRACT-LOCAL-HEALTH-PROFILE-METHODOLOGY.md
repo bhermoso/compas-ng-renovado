@@ -1,7 +1,7 @@
 # CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY
 
 > Contrato metodológico canónico del Perfil de Salud Local (PSL) en COMPÁS NG.
-> Versión 1.6 — 2026-10-22 (historial en el registro de revisiones)
+> Versión 1.7 — 2026-10-22 (historial en el registro de revisiones)
 > Estado: VIGENTE
 >
 > Este contrato define qué debe ser metodológicamente un Perfil de Salud Local,
@@ -91,6 +91,14 @@ Las unidades en que el Perfil organiza su lectura integrada se derivan del exped
 3. **Tres planos.** Cada unidad cruza capacidad (activos), necesidad documentada (Informe y estudios) y voz (priorización ciudadana y material cualitativo). Un plano sin fuente se declara como laguna (Art. 8), no se rellena.
 4. **Correspondencia declarada.** La relación entre temas del Informe, temas de la priorización y ámbitos de activos consta en una tabla declarada, versionada y validada por una persona. Ningún emparejamiento se infiere del texto.
 5. **Orden de la lectura dentro de la unidad:** lo que sostiene la salud, lo que se sabe del problema y su escala, lo que dice la comunidad, lo que falta saber y lo que queda para la priorización.
+
+### Art. 4 ter. Ejes de lectura declarados
+
+Un tema que el Informe de Salud trata y que la priorización temática no recoge (el envejecimiento y la dependencia, por ejemplo) no genera por sí solo una unidad de lectura. Puede hacerlo si una persona del equipo técnico lo declara como eje de lectura.
+
+1. **Declaración.** El eje se declara con su definición, las dimensiones del Informe que agrupa y la autoría y la fecha de quien lo declara. Sin declaración, el tema no genera unidad ni conclusión compilada.
+2. **Estatuto.** Un eje es una agrupación de evidencia, no un hallazgo. Declararlo no lo prioriza: priorizar corresponde al Grupo Motor (Art. 3).
+3. **Versión.** Cada cambio del eje es una versión nueva, con autoría y fecha.
 
 ### Art. 5. Perfil como explicación territorial
 
@@ -228,6 +236,26 @@ El Perfil puede formular relaciones entre potenciales determinantes y problemas 
 4. **Tabla declarada.** Las relaciones elegibles proceden de una tabla versionada y validada por una persona, como las correspondencias del Art. 4 bis. El sistema no infiere relaciones por coincidencia de términos en un texto.
 5. **Escala.** Una asociación observada en un ámbito superior no se atribuye al municipio ni a las personas que lo habitan; se declara la escala (Art. 13).
 6. **Contraevidencia.** Si consta evidencia que contradice la relación, se declara junto a ella (Art. 14).
+
+### Art. 8 ter. La afirmación como unidad y la cadena de lectura
+
+Cada frase del cuerpo del Perfil es una afirmación con los campos siguientes: tipo (Art. 8), texto, evidencia con localización, origen (compilada por el sistema desde átomos, o redactada por el equipo técnico), afirmaciones de las que deriva, grado de sustento cuando se apoya en una relación (Art. 8 bis) y, si requiere elección, su estado (Art. 16 ter). La evidencia es obligatoria; solo la cautela y la laguna pueden limitarse a remitir a otra afirmación.
+
+La lectura de cada unidad (Art. 4 bis) recorre cinco pasos. Cada paso admite solo ciertos tipos y tiene una prohibición propia.
+
+| Paso | Tipos que admite | Prohibido |
+|---|---|---|
+| Describir | hecho, laguna | cifra sin año y fuente; dato aproximado; sustituir el dato local por el de otro ámbito |
+| Analizar | hecho, cautela, laguna | umbral sin fuente; presentar una referencia no local como dato municipal |
+| Inferir | interpretación, hipótesis | causalidad sin grado 1 o 2; sostener una orientación con una relación de grado 3 |
+| Concluir | conclusión | conclusión sin evidencia citada |
+| Orientar | orientación técnica | responsable, plazo, recurso o indicador de ejecución; decidir prioridades |
+
+1. **Referencias no locales.** Las referencias de ámbito autonómico o provincial (por ejemplo, la Encuesta Andaluza de Salud) entran en el paso de análisis solo como referencia comparativa rotulada «no local», con encuesta, año y tabla. Nunca sustituyen el dato municipal.
+2. **Tabla de relaciones.** Las relaciones del paso de inferencia constan en una tabla declarada y versionada, con su grado y su fuente. La valida una persona del equipo técnico, y cada versión lleva su autoría y su fecha.
+3. **Generación.** Una regla puede generar una conclusión u orientación solo cuando existen la relación en la tabla y los átomos de evidencia que la sostienen. Ninguna regla genera una orientación a partir de una relación de grado 3.
+
+*Consecuencia si se viola:* el Perfil contiene frases que no se pueden clasificar ni rastrear, o una orientación descansa en una relación sin sustento.
 
 ### Art. 9. Activos para la salud con rango equivalente a los déficits
 
@@ -405,6 +433,8 @@ Las conclusiones y las orientaciones técnicas del Perfil se presentan al equipo
 4. **Resolución previa a la versión institucional.** El Perfil no puede generarse como documento institucional mientras queden propuestas sin resolver. En borrador, las pendientes se muestran como tales.
 5. **Coherencia.** Descartar una propuesta no suprime la evidencia ni la lectura integrada de las que deriva. Si dos propuestas elegidas se contradicen, el Perfil lo declara (Art. 14).
 6. **Elegir no es priorizar.** La elección es una validación técnica de lo que el Perfil afirma y orienta. La priorización entre necesidades sigue siendo deliberación del Grupo Motor (Art. 3).
+7. **Interpretaciones e hipótesis.** Las interpretaciones y las hipótesis, que exigen autoría humana (Art. 8), pasan por este mismo menú y siguen las mismas reglas de elección, descarte y resolución previa a la versión institucional.
+8. **Ubicación y modo de revisión.** Las conclusiones y las orientaciones ocupan el final del Perfil, tras la lectura integrada y en este orden: conclusiones y orientaciones técnicas, y después la frontera de decisión (Art. 16 bis). No se intercalan en las unidades ni abren el documento. El menú no es un documento aparte: es un modo de revisión del mismo Perfil, con los controles de elegir y descartar junto a cada propuesta. Los controles son interfaz y no contenido: fuera del modo de revisión se muestra solo lo elegido, y el texto es idéntico en todas las representaciones (Art. 17 bis).
 
 ### Art. 17. Autoría, validación y responsabilidad técnica
 
@@ -672,6 +702,18 @@ Toda conclusión y orientación del cuerpo del Perfil ha sido elegida por una pe
 
 *Consecuencia si se viola:* el sistema publica como conclusión del Perfil lo que nadie ha asumido, o se pierde la traza de lo descartado.
 
+**I-LHPM-17 — Afirmación tipada y con evidencia**
+
+Toda afirmación del cuerpo del Perfil tiene tipo (Art. 8) y evidencia con localización, salvo la cautela y la laguna que remiten a otra afirmación. Cada paso de la cadena de lectura admite solo los tipos que le corresponden (Art. 8 ter).
+
+*Consecuencia si se viola:* aparecen en el Perfil frases que no se pueden clasificar ni rastrear hasta su fuente.
+
+**I-LHPM-18 — Conclusiones y orientaciones al final, en el mismo documento**
+
+Las conclusiones y las orientaciones técnicas cierran el Perfil y no se presentan antes de la lectura integrada. La revisión se hace sobre el propio documento, no sobre una representación aparte (Art. 16 ter, 8).
+
+*Consecuencia si se viola:* el lector encuentra las conclusiones sin la lectura que las sostiene, o la revisión opera sobre un texto que no es el del Perfil.
+
 ## Relaciones con otros contratos
 
 | Contrato | Tipo de relación |
@@ -698,6 +740,7 @@ Toda conclusión y orientación del cuerpo del Perfil ha sido elegida por una pe
 | 2026-10-21 | 1.4 | El Perfil concluye y orienta; no decide (Art. 3, 7 quater, 16, 16 bis, I-LHPM-9). Nuevo tipo de afirmación «Orientación técnica» (Art. 8). Relaciones determinante-problema con sustento y grados (Art. 8 bis). Conexión determinante-activo declarada y transición déficit-salutogénesis (Art. 9 ter). Invariantes I-LHPM-13 a 15. Decisión del autor | COMPÁS NG |
 | 2026-10-21 | 1.5 | Conclusiones y orientaciones como menú elegible por el equipo técnico: propuesta, elección o descarte con autoría y fecha, solo las elegidas entran en el cuerpo; sin elección por defecto (Art. 16 ter, I-LHPM-16). Decisión del autor | COMPÁS NG |
 | 2026-10-22 | 1.6 | Propuestas redactadas por el equipo técnico en el cierre interpretativo, con evidencia citada, sin elección por defecto (Art. 16 ter 1 bis). Decisión del autor | COMPÁS NG |
+| 2026-10-22 | 1.7 | La afirmación como unidad y la cadena de lectura en cinco pasos (Art. 8 ter); ejes de lectura declarados (Art. 4 ter); interpretaciones e hipótesis en el menú, ubicación final de conclusiones y orientaciones y modo de revisión sobre el mismo documento (Art. 16 ter, 7 y 8). Invariantes I-LHPM-17 e I-LHPM-18. Decisión del autor | COMPÁS NG |
 
 ---
 
