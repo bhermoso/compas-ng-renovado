@@ -1,6 +1,18 @@
 import { useState } from "react";
 import type { AuthoredProposal } from "../../domain/repository";
 import { validateAuthoredProposal } from "../../application/proposals";
+import { STEP_ALLOWED_TYPES, type StatementType } from "../../domain/statements/statementTypes";
+
+const TYPE_LABEL: Record<StatementType, string> = {
+  hecho: "Hecho",
+  interpretacion: "Interpretación",
+  hipotesis: "Hipótesis",
+  orientacion: "Orientación técnica",
+  percepcion: "Percepción",
+  cautela: "Cautela",
+  laguna: "Laguna",
+  "decision-posterior": "Decisión posterior",
+};
 
 interface AuthoredProposalPanelProps {
   proposals: ReadonlyArray<AuthoredProposal>;
@@ -16,6 +28,7 @@ interface AuthoredProposalPanelProps {
 export function AuthoredProposalPanel({ proposals, onAdd, onRemove }: AuthoredProposalPanelProps) {
   const [id, setId] = useState("");
   const [kind, setKind] = useState<"conclusion" | "orientation">("conclusion");
+  const [tipo, setTipo] = useState<"" | StatementType>("");
   const [text, setText] = useState("");
   const [evidence, setEvidence] = useState("");
   const [conclusionIds, setConclusionIds] = useState<string[]>([]);
@@ -30,6 +43,7 @@ export function AuthoredProposalPanel({ proposals, onAdd, onRemove }: AuthoredPr
     const candidate: Omit<AuthoredProposal, "authoredAt"> = {
       id: id.trim(),
       kind,
+      ...(tipo !== "" ? { tipo: kind === "orientation" ? ("orientacion" as const) : tipo } : {}),
       text: text.trim(),
       evidence: evidence.split("\n").map((l) => l.trim()).filter((l) => l !== ""),
       ...(kind === "orientation" ? { conclusionIds } : {}),
@@ -43,6 +57,7 @@ export function AuthoredProposalPanel({ proposals, onAdd, onRemove }: AuthoredPr
     onAdd(candidate);
     setId("");
     setText("");
+    setTipo("");
     setEvidence("");
     setConclusionIds([]);
     setSustento("");
@@ -69,6 +84,19 @@ export function AuthoredProposalPanel({ proposals, onAdd, onRemove }: AuthoredPr
           <option value="orientation">Orientación técnica</option>
         </select>
       </label>
+      {kind === "conclusion" && (
+        <label>
+          Tipo de afirmación (Art. 8)
+          <select value={tipo} onChange={(e) => setTipo(e.target.value as "" | StatementType)}>
+            <option value="">Sin clasificar</option>
+            {STEP_ALLOWED_TYPES.concluir
+              .filter((t) => t !== "cautela")
+              .map((t) => (
+                <option key={t} value={t}>{TYPE_LABEL[t]}</option>
+              ))}
+          </select>
+        </label>
+      )}
       <label>
         Texto
         <textarea rows={3} value={text} onChange={(e) => setText(e.target.value)} />
@@ -122,7 +150,7 @@ export function AuthoredProposalPanel({ proposals, onAdd, onRemove }: AuthoredPr
             <li key={p.id} className="document-row">
               <div>
                 <p className="document-kind">
-                  {p.id} · {p.kind === "conclusion" ? "Conclusión" : "Orientación técnica"} · {p.authoredBy} ·{" "}
+                  {p.id} · {p.kind === "conclusion" ? "Conclusión" : "Orientación técnica"} · {p.tipo !== undefined ? TYPE_LABEL[p.tipo] : "sin tipo"} · {p.authoredBy} ·{" "}
                   {p.authoredAt.slice(0, 10)}
                 </p>
                 <p>{p.text}</p>

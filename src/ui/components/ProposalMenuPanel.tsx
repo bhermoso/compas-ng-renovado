@@ -79,7 +79,8 @@ export function ProposalMenuPanel({ proposals, decisions, onDecide }: ProposalMe
             <li key={id} className="document-row">
               <div>
                 <p className="document-kind">
-                  {STATE_LABEL[r.state]} · {r.proposal.kind === "conclusion" ? "Conclusión" : "Orientación técnica"} ·{" "}
+                  {STATE_LABEL[r.state]} · {r.proposal.kind === "conclusion" ? "Conclusión" : "Orientación técnica"}
+                  {r.proposal.tipo !== undefined ? ` (${r.proposal.tipo})` : " (sin tipo)"} ·{" "}
                   {r.proposal.origin === "equipo" ? "redactada por el equipo técnico" : "propuesta por el sistema"}
                   {r.proposal.derivedFrom.sustento !== undefined
                     ? ` · sustento de grado ${r.proposal.derivedFrom.sustento}`

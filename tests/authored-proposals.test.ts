@@ -16,6 +16,7 @@ import {
 const C1: AuthoredProposal = {
   id: "C1",
   kind: "conclusion",
+  tipo: "interpretacion",
   text: "Texto de conclusión.",
   evidence: ["Informe, pág. 12"],
   authoredBy: "Equipo",
@@ -32,7 +33,7 @@ describe("propuestas del equipo técnico", () => {
   });
 
   it("una orientación exige conclusión registrada, sustento y ninguna actuación operativa", () => {
-    const o = { id: "O1", kind: "orientation" as const, text: "Valorar X.", evidence: ["F17"], authoredBy: "Equipo", conclusionIds: ["C1"], sustento: 1 as const };
+    const o = { id: "O1", kind: "orientation" as const, tipo: "orientacion" as const, text: "Valorar X.", evidence: ["F17"], authoredBy: "Equipo", conclusionIds: ["C1"], sustento: 1 as const };
     expect(validateAuthoredProposal(o, [C1])).toEqual([]);
     expect(validateAuthoredProposal(o, [])).toContain("La conclusión «C1» no está registrada.");
     expect(validateAuthoredProposal({ ...o, sustento: undefined }, [C1])).toContain(
@@ -44,7 +45,7 @@ describe("propuestas del equipo técnico", () => {
   it("no nacen elegidas y la de grado 3 no se puede elegir", () => {
     const [c, o] = authoredToProposals([
       C1,
-      { ...C1, id: "O1", kind: "orientation", conclusionIds: ["C1"], sustento: 3 },
+      { ...C1, id: "O1", kind: "orientation", tipo: "orientacion", conclusionIds: ["C1"], sustento: 3 },
     ]);
     expect(c!.origin).toBe("equipo");
     expect(o!.derivedFrom.conclusionIds).toEqual([authoredProposalId({ kind: "conclusion", id: "C1" })]);

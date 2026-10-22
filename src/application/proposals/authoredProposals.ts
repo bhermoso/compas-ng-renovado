@@ -5,6 +5,7 @@
  */
 
 import type { AuthoredProposal } from "../../domain/repository";
+import { STEP_ALLOWED_TYPES } from "../../domain/statements/statementTypes";
 import { checkOrientationText, stableProposalId, type Proposal } from "./proposals";
 
 export function authoredProposalId(a: Pick<AuthoredProposal, "kind" | "id">): string {
@@ -22,6 +23,13 @@ export function validateAuthoredProposal(
   if (a.authoredBy.trim() === "") problems.push("Falta la autoría.");
   if (a.evidence.filter((e) => e.trim() !== "").length === 0) {
     problems.push("Toda propuesta cita al menos una evidencia (documento y localización).");
+  }
+  if (a.tipo === undefined) {
+    problems.push("Falta el tipo de afirmación (Art. 8).");
+  } else if (!STEP_ALLOWED_TYPES[a.kind === "orientation" ? "orientar" : "concluir"].includes(a.tipo)) {
+    problems.push(`El tipo «${a.tipo}» no se admite en ${a.kind === "orientation" ? "una orientación" : "una conclusión"}.`);
+  } else if (a.kind === "orientation" && a.tipo !== "orientacion") {
+    problems.push("Una orientación técnica es del tipo «orientacion».");
   }
   if (a.kind === "orientation") {
     const concl = a.conclusionIds ?? [];
@@ -47,6 +55,7 @@ export function authoredToProposals(list: ReadonlyArray<AuthoredProposal>): Prop
     kind: a.kind,
     text: a.text,
     origin: "equipo" as const,
+    ...(a.tipo !== undefined ? { tipo: a.tipo } : {}),
     ...(a.cautelas !== undefined && a.cautelas.trim() !== "" ? { cautelas: a.cautelas } : {}),
     derivedFrom: {
       evidence: a.evidence,

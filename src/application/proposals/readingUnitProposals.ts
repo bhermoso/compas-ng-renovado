@@ -19,6 +19,7 @@ export function buildReadingUnitProposals(
   const proposals: Proposal[] = lectura.units.map((u) => ({
     id: stableProposalId("conclusion", "lectura-por-tema", u.topicId, u.crossing),
     kind: "conclusion" as const,
+    tipo: "hecho" as const,
     text: `${u.label}. ${u.crossingStatement}`,
     derivedFrom: { evidence: [`lectura-por-tema:${u.topicId}`] },
   }));
@@ -26,6 +27,7 @@ export function buildReadingUnitProposals(
     proposals.push({
       id: stableProposalId("conclusion", "laguna", gap),
       kind: "conclusion",
+      tipo: "laguna",
       text: gap,
       derivedFrom: { evidence: ["lectura-por-tema:lagunas"] },
     });
