@@ -18,6 +18,7 @@ export * from "./FagerstromPanel";
 export * from "./SBQPanel";
 export * from "./EstudiosComplementariosPanel";
 export * from "./ActivosSaludPanel";
+export * from "./ProposalMenuPanel";
 export * from "./MunicipalInventoryPanel";
 export * from "./LocalHealthProfilePanel";
 export * from "./LocalHealthProfileView";

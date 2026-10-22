@@ -1,3 +1,4 @@
+import { buildReadingUnitProposals } from "./application/proposals";
 import { InitialLocalHealthPlanPanel } from "./ui/components/InitialLocalHealthPlanPanel";
 import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
 import { InstitutionalLogoBand } from "./ui/components/InstitutionalLogoBand";
@@ -21,6 +22,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   type CycleConciliation,
   type AssetValidationDeclaration,
+  type ProposalDecision,
   type DocumentCycle,
   type DocumentKind,
   type MunicipalDocument,
@@ -29,6 +31,7 @@ import {
   setMunicipalDocumentCycle,
   addCycleConciliation,
   addAssetValidation,
+  addProposalDecision,
   removeAssetValidation,
   removeCycleConciliation,
   replaceMunicipalDocumentByKind,
@@ -187,6 +190,7 @@ import {
   HealthReportViewer,
   EstudiosComplementariosPanel,
   ActivosSaludPanel,
+  ProposalMenuPanel,
   LocalHealthProfileView,
   ThematicPrioritisationPanel,
   CitizenParticipationSummary,
@@ -1438,6 +1442,14 @@ export default function App() {
     setWorkspace((prev) => ({
       ...prev,
       repository: removeCycleConciliation(prev.repository, conciliationId),
+      updatedAt: new Date().toISOString(),
+    }));
+  }
+
+  function handleProposalDecision(decision: ProposalDecision) {
+    setWorkspace((prev) => ({
+      ...prev,
+      repository: addProposalDecision(prev.repository, decision),
       updatedAt: new Date().toISOString(),
     }));
   }
@@ -4051,6 +4063,12 @@ export default function App() {
                 liveAnswers: buildWorkspaceDiagnosticAnswers(workspace),
               });
               return (
+                <>
+                <ProposalMenuPanel
+                  proposals={buildReadingUnitProposals(previewContext.previewAnswers.lecturaPorTema)}
+                  decisions={workspace.repository.proposalDecisions ?? []}
+                  onDecide={handleProposalDecision}
+                />
                 <LocalHealthProfileView
                   psl={runtime.psl}
                   previewPSL={previewContext.previewPSL}
@@ -4075,6 +4093,7 @@ export default function App() {
                   onCompile={handleCompilePSL}
                   onApprove={handleApprovePSL}
                 />
+                </>
               );
             })()}
             {/* Representación derivada breve (GOV-P4-01 · PR-E): dentro del único
