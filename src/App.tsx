@@ -1,4 +1,4 @@
-import { authoredToProposals, buildReadingUnitProposals } from "./application/proposals";
+import { authoredToProposals, buildReadingUnitProposals, buildRelationProposals } from "./application/proposals";
 import type { FigureInput } from "./application/figures";
 import { InitialLocalHealthPlanPanel } from "./ui/components/InitialLocalHealthPlanPanel";
 import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
@@ -4118,6 +4118,7 @@ export default function App() {
                     <ProposalReviewMode
                       proposals={[
                         ...buildReadingUnitProposals(previewContext.previewAnswers.lecturaPorTema),
+                        ...buildRelationProposals(workspace.repository.relationDeclarations).proposals,
                         ...authoredToProposals(workspace.repository.authoredProposals ?? []),
                       ]}
                       authored={workspace.repository.authoredProposals ?? []}

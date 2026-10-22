@@ -53,7 +53,7 @@ import type { EracisMunicipalContext } from "../eracis";
 import { getEracisMunicipalContext } from "../eracis";
 import type { HealthReportSanitaryReading } from "./healthReportSanitaryReading";
 import { buildHealthReportSanitaryReading } from "./healthReportSanitaryReading";
-import { authoredToProposals, buildChosenClosing, buildReadingUnitProposals, type CanonicalChosenClosing } from "../proposals";
+import { authoredToProposals, buildChosenClosing, buildReadingUnitProposals, buildRelationProposals, type CanonicalChosenClosing } from "../proposals";
 import type { UGCAssistanceQuestion } from "../ugc-clinical-assistance";
 import {
   buildUGCClinicalAssistanceReading,
@@ -748,6 +748,7 @@ export function buildDiagnosticAnswers(
   const cierreElegido = buildChosenClosing(
     [
       ...buildReadingUnitProposals(lecturaPorTema),
+      ...buildRelationProposals(fullWorkspace.repository.relationDeclarations).proposals,
       ...authoredToProposals(fullWorkspace.repository.authoredProposals ?? []),
     ],
     fullWorkspace.repository.proposalDecisions

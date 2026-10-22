@@ -1,7 +1,7 @@
 # CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY
 
 > Contrato metodológico canónico del Perfil de Salud Local (PSL) en COMPÁS NG.
-> Versión 1.7.1 — 2026-10-22 (historial en el registro de revisiones)
+> Versión 1.7.2 — 2026-10-22 (historial en el registro de revisiones)
 > Estado: VIGENTE
 >
 > Este contrato define qué debe ser metodológicamente un Perfil de Salud Local,
@@ -253,7 +253,7 @@ La conclusión no es un tipo más: es el paso en que las afirmaciones de los pas
 
 1. **Referencias no locales.** Las referencias de ámbito autonómico o provincial (por ejemplo, la Encuesta Andaluza de Salud) entran en el paso de análisis solo como referencia comparativa rotulada «no local», con encuesta, año y tabla. Nunca sustituyen el dato municipal.
 2. **Tabla de relaciones.** Las relaciones del paso de inferencia constan en una tabla declarada y versionada, con su grado y su fuente. La valida una persona del equipo técnico, y cada versión lleva su autoría y su fecha.
-3. **Generación.** Una regla puede generar una conclusión u orientación solo cuando existen la relación en la tabla y los átomos de evidencia que la sostienen. Ninguna regla genera una orientación a partir de una relación de grado 3.
+3. **Generación.** Una regla puede generar una conclusión de tipo hecho («la tabla declara esta relación, con este grado, esta autoría y esta evidencia») solo cuando la relación consta en la tabla, está validada por una persona, es de grado 1 o 2 y conserva la evidencia que la sostiene. Ninguna regla genera interpretaciones, hipótesis ni orientaciones, que exigen autoría humana (Art. 8); para la orientación el sistema puede ofrecer un borrador en el formulario de redacción, que no es una propuesta del menú ni entra en el Perfil hasta que una persona lo redacta como suyo. Las relaciones de grado 3 o sin validar no generan nada y su motivo consta. Una propuesta generada nace pendiente y su identificador incluye la versión de la relación.
 
 *Consecuencia si se viola:* el Perfil contiene frases que no se pueden clasificar ni rastrear, o una orientación descansa en una relación sin sustento.
 
@@ -742,6 +742,7 @@ Las conclusiones y las orientaciones técnicas cierran el Perfil y no se present
 | 2026-10-22 | 1.6 | Propuestas redactadas por el equipo técnico en el cierre interpretativo, con evidencia citada, sin elección por defecto (Art. 16 ter 1 bis). Decisión del autor | COMPÁS NG |
 | 2026-10-22 | 1.7 | La afirmación como unidad y la cadena de lectura en cinco pasos (Art. 8 ter); ejes de lectura declarados (Art. 4 ter); interpretaciones e hipótesis en el menú, ubicación final de conclusiones y orientaciones y modo de revisión sobre el mismo documento (Art. 16 ter, 7 y 8). Invariantes I-LHPM-17 e I-LHPM-18. Decisión del autor | COMPÁS NG |
 | 2026-10-22 | 1.7.1 | Corrección de la tabla del Art. 8 ter: «conclusión» no es un tipo del Art. 8 sino un paso; se fijan los tipos que admite cada paso, tal como los implementa el modelo de afirmación | COMPÁS NG |
+| 2026-10-22 | 1.7.2 | Art. 8 ter 3: las reglas de generación solo producen conclusiones de tipo hecho desde relaciones validadas de grado 1 o 2; interpretaciones, hipótesis y orientaciones siguen siendo de autoría humana (Art. 8), con borrador opcional para la orientación. Resuelve la contradicción entre el Art. 8 y el texto de la v1.7 | COMPÁS NG |
 
 ---
 
