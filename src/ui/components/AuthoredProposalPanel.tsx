@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { AuthoredProposal } from "../../domain/repository";
-import { validateAuthoredProposal } from "../../application/proposals";
+import { tipoForAuthored, validateAuthoredProposal } from "../../application/proposals";
 import { STEP_ALLOWED_TYPES, type StatementType } from "../../domain/statements/statementTypes";
 
 const TYPE_LABEL: Record<StatementType, string> = {
@@ -43,7 +43,7 @@ export function AuthoredProposalPanel({ proposals, onAdd, onRemove }: AuthoredPr
     const candidate: Omit<AuthoredProposal, "authoredAt"> = {
       id: id.trim(),
       kind,
-      ...(tipo !== "" ? { tipo: kind === "orientation" ? ("orientacion" as const) : tipo } : {}),
+      ...(tipoForAuthored(kind, tipo) !== undefined ? { tipo: tipoForAuthored(kind, tipo) } : {}),
       text: text.trim(),
       evidence: evidence.split("\n").map((l) => l.trim()).filter((l) => l !== ""),
       ...(kind === "orientation" ? { conclusionIds } : {}),

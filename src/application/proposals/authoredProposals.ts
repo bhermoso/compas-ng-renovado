@@ -12,6 +12,15 @@ export function authoredProposalId(a: Pick<AuthoredProposal, "kind" | "id">): st
   return stableProposalId(a.kind, "equipo", a.id);
 }
 
+/** Tipo de afirmación al registrar: la orientación técnica es siempre «orientacion»; en la conclusión lo elige quien redacta. */
+export function tipoForAuthored(
+  kind: AuthoredProposal["kind"],
+  selected: AuthoredProposal["tipo"] | ""
+): AuthoredProposal["tipo"] {
+  if (kind === "orientation") return "orientacion";
+  return selected === "" ? undefined : selected;
+}
+
 /** Problemas que impiden registrar la propuesta; vacío = admisible. */
 export function validateAuthoredProposal(
   a: Omit<AuthoredProposal, "authoredAt">,
