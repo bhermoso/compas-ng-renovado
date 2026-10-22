@@ -453,6 +453,44 @@ export function ProfileIntegratedEditorialPreview({
         </div>
       </section>
 
+      {/* ── Conclusiones y orientaciones elegidas ───────────────────────────
+          Cierran la lectura, en el orden de la cadena (Art. 16 bis): conclusiones
+          y orientaciones técnicas, y después la frontera. Solo lo que el equipo
+          técnico ha elegido (Art. 16 ter); la vista canónica y el documento
+          sellado llevan el mismo texto (Art. 17 bis). */}
+      {"chosenClosing" in view && view.chosenClosing !== undefined ? (
+        <>
+          {view.chosenClosing.conclusions.length > 0 ? (
+            <section className="pie-doc-section" aria-labelledby="pie-chosen-conclusions-title">
+              <h3 id="pie-chosen-conclusions-title" className="pie-section__title">Conclusiones</h3>
+              {view.chosenClosing.conclusions.map((c) => (
+                <article key={c.etiqueta} className="pie-hilo">
+                  <p className="pie-hilo__reading">{c.texto}</p>
+                  {c.cautelas !== undefined ? <p className="pie-hilo__context">Salvedades: {c.cautelas}</p> : null}
+                  <p className="pie-hilo__context">Evidencia: {c.evidencia.join("; ")}.</p>
+                </article>
+              ))}
+            </section>
+          ) : null}
+          {view.chosenClosing.orientations.length > 0 ? (
+            <section className="pie-doc-section" aria-labelledby="pie-chosen-orientations-title">
+              <h3 id="pie-chosen-orientations-title" className="pie-section__title">Orientaciones técnicas</h3>
+              {view.chosenClosing.orientations.map((o) => (
+                <article key={o.etiqueta} className="pie-hilo">
+                  <p className="pie-hilo__reading">{o.texto}</p>
+                  <p className="pie-hilo__context">
+                    {o.derivaDe !== undefined && o.derivaDe.length > 0 ? `Deriva de: ${o.derivaDe.join(", ")}. ` : ""}
+                    {o.sustento !== undefined ? `Sustento de grado ${o.sustento}. ` : ""}
+                    {o.cautelas !== undefined ? `Salvedades: ${o.cautelas}` : ""}
+                  </p>
+                  <p className="pie-hilo__context">Evidencia: {o.evidencia.join("; ")}.</p>
+                </article>
+              ))}
+            </section>
+          ) : null}
+        </>
+      ) : null}
+
       {/* ── Cierre interpretativo (autoría humana) ──────────────────────────
           Cierra la cadena editorial —evidencia → lectura → conclusiones— con la
           voz humana. Se rinde para la vista canónica sellada (`view.humanClosing`)
@@ -481,7 +519,7 @@ export function ProfileIntegratedEditorialPreview({
       ) : null}
 
       {/* ── Frontera institucional ───────────────────────────────────────────
-          Cierra la cadena editorial: el Perfil concluye, no recomienda (Art. 16 bis).
+          Cierra la cadena editorial: el Perfil concluye y orienta; no decide (Art. 16 bis).
           Se rinde para la vista canónica sellada (`view.institutionalBoundary`) Y
           para el borrador vivo (prop `institutionalBoundary`, desde
           `buildInstitutionalBoundary(psl.priorizacion)`), con el mismo marcado: el

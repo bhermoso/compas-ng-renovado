@@ -270,6 +270,59 @@ describe("visor PSL-C — documento institucional renderizado", () => {
     expect(canonicalHtml).toContain("pslc-viewer__frontera");
   });
 
+  it("el cierre elegido se sella y se rinde al final, antes de la frontera (Art. 16 ter 8)", () => {
+    const base = buildDiagnosticAnswers({
+      workspace: ws,
+      determinantTitles: [],
+      assets: ws.evidenceStore.atoms
+        .filter((a) => a.kind === "asset")
+        .map((a) => ({ title: a.title, content: a.content })),
+    });
+    const answers = {
+      ...base,
+      cierreElegido: {
+        conclusions: [
+          { etiqueta: "C1", tipo: "interpretacion" as const, texto: "Conclusión elegida de prueba.", evidencia: ["Informe, pág. 30"], elegidaPor: "A", elegidaEl: "2026-10-22" },
+        ],
+        orientations: [
+          { etiqueta: "O1", tipo: "orientacion" as const, texto: "Orientación elegida de prueba.", evidencia: ["C1"], sustento: 1 as const, derivaDe: ["C1"], elegidaPor: "A", elegidaEl: "2026-10-22" },
+        ],
+      },
+    };
+    const result = compileLocalHealthProfile({
+      psl: pslCompilable(generated),
+      perfil: perfilConConocimiento(),
+      compiledBy: "Equipo técnico de salud pública",
+      municipalityName: ws.municipality.identity.name,
+      municipalityProvince: ws.municipality.identity.province ?? "",
+      existingArtifactCount: 0,
+      diagnosticAnswers: answers,
+    });
+    if (!result.ok) throw new Error("compilación canónica falló");
+    const html = renderToStaticMarkup(<PSLCArtifactViewer artifact={result.artifact} />);
+    const iC = html.indexOf("Conclusión elegida de prueba.");
+    const iO = html.indexOf("Orientación elegida de prueba.");
+    const iF = html.indexOf("Frontera institucional");
+    expect(iC).toBeGreaterThan(-1);
+    expect(iO).toBeGreaterThan(iC);
+    expect(iF).toBeGreaterThan(iO);
+    expect(html).toContain("Deriva de: C1.");
+    expect(html).toContain("Sustento de grado 1.");
+    // Sin cierre elegido no aparece ninguna de las dos secciones.
+    const sin = compileLocalHealthProfile({
+      psl: pslCompilable(generated),
+      perfil: perfilConConocimiento(),
+      compiledBy: "Equipo técnico de salud pública",
+      municipalityName: ws.municipality.identity.name,
+      municipalityProvince: ws.municipality.identity.province ?? "",
+      existingArtifactCount: 0,
+      diagnosticAnswers: base,
+    });
+    if (!sin.ok) throw new Error("compilación canónica falló");
+    const htmlSin = renderToStaticMarkup(<PSLCArtifactViewer artifact={sin.artifact} />);
+    expect(htmlSin).not.toContain("Orientaciones técnicas");
+  });
+
   it("rinde y distingue la frontera institucional en la vista canónica", () => {
     // GOV-SALIDA-01 (institutionalBoundary en el visor): en la vista canónica
     // sellada, la frontera se rinde COMPLETA (enunciado + consenso) y se
@@ -300,8 +353,10 @@ describe("visor PSL-C — documento institucional renderizado", () => {
     // La frontera se rinde completa: enunciado fijo + consenso.
     expect(canonicalHtml).toContain("Frontera institucional");
     expect(canonicalHtml).toContain(
-      "no formula recomendaciones, actuaciones, programas ni objetivos estratégicos"
+      "concluye y orienta técnicamente: no fija actuaciones, programas, objetivos estratégicos ni prioridades"
     );
+
+
     expect(canonicalHtml).toContain("Plan de Acción");
     expect(canonicalHtml).toContain("fase posterior del proceso de planificación");
     expect(canonicalHtml).toContain("Consenso del Grupo Motor documentado:");

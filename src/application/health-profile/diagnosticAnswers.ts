@@ -52,6 +52,7 @@ import type { EracisMunicipalContext } from "../eracis";
 import { getEracisMunicipalContext } from "../eracis";
 import type { HealthReportSanitaryReading } from "./healthReportSanitaryReading";
 import { buildHealthReportSanitaryReading } from "./healthReportSanitaryReading";
+import { authoredToProposals, buildChosenClosing, buildReadingUnitProposals, type CanonicalChosenClosing } from "../proposals";
 import type { UGCAssistanceQuestion } from "../ugc-clinical-assistance";
 import {
   buildUGCClinicalAssistanceReading,
@@ -134,6 +135,8 @@ export interface DiagnosticAnswers {
   salutogenica: SalutogenicReading;
   /** Lectura por tema (capacidad, voz e Informe). Ausente si ninguna fuente sostiene un tema. */
   lecturaPorTema?: CanonicalReadingUnits;
+  /** Conclusiones y orientaciones elegidas por el equipo técnico (Art. 16 ter); la clave no existe si no hay ninguna. */
+  cierreElegido?: CanonicalChosenClosing;
   /** Lectura sustantiva de los estudios complementarios (bloques diagnósticos). */
   estudios: ComplementaryStudiesReading;
   /** Referencias comparativas por indicador (valor demo, provincial, Andalucía). */
@@ -739,6 +742,14 @@ export function buildDiagnosticAnswers(
     activosLocaliza.records.filter((r) => r.estado === "validado").length
   );
 
+  const cierreElegido = buildChosenClosing(
+    [
+      ...buildReadingUnitProposals(lecturaPorTema),
+      ...authoredToProposals(fullWorkspace.repository.authoredProposals ?? []),
+    ],
+    fullWorkspace.repository.proposalDecisions
+  );
+
   return {
     ...(antecedentes !== undefined ? { antecedentes } : {}),
     porEspacio: knowledgeBySpace(workspace.perfilLocalDeSalud),
@@ -752,6 +763,7 @@ export function buildDiagnosticAnswers(
     senalesPresentes,
     salutogenica,
     ...(lecturaPorTema !== undefined ? { lecturaPorTema } : {}),
+    ...(cierreElegido !== undefined ? { cierreElegido } : {}),
     estudios: buildComplementaryStudiesReading({ workspace, indicatorTitles }),
     referencias: buildIndicatorComparisonReferences({ workspace, indicatorTitles }),
     badeaContexto: getBadeaMunicipalContext(workspace.municipality.identity.id),

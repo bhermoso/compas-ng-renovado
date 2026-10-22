@@ -298,6 +298,40 @@ export function projectCanonicalToDocumentModel(
     paragraphs: reading.closing.flatMap((col) => [col.title, ...col.items]),
   });
 
+  if (reading.chosenClosing !== undefined) {
+    const cc = reading.chosenClosing;
+    if (cc.conclusions.length > 0) {
+      sections.push({
+        sectionId: "chosen-conclusions",
+        title: "Conclusiones",
+        level: 1,
+        paragraphs: cc.conclusions.flatMap((c) => [
+          c.texto,
+          ...(c.cautelas !== undefined ? [`Salvedades: ${c.cautelas}`] : []),
+          `Evidencia: ${c.evidencia.join("; ")}.`,
+        ]),
+      });
+    }
+    if (cc.orientations.length > 0) {
+      sections.push({
+        sectionId: "chosen-orientations",
+        title: "Orientaciones técnicas",
+        level: 1,
+        paragraphs: cc.orientations.flatMap((o) => [
+          o.texto,
+          [
+            o.derivaDe !== undefined && o.derivaDe.length > 0 ? `Deriva de: ${o.derivaDe.join(", ")}.` : "",
+            o.sustento !== undefined ? `Sustento de grado ${o.sustento}.` : "",
+            o.cautelas !== undefined ? `Salvedades: ${o.cautelas}` : "",
+          ]
+            .filter((x) => x !== "")
+            .join(" "),
+          `Evidencia: ${o.evidencia.join("; ")}.`,
+        ].filter((x) => x !== "")),
+      });
+    }
+  }
+
   if (reading.humanClosing !== null) {
     sections.push({
       sectionId: "human-closing",

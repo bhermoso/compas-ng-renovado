@@ -18,8 +18,8 @@ const STATE_LABEL = { pendiente: "Pendiente", elegida: "Elegida", descartada: "D
 /**
  * Menú de conclusiones propuestas (CONTRACT-LHPM v1.5, Art. 16 ter). El sistema
  * propone y no elige: cada propuesta la elige o descarta una persona del equipo
- * técnico. Por ahora el documento del Perfil no se filtra con estas decisiones;
- * queda registrada la elección, con su autoría y fecha.
+ * técnico. Lo elegido entra en el documento canónico, al final, tras la lectura
+ * (conclusiones y orientaciones); lo pendiente y lo descartado no entra.
  */
 export function ProposalMenuPanel({ proposals, decisions, onDecide }: ProposalMenuPanelProps) {
   const [author, setAuthor] = useState("");

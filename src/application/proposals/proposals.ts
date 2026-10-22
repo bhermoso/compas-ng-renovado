@@ -23,6 +23,8 @@ export interface Proposal {
   text: string;
   /** Tipo de afirmación (Art. 8); ausente = sin clasificar. */
   tipo?: StatementType;
+  /** Etiqueta de lectura (p. ej. «C1»); ausente = el identificador. */
+  label?: string;
   /** Quién propone: el sistema (por defecto) o el equipo técnico (Art. 16 ter 1 bis). */
   origin?: "sistema" | "equipo";
   /** Salvedades declaradas por quien propone. */
