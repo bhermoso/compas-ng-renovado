@@ -27,6 +27,7 @@ import type { PSLCSealedCanonicalDocument } from "../../domain/health-profile-ar
 import type { DiagnosticAnswers } from "./diagnosticAnswers";
 import type { CanonicalAntecedents } from "./antecedents";
 import type { CanonicalReadingUnits } from "../localiza-assets";
+import type { CanonicalChosenClosing } from "../proposals";
 import type {
   ProfileIntegratedEditorialHeader,
   ProfileIntegratedEditorialOverviewMessage,
@@ -68,10 +69,10 @@ export const PRIORITIZATION_PENDING_DECLARATION =
   "una lectura que la evidencia aún no permite. Cuando la priorización ciudadana está " +
   "presente, su incorporación interpretativa como evidencia queda explícitamente pendiente.";
 
-/** Enunciado fijo de frontera con el Plan de Acción (el Perfil concluye, no recomienda). */
+/** Enunciado fijo de frontera con el Plan de Acción (el Perfil concluye y orienta; no decide, Art. 16 bis). */
 export const CANONICAL_FRONTIER_STATEMENT =
-  "Este Perfil de Salud Local concluye el diagnóstico: no formula recomendaciones, " +
-  "actuaciones, programas ni objetivos estratégicos. La traducción a prioridades y " +
+  "Este Perfil de Salud Local concluye y orienta técnicamente: no fija actuaciones, " +
+  "programas, objetivos estratégicos ni prioridades. La traducción a prioridades y " +
   "acciones corresponde al Plan de Acción, que es una fase posterior del proceso de " +
   "planificación y se elabora con el Grupo Motor a partir de este documento.";
 
@@ -230,6 +231,8 @@ export interface CanonicalEditorialView {
   territorialReadings: ProfileIntegratedEditorialReadingBlock[];
   /** Lectura por tema. La clave no existe si ninguna fuente sostiene un tema. */
   readingUnits?: CanonicalReadingUnits;
+  /** Conclusiones y orientaciones elegidas por el equipo técnico; la clave no existe si no hay ninguna (Art. 16 ter). */
+  chosenClosing?: CanonicalChosenClosing;
   /**
    * Fuentes de ciclos anteriores declarados. La clave no existe cuando el
    * expediente no declara ninguna, de modo que los documentos y sellos previos
@@ -283,6 +286,7 @@ export interface SealedCanonicalProfileDocumentV2 {
     sourceBlocks: ProfileIntegratedEditorialSourceBlock[];
     territorialReadings: ProfileIntegratedEditorialReadingBlock[];
     readingUnits?: CanonicalReadingUnits;
+    chosenClosing?: CanonicalChosenClosing;
     antecedents?: CanonicalAntecedents;
     interpretation: IntegratedInterpretation;
     diagnosticSynthesis?: ProfileIntegratedDiagnosticSynthesis | null;
@@ -345,6 +349,8 @@ export type CanonicalReadingSectionId =
   | "principal-signals"
   | "group-motor-agenda"
   | "generated-closing"
+  | "chosen-conclusions"
+  | "chosen-orientations"
   | "human-closing"
   | "institutional-boundary";
 
@@ -369,6 +375,8 @@ export const CANONICAL_READING_ORDER = [
   "principal-signals",
   "group-motor-agenda",
   "generated-closing",
+  "chosen-conclusions",
+  "chosen-orientations",
   "human-closing",
   "institutional-boundary",
 ] as const satisfies readonly CanonicalReadingSectionId[];
@@ -613,6 +621,9 @@ export function buildCanonicalEditorialView(
     ...(ctx.answers.lecturaPorTema !== undefined
       ? { readingUnits: ctx.answers.lecturaPorTema }
       : {}),
+    ...(ctx.answers.cierreElegido !== undefined
+      ? { chosenClosing: ctx.answers.cierreElegido }
+      : {}),
     ...(ctx.answers.antecedentes !== undefined
       ? { antecedents: ctx.answers.antecedentes }
       : {}),
@@ -820,6 +831,7 @@ export function normalizeSealedCanonicalProfileDocument(
       informeSignalRanking: ev.informeSignalRanking ?? null,
       territorialReadings: ev.territorialReadings,
       ...(ev.readingUnits !== undefined ? { readingUnits: ev.readingUnits } : {}),
+      ...(ev.chosenClosing !== undefined ? { chosenClosing: ev.chosenClosing } : {}),
       ...(ev.antecedents !== undefined ? { antecedents: ev.antecedents } : {}),
       interpretation: ev.interpretation,
       diagnosticSynthesis: ev.diagnosticSynthesis,

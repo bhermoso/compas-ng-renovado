@@ -64,6 +64,7 @@ export function authoredToProposals(list: ReadonlyArray<AuthoredProposal>): Prop
     kind: a.kind,
     text: a.text,
     origin: "equipo" as const,
+    label: a.id,
     ...(a.tipo !== undefined ? { tipo: a.tipo } : {}),
     ...(a.cautelas !== undefined && a.cautelas.trim() !== "" ? { cautelas: a.cautelas } : {}),
     derivedFrom: {
