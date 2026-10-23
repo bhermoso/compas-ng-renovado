@@ -1,7 +1,7 @@
 # CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY
 
 > Contrato metodológico canónico del Perfil de Salud Local (PSL) en COMPÁS NG.
-> Versión 1.8.0 — 2026-10-23 (historial en el registro de revisiones)
+> Versión 2.0.0 — 2026-10-23 (historial en el registro de revisiones)
 > Estado: VIGENTE
 >
 > Este contrato define qué debe ser metodológicamente un Perfil de Salud Local,
@@ -59,9 +59,9 @@ El Perfil pertenece a la etapa de síntesis diagnóstica. Las etapas de prioriza
 | **Planificación** | ¿Qué se va a hacer, cómo, quién y cuándo? | Plan de Acción / PLS |
 | **Decisión** | ¿La corporación asume el plan como compromiso institucional? | PLS aprobado |
 
-El Perfil concluye y orienta. No decide. Formula orientaciones técnicas derivadas de sus conclusiones (Art. 7 quater): qué contrastar, qué capacidades conectar o reforzar, qué lagunas cubrir, qué determinantes explorar. No selecciona prioridades, no asigna líneas estratégicas, no fija actuaciones operativas (responsable, plazo, recurso, indicador de ejecución), no asume compromisos y no sustituye la deliberación del Grupo Motor.
+El Perfil concluye y orienta. No decide. Formula recomendaciones del Perfil derivadas de sus conclusiones y lagunas (Art. 8 quater): qué conocer, qué contrastar, qué abordar. No selecciona prioridades, no asigna líneas estratégicas, no fija actuaciones operativas (responsable, plazo, recurso, indicador de ejecución), no asume compromisos y no sustituye la deliberación del Grupo Motor.
 
-La orientación técnica propone, la priorización elige, el Plan de Acción concreta y la decisión compromete.
+La recomendación del Perfil propone, la priorización elige, el Plan de Acción concreta y la decisión compromete.
 
 La mezcla de estas etapas en el contenido del Perfil es un defecto metodológico grave que invalida el diagnóstico como base de planificación.
 
@@ -179,18 +179,18 @@ Solo pueden pasar a la sección de áreas de intervención del Perfil los aspect
 
 ### Art. 7 quater. Capítulo VI — Cierre interpretativo
 
-El Capítulo VI del Perfil es el **Cierre interpretativo y orientaciones técnicas**. No es "Plan de acción".
+El Capítulo VI del Perfil es el **Cierre interpretativo y recomendaciones del Perfil**. No es "Plan de acción".
 
 El cierre interpretativo establece:
 - Qué comprensión del territorio emerge del conjunto del diagnóstico.
 - Qué tensiones o patrones deben contrastarse con el Grupo Motor.
 - Qué capacidades territoriales pueden sostener el proceso comunitario.
 - Qué incertidumbres deben quedar explícitas antes de la priorización.
-- Qué orientaciones técnicas se derivan de las conclusiones (Art. 8, tipo «Orientación técnica»).
+- Qué recomendaciones del Perfil se derivan de las conclusiones y de las lagunas (Art. 8, tipo «Recomendación del Perfil»; Art. 8 quater).
 
-Cada orientación cita las conclusiones de las que deriva y el grado de sustento de las relaciones en que se apoya (Art. 8 bis). Solo las relaciones de grado 1 y 2 pueden sostener una orientación.
+Cada recomendación cita las conclusiones o lagunas de las que deriva y, si se apoya en una relación, su grado de sustento (Art. 8 bis). Una recomendación de tipo «Abordar» solo puede apoyarse en relaciones de grado 1 o 2.
 
-El Capítulo VI no establece compromisos, no selecciona prioridades y no fija actuaciones operativas (responsable, plazo, recurso, indicador de ejecución). Esa concreción pertenece al Plan de Acción / Plan Local de Salud, que es un producto distinto del Perfil. El Perfil termina cuando el territorio queda comprendido y orientado.
+El Capítulo VI no establece compromisos, no selecciona prioridades y no asigna líneas estratégicas, no ordena las recomendaciones entre sí y no fija actuaciones operativas (responsable, plazo, recurso, indicador de ejecución). Esa concreción pertenece al Plan de Acción / Plan Local de Salud, que es un producto distinto del Perfil. El Perfil termina cuando el territorio queda comprendido y las recomendaciones están formuladas.
 
 ### Art. 8. Tipos de afirmación
 
@@ -205,8 +205,8 @@ El Perfil opera con exactamente ocho tipos de afirmación. Toda afirmación incl
 **Hipótesis:** afirmación sobre relaciones causales o patrones no demostrados en la evidencia disponible, formulada como posibilidad para orientar la planificación.
 *Ejemplo: "Es posible que la dispersión geográfica de las pedanías esté relacionada con la escasez de activos comunitarios en esas zonas."*
 
-**Orientación técnica:** afirmación propositiva derivada de una o varias conclusiones, que indica qué conviene contrastar, explorar, conectar, reforzar o cubrir. Requiere autoría humana explícita, cita las conclusiones de las que deriva y el grado de sustento de la relación en que se apoya (Art. 8 bis). No fija responsable, plazo ni recurso.
-*Ejemplo: "Si el Grupo Motor confirma la soledad no deseada como problema, la lectura orienta a explorar su conexión con los activos de participación declarados por el equipo técnico."*
+**Recomendación del Perfil:** afirmación propositiva derivada de una o varias conclusiones o lagunas, que indica qué conviene conocer, contrastar o abordar (Art. 8 quater). Requiere autoría humana explícita, cita las conclusiones o lagunas de las que deriva y, si se apoya en una relación, el grado de sustento de esta (Art. 8 bis). No fija responsable, plazo, recurso, indicador de ejecución, prioridad ni línea estratégica.
+*Ejemplo: "Si el Grupo Motor confirma la soledad no deseada como problema, se recomienda abordar su conexión con los activos de participación declarados por el equipo técnico."*
 
 **Percepción:** afirmación que recoge el conocimiento experiencial de actores del territorio, sin pretensión de validación cuantitativa.
 *Ejemplo: "Las personas mayores del municipio señalan el transporte como barrera principal de acceso a los servicios de salud."*
@@ -230,7 +230,7 @@ El Perfil puede formular relaciones entre potenciales determinantes y problemas 
 2. **Grado de sustento, declarado en cada relación.**
    - *Grado 1 — Observada en el territorio:* ambos extremos constan en la evidencia local del mismo ciclo. Describe coexistencia, no causa.
    - *Grado 2 — Documentada en referencia externa:* la relación procede de una fuente de ámbito superior o de la literatura, con fuente verificable (por ejemplo, valores de la Encuesta Andaluza de Salud para Andalucía o Granada), etiquetada «no local». No sustituye el dato municipal.
-   - *Grado 3 — Plausible, sin sustento verificado:* se marca «no verificado». No sostiene ninguna orientación.
+   - *Grado 3 — Plausible, sin sustento verificado:* se marca «no verificado». No sostiene una recomendación de tipo «Abordar»; admite recomendaciones de tipo «Conocer» y «Contrastar» (Art. 8 quater).
 3. **Lenguaje proporcionado al sustento.** «Se asocia con», «coexiste con» o «es compatible con». «Causa», «provoca» o «explica» solo cuando la fuente citada demuestra causalidad y así lo dice.
 4. **Tabla declarada.** Las relaciones elegibles proceden de una tabla versionada y validada por una persona, como las correspondencias del Art. 4 bis. El sistema no infiere relaciones por coincidencia de términos en un texto.
 5. **Escala.** Una asociación observada en un ámbito superior no se atribuye al municipio ni a las personas que lo habitan; se declara la escala (Art. 13).
@@ -246,15 +246,36 @@ La conclusión no es un tipo más: es el paso en que las afirmaciones de los pas
 |---|---|---|
 | Describir | hecho, percepción, laguna | cifra sin año y fuente; dato aproximado; sustituir el dato local por el de otro ámbito |
 | Analizar | hecho, percepción, cautela, laguna | umbral sin fuente; presentar una referencia no local como dato municipal |
-| Inferir | interpretación, hipótesis, cautela | causalidad sin grado 1 o 2; sostener una orientación con una relación de grado 3 |
+| Inferir | interpretación, hipótesis, cautela | causalidad sin grado 1 o 2; sostener una recomendación de tipo «Abordar» con una relación de grado 3 |
 | Concluir | hecho, interpretación, laguna | conclusión sin evidencia citada |
-| Orientar | orientación técnica, decisión posterior, cautela | responsable, plazo, recurso o indicador de ejecución; decidir prioridades |
+| Orientar | recomendación del Perfil, decisión posterior, cautela | responsable, plazo, recurso o indicador de ejecución; decidir prioridades o asignar línea estratégica |
 
 1. **Referencias no locales.** Las referencias de ámbito autonómico o provincial (por ejemplo, la Encuesta Andaluza de Salud) entran en el paso de análisis solo como referencia comparativa rotulada «no local», con encuesta, año y tabla. Nunca sustituyen el dato municipal.
 2. **Tabla de relaciones.** Las relaciones del paso de inferencia constan en una tabla declarada y versionada, con su grado y su fuente. La valida una persona del equipo técnico, y cada versión lleva su autoría y su fecha.
-3. **Generación.** Una regla puede generar una conclusión de tipo hecho («la tabla declara esta relación, con este grado, esta autoría y esta evidencia») solo cuando la relación consta en la tabla, está validada por una persona, es de grado 1 o 2 y conserva la evidencia que la sostiene. Ninguna regla genera interpretaciones, hipótesis ni orientaciones, que exigen autoría humana (Art. 8); para la orientación el sistema puede ofrecer un borrador en el formulario de redacción, que no es una propuesta del menú ni entra en el Perfil hasta que una persona lo redacta como suyo. Las relaciones de grado 3 o sin validar no generan nada y su motivo consta. Una propuesta generada nace pendiente y su identificador incluye la versión de la relación.
+3. **Generación.** Una regla puede generar una conclusión de tipo hecho («la tabla declara esta relación, con este grado, esta autoría y esta evidencia») solo cuando la relación consta en la tabla, está validada por una persona, es de grado 1 o 2 y conserva la evidencia que la sostiene. Ninguna regla genera interpretaciones, hipótesis ni recomendaciones, que exigen autoría humana (Art. 8); para la recomendación el sistema puede ofrecer un borrador en el formulario de redacción, que no es una propuesta del menú ni entra en el Perfil hasta que una persona lo redacta como suyo. Las relaciones de grado 3 o sin validar no generan nada y su motivo consta. Una propuesta generada nace pendiente y su identificador incluye la versión de la relación.
 
-*Consecuencia si se viola:* el Perfil contiene frases que no se pueden clasificar ni rastrear, o una orientación descansa en una relación sin sustento.
+*Consecuencia si se viola:* el Perfil contiene frases que no se pueden clasificar ni rastrear, o una recomendación descansa en una relación sin sustento.
+
+### Art. 8 quater. Recomendaciones del Perfil
+
+La recomendación del Perfil es el último paso de la cadena de lectura (Art. 8 ter, «Orientar») y cierra el Perfil. Es de uno de tres tipos:
+
+| Tipo | Qué formula | Deriva de | Condición |
+|---|---|---|---|
+| **Conocer** | Qué dato cerraría una laguna y en qué fuente o ámbito puede estar | Una laguna, o una conclusión con un límite de información | Ninguna adicional |
+| **Contrastar** | Qué debe validar el Grupo Motor o la comunidad antes de dar una cifra o una lectura por buena | Una conclusión o una laguna, de cualquier grado | Ninguna adicional |
+| **Abordar** | Una línea de trabajo sobre un problema o una capacidad que las fuentes sostienen | Una conclusión sostenida por una relación de grado 1 o 2 | Grado 1 o 2 (Art. 8 bis) |
+
+Reglas:
+
+1. **Forma.** Verbo en infinitivo y objeto. Declara la conclusión o la laguna de la que deriva y la decisión del Grupo Motor que habilita.
+2. **Lo que no es.** No incluye responsable, plazo, recurso, indicador de ejecución, prioridad ni línea estratégica. No ordena las recomendaciones entre sí y no compromete a nadie. Esas determinaciones pertenecen a la priorización y al Plan de Acción.
+3. **Una laguna no es un área de intervención** (Art. 7 ter). Sobre una laguna solo caben recomendaciones de tipo «Conocer» o «Contrastar».
+4. **Autoría y elección.** La recomendación es de autoría humana (Art. 8) y pasa por el menú elegible (Art. 16 ter).
+5. **Derivación desde el Plan.** Toda actuación del Plan de Acción debe poder derivarse de una recomendación o de una conclusión del Perfil. La actuación que no pueda derivarse declara en el Plan la fuente en que se apoya.
+6. **Diferencia con la actuación.** La recomendación responde a qué hay que conocer, contrastar o abordar. La actuación del Plan responde a quién, cuándo, con qué recursos y cómo se mide.
+
+*Consecuencia si se viola:* el Perfil prescribe o prioriza sin deliberación, o recomienda abordar un problema que ninguna fuente sostiene.
 
 ### Art. 9. Activos para la salud con rango equivalente a los déficits
 
@@ -396,12 +417,12 @@ Las líneas estratégicas de la ESCA definen la orientación del sistema sanitar
 
 ### Art. 16. No automatización de decisiones
 
-Ningún output generado automáticamente por el sistema puede presentarse en el Perfil como decisión territorial, como prioridad seleccionada ni como orientación técnica sin validación humana explícita.
+Ningún output generado automáticamente por el sistema puede presentarse en el Perfil como decisión territorial, como prioridad seleccionada ni como recomendación del Perfil sin validación humana explícita.
 
 El sistema genera:
 - Organización de la evidencia en el EvidenceStore.
 - Síntesis de patrones emergentes en la interpretación territorial.
-- Propuestas de orientación técnica para que el equipo las valide, las matice o las descarte.
+- Propuestas de recomendación para que el equipo las valide, las matice o las descarte.
 - Andamiaje de capítulos para redacción humana.
 
 El cuerpo diagnóstico del Perfil es compilado, trazable y no editable libremente. Su autoridad metodológica depende de que pueda reconstruirse la cadena que va desde la fuente hasta la afirmación. La autoría humana no reescribe el diagnóstico como texto libre: lo interpreta, lo matiza y lo asume en los espacios de cierre y enriquecimiento previstos.
@@ -417,23 +438,49 @@ Los capítulos de conclusiones y cierre interpretativo del Perfil son siempre de
 
 La cadena metodológica del Perfil es:
 
-`evidencia → lectura integrada → conclusiones → orientaciones técnicas → | frontera de decisión | → priorización → Plan de Acción`
+`evidencia → lectura integrada → conclusiones → recomendaciones del Perfil → | frontera de decisión | → priorización → Plan de Acción`
 
-El Perfil llega hasta las orientaciones técnicas. La priorización corresponde al Grupo Motor y las actuaciones operativas al Plan de Acción y al Plan Local de Salud. La frontera entre Perfil y Plan no es un muro: toda actuación posterior debe poder derivarse de las orientaciones y conclusiones del Perfil, y toda orientación y conclusión debe poder trazarse hasta la evidencia que la sostiene.
+El Perfil llega hasta las recomendaciones. La priorización corresponde al Grupo Motor y las actuaciones operativas al Plan de Acción y al Plan Local de Salud. La frontera entre Perfil y Plan no es un muro: toda actuación posterior debe poder derivarse de las recomendaciones y conclusiones del Perfil, y toda recomendación y conclusión debe poder trazarse hasta la evidencia que la sostiene.
 
-### Art. 16 ter. Conclusiones y orientaciones como menú elegible
+### Art. 16 ter. Conclusiones y recomendaciones como menú elegible
 
-Las conclusiones y las orientaciones técnicas del Perfil se presentan al equipo técnico como un menú de propuestas. El equipo elige cuáles asume y descarta las demás.
+Las conclusiones y las recomendaciones del Perfil se presentan al equipo técnico como un menú de propuestas. El equipo elige cuáles asume y descarta las demás.
 
-1. **Propuesta.** El sistema genera cada propuesta a partir de las relaciones y lecturas declaradas (Art. 8 bis, 9 ter). Cada una lleva su texto, su tipo (conclusión u orientación), la evidencia o relación de la que deriva y su grado de sustento. Ninguna nace elegida: el sistema puede ordenar las propuestas, pero no marca ninguna.
-1 bis. **Propuestas del equipo técnico.** El equipo puede redactar conclusiones y orientaciones en el cierre interpretativo (Art. 16) cuando la lectura no las genera, por ejemplo cuando se apoyan en cifras del Informe que aún no son átomos de evidencia. Cada una cita la evidencia de la que parte, declara sus salvedades y, si se apoya en una relación, su grado de sustento (Art. 8 bis); una orientación deriva de conclusiones registradas. Entra en el mismo menú, rotulada «redactada por el equipo técnico», y no nace elegida: registrarla no equivale a elegirla. El cuerpo diagnóstico sigue siendo compilado; estas propuestas solo llegan a él si se eligen.
+1. **Propuesta.** El sistema genera cada propuesta a partir de las relaciones y lecturas declaradas (Art. 8 bis, 9 ter). Cada una lleva su texto, su tipo (conclusión o recomendación), la evidencia o relación de la que deriva y su grado de sustento. Ninguna nace elegida: el sistema puede ordenar las propuestas, pero no marca ninguna.
+1 bis. **Propuestas del equipo técnico.** El equipo puede redactar conclusiones y recomendaciones en el cierre interpretativo (Art. 16) cuando la lectura no las genera, por ejemplo cuando se apoyan en cifras del Informe que aún no son átomos de evidencia. Cada una cita la evidencia de la que parte, declara sus salvedades y, si se apoya en una relación, su grado de sustento (Art. 8 bis); una recomendación deriva de conclusiones o lagunas registradas. Entra en el mismo menú, rotulada «redactada por el equipo técnico», y no nace elegida: registrarla no equivale a elegirla. El cuerpo diagnóstico sigue siendo compilado; estas propuestas solo llegan a él si se eligen.
 2. **Elección.** El equipo técnico elige o descarta cada propuesta, con su autoría y la fecha. Puede ajustar la redacción de una propuesta elegida, que conserva el vínculo con la evidencia de origen. El descarte admite un motivo, que se recomienda registrar.
 3. **Lo que entra en el Perfil.** Solo las propuestas elegidas figuran en el cuerpo del Perfil canónico, y lo hacen igual en pantalla, visor, DOCX, PDF e impresión (Art. 17 bis). Las descartadas no se muestran en el cuerpo, pero se conservan en el registro del expediente: no se borran.
 4. **Resolución previa a la versión institucional.** El Perfil no puede generarse como documento institucional mientras queden propuestas sin resolver. En borrador, las pendientes se muestran como tales.
 5. **Coherencia.** Descartar una propuesta no suprime la evidencia ni la lectura integrada de las que deriva. Si dos propuestas elegidas se contradicen, el Perfil lo declara (Art. 14).
 6. **Elegir no es priorizar.** La elección es una validación técnica de lo que el Perfil afirma y orienta. La priorización entre necesidades sigue siendo deliberación del Grupo Motor (Art. 3).
 7. **Interpretaciones e hipótesis.** Las interpretaciones y las hipótesis, que exigen autoría humana (Art. 8), pasan por este mismo menú y siguen las mismas reglas de elección, descarte y resolución previa a la versión institucional.
-8. **Ubicación y modo de revisión.** Las conclusiones y las orientaciones ocupan el final del Perfil, tras la lectura integrada y en este orden: conclusiones y orientaciones técnicas, y después la frontera de decisión (Art. 16 bis). No se intercalan en las unidades ni abren el documento. El menú no es un documento aparte: es un modo de revisión del mismo Perfil, con los controles de elegir y descartar junto a cada propuesta. Los controles son interfaz y no contenido: fuera del modo de revisión se muestra solo lo elegido, y el texto es idéntico en todas las representaciones (Art. 17 bis).
+8. **Ubicación y modo de revisión.** Las conclusiones y las recomendaciones ocupan el final del cuerpo del Perfil, en el orden del Art. 16 quater, y después la frontera de decisión (Art. 16 bis). No se intercalan en las unidades ni abren el documento. El menú no es un documento aparte: es un modo de revisión del mismo Perfil, con los controles de elegir y descartar junto a cada propuesta. Los controles son interfaz y no contenido: fuera del modo de revisión se muestra solo lo elegido, y el texto es idéntico en todas las representaciones (Art. 17 bis).
+
+### Art. 16 quater. Estructura del Perfil
+
+El Perfil es un argumento breve: su unidad es la conclusión. Una cuestión de salud figura en el cuerpo solo si sostiene una conclusión o deja una laguna que condiciona una. La evidencia por fuente, por tema y por cifra no forma parte del cuerpo: consta en el anexo compilado.
+
+**Precondición.** La estructura rige para un Perfil, es decir, cuando se cumple la regla N+1 (Art. 7 bis A). Si solo existe el Informe de Salud, el producto es el Informe de Salud y no tiene esta estructura.
+
+**Cuerpo.** El cuerpo del Perfil consta de estos apartados, en este orden:
+
+1. **Punto de partida.** Municipio, población con fuente y año, fuentes del expediente con año y escala, estudios y activos incorporados, ejes de lectura declarados (Art. 4 ter) y lo que no consta. Es la única declaración de ausencias generales; no se repite por cuestión.
+2. **Conclusiones.** Cada una en un bloque de campos fijos: enunciado de una frase; tipo (hecho, interpretación o hipótesis); hasta tres evidencias visibles, con valor, año, fuente y página o consulta; grado de sustento de la relación que la sostiene, o «sin relación declarada»; límite principal (escala, año, tamaño, desfase entre fuentes); y recomendaciones a las que lleva. Una conclusión que repite una evidencia sin añadirle lectura no se redacta.
+3. **Convergencias y divergencias.** Las cuestiones que aparecen en dos o más fuentes, según el Art. 14. Si no hay ninguna cuestión compartida, el apartado se omite y el punto de partida lo declara.
+4. **Lo que no sabemos.** Las lagunas que condicionan una conclusión, cada una con el dato que la cerraría.
+5. **Recomendaciones del Perfil.** En el formato del Art. 8 quater.
+6. **Paso al Plan de Acción.** Texto fijo de la frontera de decisión (Art. 16 bis): qué recibe el Plan (las conclusiones, las recomendaciones y las lagunas elegidas) y que la priorización corresponde al Grupo Motor.
+7. **Autoría y validación.** Responsable técnico, fechas y registro de lo compilado por el sistema, lo declarado por el equipo y lo redactado por el equipo (Art. 17).
+
+**Anexo compilado.** Evidencia por fuente, cifras con procedencia, relaciones declaradas y unidades de lectura (Art. 4 bis). Lo genera el sistema y no admite edición manual. Es parte del mismo documento (Art. 17 bis) y es el único lugar donde figura la evidencia completa.
+
+**Longitud.** El cuerpo no crece con el número de fuentes. El número máximo de conclusiones se fija tras probar la estructura con municipios de distinta riqueza de fuentes (H-LHPM-7).
+
+**Unidades de lectura.** Las unidades (Art. 4 bis) siguen siendo la forma en que el sistema organiza la evidencia. En el cuerpo figuran a través de las conclusiones, las convergencias y las lagunas, y completas en el anexo.
+
+**Disposición transitoria.** Mientras la implementación no ensamble esta estructura, el cuerpo heredado (señales por fuente, lectura integrada en hilos, síntesis interpretativa, señales para deliberación, cierre de la lectura y matriz de evidencia) sigue generándose y debe retirarse del cuerpo bloque a bloque, sin que el caso de referencia Granada-Zaidín cambie sin justificación. Los identificadores técnicos del código (por ejemplo, el tipo `orientacion`) no se alteran por este contrato.
+
+*Consecuencia si se viola:* el Perfil vuelve a crecer por acumulación de bloques que no se alimentan entre sí, y el lector no puede seguir un argumento.
 
 ### Art. 17. Autoría, validación y responsabilidad técnica
 
@@ -499,6 +546,7 @@ Un Perfil de Salud Local es metodológicamente aceptable cuando puede responders
 | **Equilibrio activos-déficits** | ¿Los activos comunitarios tienen la misma visibilidad que los indicadores de necesidad? |
 | **No prescripción** | ¿El Perfil no prescribe automáticamente prioridades, actuaciones ni compromisos? |
 | **Autoría identificable** | ¿Los capítulos interpretativos tienen autoría humana explícita, con nombre y cargo? |
+| **Estructura breve** | ¿El cuerpo se limita a los apartados del Art. 16 quater y la evidencia por fuente consta en el anexo compilado? |
 | **Alcance delimitado** | ¿El Perfil declara qué no ha podido medir o conocer en este ciclo diagnóstico? |
 | **Separación de etapas** | ¿El Perfil no anticipa decisiones de planificación que corresponden a etapas posteriores? |
 | **Equidad transversal** | ¿El diagnóstico incorpora la perspectiva de quién está en peor situación dentro del territorio? |
@@ -528,6 +576,9 @@ Los instrumentos de COMPÁS producen datos individuales que permiten calcular in
 
 **H-LHPM-6 — Verificabilidad del contenido humano**
 El compilador exige contenido no vacío en los capítulos de autoría humana. ¿Cómo distingue el sistema entre texto de autoría genuina y andamiaje mínimamente modificado? ¿Es esta distinción técnicamente verificable o recae íntegramente en la responsabilidad deontológica del equipo técnico?
+
+**H-LHPM-7 — Número máximo de conclusiones**
+¿Cuál es el número máximo de conclusiones del cuerpo del Perfil (el modelo propone entre tres y seis)? Se decide tras probar la estructura del Art. 16 quater con Zagra, Atarfe y Granada-Zaidín. Hasta entonces, el contrato no fija un tope.
 
 ---
 
@@ -633,9 +684,9 @@ Pantalla, visor, impresión, DOCX y PDF son representaciones del mismo documento
 
 ---
 
-**I-LHPM-9 — Frontera entre orientaciones y decisión**
+**I-LHPM-9 — Frontera entre recomendaciones y decisión**
 
-El Perfil concluye y orienta; no decide. La priorización es del Grupo Motor y las actuaciones operativas (responsable, plazo, recurso, indicador) del Plan de Acción, que deben derivarse de las conclusiones y orientaciones del Perfil, y estas de la evidencia.
+El Perfil concluye y recomienda; no decide. Sus recomendaciones no llevan responsable, plazo, recurso, indicador, prioridad ni línea estratégica. La priorización es del Grupo Motor y las actuaciones operativas del Plan de Acción, que deben derivarse de las conclusiones y recomendaciones del Perfil, y estas de la evidencia.
 
 *Consecuencia si se viola:* el Perfil selecciona prioridades o fija actuaciones, o el Plan formula actuaciones sin base diagnóstica trazable.
 
@@ -671,7 +722,7 @@ Un recurso que no consta en Localiza Salud no se presenta como activo del Perfil
 
 **I-LHPM-13 — Relaciones con sustento declarado**
 
-Toda relación entre determinante y problema declara fuente, año, escala y grado de sustento (Art. 8 bis). Ninguna se infiere por coincidencia de términos. Solo las de grado 1 y 2 sostienen una orientación.
+Toda relación entre determinante y problema declara fuente, año, escala y grado de sustento (Art. 8 bis). Ninguna se infiere por coincidencia de términos. Solo las de grado 1 y 2 sostienen una recomendación de tipo «Abordar».
 
 *Consecuencia si se viola:* el Perfil presenta como relación lo que es una conjetura, o un valor externo sustituye al dato municipal.
 
@@ -681,15 +732,15 @@ La conexión entre un activo y un determinante la declara una persona del equipo
 
 *Consecuencia si se viola:* el Perfil atribuye a un activo una capacidad que nadie ha afirmado.
 
-**I-LHPM-15 — Orientación con autoría y derivación**
+**I-LHPM-15 — Recomendación con autoría y derivación**
 
-Toda orientación técnica tiene autoría humana validada, cita las conclusiones de las que deriva y no fija responsable, plazo ni recurso (Art. 8, 16).
+Toda recomendación del Perfil tiene autoría humana validada, cita las conclusiones o lagunas de las que deriva, es de un tipo del Art. 8 quater y no fija responsable, plazo ni recurso (Art. 8, 16).
 
-*Consecuencia si se viola:* el sistema emite como orientación del Perfil un texto que nadie ha validado, o el Perfil invade el Plan de Acción.
+*Consecuencia si se viola:* el sistema emite como recomendación del Perfil un texto que nadie ha validado, o el Perfil invade el Plan de Acción.
 
 **I-LHPM-16 — Menú elegible, sin elección por defecto**
 
-Toda conclusión y orientación del cuerpo del Perfil ha sido elegida por una persona del equipo técnico, con autoría y fecha. Ninguna propuesta se considera elegida por omisión y las descartadas se conservan en el registro (Art. 16 ter).
+Toda conclusión y recomendación del cuerpo del Perfil ha sido elegida por una persona del equipo técnico, con autoría y fecha. Ninguna propuesta se considera elegida por omisión y las descartadas se conservan en el registro (Art. 16 ter).
 
 *Consecuencia si se viola:* el sistema publica como conclusión del Perfil lo que nadie ha asumido, o se pierde la traza de lo descartado.
 
@@ -699,11 +750,29 @@ Toda afirmación del cuerpo del Perfil tiene tipo (Art. 8) y evidencia con local
 
 *Consecuencia si se viola:* aparecen en el Perfil frases que no se pueden clasificar ni rastrear hasta su fuente.
 
-**I-LHPM-18 — Conclusiones y orientaciones al final, en el mismo documento**
+**I-LHPM-18 — Conclusiones y recomendaciones al final, en el mismo documento**
 
-Las conclusiones y las orientaciones técnicas cierran el Perfil y no se presentan antes de la lectura integrada. La revisión se hace sobre el propio documento, no sobre una representación aparte (Art. 16 ter, 8).
+Las conclusiones y las recomendaciones cierran el cuerpo del Perfil y no se presentan antes del punto de partida. La revisión se hace sobre el propio documento, no sobre una representación aparte (Art. 16 ter, 8).
 
 *Consecuencia si se viola:* el lector encuentra las conclusiones sin la lectura que las sostiene, o la revisión opera sobre un texto que no es el del Perfil.
+
+**I-LHPM-19 — La conclusión como unidad del cuerpo**
+
+El cuerpo del Perfil se compone de los apartados del Art. 16 quater. La evidencia completa consta solo en el anexo compilado y una cuestión de salud figura en el cuerpo solo si sostiene una conclusión o condiciona una laguna.
+
+*Consecuencia si se viola:* el cuerpo vuelve a crecer por acumulación de bloques y la lectura pierde su argumento.
+
+*Fuente:* Art. 16 quater.
+
+**I-LHPM-20 — Recomendación tipada y con techo de certeza**
+
+Toda recomendación del Perfil es de tipo «Conocer», «Contrastar» o «Abordar». «Abordar» exige una conclusión sostenida por una relación de grado 1 o 2, y ninguna recomendación se formula sobre una laguna como si fuera un área de intervención.
+
+*Consecuencia si se viola:* el Perfil recomienda abordar lo que ninguna fuente sostiene, o convierte una carencia de información en objeto de intervención.
+
+*Fuente:* Arts. 7 ter y 8 quater.
+
+---
 
 ## Relaciones con otros contratos
 
@@ -740,3 +809,4 @@ Las conclusiones y las orientaciones técnicas cierran el Perfil y no se present
 *Este contrato es el documento normativo que antecede y condiciona a CONTRACT-MIT-PSL,*
 *CONTRACT-PSL-COMPAS y CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER.*
 *Todo contrato de producto que afecte al Perfil de Salud Local debe ser coherente con este contrato.*
+| 2026-10-23 | 2.0.0 | Nueva estructura del Perfil (Art. 16 quater): la conclusión como unidad, cuerpo de siete apartados y anexo compilado. La «orientación técnica» pasa a llamarse «recomendación del Perfil» y se tipifica en Conocer, Contrastar y Abordar (Art. 8 quater); «Abordar» exige relación de grado 1 o 2. Nuevos invariantes I-LHPM-19 e I-LHPM-20, criterio «Estructura breve» (Art. 19) y cuestión abierta H-LHPM-7 (tope de conclusiones). Las unidades de lectura (Art. 4 bis) pasan al anexo. Decisiones del autor del 2026-10-23 | COMPÁS NG |
