@@ -160,8 +160,6 @@ function contar(n: number, singular: string, plural: string): string {
 
 interface ProfileStateMapProps {
   hasIntegratedReading: boolean;
-  hasCanonicalDerivedProfile: boolean;
-  profileStatus: LocalHealthProfile["status"];
   diagnosticSourceCount: number;
   complementaryStudyCount: number;
   matrixSignalCount: number;
@@ -174,17 +172,11 @@ function statusLabel(ok: boolean, pending: string): string {
 
 function ProfileStateMap({
   hasIntegratedReading,
-  hasCanonicalDerivedProfile,
-  profileStatus,
   diagnosticSourceCount,
   complementaryStudyCount,
   matrixSignalCount,
   localizaAssetCount,
 }: ProfileStateMapProps) {
-  const derivedPending =
-    profileStatus === "validated" || profileStatus === "approved"
-      ? "Pendiente de compilar el PSL-C"
-      : "Pendiente de validación y compilación";
   const rows = [
     {
       title: "Lectura interpretativa COMPÁS",
@@ -192,13 +184,6 @@ function ProfileStateMap({
       detail: hasIntegratedReading
         ? `Lectura territorial integrada visible a partir de ${contar(diagnosticSourceCount, "fuente diagnóstica", "fuentes diagnósticas")}.`
         : "Todavía no hay lectura territorial suficiente para mostrar el Perfil integrado.",
-    },
-    {
-      title: "Salida pública tipo Local Health Profiles",
-      status: hasCanonicalDerivedProfile ? "Disponible" : derivedPending,
-      detail: hasCanonicalDerivedProfile
-        ? "Representación derivada del Perfil canónico: indicadores, valor territorial, referencias provincial y andaluza, sin veredictos comparativos."
-        : "No es un producto autónomo ni una segunda fuente de verdad: aparece cuando se compila un PSL-C con documento canónico sellado.",
     },
     {
       title: "Matriz de evidencia y alcance",
@@ -512,10 +497,6 @@ function PSLCSalidasInstitucionales({
               <strong>disponible tras compilar</strong>.
             </li>
             <li className="pslc-salidas__item">
-              <span aria-hidden="true">🔒</span> Perfil visual tipo Local
-              Health Profiles: <strong>disponible tras compilar</strong>.
-            </li>
-            <li className="pslc-salidas__item">
               <span aria-hidden="true">🔒</span> Impresión navegador:{" "}
               <strong>disponible tras abrir el visor institucional</strong>.
             </li>
@@ -534,13 +515,6 @@ function PSLCSalidasInstitucionales({
                 Ver documento institucional completo
               </a>{" "}
               (ir al artefacto compilado)
-            </li>
-            <li className="pslc-salidas__item pslc-salidas__item--ok">
-              <span aria-hidden="true">✓</span>{" "}
-              <a className="pslc-checklist__action" href="#perfil-health-profile-visual">
-                Ver perfil visual tipo Local Health Profiles
-              </a>{" "}
-              (salida pública en pantalla; no es el DOCX PSL-C)
             </li>
             <li className="pslc-salidas__item pslc-salidas__item--ok">
               <span aria-hidden="true">✓</span>{" "}
@@ -961,8 +935,6 @@ export function LocalHealthProfileView({
         diagnosticAnswers.estudios.totalStudies +
         (diagnosticAnswers.salutogenica.totalAssets > 0 ? 1 : 0)
       : psl.originsSummary.length;
-  const hasCanonicalDerivedProfile =
-    compiledProfiles?.some((artifact) => artifact.canonicalDocument !== undefined) ?? false;
   const complementaryStudyCount =
     diagnosticAnswers?.estudios.totalStudies ?? psl.complementaryStudyCount;
   const localizaAssetCount =
@@ -1022,8 +994,7 @@ export function LocalHealthProfileView({
           <p className="eyebrow">Ruta operativa</p>
           <h2>Validar y crear el documento institucional PSL-C</h2>
           <p className="panel-note">
-            La salida pública tipo Local Health Profiles se activa cuando existe un
-            Perfil canónico compilado. Revisa el contenido y valida técnicamente
+            Revisa el contenido y valida técnicamente
             esta versión; después aparecerá aquí la acción para compilar el PSL-C.
           </p>
           <PSLValidationAction onValidate={onValidate} />
@@ -1107,8 +1078,6 @@ export function LocalHealthProfileView({
 
       <ProfileStateMap
         hasIntegratedReading={!isEmpty && integratedEditorialView !== null}
-        hasCanonicalDerivedProfile={hasCanonicalDerivedProfile}
-        profileStatus={psl.status}
         diagnosticSourceCount={fuentesDiagnostico}
         complementaryStudyCount={complementaryStudyCount}
         matrixSignalCount={matrixSignalCount}
@@ -1738,13 +1707,7 @@ export function LocalHealthProfileView({
               : `${compiledProfiles.length} Perfiles de Salud Local han sido compilados como documentos institucionales. `}
             Cada compilación es un artefacto congelado e inmutable que representa el estado
             del diagnóstico en el momento de su generación. El DOCX/PDF es el PSL-C
-            completo; el perfil visual tipo Local Health Profiles se consulta como
-            salida pública en pantalla.
-          </p>
-          <p className="panel-note">
-            <a className="pslc-checklist__action" href="#perfil-health-profile-visual">
-              Ir al perfil visual tipo Local Health Profiles
-            </a>
+            completo.
           </p>
           <div className="psl-compiled-list">
             {[...compiledProfiles].reverse().map((artifact) => {

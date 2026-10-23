@@ -150,7 +150,6 @@ El PLS no reproduce el contenido del PSL-C: lo integra o referencia. Hay dos opc
 |---|---|---|
 | `LecturaEstrategicaLocal` | MTE canónico | Obligatoria cuando el PLS integre articulación institucional canónica; cualquier fallback EPVSA debe marcarse como provisional |
 | Memoria del proceso | Documentos en el repositorio | Obligatoria si el marco RELAS lo exige; en caso contrario, opcional |
-| Datos de referencia territorial | Fuentes externas | Obligatorios si el PSL-NHS se incluye en los anexos |
 
 ### 4.3 Lo que el compilador NO consume
 

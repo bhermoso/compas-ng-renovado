@@ -1,7 +1,7 @@
 # CONTRACT-INDEX — Índice maestro de contratos arquitectónicos
 
 > COMPÁS NG — Referencia de arquitectura contractual
-> Última actualización: 2026-09-23 — reconciliación de contratos tras PR #70–#74
+> Última actualización: 2026-10-23 — retirada del PSL-NHS y de la salida comparativa breve
 
 Este documento es la puerta de entrada a la arquitectura contractual de COMPÁS NG.
 No duplica contenido de los contratos. Cada entrada contiene: propósito, alcance, estado y relaciones.
@@ -149,11 +149,11 @@ Registro de actuaciones por cuatro entornos (sanitario, comunitario, educativo, 
 ### CONTRACT-SOURCE-CAPABILITY-MATRIX
 **Estado:** VIGENTE — creado 2026-09-24
 
-Matriz contractual de capacidades de fuente. Define qué tipos de información puede soportar, cargar e incorporar COMPÁS NG; qué ruta de entrada tienen; si son fuentes fijas o variables; si generan `EvidenceAtom`; qué papel desempeñan en la salida interpretativa COMPÁS y qué pueden aportar a la salida comparativa breve tipo OHID/Fingertips. Incluye la ruta para fuentes nuevas como ERACIS, estrategias autonómicas, planes estratégicos temáticos, estudios complementarios, activos, priorizaciones ciudadanas, documentación territorial, material cualitativo y evidencia longitudinal.
+Matriz contractual de capacidades de fuente. Define qué tipos de información puede soportar, cargar e incorporar COMPÁS NG; qué ruta de entrada tienen; si son fuentes fijas o variables; si generan `EvidenceAtom`; qué papel desempeñan en la salida interpretativa COMPÁS y qué efecto tienen en el Perfil. Incluye la ruta para fuentes nuevas como ERACIS, estrategias autonómicas, planes estratégicos temáticos, estudios complementarios, activos, priorizaciones ciudadanas, documentación territorial, material cualitativo y evidencia longitudinal.
 
 **Productores:** Repositorio Documental, parsers de estudios, cargadores de documentos, importadores GES/REDCap.
-**Consumidores:** Perfil de Salud Local, salida comparativa breve, compiladores documentales, equipo técnico.
-**Relacionado con:** CONTRACT-REPOSITORY, CONTRACT-EVIDENCE, CONTRACT-COMPLEMENTARY-STUDIES, CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY, CONTRACT-NHS-HEALTH-PROFILE.
+**Consumidores:** Perfil de Salud Local, compiladores documentales, equipo técnico.
+**Relacionado con:** CONTRACT-REPOSITORY, CONTRACT-EVIDENCE, CONTRACT-COMPLEMENTARY-STUDIES, CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.
 
 ---
 
@@ -208,7 +208,7 @@ Contrato del Motor de Interpretación Territorial (MIT) y del Perfil de Salud Lo
 Contrato metodológico canónico del Perfil de Salud Local (PSL). Define qué debe ser metodológicamente un Perfil, qué puede afirmar y qué no puede afirmar, cómo se construye su evidencia y qué condiciones debe cumplir para ser aceptable como documento institucional. Establece los 19 artículos normativos del Perfil: naturaleza, finalidad, separación de etapas, singularidad territorial, explicación territorial, razonamiento multidisciplinar, familias de evidencia admisibles, siete tipos de afirmación, activos con rango equivalente a déficits, participación como evidencia, desigualdades, comparación territorial y temporal, incertidumbre situada, convergencia y divergencia de evidencias, compatibilidad con la ESCA (Art. 15: ESCA como marco SSPA, separación de responsabilidades, no tratar ESCA como instrumento de evaluación, no convertir líneas ESCA en objetivos municipales), no automatización de decisiones, autoría y responsabilidad técnica, flexibilidad metodológica, y criterios de aceptación del Perfil. Incluye 6 invariantes (I-LHPM-1 a I-LHPM-6) y 6 hipótesis metodológicas abiertas (H-LHPM-1 a H-LHPM-6).
 
 **Productores:** No tiene productor de código directo. Es un contrato normativo que condiciona todos los contratos y motores relacionados con el Perfil.
-**Consumidores:** CONTRACT-MIT-PSL, CONTRACT-PSL-COMPAS, CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER, CONTRACT-NHS-HEALTH-PROFILE.
+**Consumidores:** CONTRACT-MIT-PSL, CONTRACT-PSL-COMPAS, CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER.
 **Relacionado con:** CONTRACT-INTERPRETATION, CONTRACT-STRATEGIC-REPOSITORY, METHODOLOGICAL-FOUNDATIONS-LOCAL-HEALTH-PLANNING.
 
 ---
@@ -226,18 +226,9 @@ Contrato canónico del Producto 3. Define el PSL-C como producto analítico terr
 
 ---
 
-## PSL-NHS — representación derivada (antiguo «Producto 4»)
+## PSL-NHS — retirado (antiguo «Producto 4»)
 
-### CONTRACT-NHS-HEALTH-PROFILE
-**Estado:** SUPERADO EN SU ESTATUTO DE PRODUCTO AUTÓNOMO (ver §0 del propio contrato y Fundamentos del Perfil único, 2026-07-17)
-
-Por los Fundamentos del Perfil único, el PSL-NHS **deja de ser un «Producto 4» institucional independiente**: no es producto autónomo ni segunda fuente de verdad. Pasa a ser una **representación derivada dentro del Perfil de Salud Local, sin veredictos comparativos**: la capacidad de posición (`computePosition`) queda **descartada** (evaluación resuelta), no pendiente. El contrato conserva su cuerpo histórico como registro de diseño, subordinado a su §0. La retirada del código/ruta/artefacto NHS queda **ejecutada** (GOV-P4-01 · PR-E); la divergencia de catálogo (6 vs 13) se disuelve con el compilador retirado.
-
-La línea vigente distingue dos salidas del mismo Perfil canónico: la salida interpretativa COMPÁS y una salida comparativa breve tipo OHID/Fingertips. La segunda se inspira en los Local Authority Health Profiles actuales de OHID/DHSC Fingertips como matriz pública de indicadores, referencias, periodos y cautelas; no restaura `NHSHealthProfileCompiler`, no crea `NHSHealthProfileArtifact` y no puede introducir conclusiones, prioridades ni datos ajenos al Perfil validado.
-
-**Productores:** `projectNHSDerived` (`src/application/health-profile/nhsDerivedProjection.ts`) como proyector puro del documento canónico, y `NHSHealthProfileView` como renderer integrado dentro del espacio «Perfil de Salud Local». No existe compilador ni artefacto NHS autónomo.
-**Consumidores:** Corporación municipal, ciudadanía, comunicación institucional.
-**Relacionado con:** CONTRACT-PSL-COMPAS, CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER, CONTRACT-COMPLEMENTARY-STUDIES, CONTRACT-DYNAMIC-TRIPYRAMID, CONTRACT-NAVIGATION, VISUAL-CONTRACT.
+`CONTRACT-NHS-HEALTH-PROFILE` queda **retirado** el 2026-10-23, por decisión del autor de trabajar solo con el Perfil de Salud Local general. Se eliminan el contrato, el proyector `projectNHSDerived`, el renderer `NHSHealthProfileView` y la «salida comparativa breve tipo OHID/Fingertips». El Perfil tiene una sola salida (`CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`, Art. 17 ter). Los documentos de certificación, benchmark y blueprint que lo mencionan se conservan como registro histórico fechado.
 
 ---
 
@@ -444,7 +435,7 @@ Contrato de navegación e identidad semántica de la interfaz de COMPÁS NG. Cub
 
 **Productores:** Equipo responsable de la interfaz (governa la UI, no un componente de código).
 **Consumidores:** Todo el código React (`src/App.tsx`, `src/ui/components/`), cualquier nueva vista o componente.
-**Relacionado con:** `VISUAL-CONTRACT`, `INSTITUTIONAL-PRODUCTS-ARCHITECTURE`, `FOUNDATIONS §2`, `OPERATING-CONSTITUTION` Bloque F, `CONTRACT-PSL-COMPAS`, `CONTRACT-NHS-HEALTH-PROFILE`, `CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT`.
+**Relacionado con:** `VISUAL-CONTRACT`, `INSTITUTIONAL-PRODUCTS-ARCHITECTURE`, `FOUNDATIONS §2`, `OPERATING-CONSTITUTION` Bloque F, `CONTRACT-PSL-COMPAS`, `CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT`.
 
 ---
 
@@ -518,11 +509,9 @@ contractual.
 
 1. **Producto único.** El único producto institucional del Perfil es el **Perfil
    de Salud Local**. El «Perfil de Salud tipo NHS» deja de definirse como producto
-   autónomo y como segunda fuente de verdad. La **representación derivada** sobrevive
-   como reexpresión **sin veredictos**; la capacidad de posición (`computePosition`)
-   queda **descartada** (ver `CONTRACT-NHS-HEALTH-PROFILE` §0). La retirada de
-   código, rutas, artefactos y tests NHS queda **ejecutada** (GOV-P4-01 · PR-E):
-   la representación derivada vive dentro del único espacio «Perfil de Salud Local».
+   autónomo y como segunda fuente de verdad. La representación derivada que
+   sobrevivió a esa decisión se retiró también el 2026-10-23: el Perfil tiene una
+   sola salida (`CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`, Art. 17 ter).
 
 2. **Arquitectura adaptativa (sin recuento obligatorio de capítulos).** Existe una
    **única lectura institucional canónica**. Su extensión y su número de secciones
@@ -561,7 +550,7 @@ Estas entradas registran decisiones o divergencias vivas que afectan a la gobern
 | GOV-PSL-01 | Estructura documental del Perfil: **rigidez numérica derogada** por los Fundamentos del Perfil único (2026-07-17). La lectura canónica es única y adaptativa; su extensión depende del expediente. Queda pendiente la *implementación* de la arquitectura adaptativa en código. | `CONTRACT-MIT-PSL` §6, `CONTRACT-PSL-COMPAS` §4, `narrativeChapters.ts`, `ProfileIntegratedEditorialPreview` | Doctrina resuelta; implementación pendiente |
 | GOV-PSL-02 | Vista editorial integrada implementada como lectura canónica sin contrato propio de producto. | `LocalHealthProfileView.tsx`, `tests/perfil-vista-editorial-integrada.test.tsx` | Pendiente de contrato/unificación |
 | GOV-PSL-03 | `PerfilFuentesPanel` y `PerfilLocalDeSaludPanel` se renderizan tras el Perfil, fuera de la lectura canónica y fuera del espacio técnico del Perfil. | `src/App.tsx:2978-2979` | Pendiente de decisión funcional |
-| GOV-P4-01 | El PSL-NHS deja de ser producto autónomo/segunda fuente de verdad (Fundamentos del Perfil único, 2026-07-17): pasa a **representación derivada sin veredictos comparativos** dentro del Perfil. La capacidad de posición (`computePosition`) queda **descartada** (evaluación resuelta). La migración de código/ruta/artefacto queda **ejecutada** (PR-E); la divergencia de catálogo (6 vs 13) se disuelve con el compilador retirado. | `CONTRACT-NHS-HEALTH-PROFILE` §0, representación derivada en `view==="psl"` | Doctrina resuelta; migración ejecutada |
+| GOV-P4-01 | El PSL-NHS deja de ser producto autónomo/segunda fuente de verdad (Fundamentos del Perfil único, 2026-07-17). La representación derivada que quedó se retira el 2026-10-23 (decisión del autor: solo Perfil general); `computePosition` sigue **descartada**. | Contrato NHS retirado; `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY` Art. 17 ter | Retirado |
 | GOV-SALIDA-01 | Pantalla e impresión derivan de `editorialView`; DOCX/PDF/visor reconstruyen desde `provenance + conclusiones.content` (dos composiciones). Los Fundamentos (2026-07-17) obligan a equivalencia **semántica** entre salidas; la unificación de código queda pendiente. | `pslcCanonicalDocument.ts`, `pslcDocumentModel.ts`, `pslcDocx.ts`, `pslcPdf.ts` | Doctrina fijada; implementación pendiente |
 | GOV-VIS-01 | Identidad visual sin autoridad operacional única: `VISUAL-CONTRACT` existe como doctrina, pero `src/App.css` concentra 10.255 líneas, 1.795 colores hexadecimales, 132 colores únicos y dos escalas de grises conviviendo (`#64748b` y familia; `#526070` y familia). | `docs/visual/VISUAL-CONTRACT.md`, `src/App.css` | Deuda de gobernanza visual |
 ---
@@ -574,7 +563,6 @@ Estas entradas registran decisiones o divergencias vivas que afectan a la gobern
 | `docs/certification/PRODUCT-1-CERTIFICATION.md` | 2026-06-29 | Producto 1 — Sistema de Estudios Complementarios: 6 instrumentos, 481 tests |
 | `docs/certification/PRODUCT-2-SAM-CERTIFICATION.md` | 2026-06-30 | Producto 2 — SAM NG: motor + integración + samAssessmentToEvidenceAtom, 573 tests |
 | `docs/certification/PRODUCT-3-PSL-CERTIFICATION.md` | 2026-06-30 | Producto 3 — PSL-C: certificación histórica fechada; estado posterior superado en catálogo de 13 estudios, DOCX/PDF y estructura documental pendiente de unificación |
-| `docs/certification/PRODUCT-4-NHS-HEALTH-PROFILE-CERTIFICATION.md` | 2026-06-30 | Producto 4 — PSL-NHS: certificación histórica fechada; UI/Home/Nav implementadas después, export D4-04 pendiente |
 
 El plano arquitectónico completo que responde a la pregunta
 "¿qué debe existir para producir un Perfil de Salud Local, un Plan Local de Salud y una

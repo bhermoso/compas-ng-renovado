@@ -18,7 +18,6 @@ describe("CONTRACT-SOURCE-CAPABILITY-MATRIX", () => {
     expect(index).toContain("CONTRACT-SOURCE-CAPABILITY-MATRIX");
     expect(index).toContain("Matriz contractual de capacidades de fuente");
     expect(index).toContain("ERACIS");
-    expect(index).toContain("salida comparativa breve tipo OHID/Fingertips");
   });
 
   it("cubre todos los DocumentKind reconocidos por el repositorio", () => {
@@ -87,13 +86,10 @@ describe("CONTRACT-SOURCE-CAPABILITY-MATRIX", () => {
     expect(matrix).toContain("No sustituyen Localiza Salud ni reabren `community-asset` como vía visible");
   });
 
-  it("mantiene la salida comparativa subordinada a estructura, referencia y cautela", () => {
-    expect(matrix).toContain("indicador identificable");
-    expect(matrix).toContain("valor local");
-    expect(matrix).toContain("periodo o fecha");
-    expect(matrix).toContain("escala territorial");
-    expect(matrix).toContain("referencia territorial o normativa válida");
-    expect(matrix).toContain("No son filas comparativas por sí mismas");
+  it("no define una salida comparativa breve", () => {
+    const cuerpo = matrix.split("## Registro de revisiones")[0];
+    expect(cuerpo).not.toContain("salida comparativa breve");
+    expect(cuerpo).not.toContain("OHID/Fingertips");
   });
 
   it("queda conectado al contrato rector del Perfil", () => {
@@ -102,7 +98,7 @@ describe("CONTRACT-SOURCE-CAPABILITY-MATRIX", () => {
     );
     expect(methodology).toContain("CONTRACT-SOURCE-CAPABILITY-MATRIX");
     expect(methodology).toContain("estatuto operativo de cada fuente admisible");
-    expect(methodology).toContain("efecto sobre la salida interpretativa y la salida comparativa breve");
+    expect(methodology).toContain("efecto sobre el Perfil");
     expect(methodology).toContain("Localiza Salud");
     expect(methodology).toContain("fuente principal/preferente para el mapa de activos del Perfil");
     expect(methodology).toContain("pendientes de reconciliación");

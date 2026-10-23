@@ -1,7 +1,7 @@
 # CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY
 
 > Contrato metodológico canónico del Perfil de Salud Local (PSL) en COMPÁS NG.
-> Versión 1.7.2 — 2026-10-22 (historial en el registro de revisiones)
+> Versión 1.8.0 — 2026-10-23 (historial en el registro de revisiones)
 > Estado: VIGENTE
 >
 > Este contrato define qué debe ser metodológicamente un Perfil de Salud Local,
@@ -19,7 +19,6 @@
 Este contrato aplica a:
 - El `LocalHealthProfile` como objeto analítico del sistema.
 - El `LocalHealthProfileArtifact` (PSL-C) como documento institucional compilado.
-- La representación comparativa breve tipo OHID/Fingertips, en lo que atañe a su función como salida derivada de la misma base diagnóstica.
 - Todo proceso de producción, validación y entrega del Perfil de Salud Local en COMPÁS NG.
 
 Este contrato no aplica a:
@@ -458,21 +457,13 @@ Existe una sola composición canónica del Perfil de Salud Local. Pantalla, viso
 
 Las diferencias de formato solo pueden afectar a soporte, paginación, densidad o adaptación visual. No pueden crear contenidos, estructuras diagnósticas, conclusiones o catálogos de fuentes distintos.
 
-### Art. 17 ter. Dos salidas del mismo Perfil canónico
+### Art. 17 ter. Una sola salida
 
-COMPÁS NG puede ofrecer dos salidas institucionales del mismo Perfil canónico, siempre que ambas deriven del mismo modelo semántico y de la misma validación:
+El Perfil de Salud Local tiene una única salida: el documento canónico del Art. 17 bis. No existe, en el estado vigente, una salida comparativa breve ni otra representación con estatuto propio, sea por audiencia, por formato o por densidad de lectura.
 
-1. **Salida interpretativa COMPÁS.** Es la lectura territorial completa: integra fuentes, declara incertidumbres, formula síntesis diagnóstica, expone tensiones, identifica capacidades y deja preguntas para el Grupo Motor. Es la salida propia del Perfil de Salud Local.
-2. **Salida comparativa breve tipo OHID/Fingertips.** Es una ficha de alta densidad para audiencia política y ciudadana: presenta indicadores, valores, periodo, escala, referencias territoriales disponibles y cautelas. Su inspiración metodológica son los Local Authority Health Profiles de OHID/DHSC Fingertips, no una copia formal ni un segundo diagnóstico.
+Una representación nueva solo puede añadirse por reforma expresa de este contrato. Hasta entonces, ninguna pantalla, exportación o proyección puede presentarse como producto distinto del Perfil.
 
-La salida comparativa breve no puede:
-- crear afirmaciones que no existan en el Perfil canónico;
-- consumir fuentes distintas de las ya incorporadas al Perfil;
-- ocultar que un valor procede de proxy contextual o de escala no municipal;
-- emitir recomendaciones, prioridades o compromisos;
-- formular posiciones automáticas "mejor/peor/similar" si el Perfil canónico no ha validado previamente dirección, comparador e inferencia suficiente.
-
-Cuando no exista referencia territorial válida para un indicador, la salida comparativa lo muestra como "referencia no disponible" o equivalente. La ausencia de referencia es una cautela visible, no un hueco que el sistema pueda rellenar por analogía.
+*Nota de revisión.* La versión 1.8.0 deroga el texto anterior de este artículo («Dos salidas del mismo Perfil canónico»), que admitía una salida comparativa breve tipo OHID/Fingertips. El autor decidió el 2026-10-23 trabajar solo con el Perfil general. La numeración de los artículos y de los invariantes no se altera.
 
 ---
 
@@ -652,13 +643,13 @@ El Perfil concluye y orienta; no decide. La priorización es del Grupo Motor y l
 
 ---
 
-**I-LHPM-10 — Dos salidas, una fuente de verdad**
+**I-LHPM-10 — Una sola salida**
 
-La salida interpretativa COMPÁS y la salida comparativa breve tipo OHID/Fingertips son representaciones del mismo Perfil canónico. Ninguna puede constituir un segundo Perfil, un segundo catálogo de indicadores o una segunda fuente de verdad.
+El Perfil de Salud Local se entrega como un único documento canónico. Ninguna otra representación tiene estatuto propio mientras este contrato no la autorice.
 
-*Consecuencia si se viola:* COMPÁS NG vuelve a producir perfiles paralelos, con riesgo de contradicción entre lo que el diagnóstico interpreta y lo que la ficha comparativa sugiere.
+*Consecuencia si se viola:* COMPÁS NG vuelve a producir perfiles paralelos, con riesgo de contradicción entre lo que el diagnóstico interpreta y lo que otra representación sugiere.
 
-*Fuente:* Arts. 17 bis y 17 ter; CONTRACT-NHS-HEALTH-PROFILE §0.
+*Fuente:* Arts. 17 bis y 17 ter.
 
 **I-LHPM-11 — Unidades derivadas del expediente**
 
@@ -721,8 +712,7 @@ Las conclusiones y las orientaciones técnicas cierran el Perfil y no se present
 | `CONTRACT-MIT-PSL` | Este contrato establece los principios que el MIT debe respetar al producir la interpretación territorial. Los Arts. 5, 6 y 14 condicionan el diseño del motor. |
 | `CONTRACT-PSL-COMPAS` | Define el producto institucional resultante de aplicar este contrato. Debe ser coherente en todos sus artículos con este contrato. |
 | `CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER` | Los gates del compilador (G-LHC-1 a G-LHC-7) son la implementación técnica de los Arts. 16, 17 e I-LHPM-3. |
-| `CONTRACT-SOURCE-CAPABILITY-MATRIX` | Define el estatuto operativo de cada fuente admisible: ruta de entrada, escala, atomización, madurez y efecto sobre la salida interpretativa y la salida comparativa breve. |
-| `CONTRACT-NHS-HEALTH-PROFILE` §0 | La representación comparativa breve tipo OHID/Fingertips es una **salida derivada** del conocimiento territorial del Perfil canónico. Por los Fundamentos del Perfil único (2026-07-17) **deja de tener estatuto de producto institucional propio** y no puede ser segunda fuente de verdad; solo sobrevive dentro del Perfil, previa validación. Los Arts. 12, 13, 17 bis y 17 ter condicionan sus criterios de generación. |
+| `CONTRACT-SOURCE-CAPABILITY-MATRIX` | Define el estatuto operativo de cada fuente admisible: ruta de entrada, escala, atomización, madurez y efecto sobre el Perfil. |
 | `CONTRACT-INTERPRETATION` | Define qué significa interpretar dentro de COMPÁS NG. Este contrato es complementario: define qué tipos de afirmación son admisibles y cuáles no (Art. 8). |
 | `CONTRACT-STRATEGIC-REPOSITORY` | Las líneas estratégicas de los marcos institucionales son referencia para el capítulo de marco estratégico del Perfil (Arts. 15.1 y 15.4). La articulación con esos marcos es posterior al Perfil. |
 | `METHODOLOGICAL-FOUNDATIONS-LOCAL-HEALTH-PLANNING` | Documento fundacional del que derivan los principios PM-1 a PM-24. Los invariantes de este contrato son aplicación normativa directa de esos principios. |
@@ -743,6 +733,7 @@ Las conclusiones y las orientaciones técnicas cierran el Perfil y no se present
 | 2026-10-22 | 1.7 | La afirmación como unidad y la cadena de lectura en cinco pasos (Art. 8 ter); ejes de lectura declarados (Art. 4 ter); interpretaciones e hipótesis en el menú, ubicación final de conclusiones y orientaciones y modo de revisión sobre el mismo documento (Art. 16 ter, 7 y 8). Invariantes I-LHPM-17 e I-LHPM-18. Decisión del autor | COMPÁS NG |
 | 2026-10-22 | 1.7.1 | Corrección de la tabla del Art. 8 ter: «conclusión» no es un tipo del Art. 8 sino un paso; se fijan los tipos que admite cada paso, tal como los implementa el modelo de afirmación | COMPÁS NG |
 | 2026-10-22 | 1.7.2 | Art. 8 ter 3: las reglas de generación solo producen conclusiones de tipo hecho desde relaciones validadas de grado 1 o 2; interpretaciones, hipótesis y orientaciones siguen siendo de autoría humana (Art. 8), con borrador opcional para la orientación. Resuelve la contradicción entre el Art. 8 y el texto de la v1.7 | COMPÁS NG |
+| 2026-10-23 | 1.8.0 | Se deroga la salida comparativa breve tipo OHID/Fingertips y su vínculo con CONTRACT-NHS-HEALTH-PROFILE (retirado): el Art. 17 ter pasa a «Una sola salida» y el invariante I-LHPM-10 a «Una sola salida». Decisión del autor: se trabaja solo con el Perfil general | COMPÁS NG |
 
 ---
 

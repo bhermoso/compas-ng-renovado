@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -55,39 +55,28 @@ describe("Fundamentos del Perfil único — CONTRACT-INDEX", () => {
   it("registra las deudas resueltas por doctrina y las migraciones pendientes", () => {
     expect(idx).toContain("GOV-SALIDA-01");
     expect(idx).toContain("rigidez numérica derogada");
-    expect(idx).toContain("representación derivada sin veredictos comparativos");
+    expect(idx).toContain("se retira el 2026-10-23");
   });
 });
 
-describe("Fundamentos del Perfil único — CONTRACT-NHS-HEALTH-PROFILE", () => {
-  const nhs = flatten(readRaw("contracts/CONTRACT-NHS-HEALTH-PROFILE.md"));
+describe("Retirada del PSL-NHS (2026-10-23)", () => {
+  const SRC = resolve(DOCS, "..");
 
-  it("deroga el estatuto de producto autónomo del PSL-NHS", () => {
-    expect(nhs).toContain("La salida tipo Local Health Profiles no es una ficha");
-    expect(nhs).toContain("no es un producto autónomo");
-    expect(nhs).toContain("no es una segunda fuente de verdad");
+  it("el contrato NHS y su certificación ya no existen", () => {
+    expect(existsSync(resolve(DOCS, "contracts/CONTRACT-NHS-HEALTH-PROFILE.md"))).toBe(false);
+    expect(existsSync(resolve(DOCS, "certification/PRODUCT-4-NHS-HEALTH-PROFILE-CERTIFICATION.md"))).toBe(false);
   });
 
-  it("mantiene derogados compiladores y artefactos NHS autónomos", () => {
-    expect(nhs).toContain("Quedan derogados los restos normativos");
-    expect(nhs).toContain("`NHSHealthProfileCompiler`");
-    expect(nhs).toContain("`NHSHealthProfileArtifact`");
-    expect(nhs).toContain("No se autoriza restaurar compiladores ni artefactos NHS autónomos");
+  it("el código del NHS ya no existe", () => {
+    expect(existsSync(resolve(SRC, "src/ui/components/NHSHealthProfileView.tsx"))).toBe(false);
+    expect(existsSync(resolve(SRC, "src/application/health-profile/nhsDerivedProjection.ts"))).toBe(false);
   });
 
-  it("define la salida como representación pública de alta densidad", () => {
-    expect(nhs).toContain("representación pública de alta densidad");
-    expect(nhs).toContain("lectura pública");
-    expect(nhs).toContain("determinantes/desigualdades");
-    expect(nhs).toContain("activos/capacidades");
-  });
-
-  it("registra la relectura vigente del referente OHID/Fingertips", () => {
-    expect(nhs).toContain("Referente oficial consultado");
-    expect(nhs).toContain("Local Authority Health Profiles");
-    expect(nhs).toContain("punto de conversación");
-    expect(nhs).toContain("spine chart");
-    expect(nhs).toContain("Local health: September 2026 update");
+  it("el índice registra la retirada y no mantiene el contrato como vigente", () => {
+    const idx = flatten(readRaw("contracts/CONTRACT-INDEX.md"));
+    expect(idx).toContain("PSL-NHS — retirado");
+    expect(idx).toContain("queda **retirado** el 2026-10-23");
+    expect(idx).not.toContain("### CONTRACT-NHS-HEALTH-PROFILE");
   });
 });
 
@@ -118,8 +107,8 @@ describe("Fundamentos del Perfil único — arquitectura adaptativa y salida can
     expect(vis).toContain("Sin lectura larga alternativa");
     expect(vis).toContain("Espacio técnico después del documento");
     expect(vis).toContain("no se exige identidad de píxeles");
-    expect(vis).toContain("Salida interpretativa y salida comparativa breve");
-    expect(vis).toContain("misma fuente de verdad, distinta densidad de lectura");
+    expect(vis).toContain("Una sola salida");
+    expect(vis).not.toContain("salida comparativa breve");
   });
 });
 
@@ -154,22 +143,22 @@ describe("Reconciliación — CONTRACT-INDEX: sin «Producto 4» vigente", () =>
   const raw = readRaw("contracts/CONTRACT-INDEX.md");
   const idx = flatten(raw);
 
-  it("reclasifica el registro NHS como representación derivada, no «Producto 4»", () => {
+  it("no mantiene el NHS como «Producto 4» ni como representación derivada", () => {
     expect(raw).not.toContain("## Producto 4 — Perfil de Salud Local tipo NHS (PSL-NHS)");
-    expect(idx).toContain("deja de ser un «Producto 4» institucional independiente");
+    expect(idx).not.toContain("Pasa a ser una **representación derivada dentro del Perfil");
     // Elimina la afirmación vigente de estatuto propio del registro.
     expect(raw).not.toContain("con estatuto de producto institucional propio por razón de su audiencia y formato");
   });
 
-  it("registra la migración NHS como ejecutada (GOV-P4-01) y mantiene la cobertura adaptativa", () => {
-    expect(idx).toContain("migración ejecutada");
+  it("registra la retirada NHS (GOV-P4-01) y mantiene la cobertura adaptativa", () => {
+    expect(idx).toContain("GOV-P4-01");
+    expect(idx).toContain("Retirado");
     expect(raw).not.toContain("los 7 capítulos del PSL");
     expect(raw).not.toContain("estructura canónica de 7 capítulos");
   });
 
-  it("identifica la rama derivada real como productor y niega compilador/artefacto autónomo", () => {
-    expect(idx).toContain("projectNHSDerived");
-    expect(idx).toContain("No existe compilador ni artefacto NHS autónomo");
+  it("ya no declara productor NHS ni compilador autónomo", () => {
+    expect(idx).not.toContain("**Productores:** `projectNHSDerived`");
     // El registro vigente no puede seguir declarando el compilador retirado.
     expect(raw).not.toContain("`NHSHealthProfileCompiler` (implementado en `src/application/nhs-health-profile-compiler/`)");
   });
@@ -206,12 +195,11 @@ describe("Reconciliación — otras fuentes vigentes corregidas", () => {
     expect(bp).toContain("lectura única y adaptativa");
   });
 
-  it("CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY (rector) deroga el estatuto propio del NHS", () => {
+  it("CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY (rector) fija una sola salida", () => {
     const rector = flatten(readRaw("contracts/CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md"));
-    expect(rector).toContain("deja de tener estatuto de producto institucional propio");
-    expect(rector).toContain("Dos salidas del mismo Perfil canónico");
-    expect(rector).toContain("Salida interpretativa COMPÁS");
-    expect(rector).toContain("Salida comparativa breve tipo OHID/Fingertips");
-    expect(rector).toContain("Dos salidas, una fuente de verdad");
+    expect(rector).toContain("### Art. 17 ter. Una sola salida");
+    expect(rector).toContain("**I-LHPM-10 — Una sola salida**");
+    expect(rector).not.toContain("**I-LHPM-10 — Dos salidas, una fuente de verdad**");
+    expect(rector).not.toContain("CONTRACT-NHS-HEALTH-PROFILE §0");
   });
 });

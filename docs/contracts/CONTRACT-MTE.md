@@ -108,7 +108,7 @@ implementación futura) es transparente para el motor.
 El MTE **no puede** recibir ni acceder a:
 
 - `EvidenceStore`, `EvidenceAtom`, `SampleQualityAssessment`
-- `LocalHealthProfileArtifact` (PSL-C), `NHSHealthProfileArtifact` (PSL-NHS)
+- `LocalHealthProfileArtifact` (PSL-C)
 - `MunicipalityWorkspace`, `MunicipalDocumentRepository`
 - `IBSEStudy`, `DUKEStudy`, y demás estudios complementarios
 - Outputs del MIT anteriores al PSL

@@ -92,9 +92,6 @@ Suite tras el paso 3: **2226/2226** (82 ficheros). `tsc -b` exit 0.
   cautela de representatividad declarable con datos) y export REDCap real de
   Zagra. AMBOS PENDIENTES DE SUBIR a municipalities/*/prioritisation/
   (git add -f, *.csv está ignorado).
-- **NHS.** Deuda D4-05 (6→13 estudios, arrastre histórico) y exportación
-  PDF/HTML de máx. 4 páginas (D4-04, invariante P4-I10). Después del Perfil
-  canónico.
 - **Deuda visual** registrada en CONTRACT-INDEX (dos escalas de grises,
   1.400+ colores hardcodeados, tokens sin uso).
 

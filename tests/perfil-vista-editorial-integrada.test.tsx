@@ -245,8 +245,7 @@ describe("mapa visible de estado del Perfil", () => {
     expect(html).toContain("Perfil de Salud Local · mapa de estado");
     expect(html).toContain("Qué existe ahora y qué queda pendiente");
     expect(html).toContain("Lectura interpretativa COMPÁS");
-    expect(html).toContain("Salida pública tipo Local Health Profiles");
-    expect(html).toContain("Pendiente de validación y compilación");
+    expect(html).not.toContain("Local Health Profiles");
     expect(html).toContain("Matriz de evidencia y alcance");
     expect(html).toContain("Activos y capacidades");
     expect(html).toContain("56 activos de Localiza Salud");
@@ -1102,7 +1101,7 @@ describe("calidad documental — textura y formularios", () => {
     const beforeTechnical = html.slice(0, html.indexOf("Espacio técnico del Perfil"));
     expect(beforeTechnical).toContain("Validar y crear el documento institucional PSL-C");
     expect(beforeTechnical).toContain("Validar técnicamente");
-    expect(beforeTechnical).toContain("La salida pública tipo Local Health Profiles se activa");
+    expect(beforeTechnical).not.toContain("Local Health Profiles");
   });
 
   it("conserva las señales cuantitativas clave en la lectura canónica", () => {
