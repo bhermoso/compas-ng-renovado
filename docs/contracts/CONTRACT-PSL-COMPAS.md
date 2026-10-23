@@ -242,7 +242,6 @@ Los siguientes elementos quedan explícitamente fuera de este producto:
 | Elemento | Motivo de exclusión |
 |---|---|
 | Generación automática de texto narrativo (IA generativa) | Principio de no-sustitución del equipo técnico |
-| NHS Health Profile | Producto 4 separado |
 | Motor de Traducción Estratégica (MTE) | Producto 5 |
 | Plan de Acción | Producto 6 |
 | Plan Local de Salud compilado | Producto 7 |

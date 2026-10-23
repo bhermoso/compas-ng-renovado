@@ -208,7 +208,7 @@ La decisión exacta sobre cuántas fases mostrar, en qué orden y con qué granu
 > del Perfil es el **Perfil de Salud Local**. **No existe, en el estado objetivo,
 > una pestaña ni un producto independiente «Perfil de Salud tipo NHS».** Esa
 > ruta/pestaña ha sido retirada del código: **migración técnica ejecutada**
-> (GOV-P4-01 · PR-E); no era vocabulario canónico. El PSL-C es la **compilación institucional del mismo
+> (GOV-P4-01 · PR-E) y el resto de la representación derivada se retiró el 2026-10-23; no era vocabulario canónico. El PSL-C es la **compilación institucional del mismo
 > Perfil**, no otro Perfil. Ninguna regla de este contrato mantiene un «Producto 4»
 > separado.
 
@@ -233,9 +233,8 @@ del Perfil es **adaptativa**: no fija seis ni siete capítulos obligatorios (ver
 
 > El antiguo «Producto 4 — Perfil de Salud tipo NHS» **ya no es denominación
 > canónica** y se retira de esta tabla. La ruta/artefacto NHS han sido retirados del
-> código: migración técnica ejecutada (ver `CONTRACT-NHS-HEALTH-PROFILE` §0). Las
-> capacidades NHS válidas, si alguna supera la evaluación científica/metodológica,
-> se presentan **dentro** del Perfil, no como producto ni pestaña propios.
+> código: migración técnica ejecutada. El Perfil tiene una sola salida
+> (`CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`, Art. 17 ter).
 
 ### 8.3 Estados del PSL en la interfaz
 
@@ -282,7 +281,7 @@ Este contrato aplica el Art. 5 (separación evidencia/interpretación/propuesta)
 - `CONTRACT-PSL-COMPAS`: los términos de este contrato en §4.1 y §8.2 son coherentes con el Producto 3 tal como está definido.
 - `CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER`: el PSL-C como "documento institucional" coincide con la denominación de §8.2.
 - `CONTRACT-MIT-PSL`: la lectura del PSL es **única y adaptativa**; su cobertura conceptual (Conclusiones, Cierre interpretativo, Síntesis y Priorización, etc.) se muestra según la riqueza del expediente, **sin recuento obligatorio de capítulos** (§6.1.1 bis).
-- `CONTRACT-NHS-HEALTH-PROFILE` §0: el PSL-NHS deja de ser producto autónomo; su retirada de código/ruta/artefacto es migración técnica ejecutada. No hay denominación canónica de un «Producto 4» separado.
+- `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY` Art. 17 ter: el Perfil tiene una sola salida. No hay denominación canónica de un «Producto 4» separado.
 
 ---
 
@@ -327,7 +326,7 @@ Este contrato no define:
 | `FOUNDATIONS §2` | Municipio como unidad de trabajo |
 | `OPERATING-CONSTITUTION` Bloque F | Terminología única sin duplicidades |
 | `CONTRACT-PSL-COMPAS` | Producto 3 y sus términos canónicos |
-| `CONTRACT-NHS-HEALTH-PROFILE` §0 | PSL-NHS derogado como producto autónomo; migración de código ejecutada |
+| `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY` Art. 17 ter | Una sola salida del Perfil; PSL-NHS retirado |
 | `CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT` | Denominación canónica del Producto 7 |
 | `docs/methodology/METHODOLOGICAL-FOUNDATIONS-LOCAL-HEALTH-PLANNING §I.3` | Las seis etapas canónicas del ciclo institucional |
 

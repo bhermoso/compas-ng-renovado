@@ -59,5 +59,5 @@ auditoría → push → PR → merge → vigilar deploy.
   complementarios, activos, o priorización ciudadana).
 - **Modelo canónico único** (Art. 17 bis) · **Cadena** (Art. 16 bis; el Perfil concluye, no
   recomienda) · **Autoría acotada** (Art. 16; la autoría humana vive en el cierre y el
-  enriquecimiento) · el NHS es representación derivada, no segunda fuente de verdad.
+  enriquecimiento) · el Perfil tiene una sola salida (NHS retirado el 2026-10-23).
 - **Granada-Zaidín** no debe cambiar su lectura canónica **sin justificación**.

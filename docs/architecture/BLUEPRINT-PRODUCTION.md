@@ -22,8 +22,8 @@
 > Profile» deja de ser un producto institucional independiente**. Donde este plano lo
 > presente como producto/artefacto/compilador propio o en un *path* paralelo, queda
 > **superado**: sería, a lo sumo, una representación derivada dentro del Perfil, sin
-> compilador ni artefacto propio garantizado; su retirada de código es migración
-> técnica pendiente. Asimismo, toda referencia a «7 capítulos» del PSL queda superada
+> compilador ni artefacto propio garantizado. El 2026-10-23 se retiró también esa
+> representación: el Perfil tiene una sola salida. Asimismo, toda referencia a «7 capítulos» del PSL queda superada
 > por la **lectura única y adaptativa** (`CONTRACT-MIT-PSL` §6.1.1 bis).
 
 ---

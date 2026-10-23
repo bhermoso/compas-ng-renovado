@@ -12,7 +12,7 @@ Producto prioritario: el Perfil de Salud Local — documento científico, editor
 - Modelo canónico único (Art. 17 bis / I-LHPM-8): pantalla, visor, DOCX, PDF e impresión son el mismo documento. Ninguna representación puede divergir.
 - Cadena (Art. 16 bis / I-LHPM-9): evidencia, lectura integrada, conclusiones, frontera, recomendaciones (Plan de Acción). El Perfil concluye y orienta técnicamente; las actuaciones, prioridades y recomendaciones son del Plan de Acción.
 - Autoría acotada (Art. 16): el cuerpo diagnóstico es compilado y trazable, no editable a mano. La autoría humana vive en el cierre interpretativo y el enriquecimiento.
-- El NHS es representación derivada del conocimiento del Perfil, con estatuto de producto propio por audiencia. No puede ser segunda fuente de verdad.
+- El Perfil tiene una sola salida (Art. 17 ter, v1.8.0). El NHS y la salida comparativa breve se retiraron el 2026-10-23: no restaurarlos ni crear representaciones derivadas sin reformar el contrato.
 
 ## Escritura y edición
 - Contrato transversal: `docs/contracts/CONTRACT-AUTHORIAL-STYLE.md`.

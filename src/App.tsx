@@ -182,7 +182,6 @@ import { listTerritorialSpaces } from "./infrastructure/relas/AdminAccounts";
 import { readAccessProfile } from "./infrastructure/relas/RelasClient";
 
 import { compileLocalHealthProfile } from "./application/health-profile-compiler";
-import { readSealedCanonicalDocument } from "./application/psl-c-canonical";
 import { approvePSL, invalidatePSL } from "./application/institutional-lifecycle";
 import { createDeliberativePrioritySelection } from "./domain/deliberative-prioritisation";
 import {
@@ -209,7 +208,6 @@ import {
   OITPanel,
   ReconciliacionPanel,
   PrioritizationPanel,
-  NHSHealthProfileView,
   LecturaEstrategicaView,
   PAIView,
   DeliberativePrioritySelectionPanel,
@@ -4160,18 +4158,6 @@ export default function App() {
                 </>
               );
             })()}
-            {/* Representación derivada breve (GOV-P4-01 · PR-E): dentro del único
-                espacio «Perfil de Salud Local», proyectada del documento canónico. */}
-            <NHSHealthProfileView
-              id="perfil-health-profile-visual"
-              document={(() => {
-                const compiled = workspace.compiledProfiles ?? [];
-                const last = compiled[compiled.length - 1];
-                return last?.canonicalDocument !== undefined
-                  ? readSealedCanonicalDocument(last.canonicalDocument)
-                  : null;
-              })()}
-            />
             <PerfilFuentesPanel workspace={workspace} onProcessReport={handleProcessExistingHealthReport} processing={isLoadingHealthReport} message={lastHealthReportMessage}>
             <DocumentIngestionPanel
               documentKinds={DOCUMENT_KINDS}

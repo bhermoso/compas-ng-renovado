@@ -23,14 +23,10 @@
 - **El PSL-NHS deja de contarse como producto institucional independiente.** Se
   retira del catálogo de productos actuales, de sus tablas y de sus grafos. El
   catálogo vigente pasa de ocho a **siete** productos.
-- El PSL-NHS pasa a ser, a lo sumo, una **representación derivada del Perfil** (p. ej.
-  comparación municipio↔referencia por dominio), **sin compilador ni artefacto propio
-  garantizado**, y solo si supera evaluación científica/metodológica. No es una
-  segunda fuente de verdad.
-- La arquitectura vigente permite dos **salidas** del mismo Perfil canónico: la salida
-  interpretativa COMPÁS y una salida comparativa breve tipo OHID/Fingertips. Esta
-  segunda salida no recupera el PSL-NHS como producto, sino que reexpresa indicadores,
-  referencias, periodos, escalas y cautelas del Perfil validado.
+- **Retirada del 2026-10-23.** El PSL-NHS ya no existe ni como representación
+  derivada: el autor decidió trabajar solo con el Perfil general. La arquitectura
+  vigente tiene una **única salida** del Perfil canónico
+  (`CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`, Art. 17 ter).
 - **Quedan superadas las recomendaciones de este documento de mantener paneles o
   compiladores separados** para PSL-C y PSL-NHS: el Perfil es único; el PSL-C es su
   compilación institucional, no otro Perfil.
@@ -39,8 +35,8 @@
   número de secciones dependen de la riqueza del expediente.
 - La retirada del **código/ruta/artefacto NHS** (`NHSHealthProfileCompiler`,
   `workspace.nhsArtifact`, pestaña de navegación) es **migración técnica ejecutada**
-  (GOV-P4-01 · PR-E). `NHSHealthProfileView` se conserva como renderer de la
-  representación derivada, proyectada del documento canónico dentro del Perfil.
+  (GOV-P4-01 · PR-E). `NHSHealthProfileView` y `projectNHSDerived` se eliminaron
+  el 2026-10-23.
 
 Las secciones históricas §4 (análisis NHS) y §6.2 (NHSHealthProfileCompiler) se
 conservan como registro de diseño **superado**; no constituyen autoridad vigente.
@@ -999,8 +995,8 @@ El VISUAL-CONTRACT §12.2 describe `LocalHealthProfilePanel` como "Generador del
 de Salud Local sintético, inspirado en NHS Local Health Profiles".
 
 **Recomendación *(reconciliada por §0)*:** el Perfil es único; **no** procede un panel
-ni un compilador NHS separados como producto propio. Las capacidades NHS válidas se
-integran, si superan evaluación, **dentro** del Perfil (lectura única y adaptativa, sin
+ni un compilador NHS separados como producto propio. Ninguna capacidad
+NHS se integra en el Perfil (lectura única y adaptativa, sin
 recuento obligatorio de capítulos). La retirada del `NHSHealthProfileCompiler`/panel es
 migración técnica ejecutada (PR-E).
 
