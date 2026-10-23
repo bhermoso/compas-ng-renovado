@@ -64,13 +64,13 @@ describe("ciclo — fase Perfil de Salud Local", () => {
   });
 
   it("no altera la semántica de Priorización ni Plan de Acción", () => {
-    // Con PSL validado, la priorización pasa a «En curso» y el Plan de Acción
+    // Con PSL validado, la priorización pasa a «En curso» y el Plan de acción
     // queda «Pendiente», exista o no el artefacto compilado.
     const sinArtefacto = render({ pslStatus: "validated", pslCompiled: false });
     const conArtefacto = render({ pslStatus: "validated", pslCompiled: true });
     for (const html of [sinArtefacto, conArtefacto]) {
       expect(html).toContain("Priorización");
-      expect(html).toContain("Plan de Acción");
+      expect(html).toContain("Plan de acción");
       expect(html).toContain("En curso");
       expect(html).toContain("Pendiente");
     }

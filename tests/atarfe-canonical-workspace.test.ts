@@ -268,9 +268,16 @@ describe("expediente canónico de Atarfe", () => {
   });
 
   it("13. las dos fuentes de entrada coinciden con el SHA-256 documentado", () => {
-    const sha = (p: string) => createHash("sha256").update(readFileSync(p)).digest("hex");
-    expect(sha(HEALTH_REPORT_DOCX_PATH)).toBe(ATARFE_INPUT_SHA256.healthReportDocx);
-    expect(sha(IBSE_CSV_PATH)).toBe(ATARFE_INPUT_SHA256.ibseCsv);
+    const sha = (b: Buffer) => createHash("sha256").update(b).digest("hex");
+    expect(sha(readFileSync(HEALTH_REPORT_DOCX_PATH))).toBe(ATARFE_INPUT_SHA256.healthReportDocx);
+    // El hash documentado es el del CSV con fin de línea CRLF (origen Windows).
+    // Git puede entregarlo con LF según la plataforma: se normaliza a CRLF antes
+    // de comparar, para que el test no dependa del sistema de ficheros.
+    const csvCrlf = Buffer.from(
+      readFileSync(IBSE_CSV_PATH, "utf8").replace(/\r?\n/g, "\r\n"),
+      "utf8"
+    );
+    expect(sha(csvCrlf)).toBe(ATARFE_INPUT_SHA256.ibseCsv);
   });
 
   it("14. la construcción es determinista (mismos bytes, IDs estables y sello temporal fijo)", async () => {
