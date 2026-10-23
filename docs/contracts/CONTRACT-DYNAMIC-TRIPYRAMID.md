@@ -254,6 +254,16 @@ La calidad muestral nunca modifica los resultados del estudio.
 Un IBSE con muestra baja sigue produciendo sus átomos con sus valores reales.
 La Tripirámide añade contexto. El equipo técnico decide el peso del dato.
 
+### Enmienda autorizada: resultados ajustados separados (2026-10-23)
+
+El responsable del proyecto autoriza incorporar postestratificación demográfica como resultado analítico separado. Esta autorización no certifica los coeficientes existentes ni convierte una muestra voluntaria en representativa.
+
+Los agregados observados, el número real de respuestas válidas y las validaciones previas se conservan. El dictamen de calidad SAM no transforma esos valores. Un cálculo ajustado deberá identificar muestra, población objetivo, referencia poblacional, periodo, celdas, exclusiones y método, y conservar su propia trazabilidad y estado de validación humana.
+
+Los pesos se calculan para cada muestra y universo compatible; no se reutilizan por el solo hecho de coincidir el municipio. Las celdas poblacionales sin respuestas y los datos demográficos ausentes impiden presentar un ajuste global como si cubriera todo el universo. No se aplican pesos neutros silenciosos para ocultar estas ausencias.
+
+La media ajustada será `sum(w_i * x_i) / sum(w_i)`, acompañada de la media observada y del recuento real. Los resultados ajustados no deciden prioridades ni sustituyen al Grupo Motor. La especificación y condiciones de activación se detallan en `../methodology/IBSE-ATARFE-PONDERACION-2026-10-23.md`. Estado: autorización y condiciones documentadas; cálculo ajustado aún no implementado.
+
 ---
 
 ## Referencia cruzada

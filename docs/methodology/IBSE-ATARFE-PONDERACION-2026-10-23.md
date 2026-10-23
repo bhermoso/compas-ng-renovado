@@ -1,7 +1,7 @@
 # IBSE de Atarfe: procedencia y condiciones para la ponderación
 
 Fecha: 23 de octubre de 2026.
-Estado: diagnóstico reproducible y propuesta pendiente de aprobación metodológica. No modifica los contratos vigentes ni activa ponderaciones.
+Estado: diagnóstico reproducible y método autorizado mediante enmienda de CONTRACT-DYNAMIC-TRIPYRAMID de 2026-10-23. No activa ponderaciones: falta verificar una muestra apta y su procedencia.
 
 ## Resultado de la revisión
 
@@ -41,7 +41,15 @@ Los cinco átomos IBSE_FACTORES y el IBSE_RESUMEN deberán distinguir resultado 
 - Export IBSE con puntuaciones, edad y sexo enlazados por respuesta, sin identificadores personales innecesarios; o estadísticos suficientes por celda (recuento y suma de cada puntuación).
 - Archivo de cálculo de los 32 coeficientes, referencia poblacional exacta y muestra de origen.
 - Universo objetivo y tratamiento de celdas vacías, edades no cubiertas y respuestas no asignables.
-- Aprobación expresa de la enmienda contractual para introducir resultados ajustados separados.
+- Autorización contractual obtenida el 2026-10-23; registrada en CONTRACT-DYNAMIC-TRIPYRAMID. No es una validación de los coeficientes existentes.
+
+## Búsqueda autónoma de datos (2026-10-23)
+
+Se ha localizado fuera del repositorio un CSV denominado `ibse_atarfe_2026-02-23.csv` en materiales de formación del responsable. Contiene edad, sexo, puntuaciones de factores y total: 374 filas, edades de 15 a 87, 170 registros con código de sexo 1 y 204 con código 2. No coincide con el export del expediente (811 respuestas válidas). No se ha establecido relación entre ambas muestras ni entre este archivo y los coeficientes SAM.
+
+Huella SHA-256 del candidato: `CED15D3D1117137697D69C4F45FFBDBFC04CE7C5C14FCA13DB7F8FC6AFC87D06`.
+
+Los monitores HTML de la misma carpeta contienen generadores de respuestas simuladas. Esto no demuestra que el CSV sea sintético, pero su origen real no está acreditado. No se ha incorporado, publicado ni utilizado para estimaciones territoriales. La ruta local y los microdatos no se publican. La búsqueda debe continuar sobre fuentes verificables, sin pedir al responsable que calcule pesos o reconstruya matrices.
 
 ## Verificación reproducible
 
