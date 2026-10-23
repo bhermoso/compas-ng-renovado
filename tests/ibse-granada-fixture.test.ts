@@ -38,6 +38,8 @@ describe("IBSE Granada provincial fixture", () => {
     expect(parsed.warnings).toEqual([]);
     expect(parsed.methodologicalCautions).toEqual([
       "Los resultados son medias de la muestra disponible, no estimaciones poblacionales.",
+      "No se ha aplicado ponderación demográfica: cada respuesta válida contribuye por igual a las medias.",
+      "El archivo no contiene ambas columnas de edad y sexo; no permite calcular pesos individuales por edad y sexo.",
     ]);
   });
 });

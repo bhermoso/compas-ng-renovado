@@ -171,6 +171,10 @@ export function parseIBSECSV(
       );
     }
     cautions.push("Los resultados son medias de la muestra disponible, no estimaciones poblacionales.");
+    cautions.push("No se ha aplicado ponderación demográfica: cada respuesta válida contribuye por igual a las medias.");
+    if (!hasDemographics) {
+      cautions.push("El archivo no contiene ambas columnas de edad y sexo; no permite calcular pesos individuales por edad y sexo.");
+    }
   }
 
   let ageSexObserved: AgeSexObservedResult | undefined;
