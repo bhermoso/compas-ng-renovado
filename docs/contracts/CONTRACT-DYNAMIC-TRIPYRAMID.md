@@ -262,7 +262,7 @@ Los agregados observados, el número real de respuestas válidas y las validacio
 
 Los pesos se calculan para cada muestra y universo compatible; no se reutilizan por el solo hecho de coincidir el municipio. Las celdas poblacionales sin respuestas y los datos demográficos ausentes impiden presentar un ajuste global como si cubriera todo el universo. No se aplican pesos neutros silenciosos para ocultar estas ausencias.
 
-La media ajustada será `sum(w_i * x_i) / sum(w_i)`, acompañada de la media observada y del recuento real. Los resultados ajustados no deciden prioridades ni sustituyen al Grupo Motor. La especificación y condiciones de activación se detallan en `../methodology/IBSE-ATARFE-PONDERACION-2026-10-23.md`. Estado: autorización y condiciones documentadas; cálculo ajustado aún no implementado.
+La media ajustada será `sum(w_i * x_i) / sum(w_i)`, acompañada de la media observada y del recuento real. Los resultados ajustados no deciden prioridades ni sustituyen al Grupo Motor. La especificación y condiciones de activación se detallan en `../methodology/IBSE-ATARFE-PONDERACION-2026-10-23.md`. Estado: motor puro implementado en `src/application/sam/computePoststratifiedMean.ts`, sin conexión aún con importación, persistencia, interfaz ni átomos IBSE. Ningún expediente se pondera automáticamente.
 
 ---
 

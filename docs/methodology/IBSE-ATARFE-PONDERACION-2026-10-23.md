@@ -53,6 +53,14 @@ Los monitores HTML de la misma carpeta contienen generadores de respuestas simul
 
 ## Verificación reproducible
 
+### Motor de cálculo separado
+
+Implementado en `src/application/sam/computePoststratifiedMean.ts`, con pruebas sintéticas en `tests/sam-poststratification.test.ts`. Recibe observaciones de una variable asignadas a celdas y una referencia explícita del mismo código municipal. Calcula pesos, medias observada y ajustada, suma de pesos, extremos y tamaño efectivo; conserva una copia de la referencia y exige validación humana. Bloquea matrices incoherentes, celdas vacías con población, observaciones incompatibles y resultados no finitos.
+
+Este motor no usa los coeficientes estáticos sin procedencia, no lee microdatos privados y no modifica expedientes. La selección válida del universo, la verificación de procedencia, la asignación etaria, las exclusiones, la huella real del archivo y la presentación de ambas medias deben resolverse en la integración siguiente. Una cadena de huella recibida por el motor no acredita por sí misma la autenticidad de una muestra. No está conectado todavía al parser, la persistencia ni la interfaz IBSE.
+
+`npx vitest run tests/sam-poststratification.test.ts`
+
 `npx vitest run tests/ibse-weighting-provenance.test.ts tests/ibse-age-sex.test.ts tests/ibse.test.ts`
 
 Las pruebas comprueban la muestra disponible, la conservación de las medias, la transmisión de cautelas a los seis átomos y que disponer de edad/sexo no se etiquete como ponderación aplicada. Los identificadores de otros municipios en las pruebas son casos sintéticos de neutralidad, no reasignaciones de evidencia real.
