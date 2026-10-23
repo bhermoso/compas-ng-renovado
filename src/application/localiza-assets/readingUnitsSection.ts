@@ -114,7 +114,7 @@ export function buildCanonicalReadingUnits(
           : "Informe de Salud: ninguna dimensión con correspondencia validada a este tema."
     );
     for (const g of groupFigures(u.cifras)) {
-      lines.push(`Cifra, ${g.indicador}: ${g.texto}. Fuente: ${g.fuentes.join("; ")}.`);
+      lines.push(`Cifra, ${g.indicador}: ${g.texto.replace(/[.\s]+$/, "")}. Fuente: ${g.fuentes.join("; ")}.`);
     }
     return {
       topicId: u.topicId,

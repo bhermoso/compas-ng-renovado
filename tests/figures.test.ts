@@ -100,3 +100,18 @@ describe("cifras en las unidades de lectura", () => {
     ]);
   });
 });
+
+describe("composición del texto de la cifra", () => {
+  it("una nota que ya termina en punto no produce doble punto antes de «Fuente»", async () => {
+    const { buildCanonicalReadingUnits } = await import("../src/application/localiza-assets");
+    const f = rec({ ...base, dimension: "actividad física y sedentarismo", nota: "Nota con punto final." });
+    const asset: LocalizaAssetRecord = {
+      atomId: "a1", nombre: "Club", descripcion: "", acceso: "Cualquiera", poblacionDestinataria: [],
+      tematicas: ["Actividad física"], municipio: "X", localidad: "X", estado: "registrado-en-localiza",
+    };
+    const c = buildCanonicalReadingUnits(deriveReadingUnits({ assets: [asset], figures: [f] }), 0)!;
+    const line = JSON.stringify(c.units);
+    expect(line).toContain("Nota de la fuente: Nota con punto final. Fuente:");
+    expect(line).not.toContain("..");
+  });
+});

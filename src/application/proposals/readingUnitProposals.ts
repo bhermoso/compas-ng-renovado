@@ -21,7 +21,7 @@ export function buildReadingUnitProposals(
     kind: "conclusion" as const,
     tipo: "hecho" as const,
     text: `${u.label}. ${u.crossingStatement}`,
-    derivedFrom: { evidence: [`lectura-por-tema:${u.topicId}`] },
+    derivedFrom: { evidence: [`Apartado «Lectura por tema» de este Perfil: ${u.label}`] },
   }));
   for (const gap of lectura.gaps) {
     proposals.push({
@@ -29,7 +29,7 @@ export function buildReadingUnitProposals(
       kind: "conclusion",
       tipo: "laguna",
       text: gap,
-      derivedFrom: { evidence: ["lectura-por-tema:lagunas"] },
+      derivedFrom: { evidence: ["Apartado «Lectura por tema» de este Perfil: lagunas declaradas"] },
     });
   }
   return proposals;
