@@ -724,6 +724,16 @@ function addMortalityFindings(
   const section = sections.find((s) => s.title === "Mortalidad");
   const lines = lineBlock(section);
   const general = lines.find((line) => /Tasa Bruta de Mortalidad/i.test(line));
+  const sourceGeography = (text: string): HealthReportFindingGeography => {
+    const municipality = text.match(/municipio de ([\p{L} '-]+?)(?=,|\.|\s+en\s+\d|\s+presenta|\s+registra|\s+fallecieron|$)/iu)?.[1];
+    return municipality !== undefined
+      ? { level: "municipality", label: municipality.trim(), isProxyForTargetTerritory: true }
+      : { level: "unknown", label: "Ámbito no identificado en el fragmento", isProxyForTargetTerritory: true };
+  };
+  const cautions = [...declaredLimitations,
+    "La tasa bruta no está ajustada por edad; no acredita por sí sola un exceso significativo de riesgo.",
+    "Los recuentos pequeños requieren evaluar la incertidumbre antes de comparar territorios o periodos.",
+  ];
   if (general !== undefined) {
     const deaths = firstNumber(general.match(/fallecieron[^0-9]*(\d[\d.]*)/i)?.[1]);
     const rate = firstNumber(general.match(/Tasa Bruta de Mortalidad de\s*([\d,]+)‰/i)?.[1]);
@@ -736,14 +746,14 @@ function addMortalityFindings(
         value: rate,
         unit: "‰ tasa bruta de mortalidad",
         numerator: deaths,
-        geography: geographyFromLabel("Granada municipio"),
-        period: "2021",
+        geography: sourceGeography(general),
+        period: periodFromText(general),
         source: {
           documentId: report.linkedDocumentId,
           sectionTitle: section?.title,
           textExcerpt: clip(general),
         },
-        limitations: declaredLimitations,
+        limitations: cautions,
         interpretationStatus: "documented-fact",
         interpretationUse: ["sanitary-thread", "inequalities", "future-human-hypothesis"],
       });
@@ -752,17 +762,17 @@ function addMortalityFindings(
       addFinding(findings, {
         kind: "territorial-comparison",
         topic: "mortalidad general: comparación Andalucía",
-        statement: `Granada municipio presenta tasa bruta de mortalidad ${rate ?? "no disponible"}‰ frente a Andalucía ${andalusia}‰.`,
+        statement: general,
         value: andalusia,
         unit: "‰ tasa bruta de mortalidad",
         geography: geographyFromLabel("Andalucía"),
-        period: "2021",
+        period: periodFromText(general),
         source: {
           documentId: report.linkedDocumentId,
           sectionTitle: section?.title,
           textExcerpt: clip(general),
         },
-        limitations: declaredLimitations,
+        limitations: cautions,
         interpretationStatus: "documented-fact",
         interpretationUse: ["sanitary-thread", "inequalities", "future-human-hypothesis"],
       });
@@ -775,16 +785,16 @@ function addMortalityFindings(
       kind: "mortality",
       topic: "mortalidad específica: principales causas",
       statement: causes,
-      value: "circulatorio 27%; tumores 25%; infecciosas 11%",
-      unit: "% defunciones por capítulo CIE-10",
-      geography: geographyFromLabel("Granada municipio"),
-      period: "2021",
+      value: causes,
+      unit: "descripción literal del Informe",
+      geography: sourceGeography(causes),
+      period: periodFromText(causes),
       source: {
         documentId: report.linkedDocumentId,
         sectionTitle: section?.title,
         textExcerpt: clip(causes),
       },
-      limitations: declaredLimitations,
+      limitations: cautions,
       interpretationStatus: "document-authored-interpretation",
       interpretationUse: ["sanitary-thread", "inequalities", "future-human-hypothesis"],
     });
@@ -1079,16 +1089,19 @@ export function buildHealthReportStructuredReading(
   const limitations = extractDeclaredLimitations(report.body.originalText);
   const findings: HealthReportStructuredFinding[] = [];
 
-  addChronicFindings(report, findings, sections);
-  addCancerFindings(report, findings, tables, limitations);
-  addScreeningFindings(report, findings, tables);
-  addLifestyleInterventionFindings(report, findings, sections);
+  // These extractors encode the Zaidin report's table layout and geography.
+  // Do not apply that source-specific interpretation to another municipality.
+  if (report.municipalityId === "granada-zaidin") {
+    addChronicFindings(report, findings, sections);
+    addCancerFindings(report, findings, tables, limitations);
+    addScreeningFindings(report, findings, tables);
+    addLifestyleInterventionFindings(report, findings, sections);
+    addDemographicFindings(report, findings, tables);
+    addMaterialInequalityFindings(report, findings, tables);
+    addEpidemiologicalEventFindings(report, findings, tables);
+    addLimitationFindings(report, findings, limitations);
+  }
   addMortalityFindings(report, findings, sections, limitations);
-  // Incremento 4 — cobertura epidemiológica prioritaria.
-  addDemographicFindings(report, findings, tables);
-  addMaterialInequalityFindings(report, findings, tables);
-  addEpidemiologicalEventFindings(report, findings, tables);
-  addLimitationFindings(report, findings, limitations);
 
   const territorialCorrespondences = buildTerritorialCorrespondences(report, tables);
   assignTableStructuringStatus(tables, findings);
@@ -1105,7 +1118,10 @@ export function buildHealthReportStructuredReading(
     "Las menciones textuales se mantienen separadas de los datos tabulares y de las interpretaciones explícitas del documento.",
     "Las tablas se extraen sólo cuando existen como HTML persistido; los gráficos no tabulares no se convierten en cifras.",
     `Extracción parcial y trazable: ${detectedNotStructured} tabla(s) detectada(s) sin estructurar y ${recognizedNotStructured} reconocida(s) sin hallazgos; su condición se registra, no se rellena con cifras.`,
-    "Los datos municipales (demografía, desigualdad) son contexto/proxy del distrito; los recuentos EDO y de brotes son absolutos, sin denominador ni tasa.",
+    "La escala de cada hallazgo debe contrastarse con el ámbito del Perfil; un recuento absoluto no equivale a una tasa.",
+    ...(report.municipalityId !== "granada-zaidin"
+      ? ["Los extractores específicos del Informe de Zaidín no se aplican a este territorio; sus tablas y secciones requieren una lectura compatible con la fuente."]
+      : []),
   ];
   if (tables.length === 0 && report.body.tableCount !== undefined && report.body.tableCount > 0) {
     extractionNotes.push("El documento declara tablas, pero no hay HTML tabular persistido para reconstruir filas.");

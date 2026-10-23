@@ -15,7 +15,7 @@ import {
 import { bundledDocuments } from './ui/components/documentAccessUtils';
 import { BackupPanel } from './ui/components/BackupPanel';
 import { DocumentationProvider } from "./ui/components/Documentation";
-import { profileSourceChanged } from './application/health-profile/profileSourceChanged';
+import { healthReportFingerprint, profileSourceChanged } from './application/health-profile/profileSourceChanged';
 import { DocumentAccess } from './ui/components/DocumentAccess.tsx';
 import type { PlanPreparationDraft } from "./domain/action-plan-catalog/PlanPreparationDraft";
 import { worksheetKey, type IndicatorWorksheet } from "./domain/action-plan-catalog/IndicatorWorksheet";
@@ -1101,7 +1101,10 @@ export default function App() {
     };
     setWorkspace((prev) => ({
       ...prev,
-      validatedPSL,
+      validatedPSL: {
+        ...validatedPSL,
+        healthReportFingerprint: healthReportFingerprint(excludeHistoricalSources(prev).healthReport),
+      },
       // CONV-A · congela ATÓMICAMENTE el snapshot de answers (payload opaco) junto
       // al PSL validado, para que preview y compilación consuman el mismo snapshot
       // semántico (psl + answers) y no se recombine con answers vivos.

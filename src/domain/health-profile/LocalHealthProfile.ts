@@ -114,6 +114,8 @@ export interface LocalHealthProfile {
   // healthReportDocumentId = linkedDocumentId del HealthReportDocument
   //                        = id del MunicipalDocument en el repositorio.
   healthReportDocumentId?: string;
+  /** Change-detection fingerprint, not a cryptographic authenticity guarantee. */
+  healthReportFingerprint?: string;
   healthReportTitle?: string;
   healthReportSectionCount: number;   // secciones parsadas del documento fuente
   healthReportAtomCount: number;      // EvidenceAtoms generados del informe

@@ -42,6 +42,7 @@ import {
   NARRATIVE_GENERATOR_VERSION,
 } from "./narrativeChapters";
 import { buildDiagnosticAnswers } from "./diagnosticAnswers";
+import { healthReportFingerprint } from "./profileSourceChanged";
 import { institutionalHealthReportTitle } from "./healthReportSanitaryReading";
 
 // ── Secciones del Marco Estratégico (Capítulo I) ──────────────────────────────
@@ -216,6 +217,7 @@ export function buildLocalHealthProfile(
 
     // ── II: Informe de Salud — referencia, nunca el documento ─────────────
     healthReportDocumentId: hr?.linkedDocumentId,
+    healthReportFingerprint: healthReportFingerprint(hr),
     healthReportTitle: hrTitle,
     healthReportSectionCount: hr?.sections.length ?? 0,
     healthReportAtomCount: hrAtomCount,

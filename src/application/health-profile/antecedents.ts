@@ -125,6 +125,9 @@ export function excludeHistoricalSources(
   if (historicalIds.size === 0) return workspace;
   return {
     ...workspace,
+    healthReport: workspace.healthReport && historicalIds.has(workspace.healthReport.linkedDocumentId)
+      ? undefined
+      : workspace.healthReport,
     repository: {
       ...workspace.repository,
       documents: workspace.repository.documents.filter((d) => !historicalIds.has(d.id)),
