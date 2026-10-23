@@ -7,6 +7,24 @@ import {
 import { buildWorkspaceStorageKey } from '../src/infrastructure/persistence/local-storage';
 import { ACTIVE_MUNICIPALITY_STORAGE_KEY } from '../src/appWorkspaceHydration';
 
+// Entorno de pruebas Node: sin navegador, localStorage se simula en memoria
+// (misma convención que active-municipality.test.ts).
+const store = new Map<string, string>();
+(globalThis as { localStorage?: unknown }).localStorage = {
+  getItem: (k: string) => store.get(k) ?? null,
+  setItem: (k: string, v: string) => {
+    store.set(k, v);
+  },
+  removeItem: (k: string) => {
+    store.delete(k);
+  },
+  clear: () => store.clear(),
+  key: (i: number) => [...store.keys()][i] ?? null,
+  get length() {
+    return store.size;
+  },
+};
+
 const CUSTOM_MUNICIPALITIES_KEY = 'compas-ng:custom-municipalities';
 
 function lojaJSON() {
