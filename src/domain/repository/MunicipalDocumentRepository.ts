@@ -236,6 +236,10 @@ export interface AuthoredProposal {
   sustento?: 1 | 2 | 3;
   /** Salvedades que el equipo declara (límites de la lectura). */
   cautelas?: string;
+  /** Laguna (Art. 16 quater, apartado 4): el dato que la cerraría. Obligatorio al registrar una laguna desde v2.2. */
+  datoQueLaCierra?: string;
+  /** Laguna: ids de las conclusiones que condiciona. */
+  condiciona?: string[];
   authoredBy: string;
   authoredAt: string;
 }

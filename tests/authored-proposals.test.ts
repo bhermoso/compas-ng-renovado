@@ -61,6 +61,16 @@ describe("propuestas del equipo técnico", () => {
     expect(validateDecision(conocer!, { decision: "elegida", decidedBy: "A" })).toEqual([]);
   });
 
+  it("una laguna declara el dato que la cerraría y solo condiciona conclusiones registradas", () => {
+    const l = { id: "L1", kind: "conclusion" as const, tipo: "laguna" as const, text: "No hay datos locales de salud mental.", evidence: ["Informe, p. 4"], authoredBy: "Equipo" };
+    expect(validateAuthoredProposal(l, [C1]).join()).toContain("dato que la cerraría");
+    expect(validateAuthoredProposal({ ...l, datoQueLaCierra: "Prevalencia local de malestar psicológico (GHQ-12)" }, [C1])).toEqual([]);
+    expect(validateAuthoredProposal({ ...l, datoQueLaCierra: "x", condiciona: ["C9"] }, [C1]).join()).toContain("«C9» no está registrada");
+    const [, lp] = authoredToProposals([C1, { ...l, datoQueLaCierra: "Prevalencia local", condiciona: ["C1"], authoredAt: "2026-10-24T00:00:00Z" }]);
+    expect(lp!.datoQueLaCierra).toBe("Prevalencia local");
+    expect(lp!.condiciona).toEqual([authoredProposalId({ kind: "conclusion", id: "C1" })]);
+  });
+
   it("no nacen elegidas y la de grado 3 no se puede elegir", () => {
     const [c, o] = authoredToProposals([
       C1,

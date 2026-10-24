@@ -22,6 +22,10 @@ export interface ChosenItem {
   /** Relación de la tabla en que se apoya. */
   relacion?: string;
   cautelas?: string;
+  /** Laguna: el dato que la cerraría; ausente = no declarado. */
+  datoQueLaCierra?: string;
+  /** Laguna: etiquetas de las conclusiones que condiciona. */
+  condiciona?: string[];
   /** Orientación: etiquetas de las conclusiones de las que deriva. */
   derivaDe?: string[];
   /** Autoría y fecha de la elección. */
@@ -50,6 +54,10 @@ export function buildChosenClosing(
     ...(r.proposal.derivedFrom.sustento !== undefined ? { sustento: r.proposal.derivedFrom.sustento } : {}),
     ...(r.proposal.derivedFrom.relationId !== undefined ? { relacion: r.proposal.derivedFrom.relationId } : {}),
     ...(r.proposal.cautelas !== undefined ? { cautelas: r.proposal.cautelas } : {}),
+    ...(r.proposal.datoQueLaCierra !== undefined ? { datoQueLaCierra: r.proposal.datoQueLaCierra } : {}),
+    ...(r.proposal.condiciona !== undefined && r.proposal.condiciona.length > 0
+      ? { condiciona: r.proposal.condiciona.map((id) => labelOf.get(id) ?? id) }
+      : {}),
     ...(r.proposal.derivedFrom.conclusionIds !== undefined
       ? { derivaDe: r.proposal.derivedFrom.conclusionIds.map((id) => labelOf.get(id) ?? id) }
       : {}),
@@ -60,4 +68,32 @@ export function buildChosenClosing(
     conclusions: elegidas.filter((r) => r.proposal.kind === "conclusion").map(toItem),
     orientations: elegidas.filter((r) => r.proposal.kind === "orientation").map(toItem),
   };
+}
+
+/**
+ * Conclusiones del cuerpo (hecho, interpretación, hipótesis) y lagunas
+ * (Art. 16 quater, apartados 2 y 4). Las lagunas no se presentan como conclusiones.
+ */
+export function splitChosenConclusions(cc: CanonicalChosenClosing): {
+  cuerpo: ChosenItem[];
+  lagunas: ChosenItem[];
+} {
+  return {
+    cuerpo: cc.conclusions.filter((c) => c.tipo !== "laguna"),
+    lagunas: cc.conclusions.filter((c) => c.tipo === "laguna"),
+  };
+}
+
+/** Líneas de una laguna en «Lo que no sabemos», idénticas en pantalla y documento (Art. 17 bis). */
+export function unknownLines(l: ChosenItem): string[] {
+  return [
+    l.texto,
+    [
+      l.condiciona !== undefined && l.condiciona.length > 0 ? `Condiciona: ${l.condiciona.join(", ")}.` : "",
+      `Dato que la cerraría: ${l.datoQueLaCierra !== undefined ? l.datoQueLaCierra.replace(/[.\s]+$/, "") + "." : "no declarado."}`,
+    ]
+      .filter((x) => x !== "")
+      .join(" "),
+    `Evidencia: ${l.evidencia.join("; ")}.`,
+  ];
 }

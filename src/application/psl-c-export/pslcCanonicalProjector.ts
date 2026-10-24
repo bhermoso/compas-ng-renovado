@@ -26,6 +26,7 @@ import type {
 import { conciliationParagraph } from "../health-profile/antecedents";
 import { RECOMMENDATION_LABEL } from "../../domain/statements/statementTypes";
 import { startingPointParagraphs } from "../health-profile/startingPoint";
+import { splitChosenConclusions, unknownLines } from "../proposals/chosenClosing";
 import type { PSLCDocumentModel, PSLCDocumentSection } from "./pslcDocumentModel";
 import { pslcDocxFileName } from "./pslcDocumentModel";
 
@@ -279,16 +280,25 @@ export function projectCanonicalToDocumentModel(
 
   if (reading.chosenClosing !== undefined) {
     const cc = reading.chosenClosing;
-    if (cc.conclusions.length > 0) {
+    const { cuerpo, lagunas } = splitChosenConclusions(cc);
+    if (cuerpo.length > 0) {
       sections.push({
         sectionId: "chosen-conclusions",
         title: "Conclusiones",
         level: 1,
-        paragraphs: cc.conclusions.flatMap((c) => [
+        paragraphs: cuerpo.flatMap((c) => [
           c.texto,
           ...(c.cautelas !== undefined ? [`Salvedades: ${c.cautelas}`] : []),
           `Evidencia: ${c.evidencia.join("; ")}.`,
         ]),
+      });
+    }
+    if (lagunas.length > 0) {
+      sections.push({
+        sectionId: "unknowns",
+        title: "Lo que no sabemos",
+        level: 1,
+        paragraphs: lagunas.flatMap(unknownLines),
       });
     }
     if (cc.orientations.length > 0) {

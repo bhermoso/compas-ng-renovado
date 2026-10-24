@@ -355,6 +355,7 @@ export type CanonicalReadingSectionId =
   | "tracer-table"
   | "generated-closing"
   | "chosen-conclusions"
+  | "unknowns"
   | "chosen-orientations"
   | "human-closing"
   | "institutional-boundary";
@@ -381,6 +382,7 @@ export const CANONICAL_READING_ORDER = [
   "tracer-table",
   "generated-closing",
   "chosen-conclusions",
+  "unknowns",
   "chosen-orientations",
   "human-closing",
   "institutional-boundary",

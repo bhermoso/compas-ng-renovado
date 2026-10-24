@@ -31,6 +31,10 @@ export interface Proposal {
   origin?: "sistema" | "equipo";
   /** Salvedades declaradas por quien propone. */
   cautelas?: string;
+  /** Laguna: el dato que la cerraría (Art. 16 quater, apartado 4). */
+  datoQueLaCierra?: string;
+  /** Laguna: ids de las propuestas de conclusión que condiciona. */
+  condiciona?: string[];
   derivedFrom: {
     /** Átomos de evidencia o ids de lectura de los que deriva. */
     evidence: string[];

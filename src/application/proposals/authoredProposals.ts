@@ -43,6 +43,16 @@ export function validateAuthoredProposal(
   } else if (a.kind === "orientation" && a.tipo !== "orientacion") {
     problems.push("Una recomendación del Perfil es del tipo «orientacion».");
   }
+  if (a.kind === "conclusion" && a.tipo === "laguna") {
+    if (a.datoQueLaCierra === undefined || a.datoQueLaCierra.trim() === "") {
+      problems.push("Una laguna declara el dato que la cerraría (Art. 16 quater, apartado 4).");
+    }
+    for (const c of a.condiciona ?? []) {
+      const target = existing.find((e) => e.kind === "conclusion" && e.id === c);
+      if (target === undefined) problems.push(`La conclusión «${c}» no está registrada.`);
+      else if (target.tipo === "laguna") problems.push(`Una laguna condiciona conclusiones, no otras lagunas («${c}»).`);
+    }
+  }
   if (a.kind === "orientation") {
     const concl = a.conclusionIds ?? [];
     if (concl.length === 0) {
@@ -95,6 +105,10 @@ export function authoredToProposals(list: ReadonlyArray<AuthoredProposal>): Prop
     ...(a.tipo !== undefined ? { tipo: a.tipo } : {}),
     ...(a.recomendacion !== undefined ? { recomendacion: a.recomendacion } : {}),
     ...(a.cautelas !== undefined && a.cautelas.trim() !== "" ? { cautelas: a.cautelas } : {}),
+    ...(a.datoQueLaCierra !== undefined && a.datoQueLaCierra.trim() !== "" ? { datoQueLaCierra: a.datoQueLaCierra } : {}),
+    ...(a.condiciona !== undefined && a.condiciona.length > 0
+      ? { condiciona: a.condiciona.map((c) => authoredProposalId({ kind: "conclusion", id: c })) }
+      : {}),
     derivedFrom: {
       evidence: a.evidence,
       ...(a.conclusionIds !== undefined
