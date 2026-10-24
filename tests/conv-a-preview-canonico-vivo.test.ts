@@ -427,7 +427,7 @@ describe("CONV-A · invariante A→B en la PANTALLA (render real, paso 4)", () =
     expect(html).toContain("Lectura territorial del diagnóstico");
     expect(html).not.toContain("Sin evidencia disponible");
     // …y es la lectura de A (integrada), no la de B (que estaría vacía).
-    expect(html).toContain("Qué debe discutir el Grupo Motor");
+    expect(html).toContain("Cierre de la lectura");
   });
 
   it("contraste — NO validado con B vivo (0 átomos): la pantalla SÍ adopta B (estado vacío)", () => {
@@ -440,7 +440,7 @@ describe("CONV-A · invariante A→B en la PANTALLA (render real, paso 4)", () =
     });
     // Sin snapshot, la preview la gobierna B (vacío): estado vacío, no la lectura de A.
     expect(html).toContain("Sin evidencia disponible");
-    expect(html).not.toContain("Qué debe discutir el Grupo Motor");
+    expect(html).not.toContain("Cierre de la lectura");
   });
 
   it("contraste — NO validado con evidencia viva: rinde la lectura viva con el rótulo de borrador", () => {

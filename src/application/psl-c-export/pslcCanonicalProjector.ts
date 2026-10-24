@@ -276,27 +276,6 @@ export function projectCanonicalToDocumentModel(
     });
   }
 
-  if (reading.groupMotorAgenda.length > 0) {
-    sections.push({
-      sectionId: "group-motor-agenda",
-      title: "Qué debe discutir el Grupo Motor",
-      level: 1,
-      kind: "groupMotorAgenda",
-      agenda: reading.groupMotorAgenda.map((c) => ({
-        tema: c.tema,
-        senal: c.senal,
-        mecanismo: c.mecanismo,
-        oculto: c.oculto,
-        pregunta: c.pregunta,
-      })),
-      paragraphs: [
-        "Cada entrada conecta una señal con su mecanismo social plausible, " +
-          "con quién puede quedar fuera de los datos y con la pregunta que el " +
-          "Grupo Motor puede responder mejor que ningún dato. Son materiales " +
-          "de deliberación, no decisiones.",
-      ],
-    });
-  }
 
   sections.push({
     sectionId: "generated-closing",

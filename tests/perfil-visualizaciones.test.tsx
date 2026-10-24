@@ -223,8 +223,8 @@ describe("gramática visual semántica y Grupo Motor", () => {
     expect(items.length).toBe(3);
   });
 
-  it("el bloque «Qué debe discutir el Grupo Motor» conecta señal, mecanismo y pregunta", () => {
-    expect(html).toContain("Qué debe discutir el Grupo Motor");
+  it("las tarjetas del Grupo Motor conectan señal, mecanismo y pregunta (datos; el bloque se retiró del cuerpo)", () => {
+    expect(html).not.toContain("Qué debe discutir el Grupo Motor");
     expect(visuales.grupoMotorCards.length).toBeGreaterThanOrEqual(4);
     expect(visuales.grupoMotorCards.length).toBeLessThanOrEqual(6);
     for (const c of visuales.grupoMotorCards) {
@@ -234,7 +234,6 @@ describe("gramática visual semántica y Grupo Motor", () => {
       expect(c.oculto.length).toBeGreaterThan(15);
       expect(c.pregunta).toMatch(/^¿.+\?$/);
     }
-    expect(html).toContain("Quién puede quedar fuera:");
     const temas = visuales.grupoMotorCards.map((c) => c.tema).join(" | ");
     expect(temas).toContain("Desigualdad");
     expect(temas).toContain("Soledad, envejecimiento");

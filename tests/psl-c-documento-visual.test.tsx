@@ -298,35 +298,9 @@ describe("documento visual — deliberación y Grupo Motor", () => {
     }
   });
 
-  it("la agenda conecta señal, mecanismo, quién puede quedar fuera y pregunta", () => {
-    const seccion = model.sections.find(
-      (s) => s.title === "Qué debe discutir el Grupo Motor"
-    );
-    expect(seccion).toBeDefined();
-    expect(seccion!.kind).toBe("groupMotorAgenda");
-    // En la lectura y antes del anexo técnico.
-    expect(titulos.indexOf("Qué debe discutir el Grupo Motor")).toBeGreaterThan(
-      titulos.indexOf("Lectura integrada del territorio")
-    );
-    expect(titulos.indexOf("Qué debe discutir el Grupo Motor")).toBeLessThan(
-      titulos.indexOf("Anexo técnico")
-    );
-    const agenda = seccion!.agenda!;
-    expect(agenda.length).toBeGreaterThanOrEqual(4);
-    for (const entrada of agenda) {
-      expect(entrada.tema.length).toBeGreaterThan(3);
-      expect(entrada.senal.length).toBeGreaterThan(15);
-      expect(entrada.mecanismo.length).toBeGreaterThan(15);
-      expect(entrada.oculto.length).toBeGreaterThan(15);
-      expect(entrada.pregunta).toMatch(/^¿.+\?$/);
-    }
-    // Materiales de deliberación, nunca decisiones ni recomendaciones
-    expect(seccion!.paragraphs.join(" ")).toContain(
-      "materiales de deliberación, no decisiones"
-    );
-    expect(JSON.stringify(seccion)).not.toMatch(
-      /se recomienda|recomendamos|debe implantarse|programa de|objetivo estrat[ée]gico|plan de acci[óo]n/i
-    );
+  it("la agenda del Grupo Motor ya no es sección del documento (contrato v2.0.0, Art. 16 quater)", () => {
+    expect(model.sections.find((s) => s.title === "Qué debe discutir el Grupo Motor")).toBeUndefined();
+    expect(model.sections.some((s) => s.kind === "groupMotorAgenda")).toBe(false);
   });
 });
 
