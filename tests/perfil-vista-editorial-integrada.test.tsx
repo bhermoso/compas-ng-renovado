@@ -248,7 +248,7 @@ describe("mapa visible de estado del Perfil", () => {
     expect(html).not.toContain("Local Health Profiles");
     expect(html).toContain("Matriz de evidencia y alcance");
     expect(html).toContain("Activos y capacidades");
-    expect(html).toContain("56 activos de Localiza Salud");
+    expect(html).toContain("56 recursos de Localiza Salud");
     expect(html).toContain("13 estudios complementarios");
   });
 });

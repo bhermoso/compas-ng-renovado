@@ -196,8 +196,8 @@ function ProfileStateMap({
       title: "Activos y capacidades",
       status: localizaAssetCount > 0 ? "Localiza Salud incorporado" : "Pendiente",
       detail: localizaAssetCount > 0
-        ? `${contar(localizaAssetCount, "activo de Localiza Salud", "activos de Localiza Salud")} como capacidad potencial; cobertura, uso efectivo y accesibilidad requieren contraste territorial.`
-        : "Sin activos Localiza Salud incorporados como fuente principal.",
+        ? `${contar(localizaAssetCount, "recurso de Localiza Salud", "recursos de Localiza Salud")} como capacidad potencial; solo los validados cuentan como activos. Cobertura, uso efectivo y accesibilidad requieren contraste territorial.`
+        : "Sin recursos de Localiza Salud incorporados.",
     },
     {
       title: "Estudios complementarios",

@@ -874,7 +874,7 @@ function buildClosingColumns(input: {
   const humanQuestion = firstHumanOpenQuestion(answers);
   const assetsText =
     answers.salutogenica.totalAssets > 0
-      ? `${formatCount(answers.salutogenica.totalAssets, "recurso", "recursos")} de Localiza Salud ${answers.salutogenica.totalAssets === 1 ? "queda" : "quedan"} como capacidad potencial${validatedCount(answers)}, pendientes de acceso, uso y reconocimiento.`
+      ? `${formatCount(answers.salutogenica.totalAssets, "recurso", "recursos")} de Localiza Salud ${answers.salutogenica.totalAssets === 1 ? "queda" : "quedan"} como capacidad potencial, pendiente de acceso, uso y reconocimiento${validatedCount(answers)}.`
       : "El expediente no incorpora todavía recursos de Localiza Salud para leer capacidades.";
   const tracerReferenceCount = answers.referencias.references.filter(
     (r) => r.tracerPriority !== undefined
