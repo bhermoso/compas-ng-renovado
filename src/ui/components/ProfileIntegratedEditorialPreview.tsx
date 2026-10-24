@@ -1,7 +1,6 @@
 import { conciliationParagraph } from "../../application/health-profile/antecedents";
-import { RECOMMENDATION_LABEL } from "../../domain/statements/statementTypes";
 import { startingPointParagraphs } from "../../application/health-profile/startingPoint";
-import { splitChosenConclusions, unknownLines } from "../../application/proposals/chosenClosing";
+import { conclusionLines, recommendationLines, splitChosenConclusions, unknownLines } from "../../application/proposals/chosenClosing";
 import type {
   ProfileIntegratedEditorialView,
   CanonicalEditorialView,
@@ -429,9 +428,9 @@ export function ProfileIntegratedEditorialPreview({
               <h3 id="pie-chosen-conclusions-title" className="pie-section__title">Conclusiones</h3>
               {splitChosenConclusions(view.chosenClosing).cuerpo.map((c) => (
                 <article key={c.etiqueta} className="pie-hilo">
-                  <p className="pie-hilo__reading">{c.texto}</p>
-                  {c.cautelas !== undefined ? <p className="pie-hilo__context">Salvedades: {c.cautelas}</p> : null}
-                  <p className="pie-hilo__context">Evidencia: {c.evidencia.join("; ")}.</p>
+                  {conclusionLines(c, view.chosenClosing!.orientations).map((line, i) => (
+                    <p key={i} className={i === 0 ? "pie-hilo__reading" : "pie-hilo__context"}>{line}</p>
+                  ))}
                 </article>
               ))}
             </section>
@@ -453,14 +452,9 @@ export function ProfileIntegratedEditorialPreview({
               <h3 id="pie-chosen-orientations-title" className="pie-section__title">Recomendaciones del Perfil</h3>
               {view.chosenClosing.orientations.map((o) => (
                 <article key={o.etiqueta} className="pie-hilo">
-                  <p className="pie-hilo__reading">{o.texto}</p>
-                  <p className="pie-hilo__context">
-                    {o.recomendacion !== undefined ? `Tipo: ${RECOMMENDATION_LABEL[o.recomendacion]}. ` : ""}
-                    {o.derivaDe !== undefined && o.derivaDe.length > 0 ? `Deriva de: ${o.derivaDe.join(", ")}. ` : ""}
-                    {o.sustento !== undefined ? `Sustento de grado ${o.sustento}${o.relacion !== undefined ? ` (relación ${o.relacion})` : ""}. ` : ""}
-                    {o.cautelas !== undefined ? `Salvedades: ${o.cautelas}` : ""}
-                  </p>
-                  <p className="pie-hilo__context">Evidencia: {o.evidencia.join("; ")}.</p>
+                  {recommendationLines(o).map((line, i) => (
+                    <p key={i} className={i === 0 ? "pie-hilo__reading" : "pie-hilo__context"}>{line}</p>
+                  ))}
                 </article>
               ))}
             </section>

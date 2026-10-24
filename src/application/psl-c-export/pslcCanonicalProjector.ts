@@ -24,9 +24,8 @@ import type {
   CanonicalTechnicalSpace,
 } from "../health-profile";
 import { conciliationParagraph } from "../health-profile/antecedents";
-import { RECOMMENDATION_LABEL } from "../../domain/statements/statementTypes";
 import { startingPointParagraphs } from "../health-profile/startingPoint";
-import { splitChosenConclusions, unknownLines } from "../proposals/chosenClosing";
+import { conclusionLines, recommendationLines, splitChosenConclusions, unknownLines } from "../proposals/chosenClosing";
 import type { PSLCDocumentModel, PSLCDocumentSection } from "./pslcDocumentModel";
 import { pslcDocxFileName } from "./pslcDocumentModel";
 
@@ -286,11 +285,7 @@ export function projectCanonicalToDocumentModel(
         sectionId: "chosen-conclusions",
         title: "Conclusiones",
         level: 1,
-        paragraphs: cuerpo.flatMap((c) => [
-          c.texto,
-          ...(c.cautelas !== undefined ? [`Salvedades: ${c.cautelas}`] : []),
-          `Evidencia: ${c.evidencia.join("; ")}.`,
-        ]),
+        paragraphs: cuerpo.flatMap((c) => conclusionLines(c, cc.orientations)),
       });
     }
     if (lagunas.length > 0) {
@@ -306,18 +301,7 @@ export function projectCanonicalToDocumentModel(
         sectionId: "chosen-orientations",
         title: "Recomendaciones del Perfil",
         level: 1,
-        paragraphs: cc.orientations.flatMap((o) => [
-          o.texto,
-          [
-            o.recomendacion !== undefined ? `Tipo: ${RECOMMENDATION_LABEL[o.recomendacion]}.` : "",
-            o.derivaDe !== undefined && o.derivaDe.length > 0 ? `Deriva de: ${o.derivaDe.join(", ")}.` : "",
-            o.sustento !== undefined ? `Sustento de grado ${o.sustento}${o.relacion !== undefined ? ` (relación ${o.relacion})` : ""}.` : "",
-            o.cautelas !== undefined ? `Salvedades: ${o.cautelas}` : "",
-          ]
-            .filter((x) => x !== "")
-            .join(" "),
-          `Evidencia: ${o.evidencia.join("; ")}.`,
-        ].filter((x) => x !== "")),
+        paragraphs: cc.orientations.flatMap(recommendationLines),
       });
     }
   }

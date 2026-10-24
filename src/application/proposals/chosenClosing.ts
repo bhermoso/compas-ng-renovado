@@ -6,7 +6,7 @@
  */
 
 import type { ProposalDecision } from "../../domain/repository";
-import type { RecommendationKind, StatementType } from "../../domain/statements/statementTypes";
+import { RECOMMENDATION_LABEL, type RecommendationKind, type StatementType } from "../../domain/statements/statementTypes";
 import { resolveProposals, type Proposal, type SustentoGrade } from "./proposals";
 
 export interface ChosenItem {
@@ -86,8 +86,9 @@ export function splitChosenConclusions(cc: CanonicalChosenClosing): {
 
 /** Líneas de una laguna en «Lo que no sabemos», idénticas en pantalla y documento (Art. 17 bis). */
 export function unknownLines(l: ChosenItem): string[] {
+  const label = visibleLabel(l);
   return [
-    l.texto,
+    `${label !== null ? `${label} · ` : ""}${l.texto}`,
     [
       l.condiciona !== undefined && l.condiciona.length > 0 ? `Condiciona: ${l.condiciona.join(", ")}.` : "",
       `Dato que la cerraría: ${l.datoQueLaCierra !== undefined ? l.datoQueLaCierra.replace(/[.\s]+$/, "") + "." : "no declarado."}`,
@@ -96,4 +97,65 @@ export function unknownLines(l: ChosenItem): string[] {
       .join(" "),
     `Evidencia: ${l.evidencia.join("; ")}.`,
   ];
+}
+
+/** Etiqueta visible: solo las que redacta el equipo (C1, O2…); las del sistema son identificadores internos. */
+export function visibleLabel(item: ChosenItem): string | null {
+  return /^[A-ZÁÉÍÓÚÑ]{1,3}\d{1,3}$/.test(item.etiqueta) ? item.etiqueta : null;
+}
+
+const TIPO_LABEL: Partial<Record<StatementType, string>> = {
+  hecho: "Hecho",
+  interpretacion: "Interpretación",
+  hipotesis: "Hipótesis",
+};
+
+const MAX_VISIBLE_EVIDENCE = 3;
+
+function evidenceLine(evidencia: string[]): string {
+  const shown = evidencia.slice(0, MAX_VISIBLE_EVIDENCE).map((e) => e.replace(/[.\s]+$/, ""));
+  const more = evidencia.length - shown.length;
+  return `Evidencia: ${shown.join("; ")}${more > 0 ? `; y ${more} más` : ""}.`;
+}
+
+/**
+ * Líneas de una conclusión en el bloque de campos fijos (Art. 16 quater, apartado 2),
+ * idénticas en pantalla y documento: etiqueta y tipo con el enunciado, hasta tres
+ * evidencias, sustento, límite principal y recomendaciones a las que lleva.
+ */
+export function conclusionLines(c: ChosenItem, orientations: ReadonlyArray<ChosenItem>): string[] {
+  const label = visibleLabel(c);
+  const tipo = c.tipo !== undefined ? TIPO_LABEL[c.tipo] : undefined;
+  const head = [label, tipo ?? "Sin clasificar"].filter((x): x is string => x !== null).join(" · ");
+  const llevaA =
+    label === null
+      ? []
+      : orientations
+          .filter((o) => (o.derivaDe ?? []).includes(label))
+          .map((o) => visibleLabel(o) ?? o.texto);
+  return [
+    `${head}. ${c.texto}`,
+    evidenceLine(c.evidencia),
+    c.sustento !== undefined
+      ? `Sustento: grado ${c.sustento}${c.relacion !== undefined ? ` (relación ${c.relacion})` : ""}.`
+      : "Sustento: sin relación declarada.",
+    ...(c.cautelas !== undefined ? [`Límite principal: ${c.cautelas.replace(/[.\s]+$/, "")}.`] : []),
+    ...(llevaA.length > 0 ? [`Lleva a: ${llevaA.join(", ")}.`] : []),
+  ];
+}
+
+/** Líneas de una recomendación del Perfil (Art. 8 quater), idénticas en pantalla y documento. */
+export function recommendationLines(o: ChosenItem): string[] {
+  const label = visibleLabel(o);
+  return [
+    `${label !== null ? `${label} · ` : ""}${o.recomendacion !== undefined ? `${RECOMMENDATION_LABEL[o.recomendacion]}. ` : ""}${o.texto}`,
+    [
+      o.derivaDe !== undefined && o.derivaDe.length > 0 ? `Deriva de: ${o.derivaDe.join(", ")}.` : "",
+      o.sustento !== undefined ? `Sustento: grado ${o.sustento}${o.relacion !== undefined ? ` (relación ${o.relacion})` : ""}.` : "",
+      o.cautelas !== undefined ? `Salvedades: ${o.cautelas.replace(/[.\s]+$/, "")}.` : "",
+    ]
+      .filter((x) => x !== "")
+      .join(" "),
+    evidenceLine(o.evidencia),
+  ].filter((x) => x !== "");
 }
