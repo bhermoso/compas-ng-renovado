@@ -320,7 +320,7 @@ describe("visor PSL-C — documento institucional renderizado", () => {
     });
     if (!sin.ok) throw new Error("compilación canónica falló");
     const htmlSin = renderToStaticMarkup(<PSLCArtifactViewer artifact={sin.artifact} />);
-    expect(htmlSin).not.toContain("Orientaciones técnicas");
+    expect(htmlSin).not.toContain("Recomendaciones del Perfil");
   });
 
   it("rinde y distingue la frontera institucional en la vista canónica", () => {

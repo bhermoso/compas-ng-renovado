@@ -3,13 +3,19 @@ import type { AuthoredProposal, RelationDeclaration } from "../../domain/reposit
 import { currentRelations } from "../../application/relations";
 import { draftOrientationFromRelation } from "../../application/proposals";
 import { tipoForAuthored, validateAuthoredProposal } from "../../application/proposals";
-import { STEP_ALLOWED_TYPES, type StatementType } from "../../domain/statements/statementTypes";
+import {
+  RECOMMENDATION_KINDS,
+  RECOMMENDATION_LABEL,
+  STEP_ALLOWED_TYPES,
+  type RecommendationKind,
+  type StatementType,
+} from "../../domain/statements/statementTypes";
 
 const TYPE_LABEL: Record<StatementType, string> = {
   hecho: "Hecho",
   interpretacion: "Interpretación",
   hipotesis: "Hipótesis",
-  orientacion: "Orientación técnica",
+  orientacion: "Recomendación del Perfil",
   percepcion: "Percepción",
   cautela: "Cautela",
   laguna: "Laguna",
@@ -25,13 +31,14 @@ interface AuthoredProposalPanelProps {
 
 /**
  * Cierre interpretativo del equipo técnico (CONTRACT-LHPM v1.6, Art. 16 ter 1 bis):
- * el equipo redacta conclusiones y orientaciones citando la evidencia. Registrar una
+ * el equipo redacta conclusiones y recomendaciones del Perfil citando la evidencia. Registrar una
  * propuesta no la elige: pasa al menú, donde se elige o se descarta.
  */
 export function AuthoredProposalPanel({ proposals, relations = [], onAdd, onRemove }: AuthoredProposalPanelProps) {
   const [id, setId] = useState("");
   const [kind, setKind] = useState<"conclusion" | "orientation">("conclusion");
   const [tipo, setTipo] = useState<"" | StatementType>("");
+  const [recomendacion, setRecomendacion] = useState<"" | RecommendationKind>("");
   const [text, setText] = useState("");
   const [evidence, setEvidence] = useState("");
   const [conclusionIds, setConclusionIds] = useState<string[]>([]);
@@ -51,6 +58,7 @@ export function AuthoredProposalPanel({ proposals, relations = [], onAdd, onRemo
       text: text.trim(),
       evidence: evidence.split("\n").map((l) => l.trim()).filter((l) => l !== ""),
       ...(kind === "orientation" ? { conclusionIds } : {}),
+      ...(kind === "orientation" && recomendacion !== "" ? { recomendacion } : {}),
       ...(kind === "orientation" && relationId !== "" ? { relationId } : {}),
       ...(sustento !== "" ? { sustento: Number(sustento) as 1 | 2 | 3 } : {}),
       ...(cautelas.trim() !== "" ? { cautelas: cautelas.trim() } : {}),
@@ -63,6 +71,7 @@ export function AuthoredProposalPanel({ proposals, relations = [], onAdd, onRemo
     setId("");
     setText("");
     setTipo("");
+    setRecomendacion("");
     setEvidence("");
     setConclusionIds([]);
     setSustento("");
@@ -74,10 +83,11 @@ export function AuthoredProposalPanel({ proposals, relations = [], onAdd, onRemo
     <section className="workspace-panel" aria-labelledby="authored-proposals-title">
       <h2 id="authored-proposals-title">Cierre interpretativo del equipo técnico</h2>
       <p>
-        Redacta conclusiones y orientaciones que no salen de la lectura por tema. Cada una cita su
-        evidencia. Registrar una propuesta no la elige: pasa al menú de propuestas, donde se elige o se
-        descarta. Una orientación deriva de conclusiones registradas, declara el grado de sustento de su
-        relación y no fija responsable, plazo, recurso ni indicador de ejecución.
+        Redacta conclusiones y recomendaciones del Perfil que no salen de la lectura por tema. Cada una
+        cita su evidencia. Registrar una propuesta no la elige: pasa al menú de propuestas, donde se elige
+        o se descarta. Una recomendación deriva de conclusiones registradas, es de tipo Conocer, Contrastar
+        o Abordar, y no fija responsable, plazo, recurso, indicador de ejecución, prioridad ni línea
+        estratégica. Abordar exige una relación de grado 1 o 2.
       </p>
       <label>
         Identificador (p. ej. C1, O1)
@@ -87,7 +97,7 @@ export function AuthoredProposalPanel({ proposals, relations = [], onAdd, onRemo
         Tipo
         <select value={kind} onChange={(e) => setKind(e.target.value as "conclusion" | "orientation")}>
           <option value="conclusion">Conclusión</option>
-          <option value="orientation">Orientación técnica</option>
+          <option value="orientation">Recomendación del Perfil</option>
         </select>
       </label>
       {kind === "conclusion" && (
@@ -111,6 +121,17 @@ export function AuthoredProposalPanel({ proposals, relations = [], onAdd, onRemo
         Evidencia citada (una por línea: documento y localización)
         <textarea rows={3} value={evidence} onChange={(e) => setEvidence(e.target.value)} />
       </label>
+      {kind === "orientation" && (
+        <label>
+          Tipo de recomendación (Art. 8 quater)
+          <select value={recomendacion} onChange={(e) => setRecomendacion(e.target.value as "" | RecommendationKind)}>
+            <option value="">Sin elegir</option>
+            {RECOMMENDATION_KINDS.map((k) => (
+              <option key={k} value={k}>{RECOMMENDATION_LABEL[k]}</option>
+            ))}
+          </select>
+        </label>
+      )}
       {kind === "orientation" && (
         <fieldset>
           <legend>Conclusiones de las que deriva</legend>
@@ -168,7 +189,7 @@ export function AuthoredProposalPanel({ proposals, relations = [], onAdd, onRemo
           <option value="">No se apoya en una relación</option>
           <option value="1">1</option>
           <option value="2">2</option>
-          <option value="3">3 (no sostiene orientación)</option>
+          <option value="3">3 (no sostiene «Abordar»)</option>
         </select>
       </label>
       <label>
@@ -189,7 +210,7 @@ export function AuthoredProposalPanel({ proposals, relations = [], onAdd, onRemo
             <li key={p.id} className="document-row">
               <div>
                 <p className="document-kind">
-                  {p.id} · {p.kind === "conclusion" ? "Conclusión" : "Orientación técnica"} · {p.tipo !== undefined ? TYPE_LABEL[p.tipo] : "sin tipo"} · {p.authoredBy} ·{" "}
+                  {p.id} · {p.kind === "conclusion" ? "Conclusión" : `Recomendación del Perfil${p.recomendacion !== undefined ? ` (${RECOMMENDATION_LABEL[p.recomendacion]})` : ""}`} · {p.tipo !== undefined ? TYPE_LABEL[p.tipo] : "sin tipo"} · {p.authoredBy} ·{" "}
                   {p.authoredAt.slice(0, 10)}
                 </p>
                 <p>{p.text}</p>

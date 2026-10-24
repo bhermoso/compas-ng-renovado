@@ -34,13 +34,31 @@ describe("propuestas del equipo técnico", () => {
   });
 
   it("una orientación exige conclusión registrada, sustento y ninguna actuación operativa", () => {
-    const o = { id: "O1", kind: "orientation" as const, tipo: "orientacion" as const, text: "Valorar X.", evidence: ["F17"], authoredBy: "Equipo", conclusionIds: ["C1"], sustento: 1 as const };
+    const o = { id: "O1", kind: "orientation" as const, tipo: "orientacion" as const, recomendacion: "abordar" as const, text: "Valorar X.", evidence: ["F17"], authoredBy: "Equipo", conclusionIds: ["C1"], sustento: 1 as const };
     expect(validateAuthoredProposal(o, [C1])).toEqual([]);
     expect(validateAuthoredProposal(o, [])).toContain("La conclusión «C1» no está registrada.");
     expect(validateAuthoredProposal({ ...o, sustento: undefined }, [C1])).toContain(
-      "Una orientación declara el grado de sustento de su relación."
+      "Una recomendación de tipo Abordar declara el grado de sustento de su relación."
     );
     expect(validateAuthoredProposal({ ...o, text: "Con presupuesto de 3000 euros." }, [C1]).join()).toContain("recurso");
+  });
+
+  it("la recomendación tiene tipo; Conocer y Contrastar no exigen relación; Abordar sí", () => {
+    const o = { id: "O1", kind: "orientation" as const, tipo: "orientacion" as const, text: "Valorar X.", evidence: ["F17"], authoredBy: "Equipo", conclusionIds: ["C1"] };
+    expect(validateAuthoredProposal(o, [C1]).join()).toContain("tipo de recomendación");
+    expect(validateAuthoredProposal({ ...o, recomendacion: "conocer" }, [C1])).toEqual([]);
+    expect(validateAuthoredProposal({ ...o, recomendacion: "contrastar" }, [C1])).toEqual([]);
+    expect(validateAuthoredProposal({ ...o, recomendacion: "abordar" }, [C1]).join()).toContain("sustento");
+    expect(validateAuthoredProposal({ ...o, recomendacion: "abordar", sustento: 3 }, [C1]).length).toBeGreaterThan(0);
+    expect(validateAuthoredProposal({ ...o, recomendacion: "conocer", text: "Con prioridad alta." }, [C1]).length).toBeGreaterThan(0);
+  });
+
+  it("los registros anteriores sin tipo siguen siendo decidibles; Abordar de grado 3 no se elige, Conocer sí", () => {
+    const base = { ...C1, id: "O1", kind: "orientation" as const, tipo: "orientacion" as const, conclusionIds: ["C1"], sustento: 3 as const };
+    const [, antiguo] = authoredToProposals([C1, base]);
+    expect(validateDecision(antiguo!, { decision: "elegida", decidedBy: "A" }).join()).toContain("grado 1 o 2");
+    const [, conocer] = authoredToProposals([C1, { ...base, recomendacion: "conocer" }]);
+    expect(validateDecision(conocer!, { decision: "elegida", decidedBy: "A" })).toEqual([]);
   });
 
   it("no nacen elegidas y la de grado 3 no se puede elegir", () => {

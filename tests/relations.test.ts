@@ -60,7 +60,7 @@ describe("tabla de relaciones (Arts. 8 bis y 8 ter 2)", () => {
   it("el sustento de una orientación sale de la relación y debe coincidir", () => {
     const rels = addRelationDeclaration(base, draft()).relationDeclarations;
     const c1 = { id: "C1", kind: "conclusion" as const, tipo: "interpretacion" as const, text: "t", evidence: ["e"], authoredBy: "A", authoredAt: "2026-10-22T00:00:00Z" };
-    const o = { id: "O1", kind: "orientation" as const, tipo: "orientacion" as const, text: "Valorar X.", evidence: ["C1"], conclusionIds: ["C1"], relationId: "R1", sustento: 1 as const, authoredBy: "A" };
+    const o = { id: "O1", kind: "orientation" as const, tipo: "orientacion" as const, recomendacion: "abordar" as const, text: "Valorar X.", evidence: ["C1"], conclusionIds: ["C1"], relationId: "R1", sustento: 1 as const, authoredBy: "A" };
     expect(validateAuthoredProposal(o, [c1], rels)).toEqual([]);
     expect(validateAuthoredProposal({ ...o, sustento: undefined }, [c1], rels).join()).toContain("no coincide");
     expect(validateAuthoredProposal(o, [c1], undefined).join()).toContain("no consta en la tabla");

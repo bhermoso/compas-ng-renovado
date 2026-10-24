@@ -1,4 +1,5 @@
 import { conciliationParagraph } from "../../application/health-profile/antecedents";
+import { RECOMMENDATION_LABEL } from "../../domain/statements/statementTypes";
 import type {
   ProfileIntegratedEditorialView,
   CanonicalEditorialView,
@@ -457,9 +458,9 @@ export function ProfileIntegratedEditorialPreview({
         </div>
       </section>
 
-      {/* ── Conclusiones y orientaciones elegidas ───────────────────────────
+      {/* ── Conclusiones y recomendaciones elegidas ───────────────────────────
           Cierran la lectura, en el orden de la cadena (Art. 16 bis): conclusiones
-          y orientaciones técnicas, y después la frontera. Solo lo que el equipo
+          y recomendaciones del Perfil, y después la frontera. Solo lo que el equipo
           técnico ha elegido (Art. 16 ter); la vista canónica y el documento
           sellado llevan el mismo texto (Art. 17 bis). */}
       {"chosenClosing" in view && view.chosenClosing !== undefined ? (
@@ -478,11 +479,12 @@ export function ProfileIntegratedEditorialPreview({
           ) : null}
           {view.chosenClosing.orientations.length > 0 ? (
             <section className="pie-doc-section" aria-labelledby="pie-chosen-orientations-title">
-              <h3 id="pie-chosen-orientations-title" className="pie-section__title">Orientaciones técnicas</h3>
+              <h3 id="pie-chosen-orientations-title" className="pie-section__title">Recomendaciones del Perfil</h3>
               {view.chosenClosing.orientations.map((o) => (
                 <article key={o.etiqueta} className="pie-hilo">
                   <p className="pie-hilo__reading">{o.texto}</p>
                   <p className="pie-hilo__context">
+                    {o.recomendacion !== undefined ? `Tipo: ${RECOMMENDATION_LABEL[o.recomendacion]}. ` : ""}
                     {o.derivaDe !== undefined && o.derivaDe.length > 0 ? `Deriva de: ${o.derivaDe.join(", ")}. ` : ""}
                     {o.sustento !== undefined ? `Sustento de grado ${o.sustento}${o.relacion !== undefined ? ` (relación ${o.relacion})` : ""}. ` : ""}
                     {o.cautelas !== undefined ? `Salvedades: ${o.cautelas}` : ""}

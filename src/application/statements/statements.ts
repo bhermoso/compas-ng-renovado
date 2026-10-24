@@ -8,6 +8,7 @@ import {
   HUMAN_AUTHORSHIP_TYPES,
   STEP_ALLOWED_TYPES,
   type ReadingStep,
+  type RecommendationKind,
   type StatementType,
 } from "../../domain/statements/statementTypes";
 import { checkOrientationText, type Proposal } from "../proposals";
@@ -23,6 +24,8 @@ export interface Statement {
   /** Afirmaciones de las que deriva (ids). */
   derivaDe: string[];
   sustento?: 1 | 2 | 3;
+  /** Tipo de recomendación del Perfil (Art. 8 quater), solo si `tipo` es «orientacion». */
+  recomendacion?: RecommendationKind;
   /** Requiere elección del equipo técnico (conclusiones y orientaciones, Art. 16 ter). */
   requiereEleccion: boolean;
 }
@@ -42,12 +45,14 @@ export function validateStatement(s: Statement): string[] {
     problems.push(`El tipo «${s.tipo}» exige autoría humana y no puede ser compilado (Art. 8).`);
   }
   if (s.tipo === "orientacion") {
-    if (s.sustento === undefined || s.sustento === 3) {
-      problems.push("Una orientación solo se apoya en relaciones de grado 1 o 2 (Art. 8 bis).");
+    // Conocer y Contrastar no exigen relación; Abordar y las anteriores a v2.0 sí (Art. 8 quater).
+    const exigeGrado = s.recomendacion === undefined || s.recomendacion === "abordar";
+    if (exigeGrado && (s.sustento === undefined || s.sustento === 3)) {
+      problems.push("Una recomendación de tipo «Abordar» solo se apoya en relaciones de grado 1 o 2 (Art. 8 bis, 8 quater).");
     }
-    if (s.derivaDe.length === 0) problems.push("Una orientación deriva de al menos una conclusión.");
+    if (s.derivaDe.length === 0) problems.push("Una recomendación deriva de al menos una conclusión.");
     for (const id of checkOrientationText(s.texto)) {
-      problems.push(`La orientación fija una actuación operativa (${id}); corresponde al Plan de Acción.`);
+      problems.push(`La recomendación excede al Perfil (${id}); corresponde al Grupo Motor o al Plan de Acción.`);
     }
   }
   return problems;
@@ -67,6 +72,7 @@ export function statementFromProposal(p: Proposal): Statement | { id: string; pr
     origen: p.origin === "equipo" ? "equipo" : "compilada",
     derivaDe: p.derivedFrom.conclusionIds ?? [],
     ...(p.derivedFrom.sustento !== undefined ? { sustento: p.derivedFrom.sustento } : {}),
+    ...(p.recomendacion !== undefined ? { recomendacion: p.recomendacion } : {}),
     requiereEleccion: true,
   };
 }
