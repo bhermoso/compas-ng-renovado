@@ -91,7 +91,7 @@ describe("enriquecimiento de fuentes — vista de impacto, no cargador", () => {
     expect(html).toContain("56 recursos de Localiza Salud");
     expect(html).toContain("documentos territoriales de contexto");
     expect(html).toContain("marcos estratégicos de referencia");
-    expect(html).toContain("fuente principal de activos");
+    expect(html).toContain("solo los validados cuentan como activos");
     expect(html).toContain("Sin evidencia directa"); // determinantes: pendiente
     expect(html).toContain("no están desagregados"); // desigualdades: pendiente
     expect(html).not.toMatch(
