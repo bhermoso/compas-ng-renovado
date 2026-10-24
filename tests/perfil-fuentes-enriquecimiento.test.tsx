@@ -88,7 +88,7 @@ describe("enriquecimiento de fuentes — vista de impacto, no cargador", () => {
     // Cobertura derivada del expediente vigente, no inventada
     expect(html).toContain("13 estudios complementarios");
     expect(html).toContain("23 indicadores");
-    expect(html).toContain("56 activos de Localiza Salud");
+    expect(html).toContain("56 recursos de Localiza Salud");
     expect(html).toContain("documentos territoriales de contexto");
     expect(html).toContain("marcos estratégicos de referencia");
     expect(html).toContain("fuente principal de activos");
