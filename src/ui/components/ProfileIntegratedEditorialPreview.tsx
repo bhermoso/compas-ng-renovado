@@ -1,5 +1,6 @@
 import { conciliationParagraph } from "../../application/health-profile/antecedents";
 import { RECOMMENDATION_LABEL } from "../../domain/statements/statementTypes";
+import { startingPointParagraphs } from "../../application/health-profile/startingPoint";
 import type {
   ProfileIntegratedEditorialView,
   CanonicalEditorialView,
@@ -100,6 +101,19 @@ export function ProfileIntegratedEditorialPreview({
         </div>
         <p className="pie-doc-open__scale">{view.header.scale}</p>
       </header>
+
+      {/* ── Punto de partida (Art. 16 quater, apartado 1) ─────────────────
+          Mismas líneas que el documento exportado (startingPointParagraphs). */}
+      {"startingPoint" in view && view.startingPoint !== undefined && (
+        <section className="pie-doc-section" aria-labelledby="pie-starting-point-title">
+          <h3 id="pie-starting-point-title" className="pie-section__title">
+            Punto de partida
+          </h3>
+          {startingPointParagraphs(view.startingPoint).map((line, i) => (
+            <p key={i} className="pie-hilo__context">{line}</p>
+          ))}
+        </section>
+      )}
 
       {/* ── Imagen general ──────────────────────────────────────────────── */}
       <section className="pie-doc-section" aria-labelledby="pie-overview-title">

@@ -174,11 +174,13 @@ describe("documento visual — imagen general", () => {
     // GOV-SALIDA-01 (PR-2): el documento v2 proyecta la LECTURA canónica: la
     // apertura es «Imagen general» (la antigua «Salud en síntesis» quedó
     // absorbida por la lectura editorial).
-    expect(titulos[0]).toBe("Imagen general");
+    // Contrato v2.0.0 (Art. 16 quater): el punto de partida precede a la imagen general.
+    expect(titulos[0]).toBe("Punto de partida");
+    expect(titulos[1]).toBe("Imagen general");
     expect(titulos.indexOf("Imagen general")).toBeLessThan(
       titulos.indexOf("Lectura integrada del territorio")
     );
-    const sintesis = model.sections[0];
+    const sintesis = model.sections[1];
     expect(sintesis.kind).toBe("summaryCards");
     const cards = sintesis.cards!;
     expect(cards.length).toBeGreaterThanOrEqual(3);

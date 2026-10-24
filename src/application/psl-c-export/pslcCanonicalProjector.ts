@@ -25,6 +25,7 @@ import type {
 } from "../health-profile";
 import { conciliationParagraph } from "../health-profile/antecedents";
 import { RECOMMENDATION_LABEL } from "../../domain/statements/statementTypes";
+import { startingPointParagraphs } from "../health-profile/startingPoint";
 import type { PSLCDocumentModel, PSLCDocumentSection } from "./pslcDocumentModel";
 import { pslcDocxFileName } from "./pslcDocumentModel";
 
@@ -109,6 +110,15 @@ export function projectCanonicalToDocumentModel(
   const sections: PSLCDocumentSection[] = [];
 
   // ── Lectura editorial ─────────────────────────────────────────────────────
+  if (reading.startingPoint !== undefined) {
+    sections.push({
+      sectionId: "starting-point",
+      title: "Punto de partida",
+      level: 1,
+      paragraphs: startingPointParagraphs(reading.startingPoint),
+    });
+  }
+
   if (reading.overview.length > 0) {
     sections.push({
       sectionId: "overview",
