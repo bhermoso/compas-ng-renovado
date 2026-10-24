@@ -768,12 +768,11 @@ describe("render — perfil de salud local canónico", () => {
 
   it("concentra las piezas centrales en una sola composición, sin duplicarlas", () => {
     expect(html).toContain("Indicadores trazadores: valores y referencias");
-    expect(html).toContain("Qué debe discutir el Grupo Motor");
+    expect(html).not.toContain("Qué debe discutir el Grupo Motor");
     // Cada pieza aparece una sola vez: no hay dos composiciones compitiendo.
     expect(
       html.match(/Indicadores trazadores: valores y referencias/g)
     ).toHaveLength(1);
-    expect(html.match(/Qué debe discutir el Grupo Motor/g)).toHaveLength(1);
   });
 
   it("CONV-A: el borrador vivo es lectura canónica pura; el anexo técnico se subordina en «Espacio técnico del Perfil»", () => {
@@ -903,7 +902,7 @@ describe("render — perfil de salud local canónico", () => {
 
     // Posición canónica: informe-ranking entre «Señales principales por fuente»
     // y «Lectura integrada»; principal-signals entre «Indicadores trazadores» y
-    // «Qué debe discutir el Grupo Motor» (subsecuencia del orden del proyector).
+    // «Cierre de la lectura» (subsecuencia del orden del proyector).
     const i = (s: string): number => canonicalHtml.indexOf(s);
     expect(i("Señales principales por fuente")).toBeLessThan(
       i("Señales sanitarias del Informe de salud")
@@ -915,7 +914,7 @@ describe("render — perfil de salud local canónico", () => {
       i("Señales principales para deliberación")
     );
     expect(i("Señales principales para deliberación")).toBeLessThan(
-      i("Qué debe discutir el Grupo Motor")
+      i("Cierre de la lectura")
     );
   });
 
@@ -958,12 +957,10 @@ describe("composición documental — estructura editorial", () => {
     }
   });
 
-  it("conserva las preguntas del Grupo Motor en la agenda deliberativa", () => {
+  it("la agenda del Grupo Motor se calcula pero ya no es cuerpo del Perfil (contrato v2.0.0)", () => {
     const beforeTechnical = html.slice(0, html.indexOf("Espacio técnico del Perfil"));
     expect(editorialView.groupMotorAgenda.length).toBeGreaterThanOrEqual(5);
-    for (const card of editorialView.groupMotorAgenda) {
-      expect(beforeTechnical).toContain(card.pregunta);
-    }
+    expect(beforeTechnical).not.toContain("Qué debe discutir el Grupo Motor");
   });
 
   it("conserva las cifras clave en la lectura canónica", () => {

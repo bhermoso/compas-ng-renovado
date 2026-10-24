@@ -404,38 +404,6 @@ export function ProfileIntegratedEditorialPreview({
         </section>
       ) : null}
 
-      {/* ── Agenda del Grupo Motor ───────────────────────────────────────── */}
-      {view.groupMotorAgenda.length > 0 && (
-        <section className="pie-doc-section" aria-labelledby="pie-agenda-title">
-          <h3 id="pie-agenda-title" className="pie-section__title">
-            Qué debe discutir el Grupo Motor
-          </h3>
-          <p className="pie-agenda-intro">
-            Cuestiones para contrastar con la experiencia territorial. El Grupo
-            Motor delibera; no recibe prioridades cerradas.
-          </p>
-          <ol className="pie-delibera">
-            {view.groupMotorAgenda.map((card) => (
-              <li key={card.id} className="pie-delibera__item">
-                <div className="pie-delibera__head">
-                  <span className={variantClass(card.variant)} aria-hidden="true" />
-                  <strong className="pie-delibera__tema">{card.tema}</strong>
-                </div>
-                <p className="pie-delibera__senal">{card.senal}</p>
-                <p className="pie-delibera__tension">
-                  <span className="pie-delibera__mechanism-label">Tensión: </span>
-                  {card.mecanismo}
-                  {" — "}
-                  <span className="pie-delibera__oculto-label">Quién puede quedar fuera: </span>
-                  {card.oculto}
-                </p>
-                <p className="pie-delibera__pregunta">{card.pregunta}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
-      )}
-
       {/* ── Cierre de la lectura (columnas generadas) ──────────────────────
           El título canónico de estas columnas es «Cierre de la lectura»; el
           rótulo «Cierre interpretativo» queda reservado para el cierre de

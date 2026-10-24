@@ -349,7 +349,6 @@ export type CanonicalReadingSectionId =
   | "diagnostic-synthesis"
   | "tracer-table"
   | "principal-signals"
-  | "group-motor-agenda"
   | "generated-closing"
   | "chosen-conclusions"
   | "chosen-orientations"
@@ -376,7 +375,6 @@ export const CANONICAL_READING_ORDER = [
   "diagnostic-synthesis",
   "tracer-table",
   "principal-signals",
-  "group-motor-agenda",
   "generated-closing",
   "chosen-conclusions",
   "chosen-orientations",

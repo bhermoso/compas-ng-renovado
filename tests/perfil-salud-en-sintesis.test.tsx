@@ -181,8 +181,8 @@ describe("pantalla — la síntesis se absorbe en la vista integrada; matriz en 
     // Resolución editorial: la composición canónica es el Perfil de Salud Local.
     expect(html).toContain("Lectura territorial del diagnóstico");
     expect(html).not.toContain("Salud en síntesis");
-    // La deliberación con el Grupo Motor sigue presente, ahora en la vista integrada.
-    expect(html).toContain("Qué debe discutir el Grupo Motor");
+    // La agenda del Grupo Motor se retiró del cuerpo (contrato v2.0.0, Art. 16 quater).
+    expect(html).not.toContain("Qué debe discutir el Grupo Motor");
     // El desarrollo capitular largo ya no es cuerpo de la pantalla.
     expect(html).not.toContain("I · Alcance y fuentes");
     // El modelo puro de síntesis sigue siendo la fuente (alimenta la vista integrada).
