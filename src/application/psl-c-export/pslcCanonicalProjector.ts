@@ -399,6 +399,14 @@ export function projectCanonicalToDocumentModel(
     paragraphs: baseParrafos,
   });
 
+  for (const block of technicalSpace.documentarySourceBlocks ?? []) {
+    sections.push({
+      sectionId: block.id as `documento-territorial:${string}`,
+      title: `Extractos de trazabilidad: ${block.title}`, level: 2,
+      paragraphs: [block.whatItDoesNotAllow, ...block.whatItAdds.split("\n\n")],
+    });
+  }
+
   sections.push({
     sectionId: "methodological-cautions",
     title: "Cautelas metodológicas",

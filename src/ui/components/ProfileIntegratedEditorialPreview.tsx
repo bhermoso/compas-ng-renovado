@@ -569,6 +569,13 @@ export function ProfileIntegratedEditorialPreview({
         <details className="pie-annex">
           <summary>{view.technicalAnnex.title}</summary>
           <p>{view.technicalAnnex.summary}</p>
+          {(view.technicalAnnex.documentarySourceBlocks ?? []).map(block => (
+            <div key={block.id}>
+              <h4>Extractos de trazabilidad: {block.title}</h4>
+              <p>{block.whatItDoesNotAllow}</p>
+              {block.whatItAdds.split("\n\n").map((passage, index) => <p key={index}>{passage}</p>)}
+            </div>
+          ))}
           <div className="pie-annex__notes">
             {view.technicalAnnex.matrix.notasBloque.map((note) => (
               <p key={note}>{note}</p>

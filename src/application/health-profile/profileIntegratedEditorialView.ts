@@ -99,6 +99,7 @@ export interface ProfileIntegratedEditorialTechnicalAnnex {
   summary: string;
   tracerRows: TrazadorRow[];
   matrix: MatrizAnexo;
+  documentarySourceBlocks?: ProfileIntegratedEditorialSourceBlock[];
 }
 
 export interface ProfileIntegratedEditorialView {
@@ -1157,32 +1158,6 @@ export function buildProfileIntegratedEditorialView(
     },
   ];
 
-  // Preserve documentary evidence in the SAME model used by screen and exports,
-  // including profiles without atomized studies or assets. Topic detection is
-  // explicitly distinguished from a measured local condition.
-  const findings = answers.desigualdadTerritorial.documentaryFindings ?? [];
-  for (const documentId of new Set(findings.map((finding) => finding.documentId))) {
-    const passages = findings.filter((finding) => finding.documentId === documentId);
-    const source = passages[0];
-    sourceBlocks.push({
-      id: `documento-territorial:${documentId}`,
-      title: source.title,
-      whatItAdds: passages.map((finding) =>
-        `${finding.theme}: «${finding.quote.trim()}» ` +
-        `(texto conservado, caracteres ${finding.start + 1}–${finding.end}). ${finding.question}`
-      ).join("\n\n"),
-      whatItDoesNotAllow:
-        `Fuente: ${source.sourceFileName ?? source.title}; documento ${documentId}. ` +
-        `Escala declarada: ${source.scale === "unknown" ? "no declarada" : source.scale}. ` +
-        `Año de referencia: ${source.referenceYear ?? "no declarado en los metadatos; consultar el original"}. ` +
-        "Estos pasajes acreditan los asuntos tratados por la fuente. Su presencia no demuestra " +
-        "magnitud, vigencia actual, concentración de desventaja ni causalidad sanitaria local. " +
-        "El contraste con los resultados de salud y las capacidades del territorio requiere comprobar " +
-        "a qué población y periodo se refieren y quién encuentra barreras de acceso",
-      variant: "equidad",
-    });
-  }
-
   const closing = buildClosingColumns({
     answers,
     synthesis,
@@ -1217,6 +1192,7 @@ export function buildProfileIntegratedEditorialView(
     groupMotorAgenda: visuals.grupoMotorCards,
     closing,
     technicalAnnex: {
+      documentarySourceBlocks: buildDocumentarySourceBlocks(answers),
       title: "Lectura territorial ampliada y anexo técnico",
       summary:
         `${formatCount(visuals.tablaTrazadores.length, "trazador", "trazadores")}, ` +
@@ -1229,4 +1205,28 @@ export function buildProfileIntegratedEditorialView(
       },
     },
   };
+}
+
+/** Search excerpts are technical evidence locators, never diagnostic prose. */
+export function buildDocumentarySourceBlocks(answers: DiagnosticAnswers): ProfileIntegratedEditorialSourceBlock[] {
+  const findings = answers.desigualdadTerritorial.documentaryFindings ?? [];
+  return [...new Set(findings.map(finding => finding.documentId))].map(documentId => {
+    const passages = findings.filter(finding => finding.documentId === documentId);
+    const source = passages[0];
+    return {
+      id: `documento-territorial:${documentId}`,
+      title: source.title,
+      whatItAdds: passages.map(finding =>
+        `Extracto indexado por «${finding.theme}»: «${finding.quote.trim()}» ` +
+        `(caracteres ${finding.start + 1}–${finding.end})`
+      ).join("\n\n"),
+      whatItDoesNotAllow:
+        `Fuente: ${source.sourceFileName ?? source.title}; documento ${documentId}. ` +
+        `Escala declarada: ${source.scale === "unknown" ? "no declarada" : source.scale}. ` +
+        `Año declarado en metadatos: ${source.referenceYear ?? "no consta"}. ` +
+        "Fragmentos de búsqueda para localizar la fuente; pueden estar incompletos. " +
+        "No constituyen una síntesis epidemiológica ni acreditan vigencia actual o causalidad local",
+      variant: "equidad",
+    };
+  });
 }

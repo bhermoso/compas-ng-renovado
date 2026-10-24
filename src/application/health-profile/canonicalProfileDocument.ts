@@ -36,7 +36,7 @@ import type {
   ProfileIntegratedEditorialClosingColumn,
   ProfileIntegratedDiagnosticSynthesis,
 } from "./profileIntegratedEditorialView";
-import { buildProfileIntegratedEditorialView } from "./profileIntegratedEditorialView";
+import { buildDocumentarySourceBlocks, buildProfileIntegratedEditorialView } from "./profileIntegratedEditorialView";
 import type { IntegratedInterpretation } from "./integratedInterpretation";
 import type { TrazadorRow, GrupoMotorCard } from "./profileDiagnosticVisuals";
 import { buildDiagnosticVisuals } from "./profileDiagnosticVisuals";
@@ -260,6 +260,7 @@ export interface CanonicalTechnicalSpace {
   epistemicMatrix: CanonicalEpistemicMatrixRow[];
   epistemicMatrixNotes: string[];
   knowledgeState: CanonicalKnowledgeState | null;
+  documentarySourceBlocks?: ProfileIntegratedEditorialSourceBlock[];
 }
 
 /** Procedencia sellada (trazabilidad diagnóstica). NO se renderiza. */
@@ -357,6 +358,7 @@ export type CanonicalReadingSectionId =
 
 export type CanonicalTechnicalSectionId =
   | "documentary-base"
+  | `documento-territorial:${string}`
   | "methodological-cautions"
   | "comparative-references"
   | "epistemic-matrix"
@@ -652,6 +654,7 @@ export function buildCanonicalTechnicalSpace(
   return {
     kind: "canonical-technical-space",
     documentaryBase: ctx.documentaryBase,
+    documentarySourceBlocks: buildDocumentarySourceBlocks(ctx.answers),
     cautions: ctx.cautions,
     comparativeReferences: ctx.answers.referencias.references.map(
       referenceToComparative

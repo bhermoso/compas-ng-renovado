@@ -1,5 +1,7 @@
 # Revisión del Perfil completo · 24 de octubre de 2026
 
+> **Corrección editorial tras revisión del usuario.** La salida descrita abajo no es un modelo de Perfil aceptable. Se confundió recuperación de fragmentos con redacción diagnóstica y se colocaron recortes incompletos y preguntas de plantilla en el cuerpo del documento. La revisión visual y las pruebas técnicas no acreditaban la calidad de esa prosa. Se retira ese ensamblado del cuerpo de los nuevos documentos; los extractos se conservan en el anexo técnico, rotulados como localizadores incompletos. Se mantiene intacta la procedencia, el estado no validado y las versiones ya selladas. Esta corrección no implementa aún la síntesis epidemiológica sustantiva. Las cifras y la comparación antes/después del informe siguiente describen el bloque anterior, no la composición editorial corregida.
+
 Base: `bhermoso/compas-ng-renovado`, `master`, `667351ff4f2e0ff487487085dbc096da1ff6469c`. El remoto y la copia local coincidían al comenzar. No se han modificado contratos fundacionales ni expedientes del usuario.
 
 ## Resultado comprobable

@@ -25,12 +25,17 @@ describe("Perfil completo: documentación → lectura → sello → exportación
     expect(doc.editorialView.pendingDeclaration).not.toContain("este Perfil es válido");
     const restored = readSealedCanonicalDocument(JSON.parse(JSON.stringify(sealCanonicalProfileDocument(doc))))!;
     expect(restored.editorialView.sourceBlocks).toEqual(doc.editorialView.sourceBlocks);
+    expect(restored.technicalSpace.documentarySourceBlocks).toHaveLength(4);
+    expect(restored.technicalSpace.documentarySourceBlocks).toEqual(doc.technicalSpace.documentarySourceBlocks);
+    expect(JSON.stringify(restored.editorialView)).not.toContain("caracteres ");
     const model = projectCanonicalToDocumentModel(restored.editorialView, restored.technicalSpace, {
       title: "Revisión", subtitle: "Borrador", fileName: "review.pdf", portada: [],
       traceability: { sourceHash: "test", artifactId: "test", sourcePSLId: psl.id,
         sourcePSLVersion: psl.version, sourcePSLEvidenceStoreVersion: psl.evidenceStoreVersion, frozenEvidenceAtomCount: 0 },
     });
     const exported = JSON.stringify(model);
+    const appendix = model.sections.findIndex(section => section.title === "Anexo técnico");
+    expect(model.sections.filter(section => section.sectionId?.startsWith("documento-territorial:")).every(section => model.sections.indexOf(section) > appendix)).toBe(true);
     for (const finding of findings) {
       expect(exported).toContain(JSON.stringify(finding.quote.trim()).slice(1, -1));
       expect(exported).toContain(finding.documentId);
