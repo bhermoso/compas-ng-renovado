@@ -895,7 +895,7 @@ describe("render — perfil de salud local canónico", () => {
       <ProfileIntegratedEditorialPreview view={canonicalView} />
     );
     expect(canonicalHtml).toContain("Señales sanitarias del Informe de salud");
-    expect(canonicalHtml).toContain("Señales principales para deliberación");
+    expect(canonicalHtml).not.toContain("Señales principales para deliberación");
     // Reutiliza la gramática visual existente (sin CSS nuevo).
     expect(canonicalHtml).toContain("pv-bar__relleno pv--informe");
     expect(canonicalHtml).toContain('class="pslc-viewer__senales"');
@@ -910,12 +910,7 @@ describe("render — perfil de salud local canónico", () => {
     expect(i("Señales sanitarias del Informe de salud")).toBeLessThan(
       i("Lectura integrada del territorio")
     );
-    expect(i("Indicadores trazadores")).toBeLessThan(
-      i("Señales principales para deliberación")
-    );
-    expect(i("Señales principales para deliberación")).toBeLessThan(
-      i("Cierre de la lectura")
-    );
+    expect(i("Indicadores trazadores")).toBeLessThan(i("Cierre de la lectura"));
   });
 
   it("el fragmento editorial no usa lenguaje de decisión ni fórmulas de plantilla", () => {

@@ -284,18 +284,9 @@ describe("documento visual — tabla de trazadores", () => {
 // ══════════════════════════════════════════════════════════════════════════════
 
 describe("documento visual — deliberación y Grupo Motor", () => {
-  it("las señales principales acompañan al documento principal", () => {
-    const seccion = model.sections.find(
-      (s) => s.title === "Señales principales para deliberación"
-    );
-    expect(seccion).toBeDefined();
-    expect(seccion!.kind).toBe("compactSignalList");
-    for (const item of seccion!.signalList!) {
-      expect(item.grupo.length).toBeGreaterThan(3);
-      expect(item.senal.length).toBeGreaterThan(10);
-      expect(item.fuente.length).toBeGreaterThan(3);
-      expect(item.pregunta.length).toBeGreaterThan(10);
-    }
+  it("las señales para deliberación ya no son sección del documento (contrato v2.0.0, Art. 16 quater)", () => {
+    expect(model.sections.find((s) => s.title === "Señales principales para deliberación")).toBeUndefined();
+    expect(model.sections.some((s) => s.kind === "compactSignalList")).toBe(false);
   });
 
   it("la agenda del Grupo Motor ya no es sección del documento (contrato v2.0.0, Art. 16 quater)", () => {
