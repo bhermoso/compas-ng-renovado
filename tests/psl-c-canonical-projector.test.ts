@@ -161,10 +161,8 @@ describe("proyección — paridad de contenido con la vista canónica", () => {
     expect(byId.get("epistemic-matrix")!.table!.rows.length).toBe(
       norm!.technicalSpace.epistemicMatrix.length
     );
-    // Señales principales (visualización de la lectura restaurada).
-    expect(byId.get("principal-signals")!.signalList!.length).toBe(
-      norm!.editorialView.principalSignals.length
-    );
+    // Señales principales para deliberación: retiradas del cuerpo (contrato v2.0.0).
+    expect(byId.has("principal-signals")).toBe(false);
     // Ranking del Informe presente sii la lectura lo lleva.
     expect(byId.has("informe-ranking")).toBe(
       norm!.editorialView.informeSignalRanking !== null

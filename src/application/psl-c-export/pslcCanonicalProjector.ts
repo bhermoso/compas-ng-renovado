@@ -260,23 +260,6 @@ export function projectCanonicalToDocumentModel(
     });
   }
 
-  if (reading.principalSignals.length > 0) {
-    sections.push({
-      sectionId: "principal-signals",
-      title: "Señales principales para deliberación",
-      level: 1,
-      kind: "compactSignalList",
-      signalList: reading.principalSignals.map((s) => ({
-        grupo: s.grupo,
-        senal: s.senal,
-        fuente: s.fuente,
-        pregunta: s.pregunta,
-      })),
-      paragraphs: [],
-    });
-  }
-
-
   sections.push({
     sectionId: "generated-closing",
     title: "Cierre de la lectura",

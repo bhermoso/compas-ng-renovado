@@ -380,30 +380,6 @@ export function ProfileIntegratedEditorialPreview({
         </section>
       )}
 
-      {/* ── Señales principales para deliberación ─────────────────────────────
-          Visualización de la lectura presente SOLO en la vista canónica sellada
-          (`view.principalSignals`), en paridad de PRESENCIA con el proyector, que
-          ya la emite (Art. 17 bis). Reutiliza `pslc-viewer__senales`; sin CSS
-          nuevo. El borrador legacy no lleva este campo y no la muestra. */}
-      {"principalSignals" in view && view.principalSignals.length > 0 ? (
-        <section
-          className="pie-doc-section"
-          aria-labelledby="pie-principal-signals-title"
-        >
-          <h3 id="pie-principal-signals-title" className="pie-section__title">
-            Señales principales para deliberación
-          </h3>
-          <ul className="pslc-viewer__senales">
-            {view.principalSignals.map((senal) => (
-              <li key={senal.grupo + senal.senal}>
-                <strong>{senal.grupo}</strong> — {senal.senal} ({senal.fuente}).{" "}
-                <em>{senal.pregunta}</em>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
       {/* ── Cierre de la lectura (columnas generadas) ──────────────────────
           El título canónico de estas columnas es «Cierre de la lectura»; el
           rótulo «Cierre interpretativo» queda reservado para el cierre de
