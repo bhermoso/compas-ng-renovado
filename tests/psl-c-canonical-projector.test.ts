@@ -214,7 +214,9 @@ describe("proyección — despacho v2 frente a fallback legacy", () => {
     const legacy = buildPSLCDocumentModel(caso.legacy);
     // v2: secciones con identidad canónica y apertura de lectura.
     expect(v2.sections.some((s) => s.sectionId === "overview")).toBe(true);
-    expect(v2.sections[0].title).toBe("Imagen general");
+    // Contrato v2.0.0 (Art. 16 quater): el cuerpo abre con el punto de partida.
+    expect(v2.sections[0].title).toBe("Punto de partida");
+    expect(v2.sections[1].title).toBe("Imagen general");
     // legacy: sin canonicalDocument, sin sectionId, forma textual clásica.
     expect(caso.legacy.canonicalDocument).toBeUndefined();
     expect(legacy.sections.every((s) => s.sectionId === undefined)).toBe(true);

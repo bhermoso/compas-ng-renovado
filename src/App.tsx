@@ -4020,6 +4020,9 @@ export default function App() {
               onRemoveConciliation={handleRemoveConciliation}
               onAddAssetValidation={handleAddAssetValidation}
               onRemoveAssetValidation={handleRemoveAssetValidation}
+              assetResources={runtime.workspace.evidenceStore.atoms
+                .filter((a) => a.kind === "asset")
+                .map((a) => ({ id: a.id, title: a.title, documentId: a.provenance.documentId ?? "" }))}
             />
 
             {/* ── BLOQUE 4: Añadir o sustituir fuentes ── */}

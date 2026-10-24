@@ -874,8 +874,8 @@ function buildClosingColumns(input: {
   const humanQuestion = firstHumanOpenQuestion(answers);
   const assetsText =
     answers.salutogenica.totalAssets > 0
-      ? `${answers.salutogenica.totalAssets} recursos de Localiza Salud quedan como fuente principal de activos y capacidades potenciales, pendientes de acceso, uso y reconocimiento.`
-      : "El expediente no incorpora todavía activos Localiza Salud suficientes para leer capacidades.";
+      ? `${formatCount(answers.salutogenica.totalAssets, "recurso", "recursos")} de Localiza Salud ${answers.salutogenica.totalAssets === 1 ? "queda" : "quedan"} como capacidad potencial${validatedCount(answers)}, pendientes de acceso, uso y reconocimiento.`
+      : "El expediente no incorpora todavía recursos de Localiza Salud para leer capacidades.";
   const tracerReferenceCount = answers.referencias.references.filter(
     (r) => r.tracerPriority !== undefined
   ).length;
@@ -1052,6 +1052,15 @@ function interpretationUnitToReadingBlock(
   };
 }
 
+
+/** «; N son activos validados» según la declaración de validación (Art. 9 bis). */
+function validatedCount(answers: DiagnosticAnswers): string {
+  const n = answers.puntoDePartida?.activosValidados ?? 0;
+  return n === 0
+    ? "; ninguno consta como activo validado"
+    : `; ${n} ${n === 1 ? "consta como activo validado" : "constan como activos validados"}`;
+}
+
 export function buildProfileIntegratedEditorialView(
   answers: DiagnosticAnswers,
   opts: BuildProfileIntegratedEditorialViewOptions
@@ -1125,8 +1134,8 @@ export function buildProfileIntegratedEditorialView(
       : "sin estudios complementarios incorporados; esta ausencia queda declarada como alcance del diagnóstico";
   const assetsSourceText =
     answers.salutogenica.totalAssets > 0
-      ? `${formatCount(answers.salutogenica.totalAssets, "recurso", "recursos")} de Localiza Salud como fuente principal de activos, inventariados como capacidades potenciales`
-      : "sin activos Localiza Salud incorporados todavía";
+      ? `${formatCount(answers.salutogenica.totalAssets, "recurso", "recursos")} de Localiza Salud, inventariados como capacidades potenciales${validatedCount(answers)}`
+      : "sin recursos de Localiza Salud incorporados todavía";
 
   const sourceBlocks: ProfileIntegratedEditorialSourceBlock[] = [
     {

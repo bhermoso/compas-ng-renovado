@@ -26,6 +26,7 @@ import type {
 import type { PSLCSealedCanonicalDocument } from "../../domain/health-profile-artifact";
 import type { DiagnosticAnswers } from "./diagnosticAnswers";
 import type { CanonicalAntecedents } from "./antecedents";
+import type { CanonicalStartingPoint } from "./startingPoint";
 import type { CanonicalReadingUnits } from "../localiza-assets";
 import type { CanonicalChosenClosing } from "../proposals";
 import type {
@@ -224,6 +225,8 @@ export interface CanonicalBuildContext {
 export interface CanonicalEditorialView {
   kind: "canonical-editorial-view";
   header: ProfileIntegratedEditorialHeader;
+  /** Punto de partida (Art. 16 quater, apartado 1). La clave no existe en sellos anteriores. */
+  startingPoint?: CanonicalStartingPoint;
   overview: ProfileIntegratedEditorialOverviewMessage[];
   sourceBlocks: ProfileIntegratedEditorialSourceBlock[];
   /** Ranking de peso textual del Informe (visualización de la lectura). null si no hay Informe. */
@@ -283,6 +286,7 @@ export interface SealedCanonicalProfileDocumentV2 {
   schemaVersion: 2;
   editorialView: {
     header: ProfileIntegratedEditorialHeader;
+    startingPoint?: CanonicalStartingPoint;
     overview: ProfileIntegratedEditorialOverviewMessage[];
     sourceBlocks: ProfileIntegratedEditorialSourceBlock[];
     territorialReadings: ProfileIntegratedEditorialReadingBlock[];
@@ -338,6 +342,7 @@ export function isLegacyEditorialView(
 // ── Identidades y orden de sección (paridad por ID, no por título) ───────────
 
 export type CanonicalReadingSectionId =
+  | "starting-point"
   | "overview"
   | "source-blocks"
   | `documento-territorial:${string}`
@@ -364,6 +369,7 @@ export type CanonicalTechnicalSectionId =
   | "traceability";
 
 export const CANONICAL_READING_ORDER = [
+  "starting-point",
   "overview",
   "source-blocks",
   "informe-ranking",
@@ -616,6 +622,9 @@ export function buildCanonicalEditorialView(
   return {
     kind: "canonical-editorial-view",
     header: ov.header,
+    ...(ctx.answers.puntoDePartida !== undefined
+      ? { startingPoint: ctx.answers.puntoDePartida }
+      : {}),
     overview: ov.overview,
     sourceBlocks: ov.sourceBlocks,
     informeSignalRanking,
@@ -829,6 +838,7 @@ export function normalizeSealedCanonicalProfileDocument(
     editorialView: {
       kind: "canonical-editorial-view",
       header: ev.header,
+      ...(ev.startingPoint !== undefined ? { startingPoint: ev.startingPoint } : {}),
       overview: ev.overview,
       sourceBlocks: ev.sourceBlocks,
       informeSignalRanking: ev.informeSignalRanking ?? null,

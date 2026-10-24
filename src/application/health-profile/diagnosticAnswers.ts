@@ -60,6 +60,8 @@ import {
   buildUGCAssistanceQuestions,
 } from "../ugc-clinical-assistance";
 import { territorialLexicon, type TerritorialLexicon } from "./territorialGrammar";
+import { buildStartingPoint, type CanonicalStartingPoint } from "./startingPoint";
+import { getPopulationReferenceSet } from "../sam/populationReferenceRegistry";
 import {
   buildAntecedents,
   excludeHistoricalSources,
@@ -139,6 +141,8 @@ export interface DiagnosticAnswers {
    * el expediente no declara ninguna: la ausencia deja el Perfil como estaba.
    */
   antecedentes?: CanonicalAntecedents;
+  /** Punto de partida del Perfil (Art. 16 quater, apartado 1). */
+  puntoDePartida?: CanonicalStartingPoint;
   /** Conocimiento del técnico agrupado por espacio funcional. */
   porEspacio: Partial<Record<ProfileSpace, SpaceKnowledge>>;
   healthReport: HealthReportReading;
@@ -804,8 +808,41 @@ export function buildDiagnosticAnswers(
     fullWorkspace.repository.proposalDecisions
   );
 
+  const STRUCTURED_STUDIES: Array<[unknown, string]> = [
+    [workspace.ibseStudy, "IBSE"],
+    [workspace.dukeStudy, "DUKE-EAS"],
+    [workspace.predimedStudy, "PREDIMED-EAS"],
+    [workspace.sf12Study, "SF-12 EAS"],
+    [workspace.suenoStudy, "Sueño EAS"],
+    [workspace.cageStudy, "CAGE-EAS"],
+    [workspace.auditcStudy, "AUDIT-C"],
+    [workspace.ipaqStudy, "IPAQ-EAS"],
+    [workspace.ghq12Study, "GHQ-12"],
+    [workspace.phq9Study, "PHQ-9"],
+    [workspace.psqiStudy, "PSQI"],
+    [workspace.fagerstromStudy, "Fagerström"],
+    [workspace.sbqStudy, "SBQ"],
+  ];
+  const puntoDePartida = buildStartingPoint({
+    municipalityName: fullWorkspace.municipality.identity.name,
+    province: fullWorkspace.municipality.identity.province,
+    ineCode: fullWorkspace.municipality.identity.ineCode,
+    documents: fullWorkspace.repository.documents,
+    badea: getBadeaMunicipalContext(fullWorkspace.municipality.identity.id),
+    ...(() => {
+      const r = getPopulationReferenceSet(fullWorkspace.municipality.identity.id).allAges;
+      return r !== undefined ? { population: { total: r.populationTotal, source: r.source, year: r.year } } : {};
+    })(),
+    structuredStudies: STRUCTURED_STUDIES.filter(([s]) => Boolean(s)).map(([, l]) => l),
+    assetsTotal: activosLocaliza.records.length + activosLocaliza.unstructured.length,
+    assetsValidated: activosLocaliza.records.filter((r) => r.estado === "validado").length,
+    hasThematicPrioritisation: workspace.thematicPrioritisationStudy != null,
+    axes: currentAxes(fullWorkspace.repository.readingAxes),
+  });
+
   return {
     ...(antecedentes !== undefined ? { antecedentes } : {}),
+    puntoDePartida,
     porEspacio: knowledgeBySpace(workspace.perfilLocalDeSalud),
     healthReport: readHealthReport(workspace),
     determinantes: inferSocialEpidemiologyDeterminants(

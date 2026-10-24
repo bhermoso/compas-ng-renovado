@@ -52,27 +52,28 @@ const labelOf = (id: string) => THEMATIC_TOPICS.find((t) => t.id === id)?.label 
 /** Recuento con el estado declarado: «validado» solo si el equipo técnico lo declaró. */
 function assetCountLabel(assets: ReadonlyArray<{ estado: string }>): string {
   const validated = assets.filter((a) => a.estado === "validado").length;
-  if (validated === 0) return plural(assets.length, "activo", "activos");
+  // Un registro de Localiza es un recurso; solo es activo cuando consta su validación (Art. 9 bis).
+  if (validated === 0) return plural(assets.length, "recurso", "recursos");
   if (validated === assets.length) {
     return plural(assets.length, "activo validado", "activos validados");
   }
-  return `${plural(assets.length, "activo", "activos")} (${plural(validated, "declarado validado", "declarados validados")})`;
+  return `${plural(assets.length, "recurso", "recursos")} (${plural(validated, "activo validado", "activos validados")})`;
 }
 
 function crossingStatement(crossing: CapacityVoiceCrossing, voiceSourceAvailable: boolean): string {
   switch (crossing) {
     case "voz-y-activo-registrado":
-      return "La ciudadanía lo señaló y Localiza registra activos con temática correspondiente a este tema.";
+      return "La ciudadanía lo señaló y Localiza registra recursos con temática correspondiente a este tema.";
     case "voz-sin-activo-registrado":
-      return "La ciudadanía lo señaló y Localiza no registra activos con temática correspondiente a este tema: es una laguna del mapa de activos, no la ausencia del recurso.";
+      return "La ciudadanía lo señaló y Localiza no registra recursos con temática correspondiente a este tema: es una laguna del mapa de Localiza, no la ausencia del recurso.";
     case "eje-con-activo-registrado":
-      return "Eje declarado por el equipo técnico: Localiza registra activos con las temáticas que el equipo conectó con el eje. La priorización ciudadana no recoge este eje.";
+      return "Eje declarado por el equipo técnico: Localiza registra recursos con las temáticas que el equipo conectó con el eje. La priorización ciudadana no recoge este eje.";
     case "eje-sin-activo-registrado":
-      return "Eje declarado por el equipo técnico: el Informe trata sus dimensiones y Localiza no registra activos con las temáticas que el equipo conectó con el eje: es una laguna del mapa de activos, no la ausencia del recurso. La priorización ciudadana no recoge este eje.";
+      return "Eje declarado por el equipo técnico: el Informe trata sus dimensiones y Localiza no registra recursos con las temáticas que el equipo conectó con el eje: es una laguna del mapa de Localiza, no la ausencia del recurso. La priorización ciudadana no recoge este eje.";
     case "activo-registrado-sin-voz":
       return voiceSourceAvailable
-        ? "Localiza registra activos con temática correspondiente y la ciudadanía no marcó este tema en la priorización."
-        : "Localiza registra activos con temática correspondiente; no consta priorización ciudadana temática.";
+        ? "Localiza registra recursos con temática correspondiente y la ciudadanía no marcó este tema en la priorización."
+        : "Localiza registra recursos con temática correspondiente; no consta priorización ciudadana temática.";
   }
 }
 
@@ -151,14 +152,14 @@ export function buildCanonicalReadingUnits(
   const sinCorrespondencia = derivation.assetsWithoutValidatedCorrespondence;
   if (sinCorrespondencia.length > 0) {
     gaps.push(
-      `${plural(sinCorrespondencia.length, "activo", "activos")} de Localiza cuya temática no corresponde a ningún tema de la priorización ` +
+      `${plural(sinCorrespondencia.length, "recurso", "recursos")} de Localiza cuya temática no corresponde a ningún tema de la priorización ` +
         `(${sinCorrespondencia.map((a) => `${a.nombre}: ${a.tematicas.join(", ") || "sin temática"}`).join("; ")}): ` +
         `no cuenta${sinCorrespondencia.length === 1 ? "" : "n"} en ninguna unidad.`
     );
   }
   if (unstructuredAssets > 0) {
     gaps.push(
-      `${plural(unstructuredAssets, "activo", "activos")} sin la estructura de una fila de Localiza: no se cruza${unstructuredAssets === 1 ? "" : "n"}.`
+      `${plural(unstructuredAssets, "recurso", "recursos")} sin la estructura de una fila de Localiza: no se cruza${unstructuredAssets === 1 ? "" : "n"}.`
     );
   }
 
@@ -168,11 +169,11 @@ export function buildCanonicalReadingUnits(
   ]).size;
   const assetsSummary =
     leidos > 0
-      ? `Localiza Salud: ${plural(leidos, "activo leído", "activos leídos")} en el expediente` +
+      ? `Localiza Salud: ${plural(leidos, "recurso leído", "recursos leídos")} en el expediente` +
         (validatedAssets > 0
-          ? `, de los cuales ${validatedAssets} ${validatedAssets === 1 ? "consta declarado" : "constan declarados"} como validado${validatedAssets === 1 ? "" : "s"} por el equipo técnico con los criterios de registro y validación de activos para la salud en Andalucía. `
-          : `. `) +
-        `Un activo cuenta en cada tema que le corresponda según sus temáticas de Localiza, por lo que los recuentos por tema no se suman.`
+          ? `, de los cuales ${validatedAssets} ${validatedAssets === 1 ? "consta declarado" : "constan declarados"} como activo${validatedAssets === 1 ? "" : "s"} validado${validatedAssets === 1 ? "" : "s"} por el equipo técnico con los criterios de registro y validación de activos para la salud en Andalucía. `
+          : `; ninguno consta declarado como activo validado. `) +
+        `Un recurso cuenta en cada tema que le corresponda según sus temáticas de Localiza, por lo que los recuentos por tema no se suman.`
       : undefined;
 
   return {
