@@ -24,6 +24,9 @@ export interface CanonicalStartingPointSource {
 
 export interface CanonicalStartingPoint {
   municipio: string;
+  /** Recursos de Localiza leídos y, de ellos, activos con validación declarada. */
+  recursos: number;
+  activosValidados: number;
   /** Población con fuente y año, o la declaración de que no consta. */
   poblacion: string;
   /** Contexto oficial verificado del ámbito (BADEA/IECA), con fuente y año. */
@@ -141,7 +144,7 @@ export function buildStartingPoint(input: BuildStartingPointInput): CanonicalSta
   }
   incorporado.push(
     input.assetsTotal > 0
-      ? `Recursos de Localiza Salud: ${input.assetsTotal}, de los que ${input.assetsValidated} tienen validación territorial declarada.`
+      ? `Recursos de Localiza Salud: ${input.assetsTotal}, de los que ${input.assetsValidated} ${input.assetsValidated === 1 ? "consta como activo validado" : "constan como activos validados"}.`
       : "Recursos de Localiza Salud: ninguno."
   );
   incorporado.push(
@@ -159,7 +162,7 @@ export function buildStartingPoint(input: BuildStartingPointInput): CanonicalSta
   if (input.structuredStudies.length === 0) noConsta.push("Estudios complementarios con indicadores estructurados.");
   if (!input.hasThematicPrioritisation) noConsta.push("Priorización ciudadana temática.");
   if (input.assetsTotal > 0 && input.assetsValidated === 0) {
-    noConsta.push("Validación territorial de los recursos de Localiza Salud.");
+    noConsta.push("Activos validados entre los recursos de Localiza Salud.");
   }
   if (input.axes.length === 0) noConsta.push("Ejes de lectura declarados por el equipo técnico.");
   const sinAnio = fuentes.filter((f) => f.anio === "año no declarado").length;
@@ -168,6 +171,8 @@ export function buildStartingPoint(input: BuildStartingPointInput): CanonicalSta
 
   return {
     municipio,
+    recursos: input.assetsTotal,
+    activosValidados: input.assetsValidated,
     poblacion:
       input.population !== undefined
         ? `${input.population.total.toLocaleString("es-ES")} habitantes (${input.population.source}).`

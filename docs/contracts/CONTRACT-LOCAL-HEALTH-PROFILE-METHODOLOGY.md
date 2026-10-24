@@ -1,7 +1,7 @@
 # CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY
 
 > Contrato metodológico canónico del Perfil de Salud Local (PSL) en COMPÁS NG.
-> Versión 2.0.0 — 2026-10-23 (historial en el registro de revisiones)
+> Versión 2.1.0 — 2026-10-24 (historial en el registro de revisiones)
 > Estado: VIGENTE
 >
 > Este contrato define qué debe ser metodológicamente un Perfil de Salud Local,
@@ -291,12 +291,14 @@ Un Perfil que solo diagnostica déficits viola su función metodológica.
 
 ### Art. 9 bis. Estatuto de los activos y patrones de cruce
 
-**Estatuto.** Solo cuenta como activo del Perfil el que consta en Localiza Salud. Un mapa previo de recursos (guía local, anexo de un perfil anterior, memoria participativa) no está validado: se conserva como candidato y sigue tres estados, cada paso con decisión humana:
+**Recurso y activo.** Un registro de Localiza Salud es un **recurso** del territorio. Es **activo para la salud** cuando consta su validación conforme a los criterios de registro y validación de activos para la salud en Andalucía, que incluyen su identificación por la comunidad. La validación la declara una persona, por recurso o para todo el documento; el sistema no la infiere. El Perfil nombra cada registro por su estatuto: un recurso sin validación declarada es capacidad potencial y no se presenta como activo.
+
+**Estatuto.** Solo entra en la lectura del Perfil lo que consta en Localiza Salud. Un mapa previo de recursos (guía local, anexo de un perfil anterior, memoria participativa) no está validado: se conserva como candidato y sigue tres estados, cada paso con decisión humana:
 
 | Estado | Entra en la lectura | Presentación |
 |---|---|---|
 | Candidato previo, sin coincidencia en Localiza | No | Lista de revisión, «pendiente de reconciliación» |
-| Revisado y registrado en Localiza Salud | Sí | Activo con fuente Localiza |
+| Revisado y registrado en Localiza Salud | Sí | Recurso con fuente Localiza (capacidad potencial) |
 | Validado | Sí | Activo validado |
 
 La coincidencia entre un candidato y Localiza la declara una persona.
@@ -305,9 +307,9 @@ La coincidencia entre un candidato y Localiza la declara una persona.
 
 | Patrón | Afirma | No afirma |
 |---|---|---|
-| Correspondencia | Necesidad documentada, activo registrado y voz coinciden | Que el activo funcione, llegue o se use |
-| Activo sin necesidad documentada | Capacidad no puesta en relación con un problema por el diagnóstico | Que no exista necesidad |
-| Necesidad sin activo registrado | El mapa de activos no la cubre | Que el activo no exista: es una laguna del mapa, no un hallazgo |
+| Correspondencia | Necesidad documentada, recurso registrado y voz coinciden | Que el recurso funcione, llegue o se use |
+| Recurso sin necesidad documentada | Capacidad no puesta en relación con un problema por el diagnóstico | Que no exista necesidad |
+| Necesidad sin recurso registrado | El mapa de Localiza no la cubre | Que el recurso no exista: es una laguna del mapa, no un hallazgo |
 | Voz sin contraste | La comunidad lo señala y el Informe no lo trata | Que el Informe lo contradiga |
 
 Las conclusiones del Perfil se formulan por patrón. Siguen siendo conclusiones, no recomendaciones (Art. 16 bis).
@@ -710,11 +712,11 @@ El Perfil no contiene unidades de lectura que ninguna fuente del expediente sost
 
 *Fuente:* Arts. 4 y 4 bis.
 
-**I-LHPM-12 — Activos validados frente a candidatos**
+**I-LHPM-12 — Activos validados, recursos y candidatos**
 
-Un recurso que no consta en Localiza Salud no se presenta como activo del Perfil ni se cuenta en la lectura. «Necesidad sin activo registrado» se refiere al mapa de Localiza y nunca se formula como inexistencia del recurso.
+Un recurso que no consta en Localiza Salud no se cuenta en la lectura. Un registro de Localiza sin validación declarada se presenta como recurso, nunca como activo. «Necesidad sin recurso registrado» se refiere al mapa de Localiza y nunca se formula como inexistencia del recurso.
 
-*Consecuencia si se viola:* un mapa sin validar pasa por evidencia, o una laguna del mapa se lee como ausencia de capacidad comunitaria.
+*Consecuencia si se viola:* un mapa sin validar pasa por evidencia, un inventario de recursos se presenta como mapa de activos, o una laguna del mapa se lee como ausencia de capacidad comunitaria.
 
 *Fuente:* Arts. 9 y 9 bis.
 
@@ -810,3 +812,4 @@ Toda recomendación del Perfil es de tipo «Conocer», «Contrastar» o «Aborda
 *CONTRACT-PSL-COMPAS y CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER.*
 *Todo contrato de producto que afecte al Perfil de Salud Local debe ser coherente con este contrato.*
 | 2026-10-23 | 2.0.0 | Nueva estructura del Perfil (Art. 16 quater): la conclusión como unidad, cuerpo de siete apartados y anexo compilado. La «orientación técnica» pasa a llamarse «recomendación del Perfil» y se tipifica en Conocer, Contrastar y Abordar (Art. 8 quater); «Abordar» exige relación de grado 1 o 2. Nuevos invariantes I-LHPM-19 e I-LHPM-20, criterio «Estructura breve» (Art. 19) y cuestión abierta H-LHPM-7 (tope de conclusiones). Las unidades de lectura (Art. 4 bis) pasan al anexo. Decisiones del autor del 2026-10-23 | COMPÁS NG |
+| 2026-10-24 | 2.1.0 | Distinción entre recurso y activo (Art. 9 bis, I-LHPM-12): un registro de Localiza Salud es un recurso; es activo para la salud cuando consta su validación con los criterios de registro y validación de activos para la salud en Andalucía, que incluyen la identificación comunitaria. Los patrones de cruce se nombran con «recurso registrado». Decisión del autor del 2026-10-24, contrastada con Loja (162 recursos, 5 activos identificados comunitariamente) | COMPÁS NG |

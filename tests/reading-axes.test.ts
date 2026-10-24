@@ -80,7 +80,7 @@ describe("ejes de lectura (Art. 4 ter)", () => {
     });
     expect(d.units[0]!.crossing).toBe("eje-sin-activo-registrado");
     const cu = buildCanonicalReadingUnits(d, 0)!.units[0]!;
-    expect(cu.crossingStatement).toContain("laguna del mapa de activos, no la ausencia del recurso");
+    expect(cu.crossingStatement).toContain("laguna del mapa de Localiza, no la ausencia del recurso");
   });
 
   it("un eje sin ninguna fuente no genera unidad y consta como laguna", () => {
