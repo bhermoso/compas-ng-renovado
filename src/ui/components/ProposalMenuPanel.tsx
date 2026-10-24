@@ -60,7 +60,7 @@ export function ProposalMenuPanel({ proposals, decisions, onDecide }: ProposalMe
 
   return (
     <section className="workspace-panel" aria-labelledby="proposal-menu-title">
-      <h2 id="proposal-menu-title">Conclusiones y orientaciones propuestas</h2>
+      <h2 id="proposal-menu-title">Conclusiones y recomendaciones propuestas</h2>
       <p>
         Las propuestas derivan de la «Lectura por tema» o las ha redactado el equipo técnico, con la evidencia que citan. Nadie elige por omisión: elige o descarta
         cada una una persona del equipo técnico, con su autoría y fecha. Las descartadas se conservan en

@@ -67,7 +67,7 @@ export function RelationTablePanel({ history, onDeclare }: RelationTablePanelPro
       <p>
         La declara y la valida una persona del equipo técnico; cada cambio es una versión nueva con su
         autoría y fecha. El grado 1 exige evidencia local de ambos extremos; el grado 2, una fuente externa
-        verificable con título, año y escala; el grado 3 es plausible y no sostiene orientaciones. Solo una
+        verificable con título, año y escala; el grado 3 es plausible y no sostiene recomendaciones de tipo «Abordar». Solo una
         relación validada de grado 1 o 2 puede sostener una orientación.
       </p>
       {current.length === 0 ? <p>No hay relaciones declaradas.</p> : (

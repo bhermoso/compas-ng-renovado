@@ -41,17 +41,30 @@ export function validateAuthoredProposal(
   } else if (!STEP_ALLOWED_TYPES[a.kind === "orientation" ? "orientar" : "concluir"].includes(a.tipo)) {
     problems.push(`El tipo «${a.tipo}» no se admite en ${a.kind === "orientation" ? "una orientación" : "una conclusión"}.`);
   } else if (a.kind === "orientation" && a.tipo !== "orientacion") {
-    problems.push("Una orientación técnica es del tipo «orientacion».");
+    problems.push("Una recomendación del Perfil es del tipo «orientacion».");
   }
   if (a.kind === "orientation") {
     const concl = a.conclusionIds ?? [];
     if (concl.length === 0) {
-      problems.push("Una orientación deriva de al menos una conclusión.");
+      problems.push("Una recomendación deriva de al menos una conclusión.");
+    }
+    if (a.recomendacion === undefined) {
+      problems.push("Falta el tipo de recomendación: Conocer, Contrastar o Abordar (Art. 8 quater).");
     }
     for (const c of concl) {
       if (!existing.some((e) => e.kind === "conclusion" && e.id === c)) {
         problems.push(`La conclusión «${c}» no está registrada.`);
       }
+    }
+    const derivadas = concl
+      .map((c) => existing.find((e) => e.kind === "conclusion" && e.id === c))
+      .filter((e): e is AuthoredProposal => e !== undefined);
+    if (
+      a.recomendacion === "abordar" &&
+      derivadas.length > 0 &&
+      derivadas.every((e) => e.tipo === "laguna")
+    ) {
+      problems.push("Sobre una laguna solo caben recomendaciones de tipo Conocer o Contrastar (Arts. 7 ter y 8 quater).");
     }
     if (a.relationId !== undefined) {
       const s = sustentoFromRelation(relations, a.relationId);
@@ -59,11 +72,14 @@ export function validateAuthoredProposal(
       else if (a.sustento !== s.grade) {
         problems.push(`El sustento declarado no coincide con el grado de la relación «${a.relationId}» (${s.grade}).`);
       }
-    } else if (a.sustento === undefined) {
-      problems.push("Una orientación declara el grado de sustento de su relación.");
+    } else if (a.recomendacion === "abordar" && a.sustento === undefined) {
+      problems.push("Una recomendación de tipo Abordar declara el grado de sustento de su relación.");
+    }
+    if (a.recomendacion === "abordar" && a.sustento === 3) {
+      problems.push("Una recomendación de tipo Abordar exige una relación de grado 1 o 2 (Art. 8 quater).");
     }
     for (const id of checkOrientationText(a.text)) {
-      problems.push(`La orientación fija una actuación operativa (${id}); corresponde al Plan de Acción.`);
+      problems.push(`La recomendación excede al Perfil (${id}); corresponde al Grupo Motor o al Plan de Acción.`);
     }
   }
   return problems;
@@ -77,6 +93,7 @@ export function authoredToProposals(list: ReadonlyArray<AuthoredProposal>): Prop
     origin: "equipo" as const,
     label: a.id,
     ...(a.tipo !== undefined ? { tipo: a.tipo } : {}),
+    ...(a.recomendacion !== undefined ? { recomendacion: a.recomendacion } : {}),
     ...(a.cautelas !== undefined && a.cautelas.trim() !== "" ? { cautelas: a.cautelas } : {}),
     derivedFrom: {
       evidence: a.evidence,

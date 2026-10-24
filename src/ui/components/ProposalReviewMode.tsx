@@ -50,7 +50,7 @@ export function ProposalReviewMode({
   const r = resolveProposals(proposals, decisions);
   return (
     <section className="workspace-panel" aria-labelledby="review-mode-title">
-      <h2 id="review-mode-title">Revisión de conclusiones y orientaciones</h2>
+      <h2 id="review-mode-title">Revisión de conclusiones y recomendaciones</h2>
       <p>
         El documento muestra solo lo elegido. Estado: {r.elegidas.length} elegidas · {r.descartadas.length}{" "}
         descartadas · {r.pendientes.length} pendientes. La versión institucional exige que no quede

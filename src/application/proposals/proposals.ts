@@ -9,7 +9,7 @@
  */
 
 import type { ProposalDecision } from "../../domain/repository";
-import type { StatementType } from "../../domain/statements/statementTypes";
+import type { RecommendationKind, StatementType } from "../../domain/statements/statementTypes";
 
 export type ProposalKind = "conclusion" | "orientation";
 
@@ -23,6 +23,8 @@ export interface Proposal {
   text: string;
   /** Tipo de afirmación (Art. 8); ausente = sin clasificar. */
   tipo?: StatementType;
+  /** Tipo de recomendación del Perfil (Art. 8 quater); solo en propuestas de tipo recomendación. Ausente en las anteriores a v2.0. */
+  recomendacion?: RecommendationKind;
   /** Etiqueta de lectura (p. ej. «C1»); ausente = el identificador. */
   label?: string;
   /** Quién propone: el sistema (por defecto) o el equipo técnico (Art. 16 ter 1 bis). */
@@ -77,6 +79,9 @@ const OPERATIONAL_PATTERNS: Array<{ id: string; pattern: RegExp }> = [
   { id: "plazo", pattern: /\b(en un plazo|antes de(l)? (\d{4}|fin de)|en \d+ (días|semanas|meses|años)|durante el (primer|segundo) (trimestre|semestre))\b/i },
   { id: "recurso", pattern: /\b(presupuesto|dotación económica|financiación de|euros|€)\b/i },
   { id: "indicador-ejecucion", pattern: /\bindicadores? de (ejecución|seguimiento|cumplimiento)\b/i },
+  // Art. 8 quater: la recomendación del Perfil no prioriza ni asigna línea estratégica.
+  { id: "prioridad", pattern: /\b(prioridad (alta|máxima|absoluta|uno)|se prioriza|priorizar (la|el|los|las)|máxima prioridad)\b/i },
+  { id: "linea-estrategica", pattern: /\b(línea estratégica|eje estratégico|objetivo estratégico)\b/i },
 ];
 
 /** Marcas de actuación operativa en el texto de una orientación (vacío = OK). */
@@ -93,14 +98,16 @@ export function validateDecision(
   if (decision.decidedBy.trim() === "") problems.push("Falta la autoría de la decisión.");
   if (decision.decision === "elegida" && proposal.kind === "orientation") {
     const s = proposal.derivedFrom.sustento;
-    if (s === undefined || s === 3) {
+    // Conocer y Contrastar no exigen relación; Abordar y las anteriores a v2.0 sí (Art. 8 quater).
+    const exigeGrado = proposal.recomendacion === undefined || proposal.recomendacion === "abordar";
+    if (exigeGrado && (s === undefined || s === 3)) {
       problems.push(
-        "Una orientación solo puede apoyarse en relaciones de grado 1 o 2 (Art. 8 bis)."
+        "Una recomendación de tipo «Abordar» solo puede apoyarse en relaciones de grado 1 o 2 (Art. 8 bis, 8 quater)."
       );
     }
     const text = decision.textoAjustado ?? proposal.text;
     for (const id of checkOrientationText(text)) {
-      problems.push(`La orientación fija una actuación operativa (${id}); corresponde al Plan de Acción.`);
+      problems.push(`La recomendación excede al Perfil (${id}); corresponde al Grupo Motor o al Plan de Acción.`);
     }
   }
   return problems;

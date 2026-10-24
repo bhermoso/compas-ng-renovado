@@ -27,5 +27,18 @@ export const STEP_ALLOWED_TYPES: Record<ReadingStep, readonly StatementType[]> =
   orientar: ["orientacion", "decision-posterior", "cautela"],
 };
 
+/**
+ * Tipos de recomendación del Perfil (Art. 8 quater, contrato v2.0.0).
+ * `abordar` exige una conclusión sostenida por una relación de grado 1 o 2.
+ */
+export const RECOMMENDATION_KINDS = ["conocer", "contrastar", "abordar"] as const;
+export type RecommendationKind = (typeof RECOMMENDATION_KINDS)[number];
+
+export const RECOMMENDATION_LABEL: Record<RecommendationKind, string> = {
+  conocer: "Conocer",
+  contrastar: "Contrastar",
+  abordar: "Abordar",
+};
+
 /** Tipos que exigen autoría humana y no los puede generar el sistema (Art. 8). */
 export const HUMAN_AUTHORSHIP_TYPES: readonly StatementType[] = ["interpretacion", "hipotesis", "orientacion"];

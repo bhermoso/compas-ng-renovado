@@ -6,13 +6,15 @@
  */
 
 import type { ProposalDecision } from "../../domain/repository";
-import type { StatementType } from "../../domain/statements/statementTypes";
+import type { RecommendationKind, StatementType } from "../../domain/statements/statementTypes";
 import { resolveProposals, type Proposal, type SustentoGrade } from "./proposals";
 
 export interface ChosenItem {
   /** Etiqueta de lectura (p. ej. «C1»); la del sistema es su identificador. */
   etiqueta: string;
   tipo?: StatementType;
+  /** Recomendación del Perfil: tipo (Art. 8 quater); ausente en las anteriores a v2.0. */
+  recomendacion?: RecommendationKind;
   /** Texto final: el ajustado por el equipo o el propuesto. */
   texto: string;
   evidencia: string[];
@@ -42,6 +44,7 @@ export function buildChosenClosing(
   const toItem = (r: (typeof elegidas)[number]): ChosenItem => ({
     etiqueta: r.proposal.label ?? r.proposal.id,
     ...(r.proposal.tipo !== undefined ? { tipo: r.proposal.tipo } : {}),
+    ...(r.proposal.recomendacion !== undefined ? { recomendacion: r.proposal.recomendacion } : {}),
     texto: r.finalText,
     evidencia: r.proposal.derivedFrom.evidence,
     ...(r.proposal.derivedFrom.sustento !== undefined ? { sustento: r.proposal.derivedFrom.sustento } : {}),

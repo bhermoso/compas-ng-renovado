@@ -24,6 +24,7 @@ import type {
   CanonicalTechnicalSpace,
 } from "../health-profile";
 import { conciliationParagraph } from "../health-profile/antecedents";
+import { RECOMMENDATION_LABEL } from "../../domain/statements/statementTypes";
 import type { PSLCDocumentModel, PSLCDocumentSection } from "./pslcDocumentModel";
 import { pslcDocxFileName } from "./pslcDocumentModel";
 
@@ -321,11 +322,12 @@ export function projectCanonicalToDocumentModel(
     if (cc.orientations.length > 0) {
       sections.push({
         sectionId: "chosen-orientations",
-        title: "Orientaciones técnicas",
+        title: "Recomendaciones del Perfil",
         level: 1,
         paragraphs: cc.orientations.flatMap((o) => [
           o.texto,
           [
+            o.recomendacion !== undefined ? `Tipo: ${RECOMMENDATION_LABEL[o.recomendacion]}.` : "",
             o.derivaDe !== undefined && o.derivaDe.length > 0 ? `Deriva de: ${o.derivaDe.join(", ")}.` : "",
             o.sustento !== undefined ? `Sustento de grado ${o.sustento}${o.relacion !== undefined ? ` (relación ${o.relacion})` : ""}.` : "",
             o.cautelas !== undefined ? `Salvedades: ${o.cautelas}` : "",
