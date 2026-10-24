@@ -72,13 +72,18 @@ function addText(
   doc.setFontSize(opts.size);
   const lineHeight = opts.size * 0.47; // mm por línea, aproximación sobria
   const lines: string[] = doc.splitTextToSize(toWinAnsi(text), CONTENT_WIDTH);
-  ensureSpace(doc, cursor, lines.length * lineHeight);
   const x = opts.align === "center" ? PAGE.width / 2 : MARGIN.left;
-  doc.text(lines, x, cursor.y, {
-    align: opts.align ?? "left",
-    baseline: "top",
-  });
-  cursor.y += lines.length * lineHeight + (opts.spacingAfter ?? 2);
+  // A paragraph can exceed one page (documentary passages and traceability).
+  // Paginate its lines instead of moving an oversized block onto a fresh page.
+  for (const line of lines) {
+    ensureSpace(doc, cursor, lineHeight);
+    doc.text(line, x, cursor.y, {
+      align: opts.align ?? "left",
+      baseline: "top",
+    });
+    cursor.y += lineHeight;
+  }
+  cursor.y += opts.spacingAfter ?? 2;
 }
 
 // ── Secciones estructuradas (contrato visual) ─────────────────────────────────
@@ -133,6 +138,10 @@ function addTable(doc: jsPDF, cursor: Cursor, table: PSLCTableData): void {
   const factor = CONTENT_WIDTH / widths.reduce((a, b) => a + b, 0);
   for (let c = 0; c < cols; c++) widths[c] *= factor;
 
+  const rowHeight = (cells: string[]): number =>
+    Math.max(0, ...cells.map((cell, c) =>
+      doc.splitTextToSize(toWinAnsi(cell ?? ""), widths[c] - padding * 2).length
+    )) * lineH + padding * 2;
   const drawRow = (cells: string[], bold: boolean): void => {
     doc.setFont("helvetica", bold ? "bold" : "normal");
     doc.setFontSize(fontSize);
@@ -141,6 +150,12 @@ function addTable(doc: jsPDF, cursor: Cursor, table: PSLCTableData): void {
     );
     const rowH =
       Math.max(...wrapped.map((w) => w.length)) * lineH + padding * 2;
+    if (!bold && cursor.y + rowH + 1 > PAGE.height - MARGIN.bottom) {
+      doc.addPage();
+      cursor.y = MARGIN.top;
+      drawRow(table.headers, true);
+      doc.setFont("helvetica", "normal");
+    }
     ensureSpace(doc, cursor, rowH + 1);
     let x = MARGIN.left;
     for (let c = 0; c < cols; c++) {
@@ -156,6 +171,9 @@ function addTable(doc: jsPDF, cursor: Cursor, table: PSLCTableData): void {
     cursor.y += 0.8;
   };
 
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(fontSize);
+  ensureSpace(doc, cursor, rowHeight(table.headers) + rowHeight(table.rows[0] ?? []) + 3);
   drawRow(table.headers, true);
   for (const row of table.rows) drawRow(row, false);
   if (table.nota !== undefined) {
@@ -264,7 +282,7 @@ export function buildPSLCPdf(model: PSLCDocumentModel): jsPDF {
   doc.addPage();
   cursor.y = MARGIN.top;
   for (const section of model.sections) {
-    ensureSpace(doc, cursor, 18);
+    ensureSpace(doc, cursor, section.table ? 60 : 18);
     cursor.y += 4;
     addText(doc, cursor, section.title, {
       size: section.level === 1 ? 13 : 11,

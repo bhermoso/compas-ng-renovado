@@ -123,10 +123,16 @@ export function projectCanonicalToDocumentModel(
     sectionId: "source-blocks",
     title: "Señales principales por fuente",
     level: 1,
-    paragraphs: reading.sourceBlocks.map(
+    paragraphs: reading.sourceBlocks.filter((b) => !b.id.startsWith("documento-territorial:")).map(
       (b) => `${b.title} — ${b.whatItAdds}. ${b.whatItDoesNotAllow}.`
     ),
   });
+  for (const block of reading.sourceBlocks.filter((b) => b.id.startsWith("documento-territorial:"))) {
+    sections.push({
+      sectionId: block.id as `documento-territorial:${string}`, title: block.title, level: 2,
+      paragraphs: [...block.whatItAdds.split("\n\n"), block.whatItDoesNotAllow],
+    });
+  }
 
   if (reading.informeSignalRanking !== null) {
     const r = reading.informeSignalRanking;

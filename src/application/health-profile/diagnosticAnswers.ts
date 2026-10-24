@@ -112,6 +112,19 @@ export interface TerritorialInequalityReading {
   hasParticipatoryPrioritisation: boolean;
   cautions: string[];
   eracisContexto?: EracisMunicipalContext;
+  /** Literal passages, not local diagnoses inferred from thematic keywords. */
+  documentaryFindings?: Array<{
+    documentId: string;
+    title: string;
+    sourceFileName?: string;
+    scale: string;
+    referenceYear?: number;
+    theme: string;
+    quote: string;
+    start: number;
+    end: number;
+    question: string;
+  }>;
 }
 
 export interface SpaceKnowledge {
@@ -278,9 +291,16 @@ interface TerritorialThemeRule {
   theme: string;
   determinantStatement: string;
   keywords: string[];
+  question: string;
 }
 
 const TERRITORIAL_THEME_RULES: TerritorialThemeRule[] = [
+  {
+    theme: "población, estructura por edad y necesidades de cuidado",
+    determinantStatement: "estructura demográfica y necesidades de cuidado",
+    keywords: ["edad media", "indice de vejez", "indice dependencia", "poblacion empadronada", "envejecimiento"],
+    question: "¿Qué edades y núcleos de población describe la fuente y cómo se relacionan sus necesidades de salud y cuidado con los recursos accesibles?",
+  },
   {
     theme: "vulnerabilidad social, barrios y desigualdad territorial",
     determinantStatement:
@@ -299,6 +319,7 @@ const TERRITORIAL_THEME_RULES: TerritorialThemeRule[] = [
       "desigualdades sociales",
       "vulnerabilidad social",
     ],
+    question: "¿Se observan diferencias de salud entre las zonas descritas y qué barreras para acceder a apoyos identifica la población?",
   },
   {
     theme: "empleo, precariedad, renta y condiciones materiales de vida",
@@ -314,6 +335,7 @@ const TERRITORIAL_THEME_RULES: TerritorialThemeRule[] = [
       "economia sumergida",
       "temporalidad",
     ],
+    question: "¿Qué grupos encuentran restricciones de ingresos o de tiempo para cuidar su salud y qué apoyos utilizan?",
   },
   {
     theme: "vivienda, espacio público, accesibilidad y entorno urbano",
@@ -333,6 +355,7 @@ const TERRITORIAL_THEME_RULES: TerritorialThemeRule[] = [
       "entorno urbano",
       "medio rural",
     ],
+    question: "¿Qué condiciones de vivienda o de movilidad afectan al descanso, la actividad cotidiana y el acceso a recursos, y para quién?",
   },
   {
     theme: "educación, infancia, juventud y trayectorias de aprendizaje",
@@ -348,6 +371,7 @@ const TERRITORIAL_THEME_RULES: TerritorialThemeRule[] = [
       "formacion",
       "abandono escolar",
     ],
+    question: "¿Cómo se distribuyen las señales de bienestar de infancia y juventud y qué apoyos educativos y comunitarios llegan a cada grupo?",
   },
   {
     theme: "redes familiares, salud mental, soledad y cuidados",
@@ -364,6 +388,7 @@ const TERRITORIAL_THEME_RULES: TerritorialThemeRule[] = [
       "envejecimiento",
       "dependencia",
     ],
+    question: "¿Qué personas quedan fuera de las redes de apoyo y cómo se relaciona esa experiencia con las señales de bienestar disponibles?",
   },
   {
     theme: "participación ciudadana y priorización comunitaria",
@@ -375,20 +400,15 @@ const TERRITORIAL_THEME_RULES: TerritorialThemeRule[] = [
       "problemas priorizados",
       "cuestionario",
     ],
+    question: "¿Quién participó, qué preocupaciones expresó y cómo se contrastan con los resultados de salud sin convertir votos en prevalencias?",
   },
 ];
 
 function sourceTextForTerritorialReading(
   document: MunicipalityWorkspace["repository"]["documents"][number]
 ): string {
-  return normalize(
-    [
-      document.title,
-      document.sourceFileName ?? "",
-      document.tags.join(" "),
-      document.sourceText ?? "",
-    ].join(" ")
-  );
+  // Metadata locates a document; it cannot substantiate a finding.
+  return normalize(document.sourceText ?? "");
 }
 
 export function buildTerritorialInequalityReading(
@@ -400,14 +420,42 @@ export function buildTerritorialInequalityReading(
   const candidateDocs = workspace.repository.documents.filter(
     (document) =>
       TERRITORIAL_SOURCE_KINDS.has(document.kind) &&
+      // Clinical-assistance documents have their own reading and scale rules.
+      document.documentNature !== "ugc-clinical-assistance-report" &&
+      document.territorialScale !== "unidad-gestion-clinica" &&
+      document.status !== "archived" && document.status !== "rejected" &&
+      document.cycle?.status !== "historical" &&
+      document.municipalityId === workspace.municipality.identity.id &&
       (document.sourceText?.trim().length ?? 0) > 0
   );
   const sourceTitles = candidateDocs.map((document) => document.title);
   const texts = candidateDocs.map(sourceTextForTerritorialReading);
   const allText = texts.join(" ");
 
+  const documentaryFindings: NonNullable<TerritorialInequalityReading["documentaryFindings"]> = [];
+  for (const document of candidateDocs) {
+    const text = document.sourceText!;
+    for (const rule of TERRITORIAL_THEME_RULES) {
+      // Keep offsets in the ORIGINAL text. Skip dotted table-of-contents rows.
+      const passage = [...text.matchAll(/[^\n]+/g)].find((match) =>
+        match[0].trim().length >= 12 && !/\.{3,}/.test(match[0]) &&
+        rule.keywords.some((keyword) => (` ${normalize(match[0])} `).includes(` ${normalize(keyword)} `))
+      );
+      if (!passage) continue;
+      const folded = passage[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      const keywordIndex = Math.min(...rule.keywords.map((keyword) => folded.indexOf(normalize(keyword))).filter((index) => index >= 0));
+      const start = passage.index! + Math.max(0, (Number.isFinite(keywordIndex) ? keywordIndex : 0) - 70);
+      // A literal excerpt with reproducible location; no invented page or period.
+      const end = Math.min(passage.index! + passage[0].length, start + 240);
+      documentaryFindings.push({
+        documentId: document.id, title: document.title, sourceFileName: document.sourceFileName,
+        scale: document.territorialScale ?? "unknown", referenceYear: document.cycle?.referenceYear,
+        theme: rule.theme, quote: text.slice(start, end), start, end, question: rule.question,
+      });
+    }
+  }
   const matchedRules = TERRITORIAL_THEME_RULES.filter((rule) =>
-    rule.keywords.some((keyword) => allText.includes(normalize(keyword)))
+    documentaryFindings.some((finding) => finding.theme === rule.theme)
   );
   const hasEracisOrPlizd =
     eracisContexto !== undefined ||
@@ -442,7 +490,7 @@ export function buildTerritorialInequalityReading(
   const available =
     hasEracisOrPlizd ||
     hasMaterialInequalitySignals ||
-    hasParticipatoryPrioritisation;
+    hasParticipatoryPrioritisation || documentaryFindings.length > 0;
   const activeRules = available ? matchedRules : [];
 
   const cautions = [
@@ -474,6 +522,7 @@ export function buildTerritorialInequalityReading(
     hasParticipatoryPrioritisation,
     cautions,
     eracisContexto,
+    documentaryFindings,
   };
 }
 
@@ -510,9 +559,10 @@ export function inferSocialEpidemiologyDeterminants(
     const zonasEracis =
       desigualdadTerritorial.eracisContexto?.disadvantagedZones.join(", ");
     lecturas.push({
-      kind: "documentado",
-      enunciado:
-        "vulnerabilidad territorial reconocida por ERACIS/PLIZD como eje de desigualdad",
+      kind: desigualdadTerritorial.eracisContexto !== undefined ? "documentado" : "a-contrastar",
+      enunciado: desigualdadTerritorial.eracisContexto !== undefined
+        ? "vulnerabilidad territorial reconocida por ERACIS/PLIZD como eje de desigualdad"
+        : "mención de ERACIS/PLIZD pendiente de verificar su alcance local",
       base:
         desigualdadTerritorial.eracisContexto !== undefined
           ? `${desigualdadTerritorial.eracisContexto.municipalityName} figura en fuente oficial de la Junta de Andalucía como municipio con zona desfavorecida` +
@@ -530,8 +580,8 @@ export function inferSocialEpidemiologyDeterminants(
       continue;
     }
     lecturas.push({
-      kind: "documentado",
-      enunciado: statement,
+      kind: "a-contrastar",
+      enunciado: `Alcance local de ${statement}`,
       base:
         fuentesTerritoriales.length > 0
           ? `documentación territorial o participativa del expediente: ${fuentesTerritoriales}`

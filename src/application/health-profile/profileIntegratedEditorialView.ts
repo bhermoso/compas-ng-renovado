@@ -45,7 +45,7 @@ export interface ProfileIntegratedEditorialOverviewMessage {
 }
 
 export interface ProfileIntegratedEditorialSourceBlock {
-  id: "informe" | "estudios" | "activos";
+  id: "informe" | "estudios" | "activos" | `documento-territorial:${string}`;
   title: string;
   whatItAdds: string;
   whatItDoesNotAllow: string;
@@ -1132,7 +1132,9 @@ export function buildProfileIntegratedEditorialView(
       id: "informe",
       title: "Informe de salud",
       whatItAdds:
-        "agenda sanitaria de partida, temas tratados y trazabilidad textual del documento fuente",
+        answers.healthReport.present
+          ? "agenda sanitaria de partida, temas tratados y trazabilidad textual del documento fuente"
+          : "el expediente no dispone de un Informe de Salud procesado; una referencia documental sin texto no permite reconstruir su contenido",
       whatItDoesNotAllow:
         "No mide por sí solo prevalencia local ni distribución interna de desigualdad",
       variant: "informe",
@@ -1155,6 +1157,32 @@ export function buildProfileIntegratedEditorialView(
     },
   ];
 
+  // Preserve documentary evidence in the SAME model used by screen and exports,
+  // including profiles without atomized studies or assets. Topic detection is
+  // explicitly distinguished from a measured local condition.
+  const findings = answers.desigualdadTerritorial.documentaryFindings ?? [];
+  for (const documentId of new Set(findings.map((finding) => finding.documentId))) {
+    const passages = findings.filter((finding) => finding.documentId === documentId);
+    const source = passages[0];
+    sourceBlocks.push({
+      id: `documento-territorial:${documentId}`,
+      title: source.title,
+      whatItAdds: passages.map((finding) =>
+        `${finding.theme}: «${finding.quote.trim()}» ` +
+        `(texto conservado, caracteres ${finding.start + 1}–${finding.end}). ${finding.question}`
+      ).join("\n\n"),
+      whatItDoesNotAllow:
+        `Fuente: ${source.sourceFileName ?? source.title}; documento ${documentId}. ` +
+        `Escala declarada: ${source.scale === "unknown" ? "no declarada" : source.scale}. ` +
+        `Año de referencia: ${source.referenceYear ?? "no declarado en los metadatos; consultar el original"}. ` +
+        "Estos pasajes acreditan los asuntos tratados por la fuente. Su presencia no demuestra " +
+        "magnitud, vigencia actual, concentración de desventaja ni causalidad sanitaria local. " +
+        "El contraste con los resultados de salud y las capacidades del territorio requiere comprobar " +
+        "a qué población y periodo se refieren y quién encuentra barreras de acceso",
+      variant: "equidad",
+    });
+  }
+
   const closing = buildClosingColumns({
     answers,
     synthesis,
@@ -1175,7 +1203,7 @@ export function buildProfileIntegratedEditorialView(
       status: opts.status,
       scale: "escala territorial declarada por cada fuente",
       sources: unique([
-        opts.informeTitulo ?? "Informe de salud",
+        ...(answers.healthReport.present ? [opts.informeTitulo ?? "Informe de salud"] : []),
         ...synthesis.senalesPrincipales.map((row) => humanSource(row.fuente)),
       ]).slice(0, 6),
       generatedDate: opts.generatedDate,

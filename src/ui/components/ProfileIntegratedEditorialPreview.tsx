@@ -130,7 +130,11 @@ export function ProfileIntegratedEditorialPreview({
               <span className={variantClass(block.variant)} aria-hidden="true" />
               <div className="pie-base-doc__body">
                 <strong className="pie-base-doc__name">{block.title}</strong>
-                <span className="pie-base-doc__adds"> — {block.whatItAdds}.</span>
+                {block.whatItAdds.includes("\n\n")
+                  ? block.whatItAdds.split("\n\n").map((passage, index) => (
+                      <p key={index} className="pie-base-doc__adds">{passage}</p>
+                    ))
+                  : <span className="pie-base-doc__adds"> — {block.whatItAdds}.</span>}
                 <span className="pie-base-doc__limit"> {block.whatItDoesNotAllow}.</span>
               </div>
             </div>

@@ -32,6 +32,7 @@ export function DocumentFileUpload({
       <input
         id={id}
         type="file"
+        aria-label={label}
         accept={accept}
         disabled={isLoading}
         onChange={(e) => {

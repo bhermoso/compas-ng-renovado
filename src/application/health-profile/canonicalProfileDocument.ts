@@ -339,6 +339,7 @@ export function isLegacyEditorialView(
 export type CanonicalReadingSectionId =
   | "overview"
   | "source-blocks"
+  | `documento-territorial:${string}`
   | "informe-ranking"
   | "pending-declaration"
   | "reading-units"
@@ -579,7 +580,10 @@ export function buildCanonicalEditorialView(
   const territorialReadings =
     readingStatus === "prioritization-pending" ? [] : ov.territorialReadings;
   const pendingDeclaration =
-    readingStatus === "prioritization-pending" ? PRIORITIZATION_PENDING_DECLARATION : null;
+    readingStatus !== "prioritization-pending" ? null
+      : !ctx.answers.healthReport.present || !(hasRealStudies || hasRealAssets || ctx.counters.hasParticipatoryPrioritisation)
+        ? "Documento de trabajo: la base disponible todavía no acredita la combinación de Informe de Salud y fuente adicional exigida por la regla N+1. Se conserva la documentación recuperada, sin presentar este borrador como Perfil integrado ni validado."
+        : PRIORITIZATION_PENDING_DECLARATION;
 
   // Visualizaciones de la lectura (peso textual del Informe y señales
   // principales): derivadas de los mismos answers, forman parte de la lectura
