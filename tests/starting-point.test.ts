@@ -19,8 +19,8 @@ describe("Punto de partida (Art. 16 quater, apartado 1)", () => {
     const text = startingPointParagraphs(sp).join("\n");
     expect(text).toContain("INFORME SALUD LOJA 2026 definitivo (Informe de Salud): año, escala y ciclo sin declarar.");
     expect(text).toContain("Población: no consta una referencia poblacional verificada con fuente y año.");
-    expect(text).toContain("Recursos de Localiza Salud: 162, de los que 0 tienen validación territorial declarada.");
-    expect(sp.noConsta).toContain("Validación territorial de los recursos de Localiza Salud.");
+    expect(text).toContain("Recursos de Localiza Salud: 162, de los que 0 constan como activos validados.");
+    expect(sp.noConsta).toContain("Activos validados entre los recursos de Localiza Salud.");
     expect(sp.noConsta).toContain("Priorización ciudadana temática.");
   });
 
@@ -33,7 +33,7 @@ describe("Punto de partida (Art. 16 quater, apartado 1)", () => {
     const text = startingPointParagraphs(sp).join("\n");
     expect(text).toContain("Población: 843 habitantes (INE — tabla 68535, 2025).");
     expect(text).toContain("Informe (Informe de Salud): 2026; escala municipio; ciclo actual.");
-    expect(sp.noConsta).not.toContain("Validación territorial de los recursos de Localiza Salud.");
+    expect(sp.noConsta).not.toContain("Activos validados entre los recursos de Localiza Salud.");
     expect(sp.noConsta).not.toContain("Priorización ciudadana temática.");
   });
 

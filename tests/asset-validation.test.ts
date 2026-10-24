@@ -41,11 +41,11 @@ describe("activos validados (declaración del equipo técnico)", () => {
       { id: "v1", documentId: "doc-loc", criteria, declaredBy: "V", declaredAt: "x" },
     ]);
     const s = buildCanonicalReadingUnits(deriveReadingUnits({ assets: records }), 0, 1);
-    expect(s?.assetsSummary).toContain("declarado como validado");
+    expect(s?.assetsSummary).toContain("declarado como activo validado");
     const none = buildCanonicalReadingUnits(deriveReadingUnits({ assets: records }), 0);
-    expect(none?.assetsSummary).not.toContain("validado");
+    expect(none?.assetsSummary).toContain("ninguno consta declarado como activo validado");
     const line = s?.units[0].lines.find((l) => l.startsWith("Localiza Salud"));
-    expect(line).toContain("2 activos (1 declarado validado) con temática");
+    expect(line).toContain("2 recursos (1 activo validado) con temática");
     const solo = readLocalizaAssets([atoms[0]], [{ id: "v1", documentId: "doc-loc", criteria, declaredBy: "V", declaredAt: "x" }]).records;
     const l1 = buildCanonicalReadingUnits(deriveReadingUnits({ assets: solo }), 0, 1)?.units[0].lines.find((l) => l.startsWith("Localiza Salud"));
     expect(l1).toContain("1 activo validado con temática");

@@ -98,7 +98,7 @@ describe("síntesis interpretativa del Perfil", () => {
   it("declara activos Localiza Salud y no atribuye estudios cuando no existen", () => {
     const assetsBlock = view.sourceBlocks.find((block) => block.id === "activos");
     expect(assetsBlock?.whatItAdds).toContain(
-      "Localiza Salud como fuente principal de activos"
+      "de Localiza Salud, inventariados como capacidades potenciales"
     );
     expect(assetsBlock?.whatItAdds).toContain("56 recursos de Localiza Salud");
     expect(assetsBlock?.whatItAdds).not.toContain("recurso(s)");

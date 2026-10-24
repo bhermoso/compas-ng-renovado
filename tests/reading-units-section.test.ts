@@ -26,11 +26,11 @@ describe("sección «Lectura por tema»", () => {
     const s = buildCanonicalReadingUnits(d, 0)!;
     const af = s.units.find((u) => u.topicId === "actividad-fisica")!;
     expect(af.lines[0]).toBe("Priorización ciudadana: 6 de 10 papeletas completas (60 %), posición 1 de 10.");
-    expect(af.lines[1]).toContain("1 activo con temática correspondiente a este tema (Club de marcha)");
+    expect(af.lines[1]).toContain("1 recurso con temática correspondiente a este tema (Club de marcha)");
     expect(af.lines[2]).toContain("presencia textual (actividad física y sedentarismo: 7 menciones)");
-    expect(af.crossingStatement).toContain("Localiza registra activos con temática correspondiente");
+    expect(af.crossingStatement).toContain("Localiza registra recursos con temática correspondiente");
     const sueno = s.units.find((u) => u.topicId === "sueno-descanso")!;
-    expect(sueno.crossingStatement).toContain("laguna del mapa de activos, no la ausencia del recurso");
+    expect(sueno.crossingStatement).toContain("laguna del mapa de Localiza, no la ausencia del recurso");
     expect(JSON.stringify(s)).not.toMatch(/se recomienda|debería|prioridad alta|urgente/i);
   });
 
@@ -38,8 +38,8 @@ describe("sección «Lectura por tema»", () => {
     const d = deriveReadingUnits({ assets: [asset("a1", "Huerto", ["Alimentación saludable"]), asset("a2", "Peña", ["Cultura y ocio"])] });
     const s = buildCanonicalReadingUnits(d, 2)!;
     expect(s.gaps.join(" ")).toContain("No consta priorización ciudadana temática");
-    expect(s.gaps.join(" ")).toContain("1 activo de Localiza cuya temática no corresponde a ningún tema de la priorización (Peña: Cultura y ocio)");
-    expect(s.gaps.join(" ")).toContain("2 activos sin la estructura de una fila de Localiza");
+    expect(s.gaps.join(" ")).toContain("1 recurso de Localiza cuya temática no corresponde a ningún tema de la priorización (Peña: Cultura y ocio)");
+    expect(s.gaps.join(" ")).toContain("2 recursos sin la estructura de una fila de Localiza");
   });
 
   it("dos expedientes distintos producen secciones distintas", () => {
@@ -53,7 +53,7 @@ describe("sección «Lectura por tema»", () => {
       assets: [asset("a1", "ZAHRA", ["Actividad física", "Bienestar emocional"]), asset("a2", "Punto", ["Otros"])],
     });
     const s = buildCanonicalReadingUnits(d, 0)!;
-    expect(s.assetsSummary).toContain("2 activos leídos en el expediente");
+    expect(s.assetsSummary).toContain("2 recursos leídos en el expediente");
     expect(s.assetsSummary).toContain("no se suman");
   });
 });
