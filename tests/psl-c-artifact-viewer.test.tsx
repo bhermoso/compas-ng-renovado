@@ -307,7 +307,7 @@ describe("visor PSL-C — documento institucional renderizado", () => {
     expect(iO).toBeGreaterThan(iC);
     expect(iF).toBeGreaterThan(iO);
     expect(html).toContain("Deriva de: C1.");
-    expect(html).toContain("Sustento de grado 1.");
+    expect(html).toContain("Sustento: grado 1.");
     // Sin cierre elegido no aparece ninguna de las dos secciones.
     const sin = compileLocalHealthProfile({
       psl: pslCompilable(generated),
