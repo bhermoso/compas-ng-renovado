@@ -159,9 +159,9 @@ export function PerfilFuentesPanel({ workspace, children, onProcessReport, proce
       estado: activos > 0 ? "cubierta" : "pendiente",
       detalle:
         activos > 0
-          ? `${contar(activos, "activo", "activos")} de Localiza Salud como fuente principal de activos; ` +
-            `lectura salutogénica y validación territorial fina pendientes.`
-          : `Sin activos Localiza Salud incorporados todavía; otras menciones de ` +
+          ? `${contar(activos, "recurso", "recursos")} de Localiza Salud; solo los validados cuentan como activos. ` +
+            `Lectura salutogénica y validación territorial fina pendientes.`
+          : `Sin recursos de Localiza Salud incorporados todavía; otras menciones de ` +
             `activos quedan como indicios hasta reconciliarse con la fuente principal.`,
     },
     {
