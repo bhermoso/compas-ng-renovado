@@ -1,4 +1,5 @@
 import type { IBSEAggregates } from "../../domain/ibse";
+import type { IBSEMeanField } from "../../domain/ibse/IBSEAdjustment";
 import { getMethodologicalModule } from "../../domain/methodology";
 import { splitRow } from "../csv-utils/splitRow";
 import {
@@ -49,9 +50,11 @@ const EMPTY_AGGREGATES: IBSEAggregates = {
  */
 export interface IBSECSVParseOptions {
   ageBands: AgeBand[];
+  collectAdjustmentRows?: boolean;
 }
 
 export interface IBSECSVParseResult {
+  adjustmentRows?: Array<{ age: string; sex: string; values: Record<IBSEMeanField, number> }>;
   aggregates: IBSEAggregates;
   methodologicalCautions: string[];
   warnings: string[];
@@ -111,6 +114,7 @@ export function parseIBSECSV(
   let sumControl = 0;
   let sumPersona = 0;
   const demographicRows: Array<{ sex?: string; age?: number }> = [];
+  const adjustmentRows: NonNullable<IBSECSVParseResult["adjustmentRows"]> = [];
 
   for (let i = 1; i < lines.length; i++) {
     const row = splitRow(lines[i]);
@@ -146,6 +150,16 @@ export function parseIBSECSV(
     }
 
     nValid++;
+    if (options?.collectAdjustmentRows) {
+      adjustmentRows.push({
+        age: idxEdad >= 0 ? row[idxEdad]?.trim() ?? "" : "",
+        sex: idxSexo >= 0 ? row[idxSexo]?.trim() ?? "" : "",
+        values: {
+          meanTotal: Number(row[idx.total]), meanFactorVinculo: Number(row[idx.factorVinculo]),
+          meanFactorSituacion: Number(row[idx.factorSituacion]), meanFactorControl: Number(row[idx.factorControl]), meanFactorPersona: Number(row[idx.factorPersona]),
+        },
+      });
+    }
     sumTotal     += total;
     sumVinculo   += vinculo;
     sumSituacion += situacion;
@@ -208,5 +222,6 @@ export function parseIBSECSV(
     methodologicalCautions: cautions,
     warnings,
     ageSexObserved,
+    ...(options?.collectAdjustmentRows ? { adjustmentRows } : {}),
   };
 }

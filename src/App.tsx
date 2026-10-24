@@ -117,7 +117,8 @@ import {
   createHealthReportDocumentFromDocx,
   createHealthReportDocumentFromPdf,
 } from "./application/health-report";
-import { parseIBSECSV, ibseStudyToEvidenceAtoms } from "./application/ibse";
+import { ibseStudyToEvidenceAtoms } from "./application/ibse";
+import { prepareIBSEImport, type IBSEAdjustmentTarget } from "./application/ibse/prepareIBSEImport";
 import { ageBandsForMunicipality } from "./application/sam";
 import { createIBSEStudy } from "./domain/ibse";
 import { parseDUKECSV, dukeStudyToEvidenceAtoms } from "./application/duke";
@@ -1886,23 +1887,18 @@ export default function App() {
       });
   }
 
-  async function handleLoadIBSECSV(file: File): Promise<void> {
+  async function handleLoadIBSECSV(file: File, target: IBSEAdjustmentTarget = "none"): Promise<void> {
     setIsLoadingIBSE(true);
     try {
       const text = await file.text();
-      // Bandas de edad para recoger la distribución edad×sexo del CSV: las del padrón del
-      // municipio si existe; si no, las quinquenales estándar (solo descriptivas).
-      const sexAgeBands = ageBandsForMunicipality(workspace.municipality.identity.id);
-      const { aggregates, methodologicalCautions, warnings, ageSexObserved } = parseIBSECSV(
-        text,
-        { ageBands: sexAgeBands }
-      );
+      const { aggregates, methodologicalCautions, warnings, ageSexObserved, demographicAdjustment } = await prepareIBSEImport(text, workspace.municipality.identity.id, target);
       const documentId = crypto.randomUUID();
       await saveOriginalFile(workspace.municipality.identity.id, documentId, file);
       const study = createIBSEStudy({
         municipalityId: workspace.municipality.identity.id,
         sourceFileName: file.name,
         aggregates,
+        demographicAdjustment,
         ageSexObserved:
           ageSexObserved === undefined
             ? undefined

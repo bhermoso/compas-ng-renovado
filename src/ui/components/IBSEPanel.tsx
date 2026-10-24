@@ -365,6 +365,30 @@ export function IBSEPanel({ ibseStudy, municipalityName }: IBSEPanelProps) {
         </p>
       </section>
 
+      {ibseStudy.demographicAdjustment && (
+        <section className="study-report__section">
+          <h4>Ajuste demográfico</h4>
+          {ibseStudy.demographicAdjustment.status === "blocked" ? (
+            <ul>{ibseStudy.demographicAdjustment.reasons.map((reason) => <li key={reason}>{reason}</li>)}</ul>
+          ) : (
+            <>
+              <p>Población de referencia: {ibseStudy.demographicAdjustment.reference.ageGroupLabel}. Resultado pendiente de validación humana.</p>
+              <table>
+                <thead><tr><th scope="col">Dimensión</th><th scope="col">Media observada</th><th scope="col">Media ajustada</th></tr></thead>
+                <tbody>{IBSE_FACTORS.map(({ field, label }) => {
+                  const metric = ibseStudy.demographicAdjustment?.status === "computed" ? ibseStudy.demographicAdjustment.metrics[field] : undefined;
+                  return metric && <tr key={field}><th scope="row">{label}</th><td>{metric.observedMean.toFixed(1)}</td><td>{metric.adjustedMean.toFixed(1)}</td></tr>;
+                })}</tbody>
+              </table>
+              <p>{ibseStudy.demographicAdjustment.metrics.meanTotal.nValid} respuestas válidas; tamaño efectivo por dispersión de pesos: {ibseStudy.demographicAdjustment.metrics.meanTotal.effectiveSampleSize.toFixed(1)}.</p>
+              <p>Fuente: {ibseStudy.demographicAdjustment.reference.source}</p>
+              <ul>{ibseStudy.demographicAdjustment.methodologicalCautions.map((caution) => <li key={caution}>{caution}</li>)}</ul>
+              <details><summary>Procedencia del ajuste</summary><p style={{ overflowWrap: "anywhere" }}>SHA-256: {ibseStudy.demographicAdjustment.sampleFingerprint}</p></details>
+            </>
+          )}
+        </section>
+      )}
+
       {/* COLAPSABLES */}
       <details className="study-report__collapsible">
         <summary>Descripción del instrumento</summary>

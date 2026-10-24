@@ -1,5 +1,6 @@
 import { DocumentReference } from "./Documentation";
 import { useEffect, useState } from "react";
+import type { IBSEAdjustmentTarget } from "../../application/ibse/prepareIBSEImport";
 import {
   loadGranadaTerritorialReferences,
   type GranadaTerritorialReferences,
@@ -174,7 +175,7 @@ interface EstudiosComplementariosPanelProps {
   ibseStudy?: IBSEStudy;
   isLoadingIBSE?: boolean;
   ibseMessage?: string | null;
-  onLoadIBSECSV?: (file: File) => void;
+  onLoadIBSECSV?: (file: File, target?: IBSEAdjustmentTarget) => void;
 
   dukeStudy?: DUKEStudy;
   isLoadingDUKE?: boolean;
@@ -303,6 +304,7 @@ export function EstudiosComplementariosPanel({
   const studySlots = [ibseStudy, dukeStudy, predimedStudy, sf12Study, suenoStudy, cageStudy, auditcStudy, ipaqStudy, ghq12Study, phq9Study, psqiStudy, fagerstromStudy, sbqStudy];
   const loadedCount = studySlots.filter(Boolean).length;
   const [granadaReferences, setGranadaReferences] = useState<GranadaTerritorialReferences>();
+  const [ibseAdjustmentTarget, setIBSEAdjustmentTarget] = useState<IBSEAdjustmentTarget>("none");
 
   useEffect(() => {
     let active = true;
@@ -422,6 +424,13 @@ export function EstudiosComplementariosPanel({
       </div>
 
       <div className="ec-studies">
+        <label>
+          Población objetivo del ajuste IBSE
+          <select value={ibseAdjustmentTarget} disabled={isLoadingIBSE} onChange={(event) => setIBSEAdjustmentTarget(event.target.value as IBSEAdjustmentTarget)}>
+            <option value="none">Sin ajuste demográfico</option>
+            <option value="15-plus">Población municipal de 15 años y más</option>
+          </select>
+        </label>
         <StudyRow
           name="IBSE"
           subtitle="Bienestar socioemocional escolar"
@@ -433,7 +442,7 @@ export function EstudiosComplementariosPanel({
           recordSummary={ibseStudy ? `${ibseStudy.aggregates.nValid} válidos · media ${ibseStudy.aggregates.meanTotal}` : undefined}
           sourceFileName={ibseStudy?.sourceFileName}
           message={ibseMessage}
-          onLoadCSV={onLoadIBSECSV}
+          onLoadCSV={(file) => onLoadIBSECSV?.(file, ibseAdjustmentTarget)}
           onDelete={makeDeleteHandler("ibse")}
         >
           <IBSEPanel ibseStudy={ibseStudy} isLoading={isLoadingIBSE} message={ibseMessage} onLoadCSV={onLoadIBSECSV} municipalityName={municipalityName} />

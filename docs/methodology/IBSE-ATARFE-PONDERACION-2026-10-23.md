@@ -1,7 +1,7 @@
 # IBSE de Atarfe: procedencia y condiciones para la ponderación
 
 Fecha: 23 de octubre de 2026.
-Estado: diagnóstico reproducible y método autorizado mediante enmienda de CONTRACT-DYNAMIC-TRIPYRAMID de 2026-10-23. No activa ponderaciones: falta verificar una muestra apta y su procedencia.
+Estado actualizado a 2026-10-24: método autorizado e integración optativa de importación IBSE implementada. El expediente de Atarfe disponible sigue sin ser ponderable por ausencia de edad y sexo; no se ha certificado ni incorporado el candidato externo de procedencia dudosa.
 
 ## Resultado de la revisión
 
@@ -57,7 +57,17 @@ Los monitores HTML de la misma carpeta contienen generadores de respuestas simul
 
 Implementado en `src/application/sam/computePoststratifiedMean.ts`, con pruebas sintéticas en `tests/sam-poststratification.test.ts`. Recibe observaciones de una variable asignadas a celdas y una referencia explícita del mismo código municipal. Calcula pesos, medias observada y ajustada, suma de pesos, extremos y tamaño efectivo; conserva una copia de la referencia y exige validación humana. Bloquea matrices incoherentes, celdas vacías con población, observaciones incompatibles y resultados no finitos.
 
-Este motor no usa los coeficientes estáticos sin procedencia, no lee microdatos privados y no modifica expedientes. La selección válida del universo, la verificación de procedencia, la asignación etaria, las exclusiones, la huella real del archivo y la presentación de ambas medias deben resolverse en la integración siguiente. Una cadena de huella recibida por el motor no acredita por sí misma la autenticidad de una muestra. No está conectado todavía al parser, la persistencia ni la interfaz IBSE.
+Este motor no usa los coeficientes estáticos sin procedencia. Una cadena de huella recibida por el motor no acredita por sí misma la autenticidad de una muestra.
+
+### Integración IBSE (2026-10-24)
+
+`prepareIBSEImport` conecta el parser con el motor. La importación ofrece «Sin ajuste demográfico» (por defecto) o «Población municipal de 15 años y más». Este último universo conserva bandas completas del padrón desde 15-19 hasta 100+; no equivale a 16+ ni se deduce de las edades observadas. Se utiliza exclusivamente la referencia del municipio activo, resolviendo sus alias mediante el registro existente. Municipios sin referencia no reciben la de Atarfe.
+
+Se calcula SHA-256 del texto UTF-8 importado, no del fichero binario original. Los registros individuales solo se usan durante el cálculo; el estudio conserva resultados y recuentos por celda, no microdatos. Faltas de cobertura, edades/sexos no asignables y puntuaciones fuera de escala bloquean el ajuste sin cambiar los agregados observados. Los filtros originales de cumplimentación y validez siguen determinando el conjunto analítico y sus cautelas.
+
+El panel presenta las cinco medias observadas y ajustadas, recuento válido, tamaño efectivo, fuente, universo y huella. Los seis átomos conservan los valores originales y añaden la trazabilidad del cálculo separado o la razón de bloqueo. El resultado ajustado permanece pendiente de validación humana; no se incorpora como nueva prioridad ni reemplaza las interpretaciones originales. No se ha añadido todavía un flujo de aprobación del ajuste ni su uso automático en el Perfil.
+
+Verificado: 11 pruebas de integración, incluida serialización/recarga mediante los servicios reales; batería completa de 2707 pruebas superadas y 5 omitidas; navegador Chromium con datos sintéticos a 1280 y 390 píxeles sin desbordamiento horizontal. La prueba visual aísla el panel: no certifica un expediente real, una escritura en Firebase ni el despliegue remoto. Script: `node tests/ibse-adjustment.smoke.mjs`, con servidor Vite en el puerto 5187 o `COMPAS_QA_URL` explícita.
 
 `npx vitest run tests/sam-poststratification.test.ts`
 

@@ -1,5 +1,6 @@
 import type { MunicipalityId } from "../municipality";
 import type { IBSEAggregates } from "./IBSEAggregates";
+import type { IBSEAdjustment } from "./IBSEAdjustment";
 
 /**
  * Discriminador del universo etario de la MUESTRA municipal importada.
@@ -44,6 +45,7 @@ export interface IBSEAgeSexObserved {
 }
 
 export interface IBSEStudy {
+  demographicAdjustment?: IBSEAdjustment;
   id: string;
   municipalityId: MunicipalityId;
   sourceFileName: string;
@@ -61,6 +63,7 @@ export interface IBSEStudy {
 }
 
 export interface CreateIBSEStudyInput {
+  demographicAdjustment?: IBSEAdjustment;
   municipalityId: MunicipalityId;
   sourceFileName: string;
   aggregates: IBSEAggregates;
@@ -79,6 +82,7 @@ export function createIBSEStudy(input: CreateIBSEStudyInput): IBSEStudy {
     municipalityId: input.municipalityId,
     sourceFileName: input.sourceFileName,
     aggregates: input.aggregates,
+    demographicAdjustment: input.demographicAdjustment,
     // Sin discriminador explícito, el estudio NO afirma ser escolar: "unknown".
     sampleScope: input.sampleScope ?? "unknown",
     strataCounts: input.strataCounts,

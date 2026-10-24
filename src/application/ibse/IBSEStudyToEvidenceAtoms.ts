@@ -96,7 +96,19 @@ export function ibseStudyToEvidenceAtoms(study: IBSEStudy): EvidenceAtom[] {
   // IBSE_RESUMEN — 1 atom, interpretación estructural de los factores (kind: "qualitative-observation")
   const resumenAtom = buildIBSEResumen(study, confidence);
 
-  return [...factorAtoms, resumenAtom];
+  const atoms = [...factorAtoms, resumenAtom];
+  const adjustment = study.demographicAdjustment;
+  if (!adjustment) return atoms;
+  const trace = adjustment.status === "blocked"
+    ? `Ajuste demográfico no calculado: ${adjustment.reasons.join(" ")}`
+    : `Resultado ajustado separado, pendiente de validación humana. Fuente: ${adjustment.reference.source}; universo: ${adjustment.reference.ageGroupLabel}; método: ${adjustment.method}; SHA-256 del texto importado: ${adjustment.sampleFingerprint}. Los valores principales siguen siendo observados.`;
+  return atoms.map((atom) => ({
+    ...atom,
+    methodology: {
+      ...atom.methodology!,
+      limitations: [...(atom.methodology?.limitations ?? []), trace],
+    },
+  }));
 }
 
 // ── IBSE_RESUMEN — Síntesis automática derivada ───────────────────────────
