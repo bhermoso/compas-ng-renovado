@@ -45,10 +45,13 @@ export function AuthoredProposalPanel({ proposals, relations = [], onAdd, onRemo
   const [relationId, setRelationId] = useState("");
   const [sustento, setSustento] = useState<"" | "1" | "2" | "3">("");
   const [cautelas, setCautelas] = useState("");
+  const [datoQueLaCierra, setDatoQueLaCierra] = useState("");
+  const [condiciona, setCondiciona] = useState<string[]>([]);
   const [author, setAuthor] = useState("");
   const [problems, setProblems] = useState<string[]>([]);
 
   const conclusions = proposals.filter((p) => p.kind === "conclusion");
+  const esLaguna = kind === "conclusion" && tipo === "laguna";
 
   function submit() {
     const candidate: Omit<AuthoredProposal, "authoredAt"> = {
@@ -62,6 +65,8 @@ export function AuthoredProposalPanel({ proposals, relations = [], onAdd, onRemo
       ...(kind === "orientation" && relationId !== "" ? { relationId } : {}),
       ...(sustento !== "" ? { sustento: Number(sustento) as 1 | 2 | 3 } : {}),
       ...(cautelas.trim() !== "" ? { cautelas: cautelas.trim() } : {}),
+      ...(esLaguna && datoQueLaCierra.trim() !== "" ? { datoQueLaCierra: datoQueLaCierra.trim() } : {}),
+      ...(esLaguna && condiciona.length > 0 ? { condiciona } : {}),
       authoredBy: author.trim(),
     };
     const found = validateAuthoredProposal(candidate, proposals, relations);
@@ -77,6 +82,8 @@ export function AuthoredProposalPanel({ proposals, relations = [], onAdd, onRemo
     setSustento("");
     setRelationId("");
     setCautelas("");
+    setDatoQueLaCierra("");
+    setCondiciona([]);
   }
 
   return (
@@ -117,6 +124,32 @@ export function AuthoredProposalPanel({ proposals, relations = [], onAdd, onRemo
         Texto
         <textarea rows={3} value={text} onChange={(e) => setText(e.target.value)} />
       </label>
+      {esLaguna && (
+        <label>
+          Dato que la cerraría (qué dato, de qué fuente y a qué escala)
+          <textarea rows={2} value={datoQueLaCierra} onChange={(e) => setDatoQueLaCierra(e.target.value)} />
+        </label>
+      )}
+      {esLaguna && (
+        <fieldset>
+          <legend>Conclusiones que condiciona (opcional)</legend>
+          {conclusions.filter((c) => c.tipo !== "laguna").length === 0 && <p>No hay conclusiones registradas.</p>}
+          {conclusions
+            .filter((c) => c.tipo !== "laguna")
+            .map((c) => (
+              <label key={c.id}>
+                <input
+                  type="checkbox"
+                  checked={condiciona.includes(c.id)}
+                  onChange={(e) =>
+                    setCondiciona((prev) => (e.target.checked ? [...prev, c.id] : prev.filter((x) => x !== c.id)))
+                  }
+                />
+                {c.id}: {c.text.slice(0, 80)}
+              </label>
+            ))}
+        </fieldset>
+      )}
       <label>
         Evidencia citada (una por línea: documento y localización)
         <textarea rows={3} value={evidence} onChange={(e) => setEvidence(e.target.value)} />

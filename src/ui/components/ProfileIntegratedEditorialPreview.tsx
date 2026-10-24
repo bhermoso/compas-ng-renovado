@@ -1,6 +1,7 @@
 import { conciliationParagraph } from "../../application/health-profile/antecedents";
 import { RECOMMENDATION_LABEL } from "../../domain/statements/statementTypes";
 import { startingPointParagraphs } from "../../application/health-profile/startingPoint";
+import { splitChosenConclusions, unknownLines } from "../../application/proposals/chosenClosing";
 import type {
   ProfileIntegratedEditorialView,
   CanonicalEditorialView,
@@ -423,14 +424,26 @@ export function ProfileIntegratedEditorialPreview({
           sellado llevan el mismo texto (Art. 17 bis). */}
       {"chosenClosing" in view && view.chosenClosing !== undefined ? (
         <>
-          {view.chosenClosing.conclusions.length > 0 ? (
+          {splitChosenConclusions(view.chosenClosing).cuerpo.length > 0 ? (
             <section className="pie-doc-section" aria-labelledby="pie-chosen-conclusions-title">
               <h3 id="pie-chosen-conclusions-title" className="pie-section__title">Conclusiones</h3>
-              {view.chosenClosing.conclusions.map((c) => (
+              {splitChosenConclusions(view.chosenClosing).cuerpo.map((c) => (
                 <article key={c.etiqueta} className="pie-hilo">
                   <p className="pie-hilo__reading">{c.texto}</p>
                   {c.cautelas !== undefined ? <p className="pie-hilo__context">Salvedades: {c.cautelas}</p> : null}
                   <p className="pie-hilo__context">Evidencia: {c.evidencia.join("; ")}.</p>
+                </article>
+              ))}
+            </section>
+          ) : null}
+          {splitChosenConclusions(view.chosenClosing).lagunas.length > 0 ? (
+            <section className="pie-doc-section" aria-labelledby="pie-unknowns-title">
+              <h3 id="pie-unknowns-title" className="pie-section__title">Lo que no sabemos</h3>
+              {splitChosenConclusions(view.chosenClosing).lagunas.map((l) => (
+                <article key={l.etiqueta} className="pie-hilo">
+                  {unknownLines(l).map((line, i) => (
+                    <p key={i} className={i === 0 ? "pie-hilo__reading" : "pie-hilo__context"}>{line}</p>
+                  ))}
                 </article>
               ))}
             </section>
