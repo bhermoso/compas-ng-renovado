@@ -10,7 +10,8 @@ Producto prioritario: el Perfil de Salud Local — documento científico, editor
 - Contrato rector: docs/contracts/CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md (versión vigente en el propio contrato)
 - Regla N+1 (Art. 7 bis A / I-LHPM-7): Informe solo no es Perfil. Perfil = Informe + al menos una de: estudios complementarios, activos, priorización ciudadana.
 - Modelo canónico único (Art. 17 bis / I-LHPM-8): pantalla, visor, DOCX, PDF e impresión son el mismo documento. Ninguna representación puede divergir.
-- Cadena (Art. 16 bis / I-LHPM-9): evidencia, lectura integrada, conclusiones, frontera, recomendaciones (Plan de Acción). El Perfil concluye y orienta técnicamente; las actuaciones, prioridades y recomendaciones son del Plan de Acción.
+- Cadena (Art. 16 bis / I-LHPM-9): evidencia, lectura integrada, conclusiones, recomendaciones del Perfil, frontera, priorización, Plan de Acción. El Perfil concluye y recomienda (Conocer, Contrastar, Abordar; Art. 8 quater); las prioridades y las actuaciones (responsable, plazo, recurso, indicador) son del Grupo Motor y del Plan de Acción.
+- Estructura del Perfil (Art. 16 quater, contrato v2.0.0): la conclusión es la unidad; el cuerpo tiene siete apartados y la evidencia completa va en el anexo compilado. Los bloques heredados del cuerpo se retiran uno a uno (disposición transitoria), sin que Granada-Zaidín cambie sin justificación.
 - Autoría acotada (Art. 16): el cuerpo diagnóstico es compilado y trazable, no editable a mano. La autoría humana vive en el cierre interpretativo y el enriquecimiento.
 - El Perfil tiene una sola salida (Art. 17 ter, v1.8.0). El NHS y la salida comparativa breve se retiraron el 2026-10-23: no restaurarlos ni crear representaciones derivadas sin reformar el contrato.
 
