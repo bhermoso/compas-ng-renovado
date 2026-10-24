@@ -72,10 +72,10 @@ export const PRIORITIZATION_PENDING_DECLARATION =
 
 /** Enunciado fijo de frontera con el Plan de Acción (el Perfil concluye y orienta; no decide, Art. 16 bis). */
 export const CANONICAL_FRONTIER_STATEMENT =
-  "Este Perfil de Salud Local concluye y orienta técnicamente: no fija actuaciones, " +
-  "programas, objetivos estratégicos ni prioridades. La traducción a prioridades y " +
-  "acciones corresponde al Plan de Acción, que es una fase posterior del proceso de " +
-  "planificación y se elabora con el Grupo Motor a partir de este documento.";
+  "El Perfil termina en sus conclusiones y recomendaciones (Conocer, Contrastar, Abordar). " +
+  "No fija actuaciones, programas, objetivos estratégicos ni prioridades: priorizar " +
+  "corresponde al Grupo Motor, y las actuaciones, con su responsable, plazo, recurso e " +
+  "indicador, al Plan de Acción, que se elabora a partir de este documento.";
 
 /** Nota institucional fija de cautela metodológica de cualquier PSL-C. */
 export const CANONICAL_INSTITUTIONAL_CAUTION_NOTE =

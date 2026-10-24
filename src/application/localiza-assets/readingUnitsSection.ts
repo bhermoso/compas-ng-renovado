@@ -31,6 +31,8 @@ export interface CanonicalReadingUnit {
   axis?: { definition: string; declaredBy: string; declaredOn: string; version: number };
   /** Qué fuentes se cruzan en esta unidad y qué significa el cruce. */
   crossingStatement: string;
+  /** Planos presentes en la unidad (Art. 14): voz ciudadana, recursos de Localiza, Informe. */
+  planes?: { voz: boolean; recursos: number; informe: boolean };
 }
 
 export interface CanonicalReadingUnits {
@@ -124,6 +126,7 @@ export function buildCanonicalReadingUnits(
       ...(u.axis !== undefined ? { axis: u.axis } : {}),
       lines,
       crossingStatement: crossingStatement(u.crossing, derivation.voiceSourceAvailable),
+      planes: { voz: u.voice !== null, recursos: assets.length, informe: u.informe !== null },
     };
   });
 
