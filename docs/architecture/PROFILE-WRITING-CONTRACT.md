@@ -1,9 +1,98 @@
 # Contrato de escritura del Perfil Local de Salud
 
-> Documento operativo, no académico. Gobierna cómo COMPÁS NG escribe el
-> Perfil. Versión inicial: 2026-07-09. Implementación testeable:
-> `src/application/health-profile/profileWritingContract.ts` y
+> Documento operativo, no académico. Gobierna cómo se escribe el Perfil,
+> lo redacte COMPÁS NG, una persona o un asistente fuera de la aplicación.
+> Versión inicial: 2026-07-09. Versión 2: 2026-10-25 (§0, lector y voz;
+> §1 y §4 alineados con el contrato metodológico v2.1.0). Implementación
+> testeable: `src/application/health-profile/profileWritingContract.ts` y
 > `tests/profile-writing-contract.test.ts`.
+
+## 0. Para quién se escribe y cómo suena
+
+Decisión del autor (2026-10-25). Esta sección prevalece sobre cualquier hábito
+de redacción y se aplica cada vez que se genere un Perfil, dentro o fuera de
+COMPÁS, para que el resultado no dependa de recordarlo en cada conversación.
+
+### 0.1 El lector
+
+El Perfil lo recibe una persona que tiene que entender su municipio y decidir:
+una técnica municipal, un concejal o una alcaldesa, una enfermera o un médico
+del centro de salud, una persona del Grupo Motor. No es un evaluador del método
+ni un revisor del sistema. Lee para saber cómo está la salud de su pueblo, por
+qué, con qué cuenta y qué conviene hacer a continuación.
+
+**Prueba del lector.** Antes de entregar cualquier apartado, se relee como lo
+leería esa persona. Si una frase le habla del documento, de sus fuentes o de
+sus reglas en vez de hablarle del municipio, se reescribe o va al anexo.
+
+### 0.2 La voz
+
+- El sujeto del texto es el municipio y su gente, no el Perfil. «Loja tiene…»,
+  «En la Alfaguara…», «Las mujeres de Loja…»; nunca «Este Perfil describe…»,
+  «En este apartado se recoge…», «Lo que no consta se declara aquí…».
+- Prosa de diagnóstico, con datos dentro de la frase y la fuente entre
+  paréntesis o en una nota, sin interrumpir la lectura. Tablas solo donde el
+  lector compara cifras.
+- Se escribe desde el lugar: el territorio, los barrios, los anejos, la
+  economía real, la historia que explica el presente. Los determinantes
+  sociales de la salud forman parte de ese discurso diagnóstico integral; no
+  se exponen como teoría ni ocupan un capítulo aparte.
+- Lo que no se sabe se dice donde importa, como un hecho sobre el
+  conocimiento del municipio y en una frase: «No hay datos de suicidio en Loja
+  posteriores a 2016». No se anuncian listas de ausencias ni se declara qué
+  entra o no entra en el documento.
+- Modelo de referencia: «Loja: lo que sabemos de los determinantes de su
+  salud» (borrador del 25-10-2026). Contramodelo: los borradores que se
+  explican a sí mismos.
+
+### 0.3 Qué no va en el cuerpo
+
+Va al anexo de notas metodológicas o a los metadatos de trazabilidad, nunca al
+cuerpo:
+
+1. La explicación de qué es el documento, qué incluye, qué deja fuera y por
+   qué (salvo un párrafo de presentación, sin reglas).
+2. Las etiquetas de tipo de afirmación («hecho», «interpretación»,
+   «hipótesis»), los grados de sustento y los rótulos de ciclo como
+   encabezados de frase. El contrato metodológico exige clasificar cada
+   afirmación (Art. 8): esa clasificación vive en la capa de trazabilidad y en
+   el bloque de conclusiones, y se nota en la prosa por cómo se dice («los
+   datos muestran», «probablemente», «no se sabe»), no por etiquetas.
+3. Las definiciones operativas (recurso y activo, local y no local) y la
+   tabla completa de fuentes.
+4. Las incoherencias de las fuentes, que van a una nota técnica dirigida a
+   quien elaboró cada fuente.
+
+### 0.4 Decisiones de estructura vigentes (Loja, 2026-10-25)
+
+- **Estilos de vida.** Sin capítulo propio. Las cifras autonómicas o
+  provinciales sin dato local (Encuesta Andaluza de Salud) son contexto,
+  rotulado «no local», dentro de la situación de salud. El Perfil dice una
+  vez, en su sitio, que no hay datos locales y que solo los habrá si se
+  producen como estudios complementarios con el Gestor de Encuestas de
+  COMPÁS.
+- **Voz de la comunidad.** Capítulo propio; la lectura integrada la cruza
+  con lo demás.
+- **Antecedentes.** Dentro del capítulo del proceso local: contar los ciclos
+  anteriores es contar qué dijeron y qué quedó.
+- **Lectura integrada.** Hasta cuatro hilos.
+- **Conclusiones y recomendaciones.** Al final, como menú numerado que el
+  equipo técnico elige, corrige o descarta (contrato metodológico,
+  Art. 8 quater y 16 quater).
+
+### 0.5 Comprobación antes de entregar
+
+Un Perfil, o un apartado, no se entrega si:
+
+- alguna frase del cuerpo tiene como sujeto el propio documento o su método;
+- aparecen etiquetas de tipo de afirmación fuera del bloque de conclusiones;
+- hay una lista de ausencias en el cuerpo en lugar de frases en su sitio;
+- una cifra no lleva año y fuente, o se presenta una cifra estimada o
+  aproximada como dato;
+- un dato no local ocupa el lugar de uno local;
+- se usa lenguaje estigmatizante sobre barrios o colectivos, aunque proceda
+  literalmente de una fuente;
+- no supera la prueba del lector (§0.1).
 
 ## 1. Propósito del Perfil Local de Salud
 
@@ -12,7 +101,9 @@ dado; el Plan de Acción pertenece a una fase posterior. Lo que aporta COMPÁS
 es convertir estudios complementarios, documentación territorial, BADEA/IECA,
 activos comunitarios, material cualitativo y el contraste del Grupo Motor en
 una **lectura territorial con sentido**: informar, interesar, suscitar
-preguntas y preparar la deliberación — sin recomendar todavía.
+preguntas y preparar la deliberación. Desde el contrato metodológico v1.4
+(2026-10-21) el Perfil concluye y recomienda qué conocer, qué contrastar y
+qué abordar (Art. 8 quater), al final del documento; no decide.
 
 ## 2. Escribir con perspectiva de sociología de la salud
 
@@ -114,7 +205,9 @@ Las redacciones finales aportadas o aprobadas por el equipo se conservan.
 
 ## 4. Fronteras (inviolables)
 
-- **No recomendaciones**, actuaciones, programas ni objetivos estratégicos.
+- **No actuaciones**, programas, objetivos estratégicos ni prioridades. Las
+  recomendaciones del Perfil (Conocer, Contrastar, Abordar) solo en su
+  capítulo final y sin responsable, plazo, recurso ni indicador.
 - **No Plan de Acción** como contenido del Perfil (es fase posterior).
 - **No causalidad falsa**: hipótesis y mecanismos plausibles, nunca
   «demuestra que» ni «causa directa».
@@ -130,8 +223,9 @@ incertidumbres; (b) cada señal queda conectada con al menos un mecanismo
 plausible o una pregunta; (c) las desigualdades no observables están
 declaradas; (d) los activos aparecen conectados con desafíos; (e) hay
 preguntas vivas para el Grupo Motor formuladas como producción de
-conocimiento; (f) el texto anima a la deliberación sin formular ninguna
-recomendación; (g) supera `checkProfileWritingContract` sin violaciones.
+conocimiento; (f) el texto anima a la deliberación y solo recomienda en su capítulo
+final (Conocer, Contrastar, Abordar); (g) supera `checkProfileWritingContract` sin violaciones; (h) cumple la
+comprobación del §0.5.
 
 ## 6. Bibliografía orientadora mínima
 
