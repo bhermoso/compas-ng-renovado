@@ -3,7 +3,8 @@
 > Documento operativo, no académico. Gobierna cómo se escribe el Perfil,
 > lo redacte COMPÁS NG, una persona o un asistente fuera de la aplicación.
 > Versión inicial: 2026-07-09. Versión 2: 2026-10-25 (§0, lector y voz;
-> §1 y §4 alineados con el contrato metodológico v2.1.0). Implementación
+> §1 y §4 alineados con el contrato metodológico v2.1.0); §0.2, §0.4 y §0.5
+> revisados el 2026-10-26 (estructura en siete apartados y citas). Implementación
 > testeable: `src/application/health-profile/profileWritingContract.ts` y
 > `tests/profile-writing-contract.test.ts`.
 
@@ -30,16 +31,18 @@ sus reglas en vez de hablarle del municipio, se reescribe o va al anexo.
 - El sujeto del texto es el municipio y su gente, no el Perfil. «Loja tiene…»,
   «En la Alfaguara…», «Las mujeres de Loja…»; nunca «Este Perfil describe…»,
   «En este apartado se recoge…», «Lo que no consta se declara aquí…».
-- Prosa de diagnóstico, con datos dentro de la frase y la fuente entre
-  paréntesis o en una nota, sin interrumpir la lectura. Tablas solo donde el
-  lector compara cifras.
+- Prosa de diagnóstico, con datos dentro de la frase. Cada dato lleva su
+  cita al lado, numerada en estilo Vancouver con la tabla o el apartado de la
+  fuente: «20.923 habitantes [1]», «el 58,8 % [4, tabla 31030]». Datos de
+  fuentes distintas no comparten cita. Tablas solo donde el lector compara
+  cifras.
 - Se escribe desde el lugar: el territorio, los barrios, los anejos, la
   economía real, la historia que explica el presente. Los determinantes
   sociales de la salud forman parte de ese discurso diagnóstico integral; no
   se exponen como teoría ni ocupan un capítulo aparte.
 - Lo que no se sabe se dice donde importa, como un hecho sobre el
   conocimiento del municipio y en una frase: «No hay datos de suicidio en Loja
-  posteriores a 2016». No se anuncian listas de ausencias ni se declara qué
+  posteriores a 2010». No se anuncian listas de ausencias ni se declara qué
   entra o no entra en el documento.
 - Modelo de referencia: «Loja: lo que sabemos de los determinantes de su
   salud» (borrador del 25-10-2026). Contramodelo: los borradores que se
@@ -63,22 +66,56 @@ cuerpo:
 4. Las incoherencias de las fuentes, que van a una nota técnica dirigida a
    quien elaboró cada fuente.
 
-### 0.4 Decisiones de estructura vigentes (Loja, 2026-10-25)
+### 0.4 Estructura vigente (Loja, 2026-10-26)
 
-- **Estilos de vida.** Sin capítulo propio. Las cifras autonómicas o
+Sigue el Art. 16 quater del contrato metodológico: la conclusión es la unidad,
+el cuerpo tiene siete apartados y la evidencia completa va en los anexos. El
+Resumen va delante del cuerpo y no se numera.
+
+**Cuerpo.**
+
+1. **Punto de partida.** El municipio en un párrafo, el proceso local (ciclo
+   actual y ciclos anteriores) y de dónde procede lo que se sabe. Las
+   preguntas que recorren la lectura y los vacíos principales, en una frase
+   cada uno.
+2. **Conclusiones.** Cada una con su enunciado y una lectura breve, seguida
+   de campos fijos: tipo, evidencia (hasta tres, con cifra y cita), relación
+   y su grado, límite y recomendaciones a las que lleva. Es el único lugar
+   del cuerpo con etiquetas de tipo de afirmación (§0.3).
+3. **Coincidencias y discrepancias entre fuentes.** Dónde convergen
+   registros, estadísticas y consultas, y dónde se separan.
+4. **Lo que no sabemos.** Tabla: pregunta sin respuesta con datos,
+   conclusión a la que afecta y dónde puede obtenerse la respuesta.
+5. **Recomendaciones.** Menú numerado (Conocer, Contrastar, Abordar), cada
+   una con la conclusión de la que deriva, para que el equipo técnico elija,
+   corrija o descarte (Art. 8 quater). «Abordar» solo con relación de grado 1
+   o 2.
+6. **Paso al Plan de Acción.** Qué recibe el Grupo Motor y qué decide él.
+7. **Autoría y validación.**
+
+**Anexos.**
+
+- Evidencia por dimensión: el municipio y su gente; situación de salud;
+  desigualdades; activos y recursos; voz de la comunidad.
+- El proceso local: ciclos, hitos y lo que dejó cada uno.
+- Cómo ha cambiado el municipio: cifras de ciclos distintos, una junto a
+  otra solo cuando se midieron de la misma manera.
+- Tablas de apoyo (por ejemplo, renta por sección censal), referencias,
+  notas metodológicas y nota técnica para quienes elaboraron las fuentes.
+
+**Decisiones que se mantienen.**
+
+- **Estilos de vida.** Sin apartado propio. Las cifras autonómicas o
   provinciales sin dato local (Encuesta Andaluza de Salud) son contexto,
-  rotulado «no local», dentro de la situación de salud. El Perfil dice una
+  rotulado «no local», dentro del anexo de situación de salud. Se dice una
   vez, en su sitio, que no hay datos locales y que solo los habrá si se
   producen como estudios complementarios con el Gestor de Encuestas de
   COMPÁS.
-- **Voz de la comunidad.** Capítulo propio; la lectura integrada la cruza
-  con lo demás.
-- **Antecedentes.** Dentro del capítulo del proceso local: contar los ciclos
-  anteriores es contar qué dijeron y qué quedó.
-- **Lectura integrada.** Hasta cuatro hilos.
-- **Conclusiones y recomendaciones.** Al final, como menú numerado que el
-  equipo técnico elige, corrige o descarta (contrato metodológico,
-  Art. 8 quater y 16 quater).
+- **Interpretación.** No hay lectura integrada en hilos ni párrafos de
+  «lectura» al final de cada anexo: la interpretación vive en las
+  conclusiones y en el apartado 3.
+- **Antecedentes.** Los ciclos anteriores se cuentan en el anexo del proceso
+  local y sirven de término de comparación, no de descripción del presente.
 
 ### 0.5 Comprobación antes de entregar
 
@@ -87,8 +124,8 @@ Un Perfil, o un apartado, no se entrega si:
 - alguna frase del cuerpo tiene como sujeto el propio documento o su método;
 - aparecen etiquetas de tipo de afirmación fuera del bloque de conclusiones;
 - hay una lista de ausencias en el cuerpo en lugar de frases en su sitio;
-- una cifra no lleva año y fuente, o se presenta una cifra estimada o
-  aproximada como dato;
+- una cifra no lleva año y cita propia al lado, o se presenta una cifra
+  estimada o aproximada como dato;
 - un dato no local ocupa el lugar de uno local;
 - se usa lenguaje estigmatizante sobre barrios o colectivos, aunque proceda
   literalmente de una fuente;
@@ -103,7 +140,7 @@ activos comunitarios, material cualitativo y el contraste del Grupo Motor en
 una **lectura territorial con sentido**: informar, interesar, suscitar
 preguntas y preparar la deliberación. Desde el contrato metodológico v1.4
 (2026-10-21) el Perfil concluye y recomienda qué conocer, qué contrastar y
-qué abordar (Art. 8 quater), al final del documento; no decide.
+qué abordar (Art. 8 quater), en el cuerpo, tras las conclusiones; no decide.
 
 ## 2. Escribir con perspectiva de sociología de la salud
 
