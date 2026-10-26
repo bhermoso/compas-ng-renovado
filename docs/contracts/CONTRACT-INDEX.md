@@ -336,7 +336,7 @@ Contrato del Compilador del Plan Local de Salud. Define los gates obligatorios (
 ## Infraestructura metodológica
 
 ### CONTRACT-DYNAMIC-TRIPYRAMID
-**Estado:** VIGENTE — revisado 2026-10-19 (v2.1: pirámide superpuesta y animada, sin semáforo)
+**Estado:** VIGENTE — revisado 2026-10-26 (v2.2: SAM describe la composición y no califica la representatividad; v2.1: pirámide superpuesta y animada, sin semáforo)
 
 Define el Sistema de Ajuste Muestral (SAM) como capacidad metodológica transversal: `PopulationReference`, `SampleQualityAssessment`, Cochran+FPC como algoritmo por defecto, clasificación high/medium/low. Motor puro implementado y certificado (Producto 2, 2026-06-29). `populationReferenceRegistry.ts` añadido (2026-07-13): IBSEPanel consume el motor SAM cuando existe referencia verificada para el municipio activo (actualmente Atarfe). Tripirámide visual, EvidenceAtoms desde SAM y estratificación pendientes.
 

@@ -43,60 +43,58 @@ function classifyQuality(coverage: number): SampleQualityLevel {
   return "low";
 }
 
+// La muestra teórica es el tamaño que necesitaría una muestra aleatoria simple de
+// la población de referencia. Compararla con la muestra conseguida informa del
+// tamaño, no de la representatividad: SAM no conoce cómo se seleccionó la muestra.
+const RANDOM_SAMPLE_PREMISE =
+  "La muestra teórica supone una selección aleatoria. Si la muestra no es probabilística " +
+  "(por ejemplo, de participación voluntaria), alcanzar ese tamaño no la hace representativa " +
+  "ni permite calcular un margen de error: quienes responden pueden diferir de quienes no " +
+  "responden aunque sean muchos.";
+
 function buildRationale(
   quality: SampleQualityLevel,
   coverage: number,
   nObserved: number,
   nTheoretical: number
 ): string {
-  const pct = coverage.toFixed(1);
+  const pct = coverage.toLocaleString("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const base =
+    `La muestra conseguida (n=${nObserved}) es el ${pct} % de la muestra teórica ` +
+    `(n=${nTheoretical}), el tamaño que necesitaría una muestra aleatoria simple de esta ` +
+    `población para estimar una proporción con error ±5 % y confianza del 95 %.`;
   switch (quality) {
     case "high":
-      return (
-        `Calidad alta: la muestra observada (n=${nObserved}) alcanza o supera la muestra ` +
-        `teórica Cochran (n=${nTheoretical}), cubriendo el ${pct} %. ` +
-        `La representatividad estadística está asegurada con los parámetros estándar.`
-      );
+      return `${base} Alcanza ese tamaño. El tamaño no informa de cómo se seleccionó la muestra.`;
     case "medium":
-      return (
-        `Calidad media: la muestra observada (n=${nObserved}) cubre el ${pct} % de la muestra ` +
-        `teórica Cochran (n=${nTheoretical}). Las estimaciones son operativas pero deben ` +
-        `interpretarse con cautela por la cobertura parcial.`
-      );
+      return `${base} No alcanza ese tamaño: aun con selección aleatoria, el error sería mayor de ±5 %.`;
     case "low":
       return (
-        `Calidad baja: la muestra observada (n=${nObserved}) solo cubre el ${pct} % de la muestra ` +
-        `teórica Cochran (n=${nTheoretical}). El margen de error real supera el estándar ` +
-        `previsto (±5 %). Las conclusiones tienen alcance descriptivo, no inferencial.`
+        `${base} Queda muy por debajo: aun con selección aleatoria, el error superaría ` +
+        `con mucho ±5 %. Las conclusiones tienen alcance descriptivo.`
       );
   }
 }
 
 function buildCautions(
   quality: SampleQualityLevel,
-  coverage: number,
   populationReference: PopulationReference
 ): string[] {
   const cautions: string[] = [];
 
   if (quality === "low") {
     cautions.push(
-      "Muestra insuficiente para estimaciones representativas con error ±5 % y confianza 95 %. " +
+      "Muestra insuficiente para estimar con error ±5 % y confianza 95 % aun con selección aleatoria. " +
       "Las conclusiones tienen alcance descriptivo, no inferencial."
     );
   } else if (quality === "medium") {
     cautions.push(
-      "Cobertura muestral parcial (60–99 % del óptimo Cochran). Se recomienda interpretar los " +
-      "resultados con cautela y no extraer inferencias categóricas sobre la población."
+      "Tamaño parcial (60–99 % de la muestra teórica): aun con selección aleatoria, el error " +
+      "superaría ±5 %. No se extraen inferencias categóricas sobre la población."
     );
   }
 
-  if (coverage < 100) {
-    cautions.push(
-      "La representatividad estadística plena no está asegurada. Se requiere valoración técnica " +
-      "antes de utilizar este dato como evidencia principal en el diagnóstico territorial."
-    );
-  }
+  cautions.push(RANDOM_SAMPLE_PREMISE);
 
   cautions.push(
     `Fuente poblacional de referencia: ${populationReference.source} (${populationReference.year}). ` +
@@ -104,7 +102,7 @@ function buildCautions(
   );
 
   cautions.push(
-    "La calidad muestral informa sobre representatividad estadística. " +
+    "El dictamen de tamaño informa. " +
     "No modifica los resultados del instrumento ni determina su validez metodológica."
   );
 
@@ -153,7 +151,6 @@ export function computeSampleQualityAssessment(
     ),
     methodologicalCautions: buildCautions(
       sampleQuality,
-      coverageGlobal,
       input.populationReference
     ),
     capabilities: {

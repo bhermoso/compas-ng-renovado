@@ -58,7 +58,7 @@ export interface AUDITCCSVParseResult {
    * Distribución observada edad×sexo de la muestra.
    * Solo presente si el CSV incluye columnas `sexo` y `anio_nacimiento`
    * Y se pasaron `ageBands` en las opciones.
-   * Para usarla con enrichWithRepresentativeness se requiere además que
+   * Para usarla con enrichWithComposition se requiere además que
    * PopulationReference.ageSexMatrix esté disponible en la referencia poblacional.
    */
   ageSexObserved?: AgeSexObservedResult;

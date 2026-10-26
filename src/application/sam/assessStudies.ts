@@ -18,8 +18,7 @@ import type { CAGEStudy } from "../../domain/cage";
 import type { AgeSexCell, PopulationReference } from "../../domain/sam/PopulationReference";
 import type { SampleQualityAssessment } from "../../domain/sam/SampleQualityAssessment";
 import { computeSampleQualityAssessment } from "./computeSampleQualityAssessment";
-import { computeHamiltonAllocation } from "./computeHamiltonAllocation";
-import { computeCellRepresentativeness } from "./computeCellRepresentativeness";
+import { computeSampleComposition } from "./computeSampleComposition";
 
 // ── EAS — Encuesta Andaluza de Salud (adultos ≥16) ──────────────────────────
 
@@ -219,24 +218,23 @@ export function assessIBSEStudySAM(
   };
 }
 
-// ── Representatividad demográfica (Hamilton + desviaciones por celda) ─────────
+// ── Composición por edad y sexo frente al padrón ─────────────────────────────
 //
-// Solo actúa cuando PopulationReference.ageSexMatrix está disponible Y se
-// aporta la distribución observada por celda (ageSexObserved). En su ausencia,
-// el flujo Cochran + cobertura global no se modifica.
+// Solo actúa cuando PopulationReference.ageSexMatrix está disponible y se aporta
+// la distribución observada por celda. En su ausencia, el dictamen de tamaño no
+// se modifica.
 
 /**
- * Enriquece un SampleQualityAssessment existente con la evaluación de
- * representatividad demográfica por celda (edad × sexo).
+ * Añade a un SampleQualityAssessment la composición por edad y sexo de la
+ * muestra frente al padrón. Describe; no califica la representatividad.
  *
- * @param assessment    Dictamen SAM ya calculado (Cochran + cobertura).
- * @param ageSexObserved  Distribución observada por celda en la muestra.
- *   Debe tener el mismo número de bandas y el mismo orden que
- *   assessment.populationReference.ageSexMatrix.
- * @returns  El mismo dictamen enriquecido con `representativeness`.
- *   Si ageSexMatrix no está en la referencia, devuelve el dictamen sin cambios.
+ * @param assessment      Dictamen SAM ya calculado (tamaño).
+ * @param ageSexObserved  Respuestas por celda, con las mismas bandas y el mismo
+ *   orden que assessment.populationReference.ageSexMatrix.
+ * @returns  El mismo dictamen con `composition`. Si la referencia no tiene
+ *   ageSexMatrix, lo devuelve sin cambios.
  */
-export function enrichWithRepresentativeness(
+export function enrichWithComposition(
   assessment: SampleQualityAssessment,
   ageSexObserved: AgeSexCell[]
 ): SampleQualityAssessment {
@@ -244,18 +242,5 @@ export function enrichWithRepresentativeness(
   if (matrix === undefined) {
     return assessment;
   }
-
-  const theoretical = computeHamiltonAllocation(matrix, assessment.nTheoretical);
-  const achieved = ageSexObserved.map((c) => ({
-    ageBand: c.ageBand,
-    male: c.male,
-    female: c.female,
-  }));
-
-  const representativeness = computeCellRepresentativeness(
-    theoretical.cells,
-    achieved
-  );
-
-  return { ...assessment, representativeness };
+  return { ...assessment, composition: computeSampleComposition(matrix, ageSexObserved) };
 }

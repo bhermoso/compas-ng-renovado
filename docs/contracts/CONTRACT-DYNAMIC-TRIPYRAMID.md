@@ -1,7 +1,9 @@
 # CONTRACT-DYNAMIC-TRIPYRAMID
 
 > Contrato de la Tripirámide Dinámica y del Sistema de Ajuste Muestral (SAM).
-> Versión 2.1 — Producto 2 — 2026-10-19
+> Versión 2.2 — Producto 2 — 2026-10-26
+>
+> Enmienda 2.2 (decisión del autor, 2026-10-26): SAM describe la composición por edad y sexo de la muestra frente al padrón y no califica su representatividad. Se retiran el error absoluto medio y la etiqueta alta / moderada / baja (umbrales 1,5 y 3,5 pp sin fuente, heredados de la auditoría del histórico). Los textos del dictamen de tamaño dejan de afirmar representatividad: la muestra teórica es la que necesitaría una muestra aleatoria simple.
 >
 > Enmienda 2.1 (decisión del autor, 2026-10-19): la Tripirámide se representa como una sola pirámide con tres capas superpuestas y **se anima**. Sustituye a la versión 2.0, que excluía las animaciones piramidales. Se mantiene la exclusión del semáforo.
 
@@ -78,7 +80,7 @@ Número de registros válidos disponibles en el estudio (n válido del instrumen
 
 ## Cálculo de la calidad muestral
 
-La calidad muestral compara la muestra observada con la teórica:
+La calidad muestral compara el tamaño de la muestra observada con el de la teórica. La muestra teórica es la que necesitaría una muestra aleatoria simple; alcanzarla no hace representativa una muestra no probabilística ni permite calcular su margen de error, y los textos del dictamen lo dicen (enmienda 2.2). Los umbrales de la tabla siguiente proceden de la versión 1 del contrato y no tienen fuente citada:
 
 | Relación | Calidad |
 |---|---|
@@ -220,8 +222,9 @@ interface DynamicTripyramidResult {
 La Tripirámide se representa como un documento con:
 
 1. **Pirámide superpuesta y animada** (enmienda 2.1). Una sola pirámide por sexo y banda de edad, con tres capas superpuestas desde el mismo eje: población (trama), afijación ideal (translúcida) y muestra conseguida (sólida). Cada capa se dibuja como porcentaje de su propio total. Al mostrarse, las capas crecen en ese orden: población, afijación ideal, muestra conseguida. La persona usuaria puede repetir la animación. Con la preferencia de movimiento reducido del sistema, o sin posibilidad de animar, la pirámide se muestra completa y sin transición. La distinción entre capas no depende solo del color (trama, translucidez y relleno sólido) y la leyenda las nombra.
-2. **Tabla de detalle** por banda de edad y sexo: población, afijación ideal y desviación en puntos porcentuales.
-3. **Calidad resultante**: etiqueta `alta / media / baja` con su criterio explícito.
+2. **Tabla de detalle** por banda de edad y sexo: población, afijación ideal, respuestas y diferencia entre muestra y población en puntos porcentuales (sobre el padrón, no sobre la afijación redondeada).
+3. **Composición** (enmienda 2.2): reparto por sexo en muestra y población, primera y última banda con respuestas, bandas con población y sin ninguna respuesta, y semi-celdas vacías en las demás bandas. Cuando hay bandas sin respuestas se advierte que, como cada capa suma el 100 %, las demás aparecen sobrerrepresentadas. No hay índice resumen ni etiqueta de representatividad.
+   - Motivo: SAM no conoce cómo se seleccionó la muestra. En una muestra no probabilística, coincidir en edad y sexo con la población no demuestra que quienes responden representen a quienes no responden. Además, un promedio de desviaciones absolutas sobre muchas celdas pequeñas diluye los grupos ausentes.
 4. **Cautelas**: lista de advertencias metodológicas.
 5. **Recordatorio institucional**: "La decisión territorial corresponde siempre al equipo técnico."
 

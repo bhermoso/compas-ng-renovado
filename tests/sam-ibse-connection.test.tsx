@@ -15,6 +15,12 @@ import { parseWorkspaceJSON, serializeWorkspaceForStorage } from "../src/infrast
 import { createCompleteMunicipalityWorkspace } from "../src/application/workspace";
 import { ATARFE_POPULATION_2025 } from "../fixtures/population/atarfe-population-2025";
 
+// Solo para comprobar en el test que una muestra proporcional coincide con el padrón.
+const meanAbsDiff = (cells: ReadonlyArray<{ diffPp: number | null }>) => {
+  const d = cells.filter((c) => c.diffPp !== null).map((c) => Math.abs(c.diffPp!));
+  return d.reduce((s, x) => s + x, 0) / d.length;
+};
+
 const MATRIX = ATARFE_POPULATION_2025.ageSexMatrix!;
 const BANDS = MATRIX.map((c) => parseAgeBandLabel(c.ageBand)!);
 
@@ -46,13 +52,13 @@ describe("assessSample con recuento agregado (observedCells)", () => {
     const total = cells.filter((c) => parseAgeBandLabel(c.ageBand)!.min >= 20 && parseAgeBandLabel(c.ageBand)!.max <= 99)
       .reduce((s, c) => s + c.male + c.female, 0);
     expect(r.assessment.nObserved).toBe(total);
-    expect(r.assessment.representativeness!.maePp).toBeLessThan(1);
+    expect(meanAbsDiff(r.assessment.composition!.cells)).toBeLessThan(1);
   });
 
   it("con todas las edades, una muestra solo adulta se desvía y se ve en la desviación por celda", () => {
     const r = assessSample({ instrumentId: "ibse", municipalityId: "atarfe", observedCells: cells });
     if (r.status !== "evaluable") throw new Error("debía ser evaluable");
-    const child = r.assessment.representativeness!.cells.find((c) => c.ageBand === "5-9" && c.sex === "male")!;
+    const child = r.assessment.composition!.cells.find((c) => c.ageBand === "5-9" && c.sex === "male")!;
     expect(child.diffPp).toBeLessThan(0);
   });
 

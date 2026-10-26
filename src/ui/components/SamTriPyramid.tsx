@@ -5,8 +5,9 @@ import "./SamTriPyramid.css";
 
 /**
  * Tripirámide SAM: población, afijación ideal (Hamilton) y muestra conseguida,
- * superpuestas en una sola pirámide por banda de edad y sexo. Solo presentación: no calcula representatividad,
- * la consume de `SampleQualityAssessment.representativeness`.
+ * superpuestas en una sola pirámide por banda de edad y sexo. Solo presentación:
+ * consume la composición de `SampleQualityAssessment.composition` y no califica
+ * la representatividad.
  *
  * Si falta el padrón por edad y sexo, o la muestra no tiene edad y sexo,
  * muestra "No evaluable" con el motivo. No rellena ni aproxima nada.
@@ -27,7 +28,10 @@ const fmtPp = (n: number | null) => {
   return `${sign}${abs} pp`;
 };
 
-const QUALITY_LABEL = { alta: "alta", moderada: "moderada", baja: "baja" } as const;
+const SEX_LABEL = { male: "hombres", female: "mujeres" } as const;
+
+const listBands = (bands: string[]) =>
+  bands.length <= 1 ? bands.join("") : `${bands.slice(0, -1).join(", ")} y ${bands[bands.length - 1]}`;
 
 type Phase = "static" | "reset" | "play";
 
@@ -142,7 +146,7 @@ export function SamTriPyramid({ assessment }: SamTriPyramidProps) {
   }
 
   const { rows } = built;
-  const rep = assessment.representativeness!;
+  const comp = assessment.composition!;
   const max = Math.max(
     ...rows.flatMap((r) => [
       r.pctPop.male, r.pctPop.female, r.pctIdeal.male, r.pctIdeal.female,
@@ -172,24 +176,46 @@ export function SamTriPyramid({ assessment }: SamTriPyramidProps) {
       </div>
       <SuperposedPyramid rows={rows} max={max} progress={progress} />
 
-      <p className="sam-tripyramid__summary">
-        Error absoluto medio: {fmtPp(rep.maePp).replace(/^\+/, "")}. Celdas dentro de ±{fmtPp(rep.tolerancePp).replace(/^\+/, "")}:{" "}
-        {fmtPct(rep.pctWithinTolerance)} %. Representatividad demográfica: {QUALITY_LABEL[rep.qualityLabel]}.
-      </p>
+      <ul className="sam-tripyramid__summary">
+        <li>
+          Mujeres: {fmtPct(comp.sex.female.pctAchieved)} % de la muestra y {fmtPct(comp.sex.female.pctPopulation)} % de la
+          población. Hombres: {fmtPct(comp.sex.male.pctAchieved)} % de la muestra y {fmtPct(comp.sex.male.pctPopulation)} % de la población.
+        </li>
+        {comp.observedBandSpan && (
+          <li>
+            Hay respuestas desde la banda {comp.observedBandSpan.first} hasta la {comp.observedBandSpan.last}.
+          </li>
+        )}
+        <li>
+          {comp.bandsWithoutResponses.length > 0
+            ? `Bandas con población y sin ninguna respuesta: ${listBands(comp.bandsWithoutResponses)}. ` +
+              "Como cada capa suma el 100 %, su ausencia hace que las demás bandas aparezcan sobrerrepresentadas."
+            : "Todas las bandas con población tienen al menos una respuesta."}
+        </li>
+        {comp.cellsWithoutResponses.length > 0 && (
+          <li>
+            Sin respuestas también en:{" "}
+            {listBands(comp.cellsWithoutResponses.map((c) => `${SEX_LABEL[c.sex]} de ${c.ageBand}`))}.
+          </li>
+        )}
+      </ul>
       <p className="sam-tripyramid__note">
-        La etiqueta de representatividad es una convención parametrizable, no un umbral canónico.
+        SAM describe la composición por edad y sexo de la muestra frente al padrón; no califica su
+        representatividad. No conoce cómo se seleccionó la muestra: si no es probabilística, quienes
+        responden pueden diferir de quienes no responden aunque coincidan en edad y sexo.
       </p>
 
       <div className="sam-tripyramid__table-wrap">
         <table className="sam-tripyramid__table">
-          <caption>Detalle por banda de edad y sexo</caption>
+          <caption>Detalle por banda de edad y sexo (diferencias en puntos porcentuales)</caption>
           <thead>
             <tr>
               <th scope="col">Edad</th>
               <th scope="col">Población H / M</th>
               <th scope="col">Ideal H / M</th>
-              <th scope="col">Desviación H</th>
-              <th scope="col">Desviación M</th>
+              <th scope="col">Respuestas H / M</th>
+              <th scope="col">Muestra − población H</th>
+              <th scope="col">Muestra − población M</th>
             </tr>
           </thead>
           <tbody>
@@ -198,6 +224,7 @@ export function SamTriPyramid({ assessment }: SamTriPyramidProps) {
                 <th scope="row">{r.ageBand}</th>
                 <td>{fmtInt(r.popMale)} / {fmtInt(r.popFemale)}</td>
                 <td>{fmtInt(r.idealMale)} / {fmtInt(r.idealFemale)}</td>
+                <td>{fmtInt(r.observed.male)} / {fmtInt(r.observed.female)}</td>
                 <td>{fmtPp(r.diff.male)}</td>
                 <td>{fmtPp(r.diff.female)}</td>
               </tr>

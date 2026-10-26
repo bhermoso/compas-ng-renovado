@@ -1,6 +1,6 @@
 import type { SampleQualityAssessment } from "../../domain/sam";
 import { computeHamiltonAllocation } from "../../application/sam/computeHamiltonAllocation";
-import type { CellDeviation } from "../../application/sam/computeCellRepresentativeness";
+import type { CompositionCell } from "../../application/sam/computeSampleComposition";
 
 export type SamTriPyramidRow = {
   ageBand: string;
@@ -12,6 +12,9 @@ export type SamTriPyramidRow = {
   pctPop: { male: number; female: number };
   pctIdeal: { male: number; female: number };
   pctAchieved: { male: number; female: number };
+  /** Respuestas por sexo en la banda. */
+  observed: { male: number; female: number };
+  /** Muestra − población, en puntos porcentuales; null sin población. */
   diff: { male: number | null; female: number | null };
 };
 
@@ -25,7 +28,7 @@ export function buildSamTriPyramidRows(
         "No evaluable: falta el padrón desglosado por edad y sexo para este municipio.",
     };
   }
-  const rep = assessment.representativeness;
+  const rep = assessment.composition;
   if (!rep) {
     return {
       notEvaluable:
@@ -39,7 +42,7 @@ export function buildSamTriPyramidRows(
     };
   }
 
-  const cell = (band: string, sex: "male" | "female"): CellDeviation | undefined =>
+  const cell = (band: string, sex: "male" | "female"): CompositionCell | undefined =>
     rep.cells.find((c) => c.ageBand === band && c.sex === sex);
   const missing = matrix.some((m) => !cell(m.ageBand, "male") || !cell(m.ageBand, "female"));
   if (missing) {
@@ -57,8 +60,8 @@ export function buildSamTriPyramidRows(
   }
 
   const rows: SamTriPyramidRow[] = matrix.map((m, i) => {
-    const cm = cell(m.ageBand, "male") as CellDeviation;
-    const cf = cell(m.ageBand, "female") as CellDeviation;
+    const cm = cell(m.ageBand, "male") as CompositionCell;
+    const cf = cell(m.ageBand, "female") as CompositionCell;
     const a = allocation.cells[i];
     return {
       ageBand: m.ageBand,
@@ -69,6 +72,7 @@ export function buildSamTriPyramidRows(
       pctPop: { male: (m.male / popTotal) * 100, female: (m.female / popTotal) * 100 },
       pctIdeal: { male: (a.male / idealTotal) * 100, female: (a.female / idealTotal) * 100 },
       pctAchieved: { male: cm.pctAchieved, female: cf.pctAchieved },
+      observed: { male: cm.observedCount, female: cf.observedCount },
       diff: { male: cm.diffPp, female: cf.diffPp },
     };
   });

@@ -16,6 +16,12 @@ import { SamAssessmentPanel } from "../src/ui/components/SamAssessmentPanel";
 import { ATARFE_POPULATION_2025 } from "../fixtures/population/atarfe-population-2025";
 import type { PopulationReference } from "../src/domain/sam/PopulationReference";
 
+// Solo para comprobar en el test que una muestra proporcional coincide con el padrón.
+const meanAbsDiff = (cells: ReadonlyArray<{ diffPp: number | null }>) => {
+  const d = cells.filter((c) => c.diffPp !== null).map((c) => Math.abs(c.diffPp!));
+  return d.reduce((s, x) => s + x, 0) / d.length;
+};
+
 const MATRIX = ATARFE_POPULATION_2025.ageSexMatrix!;
 
 /** Registros que reproducen exactamente la distribución del padrón a escala 1/50. */
@@ -71,22 +77,22 @@ describe("restrictReferenceToAgeRange", () => {
 });
 
 describe("assessSample", () => {
-  it("muestra proporcional al padrón: evaluable, con representatividad", () => {
+  it("muestra proporcional al padrón: evaluable, con composición", () => {
     const records = recordsProportional();
     const r = assessSample({ instrumentId: "t", municipalityId: "atarfe", records });
     expect(r.status).toBe("evaluable");
     if (r.status !== "evaluable") return;
     expect(r.assessment.nObserved).toBe(records.length);
-    expect(r.assessment.representativeness).toBeDefined();
-    expect(r.assessment.representativeness!.maePp).toBeLessThan(0.5);
-    expect(r.representativenessNote).toBeUndefined();
+    expect(r.assessment.composition).toBeDefined();
+    expect(meanAbsDiff(r.assessment.composition!.cells)).toBeLessThan(0.5);
+    expect(r.compositionNote).toBeUndefined();
   });
 
-  it("solo n, sin registros: dictamen de tamaño y representatividad no evaluable", () => {
+  it("solo n, sin registros: dictamen de tamaño y composición no evaluable", () => {
     const r = assessSample({ instrumentId: "t", municipalityId: "atarfe", nObserved: 400 });
     if (r.status !== "evaluable") throw new Error("debía ser evaluable");
-    expect(r.assessment.representativeness).toBeUndefined();
-    expect(r.representativenessNote).toContain("registros individuales");
+    expect(r.assessment.composition).toBeUndefined();
+    expect(r.compositionNote).toContain("registros individuales");
   });
 
   it("municipio sin referencia: no evaluable, sin estimar", () => {
@@ -116,7 +122,7 @@ describe("assessSample", () => {
       records: [{ sex: "x" }, { sex: "y" }],
     });
     if (r.status !== "evaluable") throw new Error("debía ser evaluable");
-    expect(r.representativenessNote).toContain("ningún registro");
+    expect(r.compositionNote).toContain("ningún registro");
   });
 
   it("rango de edad con bandas completas compara con el padrón recortado", () => {
@@ -129,7 +135,7 @@ describe("assessSample", () => {
     });
     if (r.status !== "evaluable") throw new Error("debía ser evaluable");
     expect(r.assessment.populationReference.ageSexMatrix!.length).toBe(16);
-    expect(r.assessment.representativeness!.maePp).toBeLessThan(1);
+    expect(meanAbsDiff(r.assessment.composition!.cells)).toBeLessThan(1);
   });
 
   it("referencia explícita sin desglose: solo dictamen de tamaño", () => {
@@ -141,7 +147,7 @@ describe("assessSample", () => {
       populationReference: ref,
     });
     if (r.status !== "evaluable") throw new Error("debía ser evaluable");
-    expect(r.representativenessNote).toContain("padrón");
+    expect(r.compositionNote).toContain("padrón");
   });
 });
 

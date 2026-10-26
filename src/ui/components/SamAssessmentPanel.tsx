@@ -19,7 +19,7 @@ const fmtPct = (n: number) =>
   n.toLocaleString("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
 export function SamAssessmentPanel({ result, title }: SamAssessmentPanelProps) {
-  const heading = title ? `Calidad muestral (SAM) — ${title}` : "Calidad muestral (SAM)";
+  const heading = title ? `Tamaño y composición de la muestra (SAM) — ${title}` : "Tamaño y composición de la muestra (SAM)";
 
   if (result.status === "not-evaluable") {
     return (
@@ -47,12 +47,12 @@ export function SamAssessmentPanel({ result, title }: SamAssessmentPanelProps) {
         <div><dt>Muestra teórica</dt><dd>{fmtInt(a.nTheoretical)}</dd></div>
         <div><dt>Muestra conseguida</dt><dd>{fmtInt(a.nObserved)}</dd></div>
         <div><dt>Cobertura</dt><dd>{fmtPct(a.coverageGlobal)} %</dd></div>
-        <div><dt>Calidad por tamaño</dt><dd>{QUALITY[a.sampleQuality]}</dd></div>
+        <div><dt>Tamaño frente a la muestra teórica</dt><dd>{QUALITY[a.sampleQuality]}</dd></div>
       </dl>
       <p className="sam-panel__rationale">{a.sampleQualityRationale}</p>
 
-      {result.representativenessNote ? (
-        <p className="sam-panel__status" role="status">{result.representativenessNote}</p>
+      {result.compositionNote ? (
+        <p className="sam-panel__status" role="status">{result.compositionNote}</p>
       ) : (
         <SamTriPyramid assessment={a} />
       )}
@@ -74,7 +74,7 @@ export function SamAssessmentPanel({ result, title }: SamAssessmentPanelProps) {
         </ul>
       </details>
       <p className="sam-panel__note">
-        Requiere validación humana. La calidad muestral informa y no modifica los resultados del estudio. La decisión territorial corresponde siempre al equipo técnico.
+        Requiere validación humana. SAM informa del tamaño y la composición de la muestra y no modifica los resultados del estudio. La decisión territorial corresponde siempre al equipo técnico.
       </p>
     </section>
   );

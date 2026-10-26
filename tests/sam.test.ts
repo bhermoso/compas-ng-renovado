@@ -240,7 +240,7 @@ describe("SAM — Cautelas metodológicas", () => {
   });
 
   it("calidad ALTA con nObs=375 no incluye cautela de representatividad", () => {
-    // coverage = 100%: representatividad asegurada
+    // coverage = 100 %: el texto no afirma representatividad por alcanzar el tamaño
     const result = computeSampleQualityAssessment(makeInput({ nObserved: 375 }));
     expect(
       result.methodologicalCautions.some((c) =>
