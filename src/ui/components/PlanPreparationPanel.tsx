@@ -208,6 +208,34 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
   </div>;
  }
 
+ function applyModuleSelection(status: "included" | "excluded") {
+  if (!canEditProposal) return;
+  const decisions = {...draft?.decisions};
+  const select = (id: string, source: string) => {
+   // Preserve explicit municipal adaptations when including a complete module.
+   const existing = decisions[id];
+   if (status === "included" && existing?.status === "modified") return;
+   decisions[id] = {status, sourceText: cleanActionPlanProposalText(source)};
+  };
+  select(module.id, module.strategicObjective);
+  for (const general of module.generalObjectives) {
+   select(general.code, general.title);
+   for (const specific of general.specificObjectives) {
+    select(specific.code, specific.title);
+    select(specific.indicator.code, specific.indicator.title);
+   }
+  }
+  onChange({
+   municipalityId,
+   moduleId: module.id,
+   version: module.version,
+   updatedAt: new Date().toISOString(),
+   decisions,
+   unaddressedNeeds: draft?.unaddressedNeeds,
+   evaluationFramework: draft?.evaluationFramework,
+  });
+ }
+
  const specificCount = module.generalObjectives.reduce((sum, general) => sum + general.specificObjectives.length, 0);
  return <article className="workspace-panel pcm-preparation">
   <details className="pcm-line-fold">
@@ -231,6 +259,11 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
    <h3>{directTerritorialEdit ? "Objetivo estratégico vigente" : "Objetivo estratégico propuesto"}</h3>
    <p><ProposalText text={canReview ? consolidatedText(module.id, revised ? plainProposalText(proposalStrategicText) : module.strategicObjective) : territorialText(module.id, revised ? proposalStrategicText : module.strategicObjective)}/></p>
   </section>
+  {canEditProposal && <div className="pcm-bulk-actions" role="group" aria-label={`Incorporación de propuestas de ${module.title}`}>
+   <button type="button" onClick={() => applyModuleSelection("included")}>Incorporar módulo completo al borrador</button>
+   <button type="button" onClick={() => applyModuleSelection("excluded")}>Excluir módulo del borrador</button>
+   <p className="panel-note">Se guardan únicamente decisiones de preparación para {municipalityId}. Se respetan las redacciones locales modificadas al incorporar. No se copian datos de seguimiento ni acuerdos de Granada-Zaidín y no se aprueba el Plan.</p>
+  </div>}
   {control(module.id, module.strategicObjective, [])}
   {module.generalObjectives.map(general => {
    const block = proposalBlocks.find(b => b.code === general.code);
