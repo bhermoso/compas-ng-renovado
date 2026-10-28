@@ -351,10 +351,10 @@ export function IBSEPanel({ ibseStudy, municipalityName }: IBSEPanelProps) {
       <section className="study-report__section">
         <p className="study-report__section-title">Coherencia con otras evidencias</p>
         <p className="study-report__interpretation">
-          El IBSE es un instrumento de origen escolar administrado a la muestra municipal
+          El IBSE mide el bienestar socioemocional de la muestra municipal
           participante ({scopeDesc.shortLabel.toLowerCase()}); su comparación con los instrumentos EAS
-          de población adulta (SF-12, DUKE-EAS, PREDIMED, Sueño, CAGE) requiere cautela por la
-          distinta composición etaria de las muestras.
+          (SF-12, DUKE-EAS, PREDIMED, Sueño, CAGE) requiere comprobar
+          las edades, la composición y los procedimientos de las muestras.
           Cuando el SF-12 MCS está disponible, la comparación entre el bienestar emocional
           de la muestra IBSE y la salud mental percibida adulta puede caracterizar si el perfil
           de bienestar subjetivo de {mun} muestra diferencias relevantes entre grupos.
