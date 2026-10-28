@@ -1,10 +1,11 @@
 import { ACTION_PLAN_CATALOG } from '../../domain/action-plan-catalog';
+import { municipalActionPlanModule } from '../../domain/action-plan-catalog/MunicipalActionPlanModule';
 import { ZAIDIN_AGING_PROPOSAL, createZaidinFinalActionPlanDraft } from '../../domain/action-plan-catalog/PlanPreparationDraft';
 import {DefinitiveActionPlanPreview} from './DefinitiveActionPlanPreview';
 import {LegacyActionPlanCatalogPanel,type LegacyActionPlanCatalogPanelProps} from './LegacyActionPlanCatalogPanel';
 
 export function ActionPlanCatalogPanel(props:LegacyActionPlanCatalogPanelProps){
- const modules=ACTION_PLAN_CATALOG.map(original => props.municipalityId === 'granada-zaidin' && original.id === ZAIDIN_AGING_PROPOSAL.id ? ZAIDIN_AGING_PROPOSAL : original);
+ const modules=ACTION_PLAN_CATALOG.map(original => municipalActionPlanModule(props.municipalityId, original));
  const previous=props.drafts?.find(draft => draft.municipalityId === props.municipalityId && draft.moduleId === ZAIDIN_AGING_PROPOSAL.id);
  const current=props.drafts?.find(draft => draft.municipalityId === props.municipalityId && draft.moduleId === ZAIDIN_AGING_PROPOSAL.id && draft.version === ZAIDIN_AGING_PROPOSAL.version);
  const drafts=props.municipalityId === 'granada-zaidin' && !current

@@ -50,7 +50,7 @@ export const proposalBlocks = [
 ];
 
 export function thematicBlockNameFor(code: string): string | undefined {
- return proposalBlocks.find(block => block.code === code)?.name;
+ return proposalBlocks.find(block => block.code === code.replace(/^ZAGRA-/, ""))?.name;
 }
 
 export function compareActionPlanNotation(left: string, right: string): number {

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { AGENDA_SETTING_LABEL, ACTUATION_STATUS_LABEL, type AgendaActuation } from "../../domain/agenda/AgendaActuation";
 import { LOCAL_HEALTH_PLAN_OUTLINE_STATUS } from "../../domain/health-plan";
 import { ACTION_PLAN_CATALOG } from "../../domain/action-plan-catalog";
+import { municipalActionPlanModule } from "../../domain/action-plan-catalog/MunicipalActionPlanModule";
 import {
   buildDefinitiveActionPlanProjection,
   resolvedPlanDecisionText,
@@ -48,11 +49,7 @@ export function LocalHealthPlanOutline({
   agendaActuations = [],
 }: LocalHealthPlanOutlineProps) {
   const modules = useMemo(
-    () => ACTION_PLAN_CATALOG.map((module) =>
-      municipalityId === "granada-zaidin" && module.id === ZAIDIN_AGING_PROPOSAL.id
-        ? ZAIDIN_AGING_PROPOSAL
-        : module
-    ),
+    () => ACTION_PLAN_CATALOG.map((module) => municipalActionPlanModule(municipalityId, module)),
     [municipalityId]
   );
   const effectiveDrafts = useMemo(() => {

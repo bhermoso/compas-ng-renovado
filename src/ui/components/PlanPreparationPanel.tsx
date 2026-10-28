@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { ActionPlanCatalogModule, CatalogGeneralObjectiveTemplate, CatalogSpecificObjectiveTemplate } from "../../domain/action-plan-catalog/ActionPlanCatalog";
 import type { PLSEvaluationFramework, UnaddressedNeed } from "../../domain/health-plan";
+import { ZAGRA_ACTION_PLAN_VERSION } from "../../domain/action-plan-catalog/MunicipalActionPlanModule";
 import {
   cleanActionPlanProposalText,
   cleanObsoleteActionPlanProgramLabels,
@@ -38,6 +39,7 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
  renderWorksheet: (module: ActionPlanCatalogModule, general: CatalogGeneralObjectiveTemplate, specific: CatalogSpecificObjectiveTemplate) => ReactNode;
 }) {
  const revised = module.version === ZAIDIN_PROPOSAL_VERSION;
+ const fourBlocks = revised || module.version === ZAGRA_ACTION_PLAN_VERSION;
  const finalApprovedText = module.version === ZAIDIN_FINAL_ACTION_PLAN_VERSION;
  const directTerritorialEdit = canEditProposal && !canReview;
  const emphasized = (text: string) => cleanActionPlanProposalText([proposalStrategicText, ...Object.values(proposalObjectiveTexts), ...proposalBlocks.map(b => b.text)].find(candidate => plainProposalText(candidate) === cleanActionPlanProposalText(text)) ?? text);
@@ -266,11 +268,11 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
   </div>}
   {control(module.id, module.strategicObjective, [])}
   {module.generalObjectives.map(general => {
-   const block = proposalBlocks.find(b => b.code === general.code);
+   const block = proposalBlocks.find(b => b.code === general.code.replace(/^ZAGRA-/, ""));
    const sourceGeneral = general.title;
    const visibleGeneral = canReview ? consolidatedText(general.code, sourceGeneral) : territorialText(general.code, (revised ? block?.text : undefined) ?? sourceGeneral);
    return <details className="pcm-general" key={general.code}>
-    <summary>{(revised ? block?.name : undefined) ?? `${general.code} · ${visibleGeneral}`}</summary>
+    <summary>{(fourBlocks ? block?.name : undefined) ?? `${general.code} · ${visibleGeneral}`}</summary>
     <p><strong>Objetivo general:</strong> <ProposalText text={visibleGeneral}/></p>
     {control(general.code, sourceGeneral, [module.id], !finalApprovedText)}
     {general.specificObjectives.map(specific => {
