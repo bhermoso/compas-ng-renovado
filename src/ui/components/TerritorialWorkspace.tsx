@@ -1,11 +1,12 @@
 import {useEffect,useState} from 'react';
 import {readRelasDraft,readRelasReview,saveRelasDraft,saveRelasReview,type RelasClient} from '../../infrastructure/relas/RelasClient';
-import {ZAIDIN_AGING_PROPOSAL,type PlanPreparationDraft,type PlanPreparationReview,type PlanPreparationReviewStatus} from '../../domain/action-plan-catalog/PlanPreparationDraft';
+import {type PlanPreparationDraft,type PlanPreparationReview,type PlanPreparationReviewStatus} from '../../domain/action-plan-catalog/PlanPreparationDraft';
+import {municipalActionPlanModule} from '../../domain/action-plan-catalog/MunicipalActionPlanModule';
 import {HEALTHY_AGING_MODULE} from '../../domain/action-plan-catalog/ActionPlanCatalog';
 import {PlanPreparationPanel} from './PlanPreparationPanel';
 
 export default function TerritorialWorkspace({client,scope,role,onBack}:{client:RelasClient;scope:string;role:string;onBack:()=>void}) {
- const module=scope==='granada-zaidin'?ZAIDIN_AGING_PROPOSAL:HEALTHY_AGING_MODULE;
+ const module=municipalActionPlanModule(scope,HEALTHY_AGING_MODULE);
  const [draft,setDraft]=useState<PlanPreparationDraft>();
  const [version,setVersion]=useState<number|null>(null);
  const [dirty,setDirty]=useState(false);

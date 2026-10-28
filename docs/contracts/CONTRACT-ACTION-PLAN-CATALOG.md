@@ -112,3 +112,24 @@ Decisiones del autor (2026-10-21):
 - **Vínculos.** Se establecen por código estable de módulo, objetivo e indicador. Valen las reglas de elegibilidad de §3 y las de vínculo potencial y real de `CONTRACT-ACTUATION-TEMPLATES` §4 bis.
 - **Qué no cambia.** Las actuaciones siguen fuera del Plan de Acción (§8). Ver las actuaciones-tipo vinculadas a un objetivo no las incorpora al Plan, ni a la agenda, ni asigna parte del resultado del indicador. El sistema no genera ni sugiere actuaciones.
 
+## 10. Cuatro bloques en Zagra — encargo del autor de 2026-10-28
+
+La línea de envejecimiento saludable de Zagra adopta la estructura vigente del
+Zaidín: Edadismo, Soledad no deseada, Autonomía y Participación. Esta adaptación
+expresa amplía a Zagra el ámbito de reutilización previsto en §7. Conserva los
+18 códigos de objetivos específicos y sus indicadores, con textos referidos al
+municipio de Zagra y procedencia identificada. No incorpora las decisiones del
+expediente del Zaidín. Las otras líneas de Zagra conservan su estructura.
+
+La versión territorial es `zagra-cuatro-bloques-2026-10-28`. Los cuatro grupos
+usan códigos propios `ZAGRA-ENV-OG1` a `ZAGRA-ENV-OG4`, porque los antiguos
+`ENV-OG1` a `ENV-OG9` agrupaban contenidos distintos. La edición, el Plan
+resultante, la exportación y el esbozo del PLS utilizan la misma estructura.
+
+Si existe un borrador municipal 3.1, se archiva íntegro antes de reagruparlo.
+Se conservan las redacciones de objetivos específicos, indicadores, fichas y
+actuaciones. La exclusión de un grupo anterior se conserva en sus objetivos
+específicos; los nuevos grupos quedan pendientes de revisión. Una versión
+desconocida no se transforma automáticamente. Esta operación no valida el Plan,
+no sustituye versiones institucionales y no crea actuaciones ni compromisos.
+

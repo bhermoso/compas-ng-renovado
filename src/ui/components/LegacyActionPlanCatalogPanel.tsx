@@ -1,5 +1,6 @@
 import { PlanPreparationPanel } from "./PlanPreparationPanel";
-import { ZAIDIN_AGING_PROPOSAL, type PlanPreparationDraft } from "../../domain/action-plan-catalog/PlanPreparationDraft";
+import { type PlanPreparationDraft } from "../../domain/action-plan-catalog/PlanPreparationDraft";
+import { municipalActionPlanModule } from "../../domain/action-plan-catalog/MunicipalActionPlanModule";
 import { useState, type ReactNode } from "react";
 import { IndicatorWorksheetEditor } from "./IndicatorWorksheetEditor";
 import { worksheetKey, type IndicatorWorksheet, type WorksheetContext } from "../../domain/action-plan-catalog/IndicatorWorksheet";
@@ -320,7 +321,7 @@ export function LegacyActionPlanCatalogPanel(props: LegacyActionPlanCatalogPanel
         </details>
       </section>
       {props.onDraftChange && ACTION_PLAN_CATALOG.map(original => {
-        const module = props.municipalityId === "granada-zaidin" && original.id === ZAIDIN_AGING_PROPOSAL.id ? ZAIDIN_AGING_PROPOSAL : original;
+        const module = municipalActionPlanModule(props.municipalityId, original);
         return <PlanPreparationPanel key={`${props.municipalityId}-${module.id}`} municipalityId={props.municipalityId} module={module}
           draft={props.drafts?.find(d => d.moduleId === module.id && d.municipalityId === props.municipalityId)} onChange={props.onDraftChange!} renderWorksheet={worksheetRenderer(true)}/>;
       })}

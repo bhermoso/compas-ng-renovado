@@ -4,6 +4,7 @@ import { InitialLocalHealthPlanPanel } from "./ui/components/InitialLocalHealthP
 import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
 import { InstitutionalLogoBand } from "./ui/components/InstitutionalLogoBand";
 import { replaceZaidinFinalDraft } from "./application/workspace/replaceZaidinFinalDraft";
+import { regroupZagraActionPlan } from "./application/workspace/regroupZagraActionPlan";
 import { processPdfHealthReport } from './application/health-report/ProcessPdfHealthReport';
 import { extractPdfText } from './infrastructure/pdf/extractPdfText';
 import {
@@ -590,7 +591,7 @@ export default function App() {
 
   useEffect(() => {
     if (pendingSeedId || protectedEmptyWorkspaceIdRef.current === workspace.municipality.identity.id) return;
-    setWorkspace(previous => replaceZaidinFinalDraft(previous));
+    setWorkspace(previous => regroupZagraActionPlan(replaceZaidinFinalDraft(previous)));
   }, [workspace, pendingSeedId]);
 
   const [title, setTitle] = useState("");
