@@ -433,7 +433,7 @@ export function EstudiosComplementariosPanel({
         </label>
         <StudyRow
           name="IBSE"
-          subtitle="Bienestar socioemocional de la población general"
+          subtitle="Índice de bienestar socioemocional"
           group="Bienestar"
           comparison={comparisons.ibse}
           inputId="ibse-csv-input"
