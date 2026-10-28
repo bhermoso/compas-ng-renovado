@@ -22,8 +22,8 @@ export const IBSE_MODULE: MethodologicalModule = {
     shortName: "IBSE",
     description:
       "Instrumento de medición del bienestar socioemocional mediante 8 ítems " +
-      "agrupados en 4 factores y un índice total. De diseño escolar, admite en la " +
-      "práctica muestras municipales de menores de 16 y de personas de 16 o más.",
+      "agrupados en 4 factores y un índice total. Se aplica a la " +
+      "población general, con muestras municipales de distintas edades.",
     purpose:
       "Evaluar el estado de bienestar subjetivo de la población participante en sus " +
       "dimensiones de vínculo, situación vital, control percibido y aspectos personales.",
@@ -33,7 +33,7 @@ export const IBSE_MODULE: MethodologicalModule = {
     // IBSEStudy, no este campo. Una muestra de 16 o más comparte el universo
     // poblacional de referencia con la EAS (adultos ≥16), no sus datos ni su muestra.
     targetPopulation:
-      "Menores de 16 y/o personas de 16 o más, según la muestra municipal (instrumento de origen escolar; no exclusivamente escolar)",
+      "Población general; el universo de análisis depende de las edades incluidas en la muestra municipal",
     createdAt: "2026-06-22",
   },
 
@@ -229,14 +229,14 @@ export const IBSE_MODULE: MethodologicalModule = {
     {
       id: "factor-vinculo",
       name: "Vínculo",
-      description: "Dimensión que recoge el sentido de pertenencia y las relaciones afectivas del escolar.",
+      description: "Dimensión que recoge el sentido de pertenencia y las relaciones afectivas de la persona.",
       itemIds: ["ibse_deprimido", "ibse_solo"],
       outputField: "meanFactorVinculo",
     },
     {
       id: "factor-situacion",
       name: "Situación",
-      description: "Dimensión que evalúa la valoración de la situación vital actual del escolar.",
+      description: "Dimensión que evalúa la valoración de la situación vital actual de la persona.",
       itemIds: ["ibse_feliz", "ibse_disfrutar"],
       outputField: "meanFactorSituacion",
     },
@@ -336,7 +336,7 @@ export const IBSE_MODULE: MethodologicalModule = {
       },
     ],
     referenceValues: {
-      population: "Escolares — valores de referencia EAS Andalucía y Granada (histórico COMPÁS)",
+      population: "Valores históricos de referencia IBSE para Andalucía y Granada (pendientes de validación de comparabilidad)",
       source: "Valores de referencia procedentes del COMPÁS histórico (monitor IBSE): " +
         "Andalucía ≈ 75.94 · Granada ≈ 81.78. Pendiente contraste con EAS oficial.",
     },
@@ -354,8 +354,8 @@ export const IBSE_MODULE: MethodologicalModule = {
   },
 
   limitations: [
-    "Instrumento diseñado para población escolar; no es aplicable a otras franjas etarias sin validación específica.",
-    "No permite análisis por subgrupos (género, curso, centro) sin acceso a los registros individuales.",
+    "La interpretación de los resultados debe especificar las edades de la muestra y comprobar la comparabilidad de las referencias utilizadas.",
+    "No permite análisis por subgrupos sin disponer de los registros individuales y tamaños suficientes.",
     "La comparación con otros municipios requiere que el proceso de administración sea metodológicamente equivalente.",
     "Los ítems específicos y sus opciones de respuesta deben contrastarse con la publicación original de Bericat (2014).",
   ],
@@ -410,9 +410,9 @@ export const IBSE_MODULE: MethodologicalModule = {
 
   institutionalNote: {
     diagnosticInterpretation:
-      "El IBSE es el único estudio de la batería específicamente centrado en la " +
-      "población escolar del municipio, con datos propios recogidos mediante el " +
-      "cuestionario REDCap municipal. Mide el bienestar subjetivo de los estudiantes " +
+      "El IBSE es un estudio de bienestar socioemocional de la " +
+      "población participante, con datos propios recogidos mediante el " +
+      "cuestionario REDCap municipal. Mide el bienestar subjetivo de las personas " +
       "en cuatro dimensiones: Vínculo (sentido de pertenencia y relaciones afectivas), " +
       "Situación (valoración de la propia vida), Control (sensación de control sobre " +
       "la propia vida) y Persona (autoestima e identidad personal). " +
@@ -421,16 +421,16 @@ export const IBSE_MODULE: MethodologicalModule = {
       "más alto y el más bajo), el índice total puede ocultar diferencias relevantes " +
       "entre dimensiones: en ese caso, el análisis por factor individual proporciona " +
       "información diagnóstica más precisa. El factor con menor puntuación señala " +
-      "la dimensión más vulnerable del bienestar escolar en el municipio.",
+      "la dimensión de bienestar socioemocional con menor puntuación en la muestra.",
 
     implications: [
-      "Análisis de los factores de bienestar escolar con menor puntuación, que señalan " +
-      "las dimensiones más vulnerables del bienestar socioemocional de la población escolar.",
+      "Análisis de los factores de bienestar socioemocional con menor puntuación, que señalan " +
+      "las dimensiones con menor puntuación entre las personas participantes.",
       "Atención especial al Factor Vínculo (soledad, pertenencia): niveles bajos pueden " +
-      "indicar dificultades de integración y convivencia en el entorno escolar.",
+      "indicar dificultades de pertenencia, apoyo o relaciones sociales.",
       "Cuando la dispersión interfactorial supere los 20 puntos, analizar cada factor " +
       "de forma independiente antes de extraer conclusiones del índice total.",
-      "Cruce con datos municipales del ámbito educativo (absentismo, rendimiento) " +
+      "Cruce con otros indicadores municipales pertinentes " +
       "cuando estén disponibles.",
       "Comparación con los valores de referencia disponibles (Andalucía ≈ 75.94, " +
       "Granada ≈ 81.78) para contextualizar el resultado del municipio, " +
@@ -439,7 +439,7 @@ export const IBSE_MODULE: MethodologicalModule = {
 
     publicHealthApplication: {
       measures: [
-        "Bienestar socioemocional subjetivo de la población escolar del municipio.",
+        "Bienestar socioemocional subjetivo de las personas participantes en el municipio.",
         "Factor Vínculo: sentido de pertenencia y calidad de las relaciones afectivas.",
         "Factor Situación: valoración de la situación vital actual.",
         "Factor Control: sensación de control sobre la propia vida.",
@@ -450,11 +450,11 @@ export const IBSE_MODULE: MethodologicalModule = {
         "Salud mental clínica ni diagnósticos psicológicos o psiquiátricos.",
         "Rendimiento académico ni adaptación escolar objetiva.",
         "Clima escolar objetivo ni condiciones del entorno educativo.",
-        "Contexto familiar, socioeconómico o cultural de los estudiantes.",
+        "Contexto familiar, socioeconómico o cultural de las personas participantes.",
       ],
       contextualUse: [
         "Instrumento municipal de aplicación directa: los datos provienen del cuestionario " +
-        "administrado al alumnado del municipio, no de una encuesta provincial.",
+        "administrado a la muestra municipal, no de una encuesta provincial.",
         "Los resultados son comparables entre municipios que usen la misma versión del " +
         "cuestionario IBSE y el mismo protocolo de administración REDCap.",
         "Las comparativas con Andalucía y Granada (valores históricos) deben interpretarse " +
@@ -462,13 +462,13 @@ export const IBSE_MODULE: MethodologicalModule = {
       ],
       commonMisinterpretations: [
         "IBSE bajo no equivale a enfermedad mental: mide bienestar subjetivo cotidiano " +
-        "en contexto escolar, no psicopatología.",
+        "en la población estudiada, no psicopatología.",
         "El índice total puede ser engañoso cuando la dispersión interfactorial es alta: " +
         "siempre revisar los factores individuales cuando rango > 20 puntos.",
         "Los umbrales (alto ≥75, medio 60–74, medio-bajo 50–59, bajo <50) son heurísticos " +
         "del sistema, no normativos ni clínicos. No validan diagnósticos individuales.",
-        "Los datos representan al alumnado que respondió el cuestionario: " +
-        "pueden no representar a toda la población escolar del municipio.",
+        "Los datos representan a quienes respondieron el cuestionario: " +
+        "pueden no representar a toda la población del municipio.",
       ],
     },
 
@@ -476,17 +476,17 @@ export const IBSE_MODULE: MethodologicalModule = {
       chapter: "Diagnóstico de Salud de la Población",
       determinants: [
         "Salud mental y bienestar",
-        "Infancia y adolescencia",
-        "Bienestar escolar y convivencia",
+        "Determinantes sociales del bienestar",
+        "Relaciones y apoyo social",
       ],
       contribution:
-        "El IBSE es el único estudio de la batería centrado específicamente en la " +
-        "población escolar del municipio. Aporta información sobre el bienestar " +
-        "socioemocional de los niños y adolescentes, una dimensión habitualmente " +
+        "El IBSE permite estudiar el bienestar socioemocional de la " +
+        "población participante del municipio. Aporta información sobre el bienestar " +
+        "socioemocional subjetivo de las personas, una dimensión habitualmente " +
         "sin cobertura en los datos epidemiológicos municipales estándar. " +
         "Sus resultados alimentan el diagnóstico de salud del Perfil, con especial " +
-        "relevancia para la identificación de necesidades en el ámbito escolar " +
-        "y para las actuaciones de promoción de la salud mental infanto-juvenil.",
+        "relevancia para identificar necesidades comunitarias de bienestar " +
+        "y orientar propuestas de promoción de la salud mental en distintas edades.",
     },
 
     relatedInstrumentIds: ["sf12-eas", "sueno-eas"],
