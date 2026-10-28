@@ -1,4 +1,5 @@
 import type { SampleAssessmentResult } from "../../application/sam/assessSample";
+import { describeSAM } from "../../application/sam/describeSAM";
 import { SamTriPyramid } from "./SamTriPyramid";
 import "./SamAssessmentPanel.css";
 
@@ -13,7 +14,7 @@ export interface SamAssessmentPanelProps {
   title?: string;
 }
 
-const QUALITY = { high: "alta", medium: "media", low: "baja" } as const;
+
 const fmtInt = (n: number) => n.toLocaleString("es-ES");
 const fmtPct = (n: number) =>
   n.toLocaleString("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -46,10 +47,10 @@ export function SamAssessmentPanel({ result, title }: SamAssessmentPanelProps) {
         <div><dt>Población de referencia</dt><dd>{fmtInt(a.populationReference.populationTotal)}</dd></div>
         <div><dt>Muestra teórica</dt><dd>{fmtInt(a.nTheoretical)}</dd></div>
         <div><dt>Muestra conseguida</dt><dd>{fmtInt(a.nObserved)}</dd></div>
-        <div><dt>Cobertura</dt><dd>{fmtPct(a.coverageGlobal)} %</dd></div>
-        <div><dt>Tamaño frente a la muestra teórica</dt><dd>{QUALITY[a.sampleQuality]}</dd></div>
+        <div><dt>Porcentaje del tamaño teórico</dt><dd>{fmtPct(a.coverageGlobal)} %</dd></div>
+        <div><dt>Confianza metodológica</dt><dd>No evaluable: requiere información del diseño y la participación.</dd></div>
       </dl>
-      <p className="sam-panel__rationale">{a.sampleQualityRationale}</p>
+      <p className="sam-panel__rationale">{a.sampleQualityRationale} {describeSAM(a)}</p>
 
       {result.compositionNote ? (
         <p className="sam-panel__status" role="status">{result.compositionNote}</p>

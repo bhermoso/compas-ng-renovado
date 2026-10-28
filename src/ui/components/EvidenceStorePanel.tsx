@@ -37,6 +37,7 @@ const ORIGIN_LABEL: Partial<Record<EvidenceOrigin, string>> = {
 };
 
 const CONFIDENCE_LABEL: Record<EvidenceConfidence, string> = {
+  "not-evaluable": "No evaluable",
   "low":    "Confianza baja",
   "medium": "Confianza media",
   "high":   "Confianza alta",
@@ -112,6 +113,7 @@ export function EvidenceStorePanel({ evidenceStore, defaultOpen = true }: Eviden
                     </div>
                     <span className="status-pill">
                       {CONFIDENCE_LABEL[atom.confidence] ?? atom.confidence}
+                      {atom.provenance.origin === "sam" && !atom.methodology.version && " (SAM histórico; pendiente de reevaluación)"}
                     </span>
                   </article>
                 ))}

@@ -158,7 +158,8 @@ describe("SamAssessmentPanel", () => {
     expect(html).toContain("Muestra teórica");
     expect(html).toContain("Tripirámide muestral");
     expect(html).toContain("Requiere validación humana");
-    expect(html).not.toContain("No evaluable");
+    expect(html).toContain("Confianza metodológica");
+    expect(html).toContain("No evaluable");
   });
   it("sin registros muestra las cifras y declara la representatividad no evaluable", () => {
     const html = render(assessSample({ instrumentId: "t", municipalityId: "atarfe", nObserved: 400 }));

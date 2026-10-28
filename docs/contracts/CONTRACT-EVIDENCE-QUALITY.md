@@ -1,5 +1,9 @@
 # CONTRACT-EVIDENCE-QUALITY
 
+> Enmienda vigente SAM-3.0.0 — 2026-10-28 (ADR-SAM-001). Prevalece sobre las reglas históricas de clasificación que figuran más abajo. Cochran + FPC solo proporciona una referencia descriptiva condicionada a selección aleatoria simple. Se retiran los niveles derivados del 60 % y 100 %: las evaluaciones nuevas devuelven sampleQuality = "not-evaluable", canClassifyQuality = false y los átomos SAM nuevos confidence = "not-evaluable". Tamaño, composición y confianza son dimensiones independientes.
+> coverageGlobal conserva por compatibilidad el cociente n/n teórico × 100; no es cobertura poblacional. populationRatioPercent es n/N × 100; solo se publica populationCoveragePercent cuando constan participantes únicos residentes y coincidencia de universo y periodo (participationBasis); nunca se deduce de un cociente grande. Sin verificación: «No evaluable» y motivo. No hay nuevos umbrales de calidad ni de cobertura elevada.
+> describeSAM comparte la explicación entre interfaz, evidencias y perfiles nuevos. Conserva las diferencias demográficas y las celdas vacías sin convertir semejanza en representatividad. Una participación muy elevada constituye una fortaleza, sin eliminar sesgos. Los perfiles ya guardados y las evidencias históricas permanecen intactos; las nuevas notas identifican el SAM histórico. planSAMEvidenceMigration prepara una migración explícita con copia íntegra del original para archivo y sustitución revisada; no persiste nada.
+
 > Contrato de calidad de la evidencia en COMPÁS NG.
 > Versión 1.0 — Sprint 1 — 2026-06-27
 
@@ -53,7 +57,7 @@ Evalúa la fiabilidad de la fuente primaria del dato.
 
 ### 2. Calidad muestral
 
-Evalúa si la muestra sobre la que se calculó el dato es suficiente y representativa.
+Describe tamaño, completitud y composición; estas dimensiones no demuestran representatividad. La siguiente tabla recoge heurísticas históricas de completitud, no criterios válidos para asignar confianza SAM.
 
 | Nivel | Criterio |
 |---|---|
@@ -119,6 +123,7 @@ La calidad se expresa en el campo `confidence`:
 
 | Valor | Correspondencia |
 |---|---|
+| `"not-evaluable"` | SAM sin información suficiente de diseño; tamaño y composición no determinan confianza. |
 | `"high"` | Calidad muestral alta + metodológica alta. |
 | `"medium"` | Calidad muestral media o metodológica media. |
 | `"low"` | Calidad muestral baja, metodológica baja, o inferencial baja. |

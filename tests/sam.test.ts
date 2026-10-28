@@ -91,46 +91,46 @@ describe("SAM — Cochran con FPC", () => {
 
 // ── 2. Clasificación de calidad muestral ─────────────────────────────────────
 
-describe("SAM — Clasificación de calidad muestral", () => {
-  it("calidad ALTA: muestra observada ≥ 100 % teórica (IBSE Atarfe, n=811)", () => {
+describe("SAM — Retirada de clasificación por tamaño", () => {
+  it("sin clasificación automática: muestra observada ≥ 100 % teórica (IBSE Atarfe, n=811)", () => {
     // coverage = 811/375 = 216.3%
     const result = computeSampleQualityAssessment(makeInput({ nObserved: 811 }));
-    expect(result.sampleQuality).toBe("high");
+    expect(result.sampleQuality).toBe("not-evaluable");
     expect(result.coverageGlobal).toBeCloseTo(216.27, 1);
   });
 
-  it("calidad ALTA: exactamente en el umbral 100 % (n=375)", () => {
+  it("sin clasificación automática: exactamente en el umbral 100 % (n=375)", () => {
     // coverage = 375/375 = 100.00%
     const result = computeSampleQualityAssessment(makeInput({ nObserved: 375 }));
-    expect(result.sampleQuality).toBe("high");
+    expect(result.sampleQuality).toBe("not-evaluable");
     expect(result.coverageGlobal).toBeCloseTo(100.0, 1);
   });
 
-  it("calidad MEDIA: inmediatamente por debajo del umbral 100 % (n=374)", () => {
+  it("sin clasificación automática: inmediatamente por debajo del umbral 100 % (n=374)", () => {
     // coverage = 374/375 = 99.7%
     const result = computeSampleQualityAssessment(makeInput({ nObserved: 374 }));
-    expect(result.sampleQuality).toBe("medium");
+    expect(result.sampleQuality).toBe("not-evaluable");
     expect(result.coverageGlobal).toBeCloseTo(99.73, 1);
   });
 
-  it("calidad MEDIA: exactamente en el umbral 60 % (n=225)", () => {
+  it("sin clasificación automática: exactamente en el umbral 60 % (n=225)", () => {
     // coverage = 225/375 = 60.00%
     const result = computeSampleQualityAssessment(makeInput({ nObserved: 225 }));
-    expect(result.sampleQuality).toBe("medium");
+    expect(result.sampleQuality).toBe("not-evaluable");
     expect(result.coverageGlobal).toBeCloseTo(60.0, 1);
   });
 
-  it("calidad BAJA: inmediatamente por debajo del umbral 60 % (n=224)", () => {
+  it("sin clasificación automática: inmediatamente por debajo del umbral 60 % (n=224)", () => {
     // coverage = 224/375 = 59.7%
     const result = computeSampleQualityAssessment(makeInput({ nObserved: 224 }));
-    expect(result.sampleQuality).toBe("low");
+    expect(result.sampleQuality).toBe("not-evaluable");
     expect(result.coverageGlobal).toBeCloseTo(59.73, 1);
   });
 
-  it("calidad BAJA: muestra muy reducida (n=100)", () => {
+  it("sin clasificación automática: muestra muy reducida (n=100)", () => {
     // coverage = 100/375 = 26.7%
     const result = computeSampleQualityAssessment(makeInput({ nObserved: 100 }));
-    expect(result.sampleQuality).toBe("low");
+    expect(result.sampleQuality).toBe("not-evaluable");
     expect(result.coverageGlobal).toBeCloseTo(26.67, 1);
   });
 
@@ -139,7 +139,7 @@ describe("SAM — Clasificación de calidad muestral", () => {
     const result = computeSampleQualityAssessment(
       makeInput({ nObserved: 130, populationReference: SYNTHETIC_POP_500 })
     );
-    expect(result.sampleQuality).toBe("low");
+    expect(result.sampleQuality).toBe("not-evaluable");
     expect(result.nTheoretical).toBe(218);
   });
 
@@ -148,7 +148,7 @@ describe("SAM — Clasificación de calidad muestral", () => {
     const result = computeSampleQualityAssessment(
       makeInput({ nObserved: 131, populationReference: SYNTHETIC_POP_500 })
     );
-    expect(result.sampleQuality).toBe("medium");
+    expect(result.sampleQuality).toBe("not-evaluable");
   });
 });
 
@@ -182,8 +182,8 @@ describe("SAM — Ausencia de modificación de evidencia", () => {
   it("llamadas sucesivas producen resultados independientes (sin estado compartido)", () => {
     const r1 = computeSampleQualityAssessment(makeInput({ nObserved: 200 }));
     const r2 = computeSampleQualityAssessment(makeInput({ nObserved: 400 }));
-    expect(r1.sampleQuality).toBe("low");
-    expect(r2.sampleQuality).toBe("high");
+    expect(r1.sampleQuality).toBe("not-evaluable");
+    expect(r2.sampleQuality).toBe("not-evaluable");
     expect(r1.nObserved).toBe(200);
     expect(r2.nObserved).toBe(400);
   });
@@ -192,7 +192,7 @@ describe("SAM — Ausencia de modificación de evidencia", () => {
 // ── 4. Cautelas metodológicas ─────────────────────────────────────────────────
 
 describe("SAM — Cautelas metodológicas", () => {
-  it("calidad ALTA: al menos 2 cautelas estándar, sin cautela de insuficiencia", () => {
+  it("sin clasificación automática: al menos 2 cautelas estándar, sin cautela de insuficiencia", () => {
     const result = computeSampleQualityAssessment(makeInput({ nObserved: 811 }));
     expect(result.methodologicalCautions.length).toBeGreaterThanOrEqual(2);
     expect(
@@ -203,17 +203,17 @@ describe("SAM — Cautelas metodológicas", () => {
     ).toBe(true);
   });
 
-  it("calidad MEDIA: incluye cautela de cobertura parcial", () => {
+  it("sin clasificación automática: incluye cautela de cobertura parcial", () => {
     const result = computeSampleQualityAssessment(makeInput({ nObserved: 250 }));
     expect(
-      result.methodologicalCautions.some((c) => c.includes("parcial"))
+      result.methodologicalCautions.some((c) => c.includes("selección aleatoria"))
     ).toBe(true);
   });
 
-  it("calidad BAJA: incluye cautela de muestra insuficiente", () => {
+  it("muestra pequeña: conserva la cautela sobre selección aleatoria", () => {
     const result = computeSampleQualityAssessment(makeInput({ nObserved: 100 }));
     expect(
-      result.methodologicalCautions.some((c) => c.includes("insuficiente"))
+      result.methodologicalCautions.some((c) => c.includes("selección aleatoria"))
     ).toBe(true);
   });
 
@@ -270,9 +270,9 @@ describe("SAM — Invariantes del SampleQualityAssessment", () => {
     expect(result.capabilities.canInferGlobalCoverage).toBe(true);
   });
 
-  it("capabilities.canClassifyQuality es true", () => {
+  it("capabilities.canClassifyQuality es false", () => {
     const result = computeSampleQualityAssessment(makeInput({ nObserved: 200 }));
-    expect(result.capabilities.canClassifyQuality).toBe(true);
+    expect(result.capabilities.canClassifyQuality).toBe(false);
   });
 
   it("instrumentId y municipalityId se preservan del input", () => {

@@ -83,7 +83,7 @@ Gramática editorial de los paneles de estudios complementarios. Distingue tres 
 ### CONTRACT-EVIDENCE-QUALITY
 **Estado:** VIGENTE
 
-Define las cuatro dimensiones de calidad de la evidencia: documental, muestral, metodológica e inferencial. Establece cómo se mapean a `confidence: "high" | "medium" | "low"` en EvidenceAtom y justifica mantener `kind: "sample-quality"` sin evolucionar a `EvidenceQualityAssessment` en Sprint 1.
+Define las cuatro dimensiones de calidad de la evidencia: documental, muestral, metodológica e inferencial. Establece cómo se mapean a `confidence: "high" | "medium" | "low" | "not-evaluable"` en EvidenceAtom y justifica mantener `kind: "sample-quality"` sin evolucionar a `EvidenceQualityAssessment` en Sprint 1.
 
 **Productores:** Parsers de estudios (calculan confianza), CONTRACT-DYNAMIC-TRIPYRAMID (calidad muestral futura).
 **Consumidores:** MIT (priorización por confianza), PSL (validación de capítulos).
@@ -336,9 +336,9 @@ Contrato del Compilador del Plan Local de Salud. Define los gates obligatorios (
 ## Infraestructura metodológica
 
 ### CONTRACT-DYNAMIC-TRIPYRAMID
-**Estado:** VIGENTE — revisado 2026-10-26 (v2.2: SAM describe la composición y no califica la representatividad; v2.1: pirámide superpuesta y animada, sin semáforo)
+**Estado:** VIGENTE — revisado 2026-10-26 (v3.0: Cochran descriptivo sin confianza automática; SAM describe la composición y no califica la representatividad; v2.1: pirámide superpuesta y animada, sin semáforo)
 
-Define el Sistema de Ajuste Muestral (SAM) como capacidad metodológica transversal: `PopulationReference`, `SampleQualityAssessment`, Cochran+FPC como algoritmo por defecto, clasificación high/medium/low. Motor puro implementado y certificado (Producto 2, 2026-06-29). `populationReferenceRegistry.ts` añadido (2026-07-13): IBSEPanel consume el motor SAM cuando existe referencia verificada para el municipio activo (actualmente Atarfe). Tripirámide visual, EvidenceAtoms desde SAM y estratificación pendientes.
+Define el Sistema de Ajuste Muestral (SAM) como capacidad metodológica transversal: `PopulationReference`, `SampleQualityAssessment`, Cochran+FPC como algoritmo por defecto, confianza SAM «No evaluable» (ADR-SAM-001, 2026-10-28), sin clasificación por tamaño. Motor puro implementado y certificado (Producto 2, 2026-06-29). `populationReferenceRegistry.ts` añadido (2026-07-13): IBSEPanel consume el motor SAM cuando existe referencia verificada para el municipio activo (actualmente Atarfe). Tripirámide visual, EvidenceAtoms desde SAM y estratificación pendientes.
 
 **Productores:** `computeSampleQualityAssessment()` (motor puro); `assess*Study()` (capa de integración); `populationReferenceRegistry.ts` (lookup de referencias).
 **Consumidores:** `IBSEPanel` (dictamen SAM cuando ref. disponible). EvidenceStore (futuro: átomos `kind: "sample-quality"`), `SamObservedAssessment` (Tripirámide superpuesta y animada, en IBSE y en el resumen de participación ciudadana).

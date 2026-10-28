@@ -2,7 +2,7 @@ import type { MunicipalityId } from "../../domain/municipality";
 import type { PopulationReference } from "../../domain/sam/PopulationReference";
 import {
   type SampleQualityAssessment,
-  type SampleQualityLevel,
+  SAM_METHODOLOGY_VERSION,
   type CochranParams,
   DEFAULT_COCHRAN_PARAMS,
 } from "../../domain/sam/SampleQualityAssessment";
@@ -37,77 +37,10 @@ function applyFPC(n0: number, N: number): number {
   return Math.ceil(n0 / (1 + (n0 - 1) / N));
 }
 
-function classifyQuality(coverage: number): SampleQualityLevel {
-  if (coverage >= 100) return "high";
-  if (coverage >= 60) return "medium";
-  return "low";
-}
-
-// La muestra teórica es el tamaño que necesitaría una muestra aleatoria simple de
-// la población de referencia. Compararla con la muestra conseguida informa del
-// tamaño, no de la representatividad: SAM no conoce cómo se seleccionó la muestra.
+// Cochran is a conditional planning reference, never a confidence classifier.
 const RANDOM_SAMPLE_PREMISE =
-  "La muestra teórica supone una selección aleatoria. Si la muestra no es probabilística " +
-  "(por ejemplo, de participación voluntaria), alcanzar ese tamaño no la hace representativa " +
-  "ni permite calcular un margen de error: quienes responden pueden diferir de quienes no " +
-  "responden aunque sean muchos.";
-
-function buildRationale(
-  quality: SampleQualityLevel,
-  coverage: number,
-  nObserved: number,
-  nTheoretical: number
-): string {
-  const pct = coverage.toLocaleString("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-  const base =
-    `La muestra conseguida (n=${nObserved}) es el ${pct} % de la muestra teórica ` +
-    `(n=${nTheoretical}), el tamaño que necesitaría una muestra aleatoria simple de esta ` +
-    `población para estimar una proporción con error ±5 % y confianza del 95 %.`;
-  switch (quality) {
-    case "high":
-      return `${base} Alcanza ese tamaño. El tamaño no informa de cómo se seleccionó la muestra.`;
-    case "medium":
-      return `${base} No alcanza ese tamaño: aun con selección aleatoria, el error sería mayor de ±5 %.`;
-    case "low":
-      return (
-        `${base} Queda muy por debajo: aun con selección aleatoria, el error superaría ` +
-        `con mucho ±5 %. Las conclusiones tienen alcance descriptivo.`
-      );
-  }
-}
-
-function buildCautions(
-  quality: SampleQualityLevel,
-  populationReference: PopulationReference
-): string[] {
-  const cautions: string[] = [];
-
-  if (quality === "low") {
-    cautions.push(
-      "Muestra insuficiente para estimar con error ±5 % y confianza 95 % aun con selección aleatoria. " +
-      "Las conclusiones tienen alcance descriptivo, no inferencial."
-    );
-  } else if (quality === "medium") {
-    cautions.push(
-      "Tamaño parcial (60–99 % de la muestra teórica): aun con selección aleatoria, el error " +
-      "superaría ±5 %. No se extraen inferencias categóricas sobre la población."
-    );
-  }
-
-  cautions.push(RANDOM_SAMPLE_PREMISE);
-
-  cautions.push(
-    `Fuente poblacional de referencia: ${populationReference.source} (${populationReference.year}). ` +
-    `El tamaño muestral teórico variará si se utiliza una fuente o año distintos.`
-  );
-
-  cautions.push(
-    "El dictamen de tamaño informa. " +
-    "No modifica los resultados del instrumento ni determina su validez metodológica."
-  );
-
-  return cautions;
-}
+  "La muestra teórica supone una selección aleatoria. Alcanzar ese tamaño no demuestra " +
+  "representatividad estadística ni permite atribuir su margen de error a esta muestra.";
 
 export interface ComputeSAMInput {
   instrumentId: string;
@@ -115,6 +48,7 @@ export interface ComputeSAMInput {
   nObserved: number;
   populationReference: PopulationReference;
   cochranParams?: Partial<CochranParams>;
+  participationBasis?: { uniqueResidents: boolean; matchingPopulationAndPeriod: boolean };
 }
 
 export function computeSampleQualityAssessment(
@@ -125,13 +59,21 @@ export function computeSampleQualityAssessment(
     ...input.cochranParams,
   };
 
+  if (!Number.isInteger(input.nObserved) || input.nObserved < 0 ||
+      !Number.isInteger(input.populationReference.populationTotal) || input.populationReference.populationTotal <= 0) {
+    throw new RangeError("SAM requiere recuentos enteros no negativos y población positiva.");
+  }
+  if (!(params.marginOfError > 0 && params.marginOfError < 1) ||
+      !(params.expectedProportion > 0 && params.expectedProportion < 1)) {
+    throw new RangeError("Parámetros Cochran inválidos.");
+  }
   const nTheoreticalRaw = cochranRaw(params);
   const nTheoretical = applyFPC(
     nTheoreticalRaw,
     input.populationReference.populationTotal
   );
   const coverageGlobal = (input.nObserved / nTheoretical) * 100;
-  const sampleQuality = classifyQuality(coverageGlobal);
+  const populationRatioPercent = input.nObserved / input.populationReference.populationTotal * 100;
 
   return {
     instrumentId: input.instrumentId,
@@ -142,20 +84,24 @@ export function computeSampleQualityAssessment(
     nTheoreticalRaw,
     nTheoretical,
     coverageGlobal,
-    sampleQuality,
-    sampleQualityRationale: buildRationale(
-      sampleQuality,
-      coverageGlobal,
-      input.nObserved,
-      nTheoretical
-    ),
-    methodologicalCautions: buildCautions(
-      sampleQuality,
-      input.populationReference
-    ),
+    methodologyVersion: SAM_METHODOLOGY_VERSION,
+    populationRatioPercent,
+    ...(input.participationBasis?.uniqueResidents && input.participationBasis.matchingPopulationAndPeriod && populationRatioPercent <= 100
+      ? { populationCoveragePercent: populationRatioPercent } : {}),
+    sampleQuality: "not-evaluable",
+    sampleQualityRationale:
+      `La muestra conseguida (n=${input.nObserved}) es el ${coverageGlobal.toLocaleString("es-ES", {maximumFractionDigits: 1})} % de la muestra teórica (n=${nTheoretical}). ` +
+      `Cochran + FPC es una referencia para selección aleatoria simple: confianza nominal ${params.confidence * 100} %, error nominal ±${params.marginOfError * 100} %. ` +
+      "Confianza metodológica: No evaluable; SAM no dispone de una evaluación verificada del diseño muestral.",
+    methodologicalCautions: [
+      RANDOM_SAMPLE_PREMISE,
+      `Fuente poblacional de referencia: ${input.populationReference.source} (${input.populationReference.year}).`,
+      "Una participación muy elevada constituye una fortaleza, pero no elimina posibles sesgos de selección o participación.",
+      "No modifica los resultados del instrumento ni sus conclusiones sustantivas.",
+    ],
     capabilities: {
       canInferGlobalCoverage: true,
-      canClassifyQuality: true,
+      canClassifyQuality: false,
     },
     requiresHumanValidation: true,
     computedAt: new Date().toISOString(),

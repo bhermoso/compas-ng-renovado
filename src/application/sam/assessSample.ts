@@ -42,6 +42,8 @@ export interface SampleRecord {
 }
 
 export interface SampleInput {
+  /** Only set after checking unique residents and matching target population/time. */
+  participationBasis?: { uniqueResidents: boolean; matchingPopulationAndPeriod: boolean };
   /** Identifica el origen de la muestra (p. ej. "ibse", "priorizacion", "csv-manual"). */
   instrumentId: string;
   municipalityId: MunicipalityId;
@@ -205,6 +207,26 @@ export function assessSample(input: SampleInput): SampleAssessmentResult {
     return { status: "not-evaluable", reasons: [resolved.reason] };
   }
   const reference = resolved.reference;
+  const demographicCells = [...(reference.ageSexMatrix ?? []), ...(input.observedCells ?? [])];
+  if (demographicCells.some(c => [c.male, c.female].some(n => !Number.isInteger(n) || n < 0))) {
+    return { status: "not-evaluable", reasons: ["Los recuentos demográficos deben ser enteros no negativos."] };
+  }
+  if (!Number.isInteger(reference.populationTotal) || reference.populationTotal <= 0) {
+    return { status: "not-evaluable", reasons: ["La población de referencia no es un recuento entero positivo."] };
+  }
+  if (input.ageRange && input.records) {
+    const { min, max } = input.ageRange;
+    const ages = input.records.map(r => r.age ?? (r.birthYear !== undefined && input.referenceYear !== undefined ? input.referenceYear - r.birthYear : NaN));
+    if (ages.some(age => !Number.isInteger(age) || age < 0 || age > MAX_VALID_AGE)) {
+      return { status: "not-evaluable", reasons: ["No se puede verificar la pertenencia al intervalo: hay registros sin edad válida."] };
+    }
+    if (ages.some(age => age < min || age > max)) {
+      const records = input.records.filter((_, i) => ages[i] >= min && ages[i] <= max);
+      const result = assessSample({ ...input, records, nObserved: records.length });
+      if (result.status === "evaluable") result.notes.push(`${input.records.length - records.length} registros fuera del intervalo quedan excluidos del tamaño y de la composición.`);
+      return result;
+    }
+  }
 
   const aligned = input.observedCells
     ? alignObservedCells(input.observedCells, reference.ageSexMatrix)
@@ -216,7 +238,7 @@ export function assessSample(input: SampleInput): SampleAssessmentResult {
   const nObserved = aligned
     ? aligned.retainedTotal
     : input.nObserved ?? input.records?.length;
-  if (nObserved === undefined || !Number.isFinite(nObserved) || nObserved <= 0) {
+  if (nObserved === undefined || !Number.isInteger(nObserved) || nObserved <= 0) {
     return {
       status: "not-evaluable",
       reasons: ["No hay tamaño de muestra: ni n válido ni registros individuales."],
@@ -228,6 +250,7 @@ export function assessSample(input: SampleInput): SampleAssessmentResult {
     municipalityId: input.municipalityId,
     nObserved,
     populationReference: reference,
+    participationBasis: input.participationBasis,
   });
 
   const notes: string[] = [];

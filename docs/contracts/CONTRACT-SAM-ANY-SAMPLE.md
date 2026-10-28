@@ -1,5 +1,9 @@
 # COMPÁS NG — Contrato de SAM para cualquier muestra con sexo y edad
 
+> Enmienda vigente SAM-3.0.0 — 2026-10-28 (ADR-SAM-001). Prevalece sobre las reglas históricas de clasificación que figuran más abajo. Cochran + FPC solo proporciona una referencia descriptiva condicionada a selección aleatoria simple. Se retiran los niveles derivados del 60 % y 100 %: las evaluaciones nuevas devuelven sampleQuality = "not-evaluable", canClassifyQuality = false y los átomos SAM nuevos confidence = "not-evaluable". Tamaño, composición y confianza son dimensiones independientes.
+> coverageGlobal conserva por compatibilidad el cociente n/n teórico × 100; no es cobertura poblacional. populationRatioPercent es n/N × 100; solo se publica populationCoveragePercent cuando constan participantes únicos residentes y coincidencia de universo y periodo (participationBasis); nunca se deduce de un cociente grande. Sin verificación: «No evaluable» y motivo. No hay nuevos umbrales de calidad ni de cobertura elevada.
+> describeSAM comparte la explicación entre interfaz, evidencias y perfiles nuevos. Conserva las diferencias demográficas y las celdas vacías sin convertir semejanza en representatividad. Una participación muy elevada constituye una fortaleza, sin eliminar sesgos. Los perfiles ya guardados y las evidencias históricas permanecen intactos; las nuevas notas identifican el SAM histórico. planSAMEvidenceMigration prepara una migración explícita con copia íntegra del original para archivo y sustitución revisada; no persiste nada.
+
 > Estado: VIGENTE para la entrada genérica (`assessSample`, implementada y con tests). La vinculación de cada productor de muestras figura en el apartado 6, con su estado.
 > Fecha: 2026-10-19. Enmienda 2026-10-26: SAM describe la composición y no califica la representatividad (véase `CONTRACT-DYNAMIC-TRIPYRAMID` v2.2). Complementa `CONTRACT-DYNAMIC-TRIPYRAMID`, que define el motor y la representación.
 

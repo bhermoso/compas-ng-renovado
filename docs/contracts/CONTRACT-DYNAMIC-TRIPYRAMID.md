@@ -1,7 +1,11 @@
 # CONTRACT-DYNAMIC-TRIPYRAMID
 
+> Enmienda vigente SAM-3.0.0 — 2026-10-28 (ADR-SAM-001). Prevalece sobre las reglas históricas de clasificación que figuran más abajo. Cochran + FPC solo proporciona una referencia descriptiva condicionada a selección aleatoria simple. Se retiran los niveles derivados del 60 % y 100 %: las evaluaciones nuevas devuelven sampleQuality = "not-evaluable", canClassifyQuality = false y los átomos SAM nuevos confidence = "not-evaluable". Tamaño, composición y confianza son dimensiones independientes.
+> coverageGlobal conserva por compatibilidad el cociente n/n teórico × 100; no es cobertura poblacional. populationRatioPercent es n/N × 100; solo se publica populationCoveragePercent cuando constan participantes únicos residentes y coincidencia de universo y periodo (participationBasis); nunca se deduce de un cociente grande. Sin verificación: «No evaluable» y motivo. No hay nuevos umbrales de calidad ni de cobertura elevada.
+> describeSAM comparte la explicación entre interfaz, evidencias y perfiles nuevos. Conserva las diferencias demográficas y las celdas vacías sin convertir semejanza en representatividad. Una participación muy elevada constituye una fortaleza, sin eliminar sesgos. Los perfiles ya guardados y las evidencias históricas permanecen intactos; las nuevas notas identifican el SAM histórico. planSAMEvidenceMigration prepara una migración explícita con copia íntegra del original para archivo y sustitución revisada; no persiste nada.
+
 > Contrato de la Tripirámide Dinámica y del Sistema de Ajuste Muestral (SAM).
-> Versión 2.2 — Producto 2 — 2026-10-26
+> Versión 3.0 — Producto 2 — 2026-10-28
 >
 > Enmienda 2.2 (decisión del autor, 2026-10-26): SAM describe la composición por edad y sexo de la muestra frente al padrón y no califica su representatividad. Se retiran el error absoluto medio y la etiqueta alta / moderada / baja (umbrales 1,5 y 3,5 pp sin fuente, heredados de la auditoría del histórico). Los textos del dictamen de tamaño dejan de afirmar representatividad: la muestra teórica es la que necesitaría una muestra aleatoria simple.
 >
@@ -31,8 +35,7 @@ registry resuelve alias de municipio (`"atarfe"` → INE `"18022"`), de modo que
 válido —o `unknown`— no es evaluable por estrato; una `mixed` con desglose válido pero sin referencia de
 un estrato tampoco, y el motivo distingue qué falta. Cuando el desglose es válido y ambas referencias
 están presentes, se muestran AMBOS dictámenes (menores de 16 con la referencia 6–15; 16+ con la adulta).
-Para municipios sin referencia verificada (p. ej. Granada-Zaidín), muestra dictamen heurístico
-simplificado con nota explícita.
+Para municipios sin referencia verificada (p. ej. Granada-Zaidín), muestra «No evaluable» con el motivo; no se aplica una clasificación alternativa por n.
 
 **Pendiente:** generación de `EvidenceAtom kind="sample-quality"`,
 persistencia en workspace, estratificación, ponderación, desplazamiento, comparación longitudinal,
@@ -78,9 +81,9 @@ Número de registros válidos disponibles en el estudio (n válido del instrumen
 
 ---
 
-## Cálculo de la calidad muestral
+## Referencia descriptiva del tamaño (clasificación histórica retirada)
 
-La calidad muestral compara el tamaño de la muestra observada con el de la teórica. La muestra teórica es la que necesitaría una muestra aleatoria simple; alcanzarla no hace representativa una muestra no probabilística ni permite calcular su margen de error, y los textos del dictamen lo dicen (enmienda 2.2). Los umbrales de la tabla siguiente proceden de la versión 1 del contrato y no tienen fuente citada:
+La calidad muestral compara el tamaño de la muestra observada con el de la teórica. La muestra teórica es la que necesitaría una muestra aleatoria simple; alcanzarla no hace representativa una muestra no probabilística ni permite calcular su margen de error, y los textos del dictamen lo dicen (enmienda 2.2). La siguiente tabla documenta exclusivamente la clasificación histórica retirada en SAM-3.0.0:
 
 | Relación | Calidad |
 |---|---|

@@ -19,6 +19,7 @@ const ORIGIN_LABEL: Partial<Record<EvidenceOrigin, string>> = {
 };
 
 const CONFIDENCE_LABEL: Record<EvidenceConfidence, string> = {
+  "not-evaluable": "No evaluable",
   high:   "Alta",
   medium: "Media",
   low:    "Baja",
@@ -49,6 +50,7 @@ function AtomCard({ atom }: { atom: EvidenceAtom }) {
         <p className="lt1-atom__title">{atom.title}</p>
         <span className={`lt1-atom__confidence lt1-atom__confidence--${atom.confidence}`}>
           {CONFIDENCE_LABEL[atom.confidence]}
+          {atom.provenance.origin === "sam" && !atom.methodology.version && " (SAM histórico; pendiente de reevaluación)"}
         </span>
       </div>
 

@@ -83,6 +83,9 @@ export function computeSampleComposition(
     );
   }
   population.forEach((p, i) => {
+    if ([p.male, p.female, observed[i].male, observed[i].female].some(n => !Number.isInteger(n) || n < 0)) {
+      throw new RangeError("Los recuentos demográficos deben ser enteros no negativos.");
+    }
     if (p.ageBand !== observed[i].ageBand) {
       throw new RangeError(
         `Las bandas no coinciden en la posición ${i}: «${p.ageBand}» frente a «${observed[i].ageBand}»`

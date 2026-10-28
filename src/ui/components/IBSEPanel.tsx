@@ -1,3 +1,4 @@
+import { describeSAM } from "../../application/sam/describeSAM";
 import type { IBSEStudy } from "../../domain/ibse";
 import { describeIBSESampleScope, validateIBSEStrataCounts } from "../../domain/ibse";
 import { IBSE_MODULE } from "../../domain/methodology/definitions/ibse";
@@ -6,7 +7,7 @@ import {
   getPopulationReferenceSet,
 } from "../../application/sam";
 import { SamObservedAssessment } from "./SamObservedAssessment";
-import type { SampleQualityLevel, SampleQualityAssessment } from "../../domain/sam";
+import type { SampleQualityAssessment } from "../../domain/sam";
 
 interface IBSEPanelProps {
   ibseStudy?: IBSEStudy;
@@ -33,26 +34,6 @@ function getIBSELevel(value: number): "alto" | "medio" | "medio-bajo" | "bajo" {
   if (value >= 50) return "medio-bajo";
   return "bajo";
 }
-
-function samLevelToDisplay(level: SampleQualityLevel): { label: string; key: string } {
-  if (level === "high") return { label: "Adecuada", key: "adecuada" };
-  if (level === "medium") return { label: "Moderada", key: "moderada" };
-  return { label: "Insuficiente", key: "insuficiente" };
-}
-
-function getSampleQualityVerdict(
-  n: number
-): { label: string; key: "adecuada" | "moderada" | "insuficiente"; note: string } {
-  if (n >= 100)
-    return { label: "Adecuada", key: "adecuada",
-      note: `El tamaño muestral (${n} registros válidos) permite una lectura descriptiva de la muestra participante.` };
-  if (n >= 30)
-    return { label: "Moderada", key: "moderada",
-      note: `El tamaño muestral (${n} registros válidos) es modesto. Los resultados son descriptivos de la muestra participante.` };
-  return { label: "Insuficiente", key: "insuficiente",
-    note: `La muestra es reducida (${n} registros). Interpretar con extrema precaución.` };
-}
-
 
 const IBSE_FACTORS: Array<{
   label: string;
@@ -99,16 +80,14 @@ export function IBSEPanel({ ibseStudy, municipalityName }: IBSEPanelProps) {
     ...(sam.under16 ? [{ key: "menores", label: "Menores de 16", a: sam.under16 }] : []),
     ...(sam.plus16 ? [{ key: "16plus", label: "16 años o más", a: sam.plus16 }] : []),
   ];
-  const heuristic = getSampleQualityVerdict(agg.nValid);
   const samSummaryNote = samStrata.length > 0
     ? samStrata
         .map(
           (s) =>
-            `SAM ${s.label}: ${samLevelToDisplay(s.a.sampleQuality).label.toLowerCase()} ` +
-            `(cobertura ${s.a.coverageGlobal.toFixed(0)} %).`
+            `SAM ${s.label}: ${describeSAM(s.a)}`
         )
         .join(" ")
-    : `${heuristic.note} SAM por estrato: ${sam.notEvaluableReason ?? "sin referencia poblacional verificada para este municipio."}`;
+    : `SAM por estrato: ${sam.notEvaluableReason ?? "sin referencia poblacional verificada para este municipio."}`;
 
   // Dispersión interfactorial
   const factorValues = [
@@ -279,9 +258,7 @@ export function IBSEPanel({ ibseStudy, municipalityName }: IBSEPanelProps) {
             {samStrata.length > 0 ? (
               <span className="study-report__quality-value">SAM por estrato</span>
             ) : (
-              <span className={`study-report__quality-verdict study-report__quality-verdict--${heuristic.key}`}>
-                {heuristic.label}
-              </span>
+              <span className="study-report__quality-value">No evaluable</span>
             )}
           </div>
         </div>
@@ -291,26 +268,22 @@ export function IBSEPanel({ ibseStudy, municipalityName }: IBSEPanelProps) {
           samStrata.map((s) => (
             <p key={s.key} className="study-report__quality-note" data-sam-stratum={s.key}>
               <strong>SAM — {s.label}:</strong>{" "}
-              <span className={`study-report__quality-verdict study-report__quality-verdict--${samLevelToDisplay(s.a.sampleQuality).key}`}>
-                {samLevelToDisplay(s.a.sampleQuality).label}
-              </span>{" "}
               {s.a.sampleQualityRationale}{" "}
               N observado: {s.a.nObserved} · N teórico Cochran: {s.a.nTheoretical} ·
-              Cobertura: {s.a.coverageGlobal.toFixed(1)} %
+              Porcentaje del tamaño teórico: {s.a.coverageGlobal.toFixed(1)} %
               (referencia: {s.a.populationReference.ageGroupLabel} — {s.a.populationReference.source}, {s.a.populationReference.year}).
             </p>
           ))
         ) : (
           <p className="study-report__quality-note">
-            {heuristic.note}{" "}
             SAM por estrato: {sam.notEvaluableReason
               ?? "sin referencia poblacional verificada para este municipio."}{" "}
-            Valoración heurística sobre la muestra participante, sin ajuste Cochran.
+            Confianza metodológica: No evaluable; falta información del diseño y la participación.
           </p>
         )}
       </section>
 
-      {/* REPRESENTATIVIDAD POR EDAD Y SEXO (SAM) */}
+      {/* COMPOSICIÓN POR EDAD Y SEXO (SAM) */}
       <SamObservedAssessment
         municipalityId={ibseStudy.municipalityId}
         instrumentId="ibse"
