@@ -19,6 +19,13 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
   expect(await (await profileAttachmentBlob(attachment)).text()).toBe(text);
   await expect(profileAttachmentBlob({...attachment,base64:btoa('alterado')})).rejects.toThrow(/integridad/);
  });
+ it('extrae un Word real y mantiene el original descargable byte por byte',async()=>{
+  const {Document,Paragraph,Packer}=await import('docx');
+  const bytes=await Packer.toBuffer(new Document({sections:[{children:[new Paragraph('Perfil externo de prueba: contenido íntegro.')]}]}));
+  const {attachment,content,notice}=await importProfileFile(new File([new Uint8Array(bytes)],'perfil.docx'),'profile-test');
+  expect(notice).toBeUndefined();expect(content.text).toContain('contenido íntegro');
+  expect(new Uint8Array(await (await profileAttachmentBlob(attachment)).arrayBuffer())).toEqual(new Uint8Array(bytes));
+ });
  it('rechaza archivos vacíos, formatos distintos y documentos de otro municipio',async()=>{
   await expect(importProfileFile(new File([],'perfil.txt'),'profile-test')).rejects.toThrow(/no vacío/);
   await expect(importProfileFile(new File(['otro'],'perfil.pdf'),'profile-test')).rejects.toThrow(/formato/);
