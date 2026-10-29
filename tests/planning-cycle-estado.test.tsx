@@ -36,13 +36,13 @@ describe("ciclo — fase Perfil de Salud Local", () => {
     // «Completada» no debe aparecer en ninguna fase del ciclo.
     expect(html).not.toContain("Completada");
     expect(html).toContain("Validado técnicamente");
-    expect(html).toContain("Pendiente de compilación institucional");
+    expect(html).toContain("Pendiente de incorporar el documento de referencia");
   });
 
   it("con artefacto PSL-C compilado la fase sí puede mostrarse «Completada»", () => {
     const html = render({ pslStatus: "validated", pslCompiled: true });
     expect(html).toContain("Completada");
-    expect(html).not.toContain("Pendiente de compilación institucional");
+    expect(html).not.toContain("Pendiente de incorporar el documento de referencia");
   });
 
   it("un borrador generado sigue «En curso», compile o no", () => {

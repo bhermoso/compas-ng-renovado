@@ -58,6 +58,8 @@ export interface TerritorialStateRecord {
 }
 
 export interface MunicipalityWorkspace {
+  /** Complete external profiles, original files and revisions, shared in Firebase. */
+  externalProfileLibrary?: import('../health-profile/ExternalHealthProfile').ExternalProfileLibrary;
   planPreparationDraftHistory?: { replacedAt: string; replacementVersion: string; draft: PlanPreparationDraft }[];
   validatedActionPlans?: PlanDocument[];
   municipality: MunicipalityContext;

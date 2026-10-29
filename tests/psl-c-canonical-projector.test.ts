@@ -27,7 +27,7 @@ import {
   buildPSLCDocumentMetadata,
 } from "../src/application/psl-c-export";
 import { loadWorkspaceFromLocalStorage } from "../src/infrastructure/persistence/local-storage";
-import { createMunicipalityRuntime } from "../src/application/runtime";
+import { createMunicipalityRuntime } from './helpers/legacyProfileRuntime';
 import type { MunicipalityWorkspace } from "../src/domain/workspace";
 import type { LocalHealthProfile } from "../src/domain/health-profile";
 import type { LocalHealthProfileArtifact } from "../src/domain/health-profile-artifact";

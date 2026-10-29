@@ -18,7 +18,10 @@ import {
 
 const REMOTE_WORKSPACE_SCHEMA = "compas-workspace-chunks/v1";
 const CHUNK_SIZE = 180_000;
-const MAX_BATCH_WRITES = 400;
+// Keep document batches well below the 10 MiB request limit, including UTF-8 and metadata.
+// https://firebase.google.com/docs/firestore/quotas
+const MAX_BATCH_WRITES = 8;
+const saveQueues = new WeakMap<RelasClient, Map<string, Promise<void>>>();
 
 interface RemoteWorkspaceManifest {
   schema: typeof REMOTE_WORKSPACE_SCHEMA;
@@ -111,6 +114,19 @@ export async function saveRemoteWorkspace(
   client: RelasClient,
   workspace: MunicipalityWorkspace
 ): Promise<void> {
+  let queue = saveQueues.get(client);
+  if (!queue) { queue = new Map(); saveQueues.set(client, queue); }
+  const key = workspace.municipality.identity.id;
+  const previous = queue.get(key) ?? Promise.resolve();
+  const next = previous.catch(() => undefined).then(() => persistRemoteWorkspace(client, workspace));
+  queue.set(key, next);
+  try { await next; } finally { if (queue.get(key) === next) queue.delete(key); }
+}
+
+async function persistRemoteWorkspace(client: RelasClient, workspace: MunicipalityWorkspace): Promise<void> {
+  const raw = JSON.stringify(workspace);
+  const chunks = splitText(raw);
+  if (chunks.length > 400) throw new Error('El expediente supera la capacidad de 400 fragmentos de Firebase. Conserva la versión anterior y reduce el tamaño de los archivos.');
   const user = client.auth.currentUser;
   if (!user) throw new Error("Inicia sesión para guardar el expediente remoto.");
   const role = await readMembership(client, workspace.municipality.identity.id);
@@ -118,8 +134,6 @@ export async function saveRemoteWorkspace(
     throw new Error("La cuenta tiene acceso de consulta y no puede guardar.");
   }
   await ensureRemoteScope(client, workspace).catch(() => undefined);
-  const raw = JSON.stringify(workspace);
-  const chunks = splitText(raw);
   const id = snapshotId();
   const previous = await readManifest(client, workspace.municipality.identity.id);
   for (let start = 0; start < chunks.length; start += MAX_BATCH_WRITES) {

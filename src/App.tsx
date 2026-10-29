@@ -1,5 +1,6 @@
-import { authoredToProposals, buildReadingUnitProposals, buildRelationProposals } from "./application/proposals";
-import type { FigureInput } from "./application/figures";
+import { ExternalProfileDashboard } from "./ui/components/ExternalProfileDashboard";
+import { EMPTY_PROFILE_LIBRARY, isExternalProfileLibrary } from "./application/health-profile/externalProfiles";
+import type { ExternalProfileLibrary } from "./domain/health-profile/ExternalHealthProfile";
 import { InitialLocalHealthPlanPanel } from "./ui/components/InitialLocalHealthPlanPanel";
 import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
 import { InstitutionalLogoBand } from "./ui/components/InstitutionalLogoBand";
@@ -16,37 +17,10 @@ import {
 import { bundledDocuments } from './ui/components/documentAccessUtils';
 import { BackupPanel } from './ui/components/BackupPanel';
 import { DocumentationProvider } from "./ui/components/Documentation";
-import { healthReportFingerprint, profileSourceChanged } from './application/health-profile/profileSourceChanged';
-import { DocumentAccess } from './ui/components/DocumentAccess.tsx';
 import type { PlanPreparationDraft } from "./domain/action-plan-catalog/PlanPreparationDraft";
 import { worksheetKey, type IndicatorWorksheet } from "./domain/action-plan-catalog/IndicatorWorksheet";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  type CycleConciliation,
-  type AssetValidationDeclaration,
-  type ProposalDecision,
-  type AuthoredProposal,
-  type DocumentCycle,
-  type DocumentKind,
-  type MunicipalDocument,
-  type MunicipalDocumentRepository,
-  addMunicipalDocument,
-  setMunicipalDocumentCycle,
-  addCycleConciliation,
-  addAssetValidation,
-  addProposalDecision,
-  addAuthoredProposal,
-  addRelationDeclaration,
-  addReadingAxisDeclaration,
-  addFigures,
-  type ReadingAxisDeclaration,
-  type RelationDeclaration,
-  removeAuthoredProposal,
-  removeAssetValidation,
-  removeCycleConciliation,
-  replaceMunicipalDocumentByKind,
-  removeMunicipalDocument,
-} from "./domain/repository";
+import { type CycleConciliation, type AssetValidationDeclaration, type DocumentCycle, type DocumentKind, type MunicipalDocument, type MunicipalDocumentRepository, addMunicipalDocument, setMunicipalDocumentCycle, addCycleConciliation, addAssetValidation, removeAssetValidation, removeCycleConciliation, replaceMunicipalDocumentByKind, removeMunicipalDocument } from "./domain/repository";
 import { type MunicipalityWorkspace } from "./domain/workspace";
 import { type QuestionnaireProject } from "./domain/questionnaire";
 import { importProjectDataset } from "./application/questionnaire";
@@ -78,42 +52,6 @@ import {
   libraryDocumentAssignmentId,
   type CompasLibraryDocument,
 } from "./application/document-library";
-// buildLocalHealthProfile is now called inside MunicipalityRuntime — not needed here.
-import {
-  computePerfilEpistemicMetrics,
-  buildDiagnosticAnswers,
-  excludeHistoricalSources,
-  serializeValidatedAnswers,
-  parseValidatedAnswersSnapshot,
-  selectDocumentPreviewContext,
-} from "./application/health-profile";
-import type { DiagnosticAnswers } from "./application/health-profile";
-import type { PerfilLocalDeSalud } from "./domain/health-profile";
-
-/**
- * DiagnosticAnswers desde el workspace, con la convención ÚNICA de derivación del
- * expediente: `determinantTitles` de los átomos `determinant` y `assets` de los
- * átomos `asset`. Helper puro compartido por el flujo de compilación
- * (`handleCompilePSL`) y por la vista viva (`LocalHealthProfileView`), para que
- * ambos alimenten exactamente los mismos answers y el artefacto congelado reciba
- * `canonicalDocument`/`readingStatus`.
- */
-function buildWorkspaceDiagnosticAnswers(
-  workspace: MunicipalityWorkspace
-): DiagnosticAnswers {
-  // Las listas salen solo de las fuentes del ciclo actual; los antecedentes los
-  // calcula buildDiagnosticAnswers con el expediente completo.
-  const current = excludeHistoricalSources(workspace);
-  return buildDiagnosticAnswers({
-    workspace,
-    determinantTitles: current.evidenceStore.atoms
-      .filter((a) => a.kind === "determinant")
-      .map((a) => a.title),
-    assets: current.evidenceStore.atoms
-      .filter((a) => a.kind === "asset")
-      .map((a) => ({ title: a.title, content: a.content })),
-  });
-}
 import {
   createHealthReportDocumentFromDocx,
   createHealthReportDocumentFromPdf,
@@ -182,44 +120,13 @@ import { syncRemoteCatalog } from "./application/remote-catalog/syncRemoteCatalo
 import { loadLocalWorkspaces } from "./infrastructure/persistence/local-workspaces";
 import { listTerritorialSpaces } from "./infrastructure/relas/AdminAccounts";
 import { readAccessProfile } from "./infrastructure/relas/RelasClient";
-
-import { compileLocalHealthProfile } from "./application/health-profile-compiler";
-import { approvePSL, invalidatePSL } from "./application/institutional-lifecycle";
 import { createDeliberativePrioritySelection } from "./domain/deliberative-prioritisation";
 import {
   validateModuleReview,
   isModuleReviewStale,
   type MunicipalActionPlanModuleReview,
 } from "./domain/action-plan-catalog";
-
-import {
-  LocalHealthPlanningCycle,
-  DocumentIngestionPanel,
-  DocumentRepositoryPanel,
-  EvidenceStorePanel,
-  HealthReportViewer,
-  EstudiosComplementariosPanel,
-  ActivosSaludPanel,
-  ProposalReviewMode,
-  LocalHealthProfileView,
-  ThematicPrioritisationPanel,
-  CitizenParticipationSummary,
-  ThematicPrioritisationModal,
-  PipelineTracePanel,
-  LT1Panel,
-  OITPanel,
-  ReconciliacionPanel,
-  PrioritizationPanel,
-  LecturaEstrategicaView,
-  PAIView,
-  DeliberativePrioritySelectionPanel,
-  ActionPlanCatalogPanel,
-  GESPanel,
-  PerfilLocalDeSaludPanel,
-  PerfilFuentesPanel,
-  LocalHealthPlanOutline,
-  AgendaBoard,
-} from "./ui/components";
+import { LocalHealthPlanningCycle, DocumentIngestionPanel, DocumentRepositoryPanel, EvidenceStorePanel, HealthReportViewer, EstudiosComplementariosPanel, ActivosSaludPanel, ThematicPrioritisationPanel, CitizenParticipationSummary, ThematicPrioritisationModal, PipelineTracePanel, LT1Panel, OITPanel, ReconciliacionPanel, PrioritizationPanel, LecturaEstrategicaView, PAIView, DeliberativePrioritySelectionPanel, ActionPlanCatalogPanel, GESPanel, LocalHealthPlanOutline, AgendaBoard } from "./ui/components";
 import type { AgendaActuation } from "./domain/agenda/AgendaActuation";
 import "./App.css";
 
@@ -476,9 +383,12 @@ export default function App() {
   });
   const [agendaFocusId, setAgendaFocusId] = useState<string | undefined>(undefined);
   const [planTab, setPlanTab] = useState<"lineas" | "resultante" | "lectura" | "prioridades" | "borrador">("lineas");
+  const profileSaveInFlightRef = useRef(false);
   const preparationDirtyRef = useRef(false);
   const onPreparationDirtyChange = useCallback((dirty: boolean) => { preparationDirtyRef.current = dirty; }, []);
   function canLeavePreparation() {
+    if (profileSaveInFlightRef.current) { setRemotePersistenceMessage("Espera a que termine el guardado del perfil en Firebase."); return false; }
+    if (profileDirtyRef.current && !window.confirm("Hay cambios sin guardar en el Perfil. ¿Descartarlos y continuar?")) return false;
     return !preparationDirtyRef.current || window.confirm("Hay cambios sin guardar en la propuesta de recogida. ¿Quieres descartarlos y continuar?");
   }
   function setView(next: AppView) {
@@ -948,6 +858,7 @@ export default function App() {
     }
     let cancelled = false;
     const timer = window.setTimeout(() => {
+      if (profileSaveInFlightRef.current) return;
       setRemotePersistenceMessage("Guardando el expediente compartido…");
       void saveRemoteWorkspace(remoteClient, workspace)
         .then(() => {
@@ -1091,157 +1002,28 @@ export default function App() {
 
   // runtime.psl is built inside MunicipalityRuntime as the canonical Nivel 2 → Nivel 3 bridge.
 
-  // ── PSL lifecycle actions ────────────────────────────────────────────────────
-
-  const handleValidatePSL = useCallback((validatedBy: string) => {
+  const profileDirtyRef = useRef(false);
+  const onProfileDirtyChange = useCallback((dirty: boolean) => { profileDirtyRef.current = dirty; }, []);
+  const handleSaveExternalProfiles = useCallback(async (library: ExternalProfileLibrary) => {
+    const municipalityId = workspace.municipality.identity.id;
+    if (!remoteClient.auth.currentUser) throw new Error("Inicia sesión para guardar el perfil y sus archivos en Firebase.");
+    if (pendingSeedId || pendingIndexedDbHydrationId || remoteHydratedMunicipalityId !== municipalityId) throw new Error("Espera a que termine la recuperación del expediente compartido.");
+    const nextLibrary = { ...library, profiles: library.profiles.map(p => workspace.externalProfileLibrary?.profiles.some(old => old.id === p.id)
+      ? p : { ...p, evidenceVersion: workspace.evidenceStore.updatedAt }) };
+    if (!isExternalProfileLibrary(nextLibrary, municipalityId)) throw new Error("La versión del perfil no supera la comprobación de integridad.");
     const now = new Date().toISOString();
-    const validatedPSL = {
-      ...runtime.psl,
-      status: "validated" as const,
-      validatedAt: now,
-      validatedBy: validatedBy.trim() || "Equipo técnico",
-    };
-    setWorkspace((prev) => ({
-      ...prev,
-      validatedPSL: {
-        ...validatedPSL,
-        healthReportFingerprint: healthReportFingerprint(excludeHistoricalSources(prev).healthReport),
-      },
-      // CONV-A · congela ATÓMICAMENTE el snapshot de answers (payload opaco) junto
-      // al PSL validado, para que preview y compilación consuman el mismo snapshot
-      // semántico (psl + answers) y no se recombine con answers vivos.
-      validatedAnswersSnapshot: serializeValidatedAnswers(
-        buildWorkspaceDiagnosticAnswers(prev)
-      ),
-      updatedAt: now,
-    }));
-  }, [runtime.psl, setWorkspace]);
-
-  const handleInvalidatePSL = useCallback(() => {
-    const current = workspace.validatedPSL;
-    if (current === undefined || current.status !== "validated") return;
-    if (
-      !window.confirm(
-        "La validación técnica se retirará y el Perfil volverá a revisión.\n\n" +
-        "Se conservarán íntegramente las conclusiones, el cierre interpretativo, " +
-        "la deliberación y los documentos compilados anteriores. Para volver a usar " +
-        "el Perfil como versión vigente habrá que validarlo de nuevo.\n\n" +
-        "¿Retirar la validación técnica?"
-      )
-    ) {
-      return;
-    }
-    setWorkspace((prev) => {
-      if (prev.validatedPSL === undefined) return prev;
-      const result = invalidatePSL({ psl: prev.validatedPSL });
-      if (!result.ok) return prev;
-      return {
-        ...prev,
-        validatedPSL: result.reviewedPSL,
-        updatedAt: result.invalidatedAt,
-      };
-    });
-  }, [setWorkspace, workspace.validatedPSL]);
-
-  const handleEditPSLConclusion = useCallback((content: string) => {
-    setWorkspace((prev) => {
-      if (!prev.validatedPSL) return prev;
-      return {
-        ...prev,
-        validatedPSL: {
-          ...prev.validatedPSL,
-          conclusiones: { ...prev.validatedPSL.conclusiones, content, status: "authored" as const },
-        },
-        updatedAt: new Date().toISOString(),
-      };
-    });
-  }, [setWorkspace]);
-
-  const handleEditPSLCierreInterpretativo = useCallback((content: string) => {
-    setWorkspace((prev) => {
-      if (!prev.validatedPSL) return prev;
-      return {
-        ...prev,
-        validatedPSL: {
-          ...prev.validatedPSL,
-          cierreInterpretativo: { ...prev.validatedPSL.cierreInterpretativo, content, status: "authored" as const },
-        },
-        updatedAt: new Date().toISOString(),
-      };
-    });
-  }, [setWorkspace]);
-
-  const handleDocumentarDeliberacion = useCallback((nota: string) => {
-    setWorkspace((prev) => {
-      if (!prev.validatedPSL) return prev;
-      const consenso = nota.trim().length > 0;
-      return {
-        ...prev,
-        validatedPSL: {
-          ...prev.validatedPSL,
-          priorizacion: {
-            ...prev.validatedPSL.priorizacion,
-            deliberacionNota: nota,
-            consensoDocumentado: consenso,
-          },
-          priorizacionStatus: consenso ? "complete" as const : prev.validatedPSL.priorizacionStatus,
-        },
-        updatedAt: new Date().toISOString(),
-      };
-    });
-  }, [setWorkspace]);
-
-  const handleCompilePSL = useCallback(() => {
-    setWorkspace((prev) => {
-      const psl = prev.validatedPSL;
-      // CONV-A · la compilación consume el MISMO snapshot deserializado que la
-      // preview (no answers vivos). Sin PSL validado o con payload
-      // ausente/ilegible/inválido no se compila: revalidación requerida.
-      const answers = parseValidatedAnswersSnapshot(prev.validatedAnswersSnapshot);
-      if (!psl || answers === null || profileSourceChanged(psl, prev)) return prev;
-      const result = compileLocalHealthProfile({
-        psl,
-        // Puente del espacio de conocimiento: sin él, el artefacto congelado
-        // no registra EKC, hipótesis ni preguntas abiertas del técnico.
-        perfil: prev.perfilLocalDeSalud,
-        municipalityName: prev.municipality.identity.name,
-        municipalityProvince: prev.municipality.identity.province,
-        existingArtifactCount: prev.compiledProfiles?.length ?? 0,
-        // Congela el documento canónico (esquema 2) desde el snapshot validado:
-        // vivo ≡ sellado por construcción (mismo psl + answers que la preview).
-        diagnosticAnswers: answers,
-      });
-      if (!result.ok) return prev;
-      return {
-        ...prev,
-        compiledProfiles: [...(prev.compiledProfiles ?? []), result.artifact],
-        updatedAt: new Date().toISOString(),
-      };
-    });
-  }, [setWorkspace]);
-
-  const handleApprovePSL = useCallback((
-    approvedBy: string,
-    approvedByRole: "coordination" | "group-motor",
-    approvingBody: string,
-  ) => {
-    setWorkspace((prev) => {
-      const psl = prev.validatedPSL;
-      if (!psl || profileSourceChanged(psl, prev)) return prev;
-      const result = approvePSL({ psl, approvedBy, approvedByRole, approvingBody });
-      if (!result.ok) return prev;
-      return {
-        ...prev,
-        validatedPSL: result.approvedPSL,
-        pslApproval: result.approvalRecord,
-        updatedAt: new Date().toISOString(),
-      };
-    });
-  }, [setWorkspace]);
-
-  const handleUpdatePerfilLocalDeSalud = useCallback((perfil: PerfilLocalDeSalud) => {
-    setWorkspace(prev => ({ ...prev, perfilLocalDeSalud: perfil }));
-  }, [setWorkspace]);
+    setRemotePersistenceMessage("Guardando el perfil completo y sus archivos en Firebase…");
+    if (profileSaveInFlightRef.current) throw new Error("Ya hay un perfil guardándose en Firebase.");
+    profileSaveInFlightRef.current = true;
+    try {
+      await saveRemoteWorkspace(remoteClient, { ...workspace, externalProfileLibrary: nextLibrary, updatedAt: now });
+    } catch (error) {
+      setRemotePersistenceMessage("No se ha guardado el perfil en Firebase. Conserva el borrador y vuelve a intentarlo.");
+      throw error;
+    } finally { profileSaveInFlightRef.current = false; }
+    setWorkspace(prev => prev.municipality.identity.id !== municipalityId ? prev : ({ ...prev, externalProfileLibrary: nextLibrary, updatedAt: now }));
+    setRemotePersistenceMessage("Perfil completo guardado en Firebase.");
+  }, [workspace, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
 
   const handleSaveDeliberativePrioritySelection = useCallback((input: {
     selectedScenarioIds: string[];
@@ -1454,54 +1236,6 @@ export default function App() {
     setWorkspace((prev) => ({
       ...prev,
       repository: removeCycleConciliation(prev.repository, conciliationId),
-      updatedAt: new Date().toISOString(),
-    }));
-  }
-
-  function handleAddAuthoredProposal(proposal: Omit<AuthoredProposal, "authoredAt">) {
-    setWorkspace((prev) => ({
-      ...prev,
-      repository: addAuthoredProposal(prev.repository, { ...proposal, authoredAt: new Date().toISOString() }),
-      updatedAt: new Date().toISOString(),
-    }));
-  }
-
-  function handleImportFigures(figures: FigureInput[]) {
-    setWorkspace((prev) => ({
-      ...prev,
-      repository: addFigures(prev.repository, figures),
-      updatedAt: new Date().toISOString(),
-    }));
-  }
-
-  function handleDeclareAxis(axis: Omit<ReadingAxisDeclaration, "version" | "declaredAt">) {
-    setWorkspace((prev) => ({
-      ...prev,
-      repository: addReadingAxisDeclaration(prev.repository, axis),
-      updatedAt: new Date().toISOString(),
-    }));
-  }
-
-  function handleDeclareRelation(relation: Omit<RelationDeclaration, "version" | "declaredAt">) {
-    setWorkspace((prev) => ({
-      ...prev,
-      repository: addRelationDeclaration(prev.repository, relation),
-      updatedAt: new Date().toISOString(),
-    }));
-  }
-
-  function handleRemoveAuthoredProposal(proposalId: string) {
-    setWorkspace((prev) => ({
-      ...prev,
-      repository: removeAuthoredProposal(prev.repository, proposalId),
-      updatedAt: new Date().toISOString(),
-    }));
-  }
-
-  function handleProposalDecision(decision: ProposalDecision) {
-    setWorkspace((prev) => ({
-      ...prev,
-      repository: addProposalDecision(prev.repository, decision),
       updatedAt: new Date().toISOString(),
     }));
   }
@@ -3485,10 +3219,10 @@ export default function App() {
       {(
         <LocalHealthPlanningCycle
           healthReportLoaded={runtime.workspace.healthReport !== undefined}
-          pslHasEvidence={runtime.psl.totalEvidenceAtoms > 0}
+          pslHasEvidence={!!workspace.externalProfileLibrary?.activeId || runtime.psl.totalEvidenceAtoms > 0}
           pslStatus={runtime.psl.status}
           pslIsStale={runtime.pslIsStale}
-          pslCompiled={(runtime.workspace.compiledProfiles?.length ?? 0) > 0}
+          pslCompiled={!!workspace.externalProfileLibrary?.activeId || (runtime.workspace.compiledProfiles?.length ?? 0) > 0}
           thematicPrioritisationDone={runtime.workspace.thematicPrioritisation !== undefined}
           agendaCount={workspace.agendaActuations?.length ?? 0}
           onNavigate={(v) => setView(v as AppView)}
@@ -4087,111 +3821,18 @@ export default function App() {
           </>
         )}
 
-        {/* ── ④ Perfil de Salud Local ──────────────────────── */}
-        {view === "psl" && (
-          <>
-            <section className="workspace-panel">
-              <h2>Informe de Salud que sirve de fuente al Perfil</h2>
-              <p><strong>Documento fuente:</strong> {workspace.healthReport?.title ?? 'Sin informe registrado'}</p>
-              <p>El archivo disponible en este bloque es el Informe de Salud original. El Perfil de Salud Local es el documento interpretativo que se revisa, valida y compila en los apartados siguientes.</p>
-              {workspace.repository.documents.filter(d => d.id === workspace.healthReport?.linkedDocumentId).map(d => <DocumentAccess key={d.id} document={d} documentLabel="Informe de Salud original" />)}
-              {runtime.pslIsStale && <p role="alert"><strong>Perfil pendiente de revisión.</strong> Han cambiado las fuentes o la evidencia desde su validación. El perfil anterior y sus documentos compilados se conservan como antecedentes; sus conclusiones requieren contraste antes de volver a validarse.</p>}
-              {workspace.healthReport?.body.format === 'plain' && <p><strong>El PDF está disponible para consulta.</strong> Su incorporación no equivale a haber revisado ni actualizado las conclusiones del Perfil. Comprueba las fechas, la escala territorial y las páginas que sustentan cada conclusión.</p>}
-              <p>Los informes de Vigilancia Integral de la Salud de las UGC son fuentes complementarias y deben interpretarse según su ámbito asistencial.</p>
-            </section>
-            {(() => {
-              // CONV-A · selección del snapshot semántico que gobierna la
-              // previsualización documental. Solo se considera VALIDADA cuando
-              // existen atómicamente `validatedPSL` Y un payload de answers
-              // deserializable y válido; en cualquier otro caso, borrador vivo no
-              // institucional (nunca se recombina validatedPSL con answers vivos).
-              // Preview y compilación consumen el MISMO snapshot deserializado.
-              const previewContext = selectDocumentPreviewContext({
-                validatedPSL: workspace.validatedPSL,
-                validatedAnswersSnapshot: workspace.validatedAnswersSnapshot,
-                livePSL: runtime.psl,
-                liveAnswers: buildWorkspaceDiagnosticAnswers(workspace),
-              });
-              return (
-                <>
-                <LocalHealthProfileView
-                  reviewSlot={
-                    <ProposalReviewMode
-                      proposals={[
-                        ...buildReadingUnitProposals(previewContext.previewAnswers.lecturaPorTema),
-                        ...buildRelationProposals(workspace.repository.relationDeclarations).proposals,
-                        ...authoredToProposals(workspace.repository.authoredProposals ?? []),
-                      ]}
-                      authored={workspace.repository.authoredProposals ?? []}
-                      decisions={workspace.repository.proposalDecisions ?? []}
-                      onDecide={handleProposalDecision}
-                      onAdd={handleAddAuthoredProposal}
-                      onRemove={handleRemoveAuthoredProposal}
-                      relations={workspace.repository.relationDeclarations ?? []}
-                      figures={workspace.repository.figures ?? []}
-                      onImportFigures={handleImportFigures}
-                      axes={workspace.repository.readingAxes ?? []}
-                      onDeclareAxis={handleDeclareAxis}
-                      onDeclareRelation={handleDeclareRelation}
-                    />
-                  }
-                  psl={runtime.psl}
-                  previewPSL={previewContext.previewPSL}
-                  isValidatedPreview={previewContext.isValidatedPreview}
-                  pslIsStale={runtime.pslIsStale}
-                  municipalityName={municipality.name}
-                  indicatorReferences={
-                    previewContext.previewAnswers.referencias.references
-                  }
-                  epistemicMetrics={
-                    workspace.perfilLocalDeSalud !== undefined
-                      ? computePerfilEpistemicMetrics(workspace.perfilLocalDeSalud)
-                      : undefined
-                  }
-                  diagnosticAnswers={previewContext.previewAnswers}
-                  compiledProfiles={workspace.compiledProfiles}
-                  onValidate={handleValidatePSL}
-                  onInvalidate={handleInvalidatePSL}
-                  onEditConclusion={handleEditPSLConclusion}
-                  onEditCierreInterpretativo={handleEditPSLCierreInterpretativo}
-                  onDocumentarDeliberacion={handleDocumentarDeliberacion}
-                  onCompile={handleCompilePSL}
-                  onApprove={handleApprovePSL}
-                />
-                </>
-              );
-            })()}
-            <PerfilFuentesPanel workspace={workspace} onProcessReport={handleProcessExistingHealthReport} processing={isLoadingHealthReport} message={lastHealthReportMessage}>
-            <DocumentIngestionPanel
-              documentKinds={DOCUMENT_KINDS}
-              kind={kind}
-              title={title}
-              plainText={plainText}
-              lastProcessedDocument={lastProcessedDocument}
-              atomsCreated={lastAtomCount}
-              isLoadingHealthReport={isLoadingHealthReport}
-              healthReportMessage={lastHealthReportMessage}
-              onKindChange={setKind}
-              onTitleChange={setTitle}
-              onPlainTextChange={setPlainText}
-              onProcessDocument={handleProcessDocument}
-              onRegisterReference={handleRegisterDocumentReference}
-              declaresOpenAnswers={declaresOpenAnswers}
-              onDeclaresOpenAnswersChange={setDeclaresOpenAnswers}
-              onLoadHealthReport={handleLoadHealthReport}
-              onLoadDocumentFile={handleLoadDocumentFile}
-              isLoadingDocumentFile={isLoadingDocumentFile}
-              documentFileMessage={documentFileMessage}
-            />
-            </PerfilFuentesPanel>
-            <PerfilLocalDeSaludPanel
-              perfil={workspace.perfilLocalDeSalud}
-              municipalityId={municipality.id}
-              municipalityName={municipality.name}
-              onUpdatePerfil={handleUpdatePerfilLocalDeSalud}
-            />
-          </>
-        )}
+        {/* Perfil elaborado externamente: documento, resultados y versiones. */}
+        {view === "psl" && <ExternalProfileDashboard
+          key={workspace.municipality.identity.id}
+          municipalityId={workspace.municipality.identity.id}
+          municipalityName={municipality.name}
+          library={workspace.externalProfileLibrary ?? EMPTY_PROFILE_LIBRARY}
+          authorName={remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || ""}
+          legacyProfiles={workspace.compiledProfiles}
+          legacyText={workspace.validatedPSL?.conclusiones.content}
+          onSave={handleSaveExternalProfiles}
+          onDirtyChange={onProfileDirtyChange}
+        />}
 
         {/* ── ⑤ Priorizaciones — técnica y participativa ──────── */}
         {view === "priorizacion" && (
@@ -4436,7 +4077,7 @@ export default function App() {
             province={municipality.province}
             healthReportTitle={workspace.healthReport?.title}
             pslStatus={runtime.psl.status}
-            pslCompiled={(workspace.compiledProfiles?.length ?? 0) > 0}
+            pslCompiled={!!workspace.externalProfileLibrary?.activeId || (workspace.compiledProfiles?.length ?? 0) > 0}
             selectedPriorities={THEMATIC_TOPICS
               .filter((topic) => workspace.thematicPrioritisation?.selectedTopicIds.includes(topic.id))
               .map((topic) => topic.label)}

@@ -25,7 +25,7 @@ import { buildIndicatorComparisonReferences } from "../src/application/health-pr
 import { generateLT1 } from "../src/application/lt1";
 import { generateOIT } from "../src/application/oit";
 import { validateCompilationPreconditions } from "../src/application/health-profile-compiler";
-import { createMunicipalityRuntime } from "../src/application/runtime";
+import { createMunicipalityRuntime } from './helpers/legacyProfileRuntime';
 import type { MunicipalityWorkspace } from "../src/domain/workspace";
 
 const _dir = dirname(fileURLToPath(import.meta.url));

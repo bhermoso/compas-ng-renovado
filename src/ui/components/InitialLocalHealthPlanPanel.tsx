@@ -29,7 +29,7 @@ export function InitialLocalHealthPlanPanel({ workspace, pslIsStale }: {
  }
  return <section className="workspace-panel" aria-label="Compilación inicial del Plan Local de Salud">
   <h2>Compilación inicial del Plan Local de Salud</h2>
-  <p>Reúne el Perfil compilado (si existe), sus prioridades y la última versión validada del Plan de Acción. Las actuaciones pueden incorporarse después.</p>
+  <p>Reúne el Perfil externo o histórico incorporado (si existe), sus prioridades y la última versión validada del Plan de Acción. Las actuaciones pueden incorporarse después.</p>
   <p>Para incluir cambios recientes, valida y guarda sus versiones antes de generar el documento.</p>
   {ready.ok && <p role="status">Criterio de calidad «Perfil validado»: {ready.profileValidation.met ? "cumplido" : "no cumplido"}. {ready.profileValidation.detail}</p>}
   {!ready.ok && <ul>{ready.issues.map(issue => <li key={issue}>{issue}</li>)}</ul>}

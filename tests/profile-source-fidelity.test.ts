@@ -1,3 +1,4 @@
+import { createMunicipalityRuntime as legacyProfileFixture } from './helpers/legacyProfileRuntime';
 import { describe, expect, it } from 'vitest';
 import seed from '../public/seeds/compas-ng-workspace-granada-zaidin.json';
 import type { MunicipalityWorkspace } from '../src/domain/workspace';
@@ -65,11 +66,11 @@ describe('Source age and validated profile preservation', () => {
     expect(answers.sanitaria.present).toBe(false);
     expect(answers.antecedentes?.sources.some(s => s.documentId === original!.linkedDocumentId)).toBe(true);
     expect(w.healthReport).toBe(original);
-    expect(createMunicipalityRuntime({workspace:w}).psl.healthReportDocumentId).toBeUndefined();
+    expect(legacyProfileFixture({workspace:w}).psl.healthReportDocumentId).toBeUndefined();
   });
   it.each(['validated', 'approved'] as const)('detects same-ID changes and preserves %s authorship', status => {
     const w = workspace();
-    w.validatedPSL = {...createMunicipalityRuntime({workspace:w}).psl, status};
+    w.validatedPSL = {...legacyProfileFixture({workspace:w}).psl, status};
     const saved = w.validatedPSL;
     expect(createMunicipalityRuntime({workspace:w}).pslIsStale).toBe(false);
     w.healthReport!.body.originalText += '\nSYNTHETIC NEW SOURCE CONTENT';
@@ -79,7 +80,7 @@ describe('Source age and validated profile preservation', () => {
   });
   it('detects changed HTML and historical status with the same report id', () => {
     const w = workspace();
-    const p = createMunicipalityRuntime({workspace:w}).psl;
+    const p = legacyProfileFixture({workspace:w}).psl;
     w.healthReport!.body.originalHtml = '<table><tr><td>Changed</td></tr></table>';
     expect(profileSourceChanged(p,w)).toBe(true);
     w.healthReport = workspace().healthReport;
@@ -94,7 +95,7 @@ describe('Source age and validated profile preservation', () => {
   });
   it('handles legacy profiles without inventing a historical fingerprint', () => {
     const w = workspace();
-    const p = {...createMunicipalityRuntime({workspace:w}).psl, healthReportFingerprint:undefined, validatedAt:'2020-01-01T00:00:00Z'};
+    const p = {...legacyProfileFixture({workspace:w}).psl, healthReportFingerprint:undefined, validatedAt:'2020-01-01T00:00:00Z'};
     w.healthReport!.updatedAt = '2025-01-01T00:00:00Z';
     expect(profileSourceChanged(p,w)).toBe(true);
     expect(p.healthReportFingerprint).toBeUndefined();

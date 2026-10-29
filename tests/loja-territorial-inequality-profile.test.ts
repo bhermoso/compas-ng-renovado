@@ -11,7 +11,7 @@ import { readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { MunicipalityWorkspace } from "../src/domain/workspace";
-import { createMunicipalityRuntime } from "../src/application/runtime";
+import { createMunicipalityRuntime } from './helpers/legacyProfileRuntime';
 import { buildDiagnosticAnswers } from "../src/application/health-profile/diagnosticAnswers";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");

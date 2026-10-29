@@ -1,3 +1,5 @@
+import { selectExternalProfile } from '../health-profile/selectExternalProfile';
+import { externalProfileDocument } from '../health-profile/externalProfileDocument';
 import type { MunicipalityWorkspace } from "../../domain/workspace";
 import { latestValidatedPlan } from "../../domain/action-plan-catalog/PlanDocument";
 import { traceabilityHasLinkedActionFichas } from "../../domain/action-plan-catalog/ActionPlanTraceability";
@@ -41,7 +43,8 @@ export function compileInitialLocalHealthPlan(
  generatedAt = new Date().toISOString()
 ): InitialPlanCompilation {
  const municipalityId = workspace.municipality.identity.id;
- const psl = workspace.validatedPSL;
+ const external = workspace.externalProfileLibrary?.profiles.find(p => p.id === workspace.externalProfileLibrary?.activeId && p.municipalityId === municipalityId);
+ const psl = external ? selectExternalProfile(workspace) : workspace.validatedPSL;
  const issues: string[] = [];
  // La validación del Perfil no es requisito: se informa como criterio de calidad.
  const ownPsl = psl && psl.municipalityId === municipalityId ? psl : undefined;
@@ -54,14 +57,14 @@ export function compileInitialLocalHealthPlan(
    && hashes.includes(p.sourceHash))
   .reduce<(NonNullable<MunicipalityWorkspace["compiledProfiles"]>)[number] | undefined>(
    (latest, p) => !latest || p.compiledAt >= latest.compiledAt ? p : latest, undefined);
- if (profile && (!profile.canonicalDocument || !readSealedCanonicalDocument(profile.canonicalDocument))) {
+ if (!external && profile && (!profile.canonicalDocument || !readSealedCanonicalDocument(profile.canonicalDocument))) {
   issues.push("Vuelve a compilar el Perfil para incorporar su documento completo y sellado.");
  }
  const plan = latestValidatedPlan(workspace.validatedActionPlans ?? [], municipalityId);
  if (!plan?.paragraphs.length) issues.push("Valida y guarda la versión actual del Plan de Acción.");
  if (issues.length || !plan) return {ok: false, issues};
 
- const profileModel = profile ? buildPSLCDocumentModel(profile) : undefined;
+ const profileModel = external ? externalProfileDocument(external,workspace.municipality.identity.name) : profile ? buildPSLCDocumentModel(profile) : undefined;
  const actionSections: PSLCDocumentSection[] = [];
  for (const paragraph of planActionParagraphs(plan)) {
   if (paragraph.heading || !actionSections.length) {
@@ -73,8 +76,8 @@ export function compileInitialLocalHealthPlan(
  const sections: PSLCDocumentSection[] = [
   {title: "1. Identidad y alcance", level: 1, paragraphs: [
    "Compilación inicial del Plan Local de Salud de " + name + ".",
-   "Documento de trabajo para revisión por el grupo. Integra el Perfil compilado vigente, si existe, y la última versión validada del Plan de Acción.",
-   "Criterio de calidad «Perfil validado»: " + (profileValidation.met ? "cumplido" : "no cumplido") + ". " + profileValidation.detail + (profile ? "" : " El Perfil no está compilado en esta versión."),
+   "Documento de trabajo para revisión por el grupo. Integra el Perfil externo o histórico vigente, si existe, y la última versión validada del Plan de Acción.",
+   "Criterio de calidad «Perfil validado»: " + (profileValidation.met ? "cumplido" : "no cumplido") + ". " + profileValidation.detail + (profileModel ? "" : " El Perfil no está incorporado en esta versión."),
    "Las fichas de actuaciones, responsables, calendario, recursos y aprobación institucional se incorporarán en una fase posterior."
   ]},
   {title: "2. Perfil de Salud Local", level: 1, paragraphs: profileModel ? profileModel.portada : ["Perfil de Salud Local no compilado en esta versión. Esta sección se completará cuando el Perfil esté compilado."]},
@@ -98,7 +101,7 @@ export function compileInitialLocalHealthPlan(
   ]},
   {title: "7. Versiones utilizadas", level: 1, paragraphs: [
    "Fecha de compilación inicial: " + generatedAt,
-   profile ? "Perfil: " + profile.artifactVersion + " · " + profile.id + " · compilado: " + profile.compiledAt : "Perfil: sin compilar en esta versión.",
+   external ? "Perfil externo: " + external.id + " · incorporado: " + external.createdAt : profile ? "Perfil: " + profile.artifactVersion + " · " + profile.id + " · compilado: " + profile.compiledAt : "Perfil: sin compilar en esta versión.",
    ...(profile ? ["Huella del Perfil: " + profile.sourceHash] : []),
    "Criterio de calidad «Perfil validado»: " + profileValidation.label + ".",
    "Plan de Acción: " + plan.generatedAt + " · validación técnica: " + (plan.validatedBy ?? "no registrada"),
@@ -111,7 +114,7 @@ export function compileInitialLocalHealthPlan(
   portada: [
    "Generado el " + generatedAt.slice(0, 10) + ".",
    "Pendiente de completar actuaciones y aprobación institucional.",
-   (profile ? "Perfil " + profile.artifactVersion : "Perfil sin compilar") + " · " + profileValidation.label + " · Plan de Acción validado el " + plan.generatedAt.slice(0, 10)
+   (external ? "Perfil externo " + external.id : profile ? "Perfil " + profile.artifactVersion : "Perfil sin incorporar") + " · " + profileValidation.label + " · Plan de Acción validado el " + plan.generatedAt.slice(0, 10)
   ],
   sections,
   fileName: "plan-local-salud-" + municipalityId.replace(/[^a-z0-9-]/gi, "-") + "-borrador-" + generatedAt.slice(0,10) + ".docx"
