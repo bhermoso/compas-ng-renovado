@@ -18,7 +18,9 @@ import {
 
 const REMOTE_WORKSPACE_SCHEMA = "compas-workspace-chunks/v1";
 const CHUNK_SIZE = 180_000;
-const MAX_BATCH_WRITES = 400;
+// Keep document batches well below the 10 MiB request limit, including UTF-8 and metadata.
+// https://firebase.google.com/docs/firestore/quotas
+const MAX_BATCH_WRITES = 8;
 const saveQueues = new WeakMap<RelasClient, Map<string, Promise<void>>>();
 
 interface RemoteWorkspaceManifest {
