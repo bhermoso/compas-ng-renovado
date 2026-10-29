@@ -21,6 +21,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: npx vitest run tests/initial-local-health-plan.test.tsx tests/local-health-plan-outline.test.tsx tests/psl-c-canonical-projector.test.ts tests/zaidin-final-replacement.test.ts tests/plan-document.test.ts tests/plan-editor-whitespace.test.tsx tests/definitive-action-plan-preview.test.tsx tests/municipality-seed-hydration.test.ts
+      - run: npx vitest run tests/external-profiles.test.tsx tests/remote-workspace-lifecycle.test.ts tests/initial-local-health-plan.test.tsx tests/local-health-plan-outline.test.tsx tests/psl-c-canonical-projector.test.ts tests/zaidin-final-replacement.test.ts tests/plan-document.test.ts tests/plan-editor-whitespace.test.tsx tests/definitive-action-plan-preview.test.tsx tests/municipality-seed-hydration.test.ts
       - run: npx playwright install --with-deps chromium
       - run: node tests/fuente-vaqueros-hydration.smoke.mjs

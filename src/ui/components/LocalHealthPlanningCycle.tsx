@@ -29,7 +29,7 @@ export interface LocalHealthPlanningCycleProps {
   pslHasEvidence: boolean;
   pslStatus: LocalHealthProfileStatus;
   pslIsStale: boolean;
-  /** Existe al menos un artefacto institucional PSL-C compilado/congelado. */
+  /** Existe un perfil externo incorporado o un artefacto histórico conservado. */
   pslCompiled: boolean;
   thematicPrioritisationDone: boolean;
   /** Seleccion deliberativa del Grupo Motor ya adoptada; opcional hasta consolidar App.tsx. */
@@ -79,7 +79,7 @@ function derivePhases({
   } else if (pslReady) {
     pslPhase = "current";
     pslStatusLabel = "Validado técnicamente";
-    pslNote = "Pendiente de compilación institucional";
+    pslNote = "Pendiente de incorporar el documento de referencia";
   } else if (pslHasEvidence) {
     pslPhase = "current";
   } else {

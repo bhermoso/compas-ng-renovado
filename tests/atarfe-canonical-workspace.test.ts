@@ -30,7 +30,7 @@ import {
   createCompleteMunicipalityWorkspace,
   isEmptyWorkspaceForPersistenceGuard,
 } from "../src/application/workspace";
-import { createMunicipalityRuntime } from "../src/application/runtime";
+import { createMunicipalityRuntime } from './helpers/legacyProfileRuntime';
 import { validateCompilationPreconditions } from "../src/application/health-profile-compiler";
 import {
   IBSE_MIXED_SAMPLE_SENTENCE,

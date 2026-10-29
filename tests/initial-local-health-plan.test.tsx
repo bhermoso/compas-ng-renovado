@@ -1,3 +1,4 @@
+import { externalProfileFixture } from './helpers/externalProfileFixture';
 /**
  * Proyección canónica → modelo documental (GOV-SALIDA-01 · PR-2).
  *
@@ -22,7 +23,7 @@ import {
   buildPSLCDocumentModel,
 } from "../src/application/psl-c-export";
 import { loadWorkspaceFromLocalStorage } from "../src/infrastructure/persistence/local-storage";
-import { createMunicipalityRuntime } from "../src/application/runtime";
+import { createMunicipalityRuntime } from './helpers/legacyProfileRuntime';
 import type { MunicipalityWorkspace } from "../src/domain/workspace";
 import type { LocalHealthProfile } from "../src/domain/health-profile";
 import type { LocalHealthProfileArtifact } from "../src/domain/health-profile-artifact";
@@ -235,12 +236,12 @@ describe("Compilación inicial del Plan Local de Salud", () => {
   ]) {
    const r = compileInitialLocalHealthPlan(changed, false);
    expect(r.ok).toBe(true);
-   if (r.ok) expect(JSON.stringify(r.document)).toContain("Perfil sin compilar");
+   if (r.ok) expect(JSON.stringify(r.document)).toContain("Perfil sin incorporar");
   }
   ws.validatedPSL!.cierreInterpretativo.content += " Nueva revisión";
   const edited = compileInitialLocalHealthPlan(ws, false);
   expect(edited.ok).toBe(true);
-  if (edited.ok) expect(JSON.stringify(edited.document)).toContain("Perfil sin compilar");
+  if (edited.ok) expect(JSON.stringify(edited.document)).toContain("Perfil sin incorporar");
  });
  it("permite un Perfil aprobado después de compilarlo sin alterar el diagnóstico", () => {
   const ws = workspace();
@@ -306,5 +307,23 @@ describe("Compilación inicial del Plan Local de Salud", () => {
   if (!result.ok) return;
   const text = JSON.stringify(result.document);
   expect(text).not.toContain("Pendiente de documentar las necesidades no priorizadas");
+ });
+});
+
+
+describe('Plan Local de Salud con perfil externo',()=>{
+ it('incorpora el texto y las cautelas del perfil externo sin exigir compilar un perfil nuevo',()=>{
+  const ws=workspace();const profile=externalProfileFixture(ws.municipality.identity.id);
+  ws.externalProfileLibrary={profiles:[profile],attachments:[],activeId:profile.id};
+  ws.compiledProfiles=[];delete ws.validatedPSL;
+  const result=compileInitialLocalHealthPlan(ws,false);
+  expect(result.ok).toBe(true);
+  if(result.ok){
+   expect(result.profileValidation.met).toBe(false);
+   expect(JSON.stringify(result.document)).toContain(profile.text.split('\n\n')[0]);
+   expect(JSON.stringify(result.document)).toContain(profile.results[2].caution);
+   expect(JSON.stringify(result.document)).toContain('Perfil externo: '+profile.id);
+   expect(JSON.stringify(result.document)).not.toContain('Vuelve a compilar el Perfil');
+  }
  });
 });

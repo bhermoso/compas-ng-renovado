@@ -26,7 +26,7 @@ import { generateOIT } from "../src/application/oit";
 import { ibseStudyToEvidenceAtoms } from "../src/application/ibse";
 import { createIBSEStudy } from "../src/domain/ibse";
 import { parseWorkspaceJSON } from "../src/infrastructure/persistence/local-storage";
-import { createMunicipalityRuntime } from "../src/application/runtime";
+import { createMunicipalityRuntime } from './helpers/legacyProfileRuntime';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const loadSeed = (rel: string) => {

@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import type { MunicipalityWorkspace } from "../src/domain/workspace";
 import { buildDiagnosticAnswers, buildTerritorialInequalityReading } from "../src/application/health-profile/diagnosticAnswers";
 import { buildCanonicalProfileDocumentFromPSL, sealCanonicalProfileDocument, readSealedCanonicalDocument } from "../src/application/health-profile/canonicalProfileDocument";
-import { createMunicipalityRuntime } from "../src/application/runtime";
+import { createMunicipalityRuntime } from './helpers/legacyProfileRuntime';
 import { projectCanonicalToDocumentModel } from "../src/application/psl-c-export/pslcCanonicalProjector";
 import { buildPSLCPdf } from "../src/application/psl-c-export/pslcPdf";
 

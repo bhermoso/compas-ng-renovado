@@ -5,7 +5,8 @@ import type { CompasPipelineResult, PipelineTraceItem, PipelineStatus } from "..
 import type { LT1Result } from "../lt1";
 import type { OITResult } from "../oit";
 import type { LocalHealthProfile } from "../../domain/health-profile";
-import { buildLocalHealthProfile, excludeHistoricalSources } from "../health-profile";
+import { excludeHistoricalSources } from "../health-profile";
+import { selectExternalProfile } from '../health-profile/selectExternalProfile';
 import type { PrioritizationResult } from "../prioritization";
 import { generatePrioritization } from "../prioritization";
 import type { EPVSATranslationResult } from "../epvsa";
@@ -151,27 +152,14 @@ export function createMunicipalityRuntime(
   const lt1 = mit.dimensionDiagnostica;
   const oit = oitParaDecision;
 
-  // ── PSL — Perfil de Salud Local (puente obligatorio Nivel 2 → Nivel 3)
-  // PSL-C1: la priorización y todos los motores del Nivel 3 consumen exclusivamente
-  // el PSL. El PSL sintetiza el análisis territorial (MIT + Reconciliación + OIT)
-  // y lo expone como objeto canónico validable.
-  //
-  // Prioridad de fuente:
-  //   1. workspace.validatedPSL — si existe, el equipo técnico lo ha validado;
-  //      se usa directamente sin recalcular (preserva status, validatedAt, validatedBy).
-  //   2. buildLocalHealthProfile() — genera un borrador fresco en estado "generated".
-  const psl: LocalHealthProfile = input.workspace.validatedPSL
-    ?? buildLocalHealthProfile({
-        sanitizedStore: integrityGuard.sanitizedStore,
-        integrityResult: integrityGuard,
-        mit,
-        reconciliacion,
-        oitParaDecision,
-        workspace: analytical,
-      });
+  // Perfil externo activo o perfil histórico guardado. Sin documento, ninguna generación.
+  const psl: LocalHealthProfile = selectExternalProfile(input.workspace);
+  const externalProfile = input.workspace.externalProfileLibrary?.profiles.find(p => p.id === input.workspace.externalProfileLibrary?.activeId);
 
   // Detectar si la evidencia cambió desde la validación del PSL.
-  const pslIsStale =
+  const pslIsStale = externalProfile
+    ? externalProfile.evidenceVersion !== undefined && externalProfile.evidenceVersion !== input.workspace.evidenceStore.updatedAt
+    :
     (psl.status === "validated" || psl.status === "approved") &&
     (psl.evidenceStoreVersion !== integrityGuard.sanitizedStore.updatedAt ||
      profileSourceChanged(psl, input.workspace));

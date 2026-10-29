@@ -25,7 +25,7 @@ import {
   type InstitutionalProfileViewModel,
 } from "../src/application/health-profile";
 import { loadWorkspaceFromLocalStorage } from "../src/infrastructure/persistence/local-storage";
-import { createMunicipalityRuntime } from "../src/application/runtime";
+import { createMunicipalityRuntime } from './helpers/legacyProfileRuntime';
 import type { LocalHealthProfile } from "../src/domain/health-profile";
 
 const store = new Map<string, string>();

@@ -1,3 +1,4 @@
+import { isExternalProfileLibrary } from '../../../application/health-profile/externalProfiles';
 import { linkFuenteVaquerosPlizdOriginal } from '../../../application/workspace/linkFuenteVaquerosPlizdOriginal';
 import { correctZaidinHealthReport } from '../../../application/workspace/correctZaidinHealthReport';
 import type { MunicipalityWorkspace } from "../../../domain/workspace";
@@ -153,6 +154,7 @@ export function parseWorkspaceJSON(
 
     // Descartar datos de versiones de esquema distintas
     if (parsed.schemaVersion !== SCHEMA_VERSION) return null;
+    if (parsed.externalProfileLibrary !== undefined && !isExternalProfileLibrary(parsed.externalProfileLibrary, parsed.municipality?.identity?.id)) return null;
 
     // Migrar formato anterior healthReports[] → healthReport singular
     if (Array.isArray(parsed.healthReports)) {

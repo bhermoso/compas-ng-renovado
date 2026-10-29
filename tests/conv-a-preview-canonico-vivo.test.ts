@@ -41,7 +41,7 @@ import {
   sealCanonicalProfileDocument,
   readSealedCanonicalDocument,
 } from "../src/application/psl-c-canonical";
-import { createMunicipalityRuntime } from "../src/application/runtime";
+import { createMunicipalityRuntime } from './helpers/legacyProfileRuntime';
 import { createMunicipalityContext } from "../src/domain/municipality";
 import { createEvidenceStore } from "../src/domain/evidence";
 import { createMunicipalDocumentRepository } from "../src/domain/repository";

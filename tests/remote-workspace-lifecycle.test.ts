@@ -1,7 +1,11 @@
+import { importProfileFile } from '../src/application/health-profile/externalProfiles';
+import { externalProfileFixture } from './helpers/externalProfileFixture';
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Firestore en memoria: rutas como clave. Solo las operaciones que usa RemoteWorkspace.
 const store = new Map<string, Record<string, unknown>>();
+let holdNextBatch: Promise<void> | undefined;
+let batchWaiting = false;
 const ref = (path: string[]) => ({ path: path.join("/"), __ref: true });
 vi.mock("firebase/firestore", () => ({
   doc: (_db: unknown, ...path: string[]) => ref(path),
@@ -23,7 +27,7 @@ vi.mock("firebase/firestore", () => ({
     return {
       set: (r: { path: string }, data: Record<string, unknown>) => ops.push(() => store.set(r.path, data)),
       delete: (r: { path: string }) => ops.push(() => store.delete(r.path)),
-      commit: async () => { ops.forEach((op) => op()); },
+      commit: async () => { const gate = holdNextBatch; holdNextBatch = undefined; if (gate) { batchWaiting = true; await gate; } ops.forEach((op) => op()); },
     };
   },
 }));
@@ -56,7 +60,7 @@ function workspace(id: string, updatedAt: string): MunicipalityWorkspace {
 }
 
 describe("expediente remoto: ciclo de vida", () => {
-  beforeEach(() => { store.clear(); administrator = true; });
+  beforeEach(() => { store.clear(); administrator = true; holdNextBatch = undefined; batchWaiting = false; });
 
   it("tras guardar dos veces solo queda la copia vigente en Firebase", async () => {
     await saveRemoteWorkspace(client, workspace("fv", "2026-10-19T10:00:00.000Z"));
@@ -93,4 +97,33 @@ describe("expediente remoto: ciclo de vida", () => {
     expect(result).toEqual({ a: "remoto-mas-reciente", b: "subido" });
     expect((await readRemoteWorkspace(client, "a"))?.updatedAt).toBe("2026-10-19T12:00:00.000Z");
   });
+});
+
+
+describe('perfil externo en Firebase fragmentado', () => {
+ it('recupera originales completos y revisiones en otro navegador sin caché local', async () => {
+  store.clear();administrator=true;
+  const w=workspace('profile-cloud','2026-10-29T09:00:00Z');
+  const text='Perfil íntegro de prueba · '+ 'a'.repeat(260000);
+  const {attachment}=await importProfileFile(new File([text],'perfil.txt'),'profile-cloud');
+  const first={...externalProfileFixture('profile-cloud'),attachmentIds:[attachment.id]};
+  const second={...first,id:'profile-test-v2',revisionOf:first.id,text:'Revisión técnica aportada'};
+  w.externalProfileLibrary={profiles:[first,second],attachments:[attachment],activeId:second.id};
+  await saveRemoteWorkspace(client,w);
+  expect([...store.keys()].filter(k=>k.includes('/chunks/')).length).toBeGreaterThan(1);
+  const recovered=await readRemoteWorkspace(client,'profile-cloud');
+  expect(recovered?.externalProfileLibrary).toEqual(w.externalProfileLibrary);
+  const {profileAttachmentBlob}=await import('../src/application/health-profile/externalProfiles');
+  expect(await (await profileAttachmentBlob(recovered!.externalProfileLibrary!.attachments[0])).text()).toBe(text);
+ });
+ it('serializa guardados simultáneos para que una copia anterior lenta no sustituya la última',async()=>{
+  store.clear();administrator=true;batchWaiting=false;
+  let release!:()=>void;holdNextBatch=new Promise<void>(resolve=>{release=resolve;});
+  const oldSave=saveRemoteWorkspace(client,workspace('queue-profile','2026-10-29T09:00:00Z'));
+  await vi.waitFor(()=>expect(batchWaiting).toBe(true));
+  const nextSave=saveRemoteWorkspace(client,workspace('queue-profile','2026-10-29T10:00:00Z'));
+  release();await Promise.all([oldSave,nextSave]);
+  expect((await readRemoteWorkspace(client,'queue-profile'))?.updatedAt).toBe('2026-10-29T10:00:00Z');
+  expect([...store.keys()].filter(k=>k.includes('/chunks/'))).toHaveLength(1);
+ });
 });

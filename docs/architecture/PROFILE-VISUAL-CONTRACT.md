@@ -1,3 +1,5 @@
+> Actualización 29-10-2026: el tab activo usa perfiles elaborados fuera de COMPÁS. Para carga, edición, conservación en Firebase y presentación rige [EXTERNAL-PROFILE.md](EXTERNAL-PROFILE.md). Las reglas de composición automática que siguen documentan exclusivamente los artefactos históricos.
+
 # Contrato visual del Perfil Local de Salud
 
 > Documento operativo. La visualización del Perfil no decora: responde
