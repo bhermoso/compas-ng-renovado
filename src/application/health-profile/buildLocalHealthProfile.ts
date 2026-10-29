@@ -15,6 +15,7 @@
  *  - El Informe de Salud se referencia por ID; nunca se embebe su contenido.
  */
 
+import { profileSAMNotes } from "../sam/profileSAMNotes";
 import type { EvidenceStore } from "../../domain/evidence";
 import type { IntegrityGuardResult } from "../../application/evidence";
 import type { EstadoTerritorialEvolutivo } from "../../application/territorial-interpretation";
@@ -452,6 +453,7 @@ function buildConclusionesScaffold(
     scopeNoun: scope.scopeNoun,
     province: extras.province,
     studyCautions: scope.studyCautions,
+    samNotes: profileSAMNotes(extras.workspace),
     hasProxyScale: scope.hasProxyScale,
     healthReportTitle,
     complementaryStudyCount: extras.complementaryStudyCount,

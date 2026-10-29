@@ -47,7 +47,7 @@ export interface NarrativeChapter {
  * validado con una versión anterior conserva su texto (no se sobrescribe),
  * pero la UI avisa de que la narrativa ha evolucionado y de cómo regenerar.
  */
-export const NARRATIVE_GENERATOR_VERSION = "2026-07-09-contrato-escritura-1";
+export const NARRATIVE_GENERATOR_VERSION = "2026-10-28-sam-3";
 
 export const NARRATIVE_CHAPTER_TITLES = [
   "Alcance, fuentes y escala de la evidencia",
@@ -59,6 +59,7 @@ export const NARRATIVE_CHAPTER_TITLES = [
 ] as const;
 
 export interface NarrativeChaptersInput {
+  samNotes?: string[];
   /** Sustantivo del ámbito: "distrito" | "municipio" | "ámbito territorial". */
   scopeNoun: string;
   /** Provincia del ámbito, para situarlo territorialmente. */
@@ -266,7 +267,7 @@ export function buildNarrativeChapters(input: NarrativeChaptersInput): Narrative
     chapters.push({
       numeral: "I",
       title: NARRATIVE_CHAPTER_TITLES[0],
-      content: [...fuentes, alcance.join(" ")].join("\n\n"),
+      content: [...fuentes, alcance.join(" "), ...(input.samNotes ?? [])].join("\n\n"),
     });
   }
 

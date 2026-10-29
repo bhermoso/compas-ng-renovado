@@ -1,8 +1,10 @@
 import type { MunicipalityId } from "../municipality";
 import type { PopulationReference } from "./PopulationReference";
-import type { RepresentativenessResult } from "../../application/sam/computeCellRepresentativeness";
+import type { SampleComposition } from "../../application/sam/computeSampleComposition";
 
-export type SampleQualityLevel = "high" | "medium" | "low";
+/** Legacy levels remain readable; SAM v3 never assigns them. */
+export type SampleQualityLevel = "high" | "medium" | "low" | "not-evaluable";
+export const SAM_METHODOLOGY_VERSION = "SAM-3.0.0";
 
 export interface CochranParams {
   confidence: number;
@@ -29,7 +31,15 @@ export interface SampleQualityAssessment {
   cochranParams: CochranParams;
   nTheoreticalRaw: number;
   nTheoretical: number;
+  /** Legacy name: n / theoretical n × 100, never population coverage. */
   coverageGlobal: number;
+  /** n / reference N, descriptive ratio, not verified unique-person coverage. */
+  populationRatioPercent?: number;
+  /** Only with verified unique residents and matching population/time universe. */
+  populationCoveragePercent?: number;
+  /** Missing on historical assessments. */
+  methodologyVersion?: string;
+  /** Legacy field; new SAM returns not-evaluable. */
   sampleQuality: SampleQualityLevel;
   sampleQualityRationale: string;
   methodologicalCautions: string[];
@@ -37,10 +47,11 @@ export interface SampleQualityAssessment {
   requiresHumanValidation: true;
   computedAt: string;
   /**
-   * Evaluación de representatividad demográfica por celda (edad × sexo).
-   * Solo presente cuando PopulationReference.ageSexMatrix está disponible
-   * Y se proporciona la distribución observada por celda (ageSexObserved).
-   * Cuando falta, el motor Cochran + cobertura global opera sin cambios.
+   * Composición por edad y sexo de la muestra frente al padrón. Describe; no
+   * califica la representatividad. Solo presente cuando
+   * PopulationReference.ageSexMatrix está disponible y se proporciona la
+   * distribución observada por celda. Cuando falta, el dictamen de tamaño
+   * solo describe su referencia teórica.
    */
-  representativeness?: RepresentativenessResult;
+  composition?: SampleComposition;
 }

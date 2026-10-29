@@ -17,7 +17,7 @@ export interface PopulationReferenceSet {
   minor?: PopulationReference;
   /**
    * Referencia poblacional de TODAS las edades (padrón completo con desglose
-   * quinquenal edad×sexo). Habilita afijación Hamilton y representatividad por celda.
+   * quinquenal edad×sexo). Habilita afijación Hamilton y descripción de la composición por celda.
    * No sustituye ni altera las claves adult/minor.
    */
   allAges?: PopulationReference;

@@ -8,7 +8,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { SamTriPyramid } from "../src/ui/components/SamTriPyramid";
 import { buildSamTriPyramidRows } from "../src/ui/components/samTriPyramidRows";
-import { enrichWithRepresentativeness } from "../src/application/sam/assessStudies";
+import { enrichWithComposition } from "../src/application/sam/assessStudies";
 import { computeSampleQualityAssessment } from "../src/application/sam/computeSampleQualityAssessment";
 import type { AgeSexCell, PopulationReference } from "../src/domain/sam/PopulationReference";
 
@@ -45,7 +45,7 @@ const base = (ref: PopulationReference) =>
 
 describe("SamTriPyramid", () => {
   it("con padrón y muestra por edad y sexo dibuja una pirámide con tres capas por fila y el detalle", () => {
-    const a = enrichWithRepresentativeness(base({ ...REF, ageSexMatrix: MATRIX }), OBSERVED);
+    const a = enrichWithComposition(base({ ...REF, ageSexMatrix: MATRIX }), OBSERVED);
     const html = render(a);
     expect(html).toContain("Población (trama)");
     expect(html).toContain("Afijación ideal (translúcida)");
@@ -59,7 +59,7 @@ describe("SamTriPyramid", () => {
   });
 
   it("las filas reproducen el padrón y la afijación Hamilton sin alterarlos", () => {
-    const a = enrichWithRepresentativeness(base({ ...REF, ageSexMatrix: MATRIX }), OBSERVED);
+    const a = enrichWithComposition(base({ ...REF, ageSexMatrix: MATRIX }), OBSERVED);
     const built = buildSamTriPyramidRows(a);
     if (!("rows" in built)) throw new Error("debía ser evaluable");
     expect(built.rows.map((r) => [r.popMale, r.popFemale])).toEqual(
@@ -89,25 +89,52 @@ describe("SamTriPyramid", () => {
   });
 
   it("bandas de la muestra que no coinciden con el padrón: no evaluable", () => {
-    const a = enrichWithRepresentativeness(base({ ...REF, ageSexMatrix: MATRIX }), OBSERVED);
+    const a = enrichWithComposition(base({ ...REF, ageSexMatrix: MATRIX }), OBSERVED);
     const tampered = {
       ...a,
-      representativeness: {
-        ...a.representativeness!,
-        cells: a.representativeness!.cells.map((c) => ({ ...c, ageBand: "x-" + c.ageBand })),
+      composition: {
+        ...a.composition!,
+        cells: a.composition!.cells.map((c) => ({ ...c, ageBand: "x-" + c.ageBand })),
       },
     };
     expect("notEvaluable" in buildSamTriPyramidRows(tampered)).toBe(true);
   });
 
+  it("describe la composición sin etiqueta de representatividad", () => {
+    const sparse: AgeSexCell[] = [
+      { ageBand: "16-29", male: 0, female: 0 },
+      { ageBand: "30-44", male: 10, female: 30 },
+      { ageBand: "45-64", male: 10, female: 0 },
+      { ageBand: "65-74", male: 5, female: 5 },
+    ];
+    const html = render(enrichWithComposition(base({ ...REF, ageSexMatrix: MATRIX }), sparse));
+    expect(html).toContain("Bandas con población y sin ninguna respuesta: 16-29.");
+    expect(html).toContain("sobrerrepresentadas");
+    expect(html).toContain("Sin respuestas también en: mujeres de 45-64.");
+    expect(html).toContain("Hay respuestas desde la banda 30-44 hasta la 65-74.");
+    expect(html).toContain("no califica su");
+    expect(html).not.toMatch(/Representatividad demográfica|Error absoluto medio|moderada/);
+  });
+
+  it("los dictámenes de tamaño no afirman representatividad", () => {
+    for (const n of [50, 300, 2000]) {
+      const a = computeSampleQualityAssessment({
+        instrumentId: "t", municipalityId: "18022", nObserved: n, populationReference: REF,
+      });
+      const text = [a.sampleQualityRationale, ...a.methodologicalCautions].join(" ");
+      expect(text).not.toMatch(/representatividad (estadística )?(está )?asegurada/);
+      expect(text).toContain("supone una selección aleatoria");
+    }
+  });
+
   it("una desviación que redondea a cero no lleva signo", () => {
-    const a = enrichWithRepresentativeness(base({ ...REF, ageSexMatrix: MATRIX }), OBSERVED);
+    const a = enrichWithComposition(base({ ...REF, ageSexMatrix: MATRIX }), OBSERVED);
     const html = renderToStaticMarkup(createElement(SamTriPyramid, { assessment: a }));
     expect(html).not.toMatch(/[−+]0,0 pp/);
   });
 
   it("sin animación disponible las capas se muestran completas y sin transición", () => {
-    const a = enrichWithRepresentativeness(base({ ...REF, ageSexMatrix: MATRIX }), OBSERVED);
+    const a = enrichWithComposition(base({ ...REF, ageSexMatrix: MATRIX }), OBSERVED);
     const html = render(a);
     expect(html).not.toContain("data-animated");
     expect(html).not.toMatch(/width:0%/);
@@ -131,7 +158,7 @@ describe("SamTriPyramid", () => {
 
 describe("SamTriPyramid · recuento progresivo", () => {
   const mk = (observed: AgeSexCell[], n: number) =>
-    enrichWithRepresentativeness(
+    enrichWithComposition(
       computeSampleQualityAssessment({
         instrumentId: "t", municipalityId: "18022", nObserved: n,
         populationReference: { ...REF, ageSexMatrix: MATRIX },

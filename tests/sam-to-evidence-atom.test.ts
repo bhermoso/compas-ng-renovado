@@ -60,22 +60,22 @@ describe("samAssessmentToEvidenceAtom — estructura canónica", () => {
 // ── 2. Mapeo de confidence desde SampleQualityLevel ──────────────────────────
 
 describe("samAssessmentToEvidenceAtom — mapeo confidence", () => {
-  it("sampleQuality='high' → confidence='high' (n=811, nTheoretical=375)", () => {
+  it("confianza no evaluable independientemente del tamaño (n=811, nTheoretical=375)", () => {
     // coverage = 811/375 = 216% → HIGH
     const atom = samAssessmentToEvidenceAtom(makeAssessment(811));
-    expect(atom.confidence).toBe("high");
+    expect(atom.confidence).toBe("not-evaluable");
   });
 
-  it("sampleQuality='medium' → confidence='medium' (n=250, coverage=66%)", () => {
+  it("confianza no evaluable independientemente del tamaño (n=250, coverage=66%)", () => {
     // coverage = 250/375 = 66.7% → MEDIUM
     const atom = samAssessmentToEvidenceAtom(makeAssessment(250));
-    expect(atom.confidence).toBe("medium");
+    expect(atom.confidence).toBe("not-evaluable");
   });
 
-  it("sampleQuality='low' → confidence='low' (n=100, coverage=26%)", () => {
+  it("confianza no evaluable independientemente del tamaño (n=100, coverage=26%)", () => {
     // coverage = 100/375 = 26.7% → LOW
     const atom = samAssessmentToEvidenceAtom(makeAssessment(100));
-    expect(atom.confidence).toBe("low");
+    expect(atom.confidence).toBe("not-evaluable");
   });
 });
 
@@ -85,7 +85,8 @@ describe("samAssessmentToEvidenceAtom — contenido", () => {
   it("content es exactamente el sampleQualityRationale del assessment", () => {
     const assessment = makeAssessment(811);
     const atom = samAssessmentToEvidenceAtom(assessment);
-    expect(atom.content).toBe(assessment.sampleQualityRationale);
+    expect(atom.content).toContain(assessment.sampleQualityRationale);
+    expect(atom.content).toContain("Cobertura poblacional: No evaluable");
   });
 
   it("methodology.limitations son las cautelas metodológicas del assessment", () => {
@@ -163,7 +164,7 @@ describe("samAssessmentToEvidenceAtom — no muta el assessment", () => {
     const assessment = makeAssessment(811);
     const atom = samAssessmentToEvidenceAtom(assessment);
     (atom as { kind: string }).kind = "indicator";
-    expect(assessment.sampleQuality).toBe("high");
+    expect(assessment.sampleQuality).toBe("not-evaluable");
   });
 
   it("llamadas sucesivas con el mismo assessment producen atoms equivalentes", () => {

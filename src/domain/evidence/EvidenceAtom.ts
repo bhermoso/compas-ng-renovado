@@ -36,11 +36,13 @@ export type EvidenceOrigin =
   | "other";
 
 export type EvidenceConfidence =
+  | "not-evaluable"
   | "low"
   | "medium"
   | "high";
 
 export interface EvidenceMethodology {
+  version?: string;
   description: string;
   limitations: string[];
   requiresHumanValidation: boolean;
@@ -93,6 +95,7 @@ export function createEvidenceAtom(input: CreateEvidenceAtomInput): EvidenceAtom
     confidence: input.confidence ?? "medium",
     provenance: input.provenance,
     methodology: {
+      ...(input.methodology?.version ? { version: input.methodology.version } : {}),
       description:
         input.methodology?.description ??
         "Evidencia registrada para análisis territorial integrado.",

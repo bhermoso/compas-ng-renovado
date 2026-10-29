@@ -206,7 +206,7 @@ describe("SAM integración — DUKE-EAS", () => {
 
   it("calidad HIGH: n=3028 >> nTheoretical=375 → cobertura 807 %", () => {
     const result = assessDUKEStudy(makeDUKEStudy(), ATARFE_ADULTS);
-    expect(result.sampleQuality).toBe("high");
+    expect(result.sampleQuality).toBe("not-evaluable");
     expect(result.nTheoretical).toBe(375);
     expect(result.coverageGlobal).toBeCloseTo(807.5, 0);
   });
@@ -230,7 +230,7 @@ describe("SAM integración — PREDIMED-EAS", () => {
 
   it("calidad HIGH: n=712 > nTheoretical=375 → cobertura 189 %", () => {
     const result = assessPREDIMEDStudy(makePREDIMEDStudy(), ATARFE_ADULTS);
-    expect(result.sampleQuality).toBe("high");
+    expect(result.sampleQuality).toBe("not-evaluable");
     expect(result.coverageGlobal).toBeCloseTo(189.9, 0);
   });
 });
@@ -248,7 +248,7 @@ describe("SAM integración — SF-12 EAS", () => {
 
   it("calidad HIGH: n=3047 >> nTheoretical=375", () => {
     const result = assessSF12Study(makeSF12Study(), ATARFE_ADULTS);
-    expect(result.sampleQuality).toBe("high");
+    expect(result.sampleQuality).toBe("not-evaluable");
   });
 });
 
@@ -265,7 +265,7 @@ describe("SAM integración — Sueño EAS", () => {
 
   it("calidad HIGH: n=3004 >> nTheoretical=375", () => {
     const result = assessSuenoStudy(makeSuenoStudy(), ATARFE_ADULTS);
-    expect(result.sampleQuality).toBe("high");
+    expect(result.sampleQuality).toBe("not-evaluable");
   });
 });
 
@@ -282,7 +282,7 @@ describe("SAM integración — CAGE-EAS", () => {
 
   it("calidad HIGH: n=2513 >> nTheoretical=375", () => {
     const result = assessCAGEStudy(makeCAGEStudy(), ATARFE_ADULTS);
-    expect(result.sampleQuality).toBe("high");
+    expect(result.sampleQuality).toBe("not-evaluable");
     expect(result.coverageGlobal).toBeCloseTo(670.1, 0);
   });
 });
@@ -299,7 +299,7 @@ describe("SAM integración — IBSE (gobernada por sampleScope)", () => {
     expect(res.plus16!.nObserved).toBe(811);
     expect(res.plus16!.populationReference.populationTotal).toBe(15_472);
     expect(res.plus16!.nTheoretical).toBe(375);
-    expect(res.plus16!.sampleQuality).toBe("high");
+    expect(res.plus16!.sampleQuality).toBe("not-evaluable");
   });
 
   it("under-16: evalúa SOLO contra la referencia de menores 6–15 (instrumentId 'ibse-under16')", () => {
@@ -602,7 +602,7 @@ describe("SAM integración — estabilidad funcional", () => {
     ];
     for (const a of assessments) {
       expect(a.requiresHumanValidation).toBe(true);
-      expect(a.sampleQuality).toBe("high");
+      expect(a.sampleQuality).toBe("not-evaluable");
       expect(a.coverageGlobal).toBeGreaterThan(100);
       expect(a.methodologicalCautions.length).toBeGreaterThan(0);
       expect(a.nTheoretical).toBe(375);
@@ -622,8 +622,8 @@ describe("SAM integración — estabilidad funcional", () => {
     expect(conDesglose.evaluable).toBe(true);
     // Cada estrato se clasifica con SU propio nValid y SU propia referencia:
     // under16 470/330 (142 %) → high ; plus16 341/375 (91 %) → medium.
-    expect(conDesglose.under16!.sampleQuality).toBe("high");
-    expect(conDesglose.plus16!.sampleQuality).toBe("medium");
+    expect(conDesglose.under16!.sampleQuality).toBe("not-evaluable");
+    expect(conDesglose.plus16!.sampleQuality).toBe("not-evaluable");
   });
 
   it("el motor SAM permanece único: todas las funciones delegan en computeSampleQualityAssessment", () => {

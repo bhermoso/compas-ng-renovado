@@ -15,7 +15,7 @@ export interface AgeBand {
 }
 
 export interface AgeSexObservedResult {
-  /** Distribución observada por celda edad×sexo — compatible con enrichWithRepresentativeness. */
+  /** Distribución observada por celda edad×sexo — compatible con enrichWithComposition. */
   cells: AgeSexCell[];
   assignedCount: number;
   unassignableCount: number;
@@ -63,7 +63,7 @@ function findBand(age: number, bands: AgeBand[]): number {
  *                       aporta `age` directamente; puede pasarse 0 si todas las filas usan age.
  * @param ageBands       Bandas de edad en orden canónico; deben coincidir con las de
  *                       PopulationReference.ageSexMatrix para poder llamar a
- *                       enrichWithRepresentativeness.
+ *                       enrichWithComposition.
  */
 export function buildAgeSexObserved(
   rows: ReadonlyArray<{ sex?: string; birthYear?: number; age?: number }>,

@@ -4,7 +4,8 @@
  * Evalúa cualquier muestra de COMPÁS con el mismo procedimiento, sea cual sea la
  * herramienta que la produjo (encuesta, priorización, Gestor de Encuestas, CSV
  * cargado a mano): tamaño frente a la muestra teórica (Cochran + FPC) y, si hay
- * padrón por edad y sexo y registros con edad y sexo, representatividad por celda.
+ * padrón por edad y sexo y registros con edad y sexo, composición por celda frente
+ * al padrón. SAM describe la composición; no califica la representatividad.
  *
  * Reglas:
  *  - Sin referencia poblacional verificada → no evaluable. No se estima nada.
@@ -22,7 +23,7 @@ import type {
 } from "../../domain/sam/PopulationReference";
 import type { SampleQualityAssessment } from "../../domain/sam/SampleQualityAssessment";
 import { computeSampleQualityAssessment } from "./computeSampleQualityAssessment";
-import { enrichWithRepresentativeness } from "./assessStudies";
+import { enrichWithComposition } from "./assessStudies";
 import {
   buildAgeSexObserved,
   type AgeBand,
@@ -41,12 +42,14 @@ export interface SampleRecord {
 }
 
 export interface SampleInput {
+  /** Only set after checking unique residents and matching target population/time. */
+  participationBasis?: { uniqueResidents: boolean; matchingPopulationAndPeriod: boolean };
   /** Identifica el origen de la muestra (p. ej. "ibse", "priorizacion", "csv-manual"). */
   instrumentId: string;
   municipalityId: MunicipalityId;
   /** Tamaño de la muestra válida. Si falta, se usa el número de registros. */
   nObserved?: number;
-  /** Registros individuales, para evaluar la representatividad por edad y sexo. */
+  /** Registros individuales, para describir la composición por edad y sexo. */
   records?: ReadonlyArray<SampleRecord>;
   /**
    * Recuento ya agregado por banda de edad y sexo (alternativa a `records`).
@@ -73,8 +76,8 @@ export type SampleAssessmentResult =
       status: "evaluable";
       assessment: SampleQualityAssessment;
       observed?: AgeSexObservedResult;
-      /** Motivos por los que no se evaluó la representatividad por edad y sexo. */
-      representativenessNote?: string;
+      /** Motivo por el que no se describió la composición por edad y sexo. */
+      compositionNote?: string;
       notes: string[];
     }
   | {
@@ -204,6 +207,26 @@ export function assessSample(input: SampleInput): SampleAssessmentResult {
     return { status: "not-evaluable", reasons: [resolved.reason] };
   }
   const reference = resolved.reference;
+  const demographicCells = [...(reference.ageSexMatrix ?? []), ...(input.observedCells ?? [])];
+  if (demographicCells.some(c => [c.male, c.female].some(n => !Number.isInteger(n) || n < 0))) {
+    return { status: "not-evaluable", reasons: ["Los recuentos demográficos deben ser enteros no negativos."] };
+  }
+  if (!Number.isInteger(reference.populationTotal) || reference.populationTotal <= 0) {
+    return { status: "not-evaluable", reasons: ["La población de referencia no es un recuento entero positivo."] };
+  }
+  if (input.ageRange && input.records) {
+    const { min, max } = input.ageRange;
+    const ages = input.records.map(r => r.age ?? (r.birthYear !== undefined && input.referenceYear !== undefined ? input.referenceYear - r.birthYear : NaN));
+    if (ages.some(age => !Number.isInteger(age) || age < 0 || age > MAX_VALID_AGE)) {
+      return { status: "not-evaluable", reasons: ["No se puede verificar la pertenencia al intervalo: hay registros sin edad válida."] };
+    }
+    if (ages.some(age => age < min || age > max)) {
+      const records = input.records.filter((_, i) => ages[i] >= min && ages[i] <= max);
+      const result = assessSample({ ...input, records, nObserved: records.length });
+      if (result.status === "evaluable") result.notes.push(`${input.records.length - records.length} registros fuera del intervalo quedan excluidos del tamaño y de la composición.`);
+      return result;
+    }
+  }
 
   const aligned = input.observedCells
     ? alignObservedCells(input.observedCells, reference.ageSexMatrix)
@@ -215,7 +238,7 @@ export function assessSample(input: SampleInput): SampleAssessmentResult {
   const nObserved = aligned
     ? aligned.retainedTotal
     : input.nObserved ?? input.records?.length;
-  if (nObserved === undefined || !Number.isFinite(nObserved) || nObserved <= 0) {
+  if (nObserved === undefined || !Number.isInteger(nObserved) || nObserved <= 0) {
     return {
       status: "not-evaluable",
       reasons: ["No hay tamaño de muestra: ni n válido ni registros individuales."],
@@ -227,6 +250,7 @@ export function assessSample(input: SampleInput): SampleAssessmentResult {
     municipalityId: input.municipalityId,
     nObserved,
     populationReference: reference,
+    participationBasis: input.participationBasis,
   });
 
   const notes: string[] = [];
@@ -238,7 +262,7 @@ export function assessSample(input: SampleInput): SampleAssessmentResult {
         `${fmt(aligned.excludedTotal)} participantes de bandas de edad fuera del rango comparado (${aligned.excludedBands.join(", ")}) quedan fuera de este dictamen. El tamaño evaluado es el de las bandas conservadas (${fmt(aligned.retainedTotal)}).`
       );
     }
-    assessment = enrichWithRepresentativeness(assessment, aligned.cells);
+    assessment = enrichWithComposition(assessment, aligned.cells);
     return { status: "evaluable", assessment, notes };
   }
 
@@ -246,7 +270,7 @@ export function assessSample(input: SampleInput): SampleAssessmentResult {
     return {
       status: "evaluable",
       assessment,
-      representativenessNote:
+      compositionNote:
         "No evaluable por edad y sexo: el padrón de referencia no está desglosado por edad y sexo.",
       notes,
     };
@@ -255,7 +279,7 @@ export function assessSample(input: SampleInput): SampleAssessmentResult {
     return {
       status: "evaluable",
       assessment,
-      representativenessNote:
+      compositionNote:
         "No evaluable por edad y sexo: no se dispone de registros individuales con edad y sexo.",
       notes,
     };
@@ -268,7 +292,7 @@ export function assessSample(input: SampleInput): SampleAssessmentResult {
       return {
         status: "evaluable",
         assessment,
-        representativenessNote: `No evaluable por edad y sexo: la banda «${cell.ageBand}» del padrón no tiene un formato reconocible.`,
+        compositionNote: `No evaluable por edad y sexo: la banda «${cell.ageBand}» del padrón no tiene un formato reconocible.`,
         notes,
       };
     }
@@ -281,7 +305,7 @@ export function assessSample(input: SampleInput): SampleAssessmentResult {
       status: "evaluable",
       assessment,
       observed,
-      representativenessNote:
+      compositionNote:
         "No evaluable por edad y sexo: ningún registro tiene sexo y edad reconocibles dentro de las bandas del padrón.",
       notes,
     };
@@ -293,6 +317,6 @@ export function assessSample(input: SampleInput): SampleAssessmentResult {
     );
   }
 
-  assessment = enrichWithRepresentativeness(assessment, observed.cells);
+  assessment = enrichWithComposition(assessment, observed.cells);
   return { status: "evaluable", assessment, observed, notes };
 }

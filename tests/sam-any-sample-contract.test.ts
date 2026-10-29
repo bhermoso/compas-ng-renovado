@@ -19,7 +19,7 @@ describe("CONTRACT-SAM-ANY-SAMPLE", () => {
   it("con padrón y sin registros emite tamaño y declara la representatividad no evaluable", () => {
     const r = assessSample({ instrumentId: "csv-manual", municipalityId: "atarfe", nObserved: 100 });
     expect(r.status).toBe("evaluable");
-    if (r.status === "evaluable") expect(r.representativenessNote).toMatch(/No evaluable por edad y sexo/);
+    if (r.status === "evaluable") expect(r.compositionNote).toMatch(/No evaluable por edad y sexo/);
   });
   it("un registro sin sexo reconocible no se imputa", () => {
     const records = Array.from({ length: 60 }, (_, i) => ({ sex: i % 5 === 0 ? "x" : i % 2 ? "1" : "2", age: 20 + (i % 50) }));
