@@ -192,7 +192,7 @@ export function ThematicPrioritisationModal({
               <div className="tp-study__meta">
                 <span className="tp-study__file">{study.sourceFileName}</span>
                 <span className="tp-study__counts">
-                  {study.completeRecords} papeletas completas de{" "}
+                  {study.validVoteRecords ?? study.completeRecords} papeletas con voto temático válido de{" "}
                   {study.totalRecords} · Importado{" "}
                   {new Date(study.importedAt).toLocaleDateString("es-ES", {
                     day: "2-digit",
