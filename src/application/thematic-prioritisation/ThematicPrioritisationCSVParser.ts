@@ -93,6 +93,7 @@ export function parseThematicPrioritisationCSV(
 
   let total = 0;
   let complete = 0;
+  let validVoteRecords = 0;
   const voteCounts: Record<string, number> = {};
   for (const { column } of COLUMN_MAP) voteCounts[column] = 0;
 
@@ -101,10 +102,9 @@ export function parseThematicPrioritisationCSV(
     total++;
 
     const isComplete = completeIdx === -1 || row[completeIdx] === COMPLETE_VAL;
-    if (!isComplete) continue;
-    complete++;
+    if (isComplete) complete++;
 
-    if (hasDemographics && options?.ageBands) {
+    if (isComplete && hasDemographics && options?.ageBands) {
       const rawEdad = row[idxEdad]?.trim();
       const parsedAge = rawEdad ? parseInt(rawEdad, 10) : undefined;
       demographicRows.push({
@@ -113,11 +113,14 @@ export function parseThematicPrioritisationCSV(
       });
     }
 
+    let hasVote = false;
     for (const { column, index } of colIndices) {
-      if (index !== -1 && row[index] === "1") {
+      if (index !== -1 && row[index]?.trim() === "1") {
         voteCounts[column]++;
+        hasVote = true;
       }
     }
+    if (hasVote) validVoteRecords++;
   }
 
   const rankingUnsorted: ThematicTopicVoteResult[] = colIndices.map(
@@ -127,8 +130,8 @@ export function parseThematicPrioritisationCSV(
       label,
       votes: voteCounts[column] ?? 0,
       pct:
-        complete > 0
-          ? Math.round(((voteCounts[column] ?? 0) / complete) * 1000) / 10
+        validVoteRecords > 0
+          ? Math.round(((voteCounts[column] ?? 0) / validVoteRecords) * 1000) / 10
           : 0,
       rank: 0,
     })
@@ -141,20 +144,20 @@ export function parseThematicPrioritisationCSV(
   const topFiveTopicIds = ranking.slice(0, 5).map((r) => r.topicId);
 
   const cautions: string[] = [];
-  if (complete === 0) {
-    cautions.push("No se encontraron papeletas completas. Verifica el formato del CSV.");
+  if (validVoteRecords === 0) {
+    cautions.push("No se encontraron papeletas con alguna temática seleccionada. Verifica el formato del CSV.");
   } else {
-    if (complete < 50) {
+    if (validVoteRecords < 50) {
       cautions.push(
-        `Muestra pequeña (${complete} papeletas completas). Interpretar con precaución.`
+        `Muestra pequeña (${validVoteRecords} papeletas con selección temática). Interpretar con precaución.`
       );
     }
-    const incompleteRate =
-      total > 0 ? ((total - complete) / total) * 100 : 0;
-    if (incompleteRate > 10) {
-      cautions.push(
-        `${incompleteRate.toFixed(1)} % de registros excluidos por incompletos.`
-      );
+    const withoutVote = total - validVoteRecords;
+    if (withoutVote > 0) {
+      cautions.push(`${withoutVote} registros sin selección temática, excluidos solo del recuento de votos.`);
+    }
+    if (complete < validVoteRecords) {
+      cautions.push("Las tablas de edad y sexo usan únicamente registros completos con variables demográficas interpretables; el ranking incluye también papeletas parciales con votos.");
     }
     cautions.push(
       "Los resultados reflejan las preferencias de las personas participantes, no de la población general."
@@ -186,6 +189,7 @@ export function parseThematicPrioritisationCSV(
       sourceFileName,
       totalRecords: total,
       completeRecords: complete,
+      validVoteRecords,
       ranking,
       topFiveTopicIds,
       ...(ageSexObserved !== undefined && { ageSexObserved }),
@@ -202,6 +206,7 @@ function emptyPartialStudy(
     sourceFileName,
     totalRecords: 0,
     completeRecords: 0,
+    validVoteRecords: 0,
     ranking: [],
     topFiveTopicIds: [],
     methodologicalCautions: [],
