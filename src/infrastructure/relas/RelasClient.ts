@@ -1,6 +1,8 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { initializeAuth, inMemoryPersistence, type Auth } from 'firebase/auth';
 import { getFirestore, doc, collection, getDocs, getDocFromServer, runTransaction, serverTimestamp, type Firestore } from 'firebase/firestore';
+import { ACTION_PLAN_CATALOG } from '../../domain/action-plan-catalog/ActionPlanCatalog';
+import { municipalActionPlanModule, prepareMunicipalActionPlanDraft } from '../../domain/action-plan-catalog/MunicipalActionPlanModule';
 import type { PlanPreparationDraft, PlanPreparationReview } from '../../domain/action-plan-catalog/PlanPreparationDraft';
 
 // Public web configuration supplied by the project owner; this does not grant data access.
@@ -41,14 +43,27 @@ export async function readRelasDraft(client: RelasClient, scope: string, moduleI
  const snapshot = await getDocFromServer(doc(client.db, 'relas_scopes', scope, 'drafts', moduleId));
  return snapshot.exists() ? snapshot.data() as RelasDraftRow : null;
 }
+function canonicalDraft(value: unknown): string | undefined {
+ return JSON.stringify(value, (_key, item) => item && typeof item === 'object' && !Array.isArray(item)
+  ? Object.fromEntries(Object.entries(item).sort(([left], [right]) => left.localeCompare(right))) : item);
+}
 export async function saveRelasDraft(client: RelasClient, draft: PlanPreparationDraft, expectedVersion: number | null): Promise<RelasDraftRow> {
  const uid = client.auth.currentUser?.uid;
  if (!uid) throw new Error('Inicia sesión para guardar.');
+ const original = ACTION_PLAN_CATALOG.find(module => module.id === draft.moduleId);
+ if (original && draft.version !== municipalActionPlanModule(draft.municipalityId, original).version) {
+  throw new Error('La versión del borrador requiere revisión de compatibilidad. No se ha guardado.');
+ }
  const ref = doc(client.db, 'relas_scopes', draft.municipalityId, 'drafts', draft.moduleId);
  try {
   return await runTransaction(client.db, async tx => {
    const current = await tx.get(ref);
    if ((current.exists() ? current.data().version : null) !== expectedVersion) throw new Error('conflict');
+   if (current.exists() && current.data().payload.version !== draft.version) {
+    if (!original) throw new Error('unknown-module-migration');
+    prepareMunicipalActionPlanDraft(draft.municipalityId, municipalActionPlanModule(draft.municipalityId, original), current.data().payload);
+    if (canonicalDraft(draft.migration?.draft) !== canonicalDraft(current.data().payload)) throw new Error('migration-source-mismatch');
+   }
    const version = (expectedVersion ?? 0) + 1;
    const row = {version, payload: JSON.parse(JSON.stringify(draft)) as PlanPreparationDraft, updatedBy: uid, updatedAt: serverTimestamp()};
    tx.set(ref, row);

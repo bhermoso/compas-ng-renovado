@@ -21,9 +21,9 @@ describe("Versiones documentales del Plan",()=>{
  it("agrupa todos los objetivos bajo un único encabezado por bloque",()=>{
   const draft=fixture();
   const doc=buildPlanDocument(draft.municipalityId,buildDefinitiveActionPlanProjection(draft.municipalityId,[module],[draft]),"2026-09-17");
-  expect(doc.paragraphs.filter(p=>p.heading).slice(1).map(p=>p.text.split(" · ")[1])).toEqual(module.generalObjectives.map(g=>thematicBlockNameFor(g.code)));
+  expect(doc.paragraphs.filter(p=>p.heading).slice(1).map(p=>p.text.split(" · ")[1])).toEqual(module.generalObjectives.map(g=>thematicBlockNameFor(g.code, module)));
   for(const general of module.generalObjectives){
-   const blockName=thematicBlockNameFor(general.code);
+   const blockName=thematicBlockNameFor(general.code, module);
    expect(doc.paragraphs.filter(p=>p.heading&&p.text==="Bloque temático · "+blockName)).toHaveLength(1);
    const heading=doc.paragraphs.findIndex(p=>p.heading&&p.text==="Bloque temático · "+blockName);
    const next=doc.paragraphs.findIndex((p,i)=>i>heading&&!!p.heading);

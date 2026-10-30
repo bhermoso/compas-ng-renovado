@@ -7,10 +7,10 @@ export function PlanDocumentActions({municipalityId,active,versions=[],worksheet
 }){
  const [name,setName]=useState("");const [message,setMessage]=useState("");const [busy,setBusy]=useState(false);
  const latest=latestValidatedPlan(versions,municipalityId);
- async function download(format:"docx"|"pdf"){
+ async function download(format:"docx"|"pdf", source:"draft"|"validated"){
   setBusy(true);setMessage("");
   try{const {downloadPlanDocument}=await import("../../application/action-plan/exportPlanDocument");
-   await downloadPlanDocument(latest??buildPlanDocument(municipalityId,active,new Date().toISOString(),{worksheets}),format);
+   await downloadPlanDocument(source === "validated" && latest ? latest : buildPlanDocument(municipalityId,active,new Date().toISOString(),{worksheets}),format);
   }catch{setMessage("No se pudo descargar el documento. Inténtalo de nuevo.");}finally{setBusy(false);}
  }
  function validate(){
@@ -21,13 +21,17 @@ export function PlanDocumentActions({municipalityId,active,versions=[],worksheet
  }
  return <section className="workspace-panel plan-document-actions" aria-label="Documento independiente del Plan">
  <h3>Documento independiente del Plan de Acción</h3>
- <p>{latest?"Las descargas contienen exclusivamente la última versión validada. Los cambios posteriores del borrador requieren una nueva validación.":"No existe una versión validada. Las descargas se identificarán como borrador."}</p>
+ <p>El borrador actual se descarga sin validar. Las versiones validadas se conservan por separado.</p>
  {latest&&<p>Última validación: {latest.generatedAt} · {latest.validatedBy}</p>}
  <label>Persona que valida técnicamente<input value={name} onChange={e=>setName(e.target.value)}/></label>
  <button type="button" disabled={busy||!onValidate} onClick={validate}>Validar y guardar versión actual</button>
  <div className="backup-panel__actions">
- <button type="button" disabled={busy||(!latest&&!active.some(x=>x.rows.length))} onClick={()=>download("docx")}>Descargar Word{latest?"":" (borrador)"}</button>
- <button type="button" disabled={busy||(!latest&&!active.some(x=>x.rows.length))} onClick={()=>download("pdf")}>Descargar PDF{latest?"":" (borrador)"}</button>
+ <button type="button" disabled={busy||!active.some(x=>x.rows.length)} onClick={()=>download("docx","draft")}>Descargar borrador actual · Word</button>
+ <button type="button" disabled={busy||!active.some(x=>x.rows.length)} onClick={()=>download("pdf","draft")}>Descargar borrador actual · PDF</button>
+ {latest&&<>
+ <button type="button" disabled={busy} onClick={()=>download("docx","validated")}>Descargar última versión validada · Word</button>
+ <button type="button" disabled={busy} onClick={()=>download("pdf","validated")}>Descargar última versión validada · PDF</button>
+ </>}
  </div><p role="status">{message}</p>
  </section>;
 }

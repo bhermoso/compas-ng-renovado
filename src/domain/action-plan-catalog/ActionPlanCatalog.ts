@@ -30,6 +30,8 @@ export interface CatalogSpecificObjectiveTemplate {
 
 export interface CatalogGeneralObjectiveTemplate {
   code: string;
+  /** Editorial label scoped to this module version, never inferred from a reused code. */
+  thematicBlockName?: string;
   title: string;
   specificObjectives: readonly CatalogSpecificObjectiveTemplate[];
 }

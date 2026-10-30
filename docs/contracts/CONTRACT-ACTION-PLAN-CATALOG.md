@@ -133,3 +133,23 @@ específicos; los nuevos grupos quedan pendientes de revisión. Una versión
 desconocida no se transforma automáticamente. Esta operación no valida el Plan,
 no sustituye versiones institucionales y no crea actuaciones ni compromisos.
 
+
+### Compatibilidad y conservación — corrección de 2026-10-30
+
+La misma transformación 3.1 se aplica al preparar la lectura del borrador
+territorial de Firebase. Abrirlo no escribe: el coordinador guarda la nueva
+versión con su original íntegro en `migration.draft`, dentro de la misma
+transacción y con control de versión concurrente. Las revisiones previas siguen
+asociadas a su versión de origen; no se reutilizan al iniciar una revisión nueva.
+Las cuentas de consulta y administración conservan sus permisos existentes.
+
+La exclusión conserva separadamente la decisión individual y su redacción. Una
+reincorporación explícita recupera las adaptaciones; también al reincorporar un
+módulo completo. Si el expediente ya fue reagrupado, la recuperación utiliza
+exclusivamente su borrador original archivado y no sustituye ediciones posteriores.
+
+Una referencia incompatible no se edita, proyecta ni exporta como la versión
+actual. Los nombres de bloque pertenecen a la versión del módulo, no se deducen
+de códigos reutilizados. Las salidas comparten el orden editorial y señalan los
+bloques pendientes. Las descargas distinguen el borrador actual de la última
+versión validada, que se mantiene inmutable.

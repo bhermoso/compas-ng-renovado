@@ -154,7 +154,7 @@ export function buildActionPlanTraceability(
           ...base,
           strategicObjective: resolvedPlanDecisionText(moduleDecision, module.strategicObjective),
           thematicBlockCode: row.general.code,
-          thematicBlock: thematicBlockNameFor(row.general.code) ?? row.general.code,
+          thematicBlock: thematicBlockNameFor(row.general.code, module) ?? row.general.code,
           indicatorRole: "action-plan" as const,
           indicatorWorksheetKey: key,
           indicatorFichaStatus: !sheet ? "missing" : actionCards.length > 0 ? "linked-actions" : "draft",

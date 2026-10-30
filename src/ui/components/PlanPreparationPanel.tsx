@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { ActionPlanCatalogModule, CatalogGeneralObjectiveTemplate, CatalogSpecificObjectiveTemplate } from "../../domain/action-plan-catalog/ActionPlanCatalog";
 import type { PLSEvaluationFramework, UnaddressedNeed } from "../../domain/health-plan";
+import { planDecisionWithStatus } from "../../domain/action-plan-catalog/PlanPreparationDraft";
 import { ZAGRA_ACTION_PLAN_VERSION } from "../../domain/action-plan-catalog/MunicipalActionPlanModule";
 import {
   cleanActionPlanProposalText,
@@ -38,6 +39,9 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
  reviewIsCurrent?: boolean;
  renderWorksheet: (module: ActionPlanCatalogModule, general: CatalogGeneralObjectiveTemplate, specific: CatalogSpecificObjectiveTemplate) => ReactNode;
 }) {
+ if (draft && (draft.municipalityId !== municipalityId || draft.moduleId !== module.id || draft.version !== module.version)) {
+  return <section role="alert">La versión del borrador requiere revisión de compatibilidad. Se conserva sin modificar y no se puede editar.</section>;
+ }
  const revised = module.version === ZAIDIN_PROPOSAL_VERSION;
  const fourBlocks = revised || module.version === ZAGRA_ACTION_PLAN_VERSION;
  const finalApprovedText = module.version === ZAIDIN_FINAL_ACTION_PLAN_VERSION;
@@ -56,6 +60,7 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
 
  function emitDraftPatch(patch: Partial<Pick<PlanPreparationDraft, "unaddressedNeeds" | "evaluationFramework">>) {
   onChange({
+   ...draft,
    municipalityId,
    moduleId: module.id,
    version: module.version,
@@ -114,16 +119,10 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
    }
   }
   const previous = decisions[id];
-  const text = status === "modified"
-   ? (textOverride ?? previous?.text ?? cleanSource)
-   : previous?.text;
-  const cleanText = text !== undefined ? cleanObsoleteActionPlanProgramLabels(text) : undefined;
-  const next: PlanPreparationDecision = {
-   status,
-   sourceText: cleanSource,
-   ...(cleanText !== undefined ? {text: cleanText} : {}),
-  };
+  const next = planDecisionWithStatus(previous, cleanSource, status,
+   status === "modified" ? (textOverride ?? previous?.text ?? cleanSource) : undefined);
   onChange({
+   ...draft,
    municipalityId,
    moduleId: module.id,
    version: module.version,
@@ -137,7 +136,7 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
  function updateReview(id: string, source: string, patch: Partial<PlanPreparationReviewDecision>) {
   if (!canReview || !onReviewChange) return;
   const proposal = proposedTextFor(draft?.decisions[id], source);
-  const previous = review?.decisions[id];
+  const previous = reviewIsCurrent ? review?.decisions[id] : undefined;
   const next: PlanPreparationReviewDecision = {
    status: patch.status ?? previous?.status ?? "reformulated",
    sourceText: source,
@@ -151,7 +150,7 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
    sourceVersion: module.version,
    sourceDraftVersion: review?.sourceDraftVersion ?? 0,
    updatedAt: new Date().toISOString(),
-   decisions: {...review?.decisions, [id]: next},
+   decisions: {...(reviewIsCurrent ? review?.decisions : {}), [id]: next},
   });
  }
 
@@ -217,7 +216,7 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
    // Preserve explicit municipal adaptations when including a complete module.
    const existing = decisions[id];
    if (status === "included" && existing?.status === "modified") return;
-   decisions[id] = {status, sourceText: cleanActionPlanProposalText(source)};
+   decisions[id] = planDecisionWithStatus(existing, cleanActionPlanProposalText(source), status);
   };
   select(module.id, module.strategicObjective);
   for (const general of module.generalObjectives) {
@@ -228,6 +227,7 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
    }
   }
   onChange({
+   ...draft,
    municipalityId,
    moduleId: module.id,
    version: module.version,
@@ -273,6 +273,7 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
    const visibleGeneral = canReview ? consolidatedText(general.code, sourceGeneral) : territorialText(general.code, (revised ? block?.text : undefined) ?? sourceGeneral);
    return <details className="pcm-general" key={general.code}>
     <summary>{(fourBlocks ? block?.name : undefined) ?? `${general.code} · ${visibleGeneral}`}</summary>
+    {draft?.decisions[general.code]?.status === "pending" && <p className="panel-note">Bloque pendiente de revisión.</p>}
     <p><strong>Objetivo general:</strong> <ProposalText text={visibleGeneral}/></p>
     {control(general.code, sourceGeneral, [module.id], !finalApprovedText)}
     {general.specificObjectives.map(specific => {
