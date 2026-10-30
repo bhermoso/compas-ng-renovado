@@ -49,8 +49,8 @@ export const proposalBlocks = [
   {code:"ENV-OG4",name:"Participación",text:"Incrementar la participación significativa y el protagonismo de las personas mayores en la comunidad, reduciendo las barreras de accesibilidad a los recursos, servicios y actividades comunitarias y la brecha digital, y fortaleciendo la coordinación comunitaria.",objectives:["ENV-OE4.1","ENV-OE4.2","ENV-OE8.1","ENV-OE8.2","ENV-OE7.1"]}
 ];
 
-export function thematicBlockNameFor(code: string): string | undefined {
- return proposalBlocks.find(block => block.code === code.replace(/^ZAGRA-/, ""))?.name;
+export function thematicBlockNameFor(code: string, module: ActionPlanCatalogModule): string | undefined {
+ return module.generalObjectives.find(general => general.code === code)?.thematicBlockName;
 }
 
 export function compareActionPlanNotation(left: string, right: string): number {
@@ -70,11 +70,13 @@ export const ZAIDIN_AGING_PROPOSAL: ActionPlanCatalogModule = {
  ...HEALTHY_AGING_MODULE, version: ZAIDIN_PROPOSAL_VERSION,
  sourceLabel: "Redacción final del Plan de Acción del Distrito Zaidín", sourceDate: "2026-09-25",
  strategicObjective: plainProposalText(proposalStrategicText),
- generalObjectives: proposalBlocks.map((block, blockIndex) => ({code: block.code, title: plainProposalText(block.text),
+ strategicObjectiveDisplayCode: "ENV-OEST",
+ generalObjectives: proposalBlocks.map((block, blockIndex) => ({code: block.code, displayCode: `ENV-OG${blockIndex + 1}`, thematicBlockName: block.name, title: plainProposalText(block.text),
  specificObjectives: block.objectives.map((code, objectiveIndex) => {
  const original = HEALTHY_AGING_MODULE.generalObjectives.flatMap(g => g.specificObjectives).find(o => o.code === code);
  if (!original) throw new Error(`Objetivo original ausente: ${code}`);
- return {...original, displayCode: `OE${blockIndex + 1}.${objectiveIndex + 1} (${code})`, title: plainProposalText(proposalObjectiveTexts[code])};
+ return {...original, displayCode: `ENV-OE${blockIndex + 1}.${objectiveIndex + 1}`, title: plainProposalText(proposalObjectiveTexts[code]),
+   indicator: {...original.indicator, displayCode: `ENV-I${blockIndex + 1}.${objectiveIndex + 1}`}};
  })}))
 };
 
@@ -104,12 +106,16 @@ export function createZaidinFinalActionPlanDraft(
 }
 
 export interface PlanPreparationDecision {
+ /** Decision hidden by an inherited exclusion; restored only by explicit inclusion. */
+ excludedDecision?: { status: "pending" | "included" | "modified"; text?: string; sourceText: string };
  status: "pending" | "included" | "excluded" | "modified";
  /** Territorial text persisted as current wording for this municipality workspace. */
  text?: string;
  sourceText: string;
 }
 export interface PlanPreparationDraft {
+ /** Complete pre-migration draft, persisted atomically with the replacement. */
+ migration?: { replacedAt: string; replacementVersion: string; draft: PlanPreparationDraft };
  municipalityId: string;
  moduleId: string;
  version: string;
@@ -193,6 +199,20 @@ export function consolidatedTextFor(sourceText: string, proposal: PlanPreparatio
  if (review.status === "reformulated" && review.consolidatedText?.trim()) return cleanActionPlanProposalText(review.consolidatedText.trim());
  return cleanActionPlanProposalText(sourceText);
 }
+export function planDecisionWithStatus(previous: PlanPreparationDecision | undefined, sourceText: string, status: PlanPreparationDecision["status"], textOverride?: string): PlanPreparationDecision {
+ const restored = status === "included" ? previous?.excludedDecision : undefined;
+ const effectiveStatus = restored?.status === "modified" ? "modified" : status;
+ const text = textOverride ?? restored?.text ?? previous?.text;
+ return {
+  status: effectiveStatus,
+  sourceText,
+  ...(text !== undefined ? {text: cleanObsoleteActionPlanProgramLabels(text)} : {}),
+  ...(status === "excluded" ? {excludedDecision: previous?.excludedDecision ?? (previous && previous.status !== "excluded"
+    ? {status: previous.status, sourceText: previous.sourceText, ...(previous.text !== undefined ? {text: previous.text} : {})}
+    : {status: "pending", sourceText})} : {}),
+ };
+}
+
 export function excludedByAncestor(draft: PlanPreparationDraft | undefined, ancestors: string[]): boolean {
  return ancestors.some(id => draft?.decisions[id]?.status === "excluded");
 }

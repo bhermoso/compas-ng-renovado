@@ -231,6 +231,7 @@ export function DefinitiveActionPlanPreview({municipalityId, modules, drafts, wo
   const active = useMemo(() => buildDefinitiveActionPlanProjection(municipalityId, modules, drafts), [municipalityId, modules, drafts]);
   const traceability = useMemo(() => buildActionPlanTraceability(municipalityId, active, worksheets), [municipalityId, active, worksheets]);
 
+  const incompatibleDrafts = drafts?.filter(draft => draft.municipalityId === municipalityId && modules.some(module => module.id === draft.moduleId && module.version !== draft.version)) ?? [];
   const pending = active.reduce((total, item) => total + pendingPreparationDecisionCount(item.module, item.draft), 0);
   const selectedObjectives = active.reduce((total, item) => total + item.rows.length, 0);
   const selectedIndicators = active.reduce((total, item) => total + item.rows.filter(row => row.indicatorIncluded).length, 0);
@@ -264,6 +265,7 @@ export function DefinitiveActionPlanPreview({municipalityId, modules, drafts, wo
   }
 
   return <section className="workspace-panel pcm-definitive-plan" aria-label={`Plan de Acción resultante · ${municipalityName}`}>
+    {incompatibleDrafts.length > 0 && <p role="alert">Hay borradores con una versión pendiente de compatibilidad. Se conservan y no se incorporan a esta proyección ni a su exportación.</p>}
     <PlanDocumentActions key={municipalityId} municipalityId={municipalityId} active={active} versions={validatedActionPlans} worksheets={worksheets} onValidate={onValidatePlan}/>
     {onDraftChange && active.some((item) => item.draft) && (
       <UnaddressedNeedsEditor active={active} onDraftChange={onDraftChange} />
@@ -316,7 +318,7 @@ export function DefinitiveActionPlanPreview({municipalityId, modules, drafts, wo
                         </div>
                         <div className="pcm-tree-node pcm-tree-node--indicator">
                           <span className="pcm-tree-node__label">Indicador de seguimiento</span>
-                          <p><strong>{link.indicatorCode}</strong> · {link.indicatorTitle}</p>
+                          <p><strong>{link.indicatorDisplayCode ?? link.indicatorCode}</strong> · {link.indicatorTitle}</p>
                         </div>
                         <div className={`pcm-tree-node pcm-tree-node--ficha pcm-tree-node--${link.indicatorFichaStatus}`}>
                           <span className="pcm-tree-node__label">Ficha del indicador</span>
@@ -365,7 +367,7 @@ export function DefinitiveActionPlanPreview({municipalityId, modules, drafts, wo
         </div>
         <div className="pcm-traceability-grid">
           {traceability.map((link) => <article key={link.indicatorWorksheetKey} className={`pcm-traceability-card pcm-traceability-card--${link.indicatorFichaStatus}`}>
-            <h4>{link.indicatorCode} · {link.indicatorTitle}</h4>
+            <h4>{link.indicatorDisplayCode ?? link.indicatorCode} · {link.indicatorTitle}</h4>
             <p className="pcm-source">{link.moduleTitle} · {link.thematicBlock} · {link.objectiveCode}</p>
             <p><strong>Objetivo:</strong> {link.objectiveTitle}</p>
             <p><strong>Ficha del indicador:</strong> {fichaStatusLabel(link.indicatorFichaStatus)}</p>
@@ -405,15 +407,16 @@ export function DefinitiveActionPlanPreview({municipalityId, modules, drafts, wo
               if (!group.length) return null;
               const generalText = resolvedPlanDecisionText(group[0].generalDecision, general.title);
               return <section key={general.code} className="pcm-plan-block">
-                <h4>Bloque temático · {thematicBlockNameFor(general.code) ?? general.code}</h4>
-                <p className="panel-note"><strong>Objetivo del bloque:</strong> {generalText}</p>
+                <h4>Bloque temático · {thematicBlockNameFor(general.code, module) ?? general.code}</h4>
+                {(!group[0].generalDecision || group[0].generalDecision.status === "pending") && <p className="panel-note">Bloque pendiente de revisión.</p>}
+                <p className="panel-note"><strong>Objetivo general · {general.displayCode ?? general.code}:</strong> {generalText}</p>
                 <ol className="pcm-generated-objectives">
                   {group.map(row => {
                     const objectiveText = resolvedPlanDecisionText(row.objectiveDecision, row.specific.title);
                     const indicatorText = resolvedPlanDecisionText(row.indicatorDecision, row.specific.indicator.title);
                     return <li key={`${row.specific.code}-${row.specific.indicator.code}`} className="pcm-specific">
                       <p><strong>Objetivo específico · {row.specific.displayCode ?? row.specific.code}</strong> · {objectiveText} {row.objectiveDecision?.status === "modified" && <span className="status-pill">Modificado</span>}</p>
-                      {row.indicatorIncluded ? <p className="pcm-preview-indicator"><strong>Indicador · {row.specific.indicator.code}</strong> · {indicatorText} {row.indicatorDecision?.status === "modified" && <span className="status-pill">Modificado</span>}</p> : <p className="panel-note">Indicador todavía no seleccionado para este objetivo.</p>}
+                      {row.indicatorIncluded ? <p className="pcm-preview-indicator"><strong>Indicador · {row.specific.indicator.displayCode ?? row.specific.indicator.code}</strong> · {indicatorText} {row.indicatorDecision?.status === "modified" && <span className="status-pill">Modificado</span>}</p> : <p className="panel-note">Indicador todavía no seleccionado para este objetivo.</p>}
                       {row.indicatorIncluded && (() => {
                         const link = traceability.find((item) => item.indicatorCode === row.specific.indicator.code);
                         return link ? <p className="panel-note pcm-preview-ficha">

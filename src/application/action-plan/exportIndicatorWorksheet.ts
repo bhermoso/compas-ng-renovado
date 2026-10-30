@@ -26,7 +26,7 @@ export function buildIndicatorWorksheetDocument(sheet: IndicatorWorksheet, revie
     text("COMPÁS NG · Borrador de trabajo para cumplimentar"),
     text(`Ámbito: ${context.municipalityId} · ${context.line}`),
     text(context.generalObjective), text(context.objective),
-    text(`${context.indicatorCode} · ${context.indicator}`),
+    text(`${context.indicatorDisplayCode ?? context.indicatorCode} · ${context.indicator}`),
     text(`Unidad: ${context.unit} · Fuente: ${context.source} · Versión ${context.moduleVersion}`),
     text(reviewNotice), text("Preparar esta ficha no constituye aprobación institucional ni evidencia diagnóstica."),
   ];
@@ -35,7 +35,7 @@ export function buildIndicatorWorksheetDocument(sheet: IndicatorWorksheet, revie
   const actions = actionId ? sheet.actions.filter((action) => action.id === actionId) : sheet.actions;
   for (const action of actions) {
     children.push(new Paragraph({ text: "Ficha de actuación o programa", heading: HeadingLevel.HEADING_1, pageBreakBefore: true }),
-      text(`Vínculo: ${context.indicatorCode} · Código de actuación: ${action.id}`), fields(actionFields, action.values));
+      text(`Vínculo: ${context.indicatorDisplayCode ?? context.indicatorCode} · Código de actuación: ${action.id}`), fields(actionFields, action.values));
     const activities = action.activities ?? [];
     children.push(heading("Actividades, hitos o productos verificables"));
     if (activities.length) {
@@ -62,7 +62,7 @@ export async function downloadIndicatorWorksheet(sheet: IndicatorWorksheet, revi
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
-  anchor.download = `Ficha-${sheet.context.municipalityId}-${sheet.context.indicatorCode}${actionId ? `-actuacion-${actionId}` : ""}.docx`;
+  anchor.download = `Ficha-${sheet.context.municipalityId}-${sheet.context.indicatorDisplayCode ?? sheet.context.indicatorCode}${actionId ? `-actuacion-${actionId}` : ""}.docx`;
   anchor.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

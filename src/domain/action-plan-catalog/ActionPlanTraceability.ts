@@ -40,8 +40,10 @@ export interface ActionPlanTraceabilityLink {
   thematicBlock: string;
   generalObjective: string;
   objectiveCode: string;
+  objectiveId?: string;
   objectiveTitle: string;
   indicatorCode: string;
+  indicatorDisplayCode?: string;
   indicatorTitle: string;
   indicatorRole: ActionPlanIndicatorRole;
   indicatorWorksheetKey: string;
@@ -120,7 +122,7 @@ export function buildActionPlanTraceability(
     rows
       .filter((row) => row.indicatorIncluded)
       .map((row) => {
-        const generalObjective = `${row.general.code} · ${resolvedPlanDecisionText(row.generalDecision, row.general.title)}`;
+        const generalObjective = `${row.general.displayCode ?? row.general.code} · ${resolvedPlanDecisionText(row.generalDecision, row.general.title)}`;
         const objectiveTitle = resolvedPlanDecisionText(row.objectiveDecision, row.specific.title);
         const indicatorTitle = resolvedPlanDecisionText(row.indicatorDecision, row.specific.indicator.title);
         const base = {
@@ -129,8 +131,10 @@ export function buildActionPlanTraceability(
           moduleVersion: module.version,
           generalObjective,
           objectiveCode: row.specific.displayCode ?? row.specific.code,
+          objectiveId: row.specific.code,
           objectiveTitle,
           indicatorCode: row.specific.indicator.code,
+          indicatorDisplayCode: row.specific.indicator.displayCode,
           indicatorTitle,
         };
         const key = worksheetKey({
@@ -154,7 +158,7 @@ export function buildActionPlanTraceability(
           ...base,
           strategicObjective: resolvedPlanDecisionText(moduleDecision, module.strategicObjective),
           thematicBlockCode: row.general.code,
-          thematicBlock: thematicBlockNameFor(row.general.code) ?? row.general.code,
+          thematicBlock: thematicBlockNameFor(row.general.code, module) ?? row.general.code,
           indicatorRole: "action-plan" as const,
           indicatorWorksheetKey: key,
           indicatorFichaStatus: !sheet ? "missing" : actionCards.length > 0 ? "linked-actions" : "draft",

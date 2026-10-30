@@ -57,6 +57,7 @@ function cleanedDecision(decision: PlanPreparationDecision | undefined): PlanPre
   if (!decision) return undefined;
   const text = decision.text !== undefined ? cleanActionPlanProposalText(decision.text) : undefined;
   return {
+    ...decision,
     status: decision.status,
     sourceText: cleanActionPlanProposalText(decision.sourceText),
     ...(text !== undefined ? { text } : {}),
@@ -94,8 +95,9 @@ export function buildDefinitiveActionPlanProjection(
   modules: ActionPlanCatalogModule[],
   drafts?: PlanPreparationDraft[]
 ): DefinitiveActionPlanModuleProjection[] {
-  return modules.map(module => {
+  return modules.flatMap(module => {
     const draft = cleanedDraft(drafts?.find(candidate => candidate.municipalityId === municipalityId && candidate.moduleId === module.id));
+    if (draft && draft.version !== module.version) return [];
     const rows = module.generalObjectives.flatMap(general => {
       if (excluded(draft, [module.id, general.code])) return [];
       return general.specificObjectives.flatMap(specific => {
@@ -115,9 +117,9 @@ export function buildDefinitiveActionPlanProjection(
         }];
       });
     }).sort((left, right) =>
-      compareActionPlanNotation(left.specific.code, right.specific.code) ||
-      compareActionPlanNotation(left.specific.indicator.code, right.specific.indicator.code)
+      module.generalObjectives.indexOf(left.general) - module.generalObjectives.indexOf(right.general) ||
+      compareActionPlanNotation(left.specific.displayCode ?? left.specific.code, right.specific.displayCode ?? right.specific.code)
     );
-    return { module, draft, moduleDecision: cleanedDecision(draft?.decisions[module.id]), rows };
+    return [{ module, draft, moduleDecision: cleanedDecision(draft?.decisions[module.id]), rows }];
   }).filter(({ module, draft }) => moduleIsActive(module, draft));
 }

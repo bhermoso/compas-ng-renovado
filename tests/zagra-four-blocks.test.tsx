@@ -15,7 +15,7 @@ const referenceCodes = HEALTHY_AGING_MODULE.generalObjectives.flatMap(g => g.spe
 describe("Plan de Acción de Zagra en cuatro bloques", () => {
   it("adapta el territorio y mantiene los 18 objetivos e indicadores y el reparto vigente", () => {
     const module = municipalActionPlanModule("zagra", HEALTHY_AGING_MODULE);
-    expect(module.generalObjectives.map(g => thematicBlockNameFor(g.code))).toEqual(["Edadismo", "Soledad no deseada", "Autonomía", "Participación"]);
+    expect(module.generalObjectives.map(g => thematicBlockNameFor(g.code, module))).toEqual(["Edadismo", "Soledad no deseada", "Autonomía", "Participación"]);
     expect(module.generalObjectives.flatMap(g => g.specificObjectives.map(s => [s.code, s.indicator.code].join("/"))).sort()).toEqual(referenceCodes);
     expect(module.generalObjectives.map(g => g.specificObjectives.length)).toEqual([2, 7, 4, 5]);
     expect(module.generalObjectives[2].specificObjectives.map(s => s.code)).toContain("ENV-OE9.1");
@@ -23,7 +23,8 @@ describe("Plan de Acción de Zagra en cuatro bloques", () => {
     expect(module.strategicObjective).toContain("de Zagra");
     expect(JSON.stringify([module.strategicObjective, module.generalObjectives])).not.toMatch(/Zaidín|del distrito|MANY AGES|SENIOR FEST/);
     for (const original of HEALTHY_AGING_MODULE.generalObjectives.flatMap(g => g.specificObjectives)) {
-      expect(module.generalObjectives.flatMap(g => g.specificObjectives).find(s => s.code === original.code)?.indicator).toEqual(original.indicator);
+      const actual = module.generalObjectives.flatMap(g => g.specificObjectives).find(s => s.code === original.code)!.indicator;
+      expect({...actual, displayCode: undefined}).toEqual({...original.indicator, displayCode: undefined});
     }
   });
 
