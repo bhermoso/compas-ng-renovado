@@ -101,7 +101,7 @@ export function LocalHealthPlanOutline({
       <section className="pie-doc-section">
         <h3>2. Diagnóstico territorial</h3>
         <p><strong>Estado:</strong> {PSL_STATUS_LABEL[pslStatus] ?? pslStatus}.</p>
-        <p><strong>Perfil compilado:</strong> {pslCompiled ? "Disponible como PSL-C." : "Pendiente de compilación como PSL-C."}</p>
+        <p><strong>Perfil incorporado:</strong> {pslCompiled ? "Documento de referencia disponible." : "Pendiente de incorporar el documento de referencia."}</p>
         <p><strong>Informe de Salud de referencia:</strong> {healthReportTitle ?? "No registrado."}</p>
         <p className="panel-note">
           El Perfil de Salud Local constituye la base diagnóstica de este esbozo; el Informe
