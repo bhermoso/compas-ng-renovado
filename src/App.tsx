@@ -3437,8 +3437,8 @@ export default function App() {
                     <span className="home-process__ordinal">02</span>
                     <span className="home-process__verb">Perfilar</span>
                     <p className="home-process__desc">
-                      Perfil de Salud Local: síntesis interpretativa validada técnicamente
-                      por el equipo.
+                      Perfil de Salud Local elaborado fuera de COMPÁS, incorporado
+                      y revisado por el equipo.
                     </p>
                   </div>
                   <div className="home-process__phase home-process__phase--3">
@@ -3496,11 +3496,21 @@ export default function App() {
 
                 {/* Zona 1: Fuentes — entran en COMPÁS, no las genera */}
                 <div className="home-sources">
-                  <p className="home-section-eyebrow">Fuentes para el diagnóstico</p>
+                  <p className="home-section-eyebrow">Documentos que se incorporan a COMPÁS</p>
                   <p className="home-sources__note">
-                    Documentos elaborados fuera de COMPÁS e incorporados al proceso diagnóstico.
+                    Informes, estudios y perfiles elaborados fuera de COMPÁS que sirven de referencia para la planificación.
                   </p>
                   <div className="home-sources__list">
+                    <div className="home-source">
+                      <p className="home-source__name">Perfil de Salud Local</p>
+                      <p className="home-source__desc">
+                        Documento elaborado fuera de COMPÁS. Se incorpora con sus resultados,
+                        se consulta, se descarga y se revisa conservando sus versiones en Firebase.
+                      </p>
+                      <button type="button" className="home-process__open" onClick={() => setView("psl")}>
+                        Abrir el Perfil de Salud Local
+                      </button>
+                    </div>
                     <div className="home-source">
                       <p className="home-source__name">Informe de Salud</p>
                       <p className="home-source__desc">
@@ -3518,23 +3528,16 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Conector — COMPÁS transforma las fuentes */}
+                {/* Conector — organización de documentos y apoyo a la planificación */}
                 <div className="home-transform">
                   <span className="home-transform__arrow">↓</span>
-                  <span className="home-transform__label">COMPÁS analiza y transforma</span>
+                  <span className="home-transform__label">COMPÁS organiza y apoya la planificación</span>
                 </div>
 
                 {/* Zona 2: Salidas — documentos que genera COMPÁS */}
                 <div className="home-outputs">
-                  <p className="home-section-eyebrow">Documentos que produce COMPÁS</p>
+                  <p className="home-section-eyebrow">Documentos de planificación y evaluación</p>
                   <div className="home-products__list">
-                    <div className="home-product home-product--1">
-                      <p className="home-product__name">Perfil de Salud Local</p>
-                      <p className="home-product__desc">
-                        Síntesis interpretativa del diagnóstico territorial validada
-                        técnicamente. Documento base para la planificación.
-                      </p>
-                    </div>
                     <div className="home-product home-product--3">
                       <p className="home-product__name">Plan de Acción Local en Salud</p>
                       <p className="home-product__desc">
