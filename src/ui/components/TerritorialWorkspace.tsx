@@ -1,3 +1,4 @@
+import {actionPlanElementCode} from '../../domain/action-plan-catalog/ActionPlanNotation';
 import {useEffect,useState} from 'react';
 import {readRelasDraft,readRelasReview,saveRelasDraft,saveRelasReview,type RelasClient} from '../../infrastructure/relas/RelasClient';
 import {type PlanPreparationDraft,type PlanPreparationReview,type PlanPreparationReviewStatus} from '../../domain/action-plan-catalog/PlanPreparationDraft';
@@ -81,7 +82,8 @@ export default function TerritorialWorkspace({client,scope,role,onBack}:{client:
 
  useEffect(()=>{const warn=(e:BeforeUnloadEvent)=>{if(dirty||reviewDirty){e.preventDefault();e.returnValue='';}};window.addEventListener('beforeunload',warn);return()=>window.removeEventListener('beforeunload',warn);},[dirty,reviewDirty]);
  const hasUnsaved=dirty||reviewDirty;
- const territorialProposals=Object.entries(draft?.decisions??{}).filter(([,decision])=>decision.status==='modified'&&Boolean(decision.text?.trim()));
+ const elementIds=new Set([module.id,...module.generalObjectives.flatMap(general=>[general.code,...general.specificObjectives.flatMap(specific=>[specific.code,specific.indicator.code])])]);
+ const territorialProposals=Object.entries(draft?.decisions??{}).filter(([id,decision])=>elementIds.has(id)&&decision.status==='modified'&&Boolean(decision.text?.trim()));
  const pendingProposals=territorialProposals.filter(([id])=>!effectiveReviewIsCurrent||!review?.decisions[id]);
  const reviewedProposals=territorialProposals.length-pendingProposals.length;
 
@@ -124,7 +126,7 @@ export default function TerritorialWorkspace({client,scope,role,onBack}:{client:
     const proposed=decision.text?.trim()||source;
     const currentReview=effectiveReviewIsCurrent?review?.decisions[id]:undefined;
     return <article key={id} className="pcm-admin-review">
-     <h4>{id}</h4>
+     <h4>{actionPlanElementCode(module,id)}</h4>
      <p><strong>Texto vigente:</strong> {source}</p>
      <p><strong>Propuesta territorial:</strong> {proposed}</p>
      <div className="backup-panel__actions">

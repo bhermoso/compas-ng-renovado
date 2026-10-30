@@ -134,14 +134,14 @@ export function LocalHealthPlanOutline({
               const generalDecision = group[0].generalDecision;
               return (
                 <div key={general.code} className="pcm-specific">
-                  <p><strong>Bloque temático · {thematicBlockNameFor(general.code, module) ?? general.code}</strong> · {resolvedPlanDecisionText(generalDecision, general.title)}</p>
+                  <p><strong>Bloque temático · {thematicBlockNameFor(general.code, module) ?? general.code}</strong> · Objetivo general · {general.displayCode ?? general.code} · {resolvedPlanDecisionText(generalDecision, general.title)}</p>
                   {(!generalDecision || generalDecision.status === "pending") && <p className="panel-note">Bloque pendiente de revisión.</p>}
                   <ul>
                     {group.map((row) => (
                       <li key={row.specific.code}>
                         <strong>Objetivo específico · {row.specific.displayCode ?? row.specific.code}</strong> · {resolvedPlanDecisionText(row.objectiveDecision, row.specific.title)}
                         {row.indicatorIncluded && (
-                          <> — <strong>{row.specific.indicator.code}</strong> · {resolvedPlanDecisionText(row.indicatorDecision, row.specific.indicator.title)}</>
+                          <> — <strong>{row.specific.indicator.displayCode ?? row.specific.indicator.code}</strong> · {resolvedPlanDecisionText(row.indicatorDecision, row.specific.indicator.title)}</>
                         )}
                       </li>
                     ))}

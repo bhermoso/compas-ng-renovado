@@ -7,6 +7,7 @@ export interface WorksheetContext {
   generalObjective: string;
   objective: string;
   indicatorCode: string;
+  indicatorDisplayCode?: string;
   indicator: string;
   unit: string;
   source: string;
@@ -118,6 +119,21 @@ export function worksheetKey(context: WorksheetContext): string {
   return `${context.municipalityId}/${context.moduleId}/${context.indicatorCode}`;
 }
 
+const referenceText = (value: string) => value.includes(" · ") ? value.slice(value.indexOf(" · ") + 3) : value;
+
 export function worksheetContextChanged(sheet: IndicatorWorksheet, context: WorksheetContext): boolean {
-  return Object.keys(context).some((key) => sheet.context[key as keyof WorksheetContext] !== context[key as keyof WorksheetContext]);
+  return (Object.keys(context) as (keyof WorksheetContext)[]).some(key => {
+    if (key === "indicatorDisplayCode") return false;
+    if (key === "generalObjective" || key === "objective") return referenceText(sheet.context[key]) !== referenceText(context[key]);
+    return sheet.context[key] !== context[key];
+  });
+}
+
+/** Notation-only projection; historical wording and reference versions remain intact. */
+export function worksheetNotationContext(saved: WorksheetContext, current: WorksheetContext): WorksheetContext {
+  if (worksheetKey(saved) !== worksheetKey(current) || saved.moduleVersion !== current.moduleVersion) return saved;
+  const label = (prior: string, next: string) => prior.includes(" · ") && next.includes(" · ")
+    ? next.slice(0, next.indexOf(" · ")) + " · " + referenceText(prior) : prior;
+  return {...saved, indicatorDisplayCode: current.indicatorDisplayCode,
+    generalObjective: label(saved.generalObjective, current.generalObjective), objective: label(saved.objective, current.objective)};
 }

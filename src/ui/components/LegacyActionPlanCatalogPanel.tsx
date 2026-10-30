@@ -1,3 +1,4 @@
+import { actionPlanElementCode } from "../../domain/action-plan-catalog/ActionPlanNotation";
 import { PlanPreparationPanel } from "./PlanPreparationPanel";
 import { type PlanPreparationDraft } from "../../domain/action-plan-catalog/PlanPreparationDraft";
 import { municipalActionPlanModule } from "../../domain/action-plan-catalog/MunicipalActionPlanModule";
@@ -169,10 +170,10 @@ function ModuleReview({
             <div className="pcm-specifics">
               {general.specificObjectives.map((specific) => (
                 <section key={specific.code} className="pcm-specific">
-                  <h3><span>{specific.code}</span> {visibleText(specific.code, specific.title)}</h3>
+                  <h3><span>{actionPlanElementCode(eligible.module,specific.code)}</span> {visibleText(specific.code, specific.title)}</h3>
                   {decisionControl(specific.code, specific.title)}
                   <div className="pcm-indicator">
-                    <p><strong>{specific.indicator.code}</strong> {visibleText(specific.indicator.code, specific.indicator.title)}</p>
+                    <p><strong>{actionPlanElementCode(eligible.module,specific.indicator.code)}</strong> {visibleText(specific.indicator.code, specific.indicator.title)}</p>
                     <dl>
                       <div><dt>Fuente propuesta</dt><dd>{specific.indicator.suggestedSource}</dd></div>
                       <div><dt>Unidad</dt><dd>{specific.indicator.unit}</dd></div>
@@ -244,8 +245,8 @@ function AvailableModule({ module, renderWorksheet }: { module: ActionPlanCatalo
             <div className="pcm-specifics pcm-specifics--preview">
               {general.specificObjectives.map((specific) => (
                 <section key={specific.code} className="pcm-specific">
-                  <h3><span>{specific.code}</span> {specific.title}</h3>
-                  <p className="pcm-preview-indicator"><strong>{specific.indicator.code}</strong> {specific.indicator.title}</p>
+                  <h3><span>{actionPlanElementCode(module,specific.code)}</span> {specific.title}</h3>
+                  <p className="pcm-preview-indicator"><strong>{actionPlanElementCode(module,specific.indicator.code)}</strong> {specific.indicator.title}</p>
                   <details className="pcm-sheet">
                     <summary>Ver ficha técnica propuesta</summary>
                     <dl>
@@ -294,12 +295,12 @@ export function LegacyActionPlanCatalogPanel(props: LegacyActionPlanCatalogPanel
       : "Propuesta pendiente de revisión vigente del Grupo Motor. Puedes preparar la recogida de datos sin incorporar el objetivo al Plan.";
     const context: WorksheetContext = {
       municipalityId: props.municipalityId, moduleId: module.id, moduleVersion: module.version,
-      line: title(module.id, module.title), generalObjective: `${general.code} · ${title(general.code, general.title)}`,
-      objective: `${specific.code} · ${title(specific.code, specific.title)}`,
-      indicatorCode: specific.indicator.code, indicator: title(specific.indicator.code, specific.indicator.title),
+      line: title(module.id, module.title), generalObjective: `${general.displayCode ?? general.code} · ${title(general.code, general.title)}`,
+      objective: `${specific.displayCode ?? specific.code} · ${title(specific.code, specific.title)}`,
+      indicatorCode: specific.indicator.code, indicatorDisplayCode: specific.indicator.displayCode, indicator: title(specific.indicator.code, specific.indicator.title),
       unit: specific.indicator.unit, source: module.sourceLabel,
     };
-    return <IndicatorWorksheetEditor key={worksheetKey(context)} context={context} reviewNotice={reviewNotice}
+    return <IndicatorWorksheetEditor key={worksheetKey(context)} context={context} module={module} reviewNotice={reviewNotice}
       sheet={props.worksheets.find((sheet) => worksheetKey(sheet.context) === worksheetKey(context))}
       onChange={props.onWorksheetChange} />;
   };

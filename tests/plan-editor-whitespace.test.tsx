@@ -1,3 +1,4 @@
+import { actionPlanElementCode } from "../src/domain/action-plan-catalog/ActionPlanNotation";
 import { isValidElement, type ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import { PlanPreparationPanel } from "../src/ui/components/PlanPreparationPanel";
@@ -19,12 +20,13 @@ describe("Plan editor preserves typed whitespace", () => {
  const objective = general.specificObjectives[0];
  for (const id of [module.id, general.code, objective.code, objective.indicator.code]) {
   it(`preserves spaces character by character, save and reopen: ${id}`, () => {
+   const visibleId = actionPlanElementCode(module,id);
    let draft: PlanPreparationDraft | undefined;
    const render = () => PlanPreparationPanel({ module, municipalityId: "granada-zaidin", draft, onChange: next => { draft = next; }, renderWorksheet: () => null });
-   find(render(), `Estado del Plan ${id}`)!.onChange!({target:{value:"modified"}});
+   find(render(), `Estado del Plan ${visibleId}`)!.onChange!({target:{value:"modified"}});
    const label = id.startsWith("ENV-B-")
-    ? `Redacción del objetivo general · ${id}`
-    : `Redacción vigente · ${id}`;
+    ? `Redacción del objetivo general · ${visibleId}`
+    : `Redacción vigente · ${visibleId}`;
    find(render(), label)!.onChange!({target:{value:""}});
    let typed = "";
    for (const char of "Mejorar  la salud\ny la participación (nota local) ") {
@@ -34,7 +36,7 @@ describe("Plan editor preserves typed whitespace", () => {
     expect(find(render(), label)!.value).toBe(typed);
     expect(draft!.decisions[id].text).toBe(typed);
    }
-   find(render(), `Guardar redacción vigente · ${id}`)!.onClick!();
+   find(render(), `Guardar redacción vigente · ${visibleId}`)!.onClick!();
    draft = JSON.parse(JSON.stringify(draft)) as PlanPreparationDraft;
    expect(find(render(), label)!.value).toBe(typed);
    expect(draft.decisions[id].text).toBe(typed);

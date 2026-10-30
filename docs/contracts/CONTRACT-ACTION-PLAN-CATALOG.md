@@ -153,3 +153,30 @@ actual. Los nombres de bloque pertenecen a la versión del módulo, no se deduce
 de códigos reutilizados. Las salidas comparten el orden editorial y señalan los
 bloques pendientes. Las descargas distinguen el borrador actual de la última
 versión validada, que se mantiene inmutable.
+
+### Notación visible de envejecimiento saludable — 2026-10-30
+
+En las estructuras de cuatro bloques de Zaidín y Zagra se aplica una jerarquía
+común: `ENV-OEST` (objetivo estratégico), `ENV-OGb` (objetivo general del bloque),
+`ENV-OEb.n` (objetivo específico) y `ENV-Ib.n` (su indicador).
+
+| Bloque | Objetivo general | Objetivos específicos | Indicadores |
+|---|---|---|---|
+| 1. Edadismo | ENV-OG1 | ENV-OE1.1 a ENV-OE1.2 | ENV-I1.1 a ENV-I1.2 |
+| 2. Soledad no deseada | ENV-OG2 | ENV-OE2.1 a ENV-OE2.7 | ENV-I2.1 a ENV-I2.7 |
+| 3. Autonomía | ENV-OG3 | ENV-OE3.1 a ENV-OE3.4 | ENV-I3.1 a ENV-I3.4 |
+| 4. Participación | ENV-OG4 | ENV-OE4.1 a ENV-OE4.5 | ENV-I4.1 a ENV-I4.5 |
+
+Son códigos de presentación, no claves de almacenamiento. Los identificadores
+originales de objetivos, indicadores y grupos territoriales conservan sus
+vínculos con decisiones, revisiones, fichas, instrumentos y actuaciones. No se
+sustituyen claves por etiquetas numéricas, pues una etiqueta nueva puede
+coincidir con un identificador antiguo de otro objetivo. La correspondencia se
+resuelve siempre dentro de la versión del módulo.
+
+Pantalla, controles accesibles, esbozo, instrumentos y exportaciones del borrador
+usan la misma notación. Las versiones documentales ya validadas mantienen sus
+códigos impresos. La visualización de una ficha guardada puede actualizar sus
+etiquetas dentro de la misma versión sin cambiar su texto, sus datos ni la
+referencia original; una versión distinta sigue marcada como referencia antigua.
+El catálogo original 3.1, Loja y otras líneas mantienen su numeración anterior.

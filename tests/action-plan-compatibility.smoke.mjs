@@ -58,6 +58,16 @@ try{
  assert.equal(archived.payload.decisions['ENV-OE1.1'].excludedDecision.text,'Adaptación municipal conservada');
  await page.getByRole('button',{name:'Recuperar versión del servidor'}).first().click();
  await page.getByText('Borrador recuperado.',{exact:true}).waitFor();assert.equal(await save.isEnabled(),false);
+ await page.locator('.pcm-line-fold > summary').click();
+ await page.locator('.pcm-general > summary').filter({hasText:'Autonomía'}).click();
+ await page.getByLabel('Estado del Plan ENV-OE3.1',{exact:true}).selectOption('included');
+ await save.click();await page.getByText('Propuesta territorial guardada. Pendiente de revisión administrativa.',{exact:true}).waitFor();
+ const edited=await page.evaluate(()=>window.savedDraft);
+ assert.equal(edited.payload.decisions['ENV-OE1.1'].status,'modified');
+ assert.equal(edited.payload.decisions['ENV-OE1.1'].text,'Adaptación municipal conservada');
+ assert.equal(edited.payload.decisions['ENV-OE3.1'],undefined);
+ assert.equal(await page.getByText('Indicador y ficha · ENV-I3.1',{exact:true}).count(),1);
+
  for(const role of ['reader','administrator']){
   await page.goto(url+'?role='+role);
   await page.getByText('Borrador reagrupado con el original archivado.',{exact:false}).waitFor();
@@ -80,5 +90,5 @@ try{
   }
  }
  assert.deepEqual(errors,[]);
- console.log('PASS: migration, save/reload, reader/admin permissions, unknown version, and four real downloads.');
+ console.log('PASS: migration, save/reload, reader/admin permissions, unknown version, hierarchical labels preserving original identifiers, and four real downloads.');
 }catch(error){console.error(await page?.locator('body').innerText());throw error;}finally{await browser?.close();await server.close();}
