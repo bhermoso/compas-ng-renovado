@@ -5,6 +5,8 @@ export type CatalogDecisionStatus = "pending" | "accepted" | "adapted" | "reject
 
 export interface CatalogIndicatorTemplate {
   code: string;
+  /** Visible notation; code remains the persistent identifier. */
+  displayCode?: string;
   title: string;
   unit: "%" | "Nº";
   suggestedSource: string;
@@ -30,6 +32,7 @@ export interface CatalogSpecificObjectiveTemplate {
 
 export interface CatalogGeneralObjectiveTemplate {
   code: string;
+  displayCode?: string;
   /** Editorial label scoped to this module version, never inferred from a reused code. */
   thematicBlockName?: string;
   title: string;
@@ -41,6 +44,7 @@ export interface ActionPlanCatalogModule {
   version: string;
   title: string;
   strategicObjective: string;
+  strategicObjectiveDisplayCode?: string;
   sourceLabel: string;
   sourceDate: string;
   generalObjectives: readonly CatalogGeneralObjectiveTemplate[];

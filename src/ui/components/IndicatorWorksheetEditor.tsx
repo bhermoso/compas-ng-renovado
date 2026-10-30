@@ -2,12 +2,15 @@ import { PlanningInstrumentCatalog } from "./PlanningInstrumentCatalog";
 import { useState } from "react";
 import {
   actionFields, activityFields, consolidationFields, createIndicatorWorksheet, indicatorFields,
-  returnFields, worksheetContextChanged,
+  returnFields, worksheetContextChanged, worksheetNotationContext,
   type IndicatorWorksheet, type WorksheetContext, type WorksheetValues,
 } from "../../domain/action-plan-catalog/IndicatorWorksheet";
 import { actionProposalsForIndicator } from "../../domain/action-plan-catalog/ActionWorksheetProposal";
 
+import type { ActionPlanCatalogModule } from "../../domain/action-plan-catalog/ActionPlanCatalog";
+
 interface Props {
+  module?: ActionPlanCatalogModule;
   context: WorksheetContext;
   sheet?: IndicatorWorksheet;
   reviewNotice: string;
@@ -27,12 +30,13 @@ function Fields({ fields, values, onChange }: {
   ))}</div>;
 }
 
-export function IndicatorWorksheetEditor({ context, sheet, reviewNotice, onChange }: Props) {
+export function IndicatorWorksheetEditor({ context, sheet, reviewNotice, onChange, module }: Props) {
   const [open, setOpen] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState("");
   const draft = sheet ?? createIndicatorWorksheet(context);
   const changed = worksheetContextChanged(draft, context);
+  const displayDraft = {...draft, context: worksheetNotationContext(draft.context, context)};
   const actionProposals = actionProposalsForIndicator(context.indicatorCode);
   function update(next: IndicatorWorksheet) {
     onChange({ ...next, updatedAt: new Date().toISOString() });
@@ -42,14 +46,14 @@ export function IndicatorWorksheetEditor({ context, sheet, reviewNotice, onChang
     setError("");
     try {
       const { downloadIndicatorWorksheet } = await import("../../application/action-plan/exportIndicatorWorksheet");
-      await downloadIndicatorWorksheet(draft, reviewNotice, changed, actionId);
+      await downloadIndicatorWorksheet(displayDraft, reviewNotice, changed, actionId);
     } catch {
       setError("No se pudo descargar el documento. Tus campos permanecen en el expediente; vuelve a intentarlo.");
     } finally { setExporting(false); }
   }
   return <details className="indicator-worksheet" open={open}
     onToggle={(event) => setOpen(event.currentTarget.open)}>
-    <summary>Gestionar actuaciones · {context.indicatorCode}{sheet ? " · En preparación" : ""}</summary>
+    <summary>Gestionar actuaciones · {context.indicatorDisplayCode ?? context.indicatorCode}{sheet ? " · En preparación" : ""}</summary>
     {open && <div className="indicator-worksheet__body">
       <p className="eyebrow">Herramienta de recogida y seguimiento · Borrador de trabajo</p>
       <h4>Marco de medición del indicador</h4>
@@ -59,9 +63,9 @@ export function IndicatorWorksheetEditor({ context, sheet, reviewNotice, onChang
         transcribe aquí las entregas que recibas.</p>
       {changed && <p role="alert" className="phase-blocked-notice">La redacción o versión de referencia ha cambiado.
         Este seguimiento conserva su referencia anterior: revisa su correspondencia antes de utilizar los datos.</p>}
-      <p><strong>Indicador al que aportarán datos las actuaciones:</strong> {draft.context.objective}<br />{draft.context.indicator}</p>
+      <p><strong>Indicador al que aportarán datos las actuaciones:</strong> {displayDraft.context.objective}<br />{displayDraft.context.indicatorDisplayCode ?? displayDraft.context.indicatorCode} · {displayDraft.context.indicator}</p>
       <p className="pcm-source">{draft.context.source} · Versión {draft.context.moduleVersion} · Unidad: {draft.context.unit}</p>
-      <PlanningInstrumentCatalog indicatorCode={context.indicatorCode} onSelect={(instrument,use) => {
+      <PlanningInstrumentCatalog notationModule={module} indicatorCode={context.indicatorCode} indicatorDisplayCode={context.indicatorDisplayCode} onSelect={(instrument,use) => {
         const note = `[OPCIÓN PENDIENTE DE REVISIÓN] ${instrument.name} · ${use}. Población: ${instrument.population}. ${instrument.limitation}${instrument.reference ? ` Fuente: ${instrument.reference}` : ''}`;
         if (!(draft.values.instrument ?? '').includes(note)) update({...draft, values:{...draft.values,instrument:[draft.values.instrument,note].filter(Boolean).join('\n\n')}});
       }} />

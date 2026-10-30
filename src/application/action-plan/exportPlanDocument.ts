@@ -39,7 +39,7 @@ export function planActionParagraphs(plan: PlanDocument): PlanParagraph[] {
   for (const link of plan.traceabilityLinks) {
    paragraphs.push({
     text: [
-     `${link.moduleTitle} → ${link.thematicBlock} → ${link.objectiveCode} → ${link.indicatorCode}`,
+     `${link.moduleTitle} → ${link.thematicBlock} → ${link.objectiveCode} → ${link.indicatorDisplayCode ?? link.indicatorCode}`,
      `Indicador del Plan de Acción: ${link.indicatorTitle}`,
      `Ficha del indicador: ${fichaStatusText(link.indicatorFichaStatus)}.`,
     ].join("\n"),
@@ -63,7 +63,7 @@ export function planActuationParagraphs(plan: PlanDocument, options: { heading?:
  for (const link of links) {
   paragraphs.push({
    text: [
-    `${link.objectiveCode} → ${link.indicatorCode}: ${link.indicatorTitle}`,
+    `${link.objectiveCode} → ${link.indicatorDisplayCode ?? link.indicatorCode}: ${link.indicatorTitle}`,
     `Ficha del indicador: ${fichaStatusText(link.indicatorFichaStatus)}. Actuaciones: ${link.actionCards.length}. Actividades: ${link.actionCards.reduce((total, action) => total + action.activities.length, 0)}. Entregas: ${link.actionCards.reduce((total, action) => total + action.deliveryCount, 0)}. Consolidaciones: ${link.consolidationCount}.`,
     link.pendingSummary.length ? `Pendiente: ${link.pendingSummary.join("; ")}` : "Sin campos obligatorios pendientes en las fichas registradas.",
    ].join("\n"),

@@ -23,7 +23,8 @@ describe("Plan de Acción de Zagra en cuatro bloques", () => {
     expect(module.strategicObjective).toContain("de Zagra");
     expect(JSON.stringify([module.strategicObjective, module.generalObjectives])).not.toMatch(/Zaidín|del distrito|MANY AGES|SENIOR FEST/);
     for (const original of HEALTHY_AGING_MODULE.generalObjectives.flatMap(g => g.specificObjectives)) {
-      expect(module.generalObjectives.flatMap(g => g.specificObjectives).find(s => s.code === original.code)?.indicator).toEqual(original.indicator);
+      const actual = module.generalObjectives.flatMap(g => g.specificObjectives).find(s => s.code === original.code)!.indicator;
+      expect({...actual, displayCode: undefined}).toEqual({...original.indicator, displayCode: undefined});
     }
   });
 

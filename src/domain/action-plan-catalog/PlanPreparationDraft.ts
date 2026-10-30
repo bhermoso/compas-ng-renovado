@@ -70,11 +70,13 @@ export const ZAIDIN_AGING_PROPOSAL: ActionPlanCatalogModule = {
  ...HEALTHY_AGING_MODULE, version: ZAIDIN_PROPOSAL_VERSION,
  sourceLabel: "Redacción final del Plan de Acción del Distrito Zaidín", sourceDate: "2026-09-25",
  strategicObjective: plainProposalText(proposalStrategicText),
- generalObjectives: proposalBlocks.map((block, blockIndex) => ({code: block.code, thematicBlockName: block.name, title: plainProposalText(block.text),
+ strategicObjectiveDisplayCode: "ENV-OEST",
+ generalObjectives: proposalBlocks.map((block, blockIndex) => ({code: block.code, displayCode: `ENV-OG${blockIndex + 1}`, thematicBlockName: block.name, title: plainProposalText(block.text),
  specificObjectives: block.objectives.map((code, objectiveIndex) => {
  const original = HEALTHY_AGING_MODULE.generalObjectives.flatMap(g => g.specificObjectives).find(o => o.code === code);
  if (!original) throw new Error(`Objetivo original ausente: ${code}`);
- return {...original, displayCode: `OE${blockIndex + 1}.${objectiveIndex + 1} (${code})`, title: plainProposalText(proposalObjectiveTexts[code])};
+ return {...original, displayCode: `ENV-OE${blockIndex + 1}.${objectiveIndex + 1}`, title: plainProposalText(proposalObjectiveTexts[code]),
+   indicator: {...original.indicator, displayCode: `ENV-I${blockIndex + 1}.${objectiveIndex + 1}`}};
  })}))
 };
 

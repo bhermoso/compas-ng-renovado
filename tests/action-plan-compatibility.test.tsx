@@ -67,7 +67,7 @@ describe('Compatibilidad territorial y conservación de decisiones',()=>{
  it('reincorporar un objetivo recupera su adaptación y conserva el original archivado',()=>{
   let draft=prepareMunicipalActionPlanDraft('zagra',module,legacy())!;
   const render=()=>PlanPreparationPanel({municipalityId:'zagra',module,draft,onChange:next=>{draft=next;},renderWorksheet:()=>null});
-  find(render(),'Estado del Plan ENV-OE1.1')!.onChange!({target:{value:'included'}});
+  find(render(),'Estado del Plan ENV-OE3.1')!.onChange!({target:{value:'included'}});
   expect(draft.decisions['ENV-OE1.1']).toMatchObject({status:'modified',text:'Redacción municipal propia'});
   expect(draft.migration?.draft).toEqual(legacy());
   draft=JSON.parse(JSON.stringify(draft));
@@ -143,7 +143,7 @@ describe('Compatibilidad territorial y conservación de decisiones',()=>{
   }};
   let next:PlanPreparationReview|undefined;
   const tree=PlanPreparationPanel({municipalityId:'zagra',module,draft:fullDraft(),onChange:()=>{},renderWorksheet:()=>null,canReview:true,canEditProposal:false,review,reviewIsCurrent:false,onReviewChange:r=>{next=r;}});
-  find(tree,'Revisión administrativa ENV-OE1.1')!.onChange!({target:{value:'reformulated'}});
+  find(tree,'Revisión administrativa ENV-OE3.1')!.onChange!({target:{value:'reformulated'}});
   expect(Object.keys(next!.decisions)).toEqual(['ENV-OE1.1']);
   expect(review.decisions['ENV-OE5.1'].status).toBe('accepted');
  });

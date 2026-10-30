@@ -26,11 +26,11 @@ function actionImplementationParagraphs(plan: NonNullable<ReturnType<typeof late
   `La versión validada del Plan de Acción incorpora ${actionCount} fichas de actuación vinculadas a indicadores y ${activityCount} actividades, hitos o productos verificables.`,
  ];
  for (const link of links.filter((item) => item.actionCards.length > 0)) {
-  paragraphs.push(`${link.objectiveCode} → ${link.indicatorCode}: ${link.actionCards.map((action) => action.name).join("; ")}.`);
+  paragraphs.push(`${link.objectiveCode} → ${link.indicatorDisplayCode ?? link.indicatorCode}: ${link.actionCards.map((action) => action.name).join("; ")}.`);
   const pending = link.pendingSummary.filter((item) => !item.includes("ficha de indicador pendiente"));
-  if (pending.length) paragraphs.push(`Pendiente de cierre en ${link.indicatorCode}: ${pending.join("; ")}.`);
+  if (pending.length) paragraphs.push(`Pendiente de cierre en ${link.indicatorDisplayCode ?? link.indicatorCode}: ${pending.join("; ")}.`);
  }
- const missing = links.filter((link) => link.actionCards.length === 0).map((link) => link.indicatorCode);
+ const missing = links.filter((link) => link.actionCards.length === 0).map((link) => link.indicatorDisplayCode ?? link.indicatorCode);
  if (missing.length) paragraphs.push(`Indicadores todavía sin ficha de actuación vinculada: ${missing.join(", ")}.`);
  paragraphs.push("Estas fichas documentan el estado de preparación; no sustituyen la aprobación institucional ni la agenda anual validada.");
  return paragraphs;
