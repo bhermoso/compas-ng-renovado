@@ -71,8 +71,8 @@ describe("Plan de Acción resultante", () => {
       [resultDraft]
     );
     expect(projection[0].rows.map(row => row.specific.code)).toEqual([
-      "ENV-OE1.2",
       "ENV-OE5.2",
+      "ENV-OE1.2",
       "ENV-OE7.1",
     ]);
 
@@ -87,8 +87,8 @@ describe("Plan de Acción resultante", () => {
     expect(html).toContain("Plan de Acción resultante · El Zaidín");
     expect(html).toContain("Generar Plan de Acción");
     expect(html).toContain("Selección preparada");
-    expect(projection[0].rows[1].objectiveDecision?.status).toBe("modified");
-    expect(projection[0].rows[1].objectiveDecision?.text).toBe(
+    expect(projection[0].rows[0].objectiveDecision?.status).toBe("modified");
+    expect(projection[0].rows[0].objectiveDecision?.text).toBe(
       "Incrementar la visibilidad de las personas mayores como personas capaces, diversas y socialmente activas en las iniciativas comunitarias del Zaidín."
     );
     expect(projection[0].rows.some(row => row.specific.code === "ENV-OE5.1")).toBe(false);
@@ -155,7 +155,7 @@ describe("Plan de Acción resultante", () => {
     const resultDraft: PlanPreparationDraft = {
       municipalityId: "granada-zaidin",
       moduleId: ZAIDIN_AGING_PROPOSAL.id,
-      version: "zaidin-4-bloques-2026-09-09-r2",
+      version: ZAIDIN_AGING_PROPOSAL.version,
       updatedAt: "2026-09-12",
       decisions: {
         [ZAIDIN_AGING_PROPOSAL.id]: {

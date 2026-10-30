@@ -69,12 +69,13 @@ export function LocalHealthPlanOutline({
     0
   );
 
+  const territorialName = municipalityId === "granada-zaidin" ? `Distrito ${municipalityName.replace(/^Granada-/, "")}` : municipalityName;
   return (
     <article className="workspace-panel psl-outline" aria-labelledby="pls-outline-title">
       <header className="pcm-module__header">
         <div>
           <p className="eyebrow">Esbozo de trabajo · Plan Local de Salud 2027–2030</p>
-          <h2 id="pls-outline-title">Plan Local de Salud del Distrito {municipalityName.replace(/^Granada-/, "")}</h2>
+          <h2 id="pls-outline-title">Plan Local de Salud {municipalityId === "granada-zaidin" ? "del" : "de"} {territorialName}</h2>
           <p className="panel-note">{municipalityName} · {province}</p>
         </div>
         <span className="status-pill" data-outline-status={LOCAL_HEALTH_PLAN_OUTLINE_STATUS}>Borrador evolutivo</span>
@@ -93,7 +94,7 @@ export function LocalHealthPlanOutline({
         <h3>1. Identidad y alcance</h3>
         <p>
           Documento de trabajo para ordenar el ciclo de planificación local en salud del
-          Distrito {municipalityName.replace(/^Granada-/, "")} durante 2027–2030.
+          {territorialName} durante 2027–2030.
         </p>
       </section>
 
@@ -133,7 +134,8 @@ export function LocalHealthPlanOutline({
               const generalDecision = group[0].generalDecision;
               return (
                 <div key={general.code} className="pcm-specific">
-                  <p><strong>Bloque temático · {thematicBlockNameFor(general.code) ?? general.code}</strong> · {resolvedPlanDecisionText(generalDecision, general.title)}</p>
+                  <p><strong>Bloque temático · {thematicBlockNameFor(general.code, module) ?? general.code}</strong> · {resolvedPlanDecisionText(generalDecision, general.title)}</p>
+                  {(!generalDecision || generalDecision.status === "pending") && <p className="panel-note">Bloque pendiente de revisión.</p>}
                   <ul>
                     {group.map((row) => (
                       <li key={row.specific.code}>

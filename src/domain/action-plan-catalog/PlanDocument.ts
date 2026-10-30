@@ -23,6 +23,7 @@ export interface PlanDocument {
  generatedAt: string;
  status: "draft" | "validated";
  validatedBy?: string;
+ moduleVersions?: {moduleId: string; version: string}[];
  unaddressedNeeds?: UnaddressedNeed[];
  evaluationFramework?: PLSEvaluationFramework;
  traceabilityLinks?: ActionPlanTraceabilityLink[];
@@ -49,6 +50,9 @@ export function buildPlanDocument(
  generatedAt: string,
  options: PlanDocumentOptions = {}
 ): PlanDocument {
+ if (active.some(({module, draft}) => draft && (draft.municipalityId !== municipalityId || draft.moduleId !== module.id || draft.version !== module.version))) {
+  throw new Error("La referencia del borrador ha cambiado. Revisa su compatibilidad antes de exportar.");
+ }
  const paragraphs: PlanDocument["paragraphs"] = [];
  for (const { module, moduleDecision, rows } of active) {
   if (!rows.length) continue;
@@ -62,10 +66,11 @@ export function buildPlanDocument(
    const group = groups.get(general.code);
    if (!group) continue;
    const first = group[0];
-   const blockName = thematicBlockNameFor(first.general.code) ?? first.general.code;
+   const blockName = thematicBlockNameFor(first.general.code, module) ?? first.general.code;
    paragraphs.push(
     {text:"Bloque temático · "+blockName,heading:true},
-    {text:"Objetivo del bloque: "+resolvedPlanDecisionText(first.generalDecision,first.general.title)}
+    {text:"Objetivo del bloque: "+resolvedPlanDecisionText(first.generalDecision,first.general.title)},
+    ...(!first.generalDecision || first.generalDecision.status === "pending" ? [{text:"Bloque pendiente de revisión."}] : [])
    );
    const orderedGroup = [...group].sort((left, right) =>
     compareActionPlanNotation(left.specific.displayCode ?? left.specific.code, right.specific.displayCode ?? right.specific.code)
@@ -85,6 +90,7 @@ export function buildPlanDocument(
   municipalityId,
   generatedAt,
   status: "draft",
+  moduleVersions: active.map(({module}) => ({moduleId: module.id, version: module.version})),
   ...(unaddressedNeeds !== undefined ? { unaddressedNeeds } : {}),
   ...(evaluationFramework !== undefined ? { evaluationFramework } : {}),
   ...(traceabilityLinks.length > 0 ? { traceabilityLinks } : {}),
