@@ -1,4 +1,5 @@
 import type { DocumentKind } from "../../domain/repository";
+import { identifyMethodologicalHeaders, type MethodologicalMatch } from "./identifyMethodologicalHeaders";
 
 export type InspectedFormat = "pdf" | "docx" | "doc" | "zip" | "csv" | "xlsx" | "xls" | "png" | "jpeg" | "unknown";
 export interface ArchiveEntry { path: string; size: number; compressedSize: number; encrypted: boolean; unsafe: boolean; format: InspectedFormat; suggestedKind?: DocumentKind | "undetermined" }
@@ -7,6 +8,7 @@ export interface PreliminaryAnalysis {
   proposedKind: DocumentKind | "undetermined";
   reasons: string[];
   warnings: string[];
+  methodologicalMatches?: MethodologicalMatch[];
   fingerprint?: string;
   archiveEntries?: ArchiveEntry[];
 }
@@ -94,6 +96,7 @@ export async function analyzeDocument(file: File): Promise<PreliminaryAnalysis> 
   if (expected !== "unknown" && format !== expected) warnings.push("La extensión no coincide con la firma detectada.");
   let proposedKind: DocumentKind | "undetermined" = "undetermined";
   let archiveEntries: ArchiveEntry[] | undefined;
+  let methodologicalMatches: MethodologicalMatch[] | undefined;
   if (format === "zip") {
     const result = inspectZip(buffer);
     archiveEntries=result.entries;
@@ -101,11 +104,13 @@ export async function analyzeDocument(file: File): Promise<PreliminaryAnalysis> 
     reasons.push("Inventario ZIP: solo listado del directorio; no se ha extraído ni abierto ningún fichero interno.");
   } else if (format === "csv") {
     const sample = new TextDecoder("utf-8").decode(bytes.slice(0,Math.min(bytes.length,16384)));
+    methodologicalMatches = identifyMethodologicalHeaders(sample.split(/\r?\n/,1)[0] ?? "");
+    if (methodologicalMatches.length) reasons.push("Coincidencias con esquemas metodológicos canónicos: requieren validación por parser y equipo técnico.");
     const suggestion = csvProposal(sample);
     proposedKind=suggestion.kind;
     if (suggestion.reason) reasons.push(suggestion.reason);
   }
   const digest=await crypto.subtle.digest("SHA-256",buffer);
   const fingerprint=Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,"0")).join("");
-  return { format,proposedKind,reasons,warnings,fingerprint,archiveEntries };
+  return { format,proposedKind,reasons,warnings,fingerprint,archiveEntries,methodologicalMatches };
 }
