@@ -167,3 +167,17 @@ Verificados directamente en `src/App.tsx` y `src/App.css` de `master`. **No equi
 - La sala de control puede ser más densa y esquemática que la home, pero debe conservar su identidad: tipografía, paleta, superficies, ritmo, marca, navegación.
 - Verificar estilos existentes de la home y `InstitutionalLogoBand` antes de decidir cabecera o logotipos, sin deducir reglas no inspeccionadas.
 - Mantener la búsqueda del contrato original abierta; ninguna inferencia del CSS debe presentarse como norma textual verificada de ese documento.
+
+
+## 11. Registro persistente de originales: contrato propuesto, escritura desactivada
+Implementación de dominio en `src/domain/repository/OriginalRecord.ts`; la capa de escritura remota **no está conectada**.
+
+- **Firestore (índice propuesto)**: `relas_scopes/{scope}/originals/{sha256}`, con `schema`, `municipalityId`, `sha256`, `storagePath`, `byteLength`, `fileName`, `contentType`, `createdBy` y fecha de creación establecida por servidor.
+- **Cloud Storage (original propuesto)**: `relas_scopes/{scope}/originals/{sha256}`, bytes sin transformar. La coincidencia de SHA-256 se verificará antes y después de subir; evitar colisiones y sobrescrituras.
+- **Vinculación propuesta**: registros anexos por `documentId/versionId` que referencian la huella y conservan el historial. La existencia de una huella no implica por sí sola validación territorial, vigencia ni aplicación metodológica.
+- **Duplicado exacto**: SHA-256 idéntico **en el mismo ámbito** y tamaño compatible, siempre contra un índice fiable. Si no hay índice, resultado `not-indexed`; nunca se deduce duplicación por nombre.
+- **Permisos**: lectura para miembros habilitados del ámbito y creación solo para coordinación/administración territorial. Prohibir actualización y borrado de originales e índices sin procedimiento de retención expresamente diseñado.
+- **Seguridad por implementar**: añadir reglas de Firestore y Storage, verificar consultas cruzadas de membresía, límites de tamaño/MIME y consistencia de metadatos con emuladores antes de habilitar cualquier escritura.
+- **Despliegue**: no añadir ni desplegar reglas de Storage sin confirmar que el bucket exista, su configuración y el comportamiento real del emulador.
+- **Compatibilidad**: no migrar automáticamente originales almacenados en IndexedDB ni borrar snapshots históricos; exportación/copia de seguridad se mantienen como vía de recuperación.
+- **Estado**: diseño y pruebas unitarias del contrato, sin cliente Firebase activo, sin migración, sin modificación de expedientes.
