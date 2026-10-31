@@ -1,9 +1,146 @@
 # Contrato de escritura del Perfil Local de Salud
 
-> Documento operativo, no académico. Gobierna cómo COMPÁS NG escribe el
-> Perfil. Versión inicial: 2026-07-09. Implementación testeable:
-> `src/application/health-profile/profileWritingContract.ts` y
+> Documento operativo, no académico. Gobierna cómo se escribe el Perfil,
+> lo redacte COMPÁS NG, una persona o un asistente fuera de la aplicación.
+> Versión inicial: 2026-07-09. Versión 2: 2026-10-25 (§0, lector y voz;
+> §1 y §4 alineados con el contrato metodológico v2.1.0); §0.2, §0.4 y §0.5
+> revisados el 2026-10-26 (estructura en siete apartados y citas). Implementación
+> testeable: `src/application/health-profile/profileWritingContract.ts` y
 > `tests/profile-writing-contract.test.ts`.
+
+## 0. Para quién se escribe y cómo suena
+
+Decisión del autor (2026-10-25). Esta sección prevalece sobre cualquier hábito
+de redacción y se aplica cada vez que se genere un Perfil, dentro o fuera de
+COMPÁS, para que el resultado no dependa de recordarlo en cada conversación.
+
+### 0.1 El lector
+
+El Perfil lo recibe una persona que tiene que entender su municipio y decidir:
+una técnica municipal, un concejal o una alcaldesa, una enfermera o un médico
+del centro de salud, una persona del Grupo Motor. No es un evaluador del método
+ni un revisor del sistema. Lee para saber cómo está la salud de su pueblo, por
+qué, con qué cuenta y qué conviene hacer a continuación.
+
+**Prueba del lector.** Antes de entregar cualquier apartado, se relee como lo
+leería esa persona. Si una frase le habla del documento, de sus fuentes o de
+sus reglas en vez de hablarle del municipio, se reescribe o va al anexo.
+
+### 0.2 La voz
+
+- El sujeto del texto es el municipio y su gente, no el Perfil. «Loja tiene…»,
+  «En la Alfaguara…», «Las mujeres de Loja…»; nunca «Este Perfil describe…»,
+  «En este apartado se recoge…», «Lo que no consta se declara aquí…».
+- Prosa de diagnóstico, con datos dentro de la frase. Cada dato lleva su
+  cita al lado, numerada en estilo Vancouver con la tabla o el apartado de la
+  fuente: «20.923 habitantes [1]», «el 58,8 % [4, tabla 31030]». Datos de
+  fuentes distintas no comparten cita. Tablas solo donde el lector compara
+  cifras.
+- Se escribe desde el lugar: el territorio, los barrios, los anejos, la
+  economía real, la historia que explica el presente. Los determinantes
+  sociales de la salud forman parte de ese discurso diagnóstico integral; no
+  se exponen como teoría ni ocupan un capítulo aparte.
+- Lo que no se sabe se dice donde importa, como un hecho sobre el
+  conocimiento del municipio y en una frase: «No hay datos de suicidio en Loja
+  posteriores a 2010». No se anuncian listas de ausencias ni se declara qué
+  entra o no entra en el documento.
+- Modelo de referencia: «Loja: lo que sabemos de los determinantes de su
+  salud» (borrador del 25-10-2026). Contramodelo: los borradores que se
+  explican a sí mismos.
+
+### 0.3 Qué no va en el cuerpo
+
+Como regla general, se reserva para anexos de notas metodológicas o metadatos
+de trazabilidad, sin impedir los campos explícitos de las conclusiones, la tabla
+de lagunas, las discrepancias entre fuentes ni el apartado de autoría y
+validación exigidos por la estructura aprobada:
+
+1. La explicación de qué es el documento, qué incluye, qué deja fuera y por
+   qué (salvo un párrafo de presentación, sin reglas).
+2. Las etiquetas de tipo de afirmación («hecho», «interpretación»,
+   «hipótesis»), los grados de sustento y los rótulos de ciclo como
+   encabezados de frase. El contrato metodológico exige clasificar cada
+   afirmación (Art. 8): esa clasificación vive en la capa de trazabilidad y en
+   el bloque de conclusiones, y se nota en la prosa por cómo se dice («los
+   datos muestran», «probablemente», «no se sabe»), no por etiquetas.
+3. Las definiciones operativas (recurso y activo, local y no local) y la
+   tabla completa de fuentes.
+4. Las incoherencias de las fuentes, que van a una nota técnica dirigida a
+   quien elaboró cada fuente.
+
+### 0.4 Estructura del Perfil RELAS y adaptación territorial (Loja, 2026-10-26)
+
+Para el caso de Loja, el Art. 16 quater del contrato metodológico organiza el
+cuerpo en siete apartados, con la conclusión como unidad y la evidencia completa
+en anexos. El Resumen precede al cuerpo y no se numera. La organización de los apartados previos puede adaptarse al territorio, pero
+todo Perfil Local de Salud RELAS debe cerrar su desarrollo diagnóstico con
+**conclusiones y recomendaciones explícitas**. Las recomendaciones son parte
+del Perfil, no un contenido indebido ni una opción que pueda omitirse por una
+regla heredada. La autoría, validación y material administrativo se ubican
+después de ese cierre diagnóstico, en los metadatos o anexos pertinentes. Esta
+estructura no ordena reestructurar automáticamente perfiles históricos. Su aplicación requiere comprobar el contrato
+metodológico vigente, la fase del expediente y la estructura aprobada para cada
+municipio; no debe suprimir ni alterar evidencia, textos validados o decisiones
+territoriales previas.
+
+**Cuerpo.**
+
+1. **Punto de partida.** El municipio en un párrafo, el proceso local (ciclo
+   actual y ciclos anteriores) y de dónde procede lo que se sabe. Las
+   preguntas que recorren la lectura y los vacíos principales, en una frase
+   cada uno.
+2. **Conclusiones.** Cada una con su enunciado y una lectura breve, seguida
+   de campos fijos: tipo, evidencia (hasta tres, con cifra y cita), relación
+   y su grado, límite y recomendaciones a las que lleva. Es el único lugar
+   del cuerpo con etiquetas de tipo de afirmación (§0.3).
+3. **Coincidencias y discrepancias entre fuentes.** Dónde convergen
+   registros, estadísticas y consultas, y dónde se separan.
+4. **Lo que no sabemos.** Tabla: pregunta sin respuesta con datos,
+   conclusión a la que afecta y dónde puede obtenerse la respuesta.
+5. **Recomendaciones.** Menú numerado (Conocer, Contrastar, Abordar), cada
+   una con la conclusión de la que deriva, para que el equipo técnico elija,
+   corrija o descarte (Art. 8 quater). «Abordar» solo con relación de grado 1
+   o 2.
+6. **Paso al Plan de Acción.** Breve transición que no incorpora actuaciones ni sustituye la decisión del Grupo Motor.
+7. **Autoría y validación.** Registro administrativo posterior al cierre de conclusiones y recomendaciones, que podrá trasladarse a metadatos o anexos para preservar ese cierre.
+
+**Anexos.**
+
+- Evidencia por dimensión: el municipio y su gente; situación de salud;
+  desigualdades; activos y recursos; voz de la comunidad.
+- El proceso local: ciclos, hitos y lo que dejó cada uno.
+- Cómo ha cambiado el municipio: cifras de ciclos distintos, una junto a
+  otra solo cuando se midieron de la misma manera.
+- Tablas de apoyo (por ejemplo, renta por sección censal), referencias,
+  notas metodológicas y nota técnica para quienes elaboraron las fuentes.
+
+**Decisiones que se mantienen.**
+
+- **Estilos de vida.** Sin apartado propio. Las cifras autonómicas o
+  provinciales sin dato local (Encuesta Andaluza de Salud) son contexto,
+  rotulado «no local», dentro del anexo de situación de salud. Se dice una
+  vez, en su sitio, que no hay datos locales y que solo los habrá si se
+  producen como estudios complementarios con el Gestor de Encuestas de
+  COMPÁS.
+- **Interpretación.** No hay lectura integrada en hilos ni párrafos de
+  «lectura» al final de cada anexo: la interpretación vive en las
+  conclusiones y en el apartado 3.
+- **Antecedentes.** Los ciclos anteriores se cuentan en el anexo del proceso
+  local y sirven de término de comparación, no de descripción del presente.
+
+### 0.5 Comprobación antes de entregar
+
+Un Perfil, o un apartado, no se entrega si:
+
+- la prosa diagnóstica se centra reiteradamente en el propio documento o su método, salvo los apartados de presentación, procedencia, validación y transición de fase;
+- aparecen etiquetas de tipo de afirmación fuera del bloque de conclusiones;
+- se acumulan listas de ausencias sin relación diagnóstica, salvo la tabla explícita de preguntas pendientes prevista en la estructura aprobada;
+- una cifra no lleva año y cita propia al lado, o se presenta una cifra
+  estimada o aproximada como dato;
+- un dato no local ocupa el lugar de uno local;
+- se usa lenguaje estigmatizante sobre barrios o colectivos, aunque proceda
+  literalmente de una fuente;
+- no supera la prueba del lector (§0.1).
 
 ## 1. Propósito del Perfil Local de Salud
 
@@ -12,7 +149,9 @@ dado; el Plan de Acción pertenece a una fase posterior. Lo que aporta COMPÁS
 es convertir estudios complementarios, documentación territorial, BADEA/IECA,
 activos comunitarios, material cualitativo y el contraste del Grupo Motor en
 una **lectura territorial con sentido**: informar, interesar, suscitar
-preguntas y preparar la deliberación — sin recomendar todavía.
+preguntas y preparar la deliberación. Desde el contrato metodológico v1.4
+(2026-10-21) el Perfil concluye y recomienda qué conocer, qué contrastar y
+qué abordar (Art. 8 quater), en el cuerpo, tras las conclusiones; no decide.
 
 ## 2. Escribir con perspectiva de sociología de la salud
 
@@ -25,7 +164,7 @@ señal de salud
 → desigualdad observable o no observable
 → activo/capacidad relacionada
 → pregunta para contraste comunitario
-→ conclusión diagnóstica sin recomendación
+→ conclusión diagnóstica → recomendaciones elegibles separadas, cuando procedan
 ```
 
 Operativamente:
@@ -95,8 +234,8 @@ salud socialmente contextualizada.
    los desafíos.
 8. BADEA/IECA es contexto municipal (proxy para ámbitos inframunicipales):
    sitúa el contexto urbano, no resuelve desigualdades internas.
-9. El cierre invita a deliberar y prepara la acción futura sin anticiparla.
-10. Tono: institucional con calor humano; prosa, no listado.
+9. El cierre invita a deliberar; las recomendaciones explícitas del cierre diagnóstico no sustituyen las decisiones del Plan de Acción.
+10. Tono: institucional y claro; prosa diagnóstica, con tablas y campos estructurados cuando sean necesarios.
 
 ### 3 bis. Contrato autorial transversal
 
@@ -108,13 +247,17 @@ prescindibles, oposiciones fabricadas, grandilocuencia y estructuras de
 plantilla.
 
 Esta aplicación queda subordinada a las fronteras metodológicas del Perfil: la
-voz analítica no autoriza recomendaciones, causalidad falsa, experiencia
-comunitaria inventada ni sustitución de evidencia local por contexto externo.
+voz analítica no autoriza prescripciones operativas fuera del menú elegible,
+causalidad falsa, experiencia comunitaria inventada ni sustitución de evidencia
+local por contexto externo.
 Las redacciones finales aportadas o aprobadas por el equipo se conservan.
 
 ## 4. Fronteras (inviolables)
 
-- **No recomendaciones**, actuaciones, programas ni objetivos estratégicos.
+- **No actuaciones**, programas, objetivos estratégicos ni prioridades. Las
+  recomendaciones del Perfil (Conocer, Contrastar, Abordar) solo en el menú
+  elegible de su apartado aprobado, vinculadas a conclusiones y sin responsable,
+  plazo, recurso ni indicador.
 - **No Plan de Acción** como contenido del Perfil (es fase posterior).
 - **No causalidad falsa**: hipótesis y mecanismos plausibles, nunca
   «demuestra que» ni «causa directa».
@@ -130,8 +273,23 @@ incertidumbres; (b) cada señal queda conectada con al menos un mecanismo
 plausible o una pregunta; (c) las desigualdades no observables están
 declaradas; (d) los activos aparecen conectados con desafíos; (e) hay
 preguntas vivas para el Grupo Motor formuladas como producción de
-conocimiento; (f) el texto anima a la deliberación sin formular ninguna
-recomendación; (g) supera `checkProfileWritingContract` sin violaciones.
+conocimiento; (f) el texto anima a la deliberación y solo recomienda en su capítulo
+final (Conocer, Contrastar, Abordar); (g) supera `checkProfileWritingContract` sin violaciones; (h) cumple la
+comprobación del §0.5.
+
+### 5 bis. Alcance del verificador automático y transición
+
+`checkProfileWritingContract` es un detector limitado de expresiones, no una
+prueba suficiente de calidad, citas, estructura ni sustento causal. Su regla
+histórica sobre recomendaciones corresponde a una narrativa anterior y no
+autoriza rechazar recomendaciones elegibles del apartado previsto. Las pruebas
+de regresión del generador antiguo describen su salida actual, no una prohibición
+metodológica universal. La prohibición de recomendaciones se considera obsoleta:
+el Perfil RELAS debe culminar con conclusiones y recomendaciones; las actuaciones,
+responsables, plazos e indicadores corresponden al Plan de Acción. Antes de activar generación nueva deben actualizarse
+verificador, pruebas, compilador y consumidores de exportación de forma conjunta,
+con pruebas sobre perfiles históricos; no se altera la salida actual mediante
+esta PR exclusivamente documental.
 
 ## 6. Bibliografía orientadora mínima
 
