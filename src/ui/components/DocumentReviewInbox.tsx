@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { proposeDocumentDestinations } from "../../application/document-ingestion/proposeDocumentDestinations";
 import type { ChangeEvent } from "react";
 import type { DocumentKind, TemporalScope } from "../../domain/repository";
 import { analyzeDocument, inspectArchiveMember, type PreliminaryAnalysis } from "../../application/document-ingestion/preliminaryDocumentAnalyzer";
@@ -116,6 +117,7 @@ export function DocumentReviewInbox({ municipality }: { municipality: string }) 
           {(active.analysis.methodologicalMatches ?? []).map(match => <p key={match.moduleId+match.adapter}>Posible instrumento: <strong>{match.label}</strong> · {match.matched}/{match.expected} columnas ({match.adapter}; {match.confidence === "strong" ? "esquema coincidente" : "coincidencia parcial"}). No validado.</p>)}
           {active.analysis.warnings.map((warning,i)=><p key={i} role="alert">{warning}</p>)}
           {active.analysis.archiveEntries && <details><summary>Entradas ZIP ({active.analysis.archiveEntries.length})</summary><ul>{active.analysis.archiveEntries.map((entry,i)=><li key={i}>{entry.path} · {entry.format} · {entry.size} bytes {entry.unsafe || entry.encrypted ? "· bloqueada" : ""} {!entry.unsafe && !entry.encrypted && !entry.path.endsWith("/") && <button type="button" onClick={()=>void inspectMember(active.id,entry.path)}>Analizar entrada</button>}{active.inspectedMembers?.[entry.path] && <span> · Firma: {active.inspectedMembers[entry.path].format} · SHA-256: {active.inspectedMembers[entry.path].fingerprint?.slice(0,12)}…</span>}</li>)}</ul></details>}</div>}
+          {active.analysis && <div className="ingestion-hint"><strong>Destinos propuestos (sin importar)</strong><ul>{proposeDocumentDestinations(active.analysis, active.kind).map(proposal => <li key={proposal.target}><strong>{proposal.label}</strong> — {proposal.basis} Confirmación humana obligatoria.</li>)}</ul></div>}
           <p className="panel-note">Ámbito de trabajo: <strong>{active.municipality}</strong>. Confirma que corresponde a este expediente.</p>
           <label>Tipo documental
             <select value={active.kind} onChange={(e) => update(active.id, { kind: e.target.value as PendingDocumentReview["kind"] })}>
