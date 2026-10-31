@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { ChangeEvent } from "react";
 import type { DocumentKind, TemporalScope } from "../../domain/repository";
+import { analyzeDocument, type PreliminaryAnalysis } from "../../application/document-ingestion/preliminaryDocumentAnalyzer";
 
 export interface PendingDocumentReview {
   id: string;
@@ -12,6 +13,8 @@ export interface PendingDocumentReview {
   documentDate: string;
   observedPeriod: string;
   temporalScope: TemporalScope;
+  analysis?: PreliminaryAnalysis;
+  analysisError?: string;
 }
 
 const KIND_OPTIONS: Array<{ value: DocumentKind | "undetermined"; label: string }> = [
@@ -43,7 +46,7 @@ export function DocumentReviewInbox({ municipality }: { municipality: string }) 
   function update(id: string, patch: Partial<PendingDocumentReview>) {
     setItems((previous) => previous.map((item) => item.id === id ? { ...item, ...patch } : item));
   }
-  function addFiles(event: ChangeEvent<HTMLInputElement>) {
+  async function addFiles(event: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.currentTarget.files ?? []);
     event.currentTarget.value = "";
     if (!files.length) return;
@@ -60,14 +63,23 @@ export function DocumentReviewInbox({ municipality }: { municipality: string }) 
     }));
     setItems((before) => [...before, ...additions]);
     setSelected(additions[0].id);
-    setMessage("Archivos añadidos solo a la bandeja temporal. No se han abierto, extraído, subido ni guardado.");
+    setMessage("Analizando archivos localmente; no se enviarán a Firebase.");
+    await Promise.all(additions.map(async (entry, index) => {
+      try {
+        const analysis = await analyzeDocument(files[index]);
+        update(entry.id, { analysis, proposedKind: analysis.proposedKind });
+      } catch (error) {
+        update(entry.id, { analysisError: error instanceof Error ? error.message : "Error de análisis" });
+      }
+    }));
+    setMessage("Análisis local completado. No se ha incorporado ni subido ningún archivo.");
   }
   return (
     <section className="workspace-panel document-review-inbox" aria-labelledby="document-review-title">
       <div className="gradient-bar" aria-hidden="true" />
       <div className="panel-header">
         <div><p className="eyebrow">Revisión previa · Prototipo sin persistencia</p><h2 id="document-review-title">Bandeja de documentación</h2></div>
-        <p className="panel-note">Prepara la clasificación y la declaración temporal antes de importar. Esta bandeja no analiza archivos, descomprime ZIP, guarda originales ni modifica evidencias.</p>
+        <p className="panel-note">Prepara la clasificación y la declaración temporal antes de importar. Analiza firmas, huellas y cabeceras CSV; en ZIP solo inspecciona el índice de entradas. No extrae documentos internos, almacena originales ni modifica evidencias.</p>
       </div>
       <label className="document-review-inbox__upload">
         Seleccionar archivos para revisión (sin subida)
@@ -84,6 +96,12 @@ export function DocumentReviewInbox({ municipality }: { municipality: string }) 
         </ul>
         {active && <div className="document-review-inbox__editor">
           <h3>Ficha de revisión</h3>
+          {active.analysisError && <p role="alert">{active.analysisError}</p>}
+          {active.analysis && <div className="ingestion-hint"><strong>Formato detectado:</strong> {active.analysis.format} · <strong>SHA-256:</strong> <code>{active.analysis.fingerprint?.slice(0,16)}…</code>
+          {active.analysis.proposedKind !== "undetermined" && <p>Propuesta: {active.analysis.proposedKind} (sin validar).</p>}
+          {active.analysis.reasons.map((reason,i)=><p key={i}>{reason}</p>)}
+          {active.analysis.warnings.map((warning,i)=><p key={i} role="alert">{warning}</p>)}
+          {active.analysis.archiveEntries && <details><summary>Entradas ZIP ({active.analysis.archiveEntries.length})</summary><ul>{active.analysis.archiveEntries.map((entry,i)=><li key={i}>{entry.path} · {entry.format} · {entry.size} bytes {entry.unsafe || entry.encrypted ? "· bloqueada" : ""}</li>)}</ul></details>}</div>}
           <p className="panel-note">Ámbito de trabajo: <strong>{active.municipality}</strong>. Confirma que corresponde a este expediente.</p>
           <label>Tipo documental
             <select value={active.kind} onChange={(e) => update(active.id, { kind: e.target.value as PendingDocumentReview["kind"] })}>
