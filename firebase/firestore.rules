@@ -124,18 +124,19 @@ service cloud.firestore {
    allow create, delete: if isAdministrator() && scope.matches('^[a-z0-9][a-z0-9-]{0,79}$');
    allow update: if false;
   }
-  // Índice documental por huella, inmutable y segregado por ámbito.
+  // Content-addressed original metadata, immutable once created.
   match /relas_scopes/{scope}/originals/{sha256} {
    allow get, list: if member(scope);
-   allow create: if canWriteScope(scope) &&
+   allow create: if canWriteScope(scope) && scopeNotWithdrawn(scope) &&
     sha256.matches('^[0-9a-f]{64}
    allow read: if member(scope);
    allow create, update: if canWriteScope(scope) && scopeNotWithdrawn(scope) && validWorkspaceManifest(scope);
-   allow delete: if isAdministrator();
+   allow delete: if false;
   }
   match /relas_scopes/{scope}/workspace_versions/{snapshotId}/chunks/{chunkId} {
    allow read: if member(scope);
-   allow create, update: if canWriteScope(scope) && scopeNotWithdrawn(scope) && validWorkspaceChunk();
+   allow create: if canWriteScope(scope) && scopeNotWithdrawn(scope) && validWorkspaceChunk();
+   allow update: if false;
    allow delete: if false;
   }
   match /relas_scopes/{scope}/drafts/{moduleId} {
@@ -187,7 +188,7 @@ service cloud.firestore {
   match /relas_scopes/{scope}/workspace/current {
    allow read: if member(scope);
    allow create, update: if canWriteScope(scope) && validWorkspaceManifest(scope);
-   allow delete: if false;
+   allow delete: if isAdministrator();
   }
   match /relas_scopes/{scope}/workspace_versions/{snapshotId}/chunks/{chunkId} {
    allow read: if member(scope);
