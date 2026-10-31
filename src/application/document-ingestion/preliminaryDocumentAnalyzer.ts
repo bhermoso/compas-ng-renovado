@@ -137,7 +137,7 @@ export async function inspectArchiveMember(
   else {
     if (typeof DecompressionStream === "undefined") throw new Error("Este navegador no admite descompresión segura.");
     let stream: ReadableStream<Uint8Array>;
-    try { stream = new Blob([compressed]).stream().pipeThrough(new DecompressionStream("deflate-raw")); }
+    try { stream = new Blob([compressed.slice().buffer]).stream().pipeThrough(new DecompressionStream("deflate-raw")); }
     catch { throw new Error("Descompresión deflate-raw no disponible en este navegador."); }
     const reader = stream.getReader();
     const blocks: Uint8Array[] = [];
