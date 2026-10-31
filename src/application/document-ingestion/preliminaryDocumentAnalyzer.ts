@@ -162,6 +162,6 @@ export async function inspectArchiveMember(
   if (bytes.byteLength !== entry.size) throw new Error("Tamaño extraído diferente del declarado.");
   if (entry.crc32 === undefined || zipCrc32(bytes) !== entry.crc32) throw new Error("Integridad CRC-32 incorrecta en entrada ZIP.");
   // El nombre interno no implica validación metodológica ni destino.
-  const member = new File([bytes], entry.path.split("/").pop() || "documento", { type: "application/octet-stream" });
+  const member = new File([new Uint8Array(bytes).buffer], entry.path.split("/").pop() || "documento", { type: "application/octet-stream" });
   return { name: entry.path, analysis: await analyzeDocument(member) };
 }
