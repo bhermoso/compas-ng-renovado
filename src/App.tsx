@@ -4,6 +4,7 @@ import type { ExternalProfileLibrary } from "./domain/health-profile/ExternalHea
 import { InitialLocalHealthPlanPanel } from "./ui/components/InitialLocalHealthPlanPanel";
 import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
 import { InstitutionalLogoBand } from "./ui/components/InstitutionalLogoBand";
+import { DocumentReviewInbox } from "./ui/components/DocumentReviewInbox";
 import { replaceZaidinFinalDraft } from "./application/workspace/replaceZaidinFinalDraft";
 import { regroupZagraActionPlan } from "./application/workspace/regroupZagraActionPlan";
 import { processPdfHealthReport } from './application/health-report/ProcessPdfHealthReport';
@@ -3762,6 +3763,8 @@ export default function App() {
                 .filter((a) => a.kind === "asset")
                 .map((a) => ({ id: a.id, title: a.title, documentId: a.provenance.documentId ?? "" }))}
             />
+
+            <DocumentReviewInbox key={runtime.workspace.municipality.identity.id} municipality={runtime.workspace.municipality.identity.name} />
 
             {/* ── BLOQUE 4: Añadir o sustituir fuentes ── */}
             <DocumentIngestionPanel
