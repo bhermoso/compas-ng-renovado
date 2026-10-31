@@ -125,3 +125,23 @@ Esos comandos son solo lectura. Confirmar mediante grep el contrato antes de cam
 2. Auditar usos de IndexedDB/originales, backup, borrado y rehidratación; inventario migratorio.
 3. Diseñar esquema Storage+Firestore y reglas de acceso con tests en emuladores.
 4. Prototipo de sala de control conforme al contrato visual, sin activar escritura nueva hasta superar pruebas.
+
+
+## 9. Auditoría de dependencias de originales y recuperación (2026-10-31)
+- `src/ui/components/DocumentAccess.tsx`: la descarga y adjunción del original llaman a `loadOriginalFile`/`saveOriginalFile` en IndexedDB; se permite sustituir el archivo local tras confirmación sin recalcular datos derivados. Para pasar a Firebase, el acceso al original debe migrarse a una interfaz de almacenamiento que compruebe huella, permisos y versión, y evitar discordancias entre fichero y evidencias.
+- `src/ui/components/BackupPanel.tsx`: `createBackup` exporta expedientes y originales disponibles **en ese navegador**, no necesariamente todos los originales de todos los equipos. Una solución Firebase debe continuar ofreciendo exportación íntegra verificada y restauración sin sobreescritura, sin que la ausencia de un archivo local signifique pérdida remota.
+- `src/infrastructure/persistence/indexed-db-workspace.ts`: persiste snapshots locales de workspace por municipio; debe tratarse como copia local/cache después de definir la fuente remota canónica, y probar conflictos y desconexión.
+- `src/infrastructure/relas/RelasClient.ts`: proyecto Firebase configurado para Firestore/Auth; el cliente `RelasClient` expone `auth` y `db`, pero no `storage`. No se ha verificado en la infraestructura remota la existencia de un bucket autorizado. No crear uno automáticamente.
+- `firebase/firestore.rules`: acceso por ámbito y pertenencia, roles `reader`/`coordinator`/`administrator`; el archivo del distribuidor debe usar equivalentes comprobables en Storage y pruebas explícitas de aislamiento entre municipios. Evitar accesos públicos persistentes.
+- El `firebase.json` actual no declara `storage`; los emuladores disponibles son Auth y Firestore. Las pruebas integrales nuevas deberán incorporar Storage solo cuando la configuración esté lista.
+
+### Migración aditiva obligatoria (no ejecutar aún)
+1. Inventariar referencias y originales locales por municipio, manteniendo copias de recuperación antes de tocar nada.
+2. Preparar reglas Storage, esquema Firestore, emuladores y tests de permisos para lectura/escritura y aislamiento entre municipios.
+3. Subir bytes con integridad hash y metadatos temporales; distinguir `pending` de `committed`.
+4. Verificar lectura autorizada en otra sesión/equipo antes de declarar la migración completa.
+5. Mantener el original IndexedDB intacto hasta confirmación y backup verificados. No borrar documentos ni derivaciones existentes.
+6. Incorporar auditoría/recuperación y manejo de archivos huérfanos o carga fallida.
+
+### Contrato visual pendiente de localizar
+La referencia `VISUAL-CONTRACT §2` está probada en `src/App.css`, pero la búsqueda de varias rutas nominales del archivo y la búsqueda indexada de GitHub no han localizado aún el texto íntegro. No afirmar que el contrato falta en todas las ramas ni inventar su contenido. Mantener este punto como verificación pendiente y bloquear la aprobación final de diseño hasta localizar el original o formalizar expresamente su recuperación.
