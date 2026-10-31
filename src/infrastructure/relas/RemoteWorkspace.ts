@@ -135,7 +135,6 @@ async function persistRemoteWorkspace(client: RelasClient, workspace: Municipali
   }
   await ensureRemoteScope(client, workspace).catch(() => undefined);
   const id = snapshotId();
-  const previous = await readManifest(client, workspace.municipality.identity.id);
   for (let start = 0; start < chunks.length; start += MAX_BATCH_WRITES) {
     const batch = writeBatch(client.db);
     chunks
@@ -183,16 +182,7 @@ async function persistRemoteWorkspace(client: RelasClient, workspace: Municipali
     { ...manifest, savedAt: serverTimestamp() }
   );
   await batch.commit();
-  // La copia anterior ya no es la vigente: se retira para que Firebase no
-  // acumule una copia completa por cada guardado. Un fallo aquí no invalida
-  // el guardado, que ya está confirmado.
-  if (previous !== null && previous.snapshotId !== id) {
-    await deleteSnapshotChunks(
-      client,
-      workspace.municipality.identity.id,
-      previous
-    ).catch(() => undefined);
-  }
+
 }
 
 async function readManifest(
@@ -211,66 +201,17 @@ async function readManifest(
     : null;
 }
 
-async function deleteSnapshotChunks(
-  client: RelasClient,
-  municipalityId: string,
-  manifest: RemoteWorkspaceManifest
-): Promise<void> {
-  for (let start = 0; start < manifest.chunkCount; start += MAX_BATCH_WRITES) {
-    const batch = writeBatch(client.db);
-    for (
-      let index = start;
-      index < Math.min(start + MAX_BATCH_WRITES, manifest.chunkCount);
-      index++
-    ) {
-      batch.delete(
-        doc(
-          client.db,
-          "relas_scopes",
-          municipalityId,
-          "workspace_versions",
-          manifest.snapshotId,
-          "chunks",
-          String(index).padStart(6, "0")
-        )
-      );
-    }
-    await batch.commit();
-  }
-}
-
-/**
- * Elimina de Firebase el expediente de un ámbito: primero los fragmentos de la
- * copia vigente y, solo cuando ya no queda ninguno, el manifiesto. Si algo
- * falla, el manifiesto permanece y el expediente sigue siendo recuperable.
- * Solo el administrador general puede ejecutarlo.
- *
- * Límite verificado en el cliente web: no se pueden enumerar copias anteriores
- * huérfanas (creadas antes de la limpieza automática); solo se retira la vigente.
+/** La eliminación física queda deshabilitada: los snapshots son históricos e inmutables.
+ * Para retirar un ámbito de la navegación existe una lápida independiente.
+ * No escribir una lápida como efecto secundario de una operación fallida.
  */
 export async function deleteRemoteWorkspace(
-  client: RelasClient,
-  municipalityId: string
+  _client: RelasClient,
+  _municipalityId: string
 ): Promise<{ deleted: boolean }> {
-  if (!client.auth.currentUser) {
-    throw new Error("Inicia sesión para eliminar el expediente de Firebase.");
-  }
-  const profile = await readAccessProfile(client);
-  if (!profile.administrator) {
-    throw new Error(
-      "Solo el administrador general puede eliminar un expediente de Firebase."
-    );
-  }
-  // La lápida va primero: si el borrado se interrumpe, ningún equipo repone
-  // el expediente a medio eliminar.
-  await writeRemoteTombstone(client, municipalityId);
-  const manifest = await readManifest(client, municipalityId);
-  if (manifest === null) return { deleted: false };
-  await deleteSnapshotChunks(client, municipalityId, manifest);
-  await deleteDoc(
-    doc(client.db, "relas_scopes", municipalityId, "workspace", "current")
-  );
-  return { deleted: true };
+  void _client;
+  void _municipalityId;
+  throw new Error("La eliminación física del expediente está deshabilitada para preservar su historial. Usa el procedimiento explícito de retirada territorial.");
 }
 
 const SCOPE_TYPES = ["municipio", "mancomunidad", "distrito-municipal"] as const;
