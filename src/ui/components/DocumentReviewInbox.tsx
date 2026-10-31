@@ -17,6 +17,7 @@ export interface PendingDocumentReview {
   analysis?: PreliminaryAnalysis;
   analysisError?: string;
   inspectedMembers?: Record<string, PreliminaryAnalysis>;
+  approved?: boolean;
 }
 
 const KIND_OPTIONS: Array<{ value: DocumentKind | "undetermined"; label: string }> = [
@@ -40,12 +41,14 @@ function proposeKind(name: string): DocumentKind | "undetermined" {
 }
 
 /** Bandeja preliminar, sin escritura ni lectura de contenido; no sustituye a los adaptadores. */
-export function DocumentReviewInbox({ municipality }: { municipality: string }) {
+export function DocumentReviewInbox({ municipality, onHandOff }: { municipality: string; onHandOff?: (file: File, kind: DocumentKind) => void }) {
   const [items, setItems] = useState<PendingDocumentReview[]>([]);
   const filesRef = useRef(new Map<string, File>());
   const [selected, setSelected] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const active = items.find((item) => item.id === selected);
+  const pendingCount = items.filter(item => !item.approved).length;
+  const analyzedCount = items.filter(item => item.analysis !== undefined).length;
   const duplicates = active?.analysis?.fingerprint ? items.filter((item) => item.id !== active.id && item.analysis?.fingerprint === active.analysis?.fingerprint) : [];
   function update(id: string, patch: Partial<PendingDocumentReview>) {
     setItems((previous) => previous.map((item) => item.id === id ? { ...item, ...patch } : item));
@@ -99,7 +102,7 @@ export function DocumentReviewInbox({ municipality }: { municipality: string }) 
         <input type="file" multiple accept=".pdf,.doc,.docx,.csv,.xlsx,.xls,.png,.jpg,.jpeg,.zip" onChange={addFiles} />
       </label>
       <p className="panel-note" role="status">{message || "Sin archivos pendientes en esta sesión."}</p>
-      {items.length > 0 && <div className="document-review-inbox__layout">
+      {items.length > 0 && <><p className="panel-note">{items.length} archivos seleccionados · {analyzedCount} analizados · {pendingCount} pendientes de confirmación.</p><div className="document-review-inbox__layout">
         <ul className="document-review-inbox__list" aria-label="Archivos pendientes">
           {items.map((item) => <li key={item.id}>
             <button type="button" aria-current={item.id === selected ? "true" : undefined} onClick={() => setSelected(item.id)}>
@@ -120,7 +123,7 @@ export function DocumentReviewInbox({ municipality }: { municipality: string }) 
           {active.analysis && <div className="ingestion-hint"><strong>Destinos propuestos (sin importar)</strong><ul>{proposeDocumentDestinations(active.analysis, active.kind).map(proposal => <li key={proposal.target}><strong>{proposal.label}</strong> — {proposal.basis} Confirmación humana obligatoria.</li>)}</ul></div>}
           <p className="panel-note">Ámbito de trabajo: <strong>{active.municipality}</strong>. Confirma que corresponde a este expediente.</p>
           <label>Tipo documental
-            <select value={active.kind} onChange={(e) => update(active.id, { kind: e.target.value as PendingDocumentReview["kind"] })}>
+            <select value={active.kind} onChange={(e) => update(active.id, { kind: e.target.value as PendingDocumentReview["kind"], approved:false })}>
               {KIND_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
             </select>
           </label>
@@ -131,14 +134,19 @@ export function DocumentReviewInbox({ municipality }: { municipality: string }) 
             <input type="text" placeholder="Ej. 2015–2016; no equivale a fecha de carga" value={active.observedPeriod} onChange={(e) => update(active.id, { observedPeriod: e.target.value })} />
           </label>
           <label>Alcance temporal (pendiente de validación técnica)
-            <select value={active.temporalScope} onChange={(e) => update(active.id, { temporalScope: e.target.value as TemporalScope })}>
+            <select value={active.temporalScope} onChange={(e) => update(active.id, { temporalScope: e.target.value as TemporalScope, approved:false })}>
               <option value="undetermined">Por determinar</option><option value="current">Actual</option><option value="historical">Histórico</option><option value="mixed">Mixto</option>
             </select>
           </label>
+          <label><input type="checkbox" checked={active.approved === true} onChange={e => update(active.id,{approved:e.target.checked})} /> He revisado la clasificación y confirmo el destino propuesto para este expediente.</label>
+          {active.analysis && active.approved && onHandOff && (active.kind === "health-report" || active.kind === "strategic-framework" || active.kind === "territorial-documentation" || active.kind === "qualitative-material") && ["pdf","docx"].includes(active.analysis.format) && <button type="button" onClick={() => {
+            const file = filesRef.current.get(active.id);
+            if (file) onHandOff(file, active.kind as DocumentKind);
+          }}>Enviar a la carga existente (puede sustituir fuentes)</button>}
           <p className="ingestion-hint">Las selecciones son provisionales: no constituyen una declaración técnica firmada y no se incorporan al expediente.</p>
           <button type="button" onClick={() => { filesRef.current.delete(active.id); setItems((before) => before.filter((item) => item.id !== active.id)); setSelected(null); setMessage("Ficha descartada. No se han modificado documentos."); }}>Descartar ficha</button>
         </div>}
-      </div>}
+      </div></>}
     </section>
   );
 }
