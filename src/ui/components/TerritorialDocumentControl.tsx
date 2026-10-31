@@ -5,8 +5,8 @@ type Props = { repository: MunicipalDocumentRepository; evidenceCount: number; s
 export function TerritorialDocumentControl({ repository, evidenceCount, studiesLoaded, totalStudies }: Props) {
   const docs = repository.documents;
   const active = docs.filter(d => d.status !== "archived" && d.status !== "rejected");
-  const historical = active.filter(d => d.temporal?.declaration?.scope === "historical" || d.cycle?.status === "historical").length;
-  const withoutCycle = active.filter(d => !d.cycle && !d.temporal).length;
+  const historical = active.filter(d => (d.temporal?.declaration && d.temporal.temporalScope === "historical") || d.cycle?.status === "historical").length;
+  const withoutCycle = active.filter(d => !d.cycle && !d.temporal?.declaration).length;
   const unvalidated = active.filter(d => d.status !== "validated").length;
   const byKind = Array.from(new Set(active.map(d => d.kind))).map(kind => ({kind,count:active.filter(d => d.kind === kind).length}));
   const gaps = [
