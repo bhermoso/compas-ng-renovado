@@ -27,6 +27,9 @@ service cloud.firestore {
     get(/databases/$(database)/documents/relas_memberships/$(request.auth.uid)/scopes/$(scope)).data.active == true &&
     get(/databases/$(database)/documents/relas_memberships/$(request.auth.uid)/scopes/$(scope)).data.role in ['coordinator', 'administrator']);
   }
+  function scopeNotWithdrawn(scope) {
+   return !exists(/databases/$(database)/documents/compas_deleted_scopes/$(scope));
+  }
   function validWorkspaceManifest(scope) {
    let d = request.resource.data;
    return d.keys().hasAll(['schema','municipalityId','snapshotId','chunkCount','characterLength','workspaceUpdatedAt','savedBy','savedAt']) &&
@@ -127,12 +130,12 @@ service cloud.firestore {
    allow create: if canWriteScope(scope) &&
     sha256.matches('^[0-9a-f]{64}
    allow read: if member(scope);
-   allow create, update: if canWriteScope(scope) && validWorkspaceManifest(scope);
+   allow create, update: if canWriteScope(scope) && scopeNotWithdrawn(scope) && validWorkspaceManifest(scope);
    allow delete: if isAdministrator();
   }
   match /relas_scopes/{scope}/workspace_versions/{snapshotId}/chunks/{chunkId} {
    allow read: if member(scope);
-   allow create, update: if canWriteScope(scope) && validWorkspaceChunk();
+   allow create, update: if canWriteScope(scope) && scopeNotWithdrawn(scope) && validWorkspaceChunk();
    allow delete: if false;
   }
   match /relas_scopes/{scope}/drafts/{moduleId} {
