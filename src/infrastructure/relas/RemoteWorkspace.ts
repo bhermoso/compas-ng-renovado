@@ -11,7 +11,6 @@ import {
 import type { MunicipalityWorkspace } from "../../domain/workspace";
 import { parseWorkspaceJSON } from "../persistence/local-storage";
 import {
-  readAccessProfile,
   readMembership,
   type RelasClient,
 } from "./RelasClient";
