@@ -100,6 +100,7 @@ export function DocumentReviewInbox({ municipality }: { municipality: string }) 
           {active.analysis && <div className="ingestion-hint"><strong>Formato detectado:</strong> {active.analysis.format} · <strong>SHA-256:</strong> <code>{active.analysis.fingerprint?.slice(0,16)}…</code>
           {active.analysis.proposedKind !== "undetermined" && <p>Propuesta: {active.analysis.proposedKind} (sin validar).</p>}
           {active.analysis.reasons.map((reason,i)=><p key={i}>{reason}</p>)}
+          {(active.analysis.methodologicalMatches ?? []).map(match => <p key={match.moduleId+match.adapter}>Posible instrumento: <strong>{match.label}</strong> · {match.matched}/{match.expected} columnas ({match.adapter}; {match.confidence === "strong" ? "esquema coincidente" : "coincidencia parcial"}). No validado.</p>)}
           {active.analysis.warnings.map((warning,i)=><p key={i} role="alert">{warning}</p>)}
           {active.analysis.archiveEntries && <details><summary>Entradas ZIP ({active.analysis.archiveEntries.length})</summary><ul>{active.analysis.archiveEntries.map((entry,i)=><li key={i}>{entry.path} · {entry.format} · {entry.size} bytes {entry.unsafe || entry.encrypted ? "· bloqueada" : ""}</li>)}</ul></details>}</div>}
           <p className="panel-note">Ámbito de trabajo: <strong>{active.municipality}</strong>. Confirma que corresponde a este expediente.</p>
