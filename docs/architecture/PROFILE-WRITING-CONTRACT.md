@@ -50,8 +50,10 @@ sus reglas en vez de hablarle del municipio, se reescribe o va al anexo.
 
 ### 0.3 Qué no va en el cuerpo
 
-Va al anexo de notas metodológicas o a los metadatos de trazabilidad, nunca al
-cuerpo:
+Como regla general, se reserva para anexos de notas metodológicas o metadatos
+de trazabilidad, sin impedir los campos explícitos de las conclusiones, la tabla
+de lagunas, las discrepancias entre fuentes ni el apartado de autoría y
+validación exigidos por la estructura aprobada:
 
 1. La explicación de qué es el documento, qué incluye, qué deja fuera y por
    qué (salvo un párrafo de presentación, sin reglas).
@@ -66,11 +68,16 @@ cuerpo:
 4. Las incoherencias de las fuentes, que van a una nota técnica dirigida a
    quien elaboró cada fuente.
 
-### 0.4 Estructura vigente (Loja, 2026-10-26)
+### 0.4 Estructura de referencia y adaptación territorial (Loja, 2026-10-26)
 
-Sigue el Art. 16 quater del contrato metodológico: la conclusión es la unidad,
-el cuerpo tiene siete apartados y la evidencia completa va en los anexos. El
-Resumen va delante del cuerpo y no se numera.
+Para el caso de Loja, el Art. 16 quater del contrato metodológico organiza el
+cuerpo en siete apartados, con la conclusión como unidad y la evidencia completa
+en anexos. El Resumen precede al cuerpo y no se numera. Esta estructura es una
+referencia editorial, no una orden de reestructuración automática de los perfiles
+preexistentes de otros territorios. Su aplicación requiere comprobar el contrato
+metodológico vigente, la fase del expediente y la estructura aprobada para cada
+municipio; no debe suprimir ni alterar evidencia, textos validados o decisiones
+territoriales previas.
 
 **Cuerpo.**
 
@@ -121,9 +128,9 @@ Resumen va delante del cuerpo y no se numera.
 
 Un Perfil, o un apartado, no se entrega si:
 
-- alguna frase del cuerpo tiene como sujeto el propio documento o su método;
+- la prosa diagnóstica se centra reiteradamente en el propio documento o su método, salvo los apartados de presentación, procedencia, validación y transición de fase;
 - aparecen etiquetas de tipo de afirmación fuera del bloque de conclusiones;
-- hay una lista de ausencias en el cuerpo en lugar de frases en su sitio;
+- se acumulan listas de ausencias sin relación diagnóstica, salvo la tabla explícita de preguntas pendientes prevista en la estructura aprobada;
 - una cifra no lleva año y cita propia al lado, o se presenta una cifra
   estimada o aproximada como dato;
 - un dato no local ocupa el lugar de uno local;
@@ -153,7 +160,7 @@ señal de salud
 → desigualdad observable o no observable
 → activo/capacidad relacionada
 → pregunta para contraste comunitario
-→ conclusión diagnóstica sin recomendación
+→ conclusión diagnóstica → recomendaciones elegibles separadas, cuando procedan
 ```
 
 Operativamente:
@@ -223,8 +230,8 @@ salud socialmente contextualizada.
    los desafíos.
 8. BADEA/IECA es contexto municipal (proxy para ámbitos inframunicipales):
    sitúa el contexto urbano, no resuelve desigualdades internas.
-9. El cierre invita a deliberar y prepara la acción futura sin anticiparla.
-10. Tono: institucional con calor humano; prosa, no listado.
+9. El cierre invita a deliberar; las orientaciones elegibles, si proceden, no sustituyen las decisiones del Plan de Acción.
+10. Tono: institucional y claro; prosa diagnóstica, con tablas y campos estructurados cuando sean necesarios.
 
 ### 3 bis. Contrato autorial transversal
 
@@ -236,15 +243,17 @@ prescindibles, oposiciones fabricadas, grandilocuencia y estructuras de
 plantilla.
 
 Esta aplicación queda subordinada a las fronteras metodológicas del Perfil: la
-voz analítica no autoriza recomendaciones, causalidad falsa, experiencia
-comunitaria inventada ni sustitución de evidencia local por contexto externo.
+voz analítica no autoriza prescripciones operativas fuera del menú elegible,
+causalidad falsa, experiencia comunitaria inventada ni sustitución de evidencia
+local por contexto externo.
 Las redacciones finales aportadas o aprobadas por el equipo se conservan.
 
 ## 4. Fronteras (inviolables)
 
 - **No actuaciones**, programas, objetivos estratégicos ni prioridades. Las
-  recomendaciones del Perfil (Conocer, Contrastar, Abordar) solo en su
-  capítulo final y sin responsable, plazo, recurso ni indicador.
+  recomendaciones del Perfil (Conocer, Contrastar, Abordar) solo en el menú
+  elegible de su apartado aprobado, vinculadas a conclusiones y sin responsable,
+  plazo, recurso ni indicador.
 - **No Plan de Acción** como contenido del Perfil (es fase posterior).
 - **No causalidad falsa**: hipótesis y mecanismos plausibles, nunca
   «demuestra que» ni «causa directa».
@@ -263,6 +272,18 @@ preguntas vivas para el Grupo Motor formuladas como producción de
 conocimiento; (f) el texto anima a la deliberación y solo recomienda en su capítulo
 final (Conocer, Contrastar, Abordar); (g) supera `checkProfileWritingContract` sin violaciones; (h) cumple la
 comprobación del §0.5.
+
+### 5 bis. Alcance del verificador automático y transición
+
+`checkProfileWritingContract` es un detector limitado de expresiones, no una
+prueba suficiente de calidad, citas, estructura ni sustento causal. Su regla
+histórica sobre recomendaciones corresponde a una narrativa anterior y no
+autoriza rechazar recomendaciones elegibles del apartado previsto. Las pruebas
+de regresión del generador antiguo describen su salida actual, no una prohibición
+metodológica universal. Antes de activar generación nueva deben actualizarse
+verificador, pruebas, compilador y consumidores de exportación de forma conjunta,
+con pruebas sobre perfiles históricos; no se altera la salida actual mediante
+esta PR exclusivamente documental.
 
 ## 6. Bibliografía orientadora mínima
 
