@@ -4,6 +4,7 @@ import {
   requiresTemporalReview,
   type DocumentTemporalMetadata,
 } from "../src/domain/repository/documentTemporalMetadata";
+import { addMunicipalDocument, createMunicipalDocumentRepository, setMunicipalDocumentTemporalMetadata } from "../src/domain/repository";
 
 describe("temporalidad documental declarada", () => {
   it("no infiere ciclo actual de un documento fechado en 2026", () => {
@@ -44,5 +45,34 @@ describe("temporalidad documental declarada", () => {
   it("mantiene como indeterminado el alcance no clasificado", () => {
     expect(declaredTemporalScope(undefined)).toBe("undetermined");
     expect(requiresTemporalReview({ suggestions: [] })).toBe(true);
+  });
+});
+
+describe("integración retrocompatible con repositorio municipal", () => {
+  it("mantiene un documento legado sin metadatos temporales", () => {
+    const base = createMunicipalDocumentRepository({ municipalityId: "zagra" });
+    const repo = addMunicipalDocument(base, { id: "doc-1", kind: "health-report", title: "Informe legado", cycle: { status: "historical", referenceYear: 2017 } });
+    expect(repo.documents[0].temporal).toBeUndefined();
+    expect(repo.documents[0].cycle).toEqual({ status: "historical", referenceYear: 2017 });
+    expect(requiresTemporalReview(repo.documents[0].temporal)).toBe(true);
+  });
+
+  it("añade la temporalidad sin alterar el ciclo legado ni otras fuentes", () => {
+    const base = createMunicipalDocumentRepository({ municipalityId: "zagra" });
+    const repo = addMunicipalDocument(addMunicipalDocument(base, {
+      id: "doc-1", kind: "health-report", title: "Informe", cycle: { status: "historical", referenceYear: 2017 },
+    }), { id: "doc-2", kind: "other", title: "Otro" });
+    const updated = setMunicipalDocumentTemporalMetadata(repo, "doc-1", {
+      observedPeriod: { literal: "2015-2016" },
+      temporalScope: "historical",
+      declaration: { declaredBy: "tecnico", declaredAt: "2026-10-31T09:00:00Z", referenceDate: "2026-10-31" },
+    });
+    expect(updated.documents[0].cycle).toEqual(repo.documents[0].cycle);
+    expect(updated.documents[1]).toBe(repo.documents[1]);
+    expect(declaredTemporalScope(updated.documents[0].temporal)).toBe("historical");
+    const cleared = setMunicipalDocumentTemporalMetadata(updated, "doc-1", undefined);
+    expect(cleared.documents[0].temporal).toBeUndefined();
+    expect(cleared.documents[0].cycle).toEqual(repo.documents[0].cycle);
+    expect(setMunicipalDocumentTemporalMetadata(repo, "missing", undefined)).toBe(repo);
   });
 });
