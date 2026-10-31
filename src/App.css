@@ -10984,8 +10984,8 @@ h3 {
   flex-direction: column;
   gap: 0.3rem;
   padding: 1rem;
-  background: var(--fondo-suave);
-  border: 1px solid var(--borde-suave);
+  background: var(--fondo-secundario);
+  border: 1px solid var(--borde);
   border-radius: 0.75rem;
 }
 .territorial-document-control__metrics strong { font-size: clamp(1.5rem, 2.7vw, 2.2rem); color: var(--azul); }
