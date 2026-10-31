@@ -1,7 +1,7 @@
 import type { DocumentKind } from "../../domain/repository";
 
 export type InspectedFormat = "pdf" | "docx" | "doc" | "zip" | "csv" | "xlsx" | "xls" | "png" | "jpeg" | "unknown";
-export interface ArchiveEntry { path: string; size: number; compressedSize: number; encrypted: boolean; unsafe: boolean; format: InspectedFormat }
+export interface ArchiveEntry { path: string; size: number; compressedSize: number; encrypted: boolean; unsafe: boolean; format: InspectedFormat; suggestedKind?: DocumentKind | "undetermined" }
 export interface PreliminaryAnalysis {
   format: InspectedFormat;
   proposedKind: DocumentKind | "undetermined";
@@ -48,12 +48,18 @@ function inspectZip(buffer: ArrayBuffer): { entries: ArchiveEntry[]; warnings: s
   const total = u32(view,eocd+12);
   if (disk !== 0 || u16(view,eocd+6) !== 0 || count === 0xffff || offset === 0xffffffff || total === 0xffffffff) throw new Error("ZIP multidisco o ZIP64 no admitido.");
   if (count > MAX_ZIP_ENTRIES) throw new Error("ZIP con demasiadas entradas.");
+  if (offset > eocd || offset + 46 > eocd) throw new Error("Directorio ZIP fuera de límites.");
   const entries: ArchiveEntry[] = [];
   let cursor = offset, totalSize = 0;
   for (let i=0;i<count;i++) {
     if (cursor + 46 > length || u32(view,cursor) !== 0x02014b50) throw new Error("Directorio ZIP inconsistente.");
     const flags=u16(view,cursor+8), method=u16(view,cursor+10), compressedSize=u32(view,cursor+20), size=u32(view,cursor+24);
     const nameLength=u16(view,cursor+28), extraLength=u16(view,cursor+30), commentLength=u16(view,cursor+32);
+    const localOffset=u32(view,cursor+42);
+    if (size === 0xffffffff || compressedSize === 0xffffffff || localOffset === 0xffffffff) throw new Error("Entrada ZIP64 no admitida.");
+    if (localOffset + 30 > offset || u32(view,localOffset) !== 0x04034b50) throw new Error("Cabecera local ZIP ausente o inválida.");
+    const dataStart=localOffset+30+u16(view,localOffset+26)+u16(view,localOffset+28);
+    if (dataStart > offset || compressedSize > offset - dataStart) throw new Error("Datos ZIP fuera de límites.");
     const end=cursor+46+nameLength+extraLength+commentLength;
     if (end > length) throw new Error("Entrada ZIP truncada.");
     const path=new TextDecoder("utf-8", {fatal:false}).decode(new Uint8Array(buffer,cursor+46,nameLength));
@@ -62,15 +68,19 @@ function inspectZip(buffer: ArrayBuffer): { entries: ArchiveEntry[]; warnings: s
     if (totalSize > MAX_ZIP_UNCOMPRESSED) throw new Error("ZIP supera el límite de tamaño descomprimido declarado.");
     const encrypted=(flags & 1) !== 0;
     if (encrypted || unsafe || (method!==0 && method!==8)) warnings.push("Entrada bloqueada o no admitida: "+path);
-    entries.push({path,size,compressedSize,encrypted,unsafe,format:formatFromName(path)});
+    if (compressedSize > 0 && size / compressedSize > 200) warnings.push("Compresión inusualmente alta: "+path);
+    if (path.toLowerCase().endsWith(".zip")) warnings.push("ZIP anidado: revisión obligatoria: "+path);
+    entries.push({path,size,compressedSize,encrypted,unsafe,format:formatFromName(path),suggestedKind:"undetermined"});
     cursor=end;
   }
+  if (cursor > eocd) throw new Error("Directorio ZIP solapado.");
   return {entries,warnings};
 }
 function csvProposal(text: string): {kind: DocumentKind | "undetermined"; reason?: string} {
   const header = text.split(/\r?\n/,1)[0]?.toLowerCase() ?? "";
   const cells = header.split(/[;,\t]/).map(s => s.trim().replace(/^"|"$/g,""));
   if (cells.includes("record_id") && cells.some(s=>/^temas___\d+$/.test(s))) return {kind:"redcap-export",reason:"Cabecera compatible con priorización temática REDCap; requiere validación del esquema."};
+  if (cells.includes("record_id") && cells.some(s=>/^\w+___\d+$/.test(s))) return {kind:"redcap-export",reason:"Cabecera compatible con casillas REDCap, sin identificar instrumento ni destino."};
   return {kind:"undetermined"};
 }
 export async function analyzeDocument(file: File): Promise<PreliminaryAnalysis> {
