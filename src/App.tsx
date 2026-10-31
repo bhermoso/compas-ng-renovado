@@ -22,7 +22,7 @@ import { DocumentationProvider } from "./ui/components/Documentation";
 import type { PlanPreparationDraft } from "./domain/action-plan-catalog/PlanPreparationDraft";
 import { worksheetKey, type IndicatorWorksheet } from "./domain/action-plan-catalog/IndicatorWorksheet";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { type CycleConciliation, type AssetValidationDeclaration, type DocumentCycle, type DocumentKind, type MunicipalDocument, type MunicipalDocumentRepository, addMunicipalDocument, setMunicipalDocumentCycle, addCycleConciliation, addAssetValidation, removeAssetValidation, removeCycleConciliation, replaceMunicipalDocumentByKind, removeMunicipalDocument } from "./domain/repository";
+import { type CycleConciliation, type AssetValidationDeclaration, type DocumentCycle, type DocumentKind, type DocumentTemporalMetadata, type MunicipalDocument, type MunicipalDocumentRepository, addMunicipalDocument, setMunicipalDocumentCycle, addCycleConciliation, addAssetValidation, removeAssetValidation, removeCycleConciliation, replaceMunicipalDocumentByKind, removeMunicipalDocument } from "./domain/repository";
 import { type MunicipalityWorkspace } from "./domain/workspace";
 import { type QuestionnaireProject } from "./domain/questionnaire";
 import { importProjectDataset } from "./application/questionnaire";
@@ -233,6 +233,13 @@ const NAV_ITEMS: { id: AppView; label: string; phase?: string }[] = [
 ];
 // Vistas eliminadas de la navegación principal pero accesibles para desarrollo:
 // "analisis" (D-002) y "lectura" (D-004).
+
+/** Opciones de los cargadores existentes cuando los invoca la bandeja de revisión. */
+type LoaderOptions = {
+  kind?: DocumentKind;
+  declaresOpenAnswers?: boolean;
+  temporal?: DocumentTemporalMetadata;
+};
 
 const DOCUMENT_KINDS: { value: DocumentKind; label: string }[] = [
   { value: "health-report",             label: "Informe de Salud" },
@@ -1258,18 +1265,18 @@ export default function App() {
     }));
   }
 
-  async function handleLoadHealthReport(file: File): Promise<void> {
+  async function handleLoadHealthReport(file: File, options: LoaderOptions = {}): Promise<boolean> {
     // .doc binario (Word 97-2003) no soportado por mammoth.
     const isLegacyDoc = /\.doc$/i.test(file.name) && !/\.docx$/i.test(file.name);
     if (isLegacyDoc) {
       setLastHealthReportMessage(
         "El formato .doc (binario) no puede procesarse. Convierte el fichero a .docx y vuelve a cargarlo."
       );
-      return;
+      return false;
     }
 
     const isPdf = /\.pdf$/i.test(file.name);
-    if (!isPdf && !/\.docx$/i.test(file.name)) { setLastHealthReportMessage("Sube un fichero PDF o DOCX."); return; }
+    if (!isPdf && !/\.docx$/i.test(file.name)) { setLastHealthReportMessage("Sube un fichero PDF o DOCX."); return false; }
 
     setIsLoadingHealthReport(true);
     try {
@@ -1293,6 +1300,7 @@ export default function App() {
         },
         sourceFileName: file.name,
         tags: ["health-report", "primary-source"],
+        ...(options.temporal !== undefined ? { temporal: options.temporal } : {}),
       };
 
       const healthReport = isPdf
@@ -1334,6 +1342,7 @@ export default function App() {
         "Preservado en el Repositorio documental. " +
         "Puedes descargar el original desde el catálogo completo de documentos de este navegador."
       );
+      return true;
     } catch (err) {
       console.error("[health-report-load-error]", err);
       setLastHealthReportMessage(
@@ -1341,6 +1350,7 @@ export default function App() {
           ? "Error al procesar el PDF. Verifica que sea un PDF válido y no esté protegido."
           : "Error al cargar el informe. Si el documento procede de LibreOffice/OpenDocument, verifica que se haya exportado correctamente a .docx. Los ficheros muy grandes o con muchas imágenes pueden requerir más tiempo."
       );
+      return false;
     } finally {
       setIsLoadingHealthReport(false);
     }
@@ -1392,13 +1402,17 @@ export default function App() {
   // DOCX → extrae texto vía mammoth → genera EvidenceAtoms del tipo correspondiente.
   // PDF → extrae texto; si no lo hay, conserva la referencia e informa de la limitación.
   // D-HR-01 no aplica aquí: estos tipos SÍ pueden generar EvidenceAtoms.
-  async function handleLoadDocumentFile(file: File): Promise<void> {
+  async function handleLoadDocumentFile(file: File, options: LoaderOptions = {}): Promise<boolean> {
+    // La bandeja de revisión fija el tipo de forma explícita: no depende del
+    // selector del bloque «Añadir o sustituir fuentes» ni de su estado previo.
+    const effectiveKind = options.kind ?? kind;
+    const structureDeclared = options.declaresOpenAnswers ?? declaresOpenAnswers;
     const isLegacyDoc = /\.doc$/i.test(file.name) && !/\.docx$/i.test(file.name);
     if (isLegacyDoc) {
       setDocumentFileMessage(
         "El formato .doc (binario) no puede procesarse. Convierte el fichero a .docx y vuelve a cargarlo."
       );
-      return;
+      return false;
     }
 
     const isDocx = /\.docx$/i.test(file.name);
@@ -1408,7 +1422,7 @@ export default function App() {
       setDocumentFileMessage(
         "Formato no admitido. Sube un fichero .docx o .pdf."
       );
-      return;
+      return false;
     }
 
     const rawName = file.name
@@ -1429,7 +1443,7 @@ export default function App() {
           setDocumentFileMessage(
             "El fichero DOCX no contiene texto extraíble. Pega el contenido manualmente en el área de texto."
           );
-          return;
+          return false;
         }
 
         const documentId = crypto.randomUUID();
@@ -1443,7 +1457,7 @@ export default function App() {
           // Un marco estratégico recargado sustituye a su versión anterior
           // (mismo fichero o mismo título): nunca se duplica.
           const replaced =
-            kind === "strategic-framework"
+            effectiveKind === "strategic-framework"
               ? removeEquivalentStrategicFramework(prev.repository, {
                   title: docTitle,
                   sourceFileName: file.name,
@@ -1465,13 +1479,14 @@ export default function App() {
           const result = ingestManualDocument({
             repository: replaced.repository,
             evidenceStore: baseStore,
-            kind,
+            kind: effectiveKind,
             title: docTitle,
             plainText,
             sourceFileName: file.name,
             sourceSystem: isDocx ? "Archivo DOCX cargado" : "Texto extraído de PDF, con marcas de página",
             documentId,
-            structure: declaresOpenAnswers ? "open-answers" : undefined,
+            structure: structureDeclared ? "open-answers" : undefined,
+            temporal: options.temporal,
           });
 
           if (result === null) return prev;
@@ -1480,7 +1495,7 @@ export default function App() {
             setLastProcessedDocument(result.document);
             setLastAtomCount(result.atomsCreated);
             setDocumentFileMessage(
-              declaresOpenAnswers && result.atomsCreated === 0
+              structureDeclared && result.atomsCreated === 0
                 ? `«${docTitle}» se ha registrado desde el archivo, pero no se encontraron respuestas abiertas numeradas (1, 2, 3…) bajo una pregunta. No se ha creado ninguna unidad de evidencia; el texto se conserva íntegro.`
                 : `Carga completada: «${docTitle}» se ha registrado desde el archivo. No necesitas rellenar el cuadro de texto. ${result.atomsCreated} unidades de evidencia extraídas.`
             );
@@ -1504,7 +1519,7 @@ export default function App() {
           // Un marco estratégico recargado sustituye a su versión anterior
           // (mismo fichero o mismo título): nunca se duplica.
           const replaced =
-            kind === "strategic-framework"
+            effectiveKind === "strategic-framework"
               ? removeEquivalentStrategicFramework(prev.repository, {
                   title: docTitle,
                   sourceFileName: file.name,
@@ -1513,7 +1528,7 @@ export default function App() {
 
           const nextRepository = addMunicipalDocument(replaced.repository, {
             id: documentId,
-            kind: kind as DocumentKind,
+            kind: effectiveKind as DocumentKind,
             title: docTitle,
             source: {
               system: "Archivo PDF — referencia documental",
@@ -1521,7 +1536,8 @@ export default function App() {
             },
             sourceFileName: file.name,
             canGenerateEvidence: false,
-            tags: [kind],
+            tags: [effectiveKind],
+            ...(options.temporal !== undefined ? { temporal: options.temporal } : {}),
           });
           const registeredDoc = nextRepository.documents.find((d) => d.id === documentId);
           if (registeredDoc === undefined) return prev;
@@ -1558,11 +1574,13 @@ export default function App() {
           };
         });
       }
+      return true;
     } catch (err) {
       console.error("[document-file-load-error]", err);
       setDocumentFileMessage(
         "Error al procesar el archivo. Verifica que sea un PDF o DOCX válido, no protegido ni dañado."
       );
+      return false;
     } finally {
       setIsLoadingDocumentFile(false);
       setDeclaresOpenAnswers(false);
@@ -3768,7 +3786,20 @@ export default function App() {
                 .map((a) => ({ id: a.id, title: a.title, documentId: a.provenance.documentId ?? "" }))}
             />
 
-            <DocumentReviewInbox key={runtime.workspace.municipality.identity.id} municipality={runtime.workspace.municipality.identity.name} onPrepare={setKind} />
+            <DocumentReviewInbox
+              key={runtime.workspace.municipality.identity.id}
+              municipality={runtime.workspace.municipality.identity.name}
+              repository={runtime.workspace.repository}
+              declaredBy={remoteClient.auth.currentUser?.email || remoteClient.auth.currentUser?.displayName || ""}
+              documentKinds={DOCUMENT_KINDS}
+              isImporting={isLoadingHealthReport === true || isLoadingDocumentFile === true}
+              loaderMessages={{ "health-report": lastHealthReportMessage, "document-file": documentFileMessage }}
+              onImport={(file, request) =>
+                request.route === "health-report"
+                  ? handleLoadHealthReport(file, { temporal: request.temporal })
+                  : handleLoadDocumentFile(file, { kind: request.kind, declaresOpenAnswers: false, temporal: request.temporal })
+              }
+            />
 
             {/* ── BLOQUE 4: Añadir o sustituir fuentes ── */}
             <DocumentIngestionPanel

@@ -1,6 +1,7 @@
 import {
   addMunicipalDocument,
   type DocumentKind,
+  type DocumentTemporalMetadata,
   type MunicipalDocument,
   type MunicipalDocumentRepository,
 } from "../../domain/repository";
@@ -23,6 +24,8 @@ export interface IngestManualDocumentInput {
   sourceSystem?: string;
   /** Estructura del texto declarada por el equipo técnico. */
   structure?: DeclaredDocumentStructure;
+  /** Metadatos temporales declarados antes de la carga (bandeja de revisión). */
+  temporal?: DocumentTemporalMetadata;
 }
 
 export interface IngestManualDocumentResult {
@@ -55,6 +58,7 @@ export function ingestManualDocument(
     sourceFileName: input.sourceFileName,
     sourceText: cleanText,
     tags: [input.kind],
+    ...(input.temporal !== undefined ? { temporal: input.temporal } : {}),
   });
 
   const registeredDocument = nextRepository.documents.find(

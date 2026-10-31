@@ -10973,6 +10973,11 @@ h3 {
 .document-review-inbox__upload { min-width:0; }
 .document-review-inbox__upload input[type="file"] { width:100%; max-width:100%; min-width:0; box-sizing:border-box; }
 .document-review-inbox__layout > * { min-width:0; }
+.document-review-inbox__fields { display:grid; gap:12px; margin:0; padding:0; border:0; min-width:0; }
+.document-review-inbox__import { display:grid; gap:8px; padding:14px; border:1px solid var(--azul); border-radius:8px; background:var(--blanco); color:var(--texto-principal); }
+.document-review-inbox__import h4 { margin:0; font-size:1rem; }
+.document-review-inbox__import p, .document-review-inbox__import ul { margin:0; }
+.document-review-inbox__import button { justify-self:start; max-width:100%; white-space:normal; }
 @media(max-width:720px){.document-review-inbox__layout{grid-template-columns:1fr;}}
 
 /* Diagnóstico territorial · resumen de control documental */
