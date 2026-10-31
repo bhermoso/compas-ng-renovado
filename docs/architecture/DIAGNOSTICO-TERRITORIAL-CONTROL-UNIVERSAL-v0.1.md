@@ -145,3 +145,25 @@ Esos comandos son solo lectura. Confirmar mediante grep el contrato antes de cam
 
 ### Contrato visual pendiente de localizar
 La referencia `VISUAL-CONTRACT §2` está probada en `src/App.css`, pero la búsqueda de varias rutas nominales del archivo y la búsqueda indexada de GitHub no han localizado aún el texto íntegro. No afirmar que el contrato falta en todas las ramas ni inventar su contenido. Mantener este punto como verificación pendiente y bloquear la aprobación final de diseño hasta localizar el original o formalizar expresamente su recuperación.
+
+
+## 10. Fundamentos visuales recuperados del código de la home (fuente primaria implementada)
+Verificados directamente en `src/App.tsx` y `src/App.css` de `master`. **No equivalen al documento original `VISUAL-CONTRACT`**, aún no localizado.
+
+| Elemento | Implementación verificada | Regla para el nuevo Tab 1 |
+| --- | --- | --- |
+| Tipografía | `Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif` | Reutilizar familia y pesos actuales |
+| Identidad | `--azul:#0074c8`, `--cyan:#00acd9`, `--verde:#94d40b`, `--amarillo:#ffb61b`, `--naranja:#ff6600`, `--rojo:#dc143c` | Reutilizar variables, no duplicar colores arbitrarios |
+| Barra institucional | `.gradient-bar` de 6 px y seis franjas, cada una ~16.66 % | Mantener uso reconocible y contenido |
+| Neutros | `--fondo-principal:#f8fafc`, `--fondo-secundario:#f1f5f9`, `--borde:#e2e8f0`, `--blanco:#ffffff` | Fondos sobrios y separación por jerarquía |
+| Texto | `--texto-principal:#1e293b`, `--texto-secundario:#526070`, `--texto-terciario:#64748b` | Contraste y legibilidad; verificar WCAG |
+| Contenedores | `.hero,.workspace-panel` con ancho máximo 1120 px; tarjetas de radio 8 px, borde y sombra tenue | Usar patrones ya establecidos salvo necesidad responsive justificada |
+| Navegación | `NAV_ITEMS` de `src/App.tsx` identifica `Diagnóstico territorial` como fase 01 | Conservar lenguaje y jerarquía global de fases |
+| Microjerarquía | `.eyebrow` azul, mayúsculas, tracking 0.14em; `.lead` secundario con interlineado 1.7 | Respetar niveles tipográficos sin saturar de texto |
+
+### Criterios de revisión visual
+- Prohibido introducir un tema genérico o librería de diseño incompatible con los tokens del repositorio.
+- Diseño responsivo, navegación por teclado, foco visible, contraste comprobado y estados de carga/error accesibles.
+- La sala de control puede ser más densa y esquemática que la home, pero debe conservar su identidad: tipografía, paleta, superficies, ritmo, marca, navegación.
+- Verificar estilos existentes de la home y `InstitutionalLogoBand` antes de decidir cabecera o logotipos, sin deducir reglas no inspeccionadas.
+- Mantener la búsqueda del contrato original abierta; ninguna inferencia del CSS debe presentarse como norma textual verificada de ese documento.
