@@ -1,21 +1,33 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // Pre-deployment draft. Two Firestore reads maximum: membership + access account.
-    // The superadministrator bypass is deliberately NOT implemented here.
-    function eligible(scope, writable) {
+    // DRAFT — do not deploy without emulator validation and bucket verification.
+    // At most two Firestore reads per evaluated branch.
+    function isAdministrator() {
+      return firestore.exists(/databases/(default)/documents/compas_admins/$(request.auth.uid)) &&
+        firestore.get(/databases/(default)/documents/compas_admins/$(request.auth.uid)).data.active == true;
+    }
+    function territorialMember(scope, writable) {
       let membership = firestore.get(/databases/(default)/documents/relas_memberships/$(request.auth.uid)/scopes/$(scope)).data;
-      let account = firestore.get(/databases/(default)/documents/compas_access_accounts/$(request.auth.uid)).data;
       return membership.active == true &&
-        membership.role in (writable ? ['coordinator','administrator'] : ['reader','coordinator','administrator']) &&
-        account.active == true && account.scope == scope;
+        membership.role in (writable ? ['coordinator', 'administrator'] : ['reader', 'coordinator', 'administrator']);
+    }
+    function accountEnabled(scope) {
+      return !firestore.exists(/databases/(default)/documents/compas_access_accounts/$(request.auth.uid)) ||
+        (firestore.get(/databases/(default)/documents/compas_access_accounts/$(request.auth.uid)).data.active == true &&
+         firestore.get(/databases/(default)/documents/compas_access_accounts/$(request.auth.uid)).data.scope == scope);
+    }
+    // Two distinct documents in territorial branch (membership and account), one in admin branch.
+    function authorized(scope, writable) {
+      return isAdministrator() || (territorialMember(scope, writable) && accountEnabled(scope));
     }
     match /relas_scopes/{scope}/originals/{hash} {
-      allow get: if request.auth != null && eligible(scope, false);
+      allow get: if request.auth != null && authorized(scope, false);
       allow list: if false;
-      allow create: if request.auth != null && eligible(scope, true) &&
+      allow create: if request.auth != null && authorized(scope, true) &&
+        scope.matches('^[a-z0-9][a-z0-9-]{0,79}$') &&
         hash.matches('^[0-9a-f]{64}$') &&
-        request.resource.size > 0 && request.resource.size <= 40 * 1024 * 1024 &&
+        request.resource.size > 0 && request.resource.size <= 41943040 &&
         request.resource.metadata.sha256 == hash &&
         request.resource.metadata.municipalityId == scope;
       allow update, delete: if false;
