@@ -5,6 +5,7 @@ import { InitialLocalHealthPlanPanel } from "./ui/components/InitialLocalHealthP
 import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
 import { InstitutionalLogoBand } from "./ui/components/InstitutionalLogoBand";
 import { DocumentReviewInbox } from "./ui/components/DocumentReviewInbox";
+import { TerritorialDocumentControl } from "./ui/components/TerritorialDocumentControl";
 import { replaceZaidinFinalDraft } from "./application/workspace/replaceZaidinFinalDraft";
 import { regroupZagraActionPlan } from "./application/workspace/regroupZagraActionPlan";
 import { processPdfHealthReport } from './application/health-report/ProcessPdfHealthReport';
@@ -3631,7 +3632,9 @@ export default function App() {
               };
 
               return (
-                <section className="diag-header workspace-panel">
+                <>
+                  <TerritorialDocumentControl repository={runtime.workspace.repository} evidenceCount={atomCount} studiesLoaded={studiesLoaded} totalStudies={studies.length} />
+                  <section className="diag-header workspace-panel">
                   <div className="diag-header__title-row">
                     <div>
                       <p className="eyebrow">Diagnóstico territorial</p>
@@ -3678,6 +3681,7 @@ export default function App() {
                     </div>
                   </div>
                 </section>
+                </>
               );
             })()}
 
