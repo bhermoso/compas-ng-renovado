@@ -45,6 +45,7 @@ export function DocumentReviewInbox({ municipality }: { municipality: string }) 
   const [selected, setSelected] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const active = items.find((item) => item.id === selected);
+  const duplicates = active?.analysis?.fingerprint ? items.filter((item) => item.id !== active.id && item.analysis?.fingerprint === active.analysis?.fingerprint) : [];
   function update(id: string, patch: Partial<PendingDocumentReview>) {
     setItems((previous) => previous.map((item) => item.id === id ? { ...item, ...patch } : item));
   }
@@ -90,7 +91,7 @@ export function DocumentReviewInbox({ municipality }: { municipality: string }) 
       <div className="gradient-bar" aria-hidden="true" />
       <div className="panel-header">
         <div><p className="eyebrow">Revisión previa · Prototipo sin persistencia</p><h2 id="document-review-title">Bandeja de documentación</h2></div>
-        <p className="panel-note">Prepara la clasificación y la declaración temporal antes de importar. Analiza firmas, huellas y cabeceras CSV; en ZIP solo inspecciona el índice de entradas. No extrae documentos internos, almacena originales ni modifica evidencias.</p>
+        <p className="panel-note">Prepara la clasificación y la declaración temporal antes de importar. Analiza firmas, huellas y cabeceras CSV; en ZIP permite inspeccionar entradas individualmente con comprobación CRC-32. No incorpora documentos internos, almacena originales ni modifica evidencias.</p>
       </div>
       <label className="document-review-inbox__upload">
         Seleccionar archivos para revisión (sin subida)
@@ -108,6 +109,7 @@ export function DocumentReviewInbox({ municipality }: { municipality: string }) 
         {active && <div className="document-review-inbox__editor">
           <h3>Ficha de revisión</h3>
           {active.analysisError && <p role="alert">{active.analysisError}</p>}
+          {duplicates.length > 0 && <p role="alert"><strong>Duplicado binario en esta bandeja:</strong> {duplicates.map((item) => item.name).join(", ")}. No se ha importado ninguno.</p>}
           {active.analysis && <div className="ingestion-hint"><strong>Formato detectado:</strong> {active.analysis.format} · <strong>SHA-256:</strong> <code>{active.analysis.fingerprint?.slice(0,16)}…</code>
           {active.analysis.proposedKind !== "undetermined" && <p>Propuesta: {active.analysis.proposedKind} (sin validar).</p>}
           {active.analysis.reasons.map((reason,i)=><p key={i}>{reason}</p>)}
