@@ -1,30 +1,21 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // DRAFT — do not deploy without emulator validation and bucket verification.
-    // At most two Firestore reads per evaluated branch.
-    function isAdministrator() {
-      return firestore.exists(/databases/(default)/documents/compas_admins/$(request.auth.uid)) &&
-        firestore.get(/databases/(default)/documents/compas_admins/$(request.auth.uid)).data.active == true;
-    }
-    function territorialMember(scope, writable) {
+    // DRAFT ONLY. Deployment blocked until claims/permissions are unified.
+    // Two Firestore documents at most: territorial membership and managed account.
+    function member(scope, writable) {
       let membership = firestore.get(/databases/(default)/documents/relas_memberships/$(request.auth.uid)/scopes/$(scope)).data;
       return membership.active == true &&
-        membership.role in (writable ? ['coordinator', 'administrator'] : ['reader', 'coordinator', 'administrator']);
+        membership.role in (writable ? ['coordinator','administrator'] : ['reader','coordinator','administrator']);
     }
-    function accountEnabled(scope) {
-      return !firestore.exists(/databases/(default)/documents/compas_access_accounts/$(request.auth.uid)) ||
-        (firestore.get(/databases/(default)/documents/compas_access_accounts/$(request.auth.uid)).data.active == true &&
-         firestore.get(/databases/(default)/documents/compas_access_accounts/$(request.auth.uid)).data.scope == scope);
-    }
-    // Two distinct documents in territorial branch (membership and account), one in admin branch.
-    function authorized(scope, writable) {
-      return isAdministrator() || (territorialMember(scope, writable) && accountEnabled(scope));
+    function activeAccount(scope) {
+      let account = firestore.get(/databases/(default)/documents/compas_access_accounts/$(request.auth.uid)).data;
+      return account.active == true && account.scope == scope;
     }
     match /relas_scopes/{scope}/originals/{hash} {
-      allow get: if request.auth != null && authorized(scope, false);
+      allow get: if request.auth != null && member(scope, false) && activeAccount(scope);
       allow list: if false;
-      allow create: if request.auth != null && authorized(scope, true) &&
+      allow create: if request.auth != null && member(scope, true) && activeAccount(scope) &&
         scope.matches('^[a-z0-9][a-z0-9-]{0,79}$') &&
         hash.matches('^[0-9a-f]{64}$') &&
         request.resource.size > 0 && request.resource.size <= 41943040 &&
