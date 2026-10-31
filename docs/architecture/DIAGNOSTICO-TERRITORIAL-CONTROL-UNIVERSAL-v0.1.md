@@ -94,3 +94,34 @@ F. Migración no destructiva y regresión; despliegue solo previa autorización.
 - No se generan evidencias ni se cambian rankings, decisiones o perfiles por previsualización.
 - Todo cambio comprometido deja registro de quién, qué, cuándo, destino y derivaciones.
 - Expedientes históricos cargan sin migración destructiva ni recategorización retroactiva.
+
+
+## 8. Auditoría adicional Firebase y contrato visual (2026-10-31)
+### Firebase — constataciones
+- `firebase.json` configura Firestore y emuladores Firestore/Auth; no registra Storage ni reglas de Storage. La disponibilidad real del bucket en el proyecto remoto no ha sido comprobada.
+- `firebase/firestore.rules` delimita lectura y escritura por membresía territorial, rol y administrador para `relas_scopes`; hay que respetar ese modelo al crear metadatos y reglas de archivos, sin asumir permisos amplios ni exponer PII.
+- `src/infrastructure/document-files/originalFiles.ts` conserva originales exclusivamente en IndexedDB local `compas-original-documents`. El comentario del código dice que no se suben. La migración a Firebase Storage es una tarea real, no una simple configuración de ruta; antes de cualquier migración deben hacerse inventario, copia, comprobación de hash y reconciliación por ámbito.
+- `src/infrastructure/relas/RemoteWorkspace.ts` escribe snapshots JSON en chunks Firestore y limpia la versión anterior; no utilizar ese almacenamiento para originales grandes ni como historial documental permanente.
+- Propuesta: Storage para bytes de originales, Firestore para manifest, clasificación, declaraciones temporales, destinos y auditoría; integridad con hash; prohibir sobreescritura por defecto; revisión de cuotas, CORS, reglas, retención y acceso firmado/autorizado antes de habilitar.
+
+### Identidad visual COMPÁS — comprobación y obligación
+- `src/App.css` contiene comentario explícito `Paleta institucional — VISUAL-CONTRACT §2`, Inter y tokens: azul #0074c8, cyan #00acd9, verde #94d40b, amarillo #ffb61b, naranja #ff6600, rojo #dc143c; neutros slate, superficies blancas y gradiente institucional de seis franjas.
+- El fichero fuente del contrato visual no ha sido confirmado con las rutas exploradas. **Bloqueante antes de aprobar el nuevo diseño:** localizar el contrato mediante grep en el clon completo y cumplirlo íntegramente, no solo su paleta.
+- La sala de control debe reutilizar tokens, componentes, espaciado y accesibilidad propios del proyecto; no importar una biblioteca gráfica o un tema extraño sin revisión.
+
+### Comprobaciones Git Bash (desde raíz de compas-ng-renovado)
+```bash
+pwd
+git remote -v
+git branch --show-current
+grep -RniE --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist 'VISUAL-CONTRACT|contrato visual|paleta institucional|gradiente COMPÁS' docs src README* 2>/dev/null | head -100
+find . -path './node_modules' -prune -o -path './.git' -prune -o -iname '*visual*contract*' -print
+grep -RniE --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist 'firebase/storage|storageBucket|getStorage|uploadBytes|ref\(.*storage' src firebase firebase.json 2>/dev/null | head -100
+```
+Esos comandos son solo lectura. Confirmar mediante grep el contrato antes de cambiar CSS.
+
+### Siguiente secuencia
+1. Localizar y leer contrato visual completo.
+2. Auditar usos de IndexedDB/originales, backup, borrado y rehidratación; inventario migratorio.
+3. Diseñar esquema Storage+Firestore y reglas de acceso con tests en emuladores.
+4. Prototipo de sala de control conforme al contrato visual, sin activar escritura nueva hasta superar pruebas.
