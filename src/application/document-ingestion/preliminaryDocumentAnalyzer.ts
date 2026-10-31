@@ -1,8 +1,9 @@
 import type { DocumentKind } from "../../domain/repository";
+import { zipCrc32 } from "./zipCrc32";
 import { identifyMethodologicalHeaders, type MethodologicalMatch } from "./identifyMethodologicalHeaders";
 
 export type InspectedFormat = "pdf" | "docx" | "doc" | "zip" | "csv" | "xlsx" | "xls" | "png" | "jpeg" | "unknown";
-export interface ArchiveEntry { path: string; size: number; compressedSize: number; encrypted: boolean; unsafe: boolean; format: InspectedFormat; suggestedKind?: DocumentKind | "undetermined"; dataStart?: number; compressionMethod?: number }
+export interface ArchiveEntry { path: string; size: number; compressedSize: number; encrypted: boolean; unsafe: boolean; format: InspectedFormat; suggestedKind?: DocumentKind | "undetermined"; dataStart?: number; compressionMethod?: number; crc32?: number }
 export interface PreliminaryAnalysis {
   format: InspectedFormat;
   proposedKind: DocumentKind | "undetermined";
@@ -57,7 +58,7 @@ function inspectZip(buffer: ArrayBuffer): { entries: ArchiveEntry[]; warnings: s
     if (cursor + 46 > length || u32(view,cursor) !== 0x02014b50) throw new Error("Directorio ZIP inconsistente.");
     const flags=u16(view,cursor+8), method=u16(view,cursor+10), compressedSize=u32(view,cursor+20), size=u32(view,cursor+24);
     const nameLength=u16(view,cursor+28), extraLength=u16(view,cursor+30), commentLength=u16(view,cursor+32);
-    const localOffset=u32(view,cursor+42);
+    const localOffset=u32(view,cursor+42), crc32=u32(view,cursor+16);
     if (size === 0xffffffff || compressedSize === 0xffffffff || localOffset === 0xffffffff) throw new Error("Entrada ZIP64 no admitida.");
     if (localOffset + 30 > offset || u32(view,localOffset) !== 0x04034b50) throw new Error("Cabecera local ZIP ausente o inválida.");
     const dataStart=localOffset+30+u16(view,localOffset+26)+u16(view,localOffset+28);
@@ -72,7 +73,7 @@ function inspectZip(buffer: ArrayBuffer): { entries: ArchiveEntry[]; warnings: s
     if (encrypted || unsafe || (method!==0 && method!==8)) warnings.push("Entrada bloqueada o no admitida: "+path);
     if (compressedSize > 0 && size / compressedSize > 200) warnings.push("Compresión inusualmente alta: "+path);
     if (path.toLowerCase().endsWith(".zip")) warnings.push("ZIP anidado: revisión obligatoria: "+path);
-    entries.push({path,size,compressedSize,encrypted,unsafe,format:formatFromName(path),suggestedKind:"undetermined",dataStart,compressionMethod:method});
+    entries.push({path,size,compressedSize,encrypted,unsafe,format:formatFromName(path),suggestedKind:"undetermined",dataStart,compressionMethod:method,crc32});
     cursor=end;
   }
   if (cursor > eocd) throw new Error("Directorio ZIP solapado.");
@@ -159,6 +160,7 @@ export async function inspectArchiveMember(
     for (const block of blocks) { bytes.set(block, at); at += block.byteLength; }
   }
   if (bytes.byteLength !== entry.size) throw new Error("Tamaño extraído diferente del declarado.");
+  if (entry.crc32 === undefined || zipCrc32(bytes) !== entry.crc32) throw new Error("Integridad CRC-32 incorrecta en entrada ZIP.");
   // El nombre interno no implica validación metodológica ni destino.
   const member = new File([bytes], entry.path.split("/").pop() || "documento", { type: "application/octet-stream" });
   return { name: entry.path, analysis: await analyzeDocument(member) };
