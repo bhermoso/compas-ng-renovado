@@ -169,3 +169,19 @@ test('lápidas de ámbitos eliminados: solo administración general las escribe 
  await assertFails(getDoc(doc(db('other'),tomb)));
  await assertSucceeds(deleteDoc(doc(db('owner'),tomb)));
 });
+
+test('retirada territorial bloquea nuevos snapshots incluso para administradores; conserva lectura histórica',async()=>{
+ await owner();
+ await assertSucceeds(setDoc(doc(db('coord'),workspaceChunkPath),chunk('coord')));
+ await assertSucceeds(setDoc(doc(db('coord'),workspaceManifestPath),manifest('coord')));
+ const tomb=`compas_deleted_scopes/${scope}`;
+ await assertSucceeds(setDoc(doc(db('owner'),tomb),{deletedBy:'owner',deletedAt:serverTimestamp()}));
+ await assertFails(setDoc(doc(db('coord'),workspaceChunkPath),chunk('coord')));
+ await assertFails(setDoc(doc(db('owner'),workspaceChunkPath),chunk('owner')));
+ await assertFails(setDoc(doc(db('coord'),workspaceManifestPath),manifest('coord')));
+ await assertFails(setDoc(doc(db('owner'),workspaceManifestPath),manifest('owner')));
+ await assertSucceeds(getDoc(doc(db('reader'),workspaceChunkPath)));
+ await assertSucceeds(getDoc(doc(db('owner'),workspaceManifestPath)));
+ await assertSucceeds(deleteDoc(doc(db('owner'),tomb)));
+ await assertSucceeds(setDoc(doc(db('coord'),workspaceChunkPath),chunk('coord')));
+});
