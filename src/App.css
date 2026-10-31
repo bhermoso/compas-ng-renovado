@@ -10971,3 +10971,31 @@ h3 {
 .document-review-inbox__editor input,.document-review-inbox__editor select { max-width:100%; min-width:0; box-sizing:border-box; border:1px solid var(--borde); background:var(--blanco); color:var(--texto-principal); padding:10px; border-radius:6px; }
 .document-review-inbox__editor :is(button,input,select):focus-visible,.document-review-inbox__list button:focus-visible { outline:3px solid var(--azul); outline-offset:2px; }
 @media(max-width:720px){.document-review-inbox__layout{grid-template-columns:1fr;}}
+
+/* Diagnóstico territorial · resumen de control documental */
+.territorial-document-control__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 1.1rem 0;
+}
+.territorial-document-control__metrics > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1rem;
+  background: #f4f8fc;
+  border: 1px solid #dce8f0;
+  border-radius: 0.75rem;
+}
+.territorial-document-control__metrics strong { font-size: clamp(1.5rem, 2.7vw, 2.2rem); color: var(--azul); }
+.territorial-document-control__metrics span { font-size: 0.85rem; color: #41576b; }
+.territorial-document-control__detail { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.territorial-document-control__detail h3 { font-size: 1rem; }
+.territorial-document-control__detail ul { padding-left: 1.2rem; }
+.territorial-document-control__detail li { margin: 0.35rem 0; }
+.territorial-document-control__detail li strong { margin-left: 0.75rem; }
+@media (max-width: 740px) {
+  .territorial-document-control__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .territorial-document-control__detail { grid-template-columns: 1fr; }
+}
