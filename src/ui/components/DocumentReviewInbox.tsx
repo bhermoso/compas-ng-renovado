@@ -32,12 +32,14 @@ export interface PendingDocumentReview {
   /** Confirmación específica cuando la incorporación sustituye documentos existentes. */
   replacementAcknowledged?: boolean;
   /** Resultado de la incorporación mediante el cargador existente. */
-  importResult?: { ok: boolean; route: InboxImportRoute; at: string };
+  importResult?: { ok: boolean; route: InboxImportRoute; studyId?: string; at: string };
 }
 
 export interface InboxImportRequest {
   route: InboxImportRoute;
   kind: InboxImportKind;
+  /** Ruta de estudios: id del módulo metodológico cuyo cargador recibe el CSV. */
+  studyId?: string;
   temporal?: DocumentTemporalMetadata;
 }
 
@@ -48,8 +50,10 @@ interface DocumentReviewInboxProps {
   declaredBy: string;
   documentKinds?: ReadonlyArray<{ value: DocumentKind; label: string }>;
   isImporting?: boolean;
-  /** Mensajes de los cargadores existentes, para mostrar el resultado real de la carga. */
-  loaderMessages?: Partial<Record<InboxImportRoute, string | null>>;
+  /** Mensaje del cargador existente, para mostrar el resultado real de la carga. */
+  getLoaderMessage?: (route: InboxImportRoute, studyId?: string) => string | null | undefined;
+  /** Instrumentos con cargador CSV conectado (ids de módulo metodológico). */
+  connectedInstruments?: readonly string[];
   /** Entrega el archivo revisado al cargador existente; resuelve true si la carga se completó. */
   onImport?: (file: File, request: InboxImportRequest) => Promise<boolean>;
 }
@@ -85,7 +89,8 @@ export function DocumentReviewInbox({
   declaredBy,
   documentKinds = [],
   isImporting = false,
-  loaderMessages = {},
+  getLoaderMessage,
+  connectedInstruments = [],
   onImport,
 }: DocumentReviewInboxProps) {
   const [items, setItems] = useState<PendingDocumentReview[]>([]);
@@ -142,7 +147,14 @@ export function DocumentReviewInbox({
   }
 
   const plan = active?.analysis
-    ? planInboxImport({ kind: active.kind, format: active.analysis.format, fileName: active.name, repository })
+    ? planInboxImport({
+        kind: active.kind,
+        format: active.analysis.format,
+        fileName: active.name,
+        repository,
+        methodologicalMatches: active.analysis.methodologicalMatches,
+        connectedInstruments,
+      })
     : undefined;
   const importPlan = plan && !("blocked" in plan) ? plan : undefined;
   const temporalPreview = active
@@ -156,6 +168,8 @@ export function DocumentReviewInbox({
     : undefined;
   const temporalError = temporalPreview && "error" in temporalPreview ? temporalPreview.error : undefined;
   const alreadyImported = active?.importResult?.ok === true;
+  const destinationLabel = (p: { kind: InboxImportKind; instrument?: { label: string } }) =>
+    p.instrument ? `${labelOf(p.kind)} · ${p.instrument.label}` : labelOf(p.kind);
   const canImport =
     !!active && !!importPlan && !!onImport && active.approved === true && duplicates.length === 0 &&
     !temporalError && !alreadyImported && !isImporting &&
@@ -175,16 +189,18 @@ export function DocumentReviewInbox({
     if ("error" in temporal) { setMessage(temporal.error); return; }
     const id = active.id;
     setLastImportId(id);
-    setMessage(`Incorporando «${active.name}» con el cargador de ${labelOf(importPlan.kind)}…`);
+    const destination = destinationLabel(importPlan);
+    const studyId = importPlan.instrument?.moduleId;
+    setMessage(`Incorporando «${active.name}» con el cargador de ${destination}…`);
     let ok: boolean;
     try {
-      ok = await onImport(file, { route: importPlan.route, kind: importPlan.kind, temporal: temporal.temporal });
+      ok = await onImport(file, { route: importPlan.route, kind: importPlan.kind, studyId, temporal: temporal.temporal });
     } catch {
       ok = false;
     }
-    update(id, { importResult: { ok, route: importPlan.route, at: new Date().toISOString() } });
+    update(id, { importResult: { ok, route: importPlan.route, studyId, at: new Date().toISOString() } });
     setMessage(ok
-      ? `«${active.name}» se ha entregado al cargador de ${labelOf(importPlan.kind)}. Revisa abajo el resultado de la carga.`
+      ? `«${active.name}» se ha entregado al cargador de ${destination}. Revisa abajo el resultado de la carga.`
       : `No se ha incorporado «${active.name}». Revisa el motivo indicado por el cargador.`);
   }
 
@@ -241,11 +257,13 @@ export function DocumentReviewInbox({
           <label><input type="checkbox" checked={active.approved === true} onChange={e => update(active.id,{approved:e.target.checked && !!active.analysis && active.kind !== "undetermined" && duplicates.length === 0, replacementAcknowledged:false})} /> He revisado la clasificación y confirmo que el archivo corresponde a este expediente.</label>
           </fieldset>
 
+          {active.analysis && active.kind === "undetermined" && (active.analysis.methodologicalMatches?.length ?? 0) > 0 && <p className="ingestion-hint">Para incorporar este CSV con el cargador del instrumento, elige el tipo «Estudio complementario».</p>}
           {active.analysis && active.kind !== "undetermined" && plan && "blocked" in plan && <p className="ingestion-hint">{plan.reason}</p>}
           {importPlan && !alreadyImported && <div className="document-review-inbox__import" aria-label="Incorporación al expediente">
             <h4>Incorporación al expediente</h4>
-            <p><strong>Destino:</strong> {labelOf(importPlan.kind)} · <strong>Efecto:</strong> {importPlan.effect === "replace" ? "sustitución" : "nuevo documento"}</p>
+            <p><strong>Destino:</strong> {destinationLabel(importPlan)} · <strong>Efecto:</strong> {importPlan.effect === "replace" ? "sustitución" : "nuevo documento"}</p>
             <p>{importPlan.consequence}</p>
+            {importPlan.notes?.map((note) => <p key={note} className="panel-note">{note}</p>)}
             {importPlan.affected.length > 0 && <div role="alert"><strong>Documentos afectados:</strong><ul>{importPlan.affected.map(doc => <li key={doc.id}>{doc.title}{doc.sourceFileName ? ` (${doc.sourceFileName})` : ""}</li>)}</ul></div>}
             {importPlan.sameFileName.length > 0 && <p role="alert"><strong>Posible duplicado en el repositorio:</strong> ya existe {importPlan.sameFileName.map(doc => `«${doc.title}» (${labelOf(doc.kind)})`).join(", ")} con el mismo nombre de archivo. Si incorporas este, quedarán ambos.</p>}
             <p className="panel-note">
@@ -263,7 +281,7 @@ export function DocumentReviewInbox({
           </div>}
           {active.importResult && <div className="ingestion-hint" role="status">
             <strong>{active.importResult.ok ? "Incorporado al expediente" : "Incorporación no completada"}</strong>
-            {lastImportId === active.id && loaderMessages[active.importResult.route] && <p>{loaderMessages[active.importResult.route]}</p>}
+            {lastImportId === active.id && getLoaderMessage?.(active.importResult.route, active.importResult.studyId) && <p>{getLoaderMessage(active.importResult.route, active.importResult.studyId)}</p>}
           </div>}
           <button type="button" onClick={() => { filesRef.current.delete(active.id); setItems((before) => before.filter((item) => item.id !== active.id)); setSelected(null); setMessage(alreadyImported ? "Ficha retirada de la bandeja. El documento incorporado permanece en el expediente." : "Ficha descartada. No se han modificado documentos."); }}>{alreadyImported ? "Retirar de la bandeja" : "Descartar ficha"}</button>
         </div>}

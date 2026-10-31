@@ -8,15 +8,26 @@ import type {
 } from "../../domain/repository";
 import { removeEquivalentStrategicFramework } from "./strategicFrameworkReplace";
 import type { InspectedFormat } from "./preliminaryDocumentAnalyzer";
+import type { MethodologicalMatch } from "./identifyMethodologicalHeaders";
 
 /** Cargador existente de COMPÁS al que la bandeja entrega el archivo revisado. */
-export type InboxImportRoute = "health-report" | "document-file";
+export type InboxImportRoute = "health-report" | "document-file" | "study-csv";
 
 export type InboxImportKind =
   | "health-report"
   | "strategic-framework"
   | "territorial-documentation"
-  | "qualitative-material";
+  | "qualitative-material"
+  | "complementary-study";
+
+/** Instrumento reconocido por cabeceras al que se entrega un CSV de estudio. */
+export interface InboxStudyInstrument {
+  moduleId: string;
+  label: string;
+  confidence: MethodologicalMatch["confidence"];
+  matched: number;
+  expected: number;
+}
 
 export interface InboxImportPlan {
   route: InboxImportRoute;
@@ -29,6 +40,10 @@ export interface InboxImportPlan {
   sameFileName: MunicipalDocument[];
   /** Consecuencia de escritura, en lenguaje de interfaz. */
   consequence: string;
+  /** Solo en la ruta de estudios: instrumento cuyo cargador recibirá el CSV. */
+  instrument?: InboxStudyInstrument;
+  /** Advertencias que no bloquean la carga (coincidencia parcial, opciones por defecto). */
+  notes?: string[];
 }
 
 export type InboxImportBlock = { blocked: true; reason: string };
@@ -38,6 +53,7 @@ const IMPORTABLE_KINDS: readonly InboxImportKind[] = [
   "strategic-framework",
   "territorial-documentation",
   "qualitative-material",
+  "complementary-study",
 ];
 
 function isImportableKind(kind: DocumentKind | "undetermined"): kind is InboxImportKind {
@@ -65,8 +81,24 @@ export function planInboxImport(input: {
   format: InspectedFormat;
   fileName: string;
   repository: MunicipalDocumentRepository;
+  /** Coincidencias de cabecera del análisis preliminar (solo CSV). */
+  methodologicalMatches?: MethodologicalMatch[];
+  /** Instrumentos con cargador CSV conectado a la bandeja (ids de módulo). */
+  connectedInstruments?: readonly string[];
 }): InboxImportPlan | InboxImportBlock {
   const { kind, format, fileName, repository } = input;
+  // Un CSV de instrumento se reconoce por sus columnas, no por el tipo elegido:
+  // IBSE se registra como exportación REDCap y el resto como estudio complementario.
+  if ((kind === "complementary-study" || kind === "redcap-export") && format === "csv") {
+    return planStudyImport(fileName, repository, input.methodologicalMatches ?? [], input.connectedInstruments ?? []);
+  }
+  if (kind === "complementary-study") {
+    return {
+      blocked: true,
+      reason:
+        "Desde la bandeja solo se incorporan estudios complementarios en CSV de un instrumento reconocido. Para un estudio en texto (PDF o DOCX), usa el bloque «Añadir o sustituir fuentes».",
+    };
+  }
   if (!isImportableKind(kind)) {
     return {
       blocked: true,
@@ -129,6 +161,57 @@ export function planInboxImport(input: {
     sameFileName: active.filter(sameName),
     consequence:
       "Añade un documento nuevo al repositorio y extrae unidades de evidencia del texto. No sustituye documentos existentes.",
+  };
+}
+
+function planStudyImport(
+  fileName: string,
+  repository: MunicipalDocumentRepository,
+  matches: MethodologicalMatch[],
+  connected: readonly string[]
+): InboxImportPlan | InboxImportBlock {
+  const candidates = matches.filter((m) => connected.includes(m.moduleId));
+  if (candidates.length === 0) {
+    return {
+      blocked: true,
+      reason: matches.length
+        ? "Las columnas coinciden con un instrumento que todavía no tiene cargador conectado a la bandeja. Usa el panel «Estudios complementarios»."
+        : "Las columnas del CSV no coinciden con ningún instrumento del catálogo metodológico. No se atribuye a ningún cuestionario: revísalo manualmente.",
+    };
+  }
+  const ratio = (m: MethodologicalMatch) => m.matched / m.expected;
+  const best = candidates[0];
+  const tied = candidates.filter((m) => m.moduleId !== best.moduleId && ratio(m) === ratio(best) && m.matched === best.matched);
+  if (tied.length) {
+    return {
+      blocked: true,
+      reason: `Las columnas encajan por igual con ${[best, ...tied].map((m) => m.label).join(" y ")}. Para no atribuir el CSV a un instrumento equivocado, cárgalo desde el panel «Estudios complementarios».`,
+    };
+  }
+  const active = activeDocuments(repository);
+  const affected = active.filter((d) => d.tags.includes(best.moduleId));
+  const normalizedName = fileName.trim().toLowerCase();
+  const sameFileName = active.filter(
+    (d) => !affected.includes(d) && d.sourceFileName !== undefined && d.sourceFileName.trim().toLowerCase() === normalizedName
+  );
+  const notes: string[] = [];
+  if (best.confidence === "partial") {
+    notes.push(`Coincidencia parcial de columnas (${best.matched}/${best.expected}). El cargador de ${best.label} comprobará si hay registros válidos; si no los hay, no escribe nada.`);
+  }
+  if (best.moduleId === "ibse") {
+    notes.push("IBSE se carga sin ajuste demográfico. Para ajustarlo por edad y sexo, usa el panel «Estudios complementarios».");
+  }
+  return {
+    route: "study-csv",
+    kind: "complementary-study",
+    effect: affected.length ? "replace" : "create",
+    affected,
+    sameFileName,
+    consequence: affected.length
+      ? `Sustituye el estudio ${best.label} cargado. El cargador retira el documento anterior y sus indicadores del análisis territorial.`
+      : `Carga el estudio ${best.label} con su cargador específico, que valida los registros y calcula los indicadores.`,
+    instrument: { moduleId: best.moduleId, label: best.label, confidence: best.confidence, matched: best.matched, expected: best.expected },
+    ...(notes.length ? { notes } : {}),
   };
 }
 

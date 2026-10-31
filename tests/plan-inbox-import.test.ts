@@ -78,3 +78,42 @@ describe("buildInboxTemporalMetadata", () => {
     expect(anonymous).toEqual({ temporal: { documentDate: { value: "2016", precision: "year" }, ingestedAt: now } });
   });
 });
+
+describe("planInboxImport · estudios complementarios en CSV", () => {
+  const connected = ["ibse", "ghq12", "cage-eas"];
+  const match = (moduleId: string, label: string, matched: number, expected: number) =>
+    ({ moduleId, label, matched, expected, confidence: matched === expected ? "strong" as const : "partial" as const, adapter: "redcap" as const });
+
+  it("entrega el CSV al cargador del instrumento reconocido, sea cual sea el tipo elegido", () => {
+    for (const kind of ["complementary-study", "redcap-export"] as const) {
+      const plan = planInboxImport({ kind, format: "csv", fileName: "ibse.csv", repository: empty, methodologicalMatches: [match("ibse", "IBSE", 6, 6)], connectedInstruments: connected });
+      if ("blocked" in plan) throw new Error(plan.reason);
+      expect(plan).toMatchObject({ route: "study-csv", kind: "complementary-study", effect: "create", instrument: { moduleId: "ibse", confidence: "strong" } });
+      expect(plan.notes?.join(" ")).toContain("sin ajuste demográfico");
+    }
+  });
+
+  it("anuncia la sustitución del estudio ya cargado del mismo instrumento", () => {
+    const repo = addMunicipalDocument(empty, { id: "g1", kind: "redcap-export", title: "GHQ-12 - previo.csv", source, sourceFileName: "previo.csv", tags: ["complementary-study", "ghq12"] });
+    const plan = planInboxImport({ kind: "complementary-study", format: "csv", fileName: "nuevo.csv", repository: repo, methodologicalMatches: [match("ghq12", "GHQ-12", 12, 13)], connectedInstruments: connected });
+    if ("blocked" in plan) throw new Error(plan.reason);
+    expect(plan.effect).toBe("replace");
+    expect(plan.affected.map(d => d.id)).toEqual(["g1"]);
+    expect(plan.consequence).toContain("retira el documento anterior");
+    expect(plan.notes?.join(" ")).toContain("Coincidencia parcial de columnas (12/13)");
+  });
+
+  it("no atribuye el CSV sin coincidencia, con instrumento no conectado o con empate", () => {
+    const base = { kind: "complementary-study" as const, format: "csv" as const, fileName: "x.csv", repository: empty, connectedInstruments: connected };
+    expect(planInboxImport({ ...base, methodologicalMatches: [] })).toMatchObject({ blocked: true });
+    expect((planInboxImport({ ...base, methodologicalMatches: [] }) as { reason: string }).reason).toContain("No se atribuye");
+    expect(planInboxImport({ ...base, methodologicalMatches: [match("psqi", "PSQI", 7, 8)] })).toMatchObject({ blocked: true });
+    const tie = planInboxImport({ ...base, methodologicalMatches: [match("ibse", "IBSE", 2, 2), match("cage-eas", "CAGE", 2, 2)] });
+    expect(tie).toMatchObject({ blocked: true });
+    expect((tie as { reason: string }).reason).toContain("por igual");
+  });
+
+  it("un estudio en PDF o DOCX no entra por la bandeja", () => {
+    expect(planInboxImport({ kind: "complementary-study", format: "pdf", fileName: "e.pdf", repository: empty })).toMatchObject({ blocked: true });
+  });
+});
