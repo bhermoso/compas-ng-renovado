@@ -2,7 +2,7 @@ import type { DocumentKind } from "../../domain/repository";
 import { identifyMethodologicalHeaders, type MethodologicalMatch } from "./identifyMethodologicalHeaders";
 
 export type InspectedFormat = "pdf" | "docx" | "doc" | "zip" | "csv" | "xlsx" | "xls" | "png" | "jpeg" | "unknown";
-export interface ArchiveEntry { path: string; size: number; compressedSize: number; encrypted: boolean; unsafe: boolean; format: InspectedFormat; suggestedKind?: DocumentKind | "undetermined" }
+export interface ArchiveEntry { path: string; size: number; compressedSize: number; encrypted: boolean; unsafe: boolean; format: InspectedFormat; suggestedKind?: DocumentKind | "undetermined"; dataStart?: number; compressionMethod?: number }
 export interface PreliminaryAnalysis {
   format: InspectedFormat;
   proposedKind: DocumentKind | "undetermined";
@@ -72,7 +72,7 @@ function inspectZip(buffer: ArrayBuffer): { entries: ArchiveEntry[]; warnings: s
     if (encrypted || unsafe || (method!==0 && method!==8)) warnings.push("Entrada bloqueada o no admitida: "+path);
     if (compressedSize > 0 && size / compressedSize > 200) warnings.push("Compresión inusualmente alta: "+path);
     if (path.toLowerCase().endsWith(".zip")) warnings.push("ZIP anidado: revisión obligatoria: "+path);
-    entries.push({path,size,compressedSize,encrypted,unsafe,format:formatFromName(path),suggestedKind:"undetermined"});
+    entries.push({path,size,compressedSize,encrypted,unsafe,format:formatFromName(path),suggestedKind:"undetermined",dataStart,compressionMethod:method});
     cursor=end;
   }
   if (cursor > eocd) throw new Error("Directorio ZIP solapado.");
@@ -113,4 +113,53 @@ export async function analyzeDocument(file: File): Promise<PreliminaryAnalysis> 
   const digest=await crypto.subtle.digest("SHA-256",buffer);
   const fingerprint=Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,"0")).join("");
   return { format,proposedKind,reasons,warnings,fingerprint,archiveEntries,methodologicalMatches };
+}
+
+/** Extrae exclusivamente una entrada segura de un ZIP clásico.
+ * Decompresión acotada por streaming: nunca confía en el tamaño declarado.
+ * No admite ZIP64, archivos cifrados ni rutas peligrosas.
+ */
+export async function inspectArchiveMember(
+  archive: File,
+  entryPath: string
+): Promise<{ name: string; analysis: PreliminaryAnalysis }> {
+  if (archive.size > MAX_INPUT) throw new Error("ZIP superior al límite permitido.");
+  const buffer = await archive.arrayBuffer();
+  const { entries } = inspectZip(buffer);
+  const entry = entries.find(x => x.path === entryPath);
+  if (!entry || entry.unsafe || entry.encrypted || entry.path.endsWith("/")) throw new Error("Entrada ZIP inexistente o bloqueada.");
+  if (entry.size > 8 * 1024 * 1024) throw new Error("Entrada superior al límite de 8 MiB.");
+  if (entry.compressionMethod !== 0 && entry.compressionMethod !== 8) throw new Error("Compresión ZIP no soportada.");
+  if (entry.dataStart === undefined || entry.dataStart + entry.compressedSize > buffer.byteLength) throw new Error("Entrada fuera de límites.");
+  const compressed = new Uint8Array(buffer, entry.dataStart, entry.compressedSize);
+  let bytes: Uint8Array;
+  if (entry.compressionMethod === 0) bytes = compressed.slice();
+  else {
+    if (typeof DecompressionStream === "undefined") throw new Error("Este navegador no admite descompresión segura.");
+    let stream: ReadableStream<Uint8Array>;
+    try { stream = new Blob([compressed]).stream().pipeThrough(new DecompressionStream("deflate-raw")); }
+    catch { throw new Error("Descompresión deflate-raw no disponible en este navegador."); }
+    const reader = stream.getReader();
+    const blocks: Uint8Array[] = [];
+    let size = 0;
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        size += value.byteLength;
+        if (size > 8 * 1024 * 1024 || size > entry.size) {
+          await reader.cancel();
+          throw new Error("Descompresión supera tamaño declarado o máximo permitido.");
+        }
+        blocks.push(value);
+      }
+    } finally { reader.releaseLock(); }
+    bytes = new Uint8Array(size);
+    let at = 0;
+    for (const block of blocks) { bytes.set(block, at); at += block.byteLength; }
+  }
+  if (bytes.byteLength !== entry.size) throw new Error("Tamaño extraído diferente del declarado.");
+  // El nombre interno no implica validación metodológica ni destino.
+  const member = new File([bytes], entry.path.split("/").pop() || "documento", { type: "application/octet-stream" });
+  return { name: entry.path, analysis: await analyzeDocument(member) };
 }
