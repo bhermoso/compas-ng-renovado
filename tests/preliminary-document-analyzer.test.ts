@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { zipCrc32 } from "../src/application/document-ingestion/zipCrc32";
 import { analyzeDocument, inspectArchiveMember } from "../src/application/document-ingestion/preliminaryDocumentAnalyzer";
 
 function file(bytes: Uint8Array, name: string): File {
@@ -47,6 +48,7 @@ function minimalZip(path: string, size = 4, compressedSize = 4): Uint8Array {
   b.set(name,30);
   v.setUint32(centralOffset,0x02014b50,true);
   v.setUint16(centralOffset+10,0,true);
+  v.setUint32(centralOffset+16,zipCrc32(b.subarray(30+name.length,30+name.length+compressedSize)),true);
   v.setUint32(centralOffset+20,compressedSize,true);
   v.setUint32(centralOffset+24,size,true);
   v.setUint16(centralOffset+28,name.length,true);
@@ -104,5 +106,18 @@ describe("inspección individual de ZIP", () => {
     expect(result.name).toBe("datos.csv");
     expect(result.analysis.fingerprint).toHaveLength(64);
     expect(result.analysis.proposedKind).toBe("undetermined");
+  });
+});
+
+describe("CRC-32 ZIP", () => {
+  it("calcula vector de referencia", () => {
+    expect(zipCrc32(encode("123456789"))).toBe(0xcbf43926);
+  });
+  it("rechaza un contenido alterado pese al tamaño válido", async () => {
+    const bytes=minimalZip("datos.csv");
+    const v=new DataView(bytes.buffer);
+    const offset=30+encode("datos.csv").length+4;
+    v.setUint32(offset+16,0x12345678,true);
+    await expect(inspectArchiveMember(file(bytes,"datos.zip"),"datos.csv")).rejects.toThrow("CRC-32");
   });
 });
