@@ -10984,12 +10984,12 @@ h3 {
   flex-direction: column;
   gap: 0.3rem;
   padding: 1rem;
-  background: #f4f8fc;
-  border: 1px solid #dce8f0;
+  background: var(--fondo-suave);
+  border: 1px solid var(--borde-suave);
   border-radius: 0.75rem;
 }
 .territorial-document-control__metrics strong { font-size: clamp(1.5rem, 2.7vw, 2.2rem); color: var(--azul); }
-.territorial-document-control__metrics span { font-size: 0.85rem; color: #41576b; }
+.territorial-document-control__metrics span { font-size: 0.85rem; color: var(--texto-secundario); }
 .territorial-document-control__detail { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
 .territorial-document-control__detail h3 { font-size: 1rem; }
 .territorial-document-control__detail ul { padding-left: 1.2rem; }
