@@ -1,4 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app';
+import { getStorage } from 'firebase/storage';
 import { initializeAuth, inMemoryPersistence, type Auth } from 'firebase/auth';
 import { getFirestore, doc, collection, getDocs, getDocFromServer, runTransaction, serverTimestamp, type Firestore } from 'firebase/firestore';
 import { ACTION_PLAN_CATALOG } from '../../domain/action-plan-catalog/ActionPlanCatalog';
@@ -10,9 +11,18 @@ const config = {
  apiKey: 'AIzaSyDYNKa2o3mxaxYd426imxlhONkhUabsS3k',
  authDomain: 'compas-98dd7.firebaseapp.com',
  projectId: 'compas-98dd7',
+ storageBucket: 'compas-98dd7.firebasestorage.app',
  appId: '1:453759873152:web:110b0be2220ff59d91f665',
 };
+/** The bucket name comes from the user-supplied Firebase config; provisioning is not verified. */
+export const RELAS_STORAGE_BUCKET = 'gs://compas-98dd7.firebasestorage.app';
 export interface RelasClient { auth: Auth; db: Firestore }
+/** Obtain Storage from the SAME named Firebase app as Auth/Firestore, without activating uploads. */
+export function getRelasDocumentStorage() {
+ const app = getApps().find(app => app.name === 'compas-relas');
+ if (!app) throw new Error('Cliente Firebase aún no inicializado.');
+ return getStorage(app, RELAS_STORAGE_BUCKET);
+}
 export interface RelasDraftRow { version: number; payload: PlanPreparationDraft }
 export interface RelasReviewRow { version: number; payload: PlanPreparationReview }
 let instance: RelasClient | undefined;

@@ -1,0 +1,28 @@
+rules_version = '2';
+service firebase.storage {
+ match /b/{bucket}/o {
+  // Borrador: los administradores globales requieren una vía de permisos
+  // independiente antes del despliegue. La evaluación territorial admite
+  // cuentas heredadas sin ficha gestionada, como en Firestore.
+  function accountEnabled(scope) {
+   return !firestore.exists(/databases/(default)/documents/compas_access_accounts/$(request.auth.uid)) ||
+    (firestore.get(/databases/(default)/documents/compas_access_accounts/$(request.auth.uid)).data.active == true &&
+     firestore.get(/databases/(default)/documents/compas_access_accounts/$(request.auth.uid)).data.scope == scope);
+  }
+  function membershipAllows(scope, writable) {
+   let m = firestore.get(/databases/(default)/documents/relas_memberships/$(request.auth.uid)/scopes/$(scope)).data;
+   return m.active == true &&
+    m.role in (writable ? ['coordinator','administrator'] : ['reader','coordinator','administrator']);
+  }
+  match /relas_scopes/{scope}/originals/{hash} {
+   allow get: if request.auth != null && accountEnabled(scope) && membershipAllows(scope,false);
+   allow list: if false;
+   allow create: if request.auth != null && accountEnabled(scope) && membershipAllows(scope,true) &&
+    hash.matches('^[0-9a-f]{64}$') &&
+    request.resource.size > 0 && request.resource.size <= 41943040 &&
+    request.resource.metadata.sha256 == hash &&
+    request.resource.metadata.municipalityId == scope;
+   allow update, delete: if false;
+  }
+ }
+}

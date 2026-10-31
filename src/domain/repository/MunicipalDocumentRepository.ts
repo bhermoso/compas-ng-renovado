@@ -1,5 +1,6 @@
 import type { RecommendationKind, StatementType } from "../statements/statementTypes";
 import type { MunicipalityId } from "../municipality";
+import type { DocumentTemporalMetadata } from "./documentTemporalMetadata";
 
 export type DocumentId = string;
 
@@ -262,6 +263,8 @@ export interface MunicipalDocument {
   ugc?: string;
   contentMode?: DocumentContentMode;
   cycle?: DocumentCycle;
+  /** Declaración temporal ampliada: opcional para preservar expedientes anteriores. */
+  temporal?: DocumentTemporalMetadata;
   createdAt: string;
   updatedAt: string;
 }
@@ -305,6 +308,7 @@ export interface AddMunicipalDocumentInput {
   ugc?: string;
   contentMode?: DocumentContentMode;
   cycle?: DocumentCycle;
+  temporal?: DocumentTemporalMetadata;
 }
 
 function defaultCanGenerateEvidence(kind: DocumentKind): boolean {
@@ -347,6 +351,7 @@ export function addMunicipalDocument(
     ugc: input.ugc,
     contentMode: input.contentMode,
     ...(input.cycle !== undefined ? { cycle: input.cycle } : {}),
+    ...(input.temporal !== undefined ? { temporal: input.temporal } : {}),
     createdAt: now,
     updatedAt: now,
   };
@@ -354,6 +359,26 @@ export function addMunicipalDocument(
   return {
     ...repository,
     documents: [...repository.documents, document],
+    updatedAt: now,
+  };
+}
+
+/** Actualiza únicamente los metadatos temporales; no altera ciclo legado ni evidencias. */
+export function setMunicipalDocumentTemporalMetadata(
+  repository: MunicipalDocumentRepository,
+  documentId: DocumentId,
+  temporal: DocumentTemporalMetadata | undefined
+): MunicipalDocumentRepository {
+  if (!repository.documents.some((doc) => doc.id === documentId)) return repository;
+  const now = new Date().toISOString();
+  return {
+    ...repository,
+    documents: repository.documents.map((doc) => {
+      if (doc.id !== documentId) return doc;
+      const { temporal: _previous, ...rest } = doc;
+      void _previous;
+      return { ...rest, ...(temporal !== undefined ? { temporal } : {}), updatedAt: now };
+    }),
     updatedAt: now,
   };
 }

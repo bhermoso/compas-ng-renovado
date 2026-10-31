@@ -27,6 +27,9 @@ service cloud.firestore {
     get(/databases/$(database)/documents/relas_memberships/$(request.auth.uid)/scopes/$(scope)).data.active == true &&
     get(/databases/$(database)/documents/relas_memberships/$(request.auth.uid)/scopes/$(scope)).data.role in ['coordinator', 'administrator']);
   }
+  function scopeNotWithdrawn(scope) {
+   return !exists(/databases/$(database)/documents/compas_deleted_scopes/$(scope));
+  }
   function validWorkspaceManifest(scope) {
    let d = request.resource.data;
    return d.keys().hasAll(['schema','municipalityId','snapshotId','chunkCount','characterLength','workspaceUpdatedAt','savedBy','savedAt']) &&
@@ -120,6 +123,67 @@ service cloud.firestore {
    allow list: if isAdministrator();
    allow create, delete: if isAdministrator() && scope.matches('^[a-z0-9][a-z0-9-]{0,79}$');
    allow update: if false;
+  }
+  // Content-addressed original metadata, immutable once created.
+  match /relas_scopes/{scope}/originals/{sha256} {
+   allow get, list: if member(scope);
+   allow create: if canWriteScope(scope) && scopeNotWithdrawn(scope) &&
+    sha256.matches('^[0-9a-f]{64}
+   allow read: if member(scope);
+   allow create, update: if canWriteScope(scope) && scopeNotWithdrawn(scope) && validWorkspaceManifest(scope);
+   allow delete: if false;
+  }
+  match /relas_scopes/{scope}/workspace_versions/{snapshotId}/chunks/{chunkId} {
+   allow read: if member(scope);
+   allow create: if canWriteScope(scope) && scopeNotWithdrawn(scope) && validWorkspaceChunk();
+   allow update: if false;
+   allow delete: if false;
+  }
+  match /relas_scopes/{scope}/drafts/{moduleId} {
+   allow read: if member(scope);
+   function hasHistory() {
+    return getAfter(/databases/$(database)/documents/relas_scopes/$(scope)/drafts/$(moduleId)/history/$(string(request.resource.data.version))).data == request.resource.data;
+   }
+   allow create: if canWriteTerritorialProposal(scope) && validDraft(scope,moduleId) && request.resource.data.version == 1 && hasHistory();
+   allow update: if canWriteTerritorialProposal(scope) && validDraft(scope,moduleId) && request.resource.data.version == resource.data.version + 1 && hasHistory();
+   allow delete: if false;
+   match /history/{version} {
+    allow read: if member(scope);
+    allow create: if canWriteTerritorialProposal(scope) && validDraft(scope,moduleId) && version == string(request.resource.data.version) &&
+     getAfter(/databases/$(database)/documents/relas_scopes/$(scope)/drafts/$(moduleId)).data == request.resource.data;
+    allow update, delete: if false;
+   }
+  }
+  match /relas_scopes/{scope}/reviews/{moduleId} {
+   allow read: if member(scope);
+   function hasHistory() {
+    return getAfter(/databases/$(database)/documents/relas_scopes/$(scope)/reviews/$(moduleId)/history/$(string(request.resource.data.version))).data == request.resource.data;
+   }
+   allow create: if isAdministrator() && validReview(scope,moduleId) && request.resource.data.version == 1 && hasHistory();
+   allow update: if isAdministrator() && validReview(scope,moduleId) && request.resource.data.version == resource.data.version + 1 && hasHistory();
+   allow delete: if false;
+   match /history/{version} {
+    allow read: if member(scope);
+    allow create: if isAdministrator() && validReview(scope,moduleId) && version == string(request.resource.data.version) &&
+     getAfter(/databases/$(database)/documents/relas_scopes/$(scope)/reviews/$(moduleId)).data == request.resource.data;
+    allow update, delete: if false;
+   }
+  }
+ }
+}
+) &&
+    request.resource.data.keys().hasAll(['schema','municipalityId','sha256','storagePath','byteLength','fileName','contentType','createdBy','createdAt']) &&
+    request.resource.data.keys().hasOnly(['schema','municipalityId','sha256','storagePath','byteLength','fileName','contentType','createdBy','createdAt']) &&
+    request.resource.data.schema == 'compas-original/v1' &&
+    request.resource.data.municipalityId == scope &&
+    request.resource.data.sha256 == sha256 &&
+    request.resource.data.storagePath == 'relas_scopes/' + scope + '/originals/' + sha256 &&
+    request.resource.data.byteLength is int && request.resource.data.byteLength > 0 && request.resource.data.byteLength <= 41943040 &&
+    request.resource.data.fileName is string && request.resource.data.fileName.size() > 0 && request.resource.data.fileName.size() <= 255 &&
+    request.resource.data.contentType is string && request.resource.data.contentType.size() > 0 && request.resource.data.contentType.size() <= 120 &&
+    request.resource.data.createdBy == request.auth.uid &&
+    request.resource.data.createdAt == request.time;
+   allow update, delete: if false;
   }
   match /relas_scopes/{scope}/workspace/current {
    allow read: if member(scope);

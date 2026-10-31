@@ -1,0 +1,152 @@
+import { useRef, useState } from "react";
+import { proposeDocumentDestinations } from "../../application/document-ingestion/proposeDocumentDestinations";
+import type { ChangeEvent } from "react";
+import type { DocumentKind, TemporalScope } from "../../domain/repository";
+import { analyzeDocument, inspectArchiveMember, type PreliminaryAnalysis } from "../../application/document-ingestion/preliminaryDocumentAnalyzer";
+
+export interface PendingDocumentReview {
+  id: string;
+  name: string;
+  size: number;
+  proposedKind: DocumentKind | "undetermined";
+  kind: DocumentKind | "undetermined";
+  municipality: string;
+  documentDate: string;
+  observedPeriod: string;
+  temporalScope: TemporalScope;
+  analysis?: PreliminaryAnalysis;
+  analysisError?: string;
+  inspectedMembers?: Record<string, PreliminaryAnalysis>;
+  approved?: boolean;
+}
+
+const KIND_OPTIONS: Array<{ value: DocumentKind | "undetermined"; label: string }> = [
+  { value: "undetermined", label: "Sin clasificar" },
+  { value: "health-report", label: "Informe de Salud" },
+  { value: "complementary-study", label: "Estudio complementario" },
+  { value: "redcap-export", label: "Exportación REDCap" },
+  { value: "localiza-salud", label: "Localiza Salud" },
+  { value: "strategic-framework", label: "Marco normativo" },
+  { value: "territorial-documentation", label: "Documentación territorial" },
+  { value: "qualitative-material", label: "Material cualitativo" },
+  { value: "longitudinal-evidence", label: "Evidencia longitudinal" },
+  { value: "other", label: "Otra fuente" },
+];
+
+function proposeKind(name: string): DocumentKind | "undetermined" {
+  const lower = name.toLowerCase();
+  if (/\.(zip|png|jpe?g)$/i.test(lower)) return "undetermined";
+  if (/\.csv$/i.test(lower)) return "undetermined"; // No inferir REDCap por extensión.
+  return "undetermined"; // Nunca inferir naturaleza de la fuente por el nombre.
+}
+
+/** Bandeja preliminar, sin escritura ni lectura de contenido; no sustituye a los adaptadores. */
+export function DocumentReviewInbox({ municipality, onPrepare }: { municipality: string; onPrepare?: (kind: DocumentKind) => void }) {
+  const [items, setItems] = useState<PendingDocumentReview[]>([]);
+  const filesRef = useRef(new Map<string, File>());
+  const [selected, setSelected] = useState<string | null>(null);
+  const [message, setMessage] = useState("");
+  const active = items.find((item) => item.id === selected);
+  const pendingCount = items.filter(item => !item.approved).length;
+  const analyzedCount = items.filter(item => item.analysis !== undefined).length;
+  const duplicates = active?.analysis?.fingerprint ? items.filter((item) => item.id !== active.id && item.analysis?.fingerprint === active.analysis?.fingerprint) : [];
+  function update(id: string, patch: Partial<PendingDocumentReview>) {
+    setItems((previous) => previous.map((item) => item.id === id ? { ...item, ...patch } : item));
+  }
+  async function addFiles(event: ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(event.currentTarget.files ?? []);
+    event.currentTarget.value = "";
+    if (!files.length) return;
+    const additions = files.map((file) => ({
+      id: crypto.randomUUID(),
+      name: file.name,
+      size: file.size,
+      proposedKind: proposeKind(file.name),
+      kind: "undetermined" as const,
+      municipality,
+      documentDate: "",
+      observedPeriod: "",
+      temporalScope: "undetermined" as const,
+    }));
+    additions.forEach((entry,index)=>filesRef.current.set(entry.id,files[index]));
+    setItems((before) => [...before, ...additions]);
+    setSelected(additions[0].id);
+    setMessage("Analizando archivos localmente; no se enviarán a Firebase.");
+    await Promise.all(additions.map(async (entry, index) => {
+      try {
+        const analysis = await analyzeDocument(files[index]);
+        update(entry.id, { analysis, proposedKind: analysis.proposedKind });
+      } catch (error) {
+        update(entry.id, { analysisError: error instanceof Error ? error.message : "Error de análisis" });
+      }
+    }));
+    setMessage("Análisis local completado. No se ha incorporado ni subido ningún archivo.");
+  }
+  async function inspectMember(id: string, path: string) {
+    const archive = filesRef.current.get(id);
+    if (!archive) return;
+    try {
+      const {analysis} = await inspectArchiveMember(archive,path);
+      setItems(previous => previous.map(item => item.id === id ? {...item,inspectedMembers:{...item.inspectedMembers,[path]:analysis}} : item));
+    } catch(error) { setMessage(error instanceof Error ? error.message : "Error al inspeccionar entrada ZIP"); }
+  }
+  return (
+    <section className="workspace-panel document-review-inbox" aria-labelledby="document-review-title">
+      <div className="gradient-bar" aria-hidden="true" />
+      <div className="panel-header">
+        <div><p className="eyebrow">Revisión previa · Prototipo sin persistencia</p><h2 id="document-review-title">Bandeja de documentación</h2></div>
+        <p className="panel-note">Prepara la clasificación y la declaración temporal antes de importar. Analiza firmas, huellas y cabeceras CSV; en ZIP permite inspeccionar entradas individualmente con comprobación CRC-32. No incorpora documentos internos, almacena originales ni modifica evidencias.</p>
+      </div>
+      <label className="document-review-inbox__upload">
+        Seleccionar archivos para revisión (sin subida)
+        <input type="file" multiple accept=".pdf,.doc,.docx,.csv,.xlsx,.xls,.png,.jpg,.jpeg,.zip" onChange={addFiles} />
+      </label>
+      <p className="panel-note" role="status">{message || "Sin archivos pendientes en esta sesión."}</p>
+      {items.length > 0 && <><p className="panel-note">{items.length} archivos seleccionados · {analyzedCount} analizados · {pendingCount} pendientes de confirmación.</p><div className="document-review-inbox__layout">
+        <ul className="document-review-inbox__list" aria-label="Archivos pendientes">
+          {items.map((item) => <li key={item.id}>
+            <button type="button" aria-current={item.id === selected ? "true" : undefined} onClick={() => setSelected(item.id)}>
+              <strong>{item.name}</strong><span>{Math.round(item.size / 1024)} KB · {item.temporalScope === "undetermined" ? "Temporalidad por declarar" : "Clasificación provisional"}</span>
+            </button>
+          </li>)}
+        </ul>
+        {active && <div className="document-review-inbox__editor">
+          <h3>Ficha de revisión</h3>
+          {active.analysisError && <p role="alert">{active.analysisError}</p>}
+          {duplicates.length > 0 && <p role="alert"><strong>Duplicado binario en esta bandeja:</strong> {duplicates.map((item) => item.name).join(", ")}. No se ha importado ninguno.</p>}
+          {active.analysis && <div className="ingestion-hint"><strong>Formato detectado:</strong> {active.analysis.format} · <strong>SHA-256:</strong> <code>{active.analysis.fingerprint?.slice(0,16)}…</code>
+          {active.analysis.proposedKind !== "undetermined" && <p>Propuesta: {active.analysis.proposedKind} (sin validar).</p>}
+          {active.analysis.reasons.map((reason,i)=><p key={i}>{reason}</p>)}
+          {(active.analysis.methodologicalMatches ?? []).map(match => <p key={match.moduleId+match.adapter}>Posible instrumento: <strong>{match.label}</strong> · {match.matched}/{match.expected} columnas ({match.adapter}; {match.confidence === "strong" ? "esquema coincidente" : "coincidencia parcial"}). No validado.</p>)}
+          {active.analysis.warnings.map((warning,i)=><p key={i} role="alert">{warning}</p>)}
+          {active.analysis.archiveEntries && <details><summary>Entradas ZIP ({active.analysis.archiveEntries.length})</summary><ul>{active.analysis.archiveEntries.map((entry,i)=><li key={i}>{entry.path} · {entry.format} · {entry.size} bytes {entry.unsafe || entry.encrypted ? "· bloqueada" : ""} {!entry.unsafe && !entry.encrypted && !entry.path.endsWith("/") && <button type="button" onClick={()=>void inspectMember(active.id,entry.path)}>Analizar entrada</button>}{active.inspectedMembers?.[entry.path] && <span> · Firma: {active.inspectedMembers[entry.path].format} · SHA-256: {active.inspectedMembers[entry.path].fingerprint?.slice(0,12)}…</span>}</li>)}</ul></details>}</div>}
+          {active.analysis && <div className="ingestion-hint"><strong>Destinos propuestos (sin importar)</strong><ul>{proposeDocumentDestinations(active.analysis, active.kind).map(proposal => <li key={proposal.target}><strong>{proposal.label}</strong> — {proposal.basis} Confirmación humana obligatoria.</li>)}</ul></div>}
+          <p className="panel-note">Ámbito de trabajo: <strong>{active.municipality}</strong>. Confirma que corresponde a este expediente.</p>
+          <label>Tipo documental
+            <select value={active.kind} onChange={(e) => update(active.id, { kind: e.target.value as PendingDocumentReview["kind"], approved:false })}>
+              {KIND_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+            </select>
+          </label>
+          <label>Fecha del documento (declaración manual)
+            <input type="text" placeholder="AAAA, AAAA-MM o AAAA-MM-DD" value={active.documentDate} onChange={(e) => update(active.id, { documentDate: e.target.value })} />
+          </label>
+          <label>Período observado
+            <input type="text" placeholder="Ej. 2015–2016; no equivale a fecha de carga" value={active.observedPeriod} onChange={(e) => update(active.id, { observedPeriod: e.target.value })} />
+          </label>
+          <label>Alcance temporal (pendiente de validación técnica)
+            <select value={active.temporalScope} onChange={(e) => update(active.id, { temporalScope: e.target.value as TemporalScope, approved:false })}>
+              <option value="undetermined">Por determinar</option><option value="current">Actual</option><option value="historical">Histórico</option><option value="mixed">Mixto</option>
+            </select>
+          </label>
+          <label><input type="checkbox" checked={active.approved === true} onChange={e => update(active.id,{approved:e.target.checked && !!active.analysis && active.kind !== "undetermined" && duplicates.length === 0})} /> He revisado la clasificación y confirmo el destino propuesto para este expediente.</label>
+          {active.analysis && active.approved && onPrepare && (active.kind === "health-report" || active.kind === "strategic-framework" || active.kind === "territorial-documentation" || active.kind === "qualitative-material") && ["pdf","docx"].includes(active.analysis.format) && <button type="button" onClick={() => {
+            onPrepare(active.kind as DocumentKind);
+            setMessage("Se ha preparado el selector de carga existente. El archivo NO se ha importado: selecciona de nuevo el original y confirma la operación en el formulario.");
+          }}>Preparar selector existente (sin importar)</button>}
+          <p className="ingestion-hint">Las selecciones son provisionales: no constituyen una declaración técnica firmada y no se incorporan al expediente.</p>
+          <button type="button" onClick={() => { filesRef.current.delete(active.id); setItems((before) => before.filter((item) => item.id !== active.id)); setSelected(null); setMessage("Ficha descartada. No se han modificado documentos."); }}>Descartar ficha</button>
+        </div>}
+      </div></>}
+    </section>
+  );
+}
