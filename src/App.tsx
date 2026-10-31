@@ -3768,7 +3768,7 @@ export default function App() {
                 .map((a) => ({ id: a.id, title: a.title, documentId: a.provenance.documentId ?? "" }))}
             />
 
-            <DocumentReviewInbox key={runtime.workspace.municipality.identity.id} municipality={runtime.workspace.municipality.identity.name} />
+            <DocumentReviewInbox key={runtime.workspace.municipality.identity.id} municipality={runtime.workspace.municipality.identity.name} onPrepare={setKind} />
 
             {/* ── BLOQUE 4: Añadir o sustituir fuentes ── */}
             <DocumentIngestionPanel
