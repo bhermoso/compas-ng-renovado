@@ -1,12 +1,22 @@
 # Diagnóstico territorial — auditoría inicial y contrato de ingesta universal (propuesta v0.1)
 Fecha: 2026-10-31. Repositorio exclusivo: bhermoso/compas-ng-renovado.
 Estado: propuesta de arquitectura; no habilita mutaciones de expedientes ni modifica contratos productivos.
+Persistencia principal obligatoria: Firebase. El almacenamiento local es como máximo caché, borrador temporal o recuperación, no destino canónico.
 
 ## 0. Decisiones de producto
 - El Tab 1 es la sala de control y punto de entrada del expediente territorial.
 - El Tab 2 alberga Perfiles RELAS elaborados externamente (informe y presentaciones coherentes); no se vuelve a implementar un generador automático.
 - Los perfiles RELAS terminan su diagnóstico con conclusiones y recomendaciones. El Plan de Acción es una fase distinta.
 - Originales inmutables, derivados versionados y distribución auditable; nunca sobrescritura silenciosa.
+
+### Persistencia Firebase — decisión vinculante
+- Autenticación y autorización: reutilizar Firebase Authentication y los permisos territoriales existentes.
+- Metadatos, índices, declaraciones temporales, referencias, estados y auditoría: Firestore, alineado con la estructura `relas_scopes` y controles de acceso existentes.
+- Originales binarios (ZIP, PDF, DOCX, JPG, etc.): diseñar almacenamiento en Firebase Cloud Storage, sujeto a comprobar configuración real, reglas, permisos, cuotas y ciclo de vida. Firestore no debe utilizarse para insertar archivos binarios grandes en snapshots JSON.
+- Usar identificadores estables, huellas de contenido, referencias desde Firestore a cada blob y vínculos de derivación; evitar duplicar originales.
+- Publicación de una ingesta por etapas: subir original, validar integridad, preparar índices/derivados y confirmar manifest de incorporación. Ante fallos, estado recuperable y limpieza segura. No asumir una transacción atómica cruzando Firestore y Cloud Storage.
+- No hacer de localStorage o IndexedDB una segunda fuente de verdad; cualquier caché debe declarar sincronización y conflictos.
+- La persistencia debe preservar versiones históricas y originales, con reglas explícitas de retención y control de acceso.
 
 ## 1. Inventario inicial confirmado en master
 - `src/App.tsx`: vista `repositorio`; monta `HealthReportViewer`, `EstudiosComplementariosPanel`, `ActivosSaludPanel`, `DocumentRepositoryPanel`, `DocumentIngestionPanel`, `EvidenceStorePanel`. Orquesta callbacks de carga y repositorios.
@@ -17,6 +27,8 @@ Estado: propuesta de arquitectura; no habilita mutaciones de expedientes ni modi
 - `src/ui/components/DocumentCycleControl.tsx`: declaración manual del ciclo y año, sin deducción del texto.
 - `src/ui/components/CycleConciliationPanel.tsx`: compara fuentes histórica y actual solo tras declaración, no propone ni resuelve convergencias automáticamente.
 - Existen rutas especializadas de importación REDCap y cuestionarios, conservación de originales, evidencias, copias y persistencia local/remota. Sus contratos y transacciones requieren auditoría detallada antes de conectar el distribuidor.
+- `src/infrastructure/relas/BrowserRelasClient.ts`: cliente Firebase Authentication + Firestore.
+- `src/infrastructure/relas/RemoteWorkspace.ts`: expedientes JSON almacenados en fragmentos Firestore bajo `relas_scopes/{municipalityId}` con manifest `workspace/current`, versiones y chunks; tras confirmar el nuevo manifest borra chunks de la versión anterior. Este esquema de snapshot no constituye por sí solo un archivo histórico persistente. La propuesta de versionado documental no debe depender de esas versiones efímeras.
 
 ## 2. Problemas y riesgos confirmados
 1. Ingesta fragmentada por naturaleza documental y panel; experiencia de entrada repetitiva.
@@ -25,7 +37,8 @@ Estado: propuesta de arquitectura; no habilita mutaciones de expedientes ni modi
 4. `replaceMunicipalDocumentByKind` elimina del array documentos anteriores del mismo tipo; no debe ser el mecanismo predeterminado del distribuidor sin archivo/versionado explícito y recuperación.
 5. La visualización actual es una sucesión de paneles, no un mapa de fuentes, estado, dependencias y destinos.
 6. Los comentarios heredados sobre el Perfil pueden inducir implementaciones contrarias a la decisión actual.
-La inspección no acredita aún cobertura total de importadores, persistencia ni pruebas de migración.
+7. La persistencia remota actual elimina los fragmentos del snapshot anterior tras guardar el nuevo; debe separarse ese mecanismo de la conservación de originales y versiones documentales.
+La inspección no acredita aún cobertura total de importadores, reglas de Cloud Storage ni pruebas de migración.
 
 ## 3. Contrato temporal propuesto (aditivo; no migrar aún)
 Cada activo documental tendrá, separadamente:
@@ -66,7 +79,7 @@ Un original puede producir varios vínculos de destino, pero una sola identidad 
 Cabecera municipio/ciclo; dropzone universal; resumen factual (originales, estudios, activos, evidencias, pendientes de revisar, documentos sin temporalidad declarada); matriz de módulos con contadores y estados; bandeja de clasificación; inspector con original, derivaciones y dependencias; línea temporal con filtros `actual/histórico/mixto/sin declarar`; bibliotecas transversal y territorial claramente distinguidas. Texto breve, detalles bajo demanda. Los indicadores de integridad deben calcularse con reglas verificables, nunca porcentajes ficticios.
 
 ## 6. Plan de implementación por PR
-A. Auditoría profunda read-only de rutas de carga, almacenamiento de originales, backup, rehidratación, remoto y exportaciones, con mapa de dependencias y casos de regresión de Zagra/Loja/Zaidín.
+A. Auditoría profunda read-only de rutas de carga, almacenamiento de originales, Firebase Authentication, Firestore, Cloud Storage (existencia/configuración/reglas), backup, rehidratación, remoto y exportaciones, con mapa de dependencias y casos de regresión de Zagra/Loja/Zaidín.
 B. Nuevos modelos aditivos de metadatos temporales y clasificador puro con pruebas (no cambios de datos ni heurísticas que confundan vigencia).
 C. Entrada universal y bandeja de revisión sin mutación de workspace.
 D. Adaptadores transaccionales, versionado/backup y pruebas end-to-end.
