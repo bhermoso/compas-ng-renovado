@@ -17,7 +17,7 @@
     "rebuild:atarfe": "vitest run --config vitest.rebuild.config.ts scripts/demo/rebuild-atarfe.gen.ts",
     "restore:zaidin": "vitest run --config vitest.rebuild.config.ts scripts/demo/restore-zaidin-console.gen.ts",
     "inject:ugc-sourcetext": "vitest run --config vitest.rebuild.config.ts scripts/demo/inject-ugc-sourcetext.gen.ts",
-    "test:relas": "firebase emulators:exec --only firestore,auth --project demo-compas-relas \"node --test tests/relas-firebase.rules.test.mjs && vitest run --config vitest.admin.config.ts\""
+    "test:relas": "firebase emulators:exec --only firestore,auth --project demo-compas-relas \"node --test tests/relas-firebase.rules.test.mjs tests/original-firebase.rules.test.mjs && vitest run --config vitest.admin.config.ts\""
   },
   "dependencies": {
     "docx": "^9.7.1",
