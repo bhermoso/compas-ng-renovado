@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { analyzeDocument } from "../src/application/document-ingestion/preliminaryDocumentAnalyzer";
+import { analyzeDocument, inspectArchiveMember } from "../src/application/document-ingestion/preliminaryDocumentAnalyzer";
 
 function file(bytes: Uint8Array, name: string): File {
   return {name, size: bytes.byteLength, arrayBuffer: async () => bytes.slice().buffer} as File;
@@ -86,5 +86,23 @@ describe("inspección defensiva del directorio ZIP", () => {
   it("no identifica un cuestionario concreto por los nombres de ficheros",async () => {
     const result=await analyzeDocument(file(minimalZip("DUKE_EAS.csv"),"datos.zip"));
     expect(result.proposedKind).toBe("undetermined");
+  });
+});
+
+describe("inspección individual de ZIP", () => {
+  it("rechaza entrada cuyo tamaño excede el límite aun si el ZIP es pequeño", async () => {
+    const archive=file(minimalZip("grande.csv",9*1024*1024,4),"datos.zip");
+    await expect(inspectArchiveMember(archive,"grande.csv")).rejects.toThrow("8 MiB");
+  });
+  it("no permite abrir ruta peligrosa", async () => {
+    const archive=file(minimalZip("../privado.csv"),"datos.zip");
+    await expect(inspectArchiveMember(archive,"../privado.csv")).rejects.toThrow("bloqueada");
+  });
+  it("analiza entrada almacenada sin modificar el expediente", async () => {
+    const archive=file(minimalZip("datos.csv"),"datos.zip");
+    const result=await inspectArchiveMember(archive,"datos.csv");
+    expect(result.name).toBe("datos.csv");
+    expect(result.analysis.fingerprint).toHaveLength(64);
+    expect(result.analysis.proposedKind).toBe("undetermined");
   });
 });
