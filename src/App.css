@@ -10957,3 +10957,17 @@ h3 {
   .document-form > * { min-width: 0; max-width: 100%; }
   .document-form button, .ekc-q-add-btn, .ekc-interp-add-btn { max-width: 100%; white-space: normal; }
 }
+
+
+/* Bandeja documental preliminar: reutiliza los tokens institucionales COMPÁS. */
+.document-review-inbox__upload { display:grid; gap:10px; padding:16px; border:1px dashed var(--azul); border-radius:8px; background:var(--fondo-principal); color:var(--texto-principal); font-weight:700; }
+.document-review-inbox__layout { display:grid; grid-template-columns:minmax(180px,0.9fr) minmax(0,1.4fr); gap:18px; margin-top:20px; }
+.document-review-inbox__list { padding:0; margin:0; list-style:none; display:grid; align-content:start; gap:8px; }
+.document-review-inbox__list button { width:100%; padding:12px; text-align:left; border:1px solid var(--borde); border-radius:8px; background:var(--blanco); color:var(--texto-principal); cursor:pointer; overflow-wrap:anywhere; }
+.document-review-inbox__list button[aria-current="true"] { border-color:var(--azul); box-shadow:0 0 0 2px rgba(0,116,200,.15); }
+.document-review-inbox__list button span { display:block; margin-top:5px; font-size:.8rem; color:var(--texto-secundario); }
+.document-review-inbox__editor { display:grid; gap:12px; align-content:start; padding:18px; border:1px solid var(--borde); border-radius:8px; background:var(--fondo-principal); }
+.document-review-inbox__editor label { display:grid; gap:6px; font-weight:600; color:var(--texto-principal); }
+.document-review-inbox__editor input,.document-review-inbox__editor select { max-width:100%; min-width:0; box-sizing:border-box; border:1px solid var(--borde); background:var(--blanco); color:var(--texto-principal); padding:10px; border-radius:6px; }
+.document-review-inbox__editor :is(button,input,select):focus-visible,.document-review-inbox__list button:focus-visible { outline:3px solid var(--azul); outline-offset:2px; }
+@media(max-width:720px){.document-review-inbox__layout{grid-template-columns:1fr;}}
