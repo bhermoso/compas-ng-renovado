@@ -68,13 +68,17 @@ validación exigidos por la estructura aprobada:
 4. Las incoherencias de las fuentes, que van a una nota técnica dirigida a
    quien elaboró cada fuente.
 
-### 0.4 Estructura de referencia y adaptación territorial (Loja, 2026-10-26)
+### 0.4 Estructura del Perfil RELAS y adaptación territorial (Loja, 2026-10-26)
 
 Para el caso de Loja, el Art. 16 quater del contrato metodológico organiza el
 cuerpo en siete apartados, con la conclusión como unidad y la evidencia completa
-en anexos. El Resumen precede al cuerpo y no se numera. Esta estructura es una
-referencia editorial, no una orden de reestructuración automática de los perfiles
-preexistentes de otros territorios. Su aplicación requiere comprobar el contrato
+en anexos. El Resumen precede al cuerpo y no se numera. La organización de los apartados previos puede adaptarse al territorio, pero
+todo Perfil Local de Salud RELAS debe cerrar su desarrollo diagnóstico con
+**conclusiones y recomendaciones explícitas**. Las recomendaciones son parte
+del Perfil, no un contenido indebido ni una opción que pueda omitirse por una
+regla heredada. La autoría, validación y material administrativo se ubican
+después de ese cierre diagnóstico, en los metadatos o anexos pertinentes. Esta
+estructura no ordena reestructurar automáticamente perfiles históricos. Su aplicación requiere comprobar el contrato
 metodológico vigente, la fase del expediente y la estructura aprobada para cada
 municipio; no debe suprimir ni alterar evidencia, textos validados o decisiones
 territoriales previas.
@@ -97,8 +101,8 @@ territoriales previas.
    una con la conclusión de la que deriva, para que el equipo técnico elija,
    corrija o descarte (Art. 8 quater). «Abordar» solo con relación de grado 1
    o 2.
-6. **Paso al Plan de Acción.** Qué recibe el Grupo Motor y qué decide él.
-7. **Autoría y validación.**
+6. **Paso al Plan de Acción.** Breve transición que no incorpora actuaciones ni sustituye la decisión del Grupo Motor.
+7. **Autoría y validación.** Registro administrativo posterior al cierre de conclusiones y recomendaciones, que podrá trasladarse a metadatos o anexos para preservar ese cierre.
 
 **Anexos.**
 
@@ -230,7 +234,7 @@ salud socialmente contextualizada.
    los desafíos.
 8. BADEA/IECA es contexto municipal (proxy para ámbitos inframunicipales):
    sitúa el contexto urbano, no resuelve desigualdades internas.
-9. El cierre invita a deliberar; las orientaciones elegibles, si proceden, no sustituyen las decisiones del Plan de Acción.
+9. El cierre invita a deliberar; las recomendaciones explícitas del cierre diagnóstico no sustituyen las decisiones del Plan de Acción.
 10. Tono: institucional y claro; prosa diagnóstica, con tablas y campos estructurados cuando sean necesarios.
 
 ### 3 bis. Contrato autorial transversal
@@ -280,7 +284,9 @@ prueba suficiente de calidad, citas, estructura ni sustento causal. Su regla
 histórica sobre recomendaciones corresponde a una narrativa anterior y no
 autoriza rechazar recomendaciones elegibles del apartado previsto. Las pruebas
 de regresión del generador antiguo describen su salida actual, no una prohibición
-metodológica universal. Antes de activar generación nueva deben actualizarse
+metodológica universal. La prohibición de recomendaciones se considera obsoleta:
+el Perfil RELAS debe culminar con conclusiones y recomendaciones; las actuaciones,
+responsables, plazos e indicadores corresponden al Plan de Acción. Antes de activar generación nueva deben actualizarse
 verificador, pruebas, compilador y consumidores de exportación de forma conjunta,
 con pruebas sobre perfiles históricos; no se altera la salida actual mediante
 esta PR exclusivamente documental.
