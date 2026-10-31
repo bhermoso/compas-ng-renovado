@@ -41,7 +41,7 @@ function proposeKind(name: string): DocumentKind | "undetermined" {
 }
 
 /** Bandeja preliminar, sin escritura ni lectura de contenido; no sustituye a los adaptadores. */
-export function DocumentReviewInbox({ municipality, onHandOff }: { municipality: string; onHandOff?: (file: File, kind: DocumentKind) => void }) {
+export function DocumentReviewInbox({ municipality, onPrepare }: { municipality: string; onPrepare?: (kind: DocumentKind) => void }) {
   const [items, setItems] = useState<PendingDocumentReview[]>([]);
   const filesRef = useRef(new Map<string, File>());
   const [selected, setSelected] = useState<string | null>(null);
@@ -138,11 +138,11 @@ export function DocumentReviewInbox({ municipality, onHandOff }: { municipality:
               <option value="undetermined">Por determinar</option><option value="current">Actual</option><option value="historical">Histórico</option><option value="mixed">Mixto</option>
             </select>
           </label>
-          <label><input type="checkbox" checked={active.approved === true} onChange={e => update(active.id,{approved:e.target.checked})} /> He revisado la clasificación y confirmo el destino propuesto para este expediente.</label>
-          {active.analysis && active.approved && onHandOff && (active.kind === "health-report" || active.kind === "strategic-framework" || active.kind === "territorial-documentation" || active.kind === "qualitative-material") && ["pdf","docx"].includes(active.analysis.format) && <button type="button" onClick={() => {
-            const file = filesRef.current.get(active.id);
-            if (file) onHandOff(file, active.kind as DocumentKind);
-          }}>Enviar a la carga existente (puede sustituir fuentes)</button>}
+          <label><input type="checkbox" checked={active.approved === true} onChange={e => update(active.id,{approved:e.target.checked && !!active.analysis && active.kind !== "undetermined" && duplicates.length === 0})} /> He revisado la clasificación y confirmo el destino propuesto para este expediente.</label>
+          {active.analysis && active.approved && onPrepare && (active.kind === "health-report" || active.kind === "strategic-framework" || active.kind === "territorial-documentation" || active.kind === "qualitative-material") && ["pdf","docx"].includes(active.analysis.format) && <button type="button" onClick={() => {
+            onPrepare(active.kind as DocumentKind);
+            setMessage("Se ha preparado el selector de carga existente. El archivo NO se ha importado: selecciona de nuevo el original y confirma la operación en el formulario.");
+          }}>Preparar selector existente (sin importar)</button>}
           <p className="ingestion-hint">Las selecciones son provisionales: no constituyen una declaración técnica firmada y no se incorporan al expediente.</p>
           <button type="button" onClick={() => { filesRef.current.delete(active.id); setItems((before) => before.filter((item) => item.id !== active.id)); setSelected(null); setMessage("Ficha descartada. No se han modificado documentos."); }}>Descartar ficha</button>
         </div>}
