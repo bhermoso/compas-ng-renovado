@@ -22,7 +22,7 @@ import { DocumentationProvider } from "./ui/components/Documentation";
 import type { PlanPreparationDraft } from "./domain/action-plan-catalog/PlanPreparationDraft";
 import { worksheetKey, type IndicatorWorksheet } from "./domain/action-plan-catalog/IndicatorWorksheet";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { type CycleConciliation, type AssetValidationDeclaration, type DocumentCycle, type DocumentKind, type DocumentTemporalMetadata, type MunicipalDocument, type MunicipalDocumentRepository, addMunicipalDocument, setMunicipalDocumentCycle, addCycleConciliation, addAssetValidation, removeAssetValidation, removeCycleConciliation, replaceMunicipalDocumentByKind, removeMunicipalDocument } from "./domain/repository";
+import { type CycleConciliation, type AssetValidationDeclaration, type DocumentCycle, type DocumentKind, type DocumentTemporalMetadata, type MunicipalDocument, type MunicipalDocumentRepository, addMunicipalDocument, setMunicipalDocumentCycle, addCycleConciliation, addAssetValidation, removeAssetValidation, removeCycleConciliation, replaceMunicipalDocumentByKind, removeMunicipalDocument, setMunicipalDocumentTemporalMetadata } from "./domain/repository";
 import { type MunicipalityWorkspace } from "./domain/workspace";
 import { type QuestionnaireProject } from "./domain/questionnaire";
 import { importProjectDataset } from "./application/questionnaire";
@@ -1587,6 +1587,51 @@ export default function App() {
     }
   }
 
+  // ── Bandeja de revisión → cargadores CSV de estudios complementarios ──────
+  // Clave = id del módulo metodológico (coincide con la etiqueta documental que
+  // cada cargador usa para sustituir su estudio anterior). La bandeja solo
+  // entrega el archivo; validación, indicadores y sustitución siguen siendo
+  // responsabilidad del cargador específico.
+  const studyCsvLoaders: Record<string, { load: (file: File) => Promise<boolean>; message: string | null; loading: boolean }> = {
+    [IBSE_DOCUMENT_TAG]: { load: (file) => handleLoadIBSECSV(file), message: ibseMessage, loading: isLoadingIBSE },
+    [DUKE_DOCUMENT_TAG]: { load: handleLoadDUKECSV, message: dukeMessage, loading: isLoadingDUKE },
+    [PREDIMED_DOCUMENT_TAG]: { load: handleLoadPREDIMEDCSV, message: predimedMessage, loading: isLoadingPREDIMED },
+    [SF12_DOCUMENT_TAG]: { load: handleLoadSF12CSV, message: sf12Message, loading: isLoadingSF12 },
+    [SUENO_DOCUMENT_TAG]: { load: handleLoadSuenoCSV, message: suenoMessage, loading: isLoadingSueno },
+    [CAGE_DOCUMENT_TAG]: { load: handleLoadCAGECSV, message: cageMessage, loading: isLoadingCAGE },
+    [AUDITC_DOCUMENT_TAG]: { load: handleLoadAUDITCCSV, message: auditcMessage, loading: isLoadingAUDITC },
+    [IPAQ_DOCUMENT_TAG]: { load: handleLoadIPAQCSV, message: ipaqMessage, loading: isLoadingIPAQ },
+    [GHQ12_DOCUMENT_TAG]: { load: handleLoadGHQ12CSV, message: ghq12Message, loading: isLoadingGHQ12 },
+    [PHQ9_DOCUMENT_TAG]: { load: handleLoadPHQ9CSV, message: phq9Message, loading: isLoadingPHQ9 },
+    [PSQI_DOCUMENT_TAG]: { load: handleLoadPSQICSV, message: psqiMessage, loading: isLoadingPSQI },
+    [FAGERSTROM_DOCUMENT_TAG]: { load: handleLoadFagerstromCSV, message: fagerstromMessage, loading: isLoadingFagerstrom },
+    [SBQ_DOCUMENT_TAG]: { load: handleLoadSBQCSV, message: sbqMessage, loading: isLoadingSBQ },
+  };
+
+  async function handleInboxStudyCsv(file: File, studyId: string | undefined, temporal: DocumentTemporalMetadata | undefined): Promise<boolean> {
+    const loader = studyId !== undefined ? studyCsvLoaders[studyId] : undefined;
+    if (studyId === undefined || loader === undefined) return false;
+    const targetMunicipalityId = workspace.municipality.identity.id;
+    const ok = await loader.load(file);
+    if (ok && temporal !== undefined) {
+      // Los cargadores de estudio no reciben temporalidad: se añade después al
+      // documento que acaban de registrar (misma etiqueta y mismo archivo).
+      setWorkspace((prev) => {
+        if (prev.municipality.identity.id !== targetMunicipalityId) return prev;
+        const registered = prev.repository.documents.find(
+          (d) => d.tags.includes(studyId) && d.sourceFileName === file.name && d.status !== "archived"
+        );
+        if (registered === undefined) return prev;
+        return {
+          ...prev,
+          repository: setMunicipalDocumentTemporalMetadata(prev.repository, registered.id, temporal),
+          updatedAt: new Date().toISOString(),
+        };
+      });
+    }
+    return ok;
+  }
+
   function handleAssignLibraryDocument(item: CompasLibraryDocument): void {
     const targetMunicipalityId = workspace.municipality.identity.id;
     const targetDocumentId = libraryDocumentAssignmentId(
@@ -1642,7 +1687,7 @@ export default function App() {
       });
   }
 
-  async function handleLoadIBSECSV(file: File, target: IBSEAdjustmentTarget = "none"): Promise<void> {
+  async function handleLoadIBSECSV(file: File, target: IBSEAdjustmentTarget = "none"): Promise<boolean> {
     setIsLoadingIBSE(true);
     try {
       const text = await file.text();
@@ -1712,14 +1757,16 @@ export default function App() {
           ? `IBSE cargado: ${aggregates.nValid} registros válidos · Media total: ${aggregates.meanTotal} · ${ibseAtoms.length} indicadores incorporados al análisis territorial.${warn}`
           : `CSV procesado sin registros válidos.${warn}`
       );
+      return true;
     } catch {
       setIbseMessage("Error al procesar el CSV. Verifica que sea una exportación REDCap válida.");
+      return false;
     } finally {
       setIsLoadingIBSE(false);
     }
   }
 
-  async function handleLoadDUKECSV(file: File): Promise<void> {
+  async function handleLoadDUKECSV(file: File): Promise<boolean> {
     setIsLoadingDUKE(true);
     try {
       const text = await file.text();
@@ -1784,14 +1831,16 @@ export default function App() {
           ? `DUKE-EAS cargado: ${aggregates.nValidGlobal} registros globales validos de ${aggregates.n}. Apoyo bajo global: ${aggregates.lowGlobalPercentage.toFixed(1)} %. ${dukeAtoms.length} evidencias incorporadas.${warn}`
           : `CSV DUKE-EAS procesado sin registros globales completos.${warn}`
       );
+      return true;
     } catch {
       setDukeMessage("Error al procesar el CSV. Verifica que incluya las columnas EAS P5701..P5711 con valores 1..5.");
+      return false;
     } finally {
       setIsLoadingDUKE(false);
     }
   }
 
-  async function handleLoadPREDIMEDCSV(file: File): Promise<void> {
+  async function handleLoadPREDIMEDCSV(file: File): Promise<boolean> {
     setIsLoadingPREDIMED(true);
     try {
       const text = await file.text();
@@ -1856,14 +1905,16 @@ export default function App() {
           ? `PREDIMED-EAS cargado: ${aggregates.nValid} registros validos de ${aggregates.n}. Alta adherencia: ${aggregates.highPercentage.toFixed(1)} %. ${predimedAtoms.length} evidencias incorporadas.${warn}`
           : `CSV PREDIMED-EAS procesado sin registros completos.${warn}`
       );
+      return true;
     } catch {
       setPredimedMessage("Error al procesar el CSV. Verifica que incluya la columna Predimed o P36BPD01_2023..P36BPD14_2023.");
+      return false;
     } finally {
       setIsLoadingPREDIMED(false);
     }
   }
 
-  async function handleLoadSF12CSV(file: File): Promise<void> {
+  async function handleLoadSF12CSV(file: File): Promise<boolean> {
     setIsLoadingSF12(true);
     try {
       const text = await file.text();
@@ -1928,14 +1979,16 @@ export default function App() {
           ? `SF-12 EAS cargado: ${aggregates.nValidPCS} registros válidos de ${aggregates.n}. PCS media: ${aggregates.meanPCS.toFixed(1)} / MCS media: ${aggregates.meanMCS.toFixed(1)}. ${sf12Atoms.length} evidencias incorporadas.${warn}`
           : `CSV SF-12 EAS procesado sin registros válidos.${warn}`
       );
+      return true;
     } catch {
       setSf12Message("Error al procesar el CSV. Verifica que incluya las columnas PCS12_SP y MCS12_SP.");
+      return false;
     } finally {
       setIsLoadingSF12(false);
     }
   }
 
-  async function handleLoadSuenoCSV(file: File): Promise<void> {
+  async function handleLoadSuenoCSV(file: File): Promise<boolean> {
     setIsLoadingSueno(true);
     try {
       const text = await file.text();
@@ -2000,14 +2053,16 @@ export default function App() {
           ? `Sueño EAS cargado: ${aggregates.nValidP33R} registros P33_R válidos de ${aggregates.n}. Sueño insuficiente: ${aggregates.pctInsufficientSleep.toFixed(1)} %. ${suenoAtoms.length} evidencias incorporadas.${warn}`
           : `CSV Sueño EAS procesado sin registros P33_R válidos.${warn}`
       );
+      return true;
     } catch {
       setSuenoMessage("Error al procesar el CSV. Verifica que incluya la columna P33_R.");
+      return false;
     } finally {
       setIsLoadingSueno(false);
     }
   }
 
-  async function handleLoadCAGECSV(file: File): Promise<void> {
+  async function handleLoadCAGECSV(file: File): Promise<boolean> {
     setIsLoadingCAGE(true);
     try {
       const text = await file.text();
@@ -2072,14 +2127,16 @@ export default function App() {
           ? `CAGE-EAS cargado: ${aggregates.nValidCAGER} registros CAGE_R válidos de ${aggregates.n}. Riesgo de alcoholismo: ${aggregates.pctRisk.toFixed(1)} % (n=${aggregates.nRisk}). ${cageAtoms.length} evidencias incorporadas.${warn}`
           : `CSV CAGE-EAS procesado sin registros CAGE_R válidos.${warn}`
       );
+      return true;
     } catch {
       setCageMessage("Error al procesar el CSV. Verifica que incluya la columna CAGE_R.");
+      return false;
     } finally {
       setIsLoadingCAGE(false);
     }
   }
 
-  async function handleLoadAUDITCCSV(file: File): Promise<void> {
+  async function handleLoadAUDITCCSV(file: File): Promise<boolean> {
     setIsLoadingAUDITC(true);
     try {
       const text = await file.text();
@@ -2144,14 +2201,16 @@ export default function App() {
           ? `AUDIT-C cargado: ${aggregates.nValid} registros válidos de ${aggregates.n}. Consumo de riesgo (≥4): ${aggregates.pctPositive.toFixed(1)} % (n=${aggregates.nPositive}). ${auditcAtoms.length} evidencias incorporadas.${warn}`
           : `CSV AUDIT-C procesado sin registros con los 3 ítems completos.${warn}`
       );
+      return true;
     } catch {
       setAuditcMessage("Error al procesar el CSV. Verifica que incluya las columnas auditc_q1, auditc_q2 y auditc_q3.");
+      return false;
     } finally {
       setIsLoadingAUDITC(false);
     }
   }
 
-  async function handleLoadIPAQCSV(file: File): Promise<void> {
+  async function handleLoadIPAQCSV(file: File): Promise<boolean> {
     setIsLoadingIPAQ(true);
     try {
       const text = await file.text();
@@ -2216,14 +2275,16 @@ export default function App() {
           ? `IPAQ-EAS cargado: ${aggregates.nValidIPAQ} válidos IPAQ_DICO · alta actividad ${aggregates.pctHigh.toFixed(1)} % (n=${aggregates.nHigh}). Inactividad tiempo libre: ${aggregates.pctInactive.toFixed(1)} %. ${ipaqAtoms.length} evidencias incorporadas.${warn}`
           : `CSV IPAQ procesado sin registros válidos en IPAQ_DICO ni P34A_R.${warn}`
       );
+      return true;
     } catch {
       setIpaqMessage("Error al procesar el CSV. Verifica que incluya las columnas IPAQ_DICO y/o P34A_R.");
+      return false;
     } finally {
       setIsLoadingIPAQ(false);
     }
   }
 
-  async function handleLoadGHQ12CSV(file: File): Promise<void> {
+  async function handleLoadGHQ12CSV(file: File): Promise<boolean> {
     setIsLoadingGHQ12(true);
     try {
       const text = await file.text();
@@ -2231,7 +2292,7 @@ export default function App() {
       const warn = warnings.length > 0 ? ` Avisos: ${warnings.join(" ")}` : "";
       if (aggregates.nValid === 0) {
         setGhq12Message(`CSV GHQ-12 procesado sin registros con los 12 ítems completos.${warn}`);
-        return;
+        return false;
       }
       const documentId = crypto.randomUUID();
       await saveOriginalFile(workspace.municipality.identity.id, documentId, file);
@@ -2290,14 +2351,16 @@ export default function App() {
       setGhq12Message(
         `GHQ-12 cargado: ${aggregates.nValid} registros válidos de ${aggregates.n}. Probable malestar (≥3): ${aggregates.pctPositive.toFixed(1)} % (n=${aggregates.nPositive}). ${ghq12Atoms.length} evidencias incorporadas.${warn}`
       );
+      return true;
     } catch {
       setGhq12Message("Error al procesar el CSV. Verifica que incluya las columnas ghq12_q1 a ghq12_q12.");
+      return false;
     } finally {
       setIsLoadingGHQ12(false);
     }
   }
 
-  async function handleLoadPHQ9CSV(file: File): Promise<void> {
+  async function handleLoadPHQ9CSV(file: File): Promise<boolean> {
     setIsLoadingPHQ9(true);
     try {
       const text = await file.text();
@@ -2305,7 +2368,7 @@ export default function App() {
       const warn = warnings.length > 0 ? ` Avisos: ${warnings.join(" ")}` : "";
       if (aggregates.nValid === 0) {
         setPhq9Message(`CSV PHQ-9 procesado sin registros con los 9 ítems completos.${warn}`);
-        return;
+        return false;
       }
       const documentId = crypto.randomUUID();
       await saveOriginalFile(workspace.municipality.identity.id, documentId, file);
@@ -2344,14 +2407,16 @@ export default function App() {
       setPhq9Message(
         `PHQ-9 cargado: ${aggregates.nValid} registros válidos de ${aggregates.n}. Síntomas mod.+ (≥10): ${aggregates.pctPositive.toFixed(1)} % (n=${aggregates.nPositive}). ${phq9Atoms.length} evidencias incorporadas.${warn}`
       );
+      return true;
     } catch {
       setPhq9Message("Error al procesar el CSV. Verifica que incluya las columnas phq9_q1 a phq9_q9.");
+      return false;
     } finally {
       setIsLoadingPHQ9(false);
     }
   }
 
-  async function handleLoadPSQICSV(file: File): Promise<void> {
+  async function handleLoadPSQICSV(file: File): Promise<boolean> {
     setIsLoadingPSQI(true);
     try {
       const text = await file.text();
@@ -2359,7 +2424,7 @@ export default function App() {
       const warn = warnings.length > 0 ? ` Avisos: ${warnings.join(" ")}` : "";
       if (aggregates.nValid === 0) {
         setPsqiMessage(`CSV PSQI procesado sin registros con los 7 componentes completos.${warn}`);
-        return;
+        return false;
       }
       const documentId = crypto.randomUUID();
       await saveOriginalFile(workspace.municipality.identity.id, documentId, file);
@@ -2398,14 +2463,16 @@ export default function App() {
       setPsqiMessage(
         `PSQI cargado: ${aggregates.nValid} registros válidos de ${aggregates.n}. Mal dormidor (&gt;5): ${aggregates.pctPositive.toFixed(1)} % (n=${aggregates.nPositive}). ${psqiAtoms.length} evidencias incorporadas.${warn}`
       );
+      return true;
     } catch {
       setPsqiMessage("Error al procesar el CSV. Verifica que incluya las columnas psqi_c1 a psqi_c7.");
+      return false;
     } finally {
       setIsLoadingPSQI(false);
     }
   }
 
-  async function handleLoadFagerstromCSV(file: File): Promise<void> {
+  async function handleLoadFagerstromCSV(file: File): Promise<boolean> {
     setIsLoadingFagerstrom(true);
     try {
       const text = await file.text();
@@ -2413,7 +2480,7 @@ export default function App() {
       const warn = warnings.length > 0 ? ` Avisos: ${warnings.join(" ")}` : "";
       if (aggregates.nValid === 0) {
         setFagerstromMessage(`CSV Fagerström procesado sin registros con los 6 ítems completos.${warn}`);
-        return;
+        return false;
       }
       const documentId = crypto.randomUUID();
       await saveOriginalFile(workspace.municipality.identity.id, documentId, file);
@@ -2452,14 +2519,16 @@ export default function App() {
       setFagerstromMessage(
         `Fagerström cargado: ${aggregates.nValid} fumadores activos de ${aggregates.n}. Dep. mod.+ (≥5): ${aggregates.pctPositive.toFixed(1)} % (n=${aggregates.nPositive}). ${fagerstromAtoms.length} evidencias incorporadas.${warn}`
       );
+      return true;
     } catch {
       setFagerstromMessage("Error al procesar el CSV. Verifica que incluya las columnas ftnd_q1 a ftnd_q6.");
+      return false;
     } finally {
       setIsLoadingFagerstrom(false);
     }
   }
 
-  async function handleLoadSBQCSV(file: File): Promise<void> {
+  async function handleLoadSBQCSV(file: File): Promise<boolean> {
     setIsLoadingSBQ(true);
     try {
       const text = await file.text();
@@ -2467,7 +2536,7 @@ export default function App() {
       const warn = warnings.length > 0 ? ` Avisos: ${warnings.join(" ")}` : "";
       if (aggregates.nValid === 0) {
         setSbqMessage(`CSV SBQ procesado sin registros con los 9 ítems completos.${warn}`);
-        return;
+        return false;
       }
       const documentId = crypto.randomUUID();
       await saveOriginalFile(workspace.municipality.identity.id, documentId, file);
@@ -2506,8 +2575,10 @@ export default function App() {
       setSbqMessage(
         `SBQ cargado: ${aggregates.nValid} registros válidos de ${aggregates.n}. Alt. sedentario (&gt;8h): ${aggregates.pctPositive.toFixed(1)} % (n=${aggregates.nPositive}). Media: ${aggregates.meanHours.toFixed(2)} h/día. ${sbqAtoms.length} evidencias incorporadas.${warn}`
       );
+      return true;
     } catch {
       setSbqMessage("Error al procesar el CSV. Verifica que incluya las columnas sbq_q1 a sbq_q9.");
+      return false;
     } finally {
       setIsLoadingSBQ(false);
     }
@@ -3792,12 +3863,19 @@ export default function App() {
               repository={runtime.workspace.repository}
               declaredBy={remoteClient.auth.currentUser?.email || remoteClient.auth.currentUser?.displayName || ""}
               documentKinds={DOCUMENT_KINDS}
-              isImporting={isLoadingHealthReport === true || isLoadingDocumentFile === true}
-              loaderMessages={{ "health-report": lastHealthReportMessage, "document-file": documentFileMessage }}
+              isImporting={isLoadingHealthReport === true || isLoadingDocumentFile === true || Object.values(studyCsvLoaders).some((loader) => loader.loading)}
+              connectedInstruments={Object.keys(studyCsvLoaders)}
+              getLoaderMessage={(route, studyId) =>
+                route === "health-report" ? lastHealthReportMessage
+                  : route === "document-file" ? documentFileMessage
+                  : studyId !== undefined ? studyCsvLoaders[studyId]?.message : undefined
+              }
               onImport={(file, request) =>
                 request.route === "health-report"
                   ? handleLoadHealthReport(file, { temporal: request.temporal })
-                  : handleLoadDocumentFile(file, { kind: request.kind, declaresOpenAnswers: false, temporal: request.temporal })
+                  : request.route === "study-csv"
+                    ? handleInboxStudyCsv(file, request.studyId, request.temporal)
+                    : handleLoadDocumentFile(file, { kind: request.kind, declaresOpenAnswers: false, temporal: request.temporal })
               }
             />
 
