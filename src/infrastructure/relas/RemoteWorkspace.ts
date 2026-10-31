@@ -133,7 +133,8 @@ async function persistRemoteWorkspace(client: RelasClient, workspace: Municipali
   if (role === "reader") {
     throw new Error("La cuenta tiene acceso de consulta y no puede guardar.");
   }
-  await ensureRemoteScope(client, workspace).catch(() => undefined);
+  await assertScopeNotWithdrawn(client, workspace.municipality.identity.id);
+  await ensureRemoteScope(client, workspace);
   const id = snapshotId();
   for (let start = 0; start < chunks.length; start += MAX_BATCH_WRITES) {
     const batch = writeBatch(client.db);
@@ -214,6 +215,12 @@ export async function deleteRemoteWorkspace(
   throw new Error("La eliminación física del expediente está deshabilitada para preservar su historial. Usa el procedimiento explícito de retirada territorial.");
 }
 
+/** Reject restoration of a withdrawn territory, including automatic synchronization. */
+export async function assertScopeNotWithdrawn(client: RelasClient, municipalityId: string): Promise<void> {
+  const snapshot = await getDocFromServer(doc(client.db, "compas_deleted_scopes", municipalityId));
+  if (snapshot.exists()) throw new Error("Ámbito retirado administrativamente: no se admite restauración automática.");
+}
+
 const SCOPE_TYPES = ["municipio", "mancomunidad", "distrito-municipal"] as const;
 
 /** Crea el registro del ámbito si no existe (lo exige el listado de administración). */
@@ -224,6 +231,7 @@ export async function ensureRemoteScope(
   const user = client.auth.currentUser;
   if (!user) throw new Error("Inicia sesión para registrar el ámbito.");
   const identity = workspace.municipality.identity;
+  await assertScopeNotWithdrawn(client, identity.id);
   const ref = doc(client.db, "relas_scopes", identity.id);
   if ((await getDocFromServer(ref)).exists()) return;
   const type = (SCOPE_TYPES as readonly string[]).includes(
