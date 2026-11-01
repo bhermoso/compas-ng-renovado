@@ -31,6 +31,8 @@ export interface PendingDocumentReview {
   approved?: boolean;
   /** Confirmación específica cuando la incorporación sustituye documentos existentes. */
   replacementAcknowledged?: boolean;
+  /** Confirmación expresa de que no es una copia, cuando el nombre coincide con uno existente. */
+  sameNameAcknowledged?: boolean;
   /** Resultado de la incorporación mediante el cargador existente. */
   importResult?: { ok: boolean; route: InboxImportRoute; studyId?: string; at: string };
 }
@@ -41,6 +43,8 @@ export interface InboxImportRequest {
   /** Ruta de estudios: id del módulo metodológico cuyo cargador recibe el CSV. */
   studyId?: string;
   temporal?: DocumentTemporalMetadata;
+  /** Huella SHA-256 del archivo, para registrarla en el documento. */
+  contentSha256?: string;
 }
 
 interface DocumentReviewInboxProps {
@@ -58,6 +62,8 @@ interface DocumentReviewInboxProps {
   registeredHealthReport?: { title: string; sourceFileName?: string };
   /** Dónde queda guardado lo que se incorpora; se muestra antes de confirmar. */
   storageNotice?: string;
+  /** Huellas de los originales conservados en este navegador, por documento. */
+  localHashes?: Readonly<Record<string, string>>;
   /** Entrega el archivo revisado al cargador existente; resuelve true si la carga se completó. */
   onImport?: (file: File, request: InboxImportRequest) => Promise<boolean>;
 }
@@ -97,6 +103,7 @@ export function DocumentReviewInbox({
   connectedInstruments = [],
   registeredHealthReport,
   storageNotice,
+  localHashes,
   onImport,
 }: DocumentReviewInboxProps) {
   const [items, setItems] = useState<PendingDocumentReview[]>([]);
@@ -170,6 +177,8 @@ export function DocumentReviewInbox({
         methodologicalMatches: active.analysis.methodologicalMatches,
         connectedInstruments,
         registeredHealthReport,
+        fingerprint: active.analysis.fingerprint,
+        localHashes,
       })
     : undefined;
   const importPlan = plan && !("blocked" in plan) ? plan : undefined;
@@ -189,7 +198,8 @@ export function DocumentReviewInbox({
   const canImport =
     !!active && !!importPlan && !!onImport && active.approved === true && duplicates.length === 0 &&
     !temporalError && !alreadyImported && !isImporting &&
-    (importPlan.effect === "create" || active.replacementAcknowledged === true);
+    (importPlan.effect === "create" || active.replacementAcknowledged === true) &&
+    (importPlan.sameFileName.length === 0 || active.sameNameAcknowledged === true);
 
   async function importActive() {
     if (!active || !importPlan || !onImport || !canImport) return;
@@ -210,7 +220,7 @@ export function DocumentReviewInbox({
     setMessage(`Incorporando «${active.name}» con el cargador de ${destination}…`);
     let ok: boolean;
     try {
-      ok = await onImport(file, { route: importPlan.route, kind: importPlan.kind, studyId, temporal: temporal.temporal });
+      ok = await onImport(file, { route: importPlan.route, kind: importPlan.kind, studyId, temporal: temporal.temporal, contentSha256: active.analysis?.fingerprint });
     } catch {
       ok = false;
     }
@@ -260,7 +270,7 @@ export function DocumentReviewInbox({
           <p className="panel-note">Ámbito de trabajo: <strong>{active.municipality}</strong>. Confirma que corresponde a este expediente.</p>
           <fieldset disabled={alreadyImported} className="document-review-inbox__fields">
           <label>Tipo documental
-            <select value={active.kind} onChange={(e) => update(active.id, { kind: e.target.value as PendingDocumentReview["kind"], approved:false, replacementAcknowledged:false })}>
+            <select value={active.kind} onChange={(e) => update(active.id, { kind: e.target.value as PendingDocumentReview["kind"], approved:false, replacementAcknowledged:false, sameNameAcknowledged:false })}>
               {KIND_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
             </select>
           </label>
@@ -287,7 +297,8 @@ export function DocumentReviewInbox({
             <p>{importPlan.consequence}</p>
             {importPlan.notes?.map((note) => <p key={note} className="panel-note">{note}</p>)}
             {importPlan.affected.length > 0 && <div role="alert"><strong>Documentos afectados:</strong><ul>{importPlan.affected.map(doc => <li key={doc.id}>{doc.title}{doc.sourceFileName ? ` (${doc.sourceFileName})` : ""}</li>)}</ul></div>}
-            {importPlan.sameFileName.length > 0 && <p role="alert"><strong>Posible duplicado en el repositorio:</strong> ya existe {importPlan.sameFileName.map(doc => `«${doc.title}» (${labelOf(doc.kind)})`).join(", ")} con el mismo nombre de archivo. Si incorporas este, quedarán ambos.</p>}
+            {importPlan.sameFileName.length > 0 && <p role="alert"><strong>Posible duplicado en el repositorio:</strong> ya existe {importPlan.sameFileName.map(doc => `«${doc.title}» (${labelOf(doc.kind)})`).join(", ")} con el mismo nombre de archivo, aunque no es el mismo archivo. Si incorporas este, quedarán ambos.</p>}
+            {importPlan.sameFileName.length > 0 && <label><input type="checkbox" checked={active.sameNameAcknowledged === true} disabled={active.approved !== true} onChange={e => update(active.id, { sameNameAcknowledged: e.target.checked })} /> Es un documento distinto: incorporarlo igualmente.</label>}
             <p className="panel-note">
               Temporalidad: {temporalPreview && "temporal" in temporalPreview && temporalPreview.temporal?.declaration
                 ? `se declarará alcance ${SCOPE_LABELS[active.temporalScope]}, firmado por ${declaredBy}.`

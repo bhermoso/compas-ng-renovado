@@ -6,6 +6,9 @@ import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
 import { InstitutionalLogoBand } from "./ui/components/InstitutionalLogoBand";
 import { DocumentReviewInbox } from "./ui/components/DocumentReviewInbox";
 import { DiagnosisControlRoom, DiagnosisModuleSection } from "./ui/components/DiagnosisControlRoom";
+import { DuplicateDocumentsPanel } from "./ui/components/DuplicateDocumentsPanel";
+import { findDuplicateGroups, findExistingCopy, retireDuplicateDocument } from "./application/document-ingestion/documentDuplicates";
+import { sha256Hex } from "./application/document-ingestion/sha256";
 import { buildDiagnosisControlSummary, type DiagnosisModuleId } from "./application/diagnosis/diagnosisControlSummary";
 import { replaceZaidinFinalDraft } from "./application/workspace/replaceZaidinFinalDraft";
 import { regroupZagraActionPlan } from "./application/workspace/regroupZagraActionPlan";
@@ -235,6 +238,12 @@ const NAV_ITEMS: { id: AppView; label: string; phase?: string }[] = [
 // Vistas eliminadas de la navegación principal pero accesibles para desarrollo:
 // "analisis" (D-002) y "lectura" (D-004).
 
+/** Registra la huella del archivo en un documento ya creado por su cargador. */
+function withContentSha256(repository: MunicipalDocumentRepository, documentId: string, contentSha256: string | undefined): MunicipalDocumentRepository {
+  if (contentSha256 === undefined) return repository;
+  return { ...repository, documents: repository.documents.map((d) => (d.id === documentId ? { ...d, contentSha256 } : d)) };
+}
+
 /** Secciones de detalle de la sala de control del diagnóstico. */
 type DiagnosisSectionId = "health-report" | "studies" | "assets" | "documents" | "manual" | "evidence";
 const DIAGNOSIS_SECTION_OF_MODULE: Record<DiagnosisModuleId, DiagnosisSectionId> = {
@@ -251,6 +260,8 @@ type LoaderOptions = {
   kind?: DocumentKind;
   declaresOpenAnswers?: boolean;
   temporal?: DocumentTemporalMetadata;
+  /** Huella SHA-256 ya calculada por la bandeja; si falta, el cargador la calcula. */
+  contentSha256?: string;
 };
 
 const DOCUMENT_KINDS: { value: DocumentKind; label: string }[] = [
@@ -538,6 +549,39 @@ export default function App() {
       return next;
     });
   }, []);
+  // Huellas de los originales conservados en este navegador, para reconocer
+  // copias de documentos anteriores a que se registrara contentSha256.
+  const originalHashCache = useRef(new Map<string, string | null>());
+  const [localOriginalHashes, setLocalOriginalHashes] = useState<Record<string, string>>({});
+  useEffect(() => {
+    let cancelled = false;
+    const municipalityId = workspace.municipality.identity.id;
+    const pending = workspace.repository.documents.filter(
+      (d) => !d.contentSha256 && d.status !== "archived" && d.status !== "rejected"
+    );
+    void (async () => {
+      for (const d of pending) {
+        const key = `${municipalityId}:${d.id}`;
+        if (originalHashCache.current.has(key)) continue;
+        try {
+          const original = await loadOriginalFile(municipalityId, d.id);
+          originalHashCache.current.set(key, original ? await sha256Hex(original) : null);
+        } catch {
+          originalHashCache.current.set(key, null);
+        }
+        if (cancelled) return;
+      }
+      if (cancelled) return;
+      const next: Record<string, string> = {};
+      for (const d of pending) {
+        const hash = originalHashCache.current.get(`${municipalityId}:${d.id}`);
+        if (hash) next[d.id] = hash;
+      }
+      setLocalOriginalHashes((previous) => (JSON.stringify(previous) === JSON.stringify(next) ? previous : next));
+    })();
+    return () => { cancelled = true; };
+  }, [workspace.repository.documents, workspace.municipality.identity.id]);
+
   const openDiagnosisModule = useCallback((module: DiagnosisModuleId) => {
     const section = DIAGNOSIS_SECTION_OF_MODULE[module];
     toggleDiagnosisModule(section, true);
@@ -1307,6 +1351,12 @@ export default function App() {
     setIsLoadingHealthReport(true);
     try {
       const arrayBuffer = await file.arrayBuffer();
+      const contentSha256 = options.contentSha256 ?? await sha256Hex(arrayBuffer);
+      const existingCopy = findExistingCopy(workspace.repository, { sha256: contentSha256, name: file.name }, localOriginalHashes);
+      if (existingCopy?.reason === "same-file") {
+        setLastHealthReportMessage(`Este archivo ya está en el expediente como «${existingCopy.document.title}». Es el mismo archivo y no se incorpora de nuevo.`);
+        return false;
+      }
       const documentId = crypto.randomUUID();
       await saveOriginalFile(workspace.municipality.identity.id, documentId, file);
       // Normalizar título: quitar extensión y convertir guiones/subrayados a espacios
@@ -1327,6 +1377,7 @@ export default function App() {
         sourceFileName: file.name,
         tags: ["health-report", "primary-source"],
         ...(options.temporal !== undefined ? { temporal: options.temporal } : {}),
+        contentSha256,
       };
 
       const healthReport = isPdf
@@ -1460,6 +1511,12 @@ export default function App() {
     const targetMunicipalityId = workspace.municipality.identity.id;
     try {
       const arrayBuffer = await file.arrayBuffer();
+      const contentSha256 = options.contentSha256 ?? await sha256Hex(arrayBuffer);
+      const existingCopy = findExistingCopy(workspace.repository, { sha256: contentSha256, name: file.name }, localOriginalHashes);
+      if (existingCopy?.reason === "same-file") {
+        setDocumentFileMessage(`Este archivo ya está en el expediente como «${existingCopy.document.title}». Es el mismo archivo y no se incorpora de nuevo.`);
+        return false;
+      }
       const extractedText = isDocx ? await extractDocxText(arrayBuffer) : (await extractPdfText(arrayBuffer)).text;
       if (isDocx || extractedText.trim()) {
         const plainText = extractedText;
@@ -1512,6 +1569,7 @@ export default function App() {
             documentId,
             structure: structureDeclared ? "open-answers" : undefined,
             temporal: options.temporal,
+            contentSha256,
           });
 
           if (result === null) return prev;
@@ -1563,6 +1621,7 @@ export default function App() {
             canGenerateEvidence: false,
             tags: [effectiveKind],
             ...(options.temporal !== undefined ? { temporal: options.temporal } : {}),
+            contentSha256,
           });
           const registeredDoc = nextRepository.documents.find((d) => d.id === documentId);
           if (registeredDoc === undefined) return prev;
@@ -1624,6 +1683,19 @@ export default function App() {
       : "Sin sesión iniciada: todo se guarda solo en este navegador. Inicia sesión para guardar el expediente en Firebase.";
   }
 
+  function handleRetireDuplicate(documentId: string, keptId: string): void {
+    const target = workspace.repository.documents.find((d) => d.id === documentId);
+    const kept = workspace.repository.documents.find((d) => d.id === keptId);
+    if (!target || !kept) return;
+    if (!window.confirm(`Se retirará «${target.title}» como copia de «${kept.title}». Quedará archivado, sin borrarse, y se quitarán sus evidencias derivadas. ¿Continuar?`)) return;
+    const targetMunicipalityId = workspace.municipality.identity.id;
+    setWorkspace((prev) => {
+      if (prev.municipality.identity.id !== targetMunicipalityId) return prev;
+      const result = retireDuplicateDocument(prev.repository, prev.evidenceStore, documentId, keptId);
+      return result ? { ...prev, repository: result.repository, evidenceStore: result.evidenceStore, updatedAt: new Date().toISOString() } : prev;
+    });
+  }
+
   // ── Bandeja de revisión → cargadores CSV de estudios complementarios ──────
   // Clave = id del módulo metodológico (coincide con la etiqueta documental que
   // cada cargador usa para sustituir su estudio anterior). La bandeja solo
@@ -1645,12 +1717,12 @@ export default function App() {
     [SBQ_DOCUMENT_TAG]: { load: handleLoadSBQCSV, message: sbqMessage, loading: isLoadingSBQ },
   };
 
-  async function handleInboxStudyCsv(file: File, studyId: string | undefined, temporal: DocumentTemporalMetadata | undefined): Promise<boolean> {
+  async function handleInboxStudyCsv(file: File, studyId: string | undefined, temporal: DocumentTemporalMetadata | undefined, contentSha256?: string): Promise<boolean> {
     const loader = studyId !== undefined ? studyCsvLoaders[studyId] : undefined;
     if (studyId === undefined || loader === undefined) return false;
     const targetMunicipalityId = workspace.municipality.identity.id;
     const ok = await loader.load(file);
-    if (ok && temporal !== undefined) {
+    if (ok && (temporal !== undefined || contentSha256 !== undefined)) {
       // Los cargadores de estudio no reciben temporalidad: se añade después al
       // documento que acaban de registrar (misma etiqueta y mismo archivo).
       setWorkspace((prev) => {
@@ -1661,7 +1733,11 @@ export default function App() {
         if (registered === undefined) return prev;
         return {
           ...prev,
-          repository: setMunicipalDocumentTemporalMetadata(prev.repository, registered.id, temporal),
+          repository: withContentSha256(
+            temporal !== undefined ? setMunicipalDocumentTemporalMetadata(prev.repository, registered.id, temporal) : prev.repository,
+            registered.id,
+            contentSha256
+          ),
           updatedAt: new Date().toISOString(),
         };
       });
@@ -3737,6 +3813,31 @@ export default function App() {
               );
             })()}
 
+            {/* ── Documentos repetidos: detección y retirada confirmada ── */}
+            {(() => {
+              const atomCountByDocument: Record<string, number> = {};
+              for (const atom of runtime.workspace.evidenceStore.atoms) {
+                const id = atom.provenance.documentId;
+                if (id) atomCountByDocument[id] = (atomCountByDocument[id] ?? 0) + 1;
+              }
+              const studyTags = ["ibse", "duke-eas", "predimed-eas", "sf12-eas", "sueno-eas", "cage-eas", "auditc", "ipaq-eas", "ghq12", "phq9", "psqi", "fagerstrom", "sbq"];
+              const protectedIds = new Set(
+                runtime.workspace.repository.documents
+                  .filter((d) => d.id === runtime.workspace.healthReport?.linkedDocumentId || d.tags.some((t) => studyTags.includes(t)))
+                  .map((d) => d.id)
+              );
+              const groups = findDuplicateGroups(runtime.workspace.repository, { localHashes: localOriginalHashes, protectedIds, atomCountByDocument });
+              return (
+                <DuplicateDocumentsPanel
+                  groups={groups}
+                  kindLabels={DOCUMENT_KINDS}
+                  atomCountByDocument={atomCountByDocument}
+                  protectedIds={protectedIds}
+                  onRetire={handleRetireDuplicate}
+                />
+              );
+            })()}
+
             {/* ── Entrada universal: análisis, revisión e incorporación ── */}
             <DocumentReviewInbox
               key={runtime.workspace.municipality.identity.id}
@@ -3748,6 +3849,7 @@ export default function App() {
               connectedInstruments={Object.keys(studyCsvLoaders)}
               registeredHealthReport={runtime.workspace.healthReport ? { title: runtime.workspace.healthReport.title, sourceFileName: runtime.workspace.healthReport.sourceFileName } : undefined}
               storageNotice={storageSummary()}
+              localHashes={localOriginalHashes}
               getLoaderMessage={(route, studyId) =>
                 route === "health-report" ? lastHealthReportMessage
                   : route === "document-file" ? documentFileMessage
@@ -3755,10 +3857,10 @@ export default function App() {
               }
               onImport={(file, request) =>
                 request.route === "health-report"
-                  ? handleLoadHealthReport(file, { temporal: request.temporal })
+                  ? handleLoadHealthReport(file, { temporal: request.temporal, contentSha256: request.contentSha256 })
                   : request.route === "study-csv"
-                    ? handleInboxStudyCsv(file, request.studyId, request.temporal)
-                    : handleLoadDocumentFile(file, { kind: request.kind, declaresOpenAnswers: false, temporal: request.temporal })
+                    ? handleInboxStudyCsv(file, request.studyId, request.temporal, request.contentSha256)
+                    : handleLoadDocumentFile(file, { kind: request.kind, declaresOpenAnswers: false, temporal: request.temporal, contentSha256: request.contentSha256 })
               }
             />
 

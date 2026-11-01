@@ -265,6 +265,8 @@ export interface MunicipalDocument {
   cycle?: DocumentCycle;
   /** Declaración temporal ampliada: opcional para preservar expedientes anteriores. */
   temporal?: DocumentTemporalMetadata;
+  /** Huella SHA-256 del archivo original cargado. Ausente en documentos anteriores. */
+  contentSha256?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -309,6 +311,7 @@ export interface AddMunicipalDocumentInput {
   contentMode?: DocumentContentMode;
   cycle?: DocumentCycle;
   temporal?: DocumentTemporalMetadata;
+  contentSha256?: string;
 }
 
 function defaultCanGenerateEvidence(kind: DocumentKind): boolean {
@@ -352,6 +355,7 @@ export function addMunicipalDocument(
     contentMode: input.contentMode,
     ...(input.cycle !== undefined ? { cycle: input.cycle } : {}),
     ...(input.temporal !== undefined ? { temporal: input.temporal } : {}),
+    ...(input.contentSha256 !== undefined ? { contentSha256: input.contentSha256 } : {}),
     createdAt: now,
     updatedAt: now,
   };

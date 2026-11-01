@@ -11042,3 +11042,20 @@ h3 {
   .diagnosis-timeline__item { grid-template-columns: 1fr; }
   .diagnosis-timeline__date { grid-row: auto; }
 }
+
+/* Diagnóstico territorial · documentos repetidos */
+.duplicate-documents { border-top: 4px solid var(--amarillo); }
+.duplicate-documents__groups { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.9rem; }
+.duplicate-documents__group { padding: 0.9rem 1rem; border: 1px solid var(--borde); border-left: 4px solid var(--amarillo); border-radius: 8px; background: var(--blanco); }
+.duplicate-documents__group--same-file, .duplicate-documents__group--same-text { border-left-color: var(--naranja); }
+.duplicate-documents__reason { margin: 0 0 0.6rem; font-size: 0.88rem; color: var(--texto-secundario); }
+.duplicate-documents__reason strong { color: var(--texto-principal); }
+.duplicate-documents__group ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.45rem; }
+.duplicate-documents__doc { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; padding: 0.55rem 0.7rem; border-radius: 6px; background: var(--fondo-principal); }
+.duplicate-documents__doc > div { display: grid; gap: 0.15rem; min-width: 0; flex: 1 1 18rem; }
+.duplicate-documents__doc > div strong { color: var(--texto-principal); overflow-wrap: anywhere; }
+.duplicate-documents__doc > div span { font-size: 0.8rem; color: var(--texto-terciario); overflow-wrap: anywhere; }
+.duplicate-documents__doc--keep { background: color-mix(in srgb, var(--verde) 10%, var(--blanco)); }
+.duplicate-documents__keep { font-size: 0.82rem; font-weight: 600; color: color-mix(in srgb, var(--verde) 45%, var(--texto-principal)); }
+.duplicate-documents__actions { display: inline-flex; gap: 0.4rem; flex-wrap: wrap; }
+.duplicate-documents__secondary { background: none; border: 1px solid var(--borde); color: var(--texto-secundario); }

@@ -9,6 +9,7 @@ import type {
 import { removeEquivalentStrategicFramework } from "./strategicFrameworkReplace";
 import type { InspectedFormat } from "./preliminaryDocumentAnalyzer";
 import type { MethodologicalMatch } from "./identifyMethodologicalHeaders";
+import { findExistingCopy } from "./documentDuplicates";
 
 /** Cargador existente de COMPÁS al que la bandeja entrega el archivo revisado. */
 export type InboxImportRoute = "health-report" | "document-file" | "study-csv";
@@ -91,8 +92,21 @@ export function planInboxImport(input: {
    * ese caso la carga es una sustitución.
    */
   registeredHealthReport?: { title: string; sourceFileName?: string };
+  /** Huella SHA-256 del archivo analizado en la bandeja. */
+  fingerprint?: string;
+  /** Huellas de los originales conservados en este navegador, por documento. */
+  localHashes?: Readonly<Record<string, string>>;
 }): InboxImportPlan | InboxImportBlock {
   const { kind, format, fileName, repository } = input;
+  // Un archivo idéntico a uno ya incorporado no entra otra vez, sea cual sea su destino.
+  const existing = findExistingCopy(repository, { sha256: input.fingerprint, name: fileName }, input.localHashes);
+  if (existing?.reason === "same-file") {
+    const when = existing.document.createdAt ? ` el ${new Date(existing.document.createdAt).toLocaleDateString("es-ES")}` : "";
+    return {
+      blocked: true,
+      reason: `Este archivo ya está en el expediente como «${existing.document.title}» (incorporado${when}). Es el mismo archivo, byte a byte, y no se incorpora de nuevo.`,
+    };
+  }
   // Un CSV de instrumento se reconoce por sus columnas, no por el tipo elegido:
   // IBSE se registra como exportación REDCap y el resto como estudio complementario.
   if ((kind === "complementary-study" || kind === "redcap-export") && format === "csv") {

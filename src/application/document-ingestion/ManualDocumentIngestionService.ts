@@ -26,6 +26,8 @@ export interface IngestManualDocumentInput {
   structure?: DeclaredDocumentStructure;
   /** Metadatos temporales declarados antes de la carga (bandeja de revisión). */
   temporal?: DocumentTemporalMetadata;
+  /** Huella SHA-256 del archivo original, cuando lo hay. */
+  contentSha256?: string;
 }
 
 export interface IngestManualDocumentResult {
@@ -59,6 +61,7 @@ export function ingestManualDocument(
     sourceText: cleanText,
     tags: [input.kind],
     ...(input.temporal !== undefined ? { temporal: input.temporal } : {}),
+    ...(input.contentSha256 !== undefined ? { contentSha256: input.contentSha256 } : {}),
   });
 
   const registeredDocument = nextRepository.documents.find(
