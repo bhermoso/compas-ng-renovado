@@ -148,14 +148,20 @@ export function buildDiagnosisControlSummary(input: DiagnosisControlInput): Diag
     : input.healthReportLoaded || input.evidenceCount > 0 || input.repository.documents.length > 0 ? "partial"
     : "empty";
 
+  const reportCardMissing =
+    input.healthReportLoaded && !active.some((d) => d.kind === "health-report");
   const modules: DiagnosisModuleSummary[] = [
     {
       id: "health-report",
       label: "Informe de Salud",
       count: input.healthReportLoaded ? 1 : 0,
       value: input.healthReportLoaded ? "Incorporado" : "Sin incorporar",
-      state: input.healthReportLoaded ? "ok" : "empty",
-      detail: input.healthReportLoaded ? "Fuente primaria del diagnóstico." : "Fuente primaria pendiente de incorporar.",
+      state: input.healthReportLoaded ? (reportCardMissing ? "partial" : "ok") : "empty",
+      detail: !input.healthReportLoaded
+        ? "Fuente primaria pendiente de incorporar."
+        : reportCardMissing
+          ? "Registrado, pero su ficha no consta en el repositorio documental."
+          : "Fuente primaria del diagnóstico.",
     },
     {
       id: "studies",

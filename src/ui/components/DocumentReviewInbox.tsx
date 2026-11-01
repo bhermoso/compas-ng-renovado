@@ -54,6 +54,10 @@ interface DocumentReviewInboxProps {
   getLoaderMessage?: (route: InboxImportRoute, studyId?: string) => string | null | undefined;
   /** Instrumentos con cargador CSV conectado (ids de módulo metodológico). */
   connectedInstruments?: readonly string[];
+  /** Informe de Salud registrado en el expediente, conste o no su ficha documental. */
+  registeredHealthReport?: { title: string; sourceFileName?: string };
+  /** Dónde queda guardado lo que se incorpora; se muestra antes de confirmar. */
+  storageNotice?: string;
   /** Entrega el archivo revisado al cargador existente; resuelve true si la carga se completó. */
   onImport?: (file: File, request: InboxImportRequest) => Promise<boolean>;
 }
@@ -91,6 +95,8 @@ export function DocumentReviewInbox({
   isImporting = false,
   getLoaderMessage,
   connectedInstruments = [],
+  registeredHealthReport,
+  storageNotice,
   onImport,
 }: DocumentReviewInboxProps) {
   const [items, setItems] = useState<PendingDocumentReview[]>([]);
@@ -163,6 +169,7 @@ export function DocumentReviewInbox({
         repository,
         methodologicalMatches: active.analysis.methodologicalMatches,
         connectedInstruments,
+        registeredHealthReport,
       })
     : undefined;
   const importPlan = plan && !("blocked" in plan) ? plan : undefined;
@@ -288,6 +295,7 @@ export function DocumentReviewInbox({
                   ? "no hay sesión identificada; los datos se guardan sin declaración y el documento seguirá pendiente de revisión temporal."
                   : "sin declaración; el documento seguirá pendiente de revisión temporal."}
             </p>
+            {storageNotice && <p className="panel-note"><strong>Dónde se guarda:</strong> {storageNotice}</p>}
             {importPlan.effect === "replace" && <label><input type="checkbox" checked={active.replacementAcknowledged === true} disabled={active.approved !== true} onChange={e => update(active.id, { replacementAcknowledged: e.target.checked })} /> Confirmo la sustitución descrita.</label>}
             <button type="button" disabled={!canImport} onClick={() => void importActive()}>
               {isImporting && lastImportId === active.id ? "Incorporando…" : importPlan.effect === "replace" ? "Sustituir e incorporar" : "Incorporar al expediente"}
