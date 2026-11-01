@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import type { ChangeEvent } from "react";
+import type { ChangeEvent, DragEvent } from "react";
 import { proposeDocumentDestinations } from "../../application/document-ingestion/proposeDocumentDestinations";
 import {
   buildInboxTemporalMetadata,
@@ -97,6 +97,7 @@ export function DocumentReviewInbox({
   const filesRef = useRef(new Map<string, File>());
   const [selected, setSelected] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [dragActive, setDragActive] = useState(false);
   const [lastImportId, setLastImportId] = useState<string | null>(null);
   const active = items.find((item) => item.id === selected);
   const pendingCount = items.filter(item => !item.importResult?.ok).length;
@@ -108,9 +109,17 @@ export function DocumentReviewInbox({
   function update(id: string, patch: Partial<PendingDocumentReview>) {
     setItems((previous) => previous.map((item) => item.id === id ? { ...item, ...patch } : item));
   }
-  async function addFiles(event: ChangeEvent<HTMLInputElement>) {
+  function addFromInput(event: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.currentTarget.files ?? []);
     event.currentTarget.value = "";
+    void addFiles(files);
+  }
+  function addFromDrop(event: DragEvent<HTMLLabelElement>) {
+    event.preventDefault();
+    setDragActive(false);
+    void addFiles(Array.from(event.dataTransfer.files ?? []));
+  }
+  async function addFiles(files: File[]) {
     if (!files.length) return;
     const additions = files.map((file) => ({
       id: crypto.randomUUID(),
@@ -208,12 +217,18 @@ export function DocumentReviewInbox({
     <section className="workspace-panel document-review-inbox" aria-labelledby="document-review-title">
       <div className="gradient-bar" aria-hidden="true" />
       <div className="panel-header">
-        <div><p className="eyebrow">Revisión previa e incorporación</p><h2 id="document-review-title">Bandeja de documentación</h2></div>
+        <div><p className="eyebrow">Entrada universal · Revisión previa e incorporación</p><h2 id="document-review-title">Incorporar documentación</h2></div>
         <p className="panel-note">Analiza firmas, huellas SHA-256 y cabeceras CSV; en ZIP permite inspeccionar entradas una a una con comprobación CRC-32. Tras tu confirmación, el mismo archivo se entrega al cargador existente de COMPÁS, sin volver a seleccionarlo. Nada se incorpora sin confirmación explícita.</p>
       </div>
-      <label className="document-review-inbox__upload">
-        Seleccionar archivos para revisión
-        <input type="file" multiple accept=".pdf,.doc,.docx,.csv,.xlsx,.xls,.png,.jpg,.jpeg,.zip" onChange={addFiles} />
+      <label
+        className={`document-review-inbox__upload${dragActive ? " document-review-inbox__upload--active" : ""}`}
+        onDragOver={(event) => { event.preventDefault(); if (!dragActive) setDragActive(true); }}
+        onDragLeave={() => setDragActive(false)}
+        onDrop={addFromDrop}
+      >
+        <span className="document-review-inbox__upload-title">Arrastra aquí los archivos o selecciónalos</span>
+        <span className="document-review-inbox__upload-hint">PDF, DOCX, CSV, Excel, imágenes o ZIP. Se analizan en este navegador; nada se incorpora sin tu confirmación.</span>
+        <input type="file" multiple accept=".pdf,.doc,.docx,.csv,.xlsx,.xls,.png,.jpg,.jpeg,.zip" onChange={addFromInput} />
       </label>
       <p className="panel-note" role="status">{message || "Sin archivos pendientes en esta sesión."}</p>
       {items.length > 0 && <><p className="panel-note">{items.length} archivos seleccionados · {analyzedCount} analizados · {pendingCount} sin incorporar.</p><div className="document-review-inbox__layout">
