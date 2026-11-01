@@ -1,7 +1,7 @@
 # CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY
 
 > Contrato metodológico canónico del Perfil de Salud Local (PSL) en COMPÁS NG.
-> Versión 2.1.0 — 2026-10-24 (historial en el registro de revisiones)
+> Versión 2.2.0 — 2026-11-01 (historial en el registro de revisiones)
 > Estado: VIGENTE
 >
 > Este contrato define qué debe ser metodológicamente un Perfil de Salud Local,
@@ -376,6 +376,21 @@ Las principales fuentes de incertidumbre que el Perfil debe declarar son:
 
 Las muestras municipales de COMPÁS NG no permiten inferencia estadística rigurosa comparable a la de encuestas de referencia poblacional. Los comparadores son indicativos, no estadísticamente significativos. La falsa precisión es más peligrosa que la incertidumbre reconocida.
 
+### Art. 13 bis. Datos epidemiológicos oficiales
+
+Los datos epidemiológicos procedentes de fuentes oficiales —el Informe de Salud, los registros sanitarios, los atlas de mortalidad, la vigilancia epidemiológica— se reproducen tal como los publica su fuente, con su valor literal, su año, su ámbito y su referencia.
+
+El Perfil no los cuestiona ni les añade cautelas propias: no comenta su método de cálculo, su denominador, la estabilidad de las tasas en poblaciones pequeñas ni las incoherencias internas de la fuente. Esa revisión corresponde a quien elabora la fuente, no al Perfil.
+
+Se mantienen, porque son hechos y no juicios sobre el dato:
+- El año o período de cada cifra.
+- La escala, cuando el dato no es municipal (Art. 13, dato de ámbito superior usado como contexto).
+- La ausencia de datos posteriores, dicha como un hecho sobre el conocimiento del municipio («No hay datos posteriores a 2015»).
+
+Las cautelas del Art. 13 siguen rigiendo para los estudios realizados en el municipio con COMPÁS NG, para la representatividad de los procesos participativos y para el uso de datos no locales como si fueran municipales.
+
+*Consecuencia si se viola:* el Perfil desautoriza la fuente oficial que le da base, sin capacidad para corregirla, y el lector pierde la referencia sobre qué cifras sostienen el diagnóstico.
+
 ### Art. 14. Convergencia y divergencia de evidencias
 
 Cuando varias fuentes apuntan en la misma dirección, el Perfil declara esa convergencia. La convergencia de fuentes independientes aumenta la solidez de una interpretación.
@@ -460,14 +475,14 @@ Las conclusiones y las recomendaciones del Perfil se presentan al equipo técnic
 
 ### Art. 16 quater. Estructura del Perfil
 
-El Perfil es un argumento breve: su unidad es la conclusión. Una cuestión de salud figura en el cuerpo solo si sostiene una conclusión o deja una laguna que condiciona una. La evidencia por fuente, por tema y por cifra no forma parte del cuerpo: consta en el anexo compilado.
+El Perfil es un argumento: su unidad es la conclusión, y se lee como un texto de diagnóstico, no como un conjunto de fichas. Una cuestión de salud figura en el cuerpo solo si sostiene una conclusión o deja una laguna que condiciona una. La evidencia por fuente, por tema y por cifra no forma parte del cuerpo: consta en el anexo compilado.
 
 **Precondición.** La estructura rige para un Perfil, es decir, cuando se cumple la regla N+1 (Art. 7 bis A). Si solo existe el Informe de Salud, el producto es el Informe de Salud y no tiene esta estructura.
 
 **Cuerpo.** El cuerpo del Perfil consta de estos apartados, en este orden:
 
 1. **Punto de partida.** Municipio, población con fuente y año, fuentes del expediente con año y escala, estudios y activos incorporados, ejes de lectura declarados (Art. 4 ter) y lo que no consta. Es la única declaración de ausencias generales; no se repite por cuestión.
-2. **Conclusiones.** Cada una en un bloque de campos fijos: enunciado de una frase; tipo (hecho, interpretación o hipótesis); hasta tres evidencias visibles, con valor, año, fuente y página o consulta; grado de sustento de la relación que la sostiene, o «sin relación declarada»; límite principal (escala, año, tamaño, desfase entre fuentes); y recomendaciones a las que lleva. Una conclusión que repite una evidencia sin añadirle lectura no se redacta.
+2. **Conclusiones.** El apartado se abre con una **lectura de conjunto**: uno a tres párrafos que relacionan las conclusiones entre sí, dicen hacia dónde apunta el diagnóstico y distinguen lo que los datos muestran de lo que se interpreta. Después, cada conclusión tiene un enunciado de una frase y una lectura breve en prosa, con las evidencias (valor, año, fuente y página o consulta) citadas dentro del texto. El tipo de afirmación (hecho, interpretación o hipótesis) se nota en cómo se dice, no en etiquetas. Cada conclusión indica al final a qué recomendaciones lleva. El tipo, las evidencias principales, el grado de sustento de la relación (o «sin relación declarada»), el límite principal y las recomendaciones constan en una **tabla de trazabilidad** del anexo. Una conclusión que repite una evidencia sin añadirle lectura no se redacta.
 3. **Convergencias y divergencias.** Las cuestiones que aparecen en dos o más fuentes, según el Art. 14. Si no hay ninguna cuestión compartida, el apartado se omite y el punto de partida lo declara.
 4. **Lo que no sabemos.** Las lagunas que condicionan una conclusión, cada una con el dato que la cerraría.
 5. **Recomendaciones del Perfil.** En el formato del Art. 8 quater.
@@ -480,7 +495,7 @@ El Perfil es un argumento breve: su unidad es la conclusión. Una cuestión de s
 
 **Unidades de lectura.** Las unidades (Art. 4 bis) siguen siendo la forma en que el sistema organiza la evidencia. En el cuerpo figuran a través de las conclusiones, las convergencias y las lagunas, y completas en el anexo.
 
-**Disposición transitoria.** Mientras la implementación no ensamble esta estructura, el cuerpo heredado (señales por fuente, lectura integrada en hilos, síntesis interpretativa, señales para deliberación, cierre de la lectura y matriz de evidencia) sigue generándose y debe retirarse del cuerpo bloque a bloque, sin que el caso de referencia Granada-Zaidín cambie sin justificación. Los identificadores técnicos del código (por ejemplo, el tipo `orientacion`) no se alteran por este contrato.
+**Disposición transitoria.** Mientras la implementación no ensamble esta estructura, el cuerpo heredado (señales por fuente, lectura integrada en hilos, síntesis interpretativa, señales para deliberación, cierre de la lectura y matriz de evidencia) sigue generándose y debe retirarse del cuerpo bloque a bloque, sin que el caso de referencia Granada-Zaidín cambie sin justificación. Los identificadores técnicos del código (por ejemplo, el tipo `orientacion`) no se alteran por este contrato. El compilador heredado (`src/application/proposals/chosenClosing.ts`) sigue presentando las conclusiones en campos fijos hasta que se adapte a la versión 2.2.0; no se modifica para no alterar el caso de referencia Granada-Zaidín sin justificación. Los Perfiles elaborados fuera de COMPÁS siguen ya el apartado 2 vigente.
 
 *Consecuencia si se viola:* el Perfil vuelve a crecer por acumulación de bloques que no se alimentan entre sí, y el lector no puede seguir un argumento.
 
@@ -543,7 +558,8 @@ Un Perfil de Salud Local es metodológicamente aceptable cuando puede responders
 | **Singularidad** | ¿Este Perfil no podría pertenecer a otro municipio sin que ningún lector lo notara? |
 | **Trazabilidad** | ¿Cada afirmación relevante es rastreable hasta la evidencia o la fuente que la sustenta? |
 | **Regla N+1** | ¿El Informe de Salud se interpreta junto a al menos una fuente adicional válida: estudios complementarios, activos y capacidades, o priorización ciudadana? |
-| **Incertidumbre visible** | ¿Las cautelas metodológicas están en el cuerpo del documento, junto al dato que condicionan? |
+| **Incertidumbre visible** | ¿Las cautelas metodológicas están en el cuerpo del documento, junto al dato que condicionan, sin añadirlas a los datos epidemiológicos oficiales (Art. 13 bis)? |
+| **Lectura de conjunto** | ¿Las conclusiones se abren con una lectura que las relaciona y se leen como prosa de diagnóstico, con la trazabilidad completa en el anexo? |
 | **Contradicciones declaradas** | ¿Las contradicciones entre fuentes están explícitamente reconocidas, sin resolución artificial? |
 | **Equilibrio activos-déficits** | ¿Los activos comunitarios tienen la misma visibilidad que los indicadores de necesidad? |
 | **No prescripción** | ¿El Perfil no prescribe automáticamente prioridades, actuaciones ni compromisos? |
@@ -774,6 +790,14 @@ Toda recomendación del Perfil es de tipo «Conocer», «Contrastar» o «Aborda
 
 *Fuente:* Arts. 7 ter y 8 quater.
 
+**I-LHPM-21 — Datos epidemiológicos oficiales sin cautelas añadidas**
+
+Las cifras epidemiológicas de fuentes oficiales se presentan con su valor, año, ámbito y referencia, sin comentarios del Perfil sobre su cálculo, su denominador o su estabilidad. Solo se declaran el año, la escala no municipal y la ausencia de datos posteriores.
+
+*Consecuencia si se viola:* el Perfil desautoriza su propia base sin poder corregirla.
+
+*Fuente:* Art. 13 bis. Decisión del autor del 2026-11-01.
+
 ---
 
 ## Relaciones con otros contratos
@@ -812,4 +836,5 @@ Toda recomendación del Perfil es de tipo «Conocer», «Contrastar» o «Aborda
 *CONTRACT-PSL-COMPAS y CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER.*
 *Todo contrato de producto que afecte al Perfil de Salud Local debe ser coherente con este contrato.*
 | 2026-10-23 | 2.0.0 | Nueva estructura del Perfil (Art. 16 quater): la conclusión como unidad, cuerpo de siete apartados y anexo compilado. La «orientación técnica» pasa a llamarse «recomendación del Perfil» y se tipifica en Conocer, Contrastar y Abordar (Art. 8 quater); «Abordar» exige relación de grado 1 o 2. Nuevos invariantes I-LHPM-19 e I-LHPM-20, criterio «Estructura breve» (Art. 19) y cuestión abierta H-LHPM-7 (tope de conclusiones). Las unidades de lectura (Art. 4 bis) pasan al anexo. Decisiones del autor del 2026-10-23 | COMPÁS NG |
+| 2026-11-01 | 2.2.0 | Conclusiones narradas y lectura de conjunto (Art. 16 quater, apartado 2): el apartado se abre con una lectura que relaciona las conclusiones; cada conclusión se escribe en prosa con las cifras citadas dentro del texto, y el tipo, las evidencias, el grado, el límite y las recomendaciones pasan a una tabla de trazabilidad del anexo. Nuevo Art. 13 bis e invariante I-LHPM-21: los datos epidemiológicos oficiales se reproducen como los publica su fuente, sin cautelas añadidas, conservando año, escala y ausencia de datos posteriores. Criterios del Art. 19 «Incertidumbre visible» (ajustado) y «Lectura de conjunto» (nuevo). Decisiones del autor del 2026-11-01, a partir del Perfil de Zagra v0.1 | COMPÁS NG |
 | 2026-10-24 | 2.1.0 | Distinción entre recurso y activo (Art. 9 bis, I-LHPM-12): un registro de Localiza Salud es un recurso; es activo para la salud cuando consta su validación con los criterios de registro y validación de activos para la salud en Andalucía, que incluyen la identificación comunitaria. Los patrones de cruce se nombran con «recurso registrado». Decisión del autor del 2026-10-24, contrastada con Loja (162 recursos, 5 activos identificados comunitariamente) | COMPÁS NG |
