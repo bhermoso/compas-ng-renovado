@@ -9,6 +9,7 @@ import { DiagnosisControlRoom, DiagnosisModuleSection } from "./ui/components/Di
 import { DuplicateDocumentsPanel } from "./ui/components/DuplicateDocumentsPanel";
 import { findDuplicateGroups, findExistingCopy, retireDuplicateDocument } from "./application/document-ingestion/documentDuplicates";
 import { sha256Hex } from "./application/document-ingestion/sha256";
+import { MAX_WORKSPACE_ORIGINALS_BYTES, decideOriginalUpload, decodeDocumentOriginal, documentOriginalsBytes, encodeDocumentOriginal, formatMegabytes, mergeDocumentOriginals, profileOriginalsBytes, pruneDocumentOriginals, type StoredDocumentOriginal } from "./application/document-files/documentOriginals";
 import { buildDiagnosisControlSummary, type DiagnosisModuleId } from "./application/diagnosis/diagnosisControlSummary";
 import { replaceZaidinFinalDraft } from "./application/workspace/replaceZaidinFinalDraft";
 import { regroupZagraActionPlan } from "./application/workspace/regroupZagraActionPlan";
@@ -39,6 +40,7 @@ import {
   shouldSkipPersistence,
   shouldReplaceWithSeed,
   shouldRestoreIndexedDbWorkspace,
+  withCarriedDocumentOriginals,
   applySeedDocumentMigration,
   backfillSeedMigrationMarker,
   resolveSeedMigration,
@@ -582,6 +584,63 @@ export default function App() {
     return () => { cancelled = true; };
   }, [workspace.repository.documents, workspace.municipality.identity.id]);
 
+  // Originales del Diagnóstico en Firebase, con el mecanismo del Perfil externo:
+  // bajada (expediente → IndexedDB, con comprobación de huella) y subida
+  // (IndexedDB → expediente, dentro del presupuesto común de 40 MB). La subida
+  // espera a que el expediente compartido esté recuperado, para no añadir
+  // originales a una versión que luego se sustituye.
+  const originalSyncSkip = useRef(new Set<string>());
+  const [localOnlyOriginals, setLocalOnlyOriginals] = useState<Array<{ documentId: string; reason: "too-large" | "over-budget" }>>([]);
+  useEffect(() => {
+    const municipalityId = workspace.municipality.identity.id;
+    const signedIn = remoteClient.auth.currentUser !== null;
+    if (pendingSeedId === municipalityId || pendingIndexedDbHydrationId === municipalityId) return;
+    if (signedIn && remoteHydratedMunicipalityId !== municipalityId) return;
+    let cancelled = false;
+    const stored = workspace.documentOriginals ?? [];
+    const documents = workspace.repository.documents;
+    void (async () => {
+      for (const original of stored) {
+        const key = `down:${municipalityId}:${original.documentId}:${original.sha256}`;
+        if (originalSyncSkip.current.has(key)) continue;
+        try {
+          const local = await loadOriginalFile(municipalityId, original.documentId);
+          if (!local) await saveOriginalFile(municipalityId, original.documentId, await decodeDocumentOriginal(original));
+        } catch (error) {
+          console.error("[original-restore-error]", original.documentId, error);
+        }
+        if (cancelled) return;
+        originalSyncSkip.current.add(key);
+      }
+      const storedIds = new Set(stored.map((o) => o.documentId));
+      let used = documentOriginalsBytes(stored) + profileOriginalsBytes(workspace.externalProfileLibrary);
+      const additions: StoredDocumentOriginal[] = [];
+      const localOnly: Array<{ documentId: string; reason: "too-large" | "over-budget" }> = [];
+      for (const d of documents) {
+        if (storedIds.has(d.id) || d.status === "rejected") continue;
+        const key = `up:${municipalityId}:${d.id}`;
+        if (originalSyncSkip.current.has(key)) continue;
+        const local = await loadOriginalFile(municipalityId, d.id).catch(() => undefined);
+        if (cancelled) return;
+        if (!local) { originalSyncSkip.current.add(key); continue; }
+        const decision = decideOriginalUpload(local.size, used);
+        if (decision !== "fits") { localOnly.push({ documentId: d.id, reason: decision }); continue; }
+        additions.push(await encodeDocumentOriginal(d.id, local));
+        used += local.size;
+        if (cancelled) return;
+      }
+      setLocalOnlyOriginals((previous) => (JSON.stringify(previous) === JSON.stringify(localOnly) ? previous : localOnly));
+      const prunedCount = stored.length - pruneDocumentOriginals(stored, documents).length;
+      if (additions.length === 0 && prunedCount === 0) return;
+      setWorkspace((prev) => {
+        if (prev.municipality.identity.id !== municipalityId) return prev;
+        const next = mergeDocumentOriginals(pruneDocumentOriginals(prev.documentOriginals ?? [], prev.repository.documents), additions.filter((a) => prev.repository.documents.some((d) => d.id === a.documentId)));
+        return { ...prev, documentOriginals: next, updatedAt: new Date().toISOString() };
+      });
+    })();
+    return () => { cancelled = true; };
+  }, [workspace.repository.documents, workspace.documentOriginals, workspace.externalProfileLibrary, workspace.municipality.identity.id, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+
   const openDiagnosisModule = useCallback((module: DiagnosisModuleId) => {
     const section = DIAGNOSIS_SECTION_OF_MODULE[module];
     toggleDiagnosisModule(section, true);
@@ -681,7 +740,7 @@ export default function App() {
       if (cancelled) return;
       if (stored !== null) {
         setWorkspace((current) => {
-          if (!shouldRestoreIndexedDbWorkspace(current, stored)) return current;
+          if (!shouldRestoreIndexedDbWorkspace(current, stored)) return withCarriedDocumentOriginals(current, stored);
           queueMicrotask(() => {
             setPendingTopics([
               ...(stored.thematicPrioritisation?.selectedTopicIds ?? []),
@@ -739,6 +798,8 @@ export default function App() {
         ) {
           newest = indexedWorkspace;
         }
+        // La copia que se conserva recibe los originales que solo tenga otra.
+        newest = withCarriedDocumentOriginals(withCarriedDocumentOriginals(newest, indexedWorkspace), localWorkspace);
         if (newest === current) return current;
         queueMicrotask(() => {
           setPendingTopics([
@@ -893,7 +954,7 @@ export default function App() {
         if (remoteWorkspace !== null) {
           setWorkspace((current) => {
             if (!shouldRestoreIndexedDbWorkspace(current, remoteWorkspace)) {
-              return current;
+              return withCarriedDocumentOriginals(current, remoteWorkspace);
             }
             queueMicrotask(() => {
               setPendingTopics([
@@ -1679,7 +1740,7 @@ export default function App() {
    */
   function storageSummary(): string {
     return remoteClient.auth.currentUser
-      ? "La ficha, el texto y las evidencias se guardan en el expediente compartido de Firebase. El archivo original, por ahora, solo se conserva en este navegador."
+      ? `La ficha, el texto, las evidencias y el archivo original se guardan en el expediente compartido de Firebase. Los originales del Diagnóstico y del Perfil comparten un límite de ${formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)} por expediente; el que no quepa se conserva solo en este navegador y se avisa.`
       : "Sin sesión iniciada: todo se guarda solo en este navegador. Inicia sesión para guardar el expediente en Firebase.";
   }
 
@@ -3810,6 +3871,31 @@ export default function App() {
                   kindLabels={DOCUMENT_KINDS}
                   onOpenModule={openDiagnosisModule}
                 />
+              );
+            })()}
+
+            {/* ── Originales en el expediente compartido ── */}
+            {(() => {
+              const stored = runtime.workspace.documentOriginals ?? [];
+              const used = documentOriginalsBytes(stored) + profileOriginalsBytes(runtime.workspace.externalProfileLibrary);
+              const titleOf = (id: string) => runtime.workspace.repository.documents.find((d) => d.id === id)?.title ?? id;
+              return (
+                <section className="workspace-panel originals-status" aria-label="Originales en el expediente compartido">
+                  <p className="originals-status__line">
+                    <strong>Originales en el expediente compartido:</strong> {stored.length === 1 ? "1 documento" : `${stored.length} documentos`} · {formatMegabytes(used)} de {formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)}, contando los del Perfil.
+                    {remoteClient.auth.currentUser ? " Se guardan en Firebase con el expediente." : " Sin sesión iniciada, se guardan solo en este navegador."}
+                  </p>
+                  {localOnlyOriginals.length > 0 && (
+                    <div role="alert" className="originals-status__warning">
+                      <strong>Solo en este navegador:</strong>
+                      <ul>
+                        {localOnlyOriginals.map((o) => (
+                          <li key={o.documentId}>{titleOf(o.documentId)} · {o.reason === "too-large" ? "supera los 20 MB por archivo" : "no cabe en el límite del expediente"}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </section>
               );
             })()}
 

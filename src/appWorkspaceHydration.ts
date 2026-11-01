@@ -383,7 +383,34 @@ export function shouldRestoreIndexedDbWorkspace(
   // Si el workspace actual ya contiene la base canónica de un municipio con
   // seed, una copia persistida más pobre no puede sustituirlo por ser más nueva.
   if (hasSeedBaselineRegression(current, stored)) return false;
-  return stored.updatedAt > current.updatedAt;
+  if (stored.updatedAt > current.updatedAt) return true;
+  // La copia ligera de localStorage no lleva los originales del Diagnóstico y
+  // se guarda con la misma fecha que la copia de IndexedDB o la remota. A
+  // igualdad de fecha prevalece la que los conserva: si no, un autoguardado
+  // posterior los eliminaría también de Firebase.
+  return (
+    stored.updatedAt === current.updatedAt &&
+    (stored.documentOriginals?.length ?? 0) > (current.documentOriginals?.length ?? 0)
+  );
+}
+
+/**
+ * Cuando se conserva `current` y se descarta otra copia del mismo expediente,
+ * traslada los originales del Diagnóstico que la otra copia tenga y `current`
+ * no, siempre que su documento exista en `current`. Solo añade: nunca quita ni
+ * sustituye. Evita perderlos cuando la copia ligera de localStorage (sin
+ * originales) gana por fecha. Devuelve `current` si no hay nada que trasladar.
+ */
+export function withCarriedDocumentOriginals(
+  current: MunicipalityWorkspace,
+  other: MunicipalityWorkspace | null
+): MunicipalityWorkspace {
+  if (!other || other.municipality.identity.id !== current.municipality.identity.id) return current;
+  const have = new Set((current.documentOriginals ?? []).map((o) => o.documentId));
+  const documentIds = new Set(current.repository.documents.map((d) => d.id));
+  const carried = (other.documentOriginals ?? []).filter((o) => !have.has(o.documentId) && documentIds.has(o.documentId));
+  if (carried.length === 0) return current;
+  return { ...current, documentOriginals: [...(current.documentOriginals ?? []), ...carried] };
 }
 
 export function shouldReplaceWithSeed(
