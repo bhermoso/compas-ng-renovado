@@ -4,6 +4,7 @@ import type { ExternalHealthProfile, ExternalProfileLibrary, ProfileAttachment, 
 import type { LocalHealthProfileArtifact } from '../../domain/health-profile-artifact';
 import { appendExternalProfile, importProfileFile, profileAttachmentBlob } from '../../application/health-profile/externalProfiles';
 import { PSLCArtifactViewer } from './PSLCArtifactViewer';
+import { ProfileResultsDashboard } from './ProfileResultsDashboard';
 import './ExternalProfileDashboard.css';
 
 interface Props {
@@ -26,31 +27,13 @@ function emptyProfile(municipalityId: string): ExternalHealthProfile {
  return {schema:'compas-external-profile/v1',id:crypto.randomUUID(),municipalityId,title:'',period:'',author:'',createdAt:new Date().toISOString(),
   status:'review',summary:'',text:'',results:[],findings:[],limitations:[],areas:[],attachmentIds:[]};
 }
-function ResultCard({ result }: {result: ProfileResult}) {
- const numeric = result.chartValue;
- const comparison=result.comparison;
- const max = Math.max(0,numeric ?? 0,comparison?.value ?? 0);
- return <article className="ep-result">
-  <div className="ep-result__context"><span>{result.topic || 'Resultado del perfil'}</span><span>{result.period || 'Periodo no indicado'}</span></div>
-  <h3>{result.title}</h3><p className="ep-result__value">{result.value}<span>{result.unit}</span></p>
-  {result.temporalContext === 'historical' && <p className="ep-result__historical">Antecedente histórico · no describe por sí solo la situación actual</p>}
-  {numeric !== undefined && comparison && numeric >= 0 && comparison.value >= 0 && max > 0 && <figure className="ep-comparison" aria-label={`Comparación de ${result.title}`}>
-   <div><span>Ámbito del perfil</span><div className="ep-bar"><i style={{width:`${numeric/max*100}%`}}/></div><b>{numeric.toLocaleString('es-ES')} {result.unit}</b></div>
-   <div><span>{comparison.label}</span><div className="ep-bar ep-bar--reference"><i style={{width:`${comparison.value/max*100}%`}}/></div><b>{comparison.value.toLocaleString('es-ES')} {result.unit}</b></div>
-  </figure>}
-  <p className="ep-result__source">Fuente: {result.source || 'Pendiente de indicar'}{result.page && ` · ${result.page}`}</p>
-  <p className="ep-result__source">Escala: {result.scale || 'No indicada'}{result.denominator && ` · Base: ${result.denominator}`}</p>
-  {result.caution && <p className="ep-result__caution">{result.caution}</p>}
- </article>;
-}
-
 export function ExternalProfileDashboard({municipalityId,municipalityName,library,legacyProfiles=[],legacyText,authorName,onSave,onDirtyChange}: Props) {
  const [selectedId,setSelectedId]=useState(library.activeId);
  const [tab,setTab]=useState<'results'|'document'|'versions'>('results');
  const [draft,setDraft]=useState<ExternalHealthProfile>();
  const [newFiles,setNewFiles]=useState<ProfileAttachment[]>([]);
  const [busy,setBusy]=useState(false); const [message,setMessage]=useState(''); const [error,setError]=useState('');
- const [topic,setTopic]=useState('Todos'); const [fileUrls,setFileUrls]=useState<Record<string,string>>({});
+ const [fileUrls,setFileUrls]=useState<Record<string,string>>({});
  const [resultDraft,setResultDraft]=useState<ProfileResult>();
  const fileInput=useRef<HTMLInputElement>(null);
  const selected=library.profiles.find(p=>p.id===(selectedId ?? library.activeId)) ?? library.profiles.find(p=>p.id===library.activeId);
@@ -98,7 +81,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
   setBusy(true);setError('');setMessage('Guardando el documento, los resultados y la versión en Firebase…');
   try{
    const next=appendExternalProfile(library,{...draft,title:draft.title.trim()},newFiles,municipalityId);
-   await onSave(next);setSelectedId(draft.id);setDraft(undefined);setNewFiles([]);setTab('results');setTopic('Todos');
+   await onSave(next);setSelectedId(draft.id);setDraft(undefined);setNewFiles([]);setTab('results');
    setMessage('Perfil completo guardado en Firebase, incluidos archivos, resultados e historial.');
   }catch(e){setError(e instanceof Error?e.message:'No se ha podido guardar. Tu borrador permanece en pantalla.');setMessage('');}
   finally{setBusy(false);}
@@ -124,8 +107,6 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
   try{await onSave(next);setMessage(success);}catch(e){setError(e instanceof Error?e.message:'No se ha podido guardar en Firebase.');setMessage('');}finally{setBusy(false);}
  }
  function patch(change:Partial<ExternalHealthProfile>){setDraft(p=>p?{...p,...change}:p);}
- const topics=['Todos',...new Set((selected?.results ?? []).map(r=>r.topic).filter((s):s is string=>!!s))];
- const results=(selected?.results ?? []).filter(r=>topic==='Todos'||r.topic===topic);
  return <section className="external-profile" aria-label="Perfil de Salud Local">
   <header className="ep-header"><div className="ep-identity"/><div className="ep-header__body">
    <div><p className="ep-eyebrow">PERFIL DE SALUD LOCAL · {municipalityName}</p><h1>El perfil y sus resultados</h1>
@@ -178,19 +159,13 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
     </div><button className="ep-primary" disabled={busy} onClick={edit}>Editar una nueva revisión</button>
     <p className="ep-help">Los originales no se modifican. Cada edición conserva la versión anterior.</p>
    </aside><div className="ep-main"><nav className="ep-tabs" aria-label="Vistas del perfil">{([['results','Resultados'],['document','Documento'],['versions','Versiones']] as const).map(([key,label])=><button key={key} aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>
-    {tab==='results'&&<><div className="ep-reading"><p className="ep-eyebrow">LECTURA DE CONJUNTO</p><h2>Qué nos dice el perfil</h2><p>{selected.summary||'El documento está disponible. Su síntesis visual todavía no se ha incorporado.'}</p></div>
-     {selected.findings.filter(Boolean).length>0&&<section className="ep-findings"><h3>Principales hallazgos</h3><ol>{selected.findings.filter(Boolean).map((f,i)=><li key={i}>{f}</li>)}</ol></section>}
-     <div className="ep-section-heading"><div><p className="ep-eyebrow">DATOS CON CONTEXTO</p><h2>Resultados del perfil</h2></div></div>
-     {topics.length>1&&<div className="ep-topics" aria-label="Filtrar resultados por tema">{topics.map(t=><button key={t} aria-pressed={topic===t} onClick={()=>setTopic(t)}>{t}</button>)}</div>}
-     {results.length?<div className="ep-results">{results.map(r=><ResultCard key={r.id} result={r}/>)}</div>:<div className="ep-pending"><h3>La presentación de resultados está pendiente</h3><p>El perfil se ha conservado completo. Incorpora el paquete de resultados preparado fuera de COMPÁS o añade sus indicadores al editar una revisión. No se han inventado gráficos a partir del texto.</p><button onClick={edit}>Incorporar resultados</button></div>}
-     {selected.limitations.filter(Boolean).length>0&&<section className="ep-limitations"><h3>Cómo interpretar estos resultados</h3><ul>{selected.limitations.filter(Boolean).map((l,i)=><li key={i}>{l}</li>)}</ul></section>}
-    </>}
+    {tab==='results'&&<ProfileResultsDashboard profile={selected} municipalityName={municipalityName} onAddResults={edit}/>}
     {tab==='document'&&<section className="ep-document-view"><h2>{selected.title}</h2>
      {pdf&&fileUrls[pdf.id]&&<><p><a href={fileUrls[pdf.id]} target="_blank" rel="noopener noreferrer">Abrir PDF original en otra pestaña</a> · Si el visor no carga, utiliza la descarga del original.</p><iframe title="PDF original del Perfil de Salud Local" src={fileUrls[pdf.id]}/></>}
      {selected.revisionOf&&<p className="ep-help">El texto puede contener cambios de esta revisión. Los archivos adjuntos siguen siendo los originales aportados.</p>}
      {selected.text?<div className="ep-document-text">{selected.text.split(/\n\s*\n/).filter(Boolean).map((p,i)=><p key={i}>{p}</p>)}</div>:<p>No hay texto extraíble. Consulta el archivo original o incorpora una transcripción.</p>}
     </section>}
-    {tab==='versions'&&<section className="ep-versions"><p className="ep-eyebrow">HISTORIAL CONSERVADO EN FIREBASE</p><h2>Versiones del perfil</h2>{[...library.profiles].reverse().map(p=><article key={p.id}><div><h3>{p.title}</h3><p>{date(p.createdAt)} · {p.author||'Autoría no declarada'} · {p.status==='validated'?'Validada':'En revisión'}{p.id===library.activeId?' · Vigente':''}</p></div><div className="ep-actions"><button onClick={()=>{setSelectedId(p.id);setTab('document');setTopic('Todos');}}>Consultar versión</button>{p.id!==library.activeId&&<button disabled={busy} onClick={()=>void commit({...library,activeId:p.id},'Versión vigente actualizada en Firebase.')}>Establecer como vigente</button>}</div></article>)}</section>}
+    {tab==='versions'&&<section className="ep-versions"><p className="ep-eyebrow">HISTORIAL CONSERVADO EN FIREBASE</p><h2>Versiones del perfil</h2>{[...library.profiles].reverse().map(p=><article key={p.id}><div><h3>{p.title}</h3><p>{date(p.createdAt)} · {p.author||'Autoría no declarada'} · {p.status==='validated'?'Validada':'En revisión'}{p.id===library.activeId?' · Vigente':''}</p></div><div className="ep-actions"><button onClick={()=>{setSelectedId(p.id);setTab('document');}}>Consultar versión</button>{p.id!==library.activeId&&<button disabled={busy} onClick={()=>void commit({...library,activeId:p.id},'Versión vigente actualizada en Firebase.')}>Establecer como vigente</button>}</div></article>)}</section>}
    </div></div>
    {selected.id===library.activeId&&selected.status==='review'&&<section className="ep-validation"><div><h3>Revisión técnica</h3><p>La incorporación no valida el contenido. La validación quedará vinculada a esta versión y a tu cuenta.</p></div><button disabled={busy} onClick={()=>{if(!authorName.trim()){setError('Identifícate para registrar la validación.');return;}if(window.confirm('¿Registrar la validación técnica de esta versión con tu cuenta?'))void commit({...library,profiles:library.profiles.map(p=>p.id===selected.id?{...p,status:'validated',validatedAt:new Date().toISOString(),validatedBy:authorName}:p)},'Validación técnica registrada en Firebase.');}}>Registrar validación técnica</button></section>}
   </>}
