@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { ProfileStructure } from "../../application/health-profile/profileStructure";
 import type { ExternalHealthProfile, ProfileResult } from "../../domain/health-profile/ExternalHealthProfile";
 import {
   formatComparisonValue,
@@ -69,21 +70,58 @@ const RECO_HINT: Record<string, string> = {
 };
 
 /** Vista «Resultados» del perfil externo: lectura, conclusiones, datos y recomendaciones. */
-export function ProfileResultsDashboard({ profile, municipalityName, onAddResults }: { profile: ExternalHealthProfile; municipalityName: string; onAddResults?: () => void }) {
+export function ProfileResultsDashboard({ profile, municipalityName, onAddResults, structure, onOpenReader }: {
+  profile: ExternalHealthProfile;
+  municipalityName: string;
+  onAddResults?: () => void;
+  /** Estructura reconocida en el texto del perfil: suple lo que el paquete no trae. */
+  structure?: ProfileStructure;
+  /** Abre el lector en un ancla (conclusión, recomendación o apartado). */
+  onOpenReader?: (anchor?: string) => void;
+}) {
   const topics = groupResultsByTopic(profile.results);
   const [topicFilter, setTopicFilter] = useState("Todos");
   const visibleTopics = topicFilter === "Todos" ? topics : topics.filter((t) => t.topic === topicFilter);
   const headlines = headlineResults(profile.results);
-  const findings = profile.findings.filter(Boolean);
-  const recommendations = groupRecommendations(profile.areas);
-  const summary = profile.summary.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+  const findings = profile.findings.filter(Boolean).length
+    ? profile.findings.filter(Boolean)
+    : (structure?.conclusions ?? []).map((c) => `${c.id}. ${c.title}`);
+  const areas = profile.areas.length
+    ? profile.areas
+    : (structure?.recommendations ?? []).map((r) => ({
+        id: r.id,
+        title: `${r.id}. ${r.text}`,
+        rationale: [r.type, r.derivesFrom ? `Deriva de ${r.derivesFrom}` : ""].filter(Boolean).join(" · "),
+      }));
+  const recommendations = groupRecommendations(areas);
+  const ownSummary = profile.summary.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+  const summary = ownSummary.length ? ownSummary : structure?.summary ?? [];
+  const figures = headlines.length === 0 ? structure?.keyFigures ?? [] : [];
+  const recoCounts = recommendations.filter((g) => g.type !== "Otras").map((g) => `${g.items.length} ${g.type}`);
+  const metrics = [
+    findings.length ? `${findings.length} conclusiones` : "",
+    areas.length ? `${areas.length} recomendaciones${recoCounts.length ? ` (${recoCounts.join(" · ")})` : ""}` : "",
+    structure?.references.length ? `${structure.references.length} referencias` : "",
+    structure?.pages ? `${structure.pages} páginas` : "",
+  ].filter(Boolean);
 
   return (
     <div className="epd">
-      {headlines.length > 0 && (
+      {(headlines.length > 0 || figures.length > 0) && (
         <section className="epd-hero" aria-label={`${municipalityName} en cifras`}>
           <p className="ep-eyebrow">{municipalityName} en cifras</p>
-          <div className="epd-kpis">{headlines.map((r) => <Headline key={r.id} result={r} />)}</div>
+          <div className="epd-kpis">
+            {headlines.map((r) => <Headline key={r.id} result={r} />)}
+            {figures.map((f, i) => (
+              <div key={i} className="epd-kpi">
+                <span className="epd-kpi__value">{f.value}<small>{f.unit ? ` ${f.unit}` : ""}</small></span>
+                <span className="epd-kpi__label">{(() => { const label = f.sentence.replace(/\s*\[[^\]]+\]/g, ""); return label.length > 140 ? `${label.slice(0, 137).trimEnd()}…` : label; })()}</span>
+                {f.citation && <span className="epd-kpi__meta">{f.citation}</span>}
+              </div>
+            ))}
+          </div>
+          {figures.length > 0 && <p className="epd-hero__note">Cifras tal como aparecen en el resumen del perfil, con su cita.</p>}
+          {metrics.length > 0 && <p className="epd-metrics">{metrics.join(" · ")}</p>}
         </section>
       )}
 
@@ -91,6 +129,7 @@ export function ProfileResultsDashboard({ profile, municipalityName, onAddResult
         <p className="ep-eyebrow">Lectura de conjunto</p>
         <h2>Qué nos dice el perfil</h2>
         {summary.length ? summary.map((p, i) => <p key={i}>{p}</p>) : <p>El documento está disponible. Su síntesis todavía no se ha incorporado.</p>}
+        {onOpenReader && structure && structure.sections.length > 1 && <button type="button" className="epd-reading__more" onClick={() => onOpenReader()}>Leer el perfil completo</button>}
       </section>
 
       {findings.length > 0 && (
@@ -100,7 +139,11 @@ export function ProfileResultsDashboard({ profile, municipalityName, onAddResult
           <ol>
             {findings.map((f, i) => {
               const match = /^(C\d+)\.\s*(.*)$/.exec(f);
-              return <li key={i}><span className="epd-findings__id">{match?.[1] ?? `C${i + 1}`}</span><span>{match?.[2] ?? f}</span></li>;
+              const id = match?.[1] ?? `C${i + 1}`;
+              const content = <><span className="epd-findings__id">{id}</span><span>{match?.[2] ?? f}</span></>;
+              return <li key={i}>{onOpenReader && structure?.conclusions.some((c) => c.id === id)
+                ? <button type="button" className="epd-findings__open" onClick={() => onOpenReader(`epr-${id}`)} aria-label={`Leer ${id} en el documento`}>{content}</button>
+                : content}</li>;
             })}
           </ol>
         </section>
@@ -119,6 +162,8 @@ export function ProfileResultsDashboard({ profile, municipalityName, onAddResult
         </div>
         {topics.length ? (
           <div className="epd-topics">{visibleTopics.map((t) => <TopicPanel key={t.topic} topic={t} />)}</div>
+        ) : figures.length > 0 ? (
+          <div className="ep-pending"><h3>Este perfil no trae paquete de indicadores</h3><p>Las cifras destacadas proceden del resumen del documento. Para gráficos comparativos con fuente, ámbito y periodo, incorpora el paquete de resultados o añade los indicadores al editar una revisión. No se generan gráficos a partir del texto.</p>{onAddResults && <button type="button" onClick={onAddResults}>Incorporar resultados</button>}</div>
         ) : (
           <div className="ep-pending"><h3>La presentación de resultados está pendiente</h3><p>El perfil se ha conservado completo. Incorpora el paquete de resultados preparado fuera de COMPÁS o añade sus indicadores al editar una revisión. No se han inventado gráficos a partir del texto.</p>{onAddResults && <button type="button" onClick={onAddResults}>Incorporar resultados</button>}</div>
         )}

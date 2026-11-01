@@ -1,0 +1,992 @@
+[Página 1]
+Perfil de Salud Local de Zagra 
+
+Oct 26, 2026 · @Blas 
+
+Borrador de trabajo para el equipo técnico y el Grupo Motor de Zagra. 
+
+Portada y créditos 
+
+Perfil de Salud Local de Zagra.   I Plan Local de Salud de Zagra. Versión 0.1, borrador sin validar. 
+
+Logos institucionales: Ayuntamiento de Zagra, Distrito Sanitario Granada Metropolitano, RELAS y Junta 
+
+de Andalucía, con los ficheros originales de su identidad corporativa. Pendientes de incorporar. 
+
+Crédito   Quién 
+
+Responsable técnico   Por designar 
+
+Equipo técnico   Por designar 
+
+Grupo Motor   Entidades representadas, por confirmar. Nombres solo con 
+
+consentimiento 
+
+Fuentes aportadas   Archivo RELAS de Zagra 2016-2020; Ayuntamiento de Zagra 
+
+(priorización temática 2026); Localiza Salud 
+
+Redacción del borrador   Claude, a petición de Blas Ramón Hermoso Rico 
+
+Presentación institucional: opcional. Si se incluye, la redacta y firma la alcaldía o la dirección del Distrito. 
+
+Resumen 
+
+Zagra tiene 843 habitantes [1], 39 menos que en 2016 (882) [2]. En 2024 nacieron 3 niños y murieron 16 
+
+personas [1]. Casi una de cada cuatro personas tiene más de 65 años, el 23,5 % [1], y uno de cada tres 
+
+hogares es de una sola persona, el 33,4 % [3, tabla 31033]. La población extranjera ha pasado de 13 
+
+personas en 2016 [4, p. 17] a 113 en 2025, el 77,0 % de origen marroquí [1]. La renta neta por persona 
+
+es de 10.656 euros, el 78,9 % de la provincial [3, tablas 31025 y 53694], y el 37,0 % de la población vive 
+
+por debajo del umbral del 60 % de la mediana, frente al 27,8 % de la provincia [3, tablas 31030 y 53694]. 
+
+El último diagnóstico de salud de Zagra es el informe RELAS de 2017, con datos de 2015 y 2016 [4]. 
+
+Registraba más diabetes e hipertensión que el resto del Distrito Granada Metropolitano [4, p. 34] y un 
+
+exceso de mortalidad por suicidio frente a España [4, p. 30]. Desde entonces no se ha vuelto a medir la 
+
+salud de la población de Zagra. En mayo de 2026, 158 vecinas y vecinos eligieron sus temas prioritarios: 
+
+el bienestar emocional y la salud mental (84,8 %), la actividad física (74,7 %) y la alimentación (71,5 %) 
+
+[5]. Los dos primeros coinciden con lo que el Grupo Motor puso en cabeza en 2017: el sedentarismo, la 
+
+soledad de las personas mayores y la salud mental [6, problemas priorizados].
+
+[Página 2]
+Localiza Salud registra tres recursos en Zagra: la Asociación de Mujeres ZAHRA, el complejo deportivo 
+
+municipal y el Punto Vuela [7]. Zagra se adhirió a la Red Local de Acción en Salud en 2016 [8], hizo su 
+
+diagnóstico y su priorización en 2017 [4] [6], y no consta que aprobara un plan. 
+
+Para decidir con más fundamento falta sobre todo un dato: un Informe de Salud actual del municipio. 
+
+Las recomendaciones del apartado 5 proponen cómo conseguirlo, qué contrastar con la comunidad y 
+
+por dónde empezar. 
+
+1. Punto de partida 
+
+Zagra es un municipio pequeño, de 11,33 km² y un solo núcleo, a 685 metros de altitud y a 64,5 km de 
+
+Granada [1]. Vive del olivar de secano, que ocupa 855 de sus 880 hectáreas de cultivos leñosos [1], y 62 
+
+de sus 101 establecimientos con actividad económica son agrícolas [1]. Su centro de salud es el de Loja: 
+
+en el pueblo hay un consultorio [1] [4, p. 45]. 
+
+Zagra pidió entrar en la Red Local de Acción en Salud el 20 de octubre de 2016 [8] y firmó el acuerdo de 
+
+colaboración con la Consejería de Salud el 15 de febrero de 2017 [9]. El informe de salud se presentó en 
+
+un taller el 30 de marzo de 2017 [10], el Grupo Motor priorizó 18 problemas el 27 de abril [11] [6] y el 
+
+Perfil de Salud Local quedó redactado en enero de 2018 [12]. En 2020 el Ayuntamiento reiteró su 
+
+compromiso con el proyecto [13]. En mayo de 2026 volvió a preguntar a la comunidad [5]. El ciclo actual 
+
+prepara el I Plan Local de Salud de Zagra. 
+
+Lo que se sabe hoy de Zagra procede de la ficha municipal del SIMA, con datos de 2019 a 2025 [1]; del 
+
+Atlas de Distribución de Renta de los Hogares del INE de 2024 [3, tablas 31025, 31030 y 31033]; de la 
+
+priorización temática de mayo de 2026 [5]; y de Localiza Salud [7]. Lo que se sabe de su salud procede 
+
+del informe de 2017 [4] y del Perfil de 2018, que lo reproduce y le añade la guía de recursos, los 
+
+problemas priorizados y los indicadores VIGIA de 2015 y 2016 [12, apartados 6.1 a 6.3]. 
+
+Dos preguntas recorren la lectura: qué ha cambiado en Zagra desde 2017 y si las preocupaciones que la 
+
+comunidad repite tienen hoy respaldo en datos de salud. 
+
+No hay un Informe de Salud de Zagra posterior a 2017; nunca se han medido localmente la 
+
+alimentación, la actividad física, el sueño ni el consumo de tabaco y alcohol; y los registros sanitarios de 
+
+Zagra no se separaban de los de Loja en 2016 [14, objetivo 1, acción 2]. 
+
+2. Conclusiones 
+
+Ocho conclusiones propuestas para que el equipo técnico elija, corrija o descarte. 
+
+C1. Zagra pierde población por saldo natural y envejece.   En 2024 hubo 3 nacimientos y 16 defunciones 
+
+[1]. El 23,5 % de la población tiene 65 años o más [1] y el 33,4 % de los hogares es unipersonal [3, tabla 
+
+31033]. En 2016 el índice generacional de ancianos era de 1,73 personas de 35 a 64 años por cada 
+
+persona de 65 o más, frente a 2,46 en la provincia [4, p. 22]. La edad media ha bajado de 47,6 años en 
+
+2016 [4, p. 16] a 46,9 en 2025 [1], en los mismos años en que ha llegado población extranjera (C6). 
+
+Tipo: hecho. Evidencia: 843 habitantes en 2025 [1] frente a 882 en 2016 [2]; 3 nacimientos y 16 
+
+defunciones en 2024 [1]; 33,4 % de hogares unipersonales [3, tabla 31033]. Relación: sin relación
+
+[Página 3]
+declarada. Límite: no hay datos de dependencia, de personas que viven solas por edad ni de quién cuida. 
+
+Lleva a R4 y R5. 
+
+C2. El malestar emocional es la preocupación más compartida de la comunidad, y el único dato de 
+
+salud sobre ella tiene más de diez años.   El 84,8 % de quienes votaron en 2026 eligió el bienestar 
+
+emocional y la salud mental [5]. En 2017 el Grupo Motor situó la soledad de las personas mayores en 
+
+tercer lugar, la salud mental y emocional en el cuarto y la sobrecarga de las cuidadoras en el quinto [6, 
+
+problemas priorizados]. El informe de 2017 encontró un exceso de riesgo de mortalidad por suicidio 
+
+frente a España en hombres mayores de 15 años y en mujeres de 15 a 45 [4, p. 30], y el centro de salud 
+
+se propuso en 2016 promover la salud mental en los centros educativos como prevención del suicidio 
+
+[14, objetivo 3]. 
+
+Tipo: interpretación. Evidencia: 134 de 158 papeletas [5]; puestos 3 a 5 de 18 en 2017 [6, problemas 
+
+priorizados]; exceso de riesgo de mortalidad por suicidio [4, p. 30]. Relación: sin relación declarada. 
+
+Límite: el cálculo de mortalidad procede del Atlas Interactivo de Mortalidad de Andalucía con datos 
+
+hasta 2012 y en una población muy pequeña [4, p. 30]. Lleva a R1, R2 y R6. 
+
+C3. La comunidad pide desde 2017 moverse más y comer mejor, y nunca se ha medido cómo se mueve 
+
+ni cómo come.   El sedentarismo fue el primer problema en 2017, con la obesidad y la mala alimentación 
+
+en los puestos sexto y séptimo [6, problemas priorizados]; en 2026 la actividad física y la alimentación 
+
+son el segundo y el tercer tema más votados [5]. Todo lo que el informe de 2017 decía sobre estilos de 
+
+vida eran cifras de Andalucía y de la provincia de Granada de 2007 [4, pp. 35-44]. 
+
+Tipo: hecho. Evidencia: sedentarismo en el primer puesto en 2017 [6, problemas priorizados]; actividad 
+
+física 118 votos y alimentación 113 de 158 en 2026 [5]. Relación: sin relación declarada. Límite: ninguna 
+
+fuente local de conducta. Lleva a R3 y R7. 
+
+C4. En 2015 el consultorio registraba más diabetes e hipertensión que el resto del Distrito; no se sabe 
+
+si sigue siendo así.   La prevalencia de diabetes era del 10,36 % frente al 7,01 % del Distrito, y la de 
+
+hipertensión del 27,56 % frente al 12,32 % [4, p. 34]. 
+
+Tipo: hecho. Evidencia: prevalencias de 2015 [4, p. 34]. Relación: sin relación declarada. Límite: el 
+
+informe no declara el denominador de las prevalencias, y en 2016 los registros de Zagra no aparecían 
+
+separados de los de Loja [14, objetivo 1, acción 2]. Lleva a R1. 
+
+C5. Zagra tiene menos renta que su provincia y más población bajo el umbral de pobreza relativa.   La 
+
+renta neta por persona es de 10.656 euros [3, tabla 31025], frente a 13.509 en la provincia [3, tabla 
+
+53694]. El 37,0 % de la población está por debajo del 60 % de la mediana [3, tabla 31030], frente al 27,8 
+
+% de la provincia [3, tabla 53694] y el 26,2 % de Andalucía [3, tabla 53689]. 
+
+Tipo: hecho. Evidencia: tablas 31025, 31030, 53689 y 53694 [3]. Relación: sin relación declarada. Límite: 
+
+Zagra es una sola sección censal y no hay datos de renta dentro del municipio. Lleva a R4. 
+
+C6. La población de origen marroquí ha crecido y su voz no consta en ninguna consulta.   En 2016 vivían 
+
+en Zagra 13 personas extranjeras, el 38 % del Reino Unido [4, p. 17]; en 2025 son 113, el 77,0 % de 
+
+Marruecos [1]. En 2016 el centro de salud describía una sola familia inmigrante, de temporeros agrícolas 
+
+[14, descripción]. La papeleta de 2026 no recoge el origen de quien vota [5].
+
+[Página 4]
+Tipo: hecho. Evidencia: 13 en 2016 [4, p. 17] y 113 en 2025 [1]; población española del 86,6 % en 2024 
+
+[3, tabla 31033]. Relación: sin relación declarada. Límite: no consta ningún dato de salud ni de 
+
+condiciones de vida de esta población. Lleva a R8. 
+
+C7. Los recursos de Zagra para moverse y relacionarse han crecido desde 2017 y se dirigen a las 
+
+primeras preocupaciones de la comunidad.   En 2016 el polideportivo no podía usarse como gimnasio 
+
+por falta de permisos y el Centro de Participación Activa estaba pendiente [14, mapa de activos]. En 
+
+2026 Localiza Salud registra un complejo deportivo con piscina, gimnasio, yoga, baile y talleres de 
+
+socialización contra la soledad, y una asociación de mujeres que organiza talleres de envejecimiento 
+
+activo y una red de apoyo [7]. En 2017 el Grupo Motor ya señalaba las rutas de senderismo, el 
+
+polideportivo y la piscina como lo que había frente al sedentarismo [6, acciones y activos]. 
+
+Tipo: interpretación. Evidencia: tres recursos registrados en Localiza Salud [7]; guía de recursos de 2016 
+
+[14, mapa de activos]. Relación: sin relación declarada. Límite: no consta que los tres recursos estén 
+
+validados por la comunidad como activos, ni si siguen activos los demás recursos de la guía de 2016. 
+
+Lleva a R9. 
+
+C8. El proceso local de Zagra se detuvo tras el diagnóstico y la comunidad ha seguido señalando lo 
+
+mismo.   Entre 2016 y 2018 Zagra se adhirió, firmó el acuerdo, hizo su informe, priorizó y redactó su Perfil 
+
+[8] [9] [4] [6] [12]. El acuerdo tenía dos años de vigencia [9, estipulación sexta] y no consta que se 
+
+prorrogara ni que se aprobara un plan. Nueve años después, dos de los tres temas más votados, el 
+
+bienestar emocional y la actividad física, coinciden con los primeros problemas de 2017 [5] [6, 
+
+problemas priorizados]. 
+
+Tipo: interpretación. Evidencia: documentos de 2016 a 2020 [8] [9] [12] [13]; priorizaciones de 2017 [6, 
+
+problemas priorizados] y 2026 [5]. Relación: sin relación declarada. Límite: no constan actas del Grupo 
+
+Motor posteriores a 2017. Lleva a R10. 
+
+3. Coincidencias y discrepancias entre fuentes 
+
+Coinciden.   La comunidad en 2017 [6, problemas priorizados] y en 2026 [5] pone en cabeza el malestar 
+
+emocional, la soledad y el sedentarismo; el centro de salud se proponía en 2016 trabajar la salud mental 
+
+y el envejecimiento activo [14, objetivos 2 y 3]; y los recursos registrados en 2026 se presentan como 
+
+respuesta a la soledad y la falta de actividad física [7]. El envejecimiento aparece en la estructura de 
+
+población [1] [3, tabla 31033] y en los problemas priorizados de 2017 [6, problemas priorizados]. 
+
+Discrepan.   El informe de 2017 situaba el suicidio entre los excesos de mortalidad del municipio [4, p. 30] 
+
+y el Grupo Motor no lo incluyó entre los 18 problemas de 2017 [6, problemas priorizados]. La sexualidad 
+
+y la salud es el quinto tema más votado en 2026, con el 34,8 % [5], y entre 2012 y 2016 solo se declaró 
+
+una infección de transmisión sexual en el municipio [4, p. 33]. El sueño y el descanso es el cuarto tema, 
+
+con el 65,8 % [5], y no aparece en ninguna fuente de salud de Zagra. En 2016 el centro de salud afirmaba 
+
+que en Zagra «solo hay población mayor» [14, descripción], cuando la de 65 años o más era el 24,60 % 
+
+[4, p. 21].
+
+[Página 5]
+4. Lo que no sabemos 
+
+Algunas preguntas importantes para Zagra no tienen hoy respuesta con datos. Todas tienen dónde 
+
+buscarla. 
+
+Qué no sabemos   Afecta a   Dónde se puede saber 
+
+Cómo está hoy la salud de la población de 
+
+Zagra 
+
+C2, C4   Informe de Salud del municipio, Distrito 
+
+Sanitario Granada Metropolitano 
+
+Si persisten la diabetes y la hipertensión 
+
+registradas en 2015, y con qué 
+
+denominador se calcularon 
+
+C4   Base Poblacional de Salud, con los datos de 
+
+Zagra separados de los de Loja 
+
+Si persiste el exceso de mortalidad por 
+
+suicidio 
+
+C2   Atlas de Mortalidad de Andalucía y registro 
+
+de mortalidad posterior a 2012 
+
+Cómo come, cuánto se mueve, cómo 
+
+duerme y cuánto fuma o bebe la población 
+
+C3   Estudio complementario con el Gestor de 
+
+Encuestas de COMPÁS 
+
+Cuántas personas mayores viven solas, 
+
+cuántas dependen de otras y quién las 
+
+cuida 
+
+C1   Servicios Sociales Comunitarios; sistema de 
+
+atención a la dependencia 
+
+Cómo vive y qué necesita la población de 
+
+origen marroquí 
+
+C6   Servicios Sociales, centro de salud y las 
+
+propias familias 
+
+Qué recursos funcionan como activos para 
+
+la gente 
+
+C7   La comunidad, con registro y validación en 
+
+Localiza Salud 
+
+5. Recomendaciones 
+
+Diez propuestas que derivan de las conclusiones. Qué se hace primero, quién lo hace y con qué recursos 
+
+lo decidirán el Grupo Motor y el Plan de Acción. 
+
+Tipo   Recomendación   Deriva de 
+
+R1   Conocer   Pedir al Distrito el Informe de Salud de Zagra, con los datos 
+
+del consultorio separados de los de Loja 
+
+C2, C4 
+
+R2   Conocer   Obtener la mortalidad por suicidio de Zagra posterior a 
+
+2012, por sexo y edad, o la de su zona básica si el municipio 
+
+es demasiado pequeño 
+
+C2 
+
+R3   Conocer   Medir los modos de vida, el sueño y el bienestar emocional 
+
+de la población con un estudio complementario en el Gestor 
+
+de Encuestas de COMPÁS 
+
+C2, C3 
+
+R4   Conocer   Reunir con Servicios Sociales los datos de personas mayores   C1, C5
+
+[Página 6]
+Tipo   Recomendación   Deriva de 
+
+que viven solas, de dependencia y de cuidados 
+
+R5   Contrastar   Contrastar con las cuidadoras y con la Asociación de 
+
+Mujeres si la sobrecarga de los cuidados señalada en 2017 
+
+sigue presente 
+
+C1 
+
+R6   Contrastar   Contrastar con la comunidad qué entiende por bienestar 
+
+emocional y salud mental al votarlo, y qué relación ve con la 
+
+soledad 
+
+C2 
+
+R7   Abordar   Trabajar la actividad física y la relación social de la población 
+
+apoyándose en el complejo deportivo y la Asociación de 
+
+Mujeres, una vez que el equipo técnico declare la relación 
+
+con la salud que lo sostiene 
+
+C3, C7 
+
+R8   Contrastar   Preguntar a las familias de origen marroquí, con Servicios 
+
+Sociales y el centro de salud, por sus condiciones de vida y 
+
+sus prioridades de salud 
+
+C6 
+
+R9   Contrastar   Revisar con la comunidad qué recursos de la guía de 2016 
+
+siguen activos y registrar en Localiza Salud los que funcionen 
+
+como activos 
+
+C7 
+
+R10   Contrastar   Contrastar con el Grupo Motor qué detuvo el proceso en 
+
+2018 y si la priorización de 2017 sigue vigente junto a la de 
+
+2026 
+
+C8 
+
+6. Paso al Plan de Acción 
+
+El Grupo Motor recibe las conclusiones que el equipo técnico elija, las diez recomendaciones y las 
+
+preguntas abiertas. A partir de aquí decide qué priorizar, y el Plan de Acción fija las líneas, los objetivos y 
+
+los indicadores. Las acciones propuestas en 2017 para cada problema priorizado [6, acciones y activos] 
+
+son un antecedente, no un punto de partida obligado. 
+
+7. Autoría y validación 
+
+Validación.   Pendiente. Responsable técnico, fecha de validación y consenso del Grupo Motor por 
+
+registrar. 
+
+Autoría.   Borrador redactado por Claude el 26-10-2026 a petición de Blas Ramón Hermoso Rico, a partir 
+
+del expediente de Zagra en COMPÁS y del archivo RELAS de Zagra. Las cifras proceden de las fuentes 
+
+citadas, sin cálculos propios salvo los porcentajes, diferencias y cocientes que se derivan de ellas. Las 
+
+conclusiones y las recomendaciones son propuestas: las elige, corrige o descarta el equipo técnico.
+
+[Página 7]
+Anexos 
+
+A. El municipio y su gente 
+
+Territorio.   Zagra tiene 11,33 km², un solo núcleo, 685 metros de altitud y está a 64,5 km de Granada [1]. 
+
+El informe de 2017 la situaba a 20 km de Loja [4, p. 14]. En 2025 viven 818 personas en el núcleo y 25 en 
+
+diseminado [1]. Hay 358 viviendas principales (2021) [1]. En 2016 había casas viejas deshabitadas en la 
+
+zona del Castillo Alto, algunas derribadas por el Ayuntamiento por riesgo de accidente y otras 
+
+reformadas como segunda vivienda [14, descripción]. 
+
+Población.   Zagra tiene 843 habitantes en 2025, 420 hombres y 423 mujeres [1]. En 2016 eran 882, 449 
+
+hombres y 433 mujeres [2]. En 2024 nacieron 3 niños, murieron 16 personas, llegaron 68 y se fueron 104 
+
+[1]. La edad media es de 46,9 años [1]; el 16,8 % tiene menos de 20 años y el 23,5 % más de 65 [1]. En 
+
+2016 la edad media era de 47,6 años, la más alta de los municipios RELAS con los que el informe la 
+
+compara [4, p. 16], el 24,60 % tenía más de 65 años y el 3,52 % más de 85, frente al 16,16 % y el 1,56 % 
+
+de la provincia [4, p. 21]. 
+
+Origen.   Hay 113 personas de nacionalidad extranjera, el 77,0 % de Marruecos [1]. En 2016 eran 13, el 38 
+
+% del Reino Unido [4, p. 17]. 
+
+Hogares.   El hogar medio tiene 2,4 personas y el 33,4 % de los hogares es unipersonal [3, tabla 31033]. 
+
+Renta.   La renta neta media por persona fue de 10.656 euros en 2024 [3, tabla 31025], el 78,9 % de la de 
+
+la provincia, 13.509 euros [3, tabla 53694], y el 79,9 % de la andaluza, 13.342 euros [3, tabla 53689]. El 
+
+37,0 % de la población tiene ingresos por unidad de consumo inferiores al 60 % de la mediana, el 38,3 % 
+
+de los hombres y el 36,0 % de las mujeres [3, tabla 31030], frente al 27,8 % de la provincia [3, tabla 
+
+53694] y el 26,2 % de Andalucía [3, tabla 53689]. El 12,5 % está por debajo del 40 % [3, tabla 31030]. En 
+
+2024 se presentaron 467 declaraciones del IRPF; la renta media no se publica [1]. 
+
+Trabajo.   En 2025 había 34 personas en paro registrado, 21 mujeres y 13 hombres [1], y la tasa municipal 
+
+de desempleo era del 11,9 % [1]. De los 576 contratos firmados, 370 fueron temporales [1], y por cada 
+
+contrato a una mujer se firmaron 2,4 a hombres (167 y 409) [1]. Doce personas cobraban el subsidio 
+
+agrario, 9 de ellas mujeres [1]. La economía es agrícola: 62 de los 101 establecimientos son de 
+
+agricultura y ganadería [1], y el olivar ocupa 875 hectáreas, 855 de secano [1]. 
+
+Servicios.   Zagra pertenece al centro de salud de Loja y tiene un consultorio [4, p. 45] [1]. En 2016 el 
+
+médico de familia y la enfermera atendían en el pueblo, y la trabajadora social y el pediatra se 
+
+compartían con Loja [14, descripción]. El colegio atiende de 3 años a 2.º de ESO; para terminar la 
+
+secundaria y el bachillerato hay que ir al IES Moraima de Loja [14, descripción]. 
+
+B. Situación de salud 
+
+Toda la información de salud de Zagra procede del informe de 2017 [4], con datos de 2015 y 2016, 
+
+reproducido sin cambios en el Perfil de 2018 [12]. 
+
+Enfermedad crónica.   En 2015 el consultorio registraba estas prevalencias, comparadas con el Distrito 
+
+Granada Metropolitano:
+
+[Página 8]
+Enfermedad o factor de riesgo   Zagra   Distrito 
+
+Diabetes   10,36 %   7,01 % 
+
+Hipertensión arterial   27,56 %   12,32 % 
+
+EPOC   4,39 %   3,99 % 
+
+Demencia   4,39 %   3,7 % 
+
+Insuficiencia cardíaca   0,44 %   4,84 % 
+
+Pacientes en anticoagulación   44,8 %   23,3 % 
+
+Fuente de toda la tabla: [4, p. 34], datos de 2015. El informe no indica sobre qué población se calculan, y 
+
+el porcentaje de anticoagulación no puede referirse al total de habitantes. En 2016 el centro de salud se 
+
+propuso mejorar el registro de la insuficiencia cardíaca y de los pacientes pluripatológicos [14, objetivo 
+
+1]. 
+
+Mortalidad.   En 2015 murieron 17 personas, 9 hombres y 8 mujeres [4, p. 30]. Frente a España, la 
+
+mortalidad general estaba aumentada en los hombres de 65 a 84 años y en las mujeres de 75 a 84, y 
+
+había exceso de riesgo en el suicidio (hombres mayores de 15 años y mujeres de 15 a 45), los accidentes 
+
+de tráfico (hombres de 45 a 64), el cáncer de hígado (mujeres de 45 a 64 y mayores de 85), el cáncer de 
+
+pulmón (hombres de 75 a 84), la enfermedad cerebrovascular, la cardiopatía isquémica y la EPOC [4, p. 
+
+30]. Los años potenciales de vida perdidos se debían sobre todo al suicidio y a los accidentes de tráfico 
+
+en los hombres, y a la diabetes en las mujeres [4, p. 32]. En 2024 murieron 16 personas [1]; no hay datos 
+
+posteriores por causa. 
+
+Cáncer.   La incidencia de 2008-2012 fue de 277,1 casos por 100.000 habitantes, muy inferior a la 
+
+provincial, 459,3 [4, p. 33]. Los cánceres más frecuentes fueron el de vejiga en los hombres y el de piel 
+
+no melanoma en las mujeres [4, p. 33]. 
+
+Enfermedades transmisibles.   Entre 2012 y 2016 se declararon muy pocas enfermedades de declaración 
+
+obligatoria: un caso de sífilis, ninguno de tuberculosis y ningún brote [4, p. 33]. La vacunación de recién 
+
+nacidos superaba el 95 % [4, p. 33]. 
+
+Cómo vive la gente.   No hay ningún dato local. El informe de 2017 describía la alimentación, el peso, el 
+
+tabaco, el alcohol y la actividad física con la Encuesta Andaluza de Salud de 2007, para Andalucía y la 
+
+provincia de Granada [4, pp. 35-44]. Esas cifras no describen a Zagra. Saber hoy cómo come, cuánto se 
+
+mueve y cómo duerme su población exige un estudio propio, que puede hacerse con el Gestor de 
+
+Encuestas de COMPÁS. 
+
+Salud ambiental y alimentaria.   Los apartados correspondientes del informe de 2017 quedaron sin 
+
+redactar [4, pp. 28-29]. 
+
+C. Desigualdades 
+
+Renta.   Zagra es una sola sección censal [3, tabla 31025], así que no hay forma de ver desigualdades de 
+
+renta dentro del pueblo. Frente a su provincia, tiene menos renta y más población bajo el umbral de 
+
+pobreza relativa: el 37,0 % frente al 27,8 % [3, tablas 31030 y 53694].
+
+[Página 9]
+Mujeres y hombres.   Hay más mujeres que hombres en paro registrado, 21 y 13 [1], y menos contratos 
+
+firmados con mujeres, 167 frente a 409 [1]. La proporción bajo el 60 % de la mediana es parecida, el 
+
+36,0 % de las mujeres y el 38,3 % de los hombres [3, tabla 31030]. En 2017 el informe pedía mirar con 
+
+perspectiva de género la salud de las mujeres por sus cargas laborales y familiares y su papel de 
+
+cuidadoras [4, p. 46], y el Grupo Motor situó la sobrecarga de las cuidadoras en el quinto puesto [6, 
+
+problemas priorizados]. Las reuniones mensuales de mujeres (GRUSE) del centro de salud funcionan 
+
+desde 2013 [14, objetivo 2]. 
+
+Edad.   Casi una de cada cuatro personas tiene más de 65 años [1] y uno de cada tres hogares es de una 
+
+sola persona [3, tabla 31033]. La soledad de las personas mayores fue el tercer problema en 2017 [6, 
+
+problemas priorizados]. 
+
+Origen.   La población de nacionalidad extranjera es el 13,4 % del municipio [3, tabla 31033] y ha pasado 
+
+de 13 a 113 personas entre 2016 y 2025 [4, p. 17] [1]. No hay ningún dato sobre su salud, su vivienda o 
+
+su trabajo, ni consta su participación en las consultas. 
+
+Lo que no se ve.   Ningún indicador de salud de Zagra se publica por sexo, edad u origen, y la papeleta de 
+
+2026 no recoge el origen de quien vota [5]. 
+
+D. Activos y recursos 
+
+Lo que registra Localiza Salud.   Tres recursos [7]: 
+
+•   La Asociación de Mujeres ZAHRA, para mujeres de 30 a 64 años: talleres de envejecimiento 
+
+activo, yoga y deporte, charlas de salud física y mental, cineforum, excursiones y una red de 
+
+apoyo contra la soledad de las mujeres mayores [7]. 
+
+•   El complejo deportivo municipal, para toda la población: piscina, gimnasio, yoga y gimnasia, 
+
+pádel y tenis, baile y talleres de socialización contra la soledad no deseada [7]. 
+
+•   El Punto Vuela, para la formación y el acceso digital [7]. 
+
+No consta que la comunidad los haya validado como activos. 
+
+Lo que había en 2016.   La guía de recursos del centro de salud recogía el Ayuntamiento, el consultorio, el 
+
+colegio, la guardería, la piscina, el polideportivo, la casa de la cultura con gimnasia, pintura, baile y 
+
+reuniones de mujeres, el auditorio, la biblioteca, el centro Guadalinfo, la farmacia, dos consultas de 
+
+dentista, la Asociación de Mujeres, la Asociación Juvenil, una asociación de teatro, una peña, la 
+
+asociación de tirachinas, una hermandad, Cáritas y una comunidad religiosa que visitaba a enfermos y 
+
+acompañaba en el duelo [14, mapa de activos]. El Centro de Participación Activa estaba pendiente de 
+
+abrir [14, mapa de activos]. Son candidatos que todavía no figuran en Localiza Salud. 
+
+Lo que la comunidad hace.   La Asociación de Mujeres organiza desde hace años la comida del Día de 
+
+Andalucía para todo el pueblo, que el centro de salud presentó en 2016 como buena práctica de 
+
+convivencia [14, buenas prácticas]. En 2017 el Grupo Motor propuso huertos sociales, actividades 
+
+intergeneracionales, bancos del tiempo, talleres de memoria con Guadalinfo y una asociación de 
+
+hombres [6, acciones y activos]. 
+
+El territorio.   El informe de 2017 nombraba como activo la orografía, el clima, el patrimonio y la 
+
+gastronomía [4, p. 46], y el Grupo Motor señalaba las rutas de senderismo [6, acciones y activos].
+
+[Página 10]
+E. La voz de la comunidad 
+
+Zagra ha preguntado dos veces por su salud: al Grupo Motor y a los participantes del taller en 2017 [6] y 
+
+a la población en 2026 [5]. 
+
+2017, taller del Grupo Motor [6, 
+
+problemas priorizados] 
+
+2026, priorización temática [5] 
+
+Quién respondió   Participantes del taller del 27 de abril   158 papeletas completas de 164 
+
+registros, de personas de 17 a 84 años 
+
+1.º   Sedentarismo   Bienestar emocional y salud mental 
+
+(84,8 %) 
+
+2.º   Desmotivación y falta de 
+
+participación 
+
+Actividad física (74,7 %) 
+
+3.º   Soledad de la población mayor   Alimentación (71,5 %) 
+
+4.º   Salud mental y emocional   Sueño y descanso (65,8 %) 
+
+5.º   Sobrecarga de las cuidadoras   Sexualidad y salud (34,8 %) 
+
+2017.   El Grupo Motor identificó 18 problemas y los ordenó por el número de personas afectadas y la 
+
+facilidad de solución [11] [6, problemas priorizados]. Para cada uno anotó lo que ya había y lo que 
+
+proponía hacer: frente al sedentarismo, actividades con la infancia fuera de la escuela y huertos sociales; 
+
+frente a la soledad, bailes, voluntariado y el Centro de Participación Activa; frente a la desmotivación, 
+
+implicar a los hombres y a la gente joven [6, acciones y activos]. 
+
+2026.   Votaron 158 personas entre el 14 y el 24 de mayo [5], el 18,7 % de los habitantes [1]. La papeleta 
+
+ofrecía diez temas y la mayoría eligió cinco [5]. Quedaron abajo el tabaco, el alcohol y otras drogas (34,2 
+
+%), el medioambiente (29,1 %), las pantallas (28,5 %), la violencia de género (24,7 %) y los accidentes 
+
+(16,5 %) [5]. La papeleta no permite saber por qué se elige cada tema. 
+
+F. El proceso local 
+
+Fecha   Hito 
+
+05-2026   Priorización temática ciudadana, 158 papeletas completas [5] 
+
+31-01-2020   El Ayuntamiento reitera su compromiso con la acción local en salud [13] 
+
+01-2018   Perfil de Salud Local de Zagra [12] 
+
+27-04-2017   Segundo taller: identificación y priorización de 18 problemas [11] [6] 
+
+30-03-2017   Taller «Impulso y desarrollo de la acción local en salud» y presentación del 
+
+informe de salud [10] 
+
+15-02-2017   Acuerdo de colaboración con la Consejería de Salud, dos años de vigencia [9] 
+
+20-10-2016   Solicitud de adhesión a RELAS [8]
+
+[Página 11]
+Fecha   Hito 
+
+2016   Plan de actuación del centro de salud de Loja para Zagra como zona con 
+
+necesidades de transformación social [14] 
+
+En la solicitud de 2016 el Ayuntamiento se comprometió a analizar la situación de salud, observar 
+
+problemas y recursos, priorizar, difundir el proyecto, actuar con transversalidad y evaluar [8]; en el 
+
+acuerdo de 2017, a liderar el proceso y elaborar el Plan Local de Salud [9, estipulación segunda]. El 
+
+Grupo Motor de 2017 lo formaban seis personas: la alcaldesa, la agente sociocultural y la técnica de 
+
+deportes del Ayuntamiento, la técnica de servicios sociales, la dinamizadora de Guadalinfo y la 
+
+trabajadora social del centro de salud [15]. Las tareas previstas tras la priorización eran recopilar los 
+
+activos y preparar la difusión [11]. No constan documentos entre 2018 y 2020, ni actas del Grupo Motor. 
+
+G. Cómo ha cambiado Zagra 
+
+Indicador   Antes   Ahora 
+
+Población   882 (2016) [2]   843 (2025) [1] 
+
+Edad media   47,6 años (2016) [4, p. 16]   46,9 años (2025) [1] 
+
+Personas de 65 y más años   24,60 % (2016) [4, p. 21]   23,5 % (2025) [1] 
+
+Población extranjera   13 (2016) [4, p. 17]   113 (2025) [1] 
+
+Paro registrado   39 (2015) [4, p. 23]   34 (2025) [1] 
+
+Establecimientos con asalariados   51 (2015) [4, p. 23]   71 (2024) [1] 
+
+Primer problema para la 
+
+comunidad 
+
+Sedentarismo (2017) [6, problemas 
+
+priorizados] 
+
+Bienestar emocional y salud 
+
+mental (2026) [5] 
+
+Lo que ha cambiado.   La población ha bajado poco, pero ha cambiado de composición: hay más de ocho 
+
+veces más personas extranjeras que en 2016, ahora sobre todo de Marruecos [4, p. 17] [1], y la edad 
+
+media ha bajado ligeramente [4, p. 16] [1]. Los recursos para la actividad física han crecido: el 
+
+polideportivo que en 2016 no podía usarse como gimnasio [14, mapa de activos] es en 2026 un 
+
+complejo con gimnasio, piscina y talleres [7]. 
+
+Lo que se mantiene.   La comunidad sigue señalando el malestar emocional, la soledad y la falta de 
+
+actividad física [6, problemas priorizados] [5]. 
+
+Lo que no se puede comparar.   La renta de 2006, 6.343,36 euros de renta bruta disponible por habitante 
+
+según Unicaja [4, p. 24], y la de 2024, 10.656 euros de renta neta por persona [3, tabla 31025], proceden 
+
+de fuentes con definiciones distintas. Las dos priorizaciones usan métodos distintos: en 2017 se 
+
+ordenaron problemas propuestos en un taller y en 2026 se votaron diez temas cerrados [6] [5]. 
+
+Las series que se cortaron.   Las prevalencias de enfermedad crónica, la mortalidad por causa y la 
+
+incidencia de cáncer se calcularon una sola vez, con datos hasta 2015 [4, pp. 30-34].
+
+[Página 12]
+H. Referencias 
+
+1.   Instituto de Estadística y Cartografía de Andalucía. Sistema de Información Multiterritorial de 
+
+Andalucía (SIMA). Ficha municipal de Zagra (18913) [Internet]. Sevilla: IECA; actualizada el 9 oct 
+
+2026 [consultado 26 oct 2026]. Disponible en: 
+
+https://www.juntadeandalucia.es/institutodeestadisticaycartografia/sima/ficha.htm? 
+
+mun=18913 
+
+2.   Instituto de Estadística y Cartografía de Andalucía. SIMA. Población por edad y sexo (Padrón 
+
+Municipal de Habitantes), Zagra, 2016 [exportación]. Sevilla: IECA; marzo de 2017. 
+
+3.   Instituto Nacional de Estadística. Atlas de Distribución de Renta de los Hogares, 2024. Tablas 
+
+31025, 31030, 31033, 53689 y 53694 [Internet]. Madrid: INE; 2026 [consultado 26 oct 2026]. 
+
+Disponible en: https://www.ine.es/dyngs/INEbase/es/operacion.htm? 
+
+c=Estadistica_C&cid=1254736177088&menu=ultiDatos&idp=1254735976608 
+
+4.   Red Local de Acción en Salud. Informe de Salud. Zagra. Proyecto de desarrollo de la acción local 
+
+en salud. Granada: Consejería de Salud, Delegación Territorial de Granada; marzo de 2017. 
+
+5.   Ayuntamiento de Zagra. Priorización temática ciudadana (papeleta REDCap 
+
+«papeleta_pri_tematica»), 14 a 24 de mayo de 2026. Exportación de datos de 21 oct 2026: 164 
+
+registros, 158 papeletas completas. 
+
+6.   Grupo Motor de Zagra. Listado de problemas de salud identificados en Zagra; problemas 
+
+priorizados, activos y acciones (taller del 27 de abril de 2017). Hoja de cálculo. Zagra; junio de 
+
+2017. 
+
+7.   Junta de Andalucía. Localiza Salud: recursos y activos para la salud del municipio de Zagra [base 
+
+de datos]. Registro incorporado al expediente el 21 oct 2026. 
+
+8.   Ayuntamiento de Zagra. Solicitud de adhesión al Plan RELAS (Red Local de Acción en Salud) 
+
+dirigida a la Delegación Territorial de Igualdad, Salud y Políticas Sociales de Granada. Zagra; 20 
+
+oct 2016. 
+
+9.   Delegación Territorial de Igualdad, Salud y Políticas Sociales en Granada; Ayuntamiento de 
+
+Zagra. Acuerdo de colaboración entre la Consejería de Salud de la Junta de Andalucía y el 
+
+Ayuntamiento de Zagra en materia de salud pública. Zagra; 15 feb 2017. 
+
+10.   Servicio de Acción Territorial en Salud Pública, Consejería de Salud. Taller «Impulso y desarrollo 
+
+de la acción local en salud». Zagra (Granada), 30 de marzo de 2017: programa. Granada; 2017. 
+
+11.   Gómez Jiménez A. Presentaciones de los talleres RELAS de Zagra de 30 de marzo y 27 de abril de 
+
+2017. Granada: Técnico de Acción Local en Salud, provincia de Granada; 2017. 
+
+12.   Red Local de Acción en Salud. Perfil de Salud Local. Zagra. Documento de trabajo. Zagra; enero 
+
+de 2018. 
+
+13.   Ayuntamiento de Zagra. Escrito a la Delegación Territorial de Salud (Servicio de Salud, Acción 
+
+Local) sobre la Estrategia de Acción Local en Salud. Zagra; 31 ene 2020. 
+
+14.   Unidad de Gestión Clínica de Loja. Plan de actuación de la Zona con Necesidades de 
+
+Transformación Social: Zagra, 2016 (descripción, objetivos, evaluación, otras actividades 
+
+comunitarias, mapa de activos y buenas prácticas). Hoja de cálculo. Loja; mayo de 2017. 
+
+15.   Grupo Motor de Zagra. Composición: seis personas, con su cargo. Zagra; mayo de 2017.
+
+[Página 13]
+I. Notas metodológicas 
+
+•   Local y no local.   Solo es dato local el que describe a la población de Zagra. Las cifras de Granada, 
+
+de Andalucía o del Distrito sirven de comparación o contexto y nunca sustituyen al dato 
+
+municipal. 
+
+•   Recurso y activo.   Se llama activo al recurso cuya identificación comunitaria consta validada en 
+
+Localiza Salud; el resto son recursos. 
+
+•   Grado de las relaciones.   1, observada en Zagra; 2, documentada en una referencia externa; 3, 
+
+plausible sin sustento. Solo los grados 1 y 2 permiten recomendar «Abordar». 
+
+•   Población pequeña.   Con 843 habitantes, pocos casos cambian mucho una tasa. Las cifras de 
+
+mortalidad y de enfermedad de 2015 deben leerse con esa cautela. 
+
+•   Ciclos.   Los documentos de 2016 a 2020 pertenecen al ciclo anterior. Se usan como antecedente 
+
+y como término de comparación, no como descripción del presente. 
+
+•   Citas.   Los números entre corchetes remiten a las referencias del anexo H; tras la coma se indica 
+
+la página, la tabla o el apartado de la fuente. 
+
+J. Nota técnica para quienes elaboraron las fuentes 
+
+•   Informe de Salud 2017: da 898 habitantes en 2014 y 11,19 km² [4, p. 14], y 882 habitantes y 11,3 
+
+km² en 2016 [4, pp. 14-15]. El índice de dependencia de 2016, 36,71 [4, p. 20], es el de 2015 
+
+según los indicadores VIGIA, que dan 56,11 para 2016 [12, apartado 6.3]. La tasa bruta de 
+
+mortalidad de 2015 es de 18,9 por mil en el texto [4, p. 30] y de 10,01 en los indicadores VIGIA 
+
+[12, apartado 6.3]. Sitúa Zagra a 72 km de Granada y a 680 m de altitud [4, p. 14], frente a 64,5 
+
+km y 685 m en el SIMA [1]. Cita tres casos de sarampión en cinco años y a continuación los 
+
+atribuye a brotes de tosferina, sarampión y parotiditis [4, p. 33]. No declara el denominador de 
+
+las prevalencias, y el 44,8 % de pacientes en anticoagulación no puede referirse a la población 
+
+total [4, p. 34]. Los apartados de salud ambiental, alimentaria y programas de promoción 
+
+quedaron sin redactar [4, pp. 28-29 y 45]. 
+
+•   Indicadores VIGIA del Perfil 2018: el índice de vejez de 217 es la razón entre mayores y jóvenes, 
+
+no el porcentaje de mayores de 65 años (24,60 %) que da el informe con el mismo nombre [12, 
+
+apartado 6.3] [4, p. 21]; registran 25 plazas en residencias de mayores en el municipio, que no 
+
+aparecen en la guía de recursos [12, apartados 6.1 y 6.3]. 
+
+•   Problemas priorizados 2017: los criterios se puntuaban de 1 a 3, pero las columnas recogen 
+
+valores de hasta 13, y las de magnitud y dificultad son idénticas en las 18 filas [6, problemas 
+
+priorizados]. 
+
+•   Plan ZNTS 2016: concluye que Zagra no corresponde a una zona con necesidades de 
+
+transformación social y que la zona que lo es está en Loja [14, descripción]; varias celdas de la 
+
+evaluación contienen fórmulas rotas [14, línea 5]. 
+
+•   SIMA 2024: registra cero bibliotecas públicas, cuando la guía de 2016 incluía una biblioteca 
+
+municipal abierta tres tardes por semana [1] [14, mapa de activos]. 
+
+•   Priorización 2026: la codificación del sexo en la papeleta no consta en el expediente, por lo que 
+
+no se ha usado.
