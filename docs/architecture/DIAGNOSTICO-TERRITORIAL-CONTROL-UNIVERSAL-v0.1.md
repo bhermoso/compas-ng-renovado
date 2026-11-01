@@ -181,3 +181,13 @@ Implementación de dominio en `src/domain/repository/OriginalRecord.ts`; la capa
 - **Despliegue**: no añadir ni desplegar reglas de Storage sin confirmar que el bucket exista, su configuración y el comportamiento real del emulador.
 - **Compatibilidad**: no migrar automáticamente originales almacenados en IndexedDB ni borrar snapshots históricos; exportación/copia de seguridad se mantienen como vía de recuperación.
 - **Estado**: diseño y pruebas unitarias del contrato, sin cliente Firebase activo, sin migración, sin modificación de expedientes.
+
+
+## 12. Originales del Diagnóstico en Firebase (implementado, 2026-11-01)
+Decisión del autor: los originales del Diagnóstico se guardan en Firebase con el mismo mecanismo que el Perfil externo (`docs/architecture/EXTERNAL-PROFILE.md`), no en Cloud Storage. Sustituye, para los originales, la propuesta de los §8, §9 y §11.
+
+- **Dónde.** `MunicipalityWorkspace.documentOriginals`: bytes completos en base64, con nombre, tipo, tamaño y SHA-256, por documento. Viajan en los fragmentos del expediente de Firebase, con sus permisos. IndexedDB (`compas-original-documents`) queda como caché del navegador.
+- **Sincronización** (`src/App.tsx`). Subida: todo original de la caché que no esté en el expediente se añade, incluidos los cargados antes de este cambio en ese navegador. Bajada: en otro equipo, los originales del expediente se restauran en la caché tras comprobar tamaño y huella. Los lectores existentes (descarga, reprocesado del Informe) no cambian.
+- **Límites.** 20 MB por archivo y 40 MB por expediente, comunes a los originales del Perfil y del Diagnóstico, para no superar los 400 fragmentos. Lo que no cabe se conserva solo en el navegador y la sala de control lo lista.
+- **Persistencia local.** La copia ligera de localStorage no lleva los originales; la de IndexedDB sí. A igualdad de fecha prevalece la copia que los conserva, y cuando se descarta una copia sus originales se trasladan a la que se queda (`withCarriedDocumentOriginals`), de modo que un autoguardado no los elimina de Firebase.
+- **Borrado.** Al eliminar un documento se retira su original del expediente. Los documentos archivados, incluidas las copias retiradas por repetidas, conservan el suyo.

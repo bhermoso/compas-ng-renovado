@@ -11059,3 +11059,10 @@ h3 {
 .duplicate-documents__keep { font-size: 0.82rem; font-weight: 600; color: color-mix(in srgb, var(--verde) 45%, var(--texto-principal)); }
 .duplicate-documents__actions { display: inline-flex; gap: 0.4rem; flex-wrap: wrap; }
 .duplicate-documents__secondary { background: none; border: 1px solid var(--borde); color: var(--texto-secundario); }
+
+/* Diagnóstico territorial · originales en el expediente compartido */
+.originals-status { padding-top: 0.9rem; padding-bottom: 0.9rem; }
+.originals-status__line { margin: 0; font-size: 0.9rem; color: var(--texto-secundario); }
+.originals-status__line strong { color: var(--texto-principal); }
+.originals-status__warning { margin-top: 0.6rem; padding: 0.6rem 0.8rem; border-left: 4px solid var(--amarillo); background: var(--fondo-principal); font-size: 0.88rem; }
+.originals-status__warning ul { margin: 0.3rem 0 0; padding-left: 1.2rem; }

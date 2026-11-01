@@ -113,12 +113,25 @@ export function serializeWorkspaceForStorage(
   return JSON.stringify(stripHtmlFields(workspace));
 }
 
+/**
+ * Copia ligera para localStorage. Los originales del Diagnóstico (base64) no
+ * caben en su cuota: viajan en la copia de IndexedDB y en Firebase. A igualdad
+ * de fecha, la hidratación prefiere la copia que los conserva.
+ */
+export function serializeWorkspaceForLocalStorage(
+  workspace: MunicipalityWorkspace
+): string {
+  const { documentOriginals: _originals, ...light } = stripHtmlFields(workspace);
+  void _originals;
+  return JSON.stringify(light);
+}
+
 export function saveWorkspaceToLocalStorage(
   workspace: MunicipalityWorkspace
 ): boolean {
   try {
     const key = buildWorkspaceStorageKey(workspace.municipality.identity.id);
-    localStorage.setItem(key, serializeWorkspaceForStorage(workspace));
+    localStorage.setItem(key, serializeWorkspaceForLocalStorage(workspace));
     return true;
   } catch {
     return false;
