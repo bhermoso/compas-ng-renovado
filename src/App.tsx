@@ -5,7 +5,8 @@ import { InitialLocalHealthPlanPanel } from "./ui/components/InitialLocalHealthP
 import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
 import { InstitutionalLogoBand } from "./ui/components/InstitutionalLogoBand";
 import { DocumentReviewInbox } from "./ui/components/DocumentReviewInbox";
-import { TerritorialDocumentControl } from "./ui/components/TerritorialDocumentControl";
+import { DiagnosisControlRoom, DiagnosisModuleSection } from "./ui/components/DiagnosisControlRoom";
+import { buildDiagnosisControlSummary, type DiagnosisModuleId } from "./application/diagnosis/diagnosisControlSummary";
 import { replaceZaidinFinalDraft } from "./application/workspace/replaceZaidinFinalDraft";
 import { regroupZagraActionPlan } from "./application/workspace/regroupZagraActionPlan";
 import { processPdfHealthReport } from './application/health-report/ProcessPdfHealthReport';
@@ -233,6 +234,17 @@ const NAV_ITEMS: { id: AppView; label: string; phase?: string }[] = [
 ];
 // Vistas eliminadas de la navegación principal pero accesibles para desarrollo:
 // "analisis" (D-002) y "lectura" (D-004).
+
+/** Secciones de detalle de la sala de control del diagnóstico. */
+type DiagnosisSectionId = "health-report" | "studies" | "assets" | "documents" | "manual" | "evidence";
+const DIAGNOSIS_SECTION_OF_MODULE: Record<DiagnosisModuleId, DiagnosisSectionId> = {
+  "health-report": "health-report",
+  studies: "studies",
+  assets: "assets",
+  frameworks: "documents",
+  "other-sources": "documents",
+  evidence: "evidence",
+};
 
 /** Opciones de los cargadores existentes cuando los invoca la bandeja de revisión. */
 type LoaderOptions = {
@@ -517,6 +529,20 @@ export default function App() {
   const [declaresOpenAnswers, setDeclaresOpenAnswers] = useState(false);
   const [plainText, setPlainText] = useState("");
   const [kind, setKind] = useState<DocumentKind>("territorial-documentation");
+  // Sala de control del diagnóstico: secciones de detalle abiertas.
+  const [openDiagModules, setOpenDiagModules] = useState<ReadonlySet<DiagnosisSectionId>>(() => new Set());
+  const toggleDiagnosisModule = useCallback((id: DiagnosisSectionId, open: boolean) => {
+    setOpenDiagModules((previous) => {
+      const next = new Set(previous);
+      if (open) next.add(id); else next.delete(id);
+      return next;
+    });
+  }, []);
+  const openDiagnosisModule = useCallback((module: DiagnosisModuleId) => {
+    const section = DIAGNOSIS_SECTION_OF_MODULE[module];
+    toggleDiagnosisModule(section, true);
+    requestAnimationFrame(() => document.getElementById(`diag-mod-${section}`)?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  }, [toggleDiagnosisModule]);
   const [lastProcessedDocument, setLastProcessedDocument] =
     useState<MunicipalDocument | null>(null);
   const [lastAtomCount, setLastAtomCount] = useState<number>(0);
@@ -3661,11 +3687,9 @@ export default function App() {
         {/* ── ② Repositorio documental ─────────────────────── */}
         {view === "repositorio" && (
           <>
-            {/* ── BLOQUE 1+2: Cabecera del diagnóstico territorial ── */}
+            {/* ── Sala de control: cabecera, resumen factual, matriz y línea temporal ── */}
             {(() => {
-              const hrLoaded = runtime.workspace.healthReport !== undefined;
               const atoms = runtime.workspace.evidenceStore.atoms;
-              const atomCount = atoms.length;
               const studies = [
                 runtime.workspace.ibseStudy,
                 runtime.workspace.dukeStudy,
@@ -3681,182 +3705,28 @@ export default function App() {
                 runtime.workspace.fagerstromStudy,
                 runtime.workspace.sbqStudy,
               ];
-              const studiesLoaded = studies.filter(Boolean).length;
-              const ibseAtoms = atoms.filter(a => a.provenance.origin === "ibse").length;
-              const studyAtoms = atoms.filter(a => a.provenance.origin === "complementary-study").length;
-
-              // Capa 3: Activos para la salud
-              const docs = runtime.workspace.repository.documents;
-              const assetDocs = docs.filter(
+              const assetDocs = runtime.workspace.repository.documents.filter(
                 (d) => d.kind === "community-asset" || d.kind === "localiza-salud"
               );
-              const assetNames = assetDocs.flatMap(assetEntriesOfDocument);
-              const assetCount = assetNames.length;
-
-              // Capa 4: Otras fuentes documentales (excluye capas 1–3).
-              // Los marcos estratégicos y normativos (strategic-framework) se
-              // excluyen también: son base del Plan de Acción / Plan Local de
-              // Salud, no fuente diagnóstica del Perfil.
-              const STUDY_TAGS = ["ibse", "duke-eas", "predimed-eas", "sf12-eas", "sueno-eas", "cage-eas", "auditc", "ipaq-eas", "ghq12", "phq9", "psqi", "fagerstrom", "sbq"];
-              const otherDocCount = docs.filter(
-                (d) =>
-                  d.kind !== "health-report" &&
-                  d.kind !== "community-asset" &&
-                  d.kind !== "localiza-salud" &&
-                  d.kind !== "complementary-study" &&
-                  d.kind !== "strategic-framework" &&
-                  !(d.kind === "redcap-export" && d.tags.some((t) => STUDY_TAGS.includes(t)))
-              ).length;
-
-              type DiagState = "ready" | "partial" | "empty";
-              const diagState: DiagState =
-                hrLoaded && atomCount > 0 ? "ready"
-                : (hrLoaded || atomCount > 0 || docs.length > 0) ? "partial"
-                : "empty";
-
-              const conclusionMsg: Record<DiagState, string> = {
-                ready:   "Diagnóstico con evidencia complementaria disponible para revisar el Perfil de Salud Local.",
-                partial: "Diagnóstico en elaboración. Incorpora el Informe de Salud y fuentes complementarias para enriquecer el análisis territorial.",
-                empty:   "El diagnóstico está vacío. Comienza incorporando el Informe de Salud del ámbito territorial.",
-              };
-
+              const summary = buildDiagnosisControlSummary({
+                repository: runtime.workspace.repository,
+                evidenceCount: atoms.length,
+                healthReportLoaded: runtime.workspace.healthReport !== undefined,
+                studiesLoaded: studies.map(Boolean),
+                studyEvidenceCount: atoms.filter(a => a.provenance.origin === "ibse" || a.provenance.origin === "complementary-study").length,
+                assetCount: assetDocs.flatMap(assetEntriesOfDocument).length,
+              });
               return (
-                <>
-                  <TerritorialDocumentControl repository={runtime.workspace.repository} evidenceCount={atomCount} studiesLoaded={studiesLoaded} totalStudies={studies.length} kindLabels={DOCUMENT_KINDS} />
-                  <section className="diag-header workspace-panel">
-                  <div className="diag-header__title-row">
-                    <div>
-                      <p className="eyebrow">Diagnóstico territorial</p>
-                      <h2 className="diag-header__municipality">{municipality.name}</h2>
-                      <p className="diag-header__subtitle">
-                        Estado metodológico del diagnóstico del ámbito territorial.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="diag-status">
-                    <p className="diag-status__heading">Estado del diagnóstico</p>
-                    <ul className="diag-status__list">
-                      <li className={`diag-status__item diag-status__item--${hrLoaded ? "ok" : "missing"}`}>
-                        <span className="diag-status__label">Informe de Salud</span>
-                        <span className="diag-status__value">
-                          {hrLoaded ? "Fuente primaria disponible" : "No incorporado"}
-                        </span>
-                      </li>
-                      <li className={`diag-status__item diag-status__item--${studiesLoaded > 0 ? "ok" : "pending"}`}>
-                        <span className="diag-status__label">Estudios complementarios</span>
-                        <span className="diag-status__value">
-                          {studiesLoaded > 0
-                            ? `${studiesLoaded} de 13 · ${ibseAtoms + studyAtoms} evidencias`
-                            : "Ninguno incorporado"}
-                        </span>
-                      </li>
-                      <li className={`diag-status__item diag-status__item--${assetCount > 0 ? "ok" : "pending"}`}>
-                        <span className="diag-status__label">Activos para la salud</span>
-                        <span className="diag-status__value">
-                          {assetCount > 0 ? `${assetCount} activos incorporados` : "Sin activos registrados"}
-                        </span>
-                      </li>
-                      <li className={`diag-status__item diag-status__item--${otherDocCount > 0 ? "ok" : "pending"}`}>
-                        <span className="diag-status__label">Otras fuentes documentales</span>
-                        <span className="diag-status__value">
-                          {otherDocCount > 0 ? `${otherDocCount} registradas` : "Ninguna registrada"}
-                        </span>
-                      </li>
-                    </ul>
-
-                    <div className={`diag-status__conclusion diag-status__conclusion--${diagState}`}>
-                      {conclusionMsg[diagState]}
-                    </div>
-                  </div>
-                </section>
-                </>
+                <DiagnosisControlRoom
+                  municipalityName={municipality.name}
+                  summary={summary}
+                  kindLabels={DOCUMENT_KINDS}
+                  onOpenModule={openDiagnosisModule}
+                />
               );
             })()}
 
-            {/* ── Capas del diagnóstico ── */}
-            <HealthReportViewer
-              healthReport={runtime.workspace.healthReport}
-              repository={runtime.workspace.repository}
-            />
-            <EstudiosComplementariosPanel
-              municipalityName={municipality.name}
-              ibseStudy={runtime.workspace.ibseStudy}
-              isLoadingIBSE={isLoadingIBSE}
-              ibseMessage={ibseMessage}
-              onLoadIBSECSV={handleLoadIBSECSV}
-              dukeStudy={runtime.workspace.dukeStudy}
-              isLoadingDUKE={isLoadingDUKE}
-              dukeMessage={dukeMessage}
-              onLoadDUKECSV={handleLoadDUKECSV}
-              predimedStudy={runtime.workspace.predimedStudy}
-              isLoadingPREDIMED={isLoadingPREDIMED}
-              predimedMessage={predimedMessage}
-              onLoadPREDIMEDCSV={handleLoadPREDIMEDCSV}
-              sf12Study={runtime.workspace.sf12Study}
-              isLoadingSF12={isLoadingSF12}
-              sf12Message={sf12Message}
-              onLoadSF12CSV={handleLoadSF12CSV}
-              suenoStudy={runtime.workspace.suenoStudy}
-              isLoadingSueno={isLoadingSueno}
-              suenoMessage={suenoMessage}
-              onLoadSuenoCSV={handleLoadSuenoCSV}
-              cageStudy={runtime.workspace.cageStudy}
-              isLoadingCAGE={isLoadingCAGE}
-              cageMessage={cageMessage}
-              onLoadCAGECSV={handleLoadCAGECSV}
-              auditcStudy={runtime.workspace.auditcStudy}
-              isLoadingAUDITC={isLoadingAUDITC}
-              auditcMessage={auditcMessage}
-              onLoadAUDITCCSV={handleLoadAUDITCCSV}
-              ipaqStudy={runtime.workspace.ipaqStudy}
-              isLoadingIPAQ={isLoadingIPAQ}
-              ipaqMessage={ipaqMessage}
-              onLoadIPAQCSV={handleLoadIPAQCSV}
-              ghq12Study={runtime.workspace.ghq12Study}
-              isLoadingGHQ12={isLoadingGHQ12}
-              ghq12Message={ghq12Message}
-              onLoadGHQ12CSV={handleLoadGHQ12CSV}
-              phq9Study={runtime.workspace.phq9Study}
-              isLoadingPHQ9={isLoadingPHQ9}
-              phq9Message={phq9Message}
-              onLoadPHQ9CSV={handleLoadPHQ9CSV}
-              psqiStudy={runtime.workspace.psqiStudy}
-              isLoadingPSQI={isLoadingPSQI}
-              psqiMessage={psqiMessage}
-              onLoadPSQICSV={handleLoadPSQICSV}
-              fagerstromStudy={runtime.workspace.fagerstromStudy}
-              isLoadingFagerstrom={isLoadingFagerstrom}
-              fagerstromMessage={fagerstromMessage}
-              onLoadFagerstromCSV={handleLoadFagerstromCSV}
-              sbqStudy={runtime.workspace.sbqStudy}
-              isLoadingSBQ={isLoadingSBQ}
-              sbqMessage={sbqMessage}
-              onLoadSBQCSV={handleLoadSBQCSV}
-              repository={runtime.workspace.repository}
-              onDeleteDocument={handleDeleteDocument}
-            />
-            <ActivosSaludPanel
-              repository={runtime.workspace.repository}
-              atoms={runtime.workspace.evidenceStore.atoms}
-              onDeleteDocument={handleDeleteDocument}
-            />
-            <DocumentRepositoryPanel
-              repository={runtime.workspace.repository}
-              onDelete={handleDeleteDocument}
-              libraryDocuments={compasDocumentLibrary}
-              libraryMessage={documentLibraryMessage}
-              onAssignLibraryDocument={handleAssignLibraryDocument}
-              onSetDocumentCycle={handleSetDocumentCycle}
-              onAddConciliation={handleAddConciliation}
-              onRemoveConciliation={handleRemoveConciliation}
-              onAddAssetValidation={handleAddAssetValidation}
-              onRemoveAssetValidation={handleRemoveAssetValidation}
-              assetResources={runtime.workspace.evidenceStore.atoms
-                .filter((a) => a.kind === "asset")
-                .map((a) => ({ id: a.id, title: a.title, documentId: a.provenance.documentId ?? "" }))}
-            />
-
+            {/* ── Entrada universal: análisis, revisión e incorporación ── */}
             <DocumentReviewInbox
               key={runtime.workspace.municipality.identity.id}
               municipality={runtime.workspace.municipality.identity.name}
@@ -3879,34 +3749,125 @@ export default function App() {
               }
             />
 
-            {/* ── BLOQUE 4: Añadir o sustituir fuentes ── */}
-            <DocumentIngestionPanel
-              documentKinds={DOCUMENT_KINDS}
-              kind={kind}
-              title={title}
-              plainText={plainText}
-              lastProcessedDocument={lastProcessedDocument}
-              atomsCreated={lastAtomCount}
-              isLoadingHealthReport={isLoadingHealthReport}
-              healthReportMessage={lastHealthReportMessage}
-              onKindChange={setKind}
-              onTitleChange={setTitle}
-              onPlainTextChange={setPlainText}
-              onProcessDocument={handleProcessDocument}
-              onRegisterReference={handleRegisterDocumentReference}
-              declaresOpenAnswers={declaresOpenAnswers}
-              onDeclaresOpenAnswersChange={setDeclaresOpenAnswers}
-              onLoadHealthReport={handleLoadHealthReport}
-              onLoadDocumentFile={handleLoadDocumentFile}
-              isLoadingDocumentFile={isLoadingDocumentFile}
-              documentFileMessage={documentFileMessage}
-            />
-
-            {/* ── BLOQUE 5: Evidencias incorporadas al análisis ── */}
-            <EvidenceStorePanel
-              evidenceStore={runtime.workspace.evidenceStore}
-              defaultOpen={false}
-            />
+            {/* ── Detalle por módulo: paneles existentes, plegados ── */}
+            <DiagnosisModuleSection id="diag-mod-health-report" title="Informe de Salud" description="Visor del Informe incorporado" open={openDiagModules.has("health-report")} onToggle={(open) => toggleDiagnosisModule("health-report", open)}>
+              <HealthReportViewer
+                healthReport={runtime.workspace.healthReport}
+                repository={runtime.workspace.repository}
+              />
+            </DiagnosisModuleSection>
+            <DiagnosisModuleSection id="diag-mod-studies" title="Estudios complementarios" description="Carga por instrumento, ajuste IBSE y resultados" open={openDiagModules.has("studies")} onToggle={(open) => toggleDiagnosisModule("studies", open)}>
+              <EstudiosComplementariosPanel
+                municipalityName={municipality.name}
+                ibseStudy={runtime.workspace.ibseStudy}
+                isLoadingIBSE={isLoadingIBSE}
+                ibseMessage={ibseMessage}
+                onLoadIBSECSV={handleLoadIBSECSV}
+                dukeStudy={runtime.workspace.dukeStudy}
+                isLoadingDUKE={isLoadingDUKE}
+                dukeMessage={dukeMessage}
+                onLoadDUKECSV={handleLoadDUKECSV}
+                predimedStudy={runtime.workspace.predimedStudy}
+                isLoadingPREDIMED={isLoadingPREDIMED}
+                predimedMessage={predimedMessage}
+                onLoadPREDIMEDCSV={handleLoadPREDIMEDCSV}
+                sf12Study={runtime.workspace.sf12Study}
+                isLoadingSF12={isLoadingSF12}
+                sf12Message={sf12Message}
+                onLoadSF12CSV={handleLoadSF12CSV}
+                suenoStudy={runtime.workspace.suenoStudy}
+                isLoadingSueno={isLoadingSueno}
+                suenoMessage={suenoMessage}
+                onLoadSuenoCSV={handleLoadSuenoCSV}
+                cageStudy={runtime.workspace.cageStudy}
+                isLoadingCAGE={isLoadingCAGE}
+                cageMessage={cageMessage}
+                onLoadCAGECSV={handleLoadCAGECSV}
+                auditcStudy={runtime.workspace.auditcStudy}
+                isLoadingAUDITC={isLoadingAUDITC}
+                auditcMessage={auditcMessage}
+                onLoadAUDITCCSV={handleLoadAUDITCCSV}
+                ipaqStudy={runtime.workspace.ipaqStudy}
+                isLoadingIPAQ={isLoadingIPAQ}
+                ipaqMessage={ipaqMessage}
+                onLoadIPAQCSV={handleLoadIPAQCSV}
+                ghq12Study={runtime.workspace.ghq12Study}
+                isLoadingGHQ12={isLoadingGHQ12}
+                ghq12Message={ghq12Message}
+                onLoadGHQ12CSV={handleLoadGHQ12CSV}
+                phq9Study={runtime.workspace.phq9Study}
+                isLoadingPHQ9={isLoadingPHQ9}
+                phq9Message={phq9Message}
+                onLoadPHQ9CSV={handleLoadPHQ9CSV}
+                psqiStudy={runtime.workspace.psqiStudy}
+                isLoadingPSQI={isLoadingPSQI}
+                psqiMessage={psqiMessage}
+                onLoadPSQICSV={handleLoadPSQICSV}
+                fagerstromStudy={runtime.workspace.fagerstromStudy}
+                isLoadingFagerstrom={isLoadingFagerstrom}
+                fagerstromMessage={fagerstromMessage}
+                onLoadFagerstromCSV={handleLoadFagerstromCSV}
+                sbqStudy={runtime.workspace.sbqStudy}
+                isLoadingSBQ={isLoadingSBQ}
+                sbqMessage={sbqMessage}
+                onLoadSBQCSV={handleLoadSBQCSV}
+                repository={runtime.workspace.repository}
+                onDeleteDocument={handleDeleteDocument}
+              />
+            </DiagnosisModuleSection>
+            <DiagnosisModuleSection id="diag-mod-assets" title="Activos para la salud" description="Activos identificados y su procedencia" open={openDiagModules.has("assets")} onToggle={(open) => toggleDiagnosisModule("assets", open)}>
+              <ActivosSaludPanel
+                repository={runtime.workspace.repository}
+                atoms={runtime.workspace.evidenceStore.atoms}
+                onDeleteDocument={handleDeleteDocument}
+              />
+            </DiagnosisModuleSection>
+            <DiagnosisModuleSection id="diag-mod-documents" title="Repositorio documental y bibliotecas" description="Documentos del expediente, ciclos, conciliaciones y biblioteca COMPÁS" open={openDiagModules.has("documents")} onToggle={(open) => toggleDiagnosisModule("documents", open)}>
+              <DocumentRepositoryPanel
+                repository={runtime.workspace.repository}
+                onDelete={handleDeleteDocument}
+                libraryDocuments={compasDocumentLibrary}
+                libraryMessage={documentLibraryMessage}
+                onAssignLibraryDocument={handleAssignLibraryDocument}
+                onSetDocumentCycle={handleSetDocumentCycle}
+                onAddConciliation={handleAddConciliation}
+                onRemoveConciliation={handleRemoveConciliation}
+                onAddAssetValidation={handleAddAssetValidation}
+                onRemoveAssetValidation={handleRemoveAssetValidation}
+                assetResources={runtime.workspace.evidenceStore.atoms
+                  .filter((a) => a.kind === "asset")
+                  .map((a) => ({ id: a.id, title: a.title, documentId: a.provenance.documentId ?? "" }))}
+              />
+            </DiagnosisModuleSection>
+            <DiagnosisModuleSection id="diag-mod-manual" title="Carga manual por tipo" description="Vía clásica: texto pegado, referencias y formularios por tipo documental" open={openDiagModules.has("manual")} onToggle={(open) => toggleDiagnosisModule("manual", open)}>
+              <DocumentIngestionPanel
+                documentKinds={DOCUMENT_KINDS}
+                kind={kind}
+                title={title}
+                plainText={plainText}
+                lastProcessedDocument={lastProcessedDocument}
+                atomsCreated={lastAtomCount}
+                isLoadingHealthReport={isLoadingHealthReport}
+                healthReportMessage={lastHealthReportMessage}
+                onKindChange={setKind}
+                onTitleChange={setTitle}
+                onPlainTextChange={setPlainText}
+                onProcessDocument={handleProcessDocument}
+                onRegisterReference={handleRegisterDocumentReference}
+                declaresOpenAnswers={declaresOpenAnswers}
+                onDeclaresOpenAnswersChange={setDeclaresOpenAnswers}
+                onLoadHealthReport={handleLoadHealthReport}
+                onLoadDocumentFile={handleLoadDocumentFile}
+                isLoadingDocumentFile={isLoadingDocumentFile}
+                documentFileMessage={documentFileMessage}
+              />
+            </DiagnosisModuleSection>
+            <DiagnosisModuleSection id="diag-mod-evidence" title="Evidencias incorporadas al análisis" description="Unidades trazables por fuente" open={openDiagModules.has("evidence")} onToggle={(open) => toggleDiagnosisModule("evidence", open)}>
+              <EvidenceStorePanel
+                evidenceStore={runtime.workspace.evidenceStore}
+                defaultOpen={false}
+              />
+            </DiagnosisModuleSection>
 
             {/* ── BLOQUE 6: Continuación del proceso ── */}
             <section className="diag-continue workspace-panel">

@@ -10971,6 +10971,10 @@ h3 {
 .document-review-inbox__editor input,.document-review-inbox__editor select { max-width:100%; min-width:0; box-sizing:border-box; border:1px solid var(--borde); background:var(--blanco); color:var(--texto-principal); padding:10px; border-radius:6px; }
 .document-review-inbox__editor :is(button,input,select):focus-visible,.document-review-inbox__list button:focus-visible { outline:3px solid var(--azul); outline-offset:2px; }
 .document-review-inbox__upload { min-width:0; }
+.document-review-inbox__upload { padding:22px 16px; text-align:center; transition:background-color .15s, border-color .15s; }
+.document-review-inbox__upload--active { border-style:solid; border-color:var(--azul); background:var(--fondo-secundario); }
+.document-review-inbox__upload-title { font-size:1.05rem; }
+.document-review-inbox__upload-hint { font-weight:400; font-size:.85rem; color:var(--texto-secundario); }
 .document-review-inbox__upload input[type="file"] { width:100%; max-width:100%; min-width:0; box-sizing:border-box; }
 .document-review-inbox__layout > * { min-width:0; }
 .document-review-inbox__fields { display:grid; gap:12px; margin:0; padding:0; border:0; min-width:0; }
@@ -10980,30 +10984,61 @@ h3 {
 .document-review-inbox__import button { justify-self:start; max-width:100%; white-space:normal; }
 @media(max-width:720px){.document-review-inbox__layout{grid-template-columns:1fr;}}
 
-/* Diagnóstico territorial · resumen de control documental */
-.territorial-document-control__metrics {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.75rem;
-  margin: 1.1rem 0;
+/* Diagnóstico territorial · sala de control (contrato §5). Solo tokens
+   institucionales; los estados se derivan de --verde y --amarillo/--naranja. */
+.diagnosis-control { display: grid; gap: 1rem; }
+.diagnosis-control__municipality { margin: 0.15rem 0 0.35rem; font-size: clamp(1.6rem, 3vw, 2.1rem); color: var(--texto-principal); }
+.diagnosis-control__state { margin: 0; padding: 0.6rem 0.85rem; border-left: 4px solid var(--borde); border-radius: 0 6px 6px 0; font-size: 0.92rem; background: var(--fondo-principal); color: var(--texto-secundario); }
+.diagnosis-control__state--ready { background: color-mix(in srgb, var(--verde) 12%, var(--blanco)); color: color-mix(in srgb, var(--verde) 45%, var(--texto-principal)); border-left-color: var(--verde); }
+.diagnosis-control__state--partial { background: color-mix(in srgb, var(--amarillo) 14%, var(--blanco)); color: color-mix(in srgb, var(--naranja) 65%, var(--texto-principal)); border-left-color: var(--amarillo); }
+.diagnosis-control__subtitle { margin: 0.5rem 0 0; font-size: 1rem; color: var(--texto-principal); }
+.diagnosis-control__metrics { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.6rem; margin: 0; }
+.diagnosis-control__metrics > div { display: flex; flex-direction: column-reverse; justify-content: flex-end; gap: 0.25rem; padding: 0.8rem; min-width: 0; background: var(--fondo-secundario); border: 1px solid var(--borde); border-radius: 8px; }
+.diagnosis-control__metrics dt { font-size: 0.78rem; line-height: 1.3; color: var(--texto-secundario); overflow-wrap: anywhere; }
+.diagnosis-control__metrics dd { margin: 0; font-size: clamp(1.35rem, 2.4vw, 1.9rem); font-weight: 700; color: var(--azul); }
+.diagnosis-control__metrics .diagnosis-control__metric--attention { border-color: var(--amarillo); }
+.diagnosis-control__metrics .diagnosis-control__metric--attention dd { color: color-mix(in srgb, var(--naranja) 65%, var(--texto-principal)); }
+.diagnosis-matrix { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; }
+.diagnosis-matrix__card { display: grid; gap: 0.35rem; align-content: start; padding: 0.9rem 1rem; min-width: 0; background: var(--blanco); border: 1px solid var(--borde); border-left: 4px solid var(--borde); border-radius: 8px; }
+.diagnosis-matrix__card--ok { border-left-color: var(--verde); }
+.diagnosis-matrix__card--partial { border-left-color: var(--amarillo); }
+.diagnosis-matrix__top { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
+.diagnosis-matrix__label { font-weight: 700; color: var(--texto-principal); }
+.diagnosis-matrix__pill { font-size: 0.72rem; font-weight: 600; padding: 0.1rem 0.5rem; border-radius: 999px; background: var(--fondo-secundario); color: var(--texto-terciario); }
+.diagnosis-matrix__pill--ok { background: color-mix(in srgb, var(--verde) 12%, var(--blanco)); color: color-mix(in srgb, var(--verde) 45%, var(--texto-principal)); }
+.diagnosis-matrix__pill--partial { background: color-mix(in srgb, var(--amarillo) 14%, var(--blanco)); color: color-mix(in srgb, var(--naranja) 65%, var(--texto-principal)); }
+.diagnosis-matrix__value { font-size: 1.4rem; color: var(--azul); }
+.diagnosis-matrix__detail { margin: 0; font-size: 0.85rem; color: var(--texto-secundario); }
+.diagnosis-matrix__open { justify-self: start; margin-top: 0.2rem; padding: 0; border: 0; background: none; color: var(--azul); font: inherit; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+.diagnosis-matrix__open::after { content: " →"; }
+.diagnosis-matrix__open:hover { text-decoration: underline; }
+.diagnosis-timeline { display: grid; gap: 0.6rem; }
+.diagnosis-timeline__filters { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.diagnosis-timeline__filters button { padding: 0.3rem 0.75rem; border: 1px solid var(--borde); border-radius: 999px; background: var(--blanco); color: var(--texto-principal); cursor: pointer; font-size: 0.85rem; }
+.diagnosis-timeline__filters button[aria-pressed="true"] { border-color: var(--azul); background: var(--azul); color: var(--blanco); }
+.diagnosis-timeline__filters button span { margin-left: 0.25rem; font-weight: 700; }
+.diagnosis-timeline__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; max-height: 22rem; overflow-y: auto; }
+.diagnosis-timeline__item { display: grid; grid-template-columns: minmax(8rem, 12rem) minmax(0, 1fr); column-gap: 0.9rem; padding: 0.55rem 0.75rem; border: 1px solid var(--borde); border-left: 4px solid var(--borde); border-radius: 6px; background: var(--blanco); }
+.diagnosis-timeline__item--current { border-left-color: var(--azul); }
+.diagnosis-timeline__item--historical { border-left-color: var(--texto-terciario); }
+.diagnosis-timeline__item--mixed { border-left-color: var(--cyan); }
+.diagnosis-timeline__date { grid-row: span 2; font-size: 0.82rem; font-weight: 600; color: var(--texto-secundario); overflow-wrap: anywhere; }
+.diagnosis-timeline__title { font-weight: 600; color: var(--texto-principal); overflow-wrap: anywhere; }
+.diagnosis-timeline__meta { font-size: 0.8rem; color: var(--texto-terciario); }
+.diagnosis-module { max-width: 1120px; margin: 0 auto 0.75rem; border: 1px solid var(--borde); border-radius: 8px; background: var(--blanco); }
+.diagnosis-module__summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.75rem; padding: 0.85rem 1.1rem; cursor: pointer; }
+.diagnosis-module__summary:focus-visible, .diagnosis-matrix__open:focus-visible, .diagnosis-timeline__filters button:focus-visible { outline: 3px solid var(--azul); outline-offset: 2px; }
+.diagnosis-module__title { font-weight: 700; color: var(--texto-principal); }
+.diagnosis-module__description { font-size: 0.85rem; color: var(--texto-secundario); }
+.diagnosis-module__body { padding: 0 0.5rem 0.5rem; }
+.diagnosis-module__body > .workspace-panel { margin-top: 0; }
+@media (max-width: 960px) {
+  .diagnosis-control__metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .diagnosis-matrix { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-.territorial-document-control__metrics > div {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  padding: 1rem;
-  background: var(--fondo-secundario);
-  border: 1px solid var(--borde);
-  border-radius: 0.75rem;
-}
-.territorial-document-control__metrics strong { font-size: clamp(1.5rem, 2.7vw, 2.2rem); color: var(--azul); }
-.territorial-document-control__metrics span { font-size: 0.85rem; color: var(--texto-secundario); }
-.territorial-document-control__detail { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-.territorial-document-control__detail h3 { font-size: 1rem; }
-.territorial-document-control__detail ul { padding-left: 1.2rem; }
-.territorial-document-control__detail li { margin: 0.35rem 0; }
-.territorial-document-control__detail li strong { margin-left: 0.75rem; }
-@media (max-width: 740px) {
-  .territorial-document-control__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .territorial-document-control__detail { grid-template-columns: 1fr; }
+@media (max-width: 600px) {
+  .diagnosis-control__metrics, .diagnosis-matrix { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .diagnosis-matrix { grid-template-columns: 1fr; }
+  .diagnosis-timeline__item { grid-template-columns: 1fr; }
+  .diagnosis-timeline__date { grid-row: auto; }
 }
