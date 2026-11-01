@@ -117,3 +117,14 @@ describe("planInboxImport · estudios complementarios en CSV", () => {
     expect(planInboxImport({ kind: "complementary-study", format: "pdf", fileName: "e.pdf", repository: empty })).toMatchObject({ blocked: true });
   });
 });
+
+describe("planInboxImport · Informe registrado sin ficha documental", () => {
+  it("lo trata como sustitución y lo explica", () => {
+    const plan = planInboxImport({ kind: "health-report", format: "pdf", fileName: "informe-zagra.pdf", repository: empty, registeredHealthReport: { title: "Informe de Salud de Zagra", sourceFileName: "zagra.pdf" } });
+    if ("blocked" in plan) throw new Error(plan.reason);
+    expect(plan.effect).toBe("replace");
+    expect(plan.affected).toEqual([]);
+    expect(plan.notes?.join(" ")).toContain("su ficha no consta en el repositorio documental");
+    expect(plan.consequence).toContain("se conserva archivado");
+  });
+});

@@ -1364,9 +1364,8 @@ export default function App() {
         updatedAt: new Date().toISOString(),
       }));
       setLastHealthReportMessage(
-        (healthReport.body.charCount > 0 ? `Informe procesado: ${healthReport.body.charCount.toLocaleString("es-ES")} caracteres disponibles para la lectura del Perfil. ` : "Original conservado, sin texto extraíble; requiere transcripción u OCR. ") +
-        "Preservado en el Repositorio documental. " +
-        "Puedes descargar el original desde el catálogo completo de documentos de este navegador."
+        (healthReport.body.charCount > 0 ? `Informe procesado: ${healthReport.body.charCount.toLocaleString("es-ES")} caracteres disponibles para la lectura del Perfil. ` : "Sin texto extraíble; requiere transcripción u OCR. ") +
+        storageSummary()
       );
       return true;
     } catch (err) {
@@ -1611,6 +1610,18 @@ export default function App() {
       setIsLoadingDocumentFile(false);
       setDeclaresOpenAnswers(false);
     }
+  }
+
+  /**
+   * Dónde queda lo incorporado, sin prometer más de lo que ocurre: con sesión,
+   * la ficha, el texto y las evidencias viajan en el expediente compartido de
+   * Firebase (autoguardado); el archivo original del Diagnóstico solo se
+   * conserva en IndexedDB de este navegador (originalFiles.ts).
+   */
+  function storageSummary(): string {
+    return remoteClient.auth.currentUser
+      ? "La ficha, el texto y las evidencias se guardan en el expediente compartido de Firebase. El archivo original, por ahora, solo se conserva en este navegador."
+      : "Sin sesión iniciada: todo se guarda solo en este navegador. Inicia sesión para guardar el expediente en Firebase.";
   }
 
   // ── Bandeja de revisión → cargadores CSV de estudios complementarios ──────
@@ -3735,6 +3746,8 @@ export default function App() {
               documentKinds={DOCUMENT_KINDS}
               isImporting={isLoadingHealthReport === true || isLoadingDocumentFile === true || Object.values(studyCsvLoaders).some((loader) => loader.loading)}
               connectedInstruments={Object.keys(studyCsvLoaders)}
+              registeredHealthReport={runtime.workspace.healthReport ? { title: runtime.workspace.healthReport.title, sourceFileName: runtime.workspace.healthReport.sourceFileName } : undefined}
+              storageNotice={storageSummary()}
               getLoaderMessage={(route, studyId) =>
                 route === "health-report" ? lastHealthReportMessage
                   : route === "document-file" ? documentFileMessage

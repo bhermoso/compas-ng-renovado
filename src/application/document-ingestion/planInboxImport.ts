@@ -85,6 +85,12 @@ export function planInboxImport(input: {
   methodologicalMatches?: MethodologicalMatch[];
   /** Instrumentos con cargador CSV conectado a la bandeja (ids de módulo). */
   connectedInstruments?: readonly string[];
+  /**
+   * Informe de Salud registrado en el expediente (workspace.healthReport). Puede
+   * existir aunque su ficha no conste en el repositorio documental; también en
+   * ese caso la carga es una sustitución.
+   */
+  registeredHealthReport?: { title: string; sourceFileName?: string };
 }): InboxImportPlan | InboxImportBlock {
   const { kind, format, fileName, repository } = input;
   // Un CSV de instrumento se reconoce por sus columnas, no por el tipo elegido:
@@ -123,15 +129,22 @@ export function planInboxImport(input: {
 
   if (kind === "health-report") {
     const affected = active.filter((d) => d.kind === "health-report");
+    const registered = input.registeredHealthReport;
+    const replaces = affected.length > 0 || registered !== undefined;
+    const notes =
+      registered !== undefined && affected.length === 0
+        ? [`Ya hay un Informe de Salud registrado («${registered.title}»${registered.sourceFileName ? `, ${registered.sourceFileName}` : ""}), aunque su ficha no consta en el repositorio documental. Pasará a versión previa; no se borra.`]
+        : undefined;
     return {
       route: "health-report",
       kind,
-      effect: affected.length ? "replace" : "create",
+      effect: replaces ? "replace" : "create",
       affected,
       sameFileName: active.filter((d) => sameName(d) && !affected.includes(d)),
-      consequence: affected.length
+      consequence: replaces
         ? "Sustituye al Informe de Salud vigente. El anterior se conserva archivado y como versión previa; no se borra."
         : "Crea el Informe de Salud del expediente. El Informe no genera unidades de evidencia.",
+      ...(notes ? { notes } : {}),
     };
   }
 

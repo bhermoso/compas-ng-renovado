@@ -75,3 +75,12 @@ describe("DiagnosisControlRoom", () => {
     expect(html).toContain("Exportación REDCap");
   });
 });
+
+describe("buildDiagnosisControlSummary · Informe sin ficha", () => {
+  it("marca el módulo como parcial cuando el Informe no tiene ficha en el repositorio", () => {
+    const s = buildDiagnosisControlSummary({ ...base, repository: empty, healthReportLoaded: true });
+    const hr = s.modules.find(m => m.id === "health-report")!;
+    expect(hr).toMatchObject({ state: "partial", value: "Incorporado" });
+    expect(hr.detail).toContain("su ficha no consta");
+  });
+});
