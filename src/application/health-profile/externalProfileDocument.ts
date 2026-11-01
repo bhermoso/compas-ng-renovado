@@ -1,5 +1,6 @@
 import type { ExternalHealthProfile } from '../../domain/health-profile/ExternalHealthProfile';
 import type { PSLCDocumentModel, PSLCDocumentSection } from '../psl-c-export/pslcDocumentModel';
+import { parseProfileStructure } from './profileStructure';
 
 /** Mechanical layout of supplied content. No diagnostic inference or generated narrative. */
 export function externalProfileDocument(profile: ExternalHealthProfile, municipalityName: string): PSLCDocumentModel {
@@ -10,11 +11,18 @@ export function externalProfileDocument(profile: ExternalHealthProfile, municipa
   `${result.value} ${result.unit}`.trim(),
   `Fuente: ${result.source}${result.page ? ` · ${result.page}` : ''}`,
   `Periodo: ${result.period || 'No indicado'} · Ámbito: ${result.scale || 'No indicado'}${result.denominator ? ` · Base: ${result.denominator}` : ''}`,
-  ...(result.temporalContext === 'historical' ? ['Antecedente histórico: no describe por sí solo la situación actual.'] : []),
   ...(result.comparison ? [`Referencia ${result.comparison.label}: ${result.comparison.value} ${result.unit}`] : []),
   ...(result.caution ? [result.caution] : []),
  ]});
- if (profile.text) sections.push({title:'Texto del perfil · esta revisión',level:1,paragraphs:profile.text.split(/\n\s*\n/).filter(Boolean)});
+ if (profile.text) {
+  // El texto se maqueta por sus apartados reconocidos; si no hay estructura, en un único bloque.
+  const structure = parseProfileStructure(profile.text);
+  const titled = structure.sections.filter(s => s.title !== 'Inicio');
+  if (titled.length >= 2) {
+   sections.push({title:'Texto del perfil · esta revisión',level:1,paragraphs:structure.sections.find(s => s.title === 'Inicio')?.paragraphs ?? []});
+   for (const s of titled) sections.push({title:s.title,level:2,paragraphs:s.paragraphs});
+  } else sections.push({title:'Texto del perfil · esta revisión',level:1,paragraphs:profile.text.split(/\n\s*\n/).filter(Boolean)});
+ }
  if (profile.limitations.some(Boolean)) sections.push({title:'Limitaciones y cautelas',level:1,paragraphs:profile.limitations.filter(Boolean)});
  if (profile.areas.length) sections.push({title:'Áreas propuestas para la deliberación',level:1,paragraphs:profile.areas.flatMap(a=>[a.title,...(a.rationale?[a.rationale]:[])])});
  return {title:profile.title,subtitle:`Perfil de Salud Local · ${municipalityName}`,portada:[

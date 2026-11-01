@@ -1,5 +1,7 @@
 import { externalProfileDocument } from '../../application/health-profile/externalProfileDocument';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { parseProfileStructure, prefillFromStructure } from '../../application/health-profile/profileStructure';
+import { ProfileReader } from './ProfileReader';
 import type { ExternalHealthProfile, ExternalProfileLibrary, ProfileAttachment, ProfileResult } from '../../domain/health-profile/ExternalHealthProfile';
 import type { LocalHealthProfileArtifact } from '../../domain/health-profile-artifact';
 import { appendExternalProfile, importProfileFile, profileAttachmentBlob } from '../../application/health-profile/externalProfiles';
@@ -56,6 +58,14 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
   })();return()=>{active=false;urls.forEach(url=>URL.revokeObjectURL(url));};
  },[selected,library.attachments]);
  const files=library.attachments.filter(f=>selected?.attachmentIds.includes(f.id));
+ const selectedText=selected?.text;
+ const structure=useMemo(()=>selectedText ? parseProfileStructure(selectedText) : undefined,[selectedText]);
+ const [readerAnchor,setReaderAnchor]=useState<string>();
+ useEffect(()=>{
+  if(tab!=='document'||!readerAnchor)return;
+  const timer=window.setTimeout(()=>{document.getElementById(readerAnchor)?.scrollIntoView({behavior:'smooth',block:'start'});setReaderAnchor(undefined);},60);
+  return()=>window.clearTimeout(timer);
+ },[tab,readerAnchor]);
  const pdf=files.find(f=>f.mimeType==='application/pdf');
  async function loadFiles(list: FileList | null) {
   if(!list?.length)return;
@@ -63,10 +73,15 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
   setBusy(true);setError('');setMessage('Leyendo el perfil y comprobando sus archivos…');
   try{
    const imported=[];for(const file of Array.from(list))imported.push(await importProfileFile(file,municipalityId));
-   const content=imported.find(x=>x.attachment.mimeType==='application/json')?.content ?? imported.find(x=>x.content.text)?.content ?? imported[0].content;
+   const packaged=imported.find(x=>x.attachment.mimeType==='application/json')?.content;
+   const documentText=imported.find(x=>x.attachment.mimeType!=='application/json'&&x.content.text)?.content.text ?? '';
+   const base=packaged ? {...packaged,text:packaged.text||documentText} : imported.find(x=>x.content.text)?.content ?? imported[0].content;
+   // Lo que el documento deja vacío se completa con su estructura reconocida (conclusiones, recomendaciones, resumen).
+   const {content,recognized}=prefillFromStructure(base);
    const attachments=imported.map(x=>x.attachment);
    setNewFiles(attachments);setResultDraft(undefined);setDraft({...emptyProfile(municipalityId),...content,attachmentIds:attachments.map(a=>a.id)});
-   setMessage(imported.map(x=>x.notice).filter(Boolean).join(' ') || 'Archivo leído. Revisa los datos y guarda el perfil en Firebase.');
+   const found=[recognized.summary?'el resumen':'',recognized.conclusions?`${recognized.conclusions} conclusiones`:'',recognized.recommendations?`${recognized.recommendations} recomendaciones`:''].filter(Boolean);
+   setMessage([...imported.map(x=>x.notice).filter(Boolean), found.length?`Se han reconocido en el documento ${found.join(', ')}. Revísalos antes de guardar.`:'Archivo leído. Revisa los datos y guarda el perfil en Firebase.'].join(' '));
   }catch(e){setError(e instanceof Error?e.message:'No se pudo leer el perfil.');setMessage('');}
   finally{setBusy(false);if(fileInput.current)fileInput.current.value='';}
  }
@@ -149,7 +164,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
    <button className="ep-primary" type="button" disabled={busy} onClick={()=>fileInput.current?.click()}>Seleccionar el perfil</button>
    <p className="ep-help">Hasta 20 MB por archivo. Originales, texto, resultados y versiones se guardan en Firebase. El navegador es una caché.</p></div>
   </div> : <>
-   <div className="ep-layout"><aside className="ep-document-card"><p className="ep-eyebrow">DOCUMENTO DE REFERENCIA</p>
+   <div className={`ep-layout${tab==='document'?' ep-layout--reading':''}`}><aside className="ep-document-card"><p className="ep-eyebrow">DOCUMENTO DE REFERENCIA</p>
     <div className="ep-cover"><span>COMPÁS</span><div><small>{municipalityName}</small><h2>{selected.title}</h2><p>{selected.period||'Periodo no declarado'}</p></div><small>PERFIL DE SALUD LOCAL</small></div>
     <p className="ep-status">{selected.id===library.activeId?'Versión vigente':'Versión anterior'} · {selected.status==='validated'?'Validada técnicamente':'En revisión'}</p>
     <dl className="ep-metadata"><div><dt>Autoría</dt><dd>{selected.author||'No declarada'}</dd></div><div><dt>Incorporación</dt><dd>{date(selected.createdAt)}</dd></div>{selected.validatedBy&&<div><dt>Validación</dt><dd>{selected.validatedBy} · {date(selected.validatedAt!)}</dd></div>}</dl>
@@ -158,12 +173,13 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
      <button type="button" onClick={()=>download(new Blob([JSON.stringify({schema:'compas-profile-package/v1',municipalityId,title:selected.title,period:selected.period,author:selected.author,summary:selected.summary,text:selected.text,results:selected.results,findings:selected.findings,limitations:selected.limitations,areas:selected.areas},null,2)],{type:'application/json'}),`${selected.title}-resultados.json`)}>↓ Descargar paquete de resultados</button>
     </div><button className="ep-primary" disabled={busy} onClick={edit}>Editar una nueva revisión</button>
     <p className="ep-help">Los originales no se modifican. Cada edición conserva la versión anterior.</p>
-   </aside><div className="ep-main"><nav className="ep-tabs" aria-label="Vistas del perfil">{([['results','Resultados'],['document','Documento'],['versions','Versiones']] as const).map(([key,label])=><button key={key} aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>
-    {tab==='results'&&<ProfileResultsDashboard profile={selected} municipalityName={municipalityName} onAddResults={edit}/>}
+   </aside><div className="ep-main"><nav className="ep-tabs" aria-label="Vistas del perfil">{([['results','Panel'],['document','Leer el perfil'],['versions','Versiones']] as const).map(([key,label])=><button key={key} aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>
+    {tab==='results'&&<ProfileResultsDashboard profile={selected} municipalityName={municipalityName} onAddResults={edit} structure={structure} onOpenReader={anchor=>{setReaderAnchor(anchor);setTab('document');}}/>}
     {tab==='document'&&<section className="ep-document-view"><h2>{selected.title}</h2>
-     {pdf&&fileUrls[pdf.id]&&<><p><a href={fileUrls[pdf.id]} target="_blank" rel="noopener noreferrer">Abrir PDF original en otra pestaña</a> · Si el visor no carga, utiliza la descarga del original.</p><iframe title="PDF original del Perfil de Salud Local" src={fileUrls[pdf.id]}/></>}
      {selected.revisionOf&&<p className="ep-help">El texto puede contener cambios de esta revisión. Los archivos adjuntos siguen siendo los originales aportados.</p>}
-     {selected.text?<div className="ep-document-text">{selected.text.split(/\n\s*\n/).filter(Boolean).map((p,i)=><p key={i}>{p}</p>)}</div>:<p>No hay texto extraíble. Consulta el archivo original o incorpora una transcripción.</p>}
+     {structure ? <ProfileReader structure={structure} title={selected.title} pdfUrl={pdf ? fileUrls[pdf.id] : undefined}/>
+      : pdf&&fileUrls[pdf.id] ? <><p><a href={fileUrls[pdf.id]} target="_blank" rel="noopener noreferrer">Abrir PDF original en otra pestaña</a></p><iframe title="PDF original del Perfil de Salud Local" src={fileUrls[pdf.id]}/></>
+      : <p>No hay texto extraíble. Consulta el archivo original o incorpora una transcripción.</p>}
     </section>}
     {tab==='versions'&&<section className="ep-versions"><p className="ep-eyebrow">HISTORIAL CONSERVADO EN FIREBASE</p><h2>Versiones del perfil</h2>{[...library.profiles].reverse().map(p=><article key={p.id}><div><h3>{p.title}</h3><p>{date(p.createdAt)} · {p.author||'Autoría no declarada'} · {p.status==='validated'?'Validada':'En revisión'}{p.id===library.activeId?' · Vigente':''}</p></div><div className="ep-actions"><button onClick={()=>{setSelectedId(p.id);setTab('document');}}>Consultar versión</button>{p.id!==library.activeId&&<button disabled={busy} onClick={()=>void commit({...library,activeId:p.id},'Versión vigente actualizada en Firebase.')}>Establecer como vigente</button>}</div></article>)}</section>}
    </div></div>

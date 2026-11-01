@@ -56,3 +56,53 @@
 .epd-howto h3{font-size:15px}.epd-howto ul{margin:0;padding-left:20px;font-size:14px;color:#334155}.epd-howto li{margin:4px 0}
 @media (max-width:900px){.epd-findings ol,.epd-topics{grid-template-columns:1fr}}
 @media (max-width:600px){.epd-kpis{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:14px}.epd-reading{padding:20px}.epd-reading p{font-size:15.5px}}
+
+/* ── Panel: cifras del resumen, métricas del documento y conclusiones enlazadas ── */
+.epd-hero__note{margin:10px 0 0!important;font-size:12.5px;color:var(--ep-muted)}
+.epd-metrics{margin:12px 0 0!important;padding-top:12px;border-top:1px solid var(--ep-line);font-size:13.5px;font-weight:600;color:var(--ep-ink)}
+.external-profile .epd-findings__open{all:unset;display:flex;gap:14px;align-items:flex-start;cursor:pointer;width:100%}
+.external-profile .epd-findings__open:hover span:last-child{color:var(--ep-blue);text-decoration:underline}
+.external-profile .epd-findings__open:focus-visible{outline:3px solid #00acd9;outline-offset:3px}
+.epd-reading__more{margin-top:6px}
+
+/* ── Lector del perfil ── */
+.epr{display:grid;gap:14px}
+.epr-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.epr-modes{display:inline-flex;gap:6px}
+.external-profile .epr-modes button{min-height:36px;padding:6px 14px;border:1px solid var(--ep-line);border-radius:999px;background:#fff;color:var(--ep-ink)}
+.external-profile .epr-modes button[aria-pressed="true"]{background:var(--ep-blue);border-color:var(--ep-blue);color:#fff}
+.epr-search input{min-width:min(280px,100%);padding:8px 12px;border:1px solid var(--ep-line);border-radius:6px;font:inherit;font-size:14px}
+.epr-layout{display:grid;grid-template-columns:250px minmax(0,1fr);gap:28px;align-items:start}
+.epr-toc{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto;padding:16px 18px;background:#fff;border:1px solid var(--ep-line)}
+.epr-toc ol{list-style:none;margin:6px 0 16px;padding:0;display:grid;gap:2px}
+.epr-toc a{display:block;padding:4px 0;font-size:13.5px;color:var(--ep-ink);text-decoration:none;line-height:1.35}
+.epr-toc a:hover{color:var(--ep-blue)}
+.epr-toc__sub a{padding-left:12px;font-size:12.5px;color:var(--ep-muted)}
+.epr-toc__chips{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 14px!important}
+.epr-toc__chips a{display:inline-block;padding:2px 8px;border-radius:12px;background:#eef6fc;color:var(--ep-blue);font-size:12px;font-weight:700}
+.epr-text{background:#fff;border:1px solid var(--ep-line);padding:34px clamp(20px,4vw,56px);font-size:16.5px;line-height:1.75;color:#243244}
+.epr-text p{max-width:72ch}
+.epr-section{scroll-margin-top:16px}
+.epr-section--1{margin-top:28px}.epr-section--1:first-child{margin-top:0}
+.epr-section h2{font-size:24px;margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--ep-line)}
+.epr-section h3{font-size:19px;margin:24px 0 10px}
+.epr-cite{font-size:.78em;color:var(--ep-blue);white-space:nowrap}
+.epr-badge{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:24px;margin-right:10px;padding:0 7px;border-radius:12px;background:#eef6fc;color:var(--ep-blue);font-size:12.5px;font-weight:700;vertical-align:2px}
+.epr-conclusions{list-style:none;margin:18px 0;padding:0;display:grid;gap:16px}
+.epr-conclusions li{padding:18px 22px;border:1px solid var(--ep-line);border-left:4px solid var(--ep-blue);background:#fbfdff;scroll-margin-top:16px}
+.epr-conclusions h4{margin:0 0 10px;font-size:17px;line-height:1.4;color:var(--ep-ink)}
+.epr-conclusions p{margin:0 0 10px}
+.epr-leads{font-size:13px;color:var(--ep-muted);margin:4px 0 0!important}
+.epr-reco-group{margin:16px 0;padding:16px 20px;border:1px solid var(--ep-line);border-top:4px solid var(--ep-blue);background:#fff}
+.epr-reco-group--contrastar{border-top-color:#ffb61b}.epr-reco-group--abordar{border-top-color:#94d40b}.epr-reco-group--otras{border-top-color:#64748b}
+.epr-reco-group h4{margin:0 0 10px;font-size:16px}
+.epr-reco-group ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.epr-reco-group li{display:flex;align-items:flex-start;font-size:15px;line-height:1.55;scroll-margin-top:16px}
+.epr-reco-group small{color:var(--ep-muted);font-size:12.5px}
+.epr-references{padding-left:22px;font-size:14px;line-height:1.55}
+.epr-references li{margin:6px 0;overflow-wrap:anywhere}
+.epr-pdf iframe{width:100%;height:78vh;border:1px solid var(--ep-line);background:#fff}
+@media (max-width:900px){.epr-layout{grid-template-columns:1fr}.epr-toc{position:static;max-height:none}}
+/* Modo lectura: el lector ocupa todo el ancho y la ficha del documento pasa debajo. */
+.ep-layout--reading{grid-template-columns:minmax(0,1fr)}
+.ep-layout--reading .ep-document-card{order:2}
