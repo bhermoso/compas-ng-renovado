@@ -50,6 +50,29 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
   expect(restored.externalProfileLibrary).toEqual(w.externalProfileLibrary);
   expect(await (await profileAttachmentBlob(restored.externalProfileLibrary!.attachments[0])).text()).toBe('Original íntegro');
  });
+ it('conserva vínculos documentales al exportar, guardar y recuperar una revisión sin activarla',()=>{
+  const original=externalProfileFixture();
+  const withLinks={...original,id:'profile-test-linked',revisionOf:original.id,results:original.results.map((r,i)=>i===0?{...r,supportsConclusions:['C1']}:r)};
+  const library=appendExternalProfile({profiles:[original],attachments:[],activeId:original.id},withLinks,[],original.municipalityId);
+  expect(library.activeId).toBe(original.id);
+  expect(library.profiles).toHaveLength(2);
+  expect(library.profiles[0].results[0].supportsConclusions).toBeUndefined();
+  expect(library.profiles[1].results[0].supportsConclusions).toEqual(['C1']);
+  const packageText=JSON.stringify({schema:'compas-profile-package/v1',municipalityId:original.municipalityId,
+    title:withLinks.title,period:withLinks.period,author:withLinks.author,summary:withLinks.summary,
+    text:withLinks.text,results:withLinks.results,findings:withLinks.findings,
+    limitations:withLinks.limitations,areas:withLinks.areas});
+  expect(readExternalProfilePackage(packageText,original.municipalityId).results[0].supportsConclusions).toEqual(['C1']);
+  expect(isExternalProfileLibrary(library,original.municipalityId)).toBe(true);
+ });
+ it('rechaza vínculos mal formados, duplicados o ajenos al contrato',()=>{
+  const p=externalProfileFixture();
+  for(const ids of [['C0'],['R1'],['C1','C1']]){
+   const broken={...p,results:p.results.map((r,i)=>i===0?{...r,supportsConclusions:ids}:r)};
+   expect(isExternalProfileLibrary({profiles:[broken],attachments:[],activeId:broken.id},p.municipalityId)).toBe(false);
+   expect(()=>readExternalProfilePackage(JSON.stringify({...broken,schema:'compas-profile-package/v1'}),p.municipalityId)).toThrow();
+  }
+ });
  it('no admite referencias rotas, bytes incompletos ni validaciones sin autoría',()=>{
   const p=externalProfileFixture();
   expect(isExternalProfileLibrary({profiles:[{...p,attachmentIds:['lost']}],attachments:[],activeId:p.id},p.municipalityId)).toBe(false);
