@@ -181,8 +181,8 @@ export function ProfileResultsDashboard({ profile, municipalityName, onAddResult
           </div>
           <div className="epd-trace__list">{structure.conclusions.map(c=>{
             const direct = structure.recommendations.filter(r=>
-              (r.derivesFrom?.match(/C\\d+/g)??[]).includes(c.id) ||
-              (c.leadsTo?.match(/R\\d+/g)??[]).includes(r.id));
+              (r.derivesFrom?.match(/C\d+/g) ?? ([] as string[])).includes(c.id) ||
+              (c.leadsTo?.match(/R\d+/g) ?? ([] as string[])).includes(r.id));
             const linkedResults = profile.results.filter(r=>r.supportsConclusions?.includes(c.id));
             return <article className="epd-trace__item" key={c.id}>
               <h3>{c.id} · {c.title}</h3>
