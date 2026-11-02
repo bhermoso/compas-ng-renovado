@@ -23,6 +23,11 @@ export interface ProfileResult {
  chartValue?: number;
  /** Optional, explicitly supplied comparison. No score or quality thresholds. */
  comparison?: { label: string; value: number };
+ /**
+  * Varios ámbitos de comparación explícitos (Distrito, provincia, Andalucía…),
+  * cuando la fuente los publica. Si existe, prevalece sobre `comparison`.
+  */
+ comparisons?: Array<{ label: string; value: number }>;
 }
 export interface ExternalHealthProfile {
  schema: 'compas-external-profile/v1';

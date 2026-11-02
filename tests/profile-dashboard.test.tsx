@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
-import { groupRecommendations, groupResultsByTopic, headlineResults, splitDataPageResults } from "../src/application/health-profile/profileDashboard";
+import { comparatorsOf, geographicComparators, groupRecommendations, groupResultsByTopic, headlineResults, sectionMetrics, splitDataPageResults } from "../src/application/health-profile/profileDashboard";
+import { isProfileResult } from "../src/application/health-profile/externalProfiles";
 import { parseProfileStructure } from "../src/application/health-profile/profileStructure";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -66,36 +67,55 @@ describe("ProfileResultsDashboard", () => {
 });
 describe("ProfileResultsDashboard · páginas de datos (Art. 17 ter)", () => {
   const text = readFileSync(resolve(__dirname, "fixtures/profile-text/loja-v0.3-package.txt"), "utf8");
+  const geo = (g: number, a: number) => ({ comparison: { label: "Provincia de Granada", value: g }, comparisons: [{ label: "Provincia de Granada", value: g }, { label: "Andalucía", value: a }] });
   const lojaResults: ProfileResult[] = [
-    r({ id: "h", title: "Habitantes", value: "20.923", topic: "Quién vive aquí", chartValue: 20923 }),
-    r({ id: "s", title: "Renta en la sección 03002", value: "7.107", unit: "€", topic: "Desigualdad", chartValue: 7107, comparison: { label: "Loja", value: 11741 }, scale: "Sección censal 03002" }),
-    r({ id: "d", title: "Dislipemia", value: "3.081,79", unit: "por 10.000", topic: "Morbilidad", chartValue: 3081.79, comparison: { label: "Provincia de Granada", value: 2718.19 } }),
-    r({ id: "m", title: "Participación en el cribado de mama", value: "73,47", unit: "%", topic: "Protección de la salud", chartValue: 73.47, comparison: { label: "Provincia de Granada", value: 84.3 } }),
+    r({ id: "h", title: "Habitantes", value: "20.923", topic: "Quién vive aquí", chartValue: 20923, comparison: { label: "Loja, 2010 [2]", value: 21688 } }),
+    r({ id: "s1", title: "Renta neta por persona", value: "7.107", unit: "€", topic: "Desigualdad", chartValue: 7107, scale: "Sección censal 03002 (Alfaguara)", comparisons: [{ label: "Loja", value: 11741 }, { label: "Provincia de Granada", value: 13509 }] }),
+    r({ id: "s2", title: "Renta neta por persona", value: "13.774", unit: "€", topic: "Desigualdad", chartValue: 13774, scale: "Sección censal 05002", comparisons: [{ label: "Loja", value: 11741 }, { label: "Provincia de Granada", value: 13509 }] }),
+    r({ id: "d", title: "Dislipemia", value: "3.081,79", unit: "por 10.000", topic: "Morbilidad", chartValue: 3081.79, ...geo(2718.19, 2569.94) }),
+    r({ id: "m", title: "Participación en el cribado de mama", value: "73,47", unit: "%", topic: "Protección de la salud", chartValue: 73.47, ...geo(84.3, 70.93) }),
   ];
   const loja: ExternalHealthProfile = { ...profile, municipalityId: "loja", results: lojaResults, text, summary: "", findings: [], areas: [] };
   const structure = parseProfileStructure(text);
-  const html = renderToStaticMarkup(<ProfileResultsDashboard profile={loja} municipalityName="Loja" structure={structure} />);
-  it("reparte los resultados por página según su tema", () => {
+  const html = renderToStaticMarkup(<ProfileResultsDashboard profile={loja} municipalityName="Loja" structure={structure} pdfUrl="blob:perfil" pdfName="Perfil.pdf" />);
+  it("reparte los resultados por página y reconoce los ámbitos de comparación", () => {
     const split = splitDataPageResults(lojaResults);
     expect(split.whoLivesHere.map((x) => x.id)).toEqual(["h"]);
-    expect(split.inequality.map((x) => x.id)).toEqual(["s"]);
+    expect(split.inequality.map((x) => x.id)).toEqual(["s1", "s2"]);
     expect(split.healthPanel.map((x) => x.id)).toEqual(["d", "m"]);
+    expect(geographicComparators(lojaResults, "Loja")).toEqual(["Provincia de Granada", "Andalucía"]);
+    expect(comparatorsOf(lojaResults[0])).toEqual([{ label: "Loja, 2010 [2]", value: 21688 }]);
+    const metrics = sectionMetrics(split.inequality);
+    expect(metrics).toHaveLength(1);
+    expect(metrics[0].rows.map((x) => x.section)).toEqual(["03002 (Alfaguara)", "05002"]);
+    expect(metrics[0].references.map((x) => x.label)).toEqual(["Loja", "Provincia de Granada"]);
   });
   it("abre con las cuatro páginas en orden y después la lectura de conjunto", () => {
-    const order = ["Loja en datos · 1 de 4", "<h2>Quién vive aquí</h2>", "<h2>Panel de salud</h2>", "<h2>Desigualdad</h2>", "Qué concluye el perfil", "Lo que concluye el perfil"].map((t) => html.indexOf(t));
+    const order = ["Perfil de Salud Local</p>", "<h2>Quién vive aquí</h2>", "<h2>Panel de salud</h2>", "<h2>Desigualdad</h2>", "Qué concluye el perfil", "Lo que concluye el perfil"].map((t) => html.indexOf(t));
     expect(order.every((i) => i >= 0)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
   });
-  it("muestra los bloques de la portada y los indicadores con su referencia, sin juicio de color", () => {
+  it("compara con varios ámbitos en columnas, sin juicio de color", () => {
     expect(html).toContain("Desigualdades");
-    expect(html).toContain("Provincia de Granada: 2.718,19 por 10.000");
-    expect(html).toContain("Sección censal 03002");
-    expect(html).not.toMatch(/epd-(better|worse|similar)/);
+    expect(html).toMatch(/<th scope="col" class="pdp-num">Provincia de Granada<\/th><th scope="col" class="pdp-num">Andalucía<\/th>/);
+    expect(html).toContain("2.718,19");
+    expect(html).toContain("2.569,94");
+    expect(html).toContain("Loja, 2010 [2]: 21.688");
+    expect(html).not.toMatch(/(better|worse|similar|mejor-que|peor-que)/);
     expect(html).not.toContain("Resultados del perfil");
+  });
+  it("explora las secciones censales y ofrece las dos descargas", () => {
+    expect(html).toContain("03002 (Alfaguara)");
+    expect(html).toContain("Descargar estas páginas · PDF");
+    expect(html).toContain('href="blob:perfil" download="Perfil.pdf"');
+  });
+  it("acepta en el paquete varios comparadores y rechaza los mal formados", () => {
+    expect(isProfileResult(lojaResults[3])).toBe(true);
+    expect(isProfileResult({ ...lojaResults[3], comparisons: [{ label: "Andalucía", value: "1" }] })).toBe(false);
   });
   it("conserva la vista anterior para perfiles sin páginas de datos", () => {
     const plain = renderToStaticMarkup(<ProfileResultsDashboard profile={profile} municipalityName="Zagra" />);
     expect(plain).toContain("Resultados del perfil");
-    expect(plain).not.toContain("en datos · 1 de 4");
+    expect(plain).not.toContain("pdp-page");
   });
 });

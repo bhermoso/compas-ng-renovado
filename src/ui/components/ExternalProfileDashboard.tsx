@@ -164,7 +164,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
    <button className="ep-primary" type="button" disabled={busy} onClick={()=>fileInput.current?.click()}>Seleccionar el perfil</button>
    <p className="ep-help">Hasta 20 MB por archivo. Originales, texto, resultados y versiones se guardan en Firebase. El navegador es una caché.</p></div>
   </div> : <>
-   <div className={`ep-layout${tab==='document'?' ep-layout--reading':''}`}><aside className="ep-document-card"><p className="ep-eyebrow">DOCUMENTO DE REFERENCIA</p>
+   <div className={`ep-layout${tab==='document'||(tab==='results'&&structure?.dataPages)?' ep-layout--reading':''}`}><aside className="ep-document-card"><p className="ep-eyebrow">DOCUMENTO DE REFERENCIA</p>
     <div className="ep-cover"><span>COMPÁS</span><div><small>{municipalityName}</small><h2>{selected.title}</h2><p>{selected.period||'Periodo no declarado'}</p></div><small>PERFIL DE SALUD LOCAL</small></div>
     <p className="ep-status">{selected.id===library.activeId?'Versión vigente':'Versión anterior'} · {selected.status==='validated'?'Validada técnicamente':'En revisión'}</p>
     <dl className="ep-metadata"><div><dt>Autoría</dt><dd>{selected.author||'No declarada'}</dd></div><div><dt>Incorporación</dt><dd>{date(selected.createdAt)}</dd></div>{selected.validatedBy&&<div><dt>Validación</dt><dd>{selected.validatedBy} · {date(selected.validatedAt!)}</dd></div>}</dl>
@@ -174,7 +174,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
     </div><button className="ep-primary" disabled={busy} onClick={edit}>Editar una nueva revisión</button>
     <p className="ep-help">Los originales no se modifican. Cada edición conserva la versión anterior.</p>
    </aside><div className="ep-main"><nav className="ep-tabs" aria-label="Vistas del perfil">{([['results','Panel'],['document','Leer el perfil'],['versions','Versiones']] as const).map(([key,label])=><button key={key} aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>
-    {tab==='results'&&<ProfileResultsDashboard profile={selected} municipalityName={municipalityName} onAddResults={edit} structure={structure} onOpenReader={anchor=>{setReaderAnchor(anchor);setTab('document');}}/>}
+    {tab==='results'&&<ProfileResultsDashboard profile={selected} municipalityName={municipalityName} onAddResults={edit} structure={structure} pdfUrl={pdf ? fileUrls[pdf.id] : undefined} pdfName={pdf?.name} onOpenReader={anchor=>{setReaderAnchor(anchor);setTab('document');}}/>}
     {tab==='document'&&<section className="ep-document-view"><h2>{selected.title}</h2>
      {selected.revisionOf&&<p className="ep-help">El texto puede contener cambios de esta revisión. Los archivos adjuntos siguen siendo los originales aportados.</p>}
      {structure ? <ProfileReader structure={structure} title={selected.title} pdfUrl={pdf ? fileUrls[pdf.id] : undefined}/>

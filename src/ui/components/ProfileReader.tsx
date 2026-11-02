@@ -72,8 +72,11 @@ export function ProfileReader({ structure, pdfUrl, title }: { structure: Profile
   const firstChapterIndex = sections.findIndex((section) =>
     /^(?:\d+[.\s]+)?Punto de partida\b/i.test(section.title.trim())
   );
-  const preliminaries = firstChapterIndex > 0 ? sections.slice(0, firstChapterIndex) : [];
-  const readingSections = firstChapterIndex > 0 ? sections.slice(firstChapterIndex) : sections;
+  // Las páginas de datos (Art. 17 ter) son parte del Perfil y abren la lectura; no van con los preliminares.
+  const isDataPage = (s: ProfileSection) => /^(.+ en datos|Quién vive aquí|Panel de salud|Desigualdad)$/i.test(s.title.trim());
+  const before = firstChapterIndex > 0 ? sections.slice(0, firstChapterIndex) : [];
+  const preliminaries = before.filter((s) => !isDataPage(s));
+  const readingSections = firstChapterIndex > 0 ? [...before.filter(isDataPage), ...sections.slice(firstChapterIndex)] : sections;
   const normalizedQuery = query.trim().toLowerCase();
   const matches = normalizedQuery
     ? sections.filter((s) => s.title.toLowerCase().includes(normalizedQuery) || s.paragraphs.some((p) => p.toLowerCase().includes(normalizedQuery)))

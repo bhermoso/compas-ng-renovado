@@ -77,7 +77,7 @@ describe("parseProfileStructure · páginas de datos del Perfil de Loja (Art. 17
   const s = parseProfileStructure(fixture("loja-v0.3-package.txt"));
   it("reconoce las páginas de datos como apartados del índice", () => {
     const titles = s.sections.map((x) => x.title);
-    expect(titles.slice(0, 3)).toEqual(["Loja en datos", "Quién vive aquí", "Desigualdad"]);
+    expect(titles.slice(0, 4)).toEqual(["Loja en datos", "Quién vive aquí", "Panel de salud", "Desigualdad"]);
     expect(titles).not.toContain("Inicio");
   });
   it("lee los bloques de la portada y de la página de desigualdad", () => {

@@ -96,6 +96,51 @@ export function splitDataPageResults(results: ProfileResult[]): DataPageResults 
   return out;
 }
 
+export type Comparator = { label: string; value: number };
+
+/** Ámbitos de comparación de un resultado: la lista explícita o, en su defecto, la comparación única. */
+export function comparatorsOf(result: ProfileResult): Comparator[] {
+  if (result.comparisons?.length) return result.comparisons;
+  return result.comparison ? [result.comparison] : [];
+}
+
+const GEO_ORDER = [/distrito/i, /provincia|granada/i, /andaluc/i, /espa[ñn]a/i];
+
+/**
+ * Ámbitos geográficos que aparecen como comparadores, en orden Distrito,
+ * provincia, Andalucía y España. Los que empiezan por el nombre del municipio
+ * («Loja, 2010») son el propio municipio en otro momento, no un ámbito.
+ */
+export function geographicComparators(results: ProfileResult[], municipalityName: string): string[] {
+  const own = norm(municipalityName);
+  const labels: string[] = [];
+  for (const r of results) for (const c of comparatorsOf(r)) {
+    if (norm(c.label).startsWith(own) || labels.includes(c.label)) continue;
+    labels.push(c.label);
+  }
+  const rank = (l: string) => { const i = GEO_ORDER.findIndex((re) => re.test(l)); return i < 0 ? GEO_ORDER.length : i; };
+  return labels.map((l, i) => ({ l, i })).sort((a, b) => rank(a.l) - rank(b.l) || a.i - b.i).map((x) => x.l);
+}
+
+export interface SectionMetric {
+  title: string;
+  unit: string;
+  rows: Array<{ section: string; value: number; display: string }>;
+  references: Comparator[];
+}
+
+/** Indicadores por sección censal (ámbito «Sección censal …»), agrupados por indicador en el orden del perfil. */
+export function sectionMetrics(results: ProfileResult[]): SectionMetric[] {
+  const out: SectionMetric[] = [];
+  for (const r of results) {
+    if (!/^secci[oó]n/i.test(r.scale ?? "") || r.chartValue === undefined) continue;
+    let metric = out.find((m) => m.title === r.title);
+    if (!metric) { metric = { title: r.title, unit: r.unit, rows: [], references: comparatorsOf(r) }; out.push(metric); }
+    metric.rows.push({ section: (r.scale ?? "").replace(/^secci[oó]n( censal)?\s*/i, "").trim(), value: r.chartValue, display: r.value });
+  }
+  return out;
+}
+
 /** Formato literal del perfil para valores de comparación (coma decimal, punto de millar). */
 export function formatComparisonValue(value: number): string {
   // Punto de millar también en cifras de cuatro dígitos (2.718,19), como en los perfiles.

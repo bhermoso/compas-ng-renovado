@@ -1,4 +1,3 @@
-import { LojaPublicHealthProfile } from "./ui/components/LojaPublicHealthProfile";
 import { ExternalProfileDashboard } from "./ui/components/ExternalProfileDashboard";
 import { EMPTY_PROFILE_LIBRARY, isExternalProfileLibrary } from "./application/health-profile/externalProfiles";
 import type { ExternalProfileLibrary } from "./domain/health-profile/ExternalHealthProfile";
@@ -4103,10 +4102,9 @@ export default function App() {
           </>
         )}
 
-        {/* Perfil externo canónico y atlas de desigualdades como material complementario, sin validar automáticamente. */}
+        {/* Perfil de Salud Local: páginas de datos, lectura y versiones del Perfil guardado en Firebase. */}
         {view === "psl" && (
           <>
-            {workspace.municipality.identity.id.toLowerCase() === "loja" && <LojaPublicHealthProfile />}
             <ExternalProfileDashboard
               key={workspace.municipality.identity.id}
               municipalityId={workspace.municipality.identity.id}
