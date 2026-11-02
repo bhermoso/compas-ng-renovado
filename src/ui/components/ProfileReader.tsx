@@ -67,10 +67,17 @@ export function ProfileReader({ structure, pdfUrl, title }: { structure: Profile
   const [mode, setMode] = useState<"text" | "pdf">("text");
   const [query, setQuery] = useState("");
   const sections = useMemo(() => structure.sections.filter((s) => s.id !== "inicio" || s.paragraphs.length), [structure]);
+  // El material de portada, créditos, resumen e índice se conserva, pero
+  // no desplaza el primer capítulo sustantivo en la lectura normal.
+  const firstChapterIndex = sections.findIndex((section) =>
+    /^(?:\d+[.\s]+)?Punto de partida\b/i.test(section.title.trim())
+  );
+  const preliminaries = firstChapterIndex > 0 ? sections.slice(0, firstChapterIndex) : [];
+  const readingSections = firstChapterIndex > 0 ? sections.slice(firstChapterIndex) : sections;
   const normalizedQuery = query.trim().toLowerCase();
   const matches = normalizedQuery
     ? sections.filter((s) => s.title.toLowerCase().includes(normalizedQuery) || s.paragraphs.some((p) => p.toLowerCase().includes(normalizedQuery)))
-    : sections;
+    : readingSections;
 
   return (
     <section className="epr" aria-label={`Lector: ${title}`}>
@@ -96,12 +103,15 @@ export function ProfileReader({ structure, pdfUrl, title }: { structure: Profile
           <nav className="epr-toc" aria-label="Índice del perfil">
             <p className="ep-eyebrow">Índice</p>
             <ol>
-              {sections.map((s) => (
+              {readingSections.map((s) => (
                 <li key={s.id} className={s.level === 2 ? "epr-toc__sub" : undefined}>
                   <a href={`#epr-sec-${s.id}`}>{s.title === "Inicio" ? "Presentación" : s.title}</a>
                 </li>
               ))}
             </ol>
+            {preliminaries.length > 0 && (
+              <p className="epr-toc__preliminary"><a href="#epr-preliminaries">Presentación y materiales preliminares</a></p>
+            )}
             {structure.conclusions.length > 0 && (
               <>
                 <p className="ep-eyebrow">Conclusiones</p>
@@ -116,6 +126,18 @@ export function ProfileReader({ structure, pdfUrl, title }: { structure: Profile
             )}
           </nav>
           <article className="epr-text">
+            {preliminaries.length > 0 && (
+              <details className="epr-preliminaries" id="epr-preliminaries" open={!!normalizedQuery}>
+                <summary>Presentación, resumen, créditos e índice del documento original</summary>
+                <p className="ep-help">Información documental conservada íntegramente. Se muestra aparte para facilitar el acceso directo al contenido del Perfil.</p>
+                {preliminaries.map((section) => (
+                  <section key={section.id} id={`epr-sec-${section.id}`} className="epr-section epr-section--preliminary">
+                    {section.title !== "Inicio" && <h3>{section.title}</h3>}
+                    <SectionBody section={section} structure={structure} />
+                  </section>
+                ))}
+              </details>
+            )}
             {normalizedQuery && <p className="ep-help">{matches.length === 1 ? "1 apartado contiene" : `${matches.length} apartados contienen`} «{query.trim()}».</p>}
             {matches.map((s) => {
               const Heading = s.level === 1 ? "h2" : "h3";

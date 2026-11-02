@@ -1,3 +1,4 @@
+import { LojaPublicHealthProfile } from "./ui/components/LojaPublicHealthProfile";
 import { ExternalProfileDashboard } from "./ui/components/ExternalProfileDashboard";
 import { EMPTY_PROFILE_LIBRARY, isExternalProfileLibrary } from "./application/health-profile/externalProfiles";
 import type { ExternalProfileLibrary } from "./domain/health-profile/ExternalHealthProfile";
@@ -4102,18 +4103,23 @@ export default function App() {
           </>
         )}
 
-        {/* Perfil elaborado externamente: documento, resultados y versiones. */}
-        {view === "psl" && <ExternalProfileDashboard
-          key={workspace.municipality.identity.id}
-          municipalityId={workspace.municipality.identity.id}
-          municipalityName={municipality.name}
-          library={workspace.externalProfileLibrary ?? EMPTY_PROFILE_LIBRARY}
-          authorName={remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || ""}
-          legacyProfiles={workspace.compiledProfiles}
-          legacyText={workspace.validatedPSL?.conclusiones.content}
-          onSave={handleSaveExternalProfiles}
-          onDirtyChange={onProfileDirtyChange}
-        />}
+        {/* Perfil externo canónico y atlas de desigualdades como material complementario, sin validar automáticamente. */}
+        {view === "psl" && (
+          <>
+            {workspace.municipality.identity.id.toLowerCase() === "loja" && <LojaPublicHealthProfile />}
+            <ExternalProfileDashboard
+              key={workspace.municipality.identity.id}
+              municipalityId={workspace.municipality.identity.id}
+              municipalityName={municipality.name}
+              library={workspace.externalProfileLibrary ?? EMPTY_PROFILE_LIBRARY}
+              authorName={remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || ""}
+              legacyProfiles={workspace.compiledProfiles}
+              legacyText={workspace.validatedPSL?.conclusiones.content}
+              onSave={handleSaveExternalProfiles}
+              onDirtyChange={onProfileDirtyChange}
+            />
+          </>
+        )}
 
         {/* ── ⑤ Priorizaciones — técnica y participativa ──────── */}
         {view === "priorizacion" && (
