@@ -101,7 +101,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
   }catch(e){setError(e instanceof Error?e.message:'No se ha podido guardar. Tu borrador permanece en pantalla.');setMessage('');}
   finally{setBusy(false);}
  }
- async function exportRevision(format:'docx') {
+ async function exportRevision() {
   if (!selected) return;
   setBusy(true);setError('');setMessage('Maquetando la revisión guardada…');
   try {
@@ -173,7 +173,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
     <div className="ep-cover"><span>COMPÁS</span><div><small>{municipalityName}</small><h2>{selected.title}</h2><p>{selected.period||'Periodo no declarado'}</p></div><small>PERFIL DE SALUD LOCAL</small></div>
     <p className="ep-status">{selected.id===library.activeId?'Versión vigente':'Versión anterior'} · {selected.status==='validated'?'Validada técnicamente':'En revisión'}</p>
     <dl className="ep-metadata"><div><dt>Autoría</dt><dd>{selected.author||'No declarada'}</dd></div><div><dt>Incorporación</dt><dd>{date(selected.createdAt)}</dd></div>{selected.validatedBy&&<div><dt>Validación</dt><dd>{selected.validatedBy} · {date(selected.validatedAt!)}</dd></div>}</dl>
-    <div className="ep-file-actions"><button type="button" disabled={busy} onClick={()=>void exportRevision('docx')}>↓ Descargar esta revisión · Word</button>{files.map(file=><a key={file.id} aria-disabled={!fileUrls[file.id]} href={fileUrls[file.id]} download={file.name}>↓ Descargar original · {file.name}</a>)}
+    <div className="ep-file-actions"><button type="button" disabled={busy} onClick={()=>void exportRevision()}>↓ Descargar esta revisión · Word</button>{files.map(file=><a key={file.id} aria-disabled={!fileUrls[file.id]} href={fileUrls[file.id]} download={file.name}>↓ Descargar original · {file.name}</a>)}
      {selected.text&&<button type="button" onClick={()=>download(new Blob([selected.text],{type:'text/plain;charset=utf-8'}),`${selected.title}.txt`)}>↓ Descargar texto de esta revisión</button>}
      <button type="button" onClick={()=>download(new Blob([JSON.stringify({schema:'compas-profile-package/v1',municipalityId,title:selected.title,period:selected.period,author:selected.author,summary:selected.summary,text:selected.text,results:selected.results,findings:selected.findings,limitations:selected.limitations,areas:selected.areas},null,2)],{type:'application/json'}),`${selected.title}-resultados.json`)}>↓ Descargar paquete de resultados</button>
     </div><button className="ep-primary" disabled={busy} onClick={edit}>Editar una nueva revisión</button>
