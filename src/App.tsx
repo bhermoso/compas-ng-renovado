@@ -4130,14 +4130,14 @@ export default function App() {
                   Las secciones no equivalen automáticamente a barrios.
                 </p>
                 <p>
-                  <a href="https://bhermoso.github.io/aula-activos-comunitarios/loja/perfil-piloto.html"
+                  <a href="https://bhermoso.github.io/aula-activos-comunitarios/laboratorio-perfiles/municipios/loja/perfil-editorial.html"
                      target="_blank" rel="noopener noreferrer">
                     Abrir el atlas de Loja en una pestaña independiente ↗
                   </a>
                 </p>
                 <iframe
                   title="Atlas interactivo de desigualdades territoriales de Loja (prototipo no validado)"
-                  src="https://bhermoso.github.io/aula-activos-comunitarios/loja/perfil-piloto.html"
+                  src="https://bhermoso.github.io/aula-activos-comunitarios/laboratorio-perfiles/municipios/loja/perfil-editorial.html"
                   loading="lazy"
                   style={{ width: "100%", minHeight: "760px", border: "1px solid #cadfd9", borderRadius: "12px", background: "#fff" }}
                 />
