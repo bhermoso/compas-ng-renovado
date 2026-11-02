@@ -173,6 +173,32 @@ export function ProfileResultsDashboard({ profile, municipalityName, onAddResult
       </>
       )}
 
+      {structure && structure.conclusions.length > 0 && (
+        <section className="epd-trace" aria-label="Trazabilidad entre indicadores, conclusiones y recomendaciones">
+          <div className="epd-trace__intro"><p className="ep-eyebrow">TRAZABILIDAD DOCUMENTAL</p>
+            <h2>De la evidencia a las propuestas</h2>
+            <p>Se muestran únicamente las relaciones explícitas del documento. Cuando no consta un vínculo, queda señalado como no documentado; no se deduce por palabras coincidentes.</p>
+          </div>
+          <div className="epd-trace__list">{structure.conclusions.map(c=>{
+            const direct = structure.recommendations.filter(r=>
+              (r.derivesFrom?.match(/C\\d+/g)??[]).includes(c.id) ||
+              (c.leadsTo?.match(/R\\d+/g)??[]).includes(r.id));
+            const linkedResults = profile.results.filter(r=>r.supportsConclusions?.includes(c.id));
+            return <article className="epd-trace__item" key={c.id}>
+              <h3>{c.id} · {c.title}</h3>
+              <div className="epd-trace__columns">
+                <div><h4>Indicadores vinculados</h4>
+                  {linkedResults.length?<ul>{linkedResults.map(r=><li key={r.id}><strong>{r.title}</strong><span>{r.value}{displayUnit(r.unit)} · {r.period}</span><small>{[r.source,r.page].filter(Boolean).join(" · ")}</small></li>)}</ul>:<p className="epd-trace__missing">No consta relación explícita con un indicador identificado.</p>}
+                </div>
+                <div><h4>Conclusión documental</h4>{c.body.map((p,i)=><p key={i}>{p}</p>)}{onOpenReader&&<button type="button" onClick={()=>onOpenReader(`epr-${c.id}`)}>Consultar {c.id} en el documento</button>}</div>
+                <div><h4>Recomendaciones relacionadas</h4>
+                  {direct.length?<ul>{direct.map(r=><li key={r.id}><strong>{r.id} · {r.type??"Sin tipo declarado"}</strong><span>{r.text}</span></li>)}</ul>:<p className="epd-trace__missing">No consta recomendación vinculada expresamente.</p>}
+                </div>
+              </div>
+            </article>;
+          })}</div>
+        </section>
+      )}
       {findings.length > 0 && (
         <section className="epd-findings">
           <p className="ep-eyebrow">Conclusiones</p>
