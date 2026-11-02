@@ -158,3 +158,12 @@
 .ep-link-editor__options input{width:15px;height:15px;margin-top:2px;flex:none}
 .ep-link-editor__options strong{color:#146a70}
 @media print{.ep-link-editor{display:none}}
+
+/* Descarga uniforme del perfil completo para todos los municipios. */
+.ep-complete-download{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:#e9f3f3;padding:14px 20px;margin:0 0 18px;border-left:4px solid #0e7888}
+.ep-complete-download>div{display:grid;gap:2px}
+.ep-complete-download strong{font-size:14px;color:#194653}
+.ep-complete-download span{font-size:12px;color:#547079}
+.ep-complete-download button{font-weight:700!important}
+@media(max-width:600px){.ep-complete-download button{width:100%}}
+@media print{.ep-complete-download{display:none!important}}
