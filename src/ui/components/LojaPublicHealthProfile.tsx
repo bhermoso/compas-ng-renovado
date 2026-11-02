@@ -10,7 +10,7 @@ const health:[string,number,number,number][]=[
 const n=(v:number,d=1)=>v.toLocaleString("es-ES",{maximumFractionDigits:d,minimumFractionDigits:d});
 type Metric="income"|"low"|"age"|"older";
 const labels:Record<Metric,string>={income:"Renta neta por persona",low:"Bajo el 60 % de la mediana",age:"Edad media",older:"Población de 65 años o más"};
-const index:Record<Metric,number>={income:1,low:2,age:3,older:4};
+const index:Record<Metric,1|2|3|4>={income:1,low:2,age:3,older:4};
 function Source({children}:{children:ReactNode}){return <details className="lp-source"><summary>Fuente y alcance</summary><div>{children}</div></details>}
 function Compare({title,values}:{title:string,values:[number,number,number]}){const max=Math.max(...values)*1.12;return <div className="lp-comparison"><div className="lp-comp-title">{title}</div><div className="lp-comp-bars">{values.map((v,i)=><div className="lp-comp-line" key={i}><span>{["Loja","Granada","Andalucía"][i]}</span><div className="lp-comp-track"><i className={i===0?"lp-comp-local":""} style={{width:`${v/max*100}%`}}/></div><strong>{n(v,1)}</strong></div>)}</div></div>}
 export function LojaPublicHealthProfile(){
