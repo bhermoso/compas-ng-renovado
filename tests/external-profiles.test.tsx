@@ -10,6 +10,7 @@ import { EMPTY_PROFILE_LIBRARY, appendExternalProfile, importProfileFile, isExte
 import { createMunicipalityRuntime } from '../src/application/runtime';
 import { parseWorkspaceJSON, serializeWorkspaceForStorage } from '../src/infrastructure/persistence/local-storage';
 import { ExternalProfileDashboard } from '../src/ui/components/ExternalProfileDashboard';
+import { ProfileEditorialLab } from '../src/ui/components/ProfileEditorialLab';
 import { externalProfileDocument } from '../src/application/health-profile/externalProfileDocument';
 import { externalProfileFixture } from './helpers/externalProfileFixture';
 
@@ -134,6 +135,17 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
   // Decisión del autor (2026-11-01): los datos epidemiológicos no se cuestionan; COMPÁS no añade advertencias propias.
   expect(html).not.toContain('Antecedente histórico');expect(html).not.toContain('no describe por sí solo');expect(html).toContain('Denominador no documentado');expect(html).toContain('Atlas ficticio');expect(html).toContain('Gestión y versiones');expect(html).toContain('Laboratorio experimental');expect(html).not.toContain('Descargar esta revisión · Word');expect(html).toContain('Perfil completo · PDF');
   expect(html).not.toContain('prevalencia actual');
+ });
+ it('el laboratorio permite revisar C3, C6 y C7 sin escribir en el perfil original',()=>{
+  const p=externalProfileFixture();
+  p.text=readFileSync(resolve('tests/fixtures/profile-text/loja-v0.3-package.txt'),'utf8');
+  const before=JSON.stringify(p);
+  const html=renderToStaticMarkup(createElement(ProfileEditorialLab,{profile:p}));
+  for(const id of ['C3','C6','C7']) expect(html).toContain('value="'+id+'"');
+  expect(html).toContain('Decisión profesional');
+  expect(html).toContain('Exportar decisión profesional');
+  expect(html).toContain('no modifica el perfil vigente');
+  expect(JSON.stringify(p)).toBe(before);
  });
  it('maqueta los datos suministrados para PDF y Word sin inventar conclusiones',()=>{
   const p=externalProfileFixture(),model=externalProfileDocument(p,'Municipio de pruebas');
