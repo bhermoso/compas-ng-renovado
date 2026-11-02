@@ -1,7 +1,7 @@
 # CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY
 
 > Contrato metodológico canónico del Perfil de Salud Local (PSL) en COMPÁS NG.
-> Versión 2.2.0 — 2026-11-01 (historial en el registro de revisiones)
+> Versión 2.3.0 — 2026-11-02 (historial en el registro de revisiones)
 > Estado: VIGENTE
 >
 > Este contrato define qué debe ser metodológicamente un Perfil de Salud Local,
@@ -521,13 +521,32 @@ Existe una sola composición canónica del Perfil de Salud Local. Pantalla, viso
 
 Las diferencias de formato solo pueden afectar a soporte, paginación, densidad o adaptación visual. No pueden crear contenidos, estructuras diagnósticas, conclusiones o catálogos de fuentes distintos.
 
-### Art. 17 ter. Una sola salida
+### Art. 17 ter. Una sola salida, con páginas de datos comparables
 
-El Perfil de Salud Local tiene una única salida: el documento canónico del Art. 17 bis. No existe, en el estado vigente, una salida comparativa breve ni otra representación con estatuto propio, sea por audiencia, por formato o por densidad de lectura.
+El Perfil de Salud Local tiene una única salida: el documento canónico del Art. 17 bis. No existe una salida comparativa breve ni otra representación con estatuto propio, sea por audiencia, por formato o por densidad de lectura.
 
-Una representación nueva solo puede añadirse por reforma expresa de este contrato. Hasta entonces, ninguna pantalla, exportación o proyección puede presentarse como producto distinto del Perfil.
+Ese único documento se abre con cuatro páginas de plantilla común, iguales en todos los municipios y en todos los ciclos, que preceden al cuerpo del Art. 16 quater:
 
-*Nota de revisión.* La versión 1.8.0 deroga el texto anterior de este artículo («Dos salidas del mismo Perfil canónico»), que admitía una salida comparativa breve tipo OHID/Fingertips. El autor decidió el 2026-10-23 trabajar solo con el Perfil general. La numeración de los artículos y de los invariantes no se altera.
+1. **Portada.** Identidad del municipio, mapa del término municipal, cifras clave y una lectura breve en cuatro bloques: resumen, desigualdades, comunidad y salud.
+2. **Quién vive aquí.** Pirámide de población frente a Andalucía, con su proyección cuando exista, y ficha comparada de hogares, origen, renta y empleo.
+3. **Panel de salud.** Los indicadores del núcleo común (Art. 17 quater), con su valor local, recuento, periodo, comparadores y cambio desde el ciclo anterior.
+4. **Desigualdad.** Lo que la media del municipio no muestra: diferencias internas por sección censal (Art. 17 quater, 4), por sexo, edad y origen, y series en el tiempo.
+
+Estas páginas son parte del Perfil, no un producto distinto: se ven igual en pantalla, visor, DOCX, PDF e impresión, y su contenido procede del mismo expediente. El panel de la aplicación muestra estas cuatro páginas; el lector, el documento entero. Las páginas de datos muestran y comparan: no concluyen, no priorizan y no sustituyen a las conclusiones ni a las recomendaciones del cuerpo.
+
+Una representación nueva con estatuto propio solo puede añadirse por reforma expresa de este contrato.
+
+*Nota de revisión.* La versión 1.8.0 derogó la salida comparativa breve tipo OHID/Fingertips (2026-10-23). La versión 2.3.0 (2026-11-02) no la restaura como salida aparte: incorpora al único Perfil las páginas de datos comparables, a partir del estudio de los Local Authority Health Profiles de Public Health England (Barking and Dagenham y Kensington and Chelsea, 2018 y 2019). La numeración de los artículos y de los invariantes no se altera.
+
+### Art. 17 quater. Núcleo de indicadores y comparación
+
+1. **Núcleo común.** El panel de salud usa un núcleo cerrado de unos treinta indicadores, igual en todos los municipios, ordenado en siete dominios: esperanza de vida y causas de muerte; morbilidad y servicios; conductas; infancia y juventud; desigualdad; determinantes sociales; protección de la salud. Cada indicador tiene una ficha con su definición, fuente andaluza, escala mínima, periodicidad, comparadores disponibles y si la fuente publica intervalos o significación. El núcleo se revisa una vez al año. Cada municipio puede añadir indicadores propios, que figuran aparte del núcleo.
+2. **Comparadores.** Cada valor local se compara, cuando la fuente lo permita, con el Distrito sanitario, la provincia del municipio —Granada en los municipios actuales— y Andalucía. Un comparador que la fuente no publica se omite y no se estima. El dato de ámbito superior nunca ocupa la columna del municipio (principio de primacía local).
+3. **Colores de comparación.** El panel marca «mejor», «similar» o «peor» que el comparador solo cuando la fuente publica intervalos de confianza o una prueba de significación. En otro caso, muestra los valores sin colores ni juicio. COMPÁS no calcula una significación propia sobre datos epidemiológicos oficiales (Art. 13 bis).
+4. **Eje de desigualdad interna.** En los municipios con dos o más secciones censales, el eje de desigualdad interna es la renta por sección censal del Atlas de Distribución de Renta de los Hogares del INE. El Perfil declara que es un eje de renta, no un índice de privación múltiple. En los municipios con una sola sección, la página de desigualdad se limita a sexo, edad, origen y comparación con los ámbitos superiores, y lo dice.
+5. **Tendencia.** Cuando existe un ciclo anterior medido de la misma manera, el panel muestra el sentido del cambio. Si la definición, la fuente o la escala cambiaron, no se comparan (Art. 12).
+
+*Consecuencia si se viola:* los perfiles de distintos municipios y ciclos dejan de poder compararse, o el panel atribuye diferencias que la fuente no sostiene.
 
 ---
 
@@ -714,7 +733,7 @@ El Perfil concluye y recomienda; no decide. Sus recomendaciones no llevan respon
 
 **I-LHPM-10 — Una sola salida**
 
-El Perfil de Salud Local se entrega como un único documento canónico. Ninguna otra representación tiene estatuto propio mientras este contrato no la autorice.
+El Perfil de Salud Local se entrega como un único documento canónico, que se abre con las cuatro páginas de datos comparables del Art. 17 ter. Ninguna otra representación tiene estatuto propio mientras este contrato no la autorice.
 
 *Consecuencia si se viola:* COMPÁS NG vuelve a producir perfiles paralelos, con riesgo de contradicción entre lo que el diagnóstico interpreta y lo que otra representación sugiere.
 
@@ -798,6 +817,14 @@ Las cifras epidemiológicas de fuentes oficiales se presentan con su valor, año
 
 *Fuente:* Art. 13 bis. Decisión del autor del 2026-11-01.
 
+**I-LHPM-22 — Panel comparable entre municipios y ciclos**
+
+El panel de salud usa el núcleo común de indicadores, declara sus comparadores (Distrito, provincia y Andalucía cuando la fuente los publica) y solo colorea una comparación cuando la fuente publica intervalos o significación. La desigualdad interna se mide con la renta por sección censal del INE cuando el municipio tiene varias secciones.
+
+*Consecuencia si se viola:* el panel deja de ser comparable o afirma diferencias que la fuente no sostiene.
+
+*Fuente:* Arts. 17 ter y 17 quater. Decisiones del autor del 2026-11-02.
+
 ---
 
 ## Relaciones con otros contratos
@@ -836,5 +863,6 @@ Las cifras epidemiológicas de fuentes oficiales se presentan con su valor, año
 *CONTRACT-PSL-COMPAS y CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER.*
 *Todo contrato de producto que afecte al Perfil de Salud Local debe ser coherente con este contrato.*
 | 2026-10-23 | 2.0.0 | Nueva estructura del Perfil (Art. 16 quater): la conclusión como unidad, cuerpo de siete apartados y anexo compilado. La «orientación técnica» pasa a llamarse «recomendación del Perfil» y se tipifica en Conocer, Contrastar y Abordar (Art. 8 quater); «Abordar» exige relación de grado 1 o 2. Nuevos invariantes I-LHPM-19 e I-LHPM-20, criterio «Estructura breve» (Art. 19) y cuestión abierta H-LHPM-7 (tope de conclusiones). Las unidades de lectura (Art. 4 bis) pasan al anexo. Decisiones del autor del 2026-10-23 | COMPÁS NG |
+| 2026-11-02 | 2.3.0 | Reforma del Art. 17 ter («Una sola salida, con páginas de datos comparables»): el único Perfil se abre con cuatro páginas de plantilla común (portada, población, panel de salud y desigualdad), sin salida aparte. Nuevo Art. 17 quater: núcleo cerrado de unos treinta indicadores en siete dominios, comparadores (Distrito, provincia y Andalucía cuando la fuente los publica), colores solo con intervalos o significación de la fuente, renta por sección censal del INE como eje de desigualdad interna y tendencia entre ciclos comparables. I-LHPM-10 ajustado y nuevo I-LHPM-22. Decisiones del autor del 2026-11-02, a partir de los Local Authority Health Profiles de Public Health England | COMPÁS NG |
 | 2026-11-01 | 2.2.0 | Conclusiones narradas y lectura de conjunto (Art. 16 quater, apartado 2): el apartado se abre con una lectura que relaciona las conclusiones; cada conclusión se escribe en prosa con las cifras citadas dentro del texto, y el tipo, las evidencias, el grado, el límite y las recomendaciones pasan a una tabla de trazabilidad del anexo. Nuevo Art. 13 bis e invariante I-LHPM-21: los datos epidemiológicos oficiales se reproducen como los publica su fuente, sin cautelas añadidas, conservando año, escala y ausencia de datos posteriores. Criterios del Art. 19 «Incertidumbre visible» (ajustado) y «Lectura de conjunto» (nuevo). Decisiones del autor del 2026-11-01, a partir del Perfil de Zagra v0.1 | COMPÁS NG |
 | 2026-10-24 | 2.1.0 | Distinción entre recurso y activo (Art. 9 bis, I-LHPM-12): un registro de Localiza Salud es un recurso; es activo para la salud cuando consta su validación con los criterios de registro y validación de activos para la salud en Andalucía, que incluyen la identificación comunitaria. Los patrones de cruce se nombran con «recurso registrado». Decisión del autor del 2026-10-24, contrastada con Loja (162 recursos, 5 activos identificados comunitariamente) | COMPÁS NG |

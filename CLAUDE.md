@@ -14,7 +14,8 @@ Producto prioritario: el Perfil de Salud Local — documento científico, editor
 - Estructura del Perfil (Art. 16 quater, contrato v2.2.0): la conclusión es la unidad; el cuerpo tiene siete apartados y la evidencia completa va en el anexo compilado. Las conclusiones se abren con una lectura de conjunto y se escriben en prosa; los campos de trazabilidad van a una tabla del anexo.
 - Datos epidemiológicos oficiales (Art. 13 bis, v2.2.0): se reproducen como los publica su fuente, sin cautelas añadidas; solo se declaran año, escala no municipal y ausencia de datos posteriores. Los bloques heredados del cuerpo se retiran uno a uno (disposición transitoria), sin que Granada-Zaidín cambie sin justificación.
 - Autoría acotada (Art. 16): el cuerpo diagnóstico es compilado y trazable, no editable a mano. La autoría humana vive en el cierre interpretativo y el enriquecimiento.
-- El Perfil tiene una sola salida (Art. 17 ter, v1.8.0). El NHS y la salida comparativa breve se retiraron el 2026-10-23: no restaurarlos ni crear representaciones derivadas sin reformar el contrato.
+- El Perfil tiene una sola salida (Art. 17 ter, v2.3.0), que se abre con cuatro páginas de datos comparables (portada, población, panel de salud, desigualdad). El NHS y la salida comparativa breve se retiraron el 2026-10-23: no restaurarlos como salida aparte ni crear representaciones derivadas sin reformar el contrato.
+- Panel comparable (Art. 17 quater, v2.3.0): núcleo cerrado de indicadores; comparadores Distrito, provincia y Andalucía cuando la fuente los publica; colores solo con intervalos o significación de la fuente; renta por sección censal del INE como eje de desigualdad interna.
 
 ## Escritura y edición
 - Contrato transversal: `docs/contracts/CONTRACT-AUTHORIAL-STYLE.md`.
