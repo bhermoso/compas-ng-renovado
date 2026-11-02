@@ -4135,6 +4135,15 @@ export default function App() {
                     Abrir el atlas de Loja en una pestaña independiente ↗
                   </a>
                 </p>
+                <p className="panel-note">
+                  <strong>Contraste a escala de dirección:</strong>{" "}
+                  <a href="https://www.wikibarrio.es/" target="_blank" rel="noopener noreferrer">
+                    Explorar Loja en WikiBarrio
+                  </a>
+                  . Sus indicadores describen secciones censales, no la renta ni
+                  la salud de cada calle, edificio o persona. Comprueba el año
+                  y los límites censales antes de asociarlos al Perfil.
+                </p>
                 <iframe
                   title="Atlas interactivo de desigualdades territoriales de Loja (prototipo no validado)"
                   src="https://bhermoso.github.io/aula-activos-comunitarios/laboratorio-perfiles/municipios/loja/perfil-editorial.html"
