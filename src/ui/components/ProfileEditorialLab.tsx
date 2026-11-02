@@ -6,7 +6,7 @@ import "./ProfileEditorialLab.css";
 type Score = "pendiente" | "mejora" | "similar" | "peor";
 type Decision = "pendiente" | "aceptada" | "rechazada" | "aplazada";
 export function ProfileEditorialLab({ profile }: { profile: ExternalHealthProfile }) {
- const chapters=useMemo(()=>parseProfileStructure(profile.text).sections.filter(s=>s.paragraphs.length>0),[profile.text]);
+ const chapters=useMemo(()=>{const d=parseProfileStructure(profile.text);return [...d.sections.filter(s=>s.paragraphs.length>0),...d.conclusions.map(c=>({id:c.id,title:c.id+'. '+c.title,paragraphs:[c.id+'. '+c.title,...c.body,c.leadsTo?'Lleva a '+c.leadsTo+'.':''].filter(Boolean)}))];},[profile.text]);
  const [chapterId,setChapterId]=useState("");
  const [alternative,setAlternative]=useState("");
  const [score,setScore]=useState<Score>("pendiente");
