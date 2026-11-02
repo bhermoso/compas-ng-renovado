@@ -93,6 +93,9 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
  async function saveDraft(e: React.FormEvent) {
   e.preventDefault();if(!draft?.title.trim())return;
   if(resultDraft){setError('Añade o cancela el indicador que estás editando antes de guardar el perfil.');return;}
+  const conclusionIds = new Set(parseProfileStructure(draft.text).conclusions.map(c=>c.id));
+  const invalidLinks = draft.results.flatMap(r=>(r.supportsConclusions??[]).filter(id=>!conclusionIds.has(id)).map(id=>`${r.title}: ${id}`));
+  if(invalidLinks.length){setError(`Hay vínculos a conclusiones que ya no figuran en el documento: ${invalidLinks.join(', ')}. Corrígelos antes de guardar.`);return;}
   setBusy(true);setError('');setMessage('Guardando el documento, los resultados y la versión en Firebase…');
   try{
    const next=appendExternalProfile(library,{...draft,title:draft.title.trim()},newFiles,municipalityId);
@@ -144,6 +147,20 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
     <label>Referencia comparable · valor<input type="number" step="any" value={Number.isFinite(resultDraft.comparison?.value)?resultDraft.comparison!.value:''} onChange={e=>setResultDraft({...resultDraft,comparison:e.target.value===''?undefined:{label:resultDraft.comparison?.label??'',value:Number(e.target.value)}})}/></label>
    </div><div className="ep-actions"><button type="button" onClick={()=>{if(!resultDraft.title.trim()||!resultDraft.value.trim()||!resultDraft.source.trim()){setError('Indica el nombre, el valor y la fuente del indicador.');return;}if(resultDraft.comparison&&(!resultDraft.comparison.label.trim()||!Number.isFinite(resultDraft.comparison.value))){setError('Completa el nombre y el valor de la referencia comparable, o retírala.');return;}patch({results:[...draft.results.filter(r=>r.id!==resultDraft.id),resultDraft]});setResultDraft(undefined);setError('');}}>Incorporar indicador</button><button type="button" onClick={()=>setResultDraft(undefined)}>Cancelar indicador</button></div></fieldset>}
    <label>Áreas que el perfil propone para la deliberación · una por línea<textarea rows={3} value={draft.areas.map(a=>a.title).join('\n')} onChange={e=>patch({areas:lines(e.target.value).map(title=>draft.areas.find(a=>a.title===title)??{id:crypto.randomUUID(),title,rationale:''})})}/></label>
+   <section className="ep-link-editor" aria-label="Vínculos entre indicadores y conclusiones">
+    <h3>Trazabilidad de la revisión</h3>
+    <p className="ep-help">Relaciona cada indicador únicamente con las conclusiones que lo citan o fundamentan expresamente. No se proponen vínculos automáticamente. Los cambios se guardan como una revisión nueva y no modifican el documento original.</p>
+    {parseProfileStructure(draft.text).conclusions.length===0
+      ? <p className="ep-help">El texto de esta revisión no contiene conclusiones C1, C2… reconocibles. No es posible añadir vínculos hasta incorporarlas al documento.</p>
+      : <div className="ep-link-editor__list">{draft.results.map(r=><fieldset key={r.id} className="ep-link-editor__item">
+         <legend>{r.title} · {r.value} {r.unit}</legend>
+         <div className="ep-link-editor__options">{parseProfileStructure(draft.text).conclusions.map(c=><label key={c.id}>
+           <input type="checkbox" checked={(r.supportsConclusions??[]).includes(c.id)}
+             onChange={e=>patch({results:draft.results.map(item=>item.id!==r.id?item:{...item,supportsConclusions:e.target.checked?[...new Set([...(item.supportsConclusions??[]),c.id])]: (item.supportsConclusions??[]).filter(id=>id!==c.id)})})}/>
+           <span><strong>{c.id}</strong> · {c.title}</span>
+         </label>)}</div>
+       </fieldset>)}</div>}
+   </section>
    <div className="ep-attached"><strong>Archivos originales incluidos en Firebase</strong>{draft.attachmentIds.map(id=><span key={id}>{[...library.attachments,...newFiles].find(a=>a.id===id)?.name}</span>)}{!draft.attachmentIds.length&&<span>Sin archivo adjunto; se conservarán el texto y los resultados.</span>}</div>
    <div className="ep-editor__footer"><p>Se guardará una versión en revisión. Subir un archivo no equivale a validarlo.</p><button className="ep-primary" disabled={!draft.title.trim()} type="submit">{busy?'Guardando…':'Guardar perfil en Firebase'}</button></div>
    </fieldset>
