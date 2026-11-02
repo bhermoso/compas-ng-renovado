@@ -128,3 +128,21 @@
 .ep-management-grid .ep-document-card{width:auto;max-width:none;position:static}
 .ep-main--management .ep-validation{margin-top:20px}
 @media(max-width:850px){.ep-management-grid{grid-template-columns:1fr}}
+
+/* Trazabilidad explícita: solo relaciones identificadas en la fuente. */
+.epd-trace{padding:28px 25px;margin:24px 0;background:#eff5f3;border-top:5px solid #207d82}
+.epd-trace__intro{max-width:900px}.epd-trace__intro p:last-child{font-size:13px;color:#526b70}
+.epd-trace__list{display:grid;gap:14px}
+.epd-trace__item{background:white;border:1px solid #d7e4e0;padding:19px}
+.epd-trace__item h3{font:600 20px Georgia,serif;color:#184450;margin:0 0 15px}
+.epd-trace__columns{display:grid;grid-template-columns:1fr 1.35fr 1.15fr;gap:20px}
+.epd-trace__columns>div+div{border-left:1px solid #dce9e5;padding-left:17px}
+.epd-trace__columns h4{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#147882;margin:0 0 12px}
+.epd-trace__columns p,.epd-trace__columns li{font-size:13px;line-height:1.52}
+.epd-trace__columns ul{padding-left:17px}.epd-trace__columns li{margin-bottom:12px}
+.epd-trace__columns li span,.epd-trace__columns li small{display:block}
+.epd-trace__columns li small{color:#667e83}
+.epd-trace__missing{color:#687a7e;font-style:italic}
+.epd-trace__columns button{font-size:12px;color:#0d6677;background:white;border:1px solid #accdce;padding:7px 11px}
+@media(max-width:850px){.epd-trace__columns{grid-template-columns:1fr}.epd-trace__columns>div+div{border-left:0;border-top:1px solid #dce9e5;padding:15px 0 0}}
+@media print{.epd-trace__item{break-inside:avoid}.epd-trace{break-before:page}}
