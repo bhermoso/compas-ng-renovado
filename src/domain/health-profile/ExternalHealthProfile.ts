@@ -21,6 +21,8 @@ export interface ProfileResult {
  denominator?: string;
  temporalContext?: 'current' | 'historical' | 'not-stated';
  chartValue?: number;
+ /** IDs C1, C2… explicitly linked to this indicator in the authored package. Never inferred. */
+ supportsConclusions?: string[];
  /** Optional, explicitly supplied comparison. No score or quality thresholds. */
  comparison?: { label: string; value: number };
  /**
