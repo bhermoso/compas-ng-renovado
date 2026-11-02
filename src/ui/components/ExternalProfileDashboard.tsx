@@ -101,7 +101,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
   }catch(e){setError(e instanceof Error?e.message:'No se ha podido guardar. Tu borrador permanece en pantalla.');setMessage('');}
   finally{setBusy(false);}
  }
- async function exportRevision(format:'pdf'|'docx') {
+ async function exportRevision(format:'docx') {
   if (!selected) return;
   setBusy(true);setError('');setMessage('Maquetando la revisión guardada…');
   try {
@@ -123,13 +123,8 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
  }
  function patch(change:Partial<ExternalHealthProfile>){setDraft(p=>p?{...p,...change}:p);}
  return <section className="external-profile" aria-label="Perfil de Salud Local">
-  <header className="ep-header"><div className="ep-identity"/><div className="ep-header__body">
-   <div><p className="ep-eyebrow">PERFIL DE SALUD LOCAL · {municipalityName}</p><h1>El perfil y sus resultados</h1>
-   <p>El documento de referencia del territorio, sus principales hallazgos y su trayectoria de revisión.</p></div>
-   <label className={`ep-upload ${busy?'ep-disabled':''}`}><span aria-hidden="true">↑</span> Cargar perfil
-    <input ref={fileInput} type="file" aria-label="Cargar perfil" multiple accept=".pdf,.docx,.txt,.md,.json" disabled={busy} onChange={e=>void loadFiles(e.currentTarget.files)}/>
-   </label></div>
-  </header>
+  {!selected && <header className="ep-header"><div className="ep-header__body"><div><p className="ep-eyebrow">PERFIL DE SALUD LOCAL · {municipalityName}</p><h1>Incorporar un perfil</h1></div></div></header>}
+  <input className="ep-sr-only" ref={fileInput} type="file" aria-label="Cargar perfil" multiple accept=".pdf,.docx,.txt,.md,.json" disabled={busy} onChange={e=>void loadFiles(e.currentTarget.files)} />
   {message&&<p className="ep-message" role="status">{message}</p>}{error&&<p className="ep-error" role="alert">{error}</p>}
   {draft ? <form className="ep-editor" onSubmit={e=>void saveDraft(e)}>
    <div className="ep-section-heading"><div><p className="ep-eyebrow">{draft.revisionOf?'NUEVA REVISIÓN':'INCORPORAR UN PERFIL EXTERNO'}</p><h2>Revisa el perfil antes de guardarlo</h2></div>
@@ -164,26 +159,29 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
    <button className="ep-primary" type="button" disabled={busy} onClick={()=>fileInput.current?.click()}>Seleccionar el perfil</button>
    <p className="ep-help">Hasta 20 MB por archivo. Originales, texto, resultados y versiones se guardan en Firebase. El navegador es una caché.</p></div>
   </div> : <>
-   <div className={`ep-layout${tab==='document'||(tab==='results'&&structure?.dataPages)?' ep-layout--reading':''}`}><aside className="ep-document-card"><p className="ep-eyebrow">DOCUMENTO DE REFERENCIA</p>
+   <nav className="ep-tabs ep-tabs--primary" aria-label="Espacios del perfil">{([['results','Perfil'],['document','Documento completo'],['versions','Gestión y versiones']] as const).map(([key,label])=><button key={key} type="button" aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>
+   {tab==='results'&&<main className="ep-main ep-main--profile"><ProfileResultsDashboard profile={selected} municipalityName={municipalityName} structure={structure} pdfUrl={pdf ? fileUrls[pdf.id] : undefined} pdfName={pdf?.name} onOpenReader={anchor=>{setReaderAnchor(anchor);setTab('document');}}/></main>}
+   {tab==='document'&&<main className="ep-main ep-main--document"><section className="ep-document-view"><h2>{selected.title}</h2>
+    {selected.revisionOf&&<p className="ep-help">El texto puede contener cambios de esta revisión. Los archivos adjuntos siguen siendo los originales aportados.</p>}
+    {structure ? <ProfileReader structure={structure} title={selected.title} pdfUrl={pdf ? fileUrls[pdf.id] : undefined}/>
+     : pdf&&fileUrls[pdf.id] ? <><p><a href={fileUrls[pdf.id]} target="_blank" rel="noopener noreferrer">Abrir PDF original en otra pestaña</a></p><iframe title="PDF original del Perfil de Salud Local" src={fileUrls[pdf.id]}/></>
+     : <p>No hay texto extraíble. Consulta el archivo original o incorpora una transcripción.</p>}
+   </section></main>}
+   {tab==='versions'&&<main className="ep-main ep-main--management">
+    <section className="ep-management-upload"><div><p className="ep-eyebrow">ADMINISTRACIÓN DOCUMENTAL</p><h2>Gestionar el perfil de {municipalityName}</h2><p>Los originales y revisiones se conservan en Firebase. Cargar un archivo no equivale a validarlo.</p></div><button type="button" className="ep-primary" disabled={busy} onClick={()=>fileInput.current?.click()}>↑ Cargar perfil</button></section>
+    <div className="ep-management-grid"><aside className="ep-document-card"><p className="ep-eyebrow">DOCUMENTO DE REFERENCIA</p>
     <div className="ep-cover"><span>COMPÁS</span><div><small>{municipalityName}</small><h2>{selected.title}</h2><p>{selected.period||'Periodo no declarado'}</p></div><small>PERFIL DE SALUD LOCAL</small></div>
     <p className="ep-status">{selected.id===library.activeId?'Versión vigente':'Versión anterior'} · {selected.status==='validated'?'Validada técnicamente':'En revisión'}</p>
     <dl className="ep-metadata"><div><dt>Autoría</dt><dd>{selected.author||'No declarada'}</dd></div><div><dt>Incorporación</dt><dd>{date(selected.createdAt)}</dd></div>{selected.validatedBy&&<div><dt>Validación</dt><dd>{selected.validatedBy} · {date(selected.validatedAt!)}</dd></div>}</dl>
-    <div className="ep-file-actions"><button type="button" disabled={busy} onClick={()=>void exportRevision('pdf')}>↓ Descargar esta revisión · PDF</button><button type="button" disabled={busy} onClick={()=>void exportRevision('docx')}>↓ Descargar esta revisión · Word</button>{files.map(file=><a key={file.id} aria-disabled={!fileUrls[file.id]} href={fileUrls[file.id]} download={file.name}>↓ Descargar original · {file.name}</a>)}
+    <div className="ep-file-actions"><button type="button" disabled={busy} onClick={()=>void exportRevision('docx')}>↓ Descargar esta revisión · Word</button>{files.map(file=><a key={file.id} aria-disabled={!fileUrls[file.id]} href={fileUrls[file.id]} download={file.name}>↓ Descargar original · {file.name}</a>)}
      {selected.text&&<button type="button" onClick={()=>download(new Blob([selected.text],{type:'text/plain;charset=utf-8'}),`${selected.title}.txt`)}>↓ Descargar texto de esta revisión</button>}
      <button type="button" onClick={()=>download(new Blob([JSON.stringify({schema:'compas-profile-package/v1',municipalityId,title:selected.title,period:selected.period,author:selected.author,summary:selected.summary,text:selected.text,results:selected.results,findings:selected.findings,limitations:selected.limitations,areas:selected.areas},null,2)],{type:'application/json'}),`${selected.title}-resultados.json`)}>↓ Descargar paquete de resultados</button>
     </div><button className="ep-primary" disabled={busy} onClick={edit}>Editar una nueva revisión</button>
     <p className="ep-help">Los originales no se modifican. Cada edición conserva la versión anterior.</p>
-   </aside><div className="ep-main"><nav className="ep-tabs" aria-label="Vistas del perfil">{([['results','Panel'],['document','Leer el perfil'],['versions','Versiones']] as const).map(([key,label])=><button key={key} aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>
-    {tab==='results'&&<ProfileResultsDashboard profile={selected} municipalityName={municipalityName} onAddResults={edit} structure={structure} pdfUrl={pdf ? fileUrls[pdf.id] : undefined} pdfName={pdf?.name} onOpenReader={anchor=>{setReaderAnchor(anchor);setTab('document');}}/>}
-    {tab==='document'&&<section className="ep-document-view"><h2>{selected.title}</h2>
-     {selected.revisionOf&&<p className="ep-help">El texto puede contener cambios de esta revisión. Los archivos adjuntos siguen siendo los originales aportados.</p>}
-     {structure ? <ProfileReader structure={structure} title={selected.title} pdfUrl={pdf ? fileUrls[pdf.id] : undefined}/>
-      : pdf&&fileUrls[pdf.id] ? <><p><a href={fileUrls[pdf.id]} target="_blank" rel="noopener noreferrer">Abrir PDF original en otra pestaña</a></p><iframe title="PDF original del Perfil de Salud Local" src={fileUrls[pdf.id]}/></>
-      : <p>No hay texto extraíble. Consulta el archivo original o incorpora una transcripción.</p>}
-    </section>}
-    {tab==='versions'&&<section className="ep-versions"><p className="ep-eyebrow">HISTORIAL CONSERVADO EN FIREBASE</p><h2>Versiones del perfil</h2>{[...library.profiles].reverse().map(p=><article key={p.id}><div><h3>{p.title}</h3><p>{date(p.createdAt)} · {p.author||'Autoría no declarada'} · {p.status==='validated'?'Validada':'En revisión'}{p.id===library.activeId?' · Vigente':''}</p></div><div className="ep-actions"><button onClick={()=>{setSelectedId(p.id);setTab('document');}}>Consultar versión</button>{p.id!==library.activeId&&<button disabled={busy} onClick={()=>void commit({...library,activeId:p.id},'Versión vigente actualizada en Firebase.')}>Establecer como vigente</button>}</div></article>)}</section>}
-   </div></div>
-   {selected.id===library.activeId&&selected.status==='review'&&<section className="ep-validation"><div><h3>Revisión técnica</h3><p>La incorporación no valida el contenido. La validación quedará vinculada a esta versión y a tu cuenta.</p></div><button disabled={busy} onClick={()=>{if(!authorName.trim()){setError('Identifícate para registrar la validación.');return;}if(window.confirm('¿Registrar la validación técnica de esta versión con tu cuenta?'))void commit({...library,profiles:library.profiles.map(p=>p.id===selected.id?{...p,status:'validated',validatedAt:new Date().toISOString(),validatedBy:authorName}:p)},'Validación técnica registrada en Firebase.');}}>Registrar validación técnica</button></section>}
+   </aside>
+    <section className="ep-versions"><p className="ep-eyebrow">HISTORIAL CONSERVADO EN FIREBASE</p><h2>Versiones del perfil</h2>{[...library.profiles].reverse().map(p=><article key={p.id}><div><h3>{p.title}</h3><p>{date(p.createdAt)} · {p.author||'Autoría no declarada'} · {p.status==='validated'?'Validada':'En revisión'}{p.id===library.activeId?' · Vigente':''}</p></div><div className="ep-actions"><button onClick={()=>{setSelectedId(p.id);setTab('document');}}>Consultar versión</button>{p.id!==library.activeId&&<button disabled={busy} onClick={()=>void commit({...library,activeId:p.id},'Versión vigente actualizada en Firebase.')}>Establecer como vigente</button>}</div></article>)}</section></div>
+    {selected.id===library.activeId&&selected.status==='review'&&<section className="ep-validation"><div><h3>Revisión técnica</h3><p>La incorporación no valida el contenido. La validación quedará vinculada a esta versión y a tu cuenta.</p></div><button disabled={busy} onClick={()=>{if(!authorName.trim()){setError('Identifícate para registrar la validación.');return;}if(window.confirm('¿Registrar la validación técnica de esta versión con tu cuenta?'))void commit({...library,profiles:library.profiles.map(p=>p.id===selected.id?{...p,status:'validated',validatedAt:new Date().toISOString(),validatedBy:authorName}:p)},'Validación técnica registrada en Firebase.');}}>Registrar validación técnica</button></section>}
+   </main>}
   </>}
   {(legacyProfiles.length>0||legacyText)&&<details className="ep-legacy"><summary>Consultar perfiles anteriores de COMPÁS · legado conservado</summary><p>Estos documentos históricos se conservan. No se regeneran ni se convierten automáticamente en el perfil externo vigente.</p>{legacyText&&<details><summary>Texto del perfil anterior</summary><p className="ep-legacy-text">{legacyText}</p></details>}{legacyProfiles.map(a=><details key={a.id}><summary>{a.portada.municipalityName} · {a.artifactVersion}</summary><PSLCArtifactViewer artifact={a}/></details>)}</details>}
   <footer className="ep-footnote">Documento elaborado fuera de COMPÁS · Contenido y gráficos trazables a su versión · Conservación completa en Firebase</footer>
