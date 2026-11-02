@@ -98,9 +98,11 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
   if(invalidLinks.length){setError(`Hay vínculos a conclusiones que ya no figuran en el documento: ${invalidLinks.join(', ')}. Corrígelos antes de guardar.`);return;}
   setBusy(true);setError('');setMessage('Guardando el documento, los resultados y la versión en Firebase…');
   try{
-   const next=appendExternalProfile(library,{...draft,title:draft.title.trim()},newFiles,municipalityId);
+   const appended=appendExternalProfile(library,{...draft,title:draft.title.trim()},newFiles,municipalityId);
+   // Una nueva revisión no sustituye la versión vigente hasta una promoción explícita.
+   const next=draft.revisionOf && library.activeId ? {...appended,activeId:library.activeId} : appended;
    await onSave(next);setSelectedId(draft.id);setDraft(undefined);setNewFiles([]);setTab('results');
-   setMessage('Perfil completo guardado en Firebase, incluidos archivos, resultados e historial.');
+   setMessage('Revisión guardada con originales y resultados. La versión vigente se establece desde Gestión y versiones.');
   }catch(e){setError(e instanceof Error?e.message:'No se ha podido guardar. Tu borrador permanece en pantalla.');setMessage('');}
   finally{setBusy(false);}
  }
