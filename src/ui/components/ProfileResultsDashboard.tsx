@@ -114,7 +114,7 @@ export function ProfileResultsDashboard({ profile, municipalityName, onAddResult
     <div className="epd">
       {pages ? (
         <>
-          <ProfileDataPages pages={pages} results={profile.results} municipalityName={municipalityName} title={profile.title} period={profile.period} metrics={metrics} pdfUrl={pdfUrl} pdfName={pdfName} />
+          <ProfileDataPages pages={pages} results={profile.results} municipalityName={municipalityName} title={profile.title} period={profile.period} metrics={metrics} pdfUrl={pdfUrl} pdfName={pdfName} interpretation={structure} />
           {structure && structure.overallReading.length > 0 && (
             <section className="epd-reading">
               <p className="ep-eyebrow">Lectura de conjunto</p>
