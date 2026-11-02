@@ -109,10 +109,6 @@ function DomainComparison({ domains, geo, municipalityName }: {
   const [chosen, setChosen] = useState(0);
   const domain = domains[Math.min(chosen, domains.length - 1)];
   if (!domain) return null;
-  const rows = domain.results.filter((r) =>
-    r.chartValue !== undefined && Number.isFinite(r.chartValue) && r.chartValue >= 0 &&
-    comparatorsOf(r).some((c) => geo.includes(c.label) && Number.isFinite(c.value) && c.value >= 0)
-  );
   const renderDomain = (d: typeof domain, printable = false) => { const domainRows = d.results.filter((r) =>
     r.chartValue !== undefined && Number.isFinite(r.chartValue) && r.chartValue >= 0 &&
     comparatorsOf(r).some((c) => geo.includes(c.label) && Number.isFinite(c.value) && c.value >= 0));
