@@ -106,13 +106,8 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
   setBusy(true);setError('');setMessage('Maquetando la revisión guardada…');
   try {
    const model = externalProfileDocument(selected,municipalityName);
-   if(format==='pdf') {
-    const {buildPSLCPdf}=await import('../../application/psl-c-export/pslcPdf');
-    download(buildPSLCPdf(model).output('blob'),model.fileName.replace(/\.docx$/,'.pdf'));
-   } else {
-    const [{buildPSLCDocx},{Packer}]=await Promise.all([import('../../application/psl-c-export/pslcDocx'),import('docx')]);
-    download(await Packer.toBlob(buildPSLCDocx(model)),model.fileName);
-   }
+   const [{buildPSLCDocx},{Packer}]=await Promise.all([import('../../application/psl-c-export/pslcDocx'),import('docx')]);
+   download(await Packer.toBlob(buildPSLCDocx(model)),model.fileName);
    setMessage('Descarga preparada con el contenido de esta revisión guardada en Firebase.');
   } catch {setError('No se ha podido preparar la descarga. Los originales y el perfil guardado siguen disponibles.');setMessage('');}
   finally {setBusy(false);}
