@@ -100,6 +100,51 @@ function IndicatorTable({ results, municipalityName, geo, caption, grouped }: { 
   );
 }
 
+/** Comparador por dominio: escala independiente por indicador; nunca mezcla unidades. */
+function DomainComparison({ domains, geo, municipalityName }: {
+  domains: ReturnType<typeof groupResultsByTopic>;
+  geo: string[];
+  municipalityName: string;
+}) {
+  const [chosen, setChosen] = useState(0);
+  const domain = domains[Math.min(chosen, domains.length - 1)];
+  if (!domain) return null;
+  const rows = domain.results.filter((r) =>
+    r.chartValue !== undefined && Number.isFinite(r.chartValue) && r.chartValue >= 0 &&
+    comparatorsOf(r).some((c) => geo.includes(c.label) && Number.isFinite(c.value) && c.value >= 0)
+  );
+  return <section className="pdp-domain-chart" aria-label="Comparador gráfico por dominio">
+    <div className="pdp-domain-chart__header">
+      <div><p className="pdp-domain-chart__eyebrow">LECTURA COMPARADA</p>
+        <h3>Indicadores por dominio</h3>
+        <p>Una escala propia por indicador. Los gráficos no expresan significación estadística.</p>
+      </div>
+      <label className="pdp-noprint">Dominio
+        <select value={chosen} onChange={(e) => setChosen(Number(e.target.value))}>
+          {domains.map((d, i) => <option key={d.topic} value={i}>{d.topic}</option>)}
+        </select>
+      </label>
+    </div>
+    <h4>{domain.topic}</h4>
+    {rows.length ? <div className="pdp-domain-chart__rows">{rows.map((r) => {
+      const refs = comparatorsOf(r).filter((c) => geo.includes(c.label) && c.value >= 0 && Number.isFinite(c.value));
+      const max = Math.max(r.chartValue!, ...refs.map((c) => c.value), 1) * 1.06;
+      return <div className="pdp-domain-chart__item" key={r.id}>
+        <div className="pdp-domain-chart__title"><b>{r.title}</b><small>{r.period || "Periodo no declarado"} · {unitOf(r.unit).trim() || "sin unidad declarada"}</small></div>
+        {[{label:municipalityName,value:r.chartValue!,local:true},...refs.map((c)=>({label:c.label,value:c.value,local:false}))].map((v) =>
+          <div className="pdp-domain-chart__measure" key={v.label}>
+            <span>{v.label}</span><i><b className={v.local?"is-local":undefined} style={{width:`${(v.value/max)*100}%`}} /></i>
+            <strong>{formatComparisonValue(v.value)}</strong>
+          </div>
+        )}
+        <details><summary>Procedencia y cautelas</summary>
+          <p>{[r.source,r.page,r.denominator ? `Base: ${r.denominator}`:undefined,r.caution].filter(Boolean).join(" · ") || "No consta detalle adicional de procedencia."}</p>
+        </details>
+      </div>;
+    })}</div> : <p className="pdp-note">Este dominio no incluye pares de valores numéricos aptos para el gráfico comparativo. Sus indicadores permanecen disponibles en la tabla.</p>}
+  </section>;
+}
+
 function SectionExplorer({ results, municipalityName }: { results: ProfileResult[]; municipalityName: string }) {
   const metrics = useMemo(() => sectionMetrics(results), [results]);
   const [metric, setMetric] = useState(0);
@@ -253,6 +298,7 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
                 </a>)}
               </nav>
               <p className="pdp-note">Los dominios organizan los indicadores incluidos en el perfil guardado. La ausencia de una referencia se muestra como «—»; no se estiman datos faltantes.</p>
+              <DomainComparison domains={healthDomains} geo={geo} municipalityName={municipalityName} />
               <Legend municipalityName={municipalityName} geo={geo} />
               <IndicatorTable results={split.healthPanel} municipalityName={municipalityName} geo={geo} caption="Indicadores del panel de salud" grouped />
             </>
