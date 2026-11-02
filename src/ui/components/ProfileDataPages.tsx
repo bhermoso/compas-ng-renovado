@@ -76,7 +76,7 @@ function IndicatorTable({ results, municipalityName, geo, caption, grouped }: { 
           </tr>
         </thead>
         {topics.map((t) => (
-          <tbody key={t.topic || "all"}>
+          <tbody key={t.topic || "all"} id={grouped ? `pdp-domain-${topics.indexOf(t)}` : undefined}>
             {grouped && <tr className="pdp-table__group"><th scope="rowgroup" colSpan={cols}>{t.topic}</th></tr>}
             {t.results.map((r) => {
               const unit = unitOf(r.unit);
@@ -180,6 +180,8 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
   const headlines = headlineResults(results);
   const inequalityOther = split.inequality.filter((r) => !/^secci[oó]n/i.test(r.scale ?? ""));
   const sectionResults = split.inequality.filter((r) => /^secci[oó]n/i.test(r.scale ?? ""));
+  const healthDomains = groupResultsByTopic(split.healthPanel);
+  const comparedCount = split.healthPanel.filter((r) => comparatorsOf(r).some((c) => geo.includes(c.label))).length;
   const pageHead = (n: number, heading: string) => (
     <header className="pdp-page__head"><span>{municipalityName} en datos · {n} de 4</span><h2>{heading}</h2></header>
   );
@@ -240,6 +242,17 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
           {pages.healthPanel.map((p, i) => <p key={i} className="pdp-text">{p}</p>)}
           {split.healthPanel.length > 0 ? (
             <>
+              <div className="pdp-health-summary" aria-label="Cobertura del sistema de indicadores">
+                <div><strong>{split.healthPanel.length}</strong><span>indicadores documentados</span></div>
+                <div><strong>{healthDomains.length}</strong><span>dominios de salud</span></div>
+                <div><strong>{comparedCount}</strong><span>con referencia territorial</span></div>
+              </div>
+              <nav className="pdp-domain-nav pdp-noprint" aria-label="Ir a un dominio del panel">
+                {healthDomains.map((domain,i)=><a href={`#pdp-domain-${i}`} key={domain.topic}>
+                  <span>{domain.topic}</span><small>{domain.results.length} indicadores</small>
+                </a>)}
+              </nav>
+              <p className="pdp-note">Los dominios organizan los indicadores incluidos en el perfil guardado. La ausencia de una referencia se muestra como «—»; no se estiman datos faltantes.</p>
               <Legend municipalityName={municipalityName} geo={geo} />
               <IndicatorTable results={split.healthPanel} municipalityName={municipalityName} geo={geo} caption="Indicadores del panel de salud" grouped />
             </>
