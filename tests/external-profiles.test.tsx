@@ -132,7 +132,7 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
   const p=externalProfileFixture();
   const html=renderToStaticMarkup(createElement(ExternalProfileDashboard,{municipalityId:p.municipalityId,municipalityName:'Municipio de pruebas',library:{profiles:[p],attachments:[],activeId:p.id},authorName:'Pruebas',onSave:async()=>{}}));
   // Decisión del autor (2026-11-01): los datos epidemiológicos no se cuestionan; COMPÁS no añade advertencias propias.
-  expect(html).not.toContain('Antecedente histórico');expect(html).not.toContain('no describe por sí solo');expect(html).toContain('Denominador no documentado');expect(html).toContain('Atlas ficticio');expect(html).toContain('Descargar esta revisión · Word');
+  expect(html).not.toContain('Antecedente histórico');expect(html).not.toContain('no describe por sí solo');expect(html).toContain('Denominador no documentado');expect(html).toContain('Atlas ficticio');expect(html).toContain('Gestión y versiones');expect(html).not.toContain('Descargar esta revisión · Word');
   expect(html).not.toContain('prevalencia actual');
  });
  it('maqueta los datos suministrados para PDF y Word sin inventar conclusiones',()=>{
