@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import type { ProfileDataPages as DataPages } from "../../application/health-profile/profileStructure";
+import type { ProfileDataPages as DataPages, ProfileStructure } from "../../application/health-profile/profileStructure";
 import type { ProfileResult } from "../../domain/health-profile/ExternalHealthProfile";
 import {
   comparatorsOf,
@@ -201,7 +201,7 @@ function printPages(node: HTMLElement | null, title: string) {
   if (doc.readyState === "complete") window.setTimeout(go, 300); else frame.addEventListener("load", () => window.setTimeout(go, 300));
 }
 
-export function ProfileDataPages({ pages, results, municipalityName, title, period, metrics, pdfUrl, pdfName }: {
+export function ProfileDataPages({ pages, results, municipalityName, title, period, metrics, pdfUrl, pdfName, interpretation }: {
   pages: DataPages;
   results: ProfileResult[];
   municipalityName: string;
@@ -210,6 +210,7 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
   metrics: string[];
   pdfUrl?: string;
   pdfName?: string;
+  interpretation?: Pick<ProfileStructure, "overallReading" | "conclusions">;
 }) {
   const root = useRef<HTMLDivElement>(null);
   const split = splitDataPageResults(results);
@@ -277,6 +278,26 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
         <section id="pdp-3" className="pdp-page" aria-label="Panel de salud">
           {pageHead(3, "Panel de salud")}
           {pages.healthPanel.map((p, i) => <p key={i} className="pdp-text">{p}</p>)}
+          {interpretation && (interpretation.overallReading.length > 0 || interpretation.conclusions.length > 0) && (
+            <section className="pdp-interpretation" aria-label="Lectura documentada del perfil">
+              <div className="pdp-interpretation__heading">
+                <p className="ep-eyebrow">INTERPRETACIÓN DEL DOCUMENTO</p>
+                <h3>De los indicadores a las conclusiones</h3>
+                <p>Texto procedente del perfil guardado, no generado a partir de los gráficos. Las conclusiones se muestran como lectura global; no se atribuyen automáticamente a un dominio concreto.</p>
+              </div>
+              {interpretation.overallReading.length > 0 && <details open className="pdp-interpretation__reading">
+                <summary>Lectura de conjunto</summary>
+                {interpretation.overallReading.map((paragraph,i)=><p key={i}>{paragraph}</p>)}
+              </details>}
+              {interpretation.conclusions.length > 0 && <details className="pdp-interpretation__conclusions">
+                <summary>{interpretation.conclusions.length} conclusiones documentadas · Ver títulos y fundamento</summary>
+                <ol>{interpretation.conclusions.map(c=><li key={c.id}><strong>{c.id}. {c.title}</strong>
+                  {c.body.map((paragraph,i)=><p key={i}>{paragraph}</p>)}
+                  {c.leadsTo && <small>Deriva en: {c.leadsTo}</small>}
+                </li>)}</ol>
+              </details>}
+            </section>
+          )}
           {split.healthPanel.length > 0 ? (
             <>
               <div className="pdp-health-summary" aria-label="Cobertura del sistema de indicadores">
