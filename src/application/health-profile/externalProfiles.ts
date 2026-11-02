@@ -13,6 +13,7 @@ export function isProfileResult(x: unknown): x is ProfileResult {
  if (['topic','scale','denominator'].some(k => x[k] !== undefined && !string(x[k]))) return false;
  if (x.temporalContext !== undefined && !['current','historical','not-stated'].includes(x.temporalContext as string)) return false;
  if (x.chartValue !== undefined && (typeof x.chartValue !== 'number' || !Number.isFinite(x.chartValue))) return false;
+ if (x.supportsConclusions !== undefined && (!strings(x.supportsConclusions) || x.supportsConclusions.length > 100 || new Set(x.supportsConclusions).size !== x.supportsConclusions.length || !x.supportsConclusions.every(id => /^C[1-9]\d*$/.test(id)))) return false;
  const validComparison = (c: unknown) => object(c) && string(c.label) && typeof c.value === 'number' && Number.isFinite(c.value);
  if (x.comparisons !== undefined && !(Array.isArray(x.comparisons) && x.comparisons.length <= 6 && x.comparisons.every(validComparison))) return false;
  return x.comparison === undefined || validComparison(x.comparison);
