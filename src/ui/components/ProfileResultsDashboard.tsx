@@ -6,6 +6,7 @@ import {
   groupRecommendations,
   groupResultsByTopic,
   headlineResults,
+  splitDataPageResults,
   type DashboardTopic,
 } from "../../application/health-profile/profileDashboard";
 
@@ -62,6 +63,44 @@ function TopicPanel({ topic }: { topic: DashboardTopic }) {
   );
 }
 
+/** Tabla de indicadores de una página de datos: valor local, referencia, periodo y fuente, sin colores de juicio. */
+function DataTable({ results, municipalityName, caption }: { results: ProfileResult[]; municipalityName: string; caption: string }) {
+  const topics = groupResultsByTopic(results);
+  const grouped = topics.length > 1;
+  return (
+    <div className="epd-table-wrap">
+      <table className="epd-table">
+        <caption className="ep-sr-only">{caption}</caption>
+        <thead><tr><th scope="col">Indicador</th><th scope="col">{municipalityName}</th><th scope="col">Referencia</th><th scope="col">Periodo</th><th scope="col">Fuente</th></tr></thead>
+        {topics.map((t) => (
+          <tbody key={t.topic}>
+            {grouped && <tr className="epd-table__group"><th scope="rowgroup" colSpan={5}>{t.topic}</th></tr>}
+            {t.results.map((r) => {
+              const unit = displayUnit(r.unit);
+              return (
+                <tr key={r.id}>
+                  <th scope="row">{r.title}{r.scale && r.scale !== municipalityName ? <small>{r.scale}</small> : null}</th>
+                  <td className="epd-table__value">{r.value}{unit}</td>
+                  <td>{r.comparison ? `${r.comparison.label}: ${formatComparisonValue(r.comparison.value)}${unit}` : "—"}</td>
+                  <td>{r.period || "—"}</td>
+                  <td className="epd-table__source">{[sourceLine(r), r.denominator ? `Base: ${r.denominator}` : ""].filter(Boolean).join(" · ")}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        ))}
+      </table>
+    </div>
+  );
+}
+
+const DATA_PAGES = [
+  { id: "epd-p1", label: "Portada" },
+  { id: "epd-p2", label: "Quién vive aquí" },
+  { id: "epd-p3", label: "Panel de salud" },
+  { id: "epd-p4", label: "Desigualdad" },
+] as const;
+
 const RECO_HINT: Record<string, string> = {
   Conocer: "Recuperar los datos que faltan",
   Contrastar: "Preguntar a quien lo vive",
@@ -105,8 +144,63 @@ export function ProfileResultsDashboard({ profile, municipalityName, onAddResult
     structure?.pages ? `${structure.pages} páginas` : "",
   ].filter(Boolean);
 
+  const pages = structure?.dataPages;
+  const split = splitDataPageResults(profile.results);
+  const pageHead = (n: number, title: string) => (
+    <div className="epd-page__head"><p className="ep-eyebrow">{municipalityName} en datos · {n} de 4</p><h2>{title}</h2></div>
+  );
+
   return (
     <div className="epd">
+      {pages ? (
+        <>
+          <nav className="epd-pages-nav" aria-label="Páginas de datos">
+            {DATA_PAGES.map((p, i) => <a key={p.id} href={`#${p.id}`}><span>{i + 1}</span>{p.label}</a>)}
+          </nav>
+          <section id="epd-p1" className="epd-hero epd-page" aria-label={`${municipalityName} en datos: portada`}>
+            {pageHead(1, municipalityName)}
+            {headlines.length > 0 && <div className="epd-kpis">{headlines.map((r) => <Headline key={r.id} result={r} />)}</div>}
+            {pages.cover.length > 0 && (
+              <div className="epd-blocks">
+                {pages.cover.map((b) => <div key={b.title} className="epd-block"><h3>{b.title}</h3><p>{b.text}</p></div>)}
+              </div>
+            )}
+            {metrics.length > 0 && <p className="epd-metrics">{metrics.join(" · ")}</p>}
+          </section>
+          <section id="epd-p2" className="epd-page" aria-label="Quién vive aquí">
+            {pageHead(2, "Quién vive aquí")}
+            {pages.whoLivesHere.map((p, i) => <p key={i} className="epd-page__text">{p}</p>)}
+            {split.whoLivesHere.length > 0 && <DataTable results={split.whoLivesHere} municipalityName={municipalityName} caption="Indicadores de población y hogares" />}
+          </section>
+          <section id="epd-p3" className="epd-page" aria-label="Panel de salud">
+            {pageHead(3, "Panel de salud")}
+            {pages.healthPanel.map((p, i) => <p key={i} className="epd-page__text">{p}</p>)}
+            {split.healthPanel.length > 0
+              ? <DataTable results={split.healthPanel} municipalityName={municipalityName} caption="Indicadores del panel de salud" />
+              : <p className="epd-page__text">El perfil no trae indicadores para el panel. {onAddResults && <button type="button" onClick={onAddResults}>Incorporar resultados</button>}</p>}
+            <p className="epd-page__note">Valores tal como los publica cada fuente. El panel no marca mejor o peor: solo podría hacerlo cuando la fuente publica intervalos o significación.</p>
+          </section>
+          <section id="epd-p4" className="epd-page" aria-label="Desigualdad">
+            {pageHead(4, "Desigualdad")}
+            {pages.inequality.intro.map((p, i) => <p key={i} className="epd-page__text">{p}</p>)}
+            {split.inequality.length > 0 && <DataTable results={split.inequality} municipalityName={municipalityName} caption="Indicadores de desigualdad" />}
+            {pages.inequality.blocks.length > 0 && (
+              <div className="epd-blocks">
+                {pages.inequality.blocks.map((b) => <div key={b.title} className="epd-block"><h3>{b.title}</h3><p>{b.text}</p></div>)}
+              </div>
+            )}
+          </section>
+          {structure && structure.overallReading.length > 0 && (
+            <section className="epd-reading">
+              <p className="ep-eyebrow">Lectura de conjunto</p>
+              <h2>Qué concluye el perfil</h2>
+              {structure.overallReading.map((p, i) => <p key={i}>{p}</p>)}
+              {onOpenReader && <button type="button" className="epd-reading__more" onClick={() => onOpenReader()}>Leer el perfil completo</button>}
+            </section>
+          )}
+        </>
+      ) : (
+      <>
       {(headlines.length > 0 || figures.length > 0) && (
         <section className="epd-hero" aria-label={`${municipalityName} en cifras`}>
           <p className="ep-eyebrow">{municipalityName} en cifras</p>
@@ -132,23 +226,6 @@ export function ProfileResultsDashboard({ profile, municipalityName, onAddResult
         {onOpenReader && structure && structure.sections.length > 1 && <button type="button" className="epd-reading__more" onClick={() => onOpenReader()}>Leer el perfil completo</button>}
       </section>
 
-      {findings.length > 0 && (
-        <section className="epd-findings">
-          <p className="ep-eyebrow">Conclusiones</p>
-          <h2>Lo que concluye el perfil</h2>
-          <ol>
-            {findings.map((f, i) => {
-              const match = /^(C\d+)\.\s*(.*)$/.exec(f);
-              const id = match?.[1] ?? `C${i + 1}`;
-              const content = <><span className="epd-findings__id">{id}</span><span>{match?.[2] ?? f}</span></>;
-              return <li key={i}>{onOpenReader && structure?.conclusions.some((c) => c.id === id)
-                ? <button type="button" className="epd-findings__open" onClick={() => onOpenReader(`epr-${id}`)} aria-label={`Leer ${id} en el documento`}>{content}</button>
-                : content}</li>;
-            })}
-          </ol>
-        </section>
-      )}
-
       <section className="epd-data">
         <div className="epd-data__head">
           <div><p className="ep-eyebrow">Datos con contexto</p><h2>Resultados del perfil</h2></div>
@@ -168,6 +245,26 @@ export function ProfileResultsDashboard({ profile, municipalityName, onAddResult
           <div className="ep-pending"><h3>La presentación de resultados está pendiente</h3><p>El perfil se ha conservado completo. Incorpora el paquete de resultados preparado fuera de COMPÁS o añade sus indicadores al editar una revisión. No se han inventado gráficos a partir del texto.</p>{onAddResults && <button type="button" onClick={onAddResults}>Incorporar resultados</button>}</div>
         )}
       </section>
+      </>
+      )}
+
+      {findings.length > 0 && (
+        <section className="epd-findings">
+          <p className="ep-eyebrow">Conclusiones</p>
+          <h2>Lo que concluye el perfil</h2>
+          <ol>
+            {findings.map((f, i) => {
+              const match = /^(C\d+)\.\s*(.*)$/.exec(f);
+              const id = match?.[1] ?? `C${i + 1}`;
+              const content = <><span className="epd-findings__id">{id}</span><span>{match?.[2] ?? f}</span></>;
+              return <li key={i}>{onOpenReader && structure?.conclusions.some((c) => c.id === id)
+                ? <button type="button" className="epd-findings__open" onClick={() => onOpenReader(`epr-${id}`)} aria-label={`Leer ${id} en el documento`}>{content}</button>
+                : content}</li>;
+            })}
+          </ol>
+        </section>
+      )}
+
 
       {recommendations.length > 0 && (
         <section className="epd-recos">

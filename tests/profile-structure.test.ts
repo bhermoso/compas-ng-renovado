@@ -73,3 +73,26 @@ describe("prefillFromStructure", () => {
     expect(recognized).toEqual({ conclusions: 0, recommendations: 0, summary: false });
   });
 });
+describe("parseProfileStructure · páginas de datos del Perfil de Loja (Art. 17 ter)", () => {
+  const s = parseProfileStructure(fixture("loja-v0.3-package.txt"));
+  it("reconoce las páginas de datos como apartados del índice", () => {
+    const titles = s.sections.map((x) => x.title);
+    expect(titles.slice(0, 3)).toEqual(["Loja en datos", "Quién vive aquí", "Desigualdad"]);
+    expect(titles).not.toContain("Inicio");
+  });
+  it("lee los bloques de la portada y de la página de desigualdad", () => {
+    expect(s.dataPages?.cover.map((b) => b.title)).toEqual(["Resumen", "Desigualdades", "Comunidad", "Salud"]);
+    expect(s.dataPages?.whoLivesHere[0]).toMatch(/^Loja tiene 20\.923 habitantes/);
+    expect(s.dataPages?.inequality.intro[0]).toMatch(/^La media de Loja esconde diferencias grandes/);
+    expect(s.dataPages?.inequality.blocks.map((b) => b.title)).toEqual(["Por barrio", "Mujeres y hombres", "Edad", "Origen", "Lo que no se ve"]);
+  });
+  it("separa la lectura de conjunto de las conclusiones", () => {
+    expect(s.overallReading).toHaveLength(3);
+    expect(s.overallReading[0]).toMatch(/^Las nueve conclusiones describen/);
+    expect(s.conclusions.map((c) => c.id)).toEqual(["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"]);
+    expect(s.recommendations).toHaveLength(11);
+  });
+  it("no inventa páginas de datos en un perfil que no las declara", () => {
+    expect(parseProfileStructure(fixture("zagra-v0.2-docx.txt")).dataPages).toBeUndefined();
+  });
+});
