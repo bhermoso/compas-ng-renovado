@@ -44,9 +44,9 @@ export function ProfileEditorialLab({ profile }: { profile: ExternalHealthProfil
      <p className="pel-meta">{!fragment.trim()?"Selecciona una frase existente.":matches===1?"Coincidencia única: sustitución comprobable.":matches===0?"El fragmento no aparece exactamente en el capítulo.":`El fragmento aparece ${matches} veces; amplía la selección.`}</p>
      <label>Redacción alternativa de ese fragmento<textarea rows={3} value={replacement} onChange={e=>setReplacement(e.target.value)} placeholder="Reescribe solo la parte que necesita corrección." /></label>
      <label>Motivo técnico y referencia que debe comprobarse<textarea rows={3} value={justification} onChange={e=>setJustification(e.target.value)} placeholder="Describe el problema y la evidencia que sustenta el cambio." /></label>
-     {matches===1&&<details><summary>Vista previa del capítulo con la sustitución</summary><div className="pel-original">{revised.split("\\n\\n").map((p,i)=><p key={i}>{p}</p>)}</div></details>}
+     {matches===1&&<details><summary>Vista previa del capítulo con la sustitución</summary><div className="pel-original">{revised.split("\n\n").map((p,i)=><p key={i}>{p}</p>)}</div></details>}
      <button type="button" disabled={!minimallyChanged} onClick={()=>{
-      const body=[`Perfil: ${profile.title}`,`Capítulo: ${selected.title}`,"REVISIÓN PUNTUAL EXPERIMENTAL · NO VALIDADA","","FRAGMENTO ORIGINAL",fragment,"","SUSTITUCIÓN PROPUESTA",replacement,"","JUSTIFICACIÓN Y VERIFICACIÓN",justification,"","CAPÍTULO EN VISTA PREVIA",revised].join("\\n");
+      const body=[`Perfil: ${profile.title}`,`Capítulo: ${selected.title}`,"REVISIÓN PUNTUAL EXPERIMENTAL · NO VALIDADA","","FRAGMENTO ORIGINAL",fragment,"","SUSTITUCIÓN PROPUESTA",replacement,"","JUSTIFICACIÓN Y VERIFICACIÓN",justification,"","CAPÍTULO EN VISTA PREVIA",revised].join("\n");
       const blob=new Blob([body],{type:"text/plain;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="revision-puntual-perfil.txt";a.click();window.setTimeout(()=>URL.revokeObjectURL(url),1000);
      }}>Descargar propuesta de corrección puntual · TXT</button>
     </section>
