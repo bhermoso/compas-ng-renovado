@@ -113,6 +113,17 @@ function DomainComparison({ domains, geo, municipalityName }: {
     r.chartValue !== undefined && Number.isFinite(r.chartValue) && r.chartValue >= 0 &&
     comparatorsOf(r).some((c) => geo.includes(c.label) && Number.isFinite(c.value) && c.value >= 0)
   );
+  const renderDomain = (d: typeof domain, printable = false) => { const domainRows = d.results.filter((r) =>
+    r.chartValue !== undefined && Number.isFinite(r.chartValue) && r.chartValue >= 0 &&
+    comparatorsOf(r).some((c) => geo.includes(c.label) && Number.isFinite(c.value) && c.value >= 0));
+    return <div className={printable ? "pdp-domain-print" : undefined} key={d.topic}><h4>{d.topic}</h4>{domainRows.length ? <div className="pdp-domain-chart__rows">{domainRows.map((r) => {
+      const refs = comparatorsOf(r).filter((c) => geo.includes(c.label) && c.value >= 0 && Number.isFinite(c.value));
+      const max = Math.max(r.chartValue!, ...refs.map((c) => c.value), 1) * 1.06;
+      return <div className="pdp-domain-chart__item" key={r.id}><div className="pdp-domain-chart__title"><b>{r.title}</b><small>{r.period || "Periodo no declarado"} · {unitOf(r.unit).trim() || "sin unidad declarada"}</small></div>
+        {[{label:municipalityName,value:r.chartValue!,local:true},...refs.map((c)=>({label:c.label,value:c.value,local:false}))].map((v) => <div className="pdp-domain-chart__measure" key={v.label}><span>{v.label}</span><i><b className={v.local?"is-local":undefined} style={{width:`${(v.value/max)*100}%`}} /></i><strong>{formatComparisonValue(v.value)}</strong></div>)}
+        <details><summary>Procedencia y cautelas</summary><p>{[r.source,r.page,r.denominator ? `Base: ${r.denominator}`:undefined,r.caution].filter(Boolean).join(" · ") || "No consta detalle adicional de procedencia."}</p></details></div>;
+    })}</div> : <p className="pdp-note">Sin pares numéricos comparables; consultar la tabla completa.</p>}</div>;
+  };
   return <section className="pdp-domain-chart" aria-label="Comparador gráfico por dominio">
     <div className="pdp-domain-chart__header">
       <div><p className="pdp-domain-chart__eyebrow">LECTURA COMPARADA</p>
@@ -125,23 +136,8 @@ function DomainComparison({ domains, geo, municipalityName }: {
         </select>
       </label>
     </div>
-    <h4>{domain.topic}</h4>
-    {rows.length ? <div className="pdp-domain-chart__rows">{rows.map((r) => {
-      const refs = comparatorsOf(r).filter((c) => geo.includes(c.label) && c.value >= 0 && Number.isFinite(c.value));
-      const max = Math.max(r.chartValue!, ...refs.map((c) => c.value), 1) * 1.06;
-      return <div className="pdp-domain-chart__item" key={r.id}>
-        <div className="pdp-domain-chart__title"><b>{r.title}</b><small>{r.period || "Periodo no declarado"} · {unitOf(r.unit).trim() || "sin unidad declarada"}</small></div>
-        {[{label:municipalityName,value:r.chartValue!,local:true},...refs.map((c)=>({label:c.label,value:c.value,local:false}))].map((v) =>
-          <div className="pdp-domain-chart__measure" key={v.label}>
-            <span>{v.label}</span><i><b className={v.local?"is-local":undefined} style={{width:`${(v.value/max)*100}%`}} /></i>
-            <strong>{formatComparisonValue(v.value)}</strong>
-          </div>
-        )}
-        <details><summary>Procedencia y cautelas</summary>
-          <p>{[r.source,r.page,r.denominator ? `Base: ${r.denominator}`:undefined,r.caution].filter(Boolean).join(" · ") || "No consta detalle adicional de procedencia."}</p>
-        </details>
-      </div>;
-    })}</div> : <p className="pdp-note">Este dominio no incluye pares de valores numéricos aptos para el gráfico comparativo. Sus indicadores permanecen disponibles en la tabla.</p>}
+    <div className="pdp-domain-screen">{renderDomain(domain)}</div>
+    <div className="pdp-domain-print-all">{domains.map((d)=>renderDomain(d,true))}</div>
   </section>;
 }
 
