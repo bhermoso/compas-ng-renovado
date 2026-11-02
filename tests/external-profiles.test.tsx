@@ -1,4 +1,7 @@
 import { createElement } from 'react';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { parseProfileStructure } from '../src/application/health-profile/profileStructure';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import seed from '../public/seeds/compas-ng-workspace-granada-zaidin.json';
@@ -72,6 +75,29 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
    expect(isExternalProfileLibrary({profiles:[broken],attachments:[],activeId:broken.id},p.municipalityId)).toBe(false);
    expect(()=>readExternalProfilePackage(JSON.stringify({...broken,schema:'compas-profile-package/v1'}),p.municipalityId)).toThrow();
   }
+ });
+ it('simula Loja v0.3: revisión trazable, lectura y recuperación sin sustituir la vigente',()=>{
+  const text=readFileSync(resolve(__dirname,'fixtures/profile-text/loja-v0.3-package.txt'),'utf8');
+  const parsed=parseProfileStructure(text);
+  expect(parsed.conclusions.length).toBeGreaterThan(0);
+  const first=externalProfileFixture('loja');
+  const indicator={...first.results[0],supportsConclusions:[parsed.conclusions[0].id]};
+  const revision={...first,id:'loja-v03-review-test',revisionOf:first.id,text,
+    results:[indicator,...first.results.slice(1)]};
+  const library=appendExternalProfile({profiles:[first],attachments:[],activeId:first.id},revision,[],'loja');
+  expect(library.activeId).toBe(first.id);
+  expect(library.profiles[0].results[0].supportsConclusions).toBeUndefined();
+  const stored=JSON.parse(JSON.stringify(library));
+  expect(isExternalProfileLibrary(stored,'loja')).toBe(true);
+  expect(stored.profiles[1].results[0].supportsConclusions).toEqual([parsed.conclusions[0].id]);
+  const page=renderToStaticMarkup(createElement(ExternalProfileDashboard,{
+    municipalityId:'loja',municipalityName:'Loja',library:stored,authorName:'Equipo de pruebas',onSave:async()=>{}
+  }));
+  expect(page).toContain('Perfil');
+  expect(page).toContain('Gestión y versiones');
+  expect(page).toContain('Documento completo');
+  // El panel abierto inicialmente representa la versión vigente, no una revisión pendiente.
+  expect(stored.activeId).toBe(first.id);
  });
  it('no admite referencias rotas, bytes incompletos ni validaciones sin autoría',()=>{
   const p=externalProfileFixture();
