@@ -146,3 +146,15 @@
 .epd-trace__columns button{font-size:12px;color:#0d6677;background:white;border:1px solid #accdce;padding:7px 11px}
 @media(max-width:850px){.epd-trace__columns{grid-template-columns:1fr}.epd-trace__columns>div+div{border-left:0;border-top:1px solid #dce9e5;padding:15px 0 0}}
 @media print{.epd-trace__item{break-inside:avoid}.epd-trace{break-before:page}}
+
+/* Vínculos documentales editables exclusivamente en borradores de revisión. */
+.ep-link-editor{border-top:2px solid #bfdad7;margin:28px 0 16px;padding-top:22px}
+.ep-link-editor>h3{font-size:19px;margin:0 0 9px}
+.ep-link-editor__list{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:12px}
+.ep-link-editor__item{border:1px solid #d3e3e0;border-radius:6px;padding:12px 14px;background:#f8fbfa;min-width:0}
+.ep-link-editor__item legend{font-size:13px;font-weight:700;color:#234f54;padding:0 5px;max-width:95%}
+.ep-link-editor__options{display:grid;gap:7px;max-height:240px;overflow:auto}
+.ep-link-editor__options label{display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:12px;line-height:1.45}
+.ep-link-editor__options input{width:15px;height:15px;margin-top:2px;flex:none}
+.ep-link-editor__options strong{color:#146a70}
+@media print{.ep-link-editor{display:none}}
