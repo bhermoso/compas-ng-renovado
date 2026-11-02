@@ -4106,6 +4106,7 @@ export default function App() {
         {/* Perfil externo canónico y atlas de desigualdades como material complementario, sin validar automáticamente. */}
         {view === "psl" && (
           <>
+            {workspace.municipality.identity.id.toLowerCase() === "loja" && <LojaPublicHealthProfile />}
             <ExternalProfileDashboard
               key={workspace.municipality.identity.id}
               municipalityId={workspace.municipality.identity.id}
@@ -4117,7 +4118,6 @@ export default function App() {
               onSave={handleSaveExternalProfiles}
               onDirtyChange={onProfileDirtyChange}
             />
-            {workspace.municipality.identity.id.toLowerCase() === "loja" && <LojaPublicHealthProfile />}
           </>
         )}
 
