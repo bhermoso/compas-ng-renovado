@@ -231,8 +231,8 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
           {["Portada", "Quién vive aquí", "Panel de salud", "Desigualdad"].map((label, i) => <a key={label} href={`#pdp-${i + 1}`}><span>{i + 1}</span>{label}</a>)}
         </nav>
         <div className="pdp-downloads">
-          <button type="button" onClick={() => printPages(root.current, `${title} · páginas de datos`)}>↓ Descargar estas páginas · PDF</button>
-          {pdfUrl && <a className="pdp-primary" href={pdfUrl} download={pdfName}>↓ Perfil completo · PDF</a>}
+          <button type="button" onClick={() => printPages(root.current, `${title} · páginas de datos`)}>↓ Guardar páginas en PDF</button>
+          {pdfUrl && <a className="pdp-primary" href={pdfUrl} download={pdfName}>↓ PDF original completo</a>}
         </div>
       </div>
 
@@ -278,6 +278,24 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
         <section id="pdp-3" className="pdp-page" aria-label="Panel de salud">
           {pageHead(3, "Panel de salud")}
           {pages.healthPanel.map((p, i) => <p key={i} className="pdp-text">{p}</p>)}
+          {split.healthPanel.length > 0 ? (
+            <>
+              <div className="pdp-health-summary" aria-label="Cobertura del sistema de indicadores">
+                <div><strong>{split.healthPanel.length}</strong><span>indicadores documentados</span></div>
+                <div><strong>{healthDomains.length}</strong><span>dominios de salud</span></div>
+                <div><strong>{comparedCount}</strong><span>con referencia territorial</span></div>
+              </div>
+              <nav className="pdp-domain-nav pdp-noprint" aria-label="Ir a un dominio del panel">
+                {healthDomains.map((domain,i)=><a href={`#pdp-domain-${i}`} key={domain.topic}>
+                  <span>{domain.topic}</span><small>{domain.results.length} indicadores</small>
+                </a>)}
+              </nav>
+              <p className="pdp-note">Los dominios organizan los indicadores incluidos en el perfil guardado. La ausencia de una referencia se muestra como «—»; no se estiman datos faltantes.</p>
+              <DomainComparison domains={healthDomains} geo={geo} municipalityName={municipalityName} />
+              <Legend municipalityName={municipalityName} geo={geo} />
+              <IndicatorTable results={split.healthPanel} municipalityName={municipalityName} geo={geo} caption="Indicadores del panel de salud" grouped />
+            </>
+          ) : <p className="pdp-text">El perfil no trae indicadores para el panel.</p>}
           {interpretation && (interpretation.overallReading.length > 0 || interpretation.conclusions.length > 0) && (
             <section className="pdp-interpretation" aria-label="Lectura documentada del perfil">
               <div className="pdp-interpretation__heading">
@@ -298,24 +316,6 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
               </details>}
             </section>
           )}
-          {split.healthPanel.length > 0 ? (
-            <>
-              <div className="pdp-health-summary" aria-label="Cobertura del sistema de indicadores">
-                <div><strong>{split.healthPanel.length}</strong><span>indicadores documentados</span></div>
-                <div><strong>{healthDomains.length}</strong><span>dominios de salud</span></div>
-                <div><strong>{comparedCount}</strong><span>con referencia territorial</span></div>
-              </div>
-              <nav className="pdp-domain-nav pdp-noprint" aria-label="Ir a un dominio del panel">
-                {healthDomains.map((domain,i)=><a href={`#pdp-domain-${i}`} key={domain.topic}>
-                  <span>{domain.topic}</span><small>{domain.results.length} indicadores</small>
-                </a>)}
-              </nav>
-              <p className="pdp-note">Los dominios organizan los indicadores incluidos en el perfil guardado. La ausencia de una referencia se muestra como «—»; no se estiman datos faltantes.</p>
-              <DomainComparison domains={healthDomains} geo={geo} municipalityName={municipalityName} />
-              <Legend municipalityName={municipalityName} geo={geo} />
-              <IndicatorTable results={split.healthPanel} municipalityName={municipalityName} geo={geo} caption="Indicadores del panel de salud" grouped />
-            </>
-          ) : <p className="pdp-text">El perfil no trae indicadores para el panel.</p>}
           <p className="pdp-note">Valores tal como los publica cada fuente. Los ámbitos se distinguen por la forma del marcador; el panel no marca mejor o peor, porque solo podría hacerlo cuando la fuente publica intervalos o significación. Cada fila tiene su propia escala.</p>
         </section>
 
