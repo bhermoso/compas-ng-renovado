@@ -4102,18 +4102,53 @@ export default function App() {
           </>
         )}
 
-        {/* Perfil elaborado externamente: documento, resultados y versiones. */}
-        {view === "psl" && <ExternalProfileDashboard
-          key={workspace.municipality.identity.id}
-          municipalityId={workspace.municipality.identity.id}
-          municipalityName={municipality.name}
-          library={workspace.externalProfileLibrary ?? EMPTY_PROFILE_LIBRARY}
-          authorName={remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || ""}
-          legacyProfiles={workspace.compiledProfiles}
-          legacyText={workspace.validatedPSL?.conclusiones.content}
-          onSave={handleSaveExternalProfiles}
-          onDirtyChange={onProfileDirtyChange}
-        />}
+        {/* Perfil externo canónico y atlas de desigualdades como material complementario, sin validar automáticamente. */}
+        {view === "psl" && (
+          <>
+            <ExternalProfileDashboard
+              key={workspace.municipality.identity.id}
+              municipalityId={workspace.municipality.identity.id}
+              municipalityName={municipality.name}
+              library={workspace.externalProfileLibrary ?? EMPTY_PROFILE_LIBRARY}
+              authorName={remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || ""}
+              legacyProfiles={workspace.compiledProfiles}
+              legacyText={workspace.validatedPSL?.conclusiones.content}
+              onSave={handleSaveExternalProfiles}
+              onDirtyChange={onProfileDirtyChange}
+            />
+            {workspace.municipality.identity.id.toLowerCase() === "loja" && (
+              <section className="workspace-panel" aria-label="Atlas territorial de desigualdades de Loja">
+                <p className="eyebrow">Loja · Atlas territorial · Modelo británico</p>
+                <h2>Desigualdades socioeconómicas y demográficas por sección censal</h2>
+                <p className="panel-note">
+                  Material exploratorio complementario del Perfil, elaborado con las 17 secciones
+                  censales recogidas en el Perfil de Salud Local de Loja (INE, Atlas de Renta 2024).
+                  Permite comparar renta por persona, población bajo el umbral del 60 % de la mediana
+                  nacional del ingreso por unidad de consumo, edad media y proporción de personas
+                  de 65 años o más. No contiene tasas de enfermedad por sección ni resultados de
+                  significación estadística. Pendiente de cotejo final con el INE y de validación técnica.
+                  Las secciones no equivalen automáticamente a barrios.
+                </p>
+                <p>
+                  <a href="https://bhermoso.github.io/aula-activos-comunitarios/loja/perfil-piloto.html"
+                     target="_blank" rel="noopener noreferrer">
+                    Abrir el atlas de Loja en una pestaña independiente ↗
+                  </a>
+                </p>
+                <iframe
+                  title="Atlas interactivo de desigualdades territoriales de Loja (prototipo no validado)"
+                  src="https://bhermoso.github.io/aula-activos-comunitarios/loja/perfil-piloto.html"
+                  loading="lazy"
+                  style={{ width: "100%", minHeight: "760px", border: "1px solid #cadfd9", borderRadius: "12px", background: "#fff" }}
+                />
+                <p className="panel-note">
+                  Este visor no incorpora el atlas al perfil externo activo ni lo aprueba;
+                  la incorporación documental y su validación siguen el circuito de COMPÁS.
+                </p>
+              </section>
+            )}
+          </>
+        )}
 
         {/* ── ⑤ Priorizaciones — técnica y participativa ──────── */}
         {view === "priorizacion" && (
