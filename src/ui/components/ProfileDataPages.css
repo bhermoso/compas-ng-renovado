@@ -178,3 +178,15 @@
 .pdp-domain-chart__item details p{margin:7px 0 0}
 @media(max-width:600px){.pdp-domain-chart{padding:14px}.pdp-domain-chart__rows{grid-template-columns:1fr}}
 @media print{.pdp-domain-chart{padding:8px;margin:12px 0;break-inside:avoid}.pdp-domain-chart__rows{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.pdp-domain-chart__item{padding:7px;break-inside:avoid}.pdp-domain-chart__measure{margin:2px 0;font-size:7pt;grid-template-columns:55px 1fr 53px}.pdp-domain-chart__measure>strong{font-size:7pt}.pdp-domain-chart__header select{display:none}.pdp-domain-chart__item details{display:none}}
+
+/* El visor interactivo muestra un dominio; la impresión incorpora todos. */
+.pdp-domain-print-all{display:none}
+@media print{
+ .pdp-domain-screen{display:none!important}
+ .pdp-domain-print-all{display:block!important}
+ .pdp-domain-print{break-before:page;page-break-before:always;margin:0 0 10px}
+ .pdp-domain-print:first-child{break-before:auto;page-break-before:auto}
+ .pdp-domain-chart{break-inside:auto!important}
+ .pdp-domain-chart__rows{break-inside:auto!important}
+ .pdp-domain-chart__item{break-inside:avoid}
+}
