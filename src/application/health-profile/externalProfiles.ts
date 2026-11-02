@@ -13,7 +13,9 @@ export function isProfileResult(x: unknown): x is ProfileResult {
  if (['topic','scale','denominator'].some(k => x[k] !== undefined && !string(x[k]))) return false;
  if (x.temporalContext !== undefined && !['current','historical','not-stated'].includes(x.temporalContext as string)) return false;
  if (x.chartValue !== undefined && (typeof x.chartValue !== 'number' || !Number.isFinite(x.chartValue))) return false;
- return x.comparison === undefined || (object(x.comparison) && string(x.comparison.label) && typeof x.comparison.value === 'number' && Number.isFinite(x.comparison.value));
+ const validComparison = (c: unknown) => object(c) && string(c.label) && typeof c.value === 'number' && Number.isFinite(c.value);
+ if (x.comparisons !== undefined && !(Array.isArray(x.comparisons) && x.comparisons.length <= 6 && x.comparisons.every(validComparison))) return false;
+ return x.comparison === undefined || validComparison(x.comparison);
 }
 export function isExternalProfileLibrary(value: unknown, municipalityId: string): value is ExternalProfileLibrary {
  if (!object(value) || !Array.isArray(value.profiles) || !Array.isArray(value.attachments)) return false;

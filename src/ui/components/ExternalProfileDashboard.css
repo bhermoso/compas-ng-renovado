@@ -115,27 +115,3 @@
 .epr-preliminaries .epr-section h3{font-size:16px}
 .epr-toc__preliminary{font-size:12px;margin:14px 0 18px}
 .epr-toc__preliminary a{color:#58736c}
-/* Páginas de datos comparables (contrato, Art. 17 ter) */
-.epd-pages-nav{display:flex;flex-wrap:wrap;gap:8px}
-.epd-pages-nav a{display:inline-flex;align-items:center;gap:8px;padding:6px 14px 6px 6px;border:1px solid var(--ep-line);border-radius:999px;background:#fff;color:var(--ep-ink);text-decoration:none;font-size:13.5px;font-weight:600}
-.epd-pages-nav a:hover{border-color:var(--ep-blue);color:var(--ep-blue)}
-.epd-pages-nav span{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#eef6fc;color:var(--ep-blue);font-size:12px}
-.epd>*{min-width:0}
-.epd-page{background:#fff;border:1px solid var(--ep-line);padding:24px 26px;scroll-margin-top:16px}
-.epd-page__head h2{margin:2px 0 14px}
-.epd-page__text{max-width:80ch;font-size:15.5px;line-height:1.7;color:#243244}
-.epd-page__note{margin:12px 0 0!important;font-size:12.5px;color:var(--ep-muted)}
-.epd-blocks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
-.epd-block{background:#f8fafc;border-left:3px solid var(--ep-blue);padding:14px 18px}
-.epd-block h3{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ep-blue);margin:0 0 6px}
-.epd-block p{margin:0;font-size:14.5px;line-height:1.6}
-.epd-table-wrap{overflow-x:auto;margin-top:8px}
-.epd-table{width:100%;border-collapse:collapse;font-size:14px;min-width:640px}
-.epd-table th,.epd-table td{padding:8px 10px;border-bottom:1px solid var(--ep-line);text-align:left;vertical-align:top}
-.epd-table thead th{font-size:12px;color:var(--ep-muted);font-weight:600;background:#f8fafc}
-.epd-table tbody th{font-weight:600}
-.epd-table tbody th small{display:block;font-weight:400;font-size:12px;color:var(--ep-muted)}
-.epd-table__group th{background:#eef6fc;color:var(--ep-blue);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
-.epd-table__value{font-weight:700;color:var(--ep-blue);white-space:nowrap}
-.epd-table__source{font-size:12px;color:var(--ep-muted)}
-@media(max-width:680px){.epd-blocks{grid-template-columns:1fr}.epd-page{padding:18px 16px}}
