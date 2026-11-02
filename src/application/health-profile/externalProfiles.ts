@@ -44,7 +44,7 @@ export function isExternalProfileLibrary(value: unknown, municipalityId: string)
 
 export function appendExternalProfile(library: ExternalProfileLibrary, profile: ExternalHealthProfile, attachments: ProfileAttachment[], municipalityId: string): ExternalProfileLibrary {
  if (profile.municipalityId !== municipalityId || library.profiles.some(p => p.id === profile.id)) throw new Error('El perfil no pertenece a este ámbito o su versión ya existe.');
- const next = { profiles: [...library.profiles, profile], attachments: [...library.attachments, ...attachments], activeId: profile.id };
+ const next = { profiles: [...library.profiles, profile], attachments: [...library.attachments, ...attachments], activeId: profile.revisionOf && library.activeId ? library.activeId : profile.id };
  if (!isExternalProfileLibrary(next, municipalityId)) throw new Error('El perfil contiene datos incompatibles o supera el límite de 40 MB de archivos por expediente.');
  return next;
 }
