@@ -115,3 +115,16 @@
 .epr-preliminaries .epr-section h3{font-size:16px}
 .epr-toc__preliminary{font-size:12px;margin:14px 0 18px}
 .epr-toc__preliminary a{color:#58736c}
+
+/* Perfil estructural: lectura a todo el ancho; gestiones separadas. */
+.ep-tabs--primary{display:flex;gap:8px;flex-wrap:wrap;padding:12px 18px;margin:0 0 12px;background:#f4f7f6;border:1px solid #dfe9e5;border-radius:8px}
+.ep-tabs--primary button{font-weight:700;white-space:nowrap}
+.ep-main--profile,.ep-main--document,.ep-main--management{width:100%;max-width:none;min-width:0}
+.ep-main--profile{padding:0}
+.ep-management-upload{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;padding:22px;background:#edf5f2;border-radius:8px;margin:8px 0 20px}
+.ep-management-upload h2{margin:4px 0}
+.ep-management-upload p{margin:5px 0;color:#58716c}
+.ep-management-grid{display:grid;grid-template-columns:minmax(250px,.85fr) minmax(0,1.6fr);gap:22px;align-items:start}
+.ep-management-grid .ep-document-card{width:auto;max-width:none;position:static}
+.ep-main--management .ep-validation{margin-top:20px}
+@media(max-width:850px){.ep-management-grid{grid-template-columns:1fr}}
