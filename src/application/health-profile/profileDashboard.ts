@@ -72,7 +72,34 @@ export function groupRecommendations(areas: ExternalHealthProfile["areas"]): Das
   return ordered.filter((t) => groups.has(t)).map((type) => ({ type, items: groups.get(type)! }));
 }
 
+export interface DataPageResults {
+  whoLivesHere: ProfileResult[];
+  inequality: ProfileResult[];
+  healthPanel: ProfileResult[];
+}
+
+const norm = (s: string | undefined) => (s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+
+/**
+ * Reparte los resultados entre las páginas de datos (Art. 17 ter) según el
+ * tema que declara el perfil: «Quién vive aquí», «Desigualdad» y, el resto,
+ * el panel de salud, en el orden en que el perfil los entrega.
+ */
+export function splitDataPageResults(results: ProfileResult[]): DataPageResults {
+  const out: DataPageResults = { whoLivesHere: [], inequality: [], healthPanel: [] };
+  for (const r of results) {
+    const topic = norm(r.topic);
+    if (topic === "quien vive aqui") out.whoLivesHere.push(r);
+    else if (topic === "desigualdad") out.inequality.push(r);
+    else out.healthPanel.push(r);
+  }
+  return out;
+}
+
 /** Formato literal del perfil para valores de comparación (coma decimal, punto de millar). */
 export function formatComparisonValue(value: number): string {
-  return value.toLocaleString("es-ES", { maximumFractionDigits: 2 });
+  // Punto de millar también en cifras de cuatro dígitos (2.718,19), como en los perfiles.
+  const [int, frac] = Math.abs(value).toFixed(2).replace(/\.?0+$/, "").split(".");
+  const grouped = int.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return `${value < 0 ? "-" : ""}${grouped}${frac ? `,${frac}` : ""}`;
 }

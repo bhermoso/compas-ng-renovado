@@ -1,0 +1,261 @@
+Loja en datos
+
+Resumen. Loja tiene casi la misma población que en 2010, pero más envejecida y con más del doble de residentes extranjeros que en 2018. Sus temas de salud son los mismos desde hace quince años; lo que se ha interrumpido, tres veces, es el proceso para abordarlos.
+
+Desigualdades. La sección censal de la Alfaguara tiene la renta más baja, 7.107 euros por persona, y el 58,8 % de su población bajo el umbral de pobreza relativa. Seis de cada diez personas en paro son mujeres.
+
+Comunidad. En las consultas de 2012, 2019 y 2022, el sedentarismo y la alimentación aparecen siempre arriba. De los cinco activos que reconoce la comunidad, tres se dirigen a personas mayores.
+
+Salud. El centro de salud registra más dislipemia, hipertensión, diabetes y obesidad que Granada y Andalucía. La vacunación y los cribados de colon y cuello de útero superan al entorno; el de mama invita a menos mujeres que la media andaluza. Las infecciones de transmisión sexual declaradas han aumentado.
+
+Quién vive aquí
+
+Loja tiene 20.923 habitantes, 10.585 mujeres y 10.338 hombres [1], en un término de 447,29 km² con 16 núcleos de población; 1.181 personas viven en diseminado [1]. La población bajó de 21.688 en 2010 [2, indicadores VIGIA] a 20.469 en 2018 [3] y ha recuperado parte desde entonces: en 2024 hubo 146 nacimientos y 184 defunciones, y llegaron 800 personas frente a 661 que se fueron [1]. La llegada de población compensa el saldo natural negativo.
+
+La población de nacionalidad extranjera bajó de 1.140 personas en 2010 a 775 en 2018 [3] y desde entonces se ha más que duplicado, hasta 1.778 en 2025, el 55,4 % de Marruecos [1] (figura 1).
+
+Desigualdad
+
+La media de Loja esconde diferencias grandes. El eje que permite verlas dentro del municipio es la renta por sección censal del Atlas de Distribución de Renta de los Hogares del INE: es un eje de renta, no un índice de privación múltiple, y ningún indicador de salud se publica por sección.
+
+Por barrio. La sección 03002, la Alfaguara, tiene la renta más baja, 7.107 euros por persona, el 60,5 % de la media de Loja [4, tabla 31025]; el 58,8 % de su población vive bajo el 60 % de la mediana [4, tabla 31030]. Es también la más joven, con una edad media de 34,3 años y un 29,3 % de menores de 18 [4, tabla 31033]. Otras dos secciones del distrito 01 tienen al menos el 40 % de su población bajo ese umbral: la 01001 y la 01003, que incluye la Alcazaba [4, tabla 31030]. En el otro extremo, en la 05002 la proporción es del 16,9 % [4, tabla 31030] (figura 3).
+
+Mujeres y hombres. Las mujeres tienen el doble de diagnósticos de ansiedad, 1.826 frente a 884, y más del triple de hipotiroidismo, 1.656 frente a 462; los hombres, más dependencia del tabaco y más diabetes [5, tabla 2]. En 2025 había 730 mujeres y 462 hombres en paro registrado, se firmaron 2,4 contratos a hombres por cada uno a mujeres y 211 de las 246 personas con subsidio agrario eran mujeres [1].
+
+Edad. Casi una de cada cinco personas tiene más de 65 años [1], y en las secciones 05001 y 04001, más de una de cada cuatro: el 27,5 % y el 26,7 % [4, tabla 31033]. El 28,4 % de los hogares es de una sola persona [4, tabla 31033].
+
+Origen. En la sección 01001, una de cada cuatro personas no tiene nacionalidad española, el 26,2 % [4, tabla 31033], y es también una de las de menor renta [4, tabla 31025].
+
+Lo que no se ve. No puede saberse si la Alcazaba y la Alfaguara enferman más que el resto, porque ningún indicador de salud se publica por barrio, por renta ni por origen. Tampoco se oyó apenas su voz: de las 165 respuestas al cuestionario de 2019, 5 procedieron de esos barrios, el 3 % [17, microdatos], cuando su población es el 6,50 % del municipio [18, apartado 4].
+
+1. Punto de partida
+
+Loja es un municipio extenso, de 447,29 km² [1], cabecera de comarca en el extremo occidental de la Vega, con 16 núcleos de población [1] y 20.923 habitantes en 2025 [1]. Dentro de su casco histórico, dos barrios contiguos, la Alcazaba y la Alfaguara, figuran como zona desfavorecida en 2012 [13] y en 2022 [14].
+
+Loja entró en la Red Local de Acción en Salud en 2010 [10, hoja de ruta] y ha empezado tres veces su plan local. Las tres veces hizo un diagnóstico y preguntó a la comunidad, y las tres se interrumpió antes de aprobar un plan: tras las elecciones municipales de 2011 [10, acta 10], tras la caída del apoyo político en 2013 [11] y con la pandemia [12]. El ciclo actual prepara el I Plan Local de Salud de Loja, con vigencia prevista de 2027 a 2030.
+
+Lo que se sabe hoy de la salud de Loja procede del Informe de Salud del Distrito Sanitario Granada Metropolitano, de octubre de 2026, con datos de 2023 a 2026 y comparación con Granada y Andalucía [5]; de la ficha municipal del SIMA, con datos de 2019 a 2025 [1]; del Atlas de Distribución de Renta de los Hogares del INE de 2024, por sección censal [4, tablas 31025, 31030 y 31033], y del Censo de 2021 [15]; y de Localiza Salud, con 162 recursos y cinco activos validados el 24-10-2026 [9]. Los ciclos anteriores dejaron un archivo que permite comparar: el informe de situación de 2010 [8], el Panel Municipal de Salud de 2012-2013, con muestra aleatoria [16], las consultas a la comunidad de 2012 [6], 2019 [17] y 2022 [7], y la actualización de 2021 [2].
+
+Dos preguntas recorren la lectura: dónde se concentra la desventaja dentro del municipio y qué ha cambiado desde 2010. No hay datos locales de alimentación, actividad física ni tabaco posteriores a 2013 [16]; ningún indicador de salud se publica por barrio; y en este ciclo todavía no se ha consultado a la comunidad.
+
+2. Conclusiones
+
+Una lectura de conjunto
+
+Las nueve conclusiones describen un municipio que ha cambiado más de composición que de tamaño y cuyos temas de salud llevan quince años siendo los mismos. El centro de salud registra más enfermedad cardiometabólica que la provincia y que Andalucía [5, tabla 3], y la comunidad pone en cabeza, consulta tras consulta, el sedentarismo y la alimentación [6] [17] [7]. Esas dos fuentes coinciden; lo que falta es el eslabón que las une, porque desde 2013 no se ha medido cómo come ni cuánto se mueve la gente de Loja [16] (C1, C2). Los recursos para moverse abundan, pero la comunidad no reconoce todavía ninguno de ellos como activo (C8).
+
+La desventaja no se reparte por igual. Se concentra en la Alfaguara, con la renta más baja y la población más joven [4, tablas 31025 y 31033], que es también el lugar del que menos se sabe (C3). Al mismo tiempo, el municipio envejece y los cuidados no aparecen en ninguna fuente (C4). Dos series de salud quedaron cortadas o en aumento sin lectura local: el suicidio, que fue el mayor exceso de mortalidad de Loja y no se ha vuelto a calcular desde 2010 [8, apartado 2.2], y las infecciones de transmisión sexual, cuyos casos declarados han aumentado [5, tabla 12] (C5, C6). La prevención sanitaria, en cambio, funciona mejor que en el entorno, salvo la invitación al cribado de mama (C7).
+
+Que la carga cardiometabólica guarde relación con los modos de vida es una relación documentada fuera de Loja, no observada en el municipio; que la Alfaguara tenga más carga de enfermedad es probable por lo que se sabe de otros lugares, pero no puede comprobarse con los datos actuales. Por eso la mayoría de las recomendaciones empiezan por conocer y contrastar. La conclusión que lo enmarca todo es la última: en Loja no han faltado diagnósticos ni participación, sino continuidad (C9).
+
+C1. Loja tiene más enfermedad cardiometabólica registrada que su provincia y que Andalucía.
+
+En 2025 el centro de salud registra 3.081,79 diagnósticos de dislipemia por 10.000 habitantes, 2.600,93 de hipertensión, 1.013,25 de diabetes y 675,83 de obesidad, frente a 2.718,19, 2.285,76, 906,66 y 568,28 en Granada [5, tabla 3] (figura 2). Las enfermedades endocrinas, nutricionales y metabólicas causaron en 2024 el 5,97 % de las muertes, frente al 3,45 % en Granada y el 3,37 % en Andalucía [5, tabla 7]. No es una situación nueva: la diabetes y la hipertensión ya superaban en 2018 las cifras del Distrito [18, apartado 6], y el propio Informe de Salud sitúa esta carga como el principal reto de la atención primaria del municipio [5, conclusiones].
+
+La comunidad pone el sedentarismo y la alimentación en cabeza en 2011 [19], en 2012 [6] y en 2022 [7]; los referentes describen una oferta deportiva estrecha y un solo comedor escolar [20], y la ciudad tiene 0,81 m² de zona verde urbana por habitante [2, indicadores VIGIA]. La relación entre los modos de vida y esta carga está documentada fuera de Loja; dentro, el último dato de conducta es de 2013 [16].
+
+Lleva a R1, R2 y R3.
+
+C2. Desde 2013 no se sabe cómo come ni cuánto se mueve la población de Loja, y es lo que la comunidad pide abordar desde 2011.
+
+En el Panel Municipal de Salud de 2012-2013, con muestra aleatoria, el 20,9 % de los adultos fumaba a diario, el 17,6 % declaraba obesidad y la mediana de días a la semana con actividad física moderada era cero [16]. Desde entonces no hay datos locales. Las cifras de la Encuesta Andaluza de Salud describen a Granada y Andalucía y solo sirven de contexto; saber cómo vive hoy la gente de Loja exige un estudio propio, que puede hacerse con el Gestor de Encuestas de COMPÁS.
+
+Lleva a R2 y R3.
+
+C3. La pobreza se concentra en la Alfaguara, de la que no hay datos de salud.
+
+La Alfaguara, la sección censal 03002 [21] [22], tiene 7.107 euros de renta neta por persona, el 60,5 % de la media municipal [4, tabla 31025], y el 58,8 % de su población bajo el 60 % de la mediana [4, tabla 31030]. Es la población más joven del municipio, con una edad media de 34,3 años [4, tabla 31033]. Lleva más de una década reconocida, con la Alcazaba, como zona desfavorecida [13] [14], y durante la pandemia quedó casi aislada [12, acta de 24 feb 2021]. La Alcazaba ocupa una parte de la sección 01003, con el 40,0 % de su población bajo ese umbral [4, tabla 31030].
+
+Es también donde menos se sabe: sus vecinos apenas respondieron a las consultas [17, microdatos] y ningún activo validado se dirige a ella [9]. Lo que se sabe de otros lugares hace probable que su carga de enfermedad sea mayor; en Loja no puede comprobarse.
+
+Lleva a R4 y R5.
+
+C4. La población envejece y los cuidados no se ven.
+
+La edad media ha pasado de 39,15 años en 2010 [2, indicadores VIGIA] a 43,5 en 2025 [1]. Hay secciones donde más de una de cada cuatro personas supera los 65 años [4, tabla 31033], y el 28,4 % de los hogares es unipersonal [4, tabla 31033]. Es el único problema con activos reconocidos: el Centro de Participación Activa y sus talleres [9].
+
+No se sabe cuántas personas dependen de otras ni quién las cuida, que en Loja, como en casi todas partes, suelen ser mujeres.
+
+Lleva a R6.
+
+C5. El suicidio fue el exceso de mortalidad más marcado de Loja y no se ha vuelto a medir.
+
+El análisis del Atlas de Mortalidad del informe de 2010 encontró en Loja tasas de suicidio elevadas respecto a Andalucía en hombres y mujeres de casi todas las edades [8, apartado 2.2 y tabla 2.1]; la actualización de 2021 repitió aquella tabla sin recalcularla [2]. Hoy hay 2.710 diagnósticos de ansiedad, 1.826 en mujeres [5, tabla 2].
+
+La comunidad sitúa el suicidio el último de 26 problemas [7] y los referentes hablan del malestar emocional como tabú [20]. Seis de cada diez contratos son temporales [1], una condición que suele acompañar al malestar, pero en Loja nadie ha medido esa relación. El GRUSE del centro de salud y los talleres del CPA son los únicos activos que tocan este problema [9].
+
+Lleva a R7.
+
+C6. Las infecciones de transmisión sexual declaradas han aumentado.
+
+Entre 2022 y octubre de 2026 se declararon 45 casos de clamidia, 27 de gonococo, 11 de sífilis y 10 de herpes genital [5, tabla 12]; entre 2003 y 2010 se habían declarado 10 casos de sífilis, gonococo y herpes [8, tabla 2.2]. El Informe de Salud lo describe como una tendencia sostenida y propone programas de educación afectivo-sexual para la población joven [5, discusión]. La salud sexual, en cambio, apenas aparece en las consultas: el 8 % la citó en 2019 [17], y un solo recurso registrado trata la sexualidad [9].
+
+Lleva a R8.
+
+C7. La prevención sanitaria funciona mejor que en el entorno, salvo la invitación al cribado de mama.
+
+La vacunación infantil completa supera el 95 % desde 2002 y es del 98,44 % en 2025 [8, tabla de cobertura vacunal 2000-2008] [5, tabla 14]. En 2025 participó en el cribado de colon el 35,77 % de las personas invitadas, frente al 33,05 % en Granada y el 23,77 % en Andalucía [5, tabla 9], y en el de cuello de útero el 33,59 %, frente al 12,59 % y el 8,68 % [5, tabla 11].
+
+En el de mama se invitó al 56,94 % de las mujeres de la edad diana, por debajo del 67,86 % de Andalucía y por encima del 28,32 % de Granada, y participó el 73,47 % de las citadas, frente al 84,30 % en la provincia y el 70,93 % en Andalucía [5, tabla 10]. El Informe propone revisar los circuitos de citación [5, discusión]. En 2006-2007 la participación había llegado al 88,72 % [8, tabla resumen del proceso de detección precoz del cáncer de mama 2000-2009].
+
+Lleva a R9.
+
+C8. Los activos reconocidos no cubren los problemas que la comunidad prioriza.
+
+Localiza Salud registra 162 recursos, 74 de ellos para la actividad física [9]. De los cinco activos validados, tres se dirigen a personas mayores, y ninguno a la alimentación, a la actividad física de la población general, a la juventud o a la zona desfavorecida [9, validación de 24 oct 2026]. La guía de recursos de 2010 y los inventarios de 2012 y 2013 recogían asociaciones, huertos sociales o un comedor escolar ecológico de los que no se sabe si siguen activos [8, apartado 6.1] [23] [24].
+
+Hay candidatos naturales: el Encuentro «Loja en Salud», que se celebra desde 2010 [10, hoja de ruta], la caminata que en 2019 reunió a 1.538 personas [25] o la adhesión a «Por 1 Millón de Pasos» en 2025 [30]. Funcionan; falta que la comunidad los reconozca y conste.
+
+Lleva a R10.
+
+C9. Los temas de salud de Loja son estables desde hace diez años; lo que se ha interrumpido es el proceso.
+
+Lo que más ha cambiado es quién vive en Loja: la edad media ha subido más de cuatro años [2, indicadores VIGIA] [1], nacen menos niños [18, apartado 1] [1] y la población extranjera se ha más que duplicado desde 2018 [3] [1]. Lo que la comunidad pide y lo que registra el centro de salud ha cambiado poco.
+
+Los tres procesos se cortaron sin plan aprobado, en 2011 [10, acta 10], 2013 [11] y 2020 [12], pero las actividades sobrevivieron a cada interrupción: el Encuentro «Loja en Salud» se celebra desde 2010 [10, hoja de ruta] y en 2019 reunió a 1.450 personas [25].
+
+Lleva a R11.
+
+3. Convergencias y divergencias
+
+Coinciden. El centro de salud registra más carga cardiometabólica que la provincia [5, tabla 3], y la comunidad pone el sedentarismo y la alimentación entre sus primeros problemas en las tres consultas [6] [17] [7]. El envejecimiento aparece en las estadísticas de población [1] [4, tabla 31033], en los activos reconocidos, casi todos para mayores [9], y en las respuestas de San Francisco-Estación en 2019 [17, microdatos]. La desventaja de la Alfaguara la muestran la renta por sección [4, tablas 31025 y 31030], el informe de 2010 [8, apartado 1.7], la Estrategia ERACIS [14] y la técnica del plan de zonas desfavorecidas en 2021 [12, acta de 24 feb 2021].
+
+Discrepan. Las infecciones de transmisión sexual crecen en los registros [5, tabla 12] y apenas aparecen en las consultas [17] [7]. El suicidio fue el mayor exceso de mortalidad del municipio [8, apartado 2.2] y queda el último en la priorización de 2022 [7]. Y las adicciones, primer problema en 2012 [6] y en 2019 [17], bajan a los puestos 17 y 21 en 2022 [7] sin que los documentos expliquen por qué.
+
+4. Lo que no sabemos
+
+Cómo evolucionan desde 2018 la diabetes, la hipertensión y la obesidad registradas, por sexo y edad (afecta a C1). Dónde se puede saber: Distrito Granada Metropolitano, Base Poblacional de Salud.
+
+Cómo come, cuánto se mueve y cuánto fuma hoy la población (afecta a C1, C2). Dónde se puede saber: Estudio complementario con el Gestor de Encuestas de COMPÁS.
+
+Si la Alcazaba y la Alfaguara enferman más que el resto (afecta a C3). Dónde se puede saber: Base Poblacional de Salud por sección censal (03002 y 01003).
+
+Cuántas personas dependen de otras y quién las cuida (afecta a C4). Dónde se puede saber: Servicios Sociales municipales; sistema de atención a la dependencia.
+
+Si persiste el exceso de suicidio (afecta a C5). Dónde se puede saber: Mortalidad por suicidio posterior a 2010, por sexo y edad: Atlas de Mortalidad de Andalucía, IECA.
+
+Quién se infecta, a qué edad y qué recursos de salud sexual echa en falta la población joven (afecta a C6). Dónde se puede saber: Centro de salud; vigilancia epidemiológica del Distrito; jóvenes del municipio.
+
+Por qué el cribado de mama invita a menos mujeres (afecta a C7). Dónde se puede saber: Programa de detección precoz de cáncer de mama.
+
+Qué recursos funcionan como activos para la gente (afecta a C8). Dónde se puede saber: La comunidad, con registro y validación en Localiza Salud.
+
+5. Recomendaciones del Perfil
+
+Once propuestas que derivan de las conclusiones. Qué se hace primero, quién lo hace y con qué recursos lo decidirán el Grupo Motor y el Plan de Acción.
+
+Conocer. Recuperar los datos que faltan
+
+R1. Pedir al Distrito la serie de diabetes, hipertensión, dislipemia y obesidad registradas desde 2018, por sexo y edad. Deriva de C1.
+
+R2. Medir los modos de vida de la población de Loja con un estudio complementario en el Gestor de Encuestas de COMPÁS, comparable con el Panel de 2013. Deriva de C1, C2.
+
+R4. Pedir los indicadores de salud de las secciones censales 03002 (Alfaguara) y 01003 (Alcazaba). Deriva de C3.
+
+R6. Reunir los datos de dependencia y de cuidados del municipio. Deriva de C4.
+
+R7. Obtener la mortalidad por suicidio de Loja posterior a 2010, por sexo y edad. Deriva de C5.
+
+R9. Conocer por qué el cribado de mama invita a menos mujeres que la media andaluza. Deriva de C7.
+
+Contrastar. Preguntar a quien lo vive
+
+R5. Contrastar con Servicios Sociales, la Casa de Zonas y vecinos y vecinas del barrio qué problemas y qué activos reconocen. Deriva de C3.
+
+R8. Contrastar con el centro de salud y con jóvenes del municipio qué hay detrás del aumento de las infecciones de transmisión sexual y qué recursos de salud sexual faltan. Deriva de C6.
+
+R10. Contrastar con la comunidad qué recursos de alimentación y actividad física funcionan como activos y registrarlos en Localiza Salud. Deriva de C8.
+
+R11. Contrastar con el Grupo Motor si la priorización de 2022 sigue vigente, para partir de ella. Deriva de C9.
+
+Abordar. Empezar a actuar donde hay fundamento
+
+R3. Trabajar la alimentación y la actividad física de la población general apoyándose en los recursos que ya existen, una vez que el equipo técnico declare la relación con la carga cardiometabólica, documentada fuera de Loja. Deriva de C1, C2.
+
+6. Paso al Plan de Acción
+
+El Grupo Motor recibe las conclusiones que el equipo técnico elija, las once recomendaciones y las preguntas abiertas. A partir de aquí decide qué priorizar, y el Plan de Acción fija las líneas, los objetivos y los indicadores. El borrador de plan de 2022 quedó con los objetivos vacíos [26]: es un antecedente, no un punto de partida obligado.
+
+7. Autoría y validación
+
+Validación. Pendiente. Responsable técnico, fecha de validación y consenso del Grupo Motor por registrar.
+
+Autoría. Versión 0.1 redactada por Claude el 25 y el 26-10-2026, y versiones 0.2 y 0.3 el 2-11-2026, a petición de Blas Ramón Hermoso Rico, a partir del expediente de Loja en COMPÁS. La versión 0.2 conserva los datos y las referencias de la 0.1; cambia la estructura, que sigue el contrato metodológico v2.3.0, y la redacción de las conclusiones, y reproduce los datos epidemiológicos como los publica su fuente. La versión 0.3 contrasta las cifras con el expediente de Loja en COMPÁS (copia de 2-11-2026) y completa, con el Informe de Salud [5], los comparadores de los cribados y de la mortalidad, el año de las causas de muerte (2024) y la mortalidad endocrina y metabólica. Las cifras proceden de las fuentes citadas, sin cálculos propios salvo los porcentajes y cocientes que se derivan de ellas. La validación de los cinco activos la hizo Blas Ramón Hermoso Rico el 24-10-2026, con los criterios de la Junta de Andalucía del 9 de junio de 2026. Las conclusiones y las recomendaciones son propuestas: las elige, corrige o descarta el equipo técnico.
+
+Referencias
+
+1. Instituto de Estadística y Cartografía de Andalucía. Sistema de Información Multiterritorial de Andalucía (SIMA). Ficha municipal de Loja (18122) [Internet]. Sevilla: IECA; actualizada el 9 oct 2026 [consultado 25 oct 2026]. Disponible en: https://www.juntadeandalucia.es/institutodeestadisticaycartografia/sima/ficha.htm?mun=18122
+
+2. Grupo Motor del Plan Local de Salud de Loja; Distrito Sanitario Granada Metropolitano. Perfil de Salud Local. I Plan Local de Salud Loja. Análisis epidemiológico (indicadores 2010-2020, sistema VIGIA). Documento de trabajo. Loja; abril de 2021.
+
+3. Distrito Sanitario Granada Metropolitano. Informe de salud de Loja 2019: indicadores sociodemográficos 2010, 2015, 2017 y 2018. Documento de trabajo. Loja; 2019.
+
+4. Instituto Nacional de Estadística. Atlas de Distribución de Renta de los Hogares, 2024. Tablas 31025, 31030, 31033, 53689 y 53694 [Internet]. Madrid: INE; 2026 [consultado 25 oct 2026]. Disponible en: https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177088&menu=ultiDatos&idp=1254735976608
+
+5. Unidad de Prevención, Promoción y Vigilancia de la Salud, Distrito Sanitario Granada Metropolitano. Informe sobre la situación de salud en el municipio de Loja. Granada: Servicio Andaluz de Salud; 5 de octubre de 2026.
+
+6. Grupo Motor RELAS Loja. Problemas y factores de riesgo detectados y priorizados. RELAS Loja. Loja; 2012.
+
+7. Grupo Motor del Plan Local de Salud de Loja. Listado definitivo de problemas de salud/factores de riesgo por orden de priorización (método de Hanlon, 40 participantes) y hoja de cálculo de la priorización. Loja; noviembre de 2021 a marzo de 2022.
+
+8. Grupo Motor Inicial RELAS Loja; Delegación Provincial de Salud de Granada. Perfil Salud Local Loja. 1.ª parte: análisis sociodemográfico y diagnóstico de salud (informe de situación municipal). Loja; 2010-2011.
+
+9. Junta de Andalucía. Localiza Salud: recursos y activos para la salud del municipio de Loja [base de datos]. Consulta de octubre de 2026; validación de activos de 24 oct 2026.
+
+10. Grupo Motor Inicial RELAS Loja. Hoja de ruta 2010-2011 y actas de las reuniones 1 a 10 (4 nov 2010 a 15 jun 2011). Loja; 2010-2011.
+
+11. Grupo Motor del Plan Local de Acción en Salud de Loja. Situación del PLAS: carta al alcalde. Loja; 10 abr 2013.
+
+12. Grupo Motor del Plan Local de Salud de Loja. Actas de las reuniones de 24 feb, 24 mar y 28 abr 2021. Loja; 2021.
+
+13. Ayuntamiento de Loja. Plan Local de Acción en Salud de Loja: solicitud de subvención a la Consejería de Salud. Loja; mayo de 2012.
+
+14. Ahora Granada. La Estrategia Eracis inyecta 12,5 millones de euros en 13 zonas desfavorecidas de Granada [Internet]. 12 ene 2022 [consultado 26 oct 2026]. Disponible en: https://www.ahoragranada.com/noticias/la-estrategia-eracis-inyecta-125-millones-de-euros-en-13-zonas-desfavorecidas-de-granada/
+
+15. Instituto Nacional de Estadística. Censo de Población 2021. Tabla 66620: población de 15 y más años por nivel de estudios, sexo y municipio [Internet]. Madrid: INE [consultado 25 oct 2026]. Disponible en: https://servicios.ine.es/wstempus/js/ES/DATOS_TABLA/66620
+
+16. Escuela Andaluza de Salud Pública. Panel Municipal de Salud de Andalucía. Loja. Sevilla: Consejería de Salud y Bienestar Social; julio de 2013.
+
+17. Mesa de coordinación intersectorial de Loja. Cuestionario de identificación de factores de riesgo y problemas de salud: análisis de respuestas y microdatos (formulario en línea, 19 jul a 11 sep 2019). Loja; octubre de 2019.
+
+18. Ayuntamiento de Loja. Borrador del Perfil de Salud Local de Loja (apartado 1, «Población y territorio», y apartados 2 a 15 de la plantilla RELAS). Documento de trabajo. Loja; 2019.
+
+19. Grupo Motor Inicial RELAS Loja. Determinantes sociales de la salud de Loja (matriz y texto). Loja; mayo de 2011.
+
+20. Mesa de coordinación intersectorial de Loja. Síntesis de entrevistas a referentes del municipio. Loja; 2019.
+
+21. OpenStreetMap. Servicio de geocodificación Nominatim: calles de los barrios de la Alcazaba y la Alfaguara (Loja) [Internet] [consultado 26 oct 2026]. Disponible en: https://nominatim.openstreetmap.org/
+
+22. WikiBarrio. Límites de secciones censales (versión secc2025) con datos del Censo Anual de Población y del Atlas de Distribución de Renta de los Hogares del INE [Internet] [consultado 26 oct 2026]. Disponible en: https://www.wikibarrio.es/
+
+23. Grupo Motor RELAS Loja. Determinantes de salud: documento definitivo para difusión (con tabla de intervenciones existentes y propuestas). Loja; enero de 2012.
+
+24. Grupo Motor RELAS Loja. Propuesta de guion de las mesas de adicciones, vida activa y cronicidad. Loja; 28 jun 2013.
+
+25. Ayuntamiento de Loja. Memoria de actividades «Otoño Saludable» y VII Semana de la Salud de Loja 2019. Loja; 2019.
+
+26. Grupo Motor del Plan Local de Salud de Loja. Problemas priorizados y propuesta de plan de acción; Plan de Acción Loja (tabla por líneas). Loja; marzo de 2022.
+
+27. del Moral Campaña MC. Informe de incidencia de cáncer en Loja 2007-2016. Datos del Registro de Cáncer de Granada. Granada: Distrito Sanitario Granada Metropolitano, Epidemiología; 24 mar 2021.
+
+28. Ayuntamiento de Loja. II Semana de la Salud de Loja (18 a 22 nov 2013): programa a 5 de noviembre de 2013. Loja; 2013.
+
+29. Ayuntamiento de Loja. I Gala de la Salud Pública de Loja: información resumen de interés. Loja; 2021.
+
+30. Zona Básica de Salud de Loja. Solicitud de adhesión al programa «Por 1 Millón de Pasos». Granada; 1 abr 2025.
+
+31. Grupo Motor RELAS Loja. Análisis del cuestionario de problemas de salud por mesas sectoriales. Loja; mayo de 2012.
+
+32. Grupo Motor RELAS Loja. Propuesta de estructura del Plan Local de Salud de Loja (ficha de línea de trabajo). Loja; c. 2013.
+
+33. Grupo Motor del Plan Local de Salud de Loja. Plantilla del I Plan Local de Salud de Loja. Loja; 18 oct 2021.
+
+34. Delegación Provincial de Salud de Granada; Ayuntamiento de Loja. Acuerdo de colaboración para el desarrollo de la Red Local de Acción en Salud en Loja. 4 feb 2011.
+
+35. Grupo Motor RELAS Loja. Informe del proyecto RELAS en Loja (26 mar 2012), acta de 14 jun 2012 y relación de personas integrantes del Grupo Motor (febrero de 2012). Loja; 2012.
+
+36. Ayuntamiento de Loja. Anteproyecto de la V Semana de la Salud Pública de Loja. Loja; 27 sep 2017.
+
+37. Ayuntamiento de Loja. Propuesta de reglamento de la Mesa de coordinación intersectorial para la implementación local de la Estrategia de Promoción de la Salud y Prevención del SNS (Mesa creada el 19 nov 2018). Loja; febrero de 2019.
+
+38. Mesa de coordinación intersectorial de Loja. Encuesta de hábitos saludables en la población de Loja: análisis por tramos de edad (6-9, 9-12 y más de 12 años). Loja; septiembre de 2019.

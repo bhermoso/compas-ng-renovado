@@ -39,6 +39,24 @@ export interface ProfileKeyFigure {
   citation?: string;
 }
 
+/** Bloque con rótulo de una página de datos: «Resumen. Loja tiene…». */
+export interface ProfileDataBlock {
+  title: string;
+  text: string;
+}
+
+/**
+ * Páginas de datos comparables con que se abre el Perfil (contrato, Art. 17 ter):
+ * portada, quién vive aquí, panel de salud y desigualdad. Solo se reconocen si
+ * el documento las declara con esos rótulos; su contenido es el del texto.
+ */
+export interface ProfileDataPages {
+  cover: ProfileDataBlock[];
+  whoLivesHere: string[];
+  healthPanel: string[];
+  inequality: { intro: string[]; blocks: ProfileDataBlock[] };
+}
+
 export interface ProfileStructure {
   sections: ProfileSection[];
   summary: string[];
@@ -46,6 +64,9 @@ export interface ProfileStructure {
   recommendations: ProfileRecommendation[];
   references: string[];
   keyFigures: ProfileKeyFigure[];
+  /** Lectura de conjunto con que se abre el apartado de conclusiones. */
+  overallReading: string[];
+  dataPages?: ProfileDataPages;
   pages?: number;
 }
 
@@ -62,6 +83,8 @@ function headingOf(block: string): { title: string; level: 1 | 2 } | null {
   const line = block.replace(/\s+/g, " ").trim();
   if (line.length > 80 || /[.,;:]$/.test(line)) return null;
   if (/^(Resumen|Anexos|Portada y créditos|Referencias|Índice)$/i.test(line)) return { title: line, level: 1 };
+  // Páginas de datos del Art. 17 ter: «Loja en datos», «Quién vive aquí», «Panel de salud», «Desigualdad».
+  if (/^(Quién vive aquí|Panel de salud|Desigualdad)$/i.test(line) || /^[A-ZÁÉÍÓÚÑ][^.]{1,40} en datos$/.test(line)) return { title: line, level: 1 };
   const numbered = /^(\d{1,2})\.?\s+([A-ZÁÉÍÓÚÑ¿][^.]{2,76})$/.exec(line);
   if (numbered && !/^\d+\.º/.test(line) && !/\d{4}/.test(numbered[2])) return { title: `${numbered[1]}. ${numbered[2].trim()}`, level: 1 };
   const annex = /^([A-K])\.\s+([A-ZÁÉÍÓÚÑ][^.]{2,76})$/.exec(line);
@@ -233,6 +256,41 @@ function extractTiles(summary: string[]): { tiles: ProfileKeyFigure[]; prose: st
   return { tiles, prose };
 }
 
+/** Separa los párrafos con rótulo («Por barrio. …») de los que no lo tienen. */
+function labelledBlocks(paragraphs: string[]): { intro: string[]; blocks: ProfileDataBlock[] } {
+  const intro: string[] = [];
+  const blocks: ProfileDataBlock[] = [];
+  for (const p of paragraphs) {
+    const m = /^([A-ZÁÉÍÓÚÑ][^.]{1,40})\.\s+(.+)$/s.exec(p);
+    if (m && m[1].split(" ").length <= 5) blocks.push({ title: m[1].trim(), text: m[2].trim() });
+    else intro.push(p);
+  }
+  return { intro, blocks };
+}
+
+function dataPagesOf(find: (re: RegExp) => ProfileSection | undefined): ProfileDataPages | undefined {
+  const cover = find(/^.+ en datos$/i);
+  const who = find(/^quién vive aquí$/i);
+  const panel = find(/^panel de salud$/i);
+  const inequality = find(/^desigualdad$/i);
+  if (!cover && [who, panel, inequality].filter(Boolean).length < 2) return undefined;
+  return {
+    cover: cover ? labelledBlocks(cover.paragraphs).blocks : [],
+    whoLivesHere: who?.paragraphs ?? [],
+    healthPanel: panel?.paragraphs ?? [],
+    inequality: labelledBlocks(inequality?.paragraphs ?? []),
+  };
+}
+
+/** Párrafos que preceden a la primera conclusión, sin el rótulo «Una lectura de conjunto». */
+function overallReadingOf(section: ProfileSection | undefined): string[] {
+  if (!section) return [];
+  const first = section.paragraphs.findIndex((p) => /^C\d+[.\s]/.test(p));
+  const intro = first >= 0 ? section.paragraphs.slice(0, first) : [];
+  if (!intro.some((p) => /^una lectura de conjunto$/i.test(p.trim()))) return [];
+  return intro.filter((p) => !/^una lectura de conjunto$/i.test(p.trim()));
+}
+
 export function parseProfileStructure(text: string): ProfileStructure {
   const { blocks, fromPdf, pages } = blocksOf(text);
   const paragraphs = fromPdf ? reflow(blocks) : blocks.map((b) => b.replace(/\s+/g, " ").trim());
@@ -258,6 +316,7 @@ export function parseProfileStructure(text: string): ProfileStructure {
   const conclusionsSection = find(/conclusiones/i);
   const recommendationsSection = find(/recomendaciones/i);
   const referencesSection = find(/referencias/i);
+  const dataPages = dataPagesOf(find);
   return {
     sections: sections.filter((s) => s.paragraphs.length || s.level === 1),
     summary,
@@ -265,6 +324,8 @@ export function parseProfileStructure(text: string): ProfileStructure {
     recommendations: recommendationsSection ? parseRecommendations(recommendationsSection.paragraphs) : [],
     references: (referencesSection?.paragraphs ?? []).map((r) => r.replace(/^\d+\.\s*/, "").trim()).filter(Boolean),
     keyFigures: tiles.length >= 3 ? tiles.slice(0, 6) : keyFiguresFrom(summary),
+    overallReading: overallReadingOf(conclusionsSection),
+    ...(dataPages ? { dataPages } : {}),
     ...(pages ? { pages } : {}),
   };
 }
