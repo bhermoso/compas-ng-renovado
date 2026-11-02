@@ -190,3 +190,16 @@
  .pdp-domain-chart__rows{break-inside:auto!important}
  .pdp-domain-chart__item{break-inside:avoid}
 }
+
+/* Interpretación trazable: texto literal del perfil, separada de comparaciones visuales. */
+.pdp-interpretation{margin:22px 0;padding:23px;background:#f3f8f6;border-left:5px solid #237a73}
+.pdp-interpretation__heading h3{font-size:23px;color:#193e43;margin:4px 0 9px}
+.pdp-interpretation__heading>p:last-child{font-size:12px;color:#556f6c;max-width:84ch}
+.pdp-interpretation details{border-top:1px solid #cbded8;margin-top:13px;padding-top:11px}
+.pdp-interpretation summary{cursor:pointer;color:#174f4a;font-weight:700;font-size:14px}
+.pdp-interpretation details p{font-size:13px;line-height:1.58;margin:10px 0}
+.pdp-interpretation ol{padding-left:25px}
+.pdp-interpretation li{margin:12px 0;padding:9px 10px;background:#fff}
+.pdp-interpretation li strong{font-size:13px}
+.pdp-interpretation li small{font-size:11px;color:#56756d}
+@media print{.pdp-interpretation{padding:12px;margin:12px 0;break-inside:auto}.pdp-interpretation details{display:block!important}.pdp-interpretation details>summary{display:list-item}.pdp-interpretation li{break-inside:avoid}.pdp-interpretation__heading h3{font-size:15pt}}
