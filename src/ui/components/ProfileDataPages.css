@@ -138,3 +138,17 @@
  .pdp-section-card dd{font-size:11pt}
  .pdp-table-wrap{overflow:visible}
 }
+
+/* Visión de conjunto del sistema de indicadores: datos del perfil, no estimaciones. */
+.pdp-health-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0 18px}
+.pdp-health-summary>div{padding:15px 18px;background:#edf5f7;border-top:4px solid #126e81;display:flex;flex-direction:column;gap:4px}
+.pdp-health-summary strong{font-size:30px;line-height:1.1;color:#174c60;font-weight:750;font-variant-numeric:tabular-nums}
+.pdp-health-summary span{font-size:12px;font-weight:600;color:#526976}
+.pdp-domain-nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:9px;margin:14px 0 17px}
+.pdp-domain-nav a{display:flex;min-height:63px;flex-direction:column;justify-content:space-between;gap:7px;padding:11px 13px;background:#fff;border:1px solid #ccdee4;border-left:4px solid #16829a;color:#234857;text-decoration:none;font-size:13px;font-weight:700}
+.pdp-domain-nav a:hover,.pdp-domain-nav a:focus-visible{background:#e8f4f6;outline-offset:2px}
+.pdp-domain-nav small{font-size:11px;color:#667985;font-weight:500}
+.pdp-table tbody[id]{scroll-margin-top:110px}
+.pdp-table tbody[id] .pdp-table__group th{font-size:12px;background:#d9edf2}
+@media(max-width:600px){.pdp-health-summary{grid-template-columns:1fr 1fr}.pdp-health-summary>div:last-child{grid-column:span 2}}
+@media print{.pdp-health-summary{gap:7px;margin:7px 0 10px}.pdp-health-summary>div{padding:6px 9px;break-inside:avoid}.pdp-health-summary strong{font-size:14pt}.pdp-health-summary span{font-size:7pt}.pdp-domain-nav{display:none!important}}
