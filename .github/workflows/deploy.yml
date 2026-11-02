@@ -32,6 +32,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Test profile revisions and evidence links
+        run: npx vitest run tests/external-profiles.test.tsx tests/profile-structure.test.ts
+
       - name: Build
         run: npm run build
 
