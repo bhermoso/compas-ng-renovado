@@ -7,6 +7,7 @@ import type { LocalHealthProfileArtifact } from '../../domain/health-profile-art
 import { appendExternalProfile, importProfileFile, profileAttachmentBlob } from '../../application/health-profile/externalProfiles';
 import { PSLCArtifactViewer } from './PSLCArtifactViewer';
 import { ProfileResultsDashboard } from './ProfileResultsDashboard';
+import { ProfileEditorialLab } from './ProfileEditorialLab';
 import './ExternalProfileDashboard.css';
 
 interface Props {
@@ -54,7 +55,7 @@ function emptyProfile(municipalityId: string): ExternalHealthProfile {
 }
 export function ExternalProfileDashboard({municipalityId,municipalityName,library,legacyProfiles=[],legacyText,authorName,onSave,onDirtyChange}: Props) {
  const [selectedId,setSelectedId]=useState(library.activeId);
- const [tab,setTab]=useState<'results'|'document'|'versions'>('results');
+ const [tab,setTab]=useState<'results'|'document'|'versions'|'laboratory'>('results');
  const [draft,setDraft]=useState<ExternalHealthProfile>();
  const [newFiles,setNewFiles]=useState<ProfileAttachment[]>([]);
  const [busy,setBusy]=useState(false); const [message,setMessage]=useState(''); const [error,setError]=useState('');
@@ -197,7 +198,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
    <button className="ep-primary" type="button" disabled={busy} onClick={()=>fileInput.current?.click()}>Seleccionar el perfil</button>
    <p className="ep-help">Hasta 20 MB por archivo. Originales, texto, resultados y versiones se guardan en Firebase. El navegador es una caché.</p></div>
   </div> : <>
-   <nav className="ep-tabs ep-tabs--primary" aria-label="Espacios del perfil">{([['results','Perfil'],['document','Documento completo'],['versions','Gestión y versiones']] as const).map(([key,label])=><button key={key} type="button" aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>
+   <nav className="ep-tabs ep-tabs--primary" aria-label="Espacios del perfil">{([['results','Perfil'],['document','Documento completo'],['versions','Gestión y versiones'],['laboratory','Laboratorio experimental']] as const).map(([key,label])=><button key={key} type="button" aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>
    {tab==='results'&&<main className="ep-main ep-main--profile">
     <div className="ep-complete-download pdp-noprint">
       <div><strong>Perfil de Salud Local completo</strong><span>Incluye datos, interpretación, conclusiones y recomendaciones de esta versión.</span></div>
@@ -210,6 +211,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
      : pdf&&fileUrls[pdf.id] ? <><p><a href={fileUrls[pdf.id]} target="_blank" rel="noopener noreferrer">Abrir PDF original en otra pestaña</a></p><iframe title="PDF original del Perfil de Salud Local" src={fileUrls[pdf.id]}/></>
      : <p>No hay texto extraíble. Consulta el archivo original o incorpora una transcripción.</p>}
    </section></main>}
+   {tab==='laboratory'&&<main className="ep-main ep-main--laboratory"><ProfileEditorialLab key={selected.id} profile={selected}/></main>}
    {tab==='versions'&&<main className="ep-main ep-main--management">
     <section className="ep-management-upload"><div><p className="ep-eyebrow">ADMINISTRACIÓN DOCUMENTAL</p><h2>Gestionar el perfil de {municipalityName}</h2><p>Los originales y revisiones se conservan en Firebase. Cargar un archivo no equivale a validarlo.</p></div><button type="button" className="ep-primary" disabled={busy} onClick={()=>fileInput.current?.click()}>↑ Cargar perfil</button></section>
     <div className="ep-management-grid"><aside className="ep-document-card"><p className="ep-eyebrow">DOCUMENTO DE REFERENCIA</p>
