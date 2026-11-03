@@ -167,3 +167,18 @@
 .ep-complete-download button{font-weight:700!important}
 @media(max-width:600px){.ep-complete-download button{width:100%}}
 @media print{.ep-complete-download{display:none!important}}
+
+/* Exportación canónica: los filtros de la interfaz no limitan el documento impreso. */
+.epd-print-topics{display:none}
+.epd-full-document{display:none}
+@media print{
+ .epd-screen-topics{display:none!important}
+ .epd-print-topics{display:grid!important}
+ .epd-full-document{display:block!important;break-before:page;page-break-before:always}
+ .epd-full-document header{border-bottom:1px solid #cbd5e1;margin-bottom:12px}
+ .epd-full-document p{font-size:10pt;line-height:1.48;white-space:pre-wrap;overflow-wrap:anywhere;orphans:3;widows:3;margin:0 0 11px}
+ .epd-full-document header p{font-size:9pt;color:#546879}
+ .epd-full-document h2{font-size:18pt}
+ .epd-topics .epd-topic{break-inside:auto}
+ .epd-row{break-inside:avoid}
+}
