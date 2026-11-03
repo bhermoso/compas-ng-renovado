@@ -8,6 +8,7 @@
 
 - Loja v0.3: `tests/fixtures/profile-text/loja-v0.3-package.txt` (27.252 caracteres). **Es texto de paquete conservado en el repositorio**, no certificación de posesión del PDF original.
 - Zagra v0.1: `tests/fixtures/profile-text/zagra-v0.1-pdf.txt` (texto extraído, 13 marcadores de página) y PDF de 13 páginas facilitado en la conversación (`Perfil de Salud Local de Zagra (1).pdf`). **No se deduce de ello que los bytes del PDF estén asociados como original a una versión en Firebase.**
+- **Identificador verificable del PDF Zagra v0.1 aportado:** 209.341 bytes; 13 páginas; SHA-256 `1c43380b28f46c39f9c59b8f51efa618fa79871ff4f21ed55136741c9693c4eb`, calculado sobre el archivo PDF original suministrado en esta conversación. Este identificador permite cotejarlo con `externalProfileLibrary.attachments[].sha256`; **no implica coincidencia hasta leer el inventario real de Firebase**.
 - Zagra v0.2: `tests/fixtures/profile-text/zagra-v0.2-docx.txt` y `tests/fixtures/profile-text/zagra-v0.2-pdf.txt` (extracciones conservadas en el repositorio; la última contiene 18 marcadores de página). La presencia de extracciones **no demuestra por sí sola** que los originales DOCX/PDF estén en la biblioteca de Firebase ni cuál sea la versión vigente.
 - Implementación: `src/application/health-profile/externalProfiles.ts`, `profileStructure.ts`, `src/ui/components/ExternalProfileDashboard.tsx`, `ProfileResultsDashboard.tsx`; contrato de arquitectura `docs/architecture/EXTERNAL-PROFILE.md`.
 
