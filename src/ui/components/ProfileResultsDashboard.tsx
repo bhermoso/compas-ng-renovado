@@ -245,7 +245,7 @@ export function ProfileResultsDashboard({ profile, municipalityName, onAddResult
         <section className="epd-full-document pdp-print-only" aria-label="Documento íntegro incorporado al perfil">
           <header><p className="ep-eyebrow">DOCUMENTO FUENTE · TRANSCRIPCIÓN DISPONIBLE</p><h2>Texto completo del perfil incorporado</h2>
           <p>Se reproduce el texto guardado en esta revisión. Los archivos originales adjuntos se conservan independientemente.</p></header>
-          {profile.text.split(/\\n\\s*\\n/).filter(Boolean).map((p,i)=><p key={i}>{p}</p>)}
+          {profile.text.split(/\n\s*\n/).filter(Boolean).map((p,i)=><p key={i}>{p}</p>)}
         </section>
       )}
       {profile.limitations.filter(Boolean).length > 0 && (
