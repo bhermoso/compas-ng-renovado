@@ -157,6 +157,18 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
   expect(html).toContain('epd-screen-topics');
   expect(html).toContain('Perfil completo · PDF');
  });
+ it('reconoce un perfil anterior de COMPÁS sin exigir que se convierta en perfil externo',()=>{
+  const html=renderToStaticMarkup(createElement(ExternalProfileDashboard,{
+   municipalityId:'zagra-test',municipalityName:'Zagra',library:EMPTY_PROFILE_LIBRARY,
+   legacyText:'Perfil histórico de Zagra conservado en el expediente.',
+   authorName:'Pruebas',onSave:async()=>{}
+  }));
+  expect(html).toContain('Ya existe un perfil anterior de COMPÁS');
+  expect(html).toContain('Perfil histórico de Zagra conservado en el expediente.');
+  expect(html).toContain('ep-legacy');
+  expect(html).toContain('open=""');
+  expect(html).toContain('Seleccionar el perfil');
+ });
  it('maqueta los datos suministrados para PDF y Word sin inventar conclusiones',()=>{
   const p=externalProfileFixture(),model=externalProfileDocument(p,'Municipio de pruebas');
   expect(model.sections.find(s=>s.title.startsWith('Texto del perfil'))?.paragraphs.join('\n\n')).toBe(p.text);
