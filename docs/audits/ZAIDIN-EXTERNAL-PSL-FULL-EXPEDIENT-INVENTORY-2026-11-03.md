@@ -107,3 +107,42 @@ Hay numerosos registros de la ciudad de Granada fuera del Zaidín (Almanjáyar, 
 **No apto todavía para aprobar o importar como Perfil externo completo.** Sí existe evidencia suficiente para formular hipótesis y una estructura de perfil; no para certificar trazabilidad íntegra del original, materiales cualitativos ni validación de todos los recursos.
 
 **Secuencia obligatoria:** originales íntegros y fichas verificadas → matriz por afirmación con página/tabla/escala/año → lectura integrada → conclusiones y recomendaciones humanas → original externo PDF/DOCX/JSON → importación como revisión nueva, sin sustituir perfiles previos.
+
+## Complemento de lectura detallada — comprobación de descripciones y ámbito de los 56 registros
+
+Se han revisado **los nombres y los campos descriptivos** de las 56 líneas del documento Localiza Salud del export (se evita publicar teléfonos o correos personales). El triage anterior basado en títulos **no constituye geolocalización ni certificación de vigencia**. La siguiente lectura complementa aquella clasificación:
+
+- **Cinco referencias explícitas al Zaidín:** entradas **12** (Centro de Participación Activa Zaidín), **20** (GRAFA Zaidín Sur), **28** (GRUSE Centro de Salud Zaidín Sur), **29** (GRUSE Zaidín/Centro) y **42** (Punto Vuela Zaidín). Son candidatas a activos específicos, sujetos a revisión de ubicación, fechas, población y acceso.
+- **Dos posibles duplicados:** entradas **39** y **40**, «Proyecto Leer conmigo» y «Proyecto Leer Contigo», describen un club de lectura en el Hospital Universitario Clínico San Cecilio con textos casi iguales. No se eliminan ni se fusionan en Firebase sin verificación de identidad.
+- **Registros explícitos fuera del barrio**: el listado menciona Almanjáyar, Cartuja, La Chana, Albayda, Realejo, Ronda, Cerrillo de Maracena, San Ildefonso y centros de salud de otros sectores. Son posibles recursos de referencia de la ciudad, pero su presencia en la lista de Zaidín **no acredita localización ni accesibilidad distrital**. Ejemplos comprobables: 1 Asociación Alfa (Almanjáyar), 3 asociación vecinal Cerrillo de Maracena, 4 asociación vecinal La Chana, 7 caminatas CS Almanjáyar/Cartuja, 34 parque Antonio Jiménez Blanco (Realejo), 35 parque Las Alquerías (Chana/Ronda), 38 piscina municipal Almanjáyar, 41 Punto Vuela Almanjáyar y 54 talleres del Centro de Participación Activa Ronda (la propia descripción exige empadronamiento en Ronda).
+- **Recursos de ámbito amplio:** asociaciones provinciales, entidades universitarias y actuaciones hospitalarias pueden servir a residentes del Zaidín sin estar en su territorio. Deben describirse como **recursos accesibles o potencialmente accesibles desde Zaidín**, si se documenta dicha condición, no como activos territoriales validados.
+- **Descripciones sin localización suficiente:** «MÁQUINAS DE EJERCICIOS BIOSALUDABLES», «Marcha Saludable», «QUIOSCO DE LA MÚSICA», «Taller de Afrontamiento de la Ansiedad (GRAFA)» requieren identificar emplazamiento y entidad.
+
+**Consecuencia para el futuro Perfil:** usar una formulación que preserve tanto el potencial comunitario como la incertidumbre: «El expediente reúne 56 registros de recursos de Granada, incluidos varios identificados específicamente con el Zaidín; queda pendiente verificar cuáles tienen cobertura efectiva, acceso y reconocimiento en este distrito». No usar «56 activos del Zaidín».
+
+## Matriz de afirmaciones contrastadas en la extracción histórica del Informe de Salud
+
+| ID | Hecho recuperado | Localización dentro del texto extraído | Ámbito y periodo | Salvedad antes de versión final |
+|---|---|---|---|---|
+| E01 | Población Zaidín 42.163; 19.518 hombres y 22.645 mujeres | §3, «Población Municipio de Granada y Distrito Zaidín 2022» | Distrito censal; 2022 | Comprobar celda de tabla del PDF original |
+| E02 | HTA ligeramente superior a Granada capital y Distrito Sanitario en las dos UA | §4.1.1 «Hipertensión Arterial» | UA Centro y Sur, 2021 | Valor absoluto y denominador en tabla gráfica no recuperados |
+| E03 | Diabetes similar entre áreas y algo mayor en Centro; EPOC con mayor prevalencia en Sur | §4.1.1 «Diabetes Mellitus», «EPOC» | UA, 2021 | Contrastar tablas y ajuste por edad |
+| E04 | Cribado colorrectal: 4.963 elegibles / 2.145 aceptan Centro; 8.287 / 3.262 Sur; municipal 40 % | §4.2 «Diagnóstico Precoz del Cáncer de Colon» | UA, 2022 | El texto usa «aceptación»; no denominar «pruebas realizadas» |
+| E05 | Test válidos: 1.563 Centro, 2.311 Sur; positivos: 124 y 194; positividad 7,9 % y 8,4 % | Misma tabla de cribado colorrectal | UA, 2022 | Positividad sobre pruebas válidas, no sobre población elegible |
+| E06 | Cribado mama: captación 87 % Centro y 86 % Sur | §4.2 «Diagnóstico Precoz del Cáncer de Mama» | UA, 2022 | Captación no equivale a incidencia ni detección |
+| E07 | Captación precoz embarazo: 84,7 % Centro, 90,3 % Sur y 86,7 % Distrito Sanitario | §4.2.3 «Captación Precoz en el Embarazo» | UA / Distrito, Informe 2023 | Verificar año de registro en tabla original |
+| E08 | Vacunación completa >99 % nacidos 2020; primovacunación >94 % nacidos 2021 | §4.2.2 «Vacunaciones» | Dos cohortes, resultados de 2022 | No extrapolar a toda la población |
+| E09 | Intervención avanzada individual tabaquismo: 10,7 % Centro, 1 % Sur, 8 % Distrito | §4.2.4 «Estilos de Vida» | UA / Distrito, 2018–2021 | Actividad sanitaria, **no prevalencia** de fumadores |
+| E10 | La mortalidad general y por causas se presenta para **Granada capital**, por ausencia de estadísticas oficiales por barrio/UA | §4.3 «Análisis de la mortalidad» | Municipio, 2021 y antecedentes | Prohibida atribución al Zaidín |
+| E11 | Los informes UGC Centro-Este y Sur constan como **listados de indicadores «A mejorar»** sin porcentajes numéricos en los campos `sourceText` | Dos documentos «Vigilancia integral de la salud» del export | UA; fecha no acreditada en texto | No inventar magnitudes ni asumir diferencias basadas solo en rótulos |
+
+**Nota de paginación:** estas referencias a capítulos y tablas son **localizaciones provisionales del texto extraído**, no páginas certificadas del PDF de 130 páginas. Deben convertirse a páginas exactas tras inspeccionar los originales completos.
+
+## Verificación de disponibilidad de originales y límites reales de esta auditoría
+
+- Se ha comprobado que el **árbol de GitHub** contiene el PDF de 130 páginas (4.226.437 bytes), EPVSA (738.109 bytes), ESCA (3.445.608 bytes) y Plan de Mayores (5.593.933 bytes), pero los binarios no se han podido recuperar para lectura visual en la sesión. No se declara revisada íntegramente ninguna de esas cuatro fuentes.
+- El material recuperado del Informe de Salud es un **texto histórico procedente de una conversión DOCX**, no una sustitución científicamente certificada de su PDF de origen.
+- El export público contiene referencias de los tres marcos estratégicos, sin cuerpo documental. Se mantiene pendiente la lectura íntegra de esos documentos para una síntesis de contexto, sin tratarlos como resultados locales.
+- Los informes de vigilancia UGC se han leído íntegramente **en sus campos de texto del export**, pero no se han cotejado con los originales DOCX. Las 56 fichas de recursos se han leído como filas de texto exportado; no se ha realizado verificación de campo o contacto.
+
+**Dictamen de cierre de fase:** inventario y matriz de hechos disponibles **completados para las fuentes textuales del export**, pero el expediente **no está íntegramente cotejado con sus fuentes originales**. La redacción externa final y su incorporación a Firebase permanecen suspendidas hasta superar ese control.
