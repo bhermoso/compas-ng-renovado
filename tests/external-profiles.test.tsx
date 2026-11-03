@@ -144,7 +144,7 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
   for(const id of ['C3','C6','C7']) expect(html).toContain('value="'+id+'"');
   expect(html).toContain('Decisión profesional');
   expect(html).toContain('Exportar decisión profesional');
-  expect(html).toContain('no modifica el perfil vigente');
+  expect(html).toContain('ni modifica el perfil vigente');
   expect(JSON.stringify(p)).toBe(before);
  });
  it('maqueta los datos suministrados para PDF y Word sin inventar conclusiones',()=>{
