@@ -176,7 +176,7 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
   const html=renderToStaticMarkup(createElement(ExternalProfileDashboard,{municipalityId:p.municipalityId,municipalityName:'Municipio de pruebas',library,authorName:'Pruebas',onSave:async()=>{}}));
   expect(html).toContain('Comprobar si el PDF original ya está guardado');
   expect(html).toContain('0 PDF originales adjuntos');
-  expect(html).toContain('no sube archivos');
+  expect(html).toContain('No sube archivos');
   expect(JSON.stringify(library)).toBe(snapshot);
  });
  it('maqueta los datos suministrados para PDF y Word sin inventar conclusiones',()=>{
