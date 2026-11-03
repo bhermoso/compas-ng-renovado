@@ -8,6 +8,7 @@ import { appendExternalProfile, importProfileFile, profileAttachmentBlob } from 
 import { PSLCArtifactViewer } from './PSLCArtifactViewer';
 import { ProfileResultsDashboard } from './ProfileResultsDashboard';
 import { ProfileEditorialLab } from './ProfileEditorialLab';
+import { ProfileOriginalVerifier } from './ProfileOriginalVerifier';
 import './ExternalProfileDashboard.css';
 
 interface Props {
@@ -228,6 +229,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
     {selected.id===library.activeId&&selected.status==='review'&&<section className="ep-validation"><div><h3>Revisión técnica</h3><p>La incorporación no valida el contenido. La validación quedará vinculada a esta versión y a tu cuenta.</p></div><button disabled={busy} onClick={()=>{if(!authorName.trim()){setError('Identifícate para registrar la validación.');return;}if(window.confirm('¿Registrar la validación técnica de esta versión con tu cuenta?'))void commit({...library,profiles:library.profiles.map(p=>p.id===selected.id?{...p,status:'validated',validatedAt:new Date().toISOString(),validatedBy:authorName}:p)},'Validación técnica registrada en Firebase.');}}>Registrar validación técnica</button></section>}
    </main>}
   </>}
+  {!draft&&<ProfileOriginalVerifier key={municipalityId} library={library}/>}
   {(legacyProfiles.length>0||legacyText)&&<details className="ep-legacy" open={!selected}><summary>Consultar perfiles anteriores de COMPÁS · legado conservado</summary><p>Estos documentos históricos se conservan. No se regeneran ni se convierten automáticamente en el perfil externo vigente.</p>{legacyText&&<details><summary>Texto del perfil anterior</summary><p className="ep-legacy-text">{legacyText}</p></details>}{legacyProfiles.map(a=><details key={a.id}><summary>{a.portada.municipalityName} · {a.artifactVersion}</summary><PSLCArtifactViewer artifact={a}/></details>)}</details>}
   <footer className="ep-footnote">Documento elaborado fuera de COMPÁS · Contenido y gráficos trazables a su versión · Conservación completa en Firebase</footer>
  </section>;
