@@ -182,3 +182,11 @@
  .epd-topics .epd-topic{break-inside:auto}
  .epd-row{break-inside:avoid}
 }
+
+/* Comprobación no destructiva del original asociado al expediente. */
+.ep-original-check{margin:22px 0;padding:20px 24px;border:1px solid #c6d9e0;border-left:4px solid #146b82;background:#f5fafb}
+.external-profile .ep-original-check h3{font-size:17px;margin:0 0 8px}
+.ep-original-check p{font-size:13px;line-height:1.55;margin:6px 0 10px}
+.ep-original-check__input{display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:13px;font-weight:650;padding:10px 0}
+.ep-original-check__input input{max-width:100%;font:inherit;font-size:12px}
+@media print{.ep-original-check{display:none!important}}
