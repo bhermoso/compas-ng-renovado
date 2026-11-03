@@ -147,6 +147,16 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
   expect(html).toContain('ni modifica el perfil vigente');
   expect(JSON.stringify(p)).toBe(before);
  });
+ it('el PDF completo incluye el texto fuente y todos los grupos de indicadores, sin depender del filtro visible',()=>{
+  const p=externalProfileFixture();
+  const html=renderToStaticMarkup(createElement(ExternalProfileDashboard,{municipalityId:p.municipalityId,municipalityName:'Municipio de pruebas',library:{profiles:[p],attachments:[],activeId:p.id},authorName:'Pruebas',onSave:async()=>{}}));
+  expect(html).toContain('epd-full-document');
+  expect(html).toContain('Texto completo del perfil incorporado');
+  expect(html).toContain('Contenido literal aportado por el equipo.');
+  expect(html).toContain('epd-print-topics');
+  expect(html).toContain('epd-screen-topics');
+  expect(html).toContain('Perfil completo · PDF');
+ });
  it('maqueta los datos suministrados para PDF y Word sin inventar conclusiones',()=>{
   const p=externalProfileFixture(),model=externalProfileDocument(p,'Municipio de pruebas');
   expect(model.sections.find(s=>s.title.startsWith('Texto del perfil'))?.paragraphs.join('\n\n')).toBe(p.text);
