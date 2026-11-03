@@ -163,7 +163,7 @@ export function ProfileResultsDashboard({ profile, municipalityName, onAddResult
           )}
         </div>
         {topics.length ? (
-          <div className="epd-topics">{visibleTopics.map((t) => <TopicPanel key={t.topic} topic={t} />)}</div>
+          <><div className="epd-topics epd-screen-topics">{visibleTopics.map((t) => <TopicPanel key={t.topic} topic={t} />)}</div><div className="epd-topics epd-print-topics">{topics.map((t) => <TopicPanel key={t.topic} topic={t} />)}</div></>
         ) : figures.length > 0 ? (
           <div className="ep-pending"><h3>Este perfil no trae paquete de indicadores</h3><p>Las cifras destacadas proceden del resumen del documento. Para gráficos comparativos con fuente, ámbito y periodo, incorpora el paquete de resultados o añade los indicadores al editar una revisión. No se generan gráficos a partir del texto.</p>{onAddResults && <button type="button" onClick={onAddResults}>Incorporar resultados</button>}</div>
         ) : (
@@ -241,6 +241,13 @@ export function ProfileResultsDashboard({ profile, municipalityName, onAddResult
         </section>
       )}
 
+      {profile.text.trim().length > 0 && (
+        <section className="epd-full-document pdp-print-only" aria-label="Documento íntegro incorporado al perfil">
+          <header><p className="ep-eyebrow">DOCUMENTO FUENTE · TRANSCRIPCIÓN DISPONIBLE</p><h2>Texto completo del perfil incorporado</h2>
+          <p>Se reproduce el texto guardado en esta revisión. Los archivos originales adjuntos se conservan independientemente.</p></header>
+          {profile.text.split(/\\n\\s*\\n/).filter(Boolean).map((p,i)=><p key={i}>{p}</p>)}
+        </section>
+      )}
       {profile.limitations.filter(Boolean).length > 0 && (
         <section className="epd-howto">
           <h3>Cómo leer estos resultados</h3>
