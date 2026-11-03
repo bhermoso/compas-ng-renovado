@@ -169,6 +169,16 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
   expect(html).toContain('open=""');
   expect(html).toContain('Seleccionar el perfil');
  });
+ it('permite cotejar un PDF original sin añadir archivos o modificar el expediente',()=>{
+  const p=externalProfileFixture();
+  const library={profiles:[p],attachments:[],activeId:p.id};
+  const snapshot=JSON.stringify(library);
+  const html=renderToStaticMarkup(createElement(ExternalProfileDashboard,{municipalityId:p.municipalityId,municipalityName:'Municipio de pruebas',library,authorName:'Pruebas',onSave:async()=>{}}));
+  expect(html).toContain('Comprobar si el PDF original ya está guardado');
+  expect(html).toContain('0 PDF originales adjuntos');
+  expect(html).toContain('no sube archivos');
+  expect(JSON.stringify(library)).toBe(snapshot);
+ });
  it('maqueta los datos suministrados para PDF y Word sin inventar conclusiones',()=>{
   const p=externalProfileFixture(),model=externalProfileDocument(p,'Municipio de pruebas');
   expect(model.sections.find(s=>s.title.startsWith('Texto del perfil'))?.paragraphs.join('\n\n')).toBe(p.text);
