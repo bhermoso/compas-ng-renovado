@@ -34,3 +34,15 @@
 .sam-tripyramid__table th[scope="row"], .sam-tripyramid__table thead th:first-child { text-align: left; }
 .sam-tripyramid__progress { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin: 8px 0; font-size: .85rem; }
 .sam-tripyramid__progress progress { width: 180px; max-width: 100%; accent-color: var(--azul); }
+
+
+/* Pirámide SAM: conservar los patrones de datos; retirar la decoración. */
+.sam-tripyramid{
+  border:0;border-top:1px solid var(--borde);border-radius:0;
+  padding:16px 0;background:#fff;
+}
+.sam-tripyramid__empty{background:transparent;border-left:2px solid var(--amarillo)}
+.sam-tripyramid__swatch{border-radius:0}
+.sam-tripyramid__layer--male,.sam-tripyramid__layer--female{border-radius:0}
+.sam-tripyramid__layer[data-animated="true"]{transition:none}
+.sam-tripyramid__table th,.sam-tripyramid__table td{padding:8px 10px}
