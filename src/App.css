@@ -11438,3 +11438,75 @@ h3 {
   .tp-modal{box-shadow:none}
   .pcm-line-decision,.pcm-general,.pcm-specific,.diagnosis-matrix__card {break-inside:avoid}
 }
+
+
+/* Estudios, reconciliación, PSL-C y administración: misma gramática. */
+.study-report__quality-verdict,
+.study-report__quality-verdict--adecuada,
+.study-report__quality-verdict--moderada,
+.study-report__quality-verdict--insuficiente {
+  background:transparent;color:var(--texto-principal);
+  border:0;border-bottom:1px solid var(--borde);border-radius:0;
+  padding:4px 0;font-weight:600;
+}
+.study-report__quality-verdict--adecuada {border-bottom-color:var(--verde)}
+.study-report__quality-verdict--moderada {border-bottom-color:var(--amarillo)}
+.study-report__quality-verdict--insuficiente {border-bottom-color:var(--rojo)}
+.study-threshold-badge,
+.study-threshold-badge[data-level="alto"],
+.study-threshold-badge[data-level="medio"],
+.study-threshold-badge[data-level="medio-bajo"],
+.study-threshold-badge[data-level="bajo"]{
+  background:transparent;color:var(--texto-principal);
+  border:0;border-bottom:1px solid var(--borde);
+  border-radius:0;padding:3px 0;
+}
+.study-threshold-badge[data-level="alto"]{border-bottom-color:var(--verde)}
+.study-threshold-badge[data-level="medio"]{border-bottom-color:var(--azul)}
+.study-threshold-badge[data-level="medio-bajo"]{border-bottom-color:var(--amarillo)}
+.study-threshold-badge[data-level="bajo"]{border-bottom-color:var(--rojo)}
+.psl-doc-notice--info,.psl-doc-notice--warning,
+.psl-doc-stale,.exp-card__stale,.prio-psl-warning{
+  background:transparent;color:var(--texto-secundario);
+  border:0;border-left:2px solid var(--borde);
+  border-radius:0;padding:9px 12px;
+}
+.psl-doc-notice--info {border-left-color:var(--azul)}
+.psl-doc-notice--warning,.psl-doc-stale,.exp-card__stale,.prio-psl-warning{
+  border-left-color:var(--amarillo);
+}
+.reco-summary-chip,
+.reco-summary-chip--escalada,
+.reco-summary-chip--no-escalada {
+  background:transparent;color:var(--texto-secundario);
+  border:0;border-bottom:1px solid var(--borde);border-radius:0;
+}
+.reco-summary-chip--escalada {border-bottom-color:var(--verde)}
+.reco-summary-chip--no-escalada {border-bottom-color:var(--amarillo)}
+.ges-status-badge,.ges-status-badge--draft,.ges-status-badge--ready,
+.ges-badge,.ges-badge--status-draft,.ges-badge--status-validated,
+.ges-badge--status-deprecated,.ges-badge--eas,.ges-badge--cat {
+  background:transparent;color:var(--texto-secundario);
+  border:0;border-bottom:1px solid var(--borde);
+  border-radius:0;padding:3px 0;
+}
+.ges-status-badge--draft,.ges-badge--status-draft {border-bottom-color:var(--amarillo)}
+.ges-status-badge--ready,.ges-badge--status-validated {border-bottom-color:var(--verde)}
+.ges-badge--status-deprecated {border-bottom-color:var(--rojo)}
+.ges-badge--eas,.ges-badge--cat {border-bottom-color:var(--azul)}
+.ges-module-row--checked,.ges-instrument-item--block {
+  background:transparent;border:0;border-left:2px solid var(--azul);
+  border-bottom:1px solid var(--borde);border-radius:0;
+}
+.ges-composition-summary,.ges-detail__total {
+  background:transparent;border:0;border-top:1px solid var(--borde);
+  border-radius:0;padding:12px 0;color:var(--texto-principal);
+}
+.ges-btn--danger,.ges-btn--danger:hover {
+  background:#fff;border:1px solid var(--borde);border-left:3px solid var(--rojo);
+  border-radius:0;color:var(--rojo);
+}
+.pai-objetivo--sin-cobertura,.pai-tension {
+  background:#fff;border:0;border-left:2px solid var(--amarillo);
+  border-bottom:1px solid var(--borde);border-radius:0;
+}
