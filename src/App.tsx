@@ -1157,6 +1157,64 @@ export default function App() {
 
   const profileDirtyRef = useRef(false);
   const onProfileDirtyChange = useCallback((dirty: boolean) => { profileDirtyRef.current = dirty; }, []);
+  const handleStoreDocumentOriginal = useCallback(async (documentId: string, file: File): Promise<void> => {
+    const municipalityId = workspace.municipality.identity.id;
+    if (!remoteClient.auth.currentUser) throw new Error("Inicia sesión para conservar el original en Firebase.");
+    if (remoteHydratedMunicipalityId !== municipalityId || pendingSeedId || pendingIndexedDbHydrationId) {
+      throw new Error("Recupera primero el expediente compartido para evitar sobrescribir información.");
+    }
+    const doc = workspace.repository.documents.find(d => d.id === documentId);
+    if (!doc) throw new Error("El documento ya no existe en este expediente.");
+    const hash = await sha256Hex(await file.arrayBuffer());
+    const previous = workspace.documentOriginals?.find(o => o.documentId === documentId);
+    if (previous && previous.sha256 !== hash) {
+      throw new Error("Este documento ya tiene un original diferente en Firebase. Incorpóralo como nueva versión documental, sin sustituir silenciosamente sus evidencias.");
+    }
+    if (doc.contentSha256 && doc.contentSha256 !== hash) {
+      throw new Error("El archivo no coincide con la huella registrada para esta fuente. No se puede alterar su contenido sin una nueva versión documental.");
+    }
+    const other = workspace.repository.documents.find(d => d.id !== documentId && d.status !== "archived" && d.status !== "rejected" && (
+      d.contentSha256 === hash || workspace.documentOriginals?.some(o => o.documentId === d.id && o.sha256 === hash)
+    ));
+    if (other) throw new Error(`Archivo idéntico ya registrado: «${other.title}». Utiliza el documento existente, sin crear un duplicado.`);
+    if (previous) {
+      await saveOriginalFile(municipalityId, documentId, file);
+      return;
+    }
+    const used = documentOriginalsBytes(workspace.documentOriginals) + profileOriginalsBytes(workspace.externalProfileLibrary);
+    const decision = decideOriginalUpload(file.size, used);
+    if (decision !== "fits") {
+      throw new Error(decision === "too-large" ? "El original supera el límite de 20 MB por archivo." : "Se supera el límite compartido de 40 MB de originales y perfiles.");
+    }
+    if (profileSaveInFlightRef.current) throw new Error("Hay otra operación documental guardándose en Firebase.");
+    const original = await encodeDocumentOriginal(documentId, file);
+    const next = {
+      ...workspace,
+      documentOriginals: mergeDocumentOriginals(workspace.documentOriginals ?? [], [original]),
+      updatedAt: new Date().toISOString(),
+    };
+    profileSaveInFlightRef.current = true;
+    setRemotePersistenceMessage("Guardando el archivo original en Firebase…");
+    try {
+      await saveRemoteWorkspace(remoteClient, next);
+      setWorkspace(current => current.municipality.identity.id === municipalityId ? ({
+        ...current,
+        documentOriginals: mergeDocumentOriginals(current.documentOriginals ?? [], [original]),
+        updatedAt: next.updatedAt,
+      }) : current);
+      setRemotePersistenceMessage("Archivo original guardado en Firebase.");
+      // IndexedDB es solamente una caché; un fallo local no revierte el guardado remoto.
+      await saveOriginalFile(municipalityId, documentId, file).catch(error => {
+        console.warn("[original-cache-error]", error);
+      });
+    } catch (error) {
+      setRemotePersistenceMessage("El original no se ha guardado en Firebase.");
+      throw error;
+    } finally {
+      profileSaveInFlightRef.current = false;
+    }
+  }, [workspace, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+
   const handleSaveExternalProfiles = useCallback(async (library: ExternalProfileLibrary) => {
     const municipalityId = workspace.municipality.identity.id;
     if (!remoteClient.auth.currentUser) throw new Error("Inicia sesión para guardar el perfil y sus archivos en Firebase.");
@@ -3423,7 +3481,7 @@ export default function App() {
   // ── Render ──────────────────────────────────────────────────
 
   return (
-    <DocumentationProvider key={municipality.id} workspace={workspace}>
+    <DocumentationProvider key={municipality.id} workspace={workspace} onStoreOriginal={handleStoreDocumentOriginal}>
       {municipalityToDelete && <DeleteWorkspaceDialog
         name={municipalityToDelete.name}
         discardDraft={preparationDirtyRef.current && municipalityToDelete.id === municipality.id}
