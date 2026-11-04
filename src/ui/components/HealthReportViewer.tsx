@@ -3,6 +3,7 @@ import { institutionalHealthReportTitle } from "../../application/health-profile
 import type { HealthReportDocument, HealthReportSection } from "../../domain/health-report";
 import type { MunicipalDocumentRepository } from '../../domain/repository';
 import { DocumentAccess } from './DocumentAccess.tsx';
+import { DocumentReference } from './Documentation';
 
 interface HealthReportViewerProps {
   healthReport?: HealthReportDocument;
@@ -74,7 +75,7 @@ export function HealthReportViewer({ healthReport, repository }: HealthReportVie
           <div className="hr-viewer__header">
             <div>
               <p className="eyebrow">Informe de Salud · Fuente primaria</p>
-              <h2 className="hr-viewer__title">{institutionalHealthReportTitle(healthReport.municipalityId, healthReport.title)}</h2>
+              <h2 className="hr-viewer__title"><DocumentReference documentId={healthReport.linkedDocumentId}>{institutionalHealthReportTitle(healthReport.municipalityId, healthReport.title)}</DocumentReference></h2>
             </div>
             <div className="hr-viewer__meta">
               <span className="panel-note">
@@ -99,7 +100,7 @@ export function HealthReportViewer({ healthReport, repository }: HealthReportVie
 
           <div className="hr-viewer__source-access">
             <h3>Documento fuente</h3>
-            <p><strong>Título registrado:</strong> {healthReport.title}</p>
+            <p><strong>Título registrado:</strong> <DocumentReference documentId={healthReport.linkedDocumentId}>{healthReport.title}</DocumentReference></p>
             {sourceDocument ? <DocumentAccess key={sourceDocument.id} document={sourceDocument} /> : <p>No se ha localizado el registro documental vinculado a este informe.</p>}
             {healthReport.body.format === 'html' && <p><strong>Vista convertida del Word.</strong> Las imágenes, gráficos y el formato pueden no haberse conservado. Consulta el archivo original para comprobarlos.</p>}
             {/estilo[_ ]Atarfe/i.test(healthReport.sourceFileName) && <p><strong>Versión adaptada.</strong> Este registro procede de «{healthReport.sourceFileName}». No acredita la conservación del PDF original del distrito.</p>}
