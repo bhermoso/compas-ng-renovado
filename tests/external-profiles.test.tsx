@@ -161,6 +161,7 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
   }));
   expect(html).toContain('Exportar presentación COMPÁS · PDF');
   expect(html).toContain('PDF original no adjunto a esta versión.');
+  expect(html).toContain('Borrador técnico: pendiente de validación.');
   expect(html).not.toContain('Perfil completo · PDF');
  });
 
