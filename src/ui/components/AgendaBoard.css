@@ -105,3 +105,61 @@
 .agenda-timeline__group li { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 4px 0; border-bottom: 1px dashed var(--borde); }
 .agenda-timeline__item { background: none; border: 0; padding: 0; font: inherit; text-align: left; color: var(--texto-principal); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 .agenda-filters input[type="search"] { min-width: 0; width: 100%; max-width: 18rem; }
+
+
+/* COMPÁS · Agenda operativa: tablero funcional, no colección de tarjetas. */
+.agenda-toolbar{padding-bottom:10px;border-bottom:1px solid var(--borde)}
+.agenda-board{gap:0;border:1px solid var(--borde)}
+.agenda-column{background:#fff;border:0;border-right:1px solid var(--borde);border-radius:0}
+.agenda-column:last-child{border-right:0}
+.agenda-column header{
+  min-height:0;background:#fff;border:0;border-bottom:1px solid var(--borde);
+  padding:13px 12px 10px;
+}
+.agenda-column--sanitario header,
+.agenda-column--comunitario header,
+.agenda-column--educativo header,
+.agenda-column--laboral header {border-bottom:1px solid var(--borde)}
+.agenda-column__body{padding:8px 10px 14px;gap:0}
+.agenda-card{
+  background:#fff;border:0;border-bottom:1px solid var(--borde);
+  border-radius:0;padding:12px 4px;box-shadow:none;
+}
+.agenda-card:hover{border-color:var(--azul)}
+.agenda-card--orphan{border-bottom-style:dashed}
+.agenda-card--prio-alta {border-left:2px solid var(--rojo);padding-left:9px}
+.agenda-card--prio-media {border-left:2px solid var(--amarillo);padding-left:9px}
+.agenda-card--prio-baja {border-left:2px solid var(--borde);padding-left:9px}
+.agenda-card__title {font-size:14px;line-height:1.5}
+.agenda-badge{
+  background:transparent;border:0;border-bottom:1px solid var(--borde);
+  border-radius:0;padding:2px 0;font-weight:400;
+}
+.agenda-badge--status-finalizada {border-bottom-color:var(--verde)}
+.agenda-badge--status-en-ejecucion {border-bottom-color:var(--azul)}
+.agenda-badge--status-suspendida,.agenda-badge--prio-alta {border-bottom-color:var(--rojo)}
+.agenda-badge--line {border-bottom-color:var(--azul);color:var(--azul)}
+.agenda-badge--prio-alta {color:var(--texto-principal)}
+.agenda-templates,.agenda-notice,.agenda-timeline,.agenda-catalog__line,.agenda-catalog__program{
+  background:#fff;border:0;border-top:1px solid var(--borde);
+  border-radius:0;box-shadow:none;
+}
+.agenda-templates__item {
+  border:0;border-bottom:1px solid var(--borde);
+  border-radius:0;padding:10px 0;
+}
+.agenda-templates__list{gap:0}
+.agenda-notice{border-left:2px solid var(--azul);padding:9px 12px}
+.agenda-menu__list{border-radius:0;box-shadow:0 1px 3px rgba(15,23,42,.06)}
+.agenda-toolbar button,.agenda-filters button,.agenda-import button,
+.agenda-notice button,.agenda-templates button,.agenda-catalog button,.ficha button{
+  border-radius:0;
+}
+.agenda-toolbar .agenda-primary{border-left:3px solid var(--azul)}
+.agenda-toolbar .agenda-primary:hover:not(:disabled){background:var(--azul);border-color:var(--azul)}
+.ficha{border-radius:0;padding:16px 0;border:0;border-top:1px solid var(--borde)}
+.ficha-warning{background:transparent;border-left:2px solid var(--amarillo)}
+.ficha-field--read .ficha-read-value{background:transparent;border-bottom:1px solid var(--borde);border-radius:0}
+@media(max-width:720px){
+  .agenda-board{grid-template-columns:repeat(5,minmax(205px,1fr))}
+}

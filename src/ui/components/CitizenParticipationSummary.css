@@ -21,3 +21,16 @@
   .citizen-summary__ranking li { grid-template-columns: 1.4em minmax(0, 1fr) 6.5em; }
   .citizen-summary__track { grid-column: 2 / 4; grid-row: 2; }
 }
+
+
+/* Participación: rankings y preguntas como tablas de evidencia, no paneles. */
+.citizen-summary{
+  border:0;border-top:1px solid var(--borde);border-radius:0;
+  background:#fff;padding:16px 0;
+}
+.citizen-summary h3{font-size:18px}
+.citizen-summary__ranking li{border-bottom:1px solid var(--borde);padding:8px 0}
+.citizen-summary__track{height:7px;background:var(--fondo-secundario)}
+.citizen-summary__bar{background:var(--azul)}
+.citizen-summary__empty{background:transparent;border-left:2px solid var(--amarillo);padding:8px 12px}
+.citizen-summary__table th,.citizen-summary__table td{padding:8px 11px}

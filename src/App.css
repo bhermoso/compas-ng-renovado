@@ -11241,3 +11241,272 @@ h3 {
 }
 
 .diagnosis-control .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+
+/* ======================================================================
+   SEGUNDA PASADA · COMPÁS INSTITUCIONAL
+   Contrato: docs/visual/VISUAL-CONTRACT.md.
+   Una única jerarquía editorial para Diagnóstico, Plan, Priorización y
+   expediente municipal. Nunca reemplazar los estados funcionales ni
+   ocultar avisos, comparadores o acciones de recuperación.
+   ====================================================================== */
+
+/* Diagnóstico: registro en filas; el estado se lee, no se anuncia con cajas. */
+.diag-status__list {gap:0;border-top:1px solid var(--borde)}
+.diag-status__item {
+  padding:12px 14px 12px 0;
+  border:0;border-bottom:1px solid var(--borde);
+  border-radius:0;background:transparent;
+}
+.diag-status__item--ok {border-left:2px solid var(--verde);padding-left:10px}
+.diag-status__item--missing {border-left:2px solid var(--rojo);padding-left:10px}
+.diag-status__item--pending {border-left:2px solid var(--borde);padding-left:10px}
+.diag-status__item--ok .diag-status__value,
+.diag-status__item--pending .diag-status__value {color:var(--texto-principal)}
+.diag-status__conclusion,
+.diag-status__conclusion--ready,
+.diag-status__conclusion--partial,
+.diag-status__conclusion--empty {
+  background:transparent;border:0;border-left:2px solid var(--borde);
+  color:var(--texto-secundario);border-radius:0;
+  padding:9px 0 9px 12px;font-weight:500;
+}
+.diag-status__conclusion--ready {border-left-color:var(--verde)}
+.diag-status__conclusion--partial {border-left-color:var(--amarillo)}
+.diag-status__conclusion--empty {border-left-color:var(--borde)}
+.diagnosis-control__state,
+.diagnosis-control__state--ready,
+.diagnosis-control__state--partial {
+  background:transparent;border:0;border-left:2px solid var(--borde);
+  border-radius:0;color:var(--texto-secundario);padding:8px 0 8px 12px;
+}
+.diagnosis-control__state--ready {border-left-color:var(--verde)}
+.diagnosis-control__state--partial {border-left-color:var(--amarillo)}
+.diagnosis-control__metrics {
+  gap:0;border-block:1px solid var(--borde);
+}
+.diagnosis-control__metrics > div {
+  padding:12px 14px 12px 0;
+  background:transparent;border:0;border-right:1px solid var(--borde);
+  border-radius:0;
+}
+.diagnosis-control__metrics > div:last-child {border-right:0}
+.diagnosis-control__metrics dd {font-size:clamp(1.2rem,2vw,1.55rem);color:var(--texto-principal)}
+.diagnosis-control__metrics .diagnosis-control__metric--attention {border-bottom:2px solid var(--amarillo)}
+.diagnosis-control__metrics .diagnosis-control__metric--attention dd {color:var(--texto-principal)}
+.diagnosis-matrix {gap:0;border-top:1px solid var(--borde)}
+.diagnosis-matrix__card {
+  background:transparent;border:0;border-bottom:1px solid var(--borde);
+  border-radius:0;padding:13px 16px 13px 0;
+}
+.diagnosis-matrix__card--ok {border-left:2px solid var(--verde);padding-left:12px}
+.diagnosis-matrix__card--partial {border-left:2px solid var(--amarillo);padding-left:12px}
+.diagnosis-matrix__pill,
+.diagnosis-matrix__pill--ok,
+.diagnosis-matrix__pill--partial {
+  background:transparent;color:var(--texto-secundario);
+  padding:0;border-radius:0;font-weight:500;
+}
+.diagnosis-matrix__value {font-size:1.15rem;color:var(--texto-principal)}
+.diagnosis-matrix__card-action:focus-visible {outline:2px solid var(--azul)}
+.diagnosis-timeline__filters {gap:0;border-bottom:1px solid var(--borde)}
+.diagnosis-timeline__filters button,
+.diagnosis-timeline__filters button[aria-pressed="true"] {
+  border:0;border-bottom:2px solid transparent;border-radius:0;
+  background:transparent;color:var(--texto-secundario);
+  padding:8px 12px;
+}
+.diagnosis-timeline__filters button[aria-pressed="true"] {
+  border-bottom-color:var(--azul);color:var(--azul);
+}
+.diagnosis-timeline__item {
+  background:transparent;border:0;border-bottom:1px solid var(--borde);
+  border-radius:0;padding:9px 0;
+}
+.diagnosis-timeline__item--current {border-left:2px solid var(--azul);padding-left:10px}
+.diagnosis-timeline__item--historical {border-left:2px solid var(--texto-terciario);padding-left:10px}
+
+/* Priorizar: selección y clasificación sin tarjetas azules ni chips saturados. */
+.tp-grid {gap:0 20px}
+.tp-topic {
+  border:0;border-bottom:1px solid var(--borde);border-radius:0;
+  background:transparent;padding:12px 6px;transition:none;
+}
+.tp-topic--selected {
+  background:transparent;border:0;border-bottom:2px solid var(--azul);
+}
+.tp-topic--selected .tp-topic__check {background:var(--azul);border-color:var(--azul)}
+.tp-save-btn,.tp-apply-btn {border-radius:0;background:var(--azul);font-weight:600;padding:8px 14px}
+.tp-saved-note {background:transparent;border:0;border-top:1px solid var(--borde);border-radius:0;padding:10px 0}
+.tp-modal {border-radius:2px;box-shadow:0 2px 12px rgba(15,23,42,.09)}
+.tp-modal__header {padding:22px 26px 17px}
+.tp-modal__close {border-radius:2px;background:#fff}
+.tp-ranking {gap:0;border-top:1px solid var(--borde)}
+.tp-ranking__row,
+.tp-ranking__row--top5 {
+  background:transparent;border:0;border-bottom:1px solid var(--borde);
+  border-radius:0;padding:9px 4px;
+}
+.tp-ranking__row--top5 {border-left:2px solid var(--azul);padding-left:10px}
+.tp-ranking__bar {background:var(--texto-terciario);border-radius:0}
+.tp-ranking__row--top5 .tp-ranking__bar {background:var(--azul)}
+.tp-study__cautions {
+  background:transparent;border:0;border-left:2px solid var(--amarillo);
+  color:var(--texto-secundario);border-radius:0;padding:8px 12px;
+}
+
+/* Plan de acción: instrumento de trabajo REDCap, filas y edición funcional. */
+.pcm-trace,.pcm-locked-note,.pcm-generation-prompt,
+.plan-psl-provenance,
+.plan-psl-provenance--validated,
+.plan-psl-provenance--draft,
+.plan-psl-provenance--stale {
+  background:transparent;color:var(--texto-secundario);
+  border:0;border-left:2px solid var(--borde);border-radius:0;
+  padding:9px 12px;
+}
+.pcm-trace,.plan-psl-provenance--validated {border-left-color:var(--verde)}
+.pcm-locked-note,.plan-psl-provenance--draft {border-left-color:var(--amarillo)}
+.plan-psl-provenance--stale {border-left-color:var(--naranja)}
+.pcm-line-decision,.pcm-tree-module,.pcm-indicator,
+.pcm-traceability-card,.pcm-general,.pcm-specific {
+  background:#fff;border:0;border-bottom:1px solid var(--borde);
+  border-radius:0;box-shadow:none;
+}
+.pcm-general > summary {background:transparent;border-bottom:1px solid var(--borde)}
+.pcm-tree-module {padding:14px 0}
+.pcm-line-decision {padding:12px 0}
+.pcm-specific {padding:12px 0}
+.pcm-save-row button {
+  background:#fff;color:var(--azul);
+  border:1px solid var(--borde);border-left:3px solid var(--azul);
+  border-radius:0;font-weight:600;
+}
+.pcm-save-row button:hover {background:var(--fondo-principal)}
+.pcm-save-confirmation {color:var(--texto-secundario);font-weight:500}
+.plan-tabs {gap:0;border-bottom:1px solid var(--borde)}
+.plan-tabs__tab,.plan-tabs__tab--active {
+  background:transparent;border:0;border-bottom:2px solid transparent;
+  border-radius:0;box-shadow:none;padding:8px 13px;
+  color:var(--texto-secundario);
+}
+.plan-tabs__tab--active {border-bottom-color:var(--azul);color:var(--azul)}
+.plan-objective-item {background:transparent;border-bottom:1px solid var(--borde)}
+
+/* Expediente municipal: estado semántico por borde, no bloque de color. */
+.exp-psl-chip,.exp-psl-chip--validated,.exp-psl-chip--draft,.exp-psl-chip--empty,
+.psl-doc-status-chip,.psl-doc-status-chip--review,.psl-doc-status-chip--validated {
+  background:transparent;border:0;border-radius:0;
+  padding:3px 0;color:var(--texto-secundario);font-weight:600;
+}
+.exp-psl-chip--validated,.psl-doc-status-chip--validated {border-bottom:2px solid var(--verde)}
+.exp-psl-chip--draft,.psl-doc-status-chip--review {border-bottom:2px solid var(--amarillo)}
+.status-pill,.status-pill--partial,.status-pill--empty {
+  background:transparent;border:0;border-bottom:1px solid var(--borde);
+  border-radius:0;color:var(--texto-secundario);font-weight:600;
+  padding:3px 0;
+}
+.status-pill--partial {border-bottom-color:var(--amarillo)}
+.pipeline-empty-notice {border:0;border-top:1px solid var(--borde);border-radius:0;background:transparent;padding:14px 0}
+.exp-card__goto,.exp-card__goto:hover {
+  background:#fff;border:1px solid var(--borde);
+  border-left:3px solid var(--azul);border-radius:0;color:var(--azul);
+}
+
+/* Navegación documental: escala tipográfica y blancos comunes. */
+.document-review-inbox__list button {
+  border:0;border-bottom:1px solid var(--borde);border-radius:0;
+  box-shadow:none;padding:11px 0;
+}
+.document-review-inbox__list button[aria-current="true"] {
+  border-bottom:2px solid var(--azul);box-shadow:none;
+}
+.document-review-inbox__editor,.document-review-inbox__import {
+  border:1px solid var(--borde);border-radius:0;background:#fff;
+}
+.document-review-inbox__editor input,
+.document-review-inbox__editor select{border-radius:0}
+@media(max-width:720px) {
+  .diag-status__list,.diagnosis-control__metrics,.diagnosis-matrix{grid-template-columns:1fr 1fr}
+  .diagnosis-control__metrics > div{border-right:0;border-bottom:1px solid var(--borde)}
+  .tp-grid{grid-template-columns:1fr}
+}
+@media(max-width:460px) {
+  .diag-status__list,.diagnosis-control__metrics,.diagnosis-matrix{grid-template-columns:1fr}
+}
+@media print{
+  .tp-modal{box-shadow:none}
+  .pcm-line-decision,.pcm-general,.pcm-specific,.diagnosis-matrix__card {break-inside:avoid}
+}
+
+
+/* Estudios, reconciliación, PSL-C y administración: misma gramática. */
+.study-report__quality-verdict,
+.study-report__quality-verdict--adecuada,
+.study-report__quality-verdict--moderada,
+.study-report__quality-verdict--insuficiente {
+  background:transparent;color:var(--texto-principal);
+  border:0;border-bottom:1px solid var(--borde);border-radius:0;
+  padding:4px 0;font-weight:600;
+}
+.study-report__quality-verdict--adecuada {border-bottom-color:var(--verde)}
+.study-report__quality-verdict--moderada {border-bottom-color:var(--amarillo)}
+.study-report__quality-verdict--insuficiente {border-bottom-color:var(--rojo)}
+.study-threshold-badge,
+.study-threshold-badge[data-level="alto"],
+.study-threshold-badge[data-level="medio"],
+.study-threshold-badge[data-level="medio-bajo"],
+.study-threshold-badge[data-level="bajo"]{
+  background:transparent;color:var(--texto-principal);
+  border:0;border-bottom:1px solid var(--borde);
+  border-radius:0;padding:3px 0;
+}
+.study-threshold-badge[data-level="alto"]{border-bottom-color:var(--verde)}
+.study-threshold-badge[data-level="medio"]{border-bottom-color:var(--azul)}
+.study-threshold-badge[data-level="medio-bajo"]{border-bottom-color:var(--amarillo)}
+.study-threshold-badge[data-level="bajo"]{border-bottom-color:var(--rojo)}
+.psl-doc-notice--info,.psl-doc-notice--warning,
+.psl-doc-stale,.exp-card__stale,.prio-psl-warning{
+  background:transparent;color:var(--texto-secundario);
+  border:0;border-left:2px solid var(--borde);
+  border-radius:0;padding:9px 12px;
+}
+.psl-doc-notice--info {border-left-color:var(--azul)}
+.psl-doc-notice--warning,.psl-doc-stale,.exp-card__stale,.prio-psl-warning{
+  border-left-color:var(--amarillo);
+}
+.reco-summary-chip,
+.reco-summary-chip--escalada,
+.reco-summary-chip--no-escalada {
+  background:transparent;color:var(--texto-secundario);
+  border:0;border-bottom:1px solid var(--borde);border-radius:0;
+}
+.reco-summary-chip--escalada {border-bottom-color:var(--verde)}
+.reco-summary-chip--no-escalada {border-bottom-color:var(--amarillo)}
+.ges-status-badge,.ges-status-badge--draft,.ges-status-badge--ready,
+.ges-badge,.ges-badge--status-draft,.ges-badge--status-validated,
+.ges-badge--status-deprecated,.ges-badge--eas,.ges-badge--cat {
+  background:transparent;color:var(--texto-secundario);
+  border:0;border-bottom:1px solid var(--borde);
+  border-radius:0;padding:3px 0;
+}
+.ges-status-badge--draft,.ges-badge--status-draft {border-bottom-color:var(--amarillo)}
+.ges-status-badge--ready,.ges-badge--status-validated {border-bottom-color:var(--verde)}
+.ges-badge--status-deprecated {border-bottom-color:var(--rojo)}
+.ges-badge--eas,.ges-badge--cat {border-bottom-color:var(--azul)}
+.ges-module-row--checked,.ges-instrument-item--block {
+  background:transparent;border:0;border-left:2px solid var(--azul);
+  border-bottom:1px solid var(--borde);border-radius:0;
+}
+.ges-composition-summary,.ges-detail__total {
+  background:transparent;border:0;border-top:1px solid var(--borde);
+  border-radius:0;padding:12px 0;color:var(--texto-principal);
+}
+.ges-btn--danger,.ges-btn--danger:hover {
+  background:#fff;border:1px solid var(--borde);border-left:3px solid var(--rojo);
+  border-radius:0;color:var(--rojo);
+}
+.pai-objetivo--sin-cobertura,.pai-tension {
+  background:#fff;border:0;border-left:2px solid var(--amarillo);
+  border-bottom:1px solid var(--borde);border-radius:0;
+}

@@ -11,3 +11,14 @@
 .sam-panel__cautions summary { cursor: pointer; font-weight: 600; }
 .sam-panel__cautions li { margin: 4px 0; line-height: 1.5; }
 .sam-panel__note { max-width: 90ch; font-size: .85rem; color: var(--texto-secundario); margin: 8px 0 0; }
+
+
+/* Evaluación SAM: filas y fuentes, no tarjetas de estado. */
+.sam-panel{
+  border:0;border-top:1px solid var(--borde);border-radius:0;
+  background:#fff;padding:16px 0;
+}
+.sam-panel__figures{gap:0;border-top:1px solid var(--borde)}
+.sam-panel__figures div{padding:12px 10px 9px 0;border-bottom:1px solid var(--borde)}
+.sam-panel__figures dd{font-size:19px;color:var(--texto-principal)}
+.sam-panel__status{background:transparent;border-left:2px solid var(--amarillo);padding:8px 12px}
