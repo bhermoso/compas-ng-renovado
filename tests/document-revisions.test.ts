@@ -32,6 +32,14 @@ describe("revisiones documentales sin duplicidad", () => {
     expect(next.evidenceStore).toBe(ws.evidenceStore);
   });
 
+  it("no hereda una URL del documento anterior al crear una nueva versión", async () => {
+    const ws=await fixture();
+    ws.repository.documents[0].source.url="https://example.com/antiguo.pdf";
+    const newFile=await encodeDocumentOriginal("nuevo",original("informe con otros datos"));
+    const revised=createDocumentRevision(ws,"informe",newFile);
+    expect(revised.repository.documents.find(d=>d.id==="nuevo")?.source.url).toBeUndefined();
+    expect(revised.repository.documents.find(d=>d.id==="informe")?.source.url).toBe("https://example.com/antiguo.pdf");
+  });
   it("bloquea contenidos idénticos aunque cambie el nombre", async () => {
     const ws = await fixture();
     const copy = await encodeDocumentOriginal("otra", new File(["informe A"], "renombrado.pdf"));
