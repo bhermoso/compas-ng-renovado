@@ -7,7 +7,10 @@ import { documentAccessUrl, documentDownloadFileName, isPdfDocumentAccess } from
 
 export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable=false,showManagementActions=true}:{document:MunicipalDocument;documentLabel?:string;retainedTextAvailable?:boolean;showManagementActions?:boolean}){
  const contextualLabel=documentLabel?.trim();
- const management=useDocumentOriginalManagement();
+ const context=useDocumentOriginalManagement();
+ // Never present active-municipality write operations on a document from the
+ // cross-municipality read-only library.
+ const management=context?.municipalityId===doc.municipalityId ? context : null;
  const remoteOriginal=management?.originals.find(o=>o.documentId===doc.id);
  const [file,setFile]=useState<File>();const [message,setMessage]=useState('');
  const [loading,setLoading]=useState(true);
