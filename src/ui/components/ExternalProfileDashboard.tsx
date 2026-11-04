@@ -192,13 +192,26 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
    <div className="ep-attached"><strong>Archivos originales incluidos en Firebase</strong>{draft.attachmentIds.map(id=><span key={id}>{[...library.attachments,...newFiles].find(a=>a.id===id)?.name}</span>)}{!draft.attachmentIds.length&&<span>Sin archivo adjunto; se conservarán el texto y los resultados.</span>}</div>
    <div className="ep-editor__footer"><p>Se guardará una versión en revisión. Subir un archivo no equivale a validarlo.</p><button className="ep-primary" disabled={!draft.title.trim()} type="submit">{busy?'Guardando…':'Guardar perfil en Firebase'}</button></div>
    </fieldset>
-  </form> : !selected ? <div className="ep-empty"><div className="ep-paper" aria-hidden="true"><span>COMPÁS</span><i/><i/><i/><i/><i/></div>
+  </form> : !selected ? <>
+   {(legacyProfiles.length>0||legacyText)&&<section className="ep-legacy-direct" aria-labelledby="ep-previous-profile-title">
+     <header><p className="ep-eyebrow">PERFIL DE SALUD LOCAL · EXPEDIENTE MUNICIPAL</p>
+       <h1 id="ep-previous-profile-title">Perfil disponible de {municipalityName}</h1>
+       <p>Este perfil fue elaborado anteriormente en COMPÁS y se conserva como antecedente. No es una versión externa validada ni acredita por sí solo que el histórico documental esté completo.</p>
+     </header>
+     {legacyProfiles.map(a=><article key={a.id} className="ep-legacy-direct__entry">
+       <h2>{a.portada.municipalityName} · {a.artifactVersion}</h2>
+       <PSLCArtifactViewer artifact={a}/>
+     </article>)}
+     {legacyText&&!legacyProfiles.length&&<details open><summary>Consultar texto del perfil anterior</summary><p className="ep-legacy-text">{legacyText}</p></details>}
+     <p className="ep-help">Para incorporar un perfil externo actualizado y sus originales, utiliza el apartado siguiente. Las versiones anteriores se conservan sin sustituirlas automáticamente.</p>
+   </section>}
+   <div className="ep-empty" id="ep-import-profile"><div className="ep-paper" aria-hidden="true"><span>COMPÁS</span><i/><i/><i/><i/><i/></div>
    <div><p className="ep-eyebrow">PERFIL DE SALUD LOCAL · EXPEDIENTE MUNICIPAL</p><h2>{legacyProfiles.length>0||legacyText ? "Ya existe un perfil anterior de COMPÁS" : "Incorpora el Perfil de Salud Local"}</h2>
    <p>{legacyProfiles.length>0||legacyText ? "El expediente conserva un perfil elaborado previamente en COMPÁS. Puedes consultarlo más abajo, en «Perfiles anteriores de COMPÁS». Si también deseas incorporar un documento externo, se guardará por separado y no sustituirá el anterior." : "Carga el documento elaborado fuera de COMPÁS. Podrás consultarlo, descargar sus originales, editar una revisión y presentar sus resultados con la identidad institucional."}</p>
    <p className="ep-formats">PDF · Word DOCX · texto · Markdown · paquete de resultados JSON</p>
    <button className="ep-primary" type="button" disabled={busy} onClick={()=>fileInput.current?.click()}>Seleccionar el perfil</button>
    <p className="ep-help">Hasta 20 MB por archivo. Originales, texto, resultados y versiones se guardan en Firebase. El navegador es una caché.</p></div>
-  </div> : <>
+  </div></> : <>
    <nav className="ep-tabs ep-tabs--primary" aria-label="Espacios del perfil">{([['results','Perfil'],['document','Documento completo'],['versions','Gestión y versiones'],['laboratory','Laboratorio experimental']] as const).map(([key,label])=><button key={key} type="button" aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>
    {tab==='results'&&<main className="ep-main ep-main--profile">
     <div className="ep-complete-download pdp-noprint">
@@ -230,7 +243,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
    </main>}
   </>}
   {!draft&&<ProfileOriginalVerifier key={municipalityId} library={library}/>}
-  {(legacyProfiles.length>0||legacyText)&&<details className="ep-legacy" open={!selected}><summary>Consultar perfiles anteriores de COMPÁS · legado conservado</summary><p>Estos documentos históricos se conservan. No se regeneran ni se convierten automáticamente en el perfil externo vigente.</p>{legacyText&&<details><summary>Texto del perfil anterior</summary><p className="ep-legacy-text">{legacyText}</p></details>}{legacyProfiles.map(a=><details key={a.id}><summary>{a.portada.municipalityName} · {a.artifactVersion}</summary><PSLCArtifactViewer artifact={a}/></details>)}</details>}
+  {selected&&(legacyProfiles.length>0||legacyText)&&<details className="ep-legacy"><summary>Consultar perfiles anteriores de COMPÁS · legado conservado</summary><p>Estos documentos históricos se conservan. No se regeneran ni se convierten automáticamente en el perfil externo vigente.</p>{legacyText&&<details><summary>Texto del perfil anterior</summary><p className="ep-legacy-text">{legacyText}</p></details>}{legacyProfiles.map(a=><details key={a.id}><summary>{a.portada.municipalityName} · {a.artifactVersion}</summary><PSLCArtifactViewer artifact={a}/></details>)}</details>}
   <footer className="ep-footnote">Documento elaborado fuera de COMPÁS · Contenido y gráficos trazables a su versión · Conservación completa en Firebase</footer>
  </section>;
 }
