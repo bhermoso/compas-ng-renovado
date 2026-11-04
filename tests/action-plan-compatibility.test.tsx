@@ -2,7 +2,7 @@ import {isValidElement, type ReactNode} from 'react';
 import {describe, expect, it} from 'vitest';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {HEALTHY_AGING_MODULE as original, ADDICTIONS_MODULE} from '../src/domain/action-plan-catalog/ActionPlanCatalog';
-import {ZAGRA_AGING_PROPOSAL as module, prepareMunicipalActionPlanDraft, municipalActionPlanModule} from '../src/domain/action-plan-catalog/MunicipalActionPlanModule';
+import {ZAGRA_AGING_PROPOSAL as module, prepareMunicipalActionPlanDraft, municipalActionPlanModule, COMMON_AGING_FOUR_BLOCKS_VERSION} from '../src/domain/action-plan-catalog/MunicipalActionPlanModule';
 import {type PlanPreparationDraft, type PlanPreparationReview, thematicBlockNameFor} from '../src/domain/action-plan-catalog/PlanPreparationDraft';
 import {buildDefinitiveActionPlanProjection as project} from '../src/domain/action-plan-catalog/DefinitiveActionPlanProjection';
 import {buildPlanDocument, validatePlanDocument} from '../src/domain/action-plan-catalog/PlanDocument';
@@ -103,15 +103,23 @@ describe('Compatibilidad territorial y conservación de decisiones',()=>{
   expect(positions).toEqual([...positions].sort((a,b)=>a-b));
   expect(html).toContain('Plan Local de Salud de Zagra');expect(html).not.toContain('Distrito Zagra');
  });
- it('Loja y otras líneas conservan el significado original de sus códigos',()=>{
-  const loja=municipalActionPlanModule('loja',original);expect(loja).toBe(original);
+ it('Loja conserva el plan de nueve grupos como antecedente y recibe cuatro bloques versionados sin decisión heredada',()=>{
+  const loja=municipalActionPlanModule('loja',original);
+  expect(loja.version).toBe(COMMON_AGING_FOUR_BLOCKS_VERSION);
   expect(municipalActionPlanModule('zagra',ADDICTIONS_MODULE)).toBe(ADDICTIONS_MODULE);
-  expect(thematicBlockNameFor('ENV-OG1',loja)).toBeUndefined();
-  const draft={...fullDraft(),municipalityId:'loja',version:original.version};
-  draft.decisions['ENV-OG1']={status:'included',sourceText:original.generalObjectives[0].title};
-  const doc=buildPlanDocument('loja',project('loja',[loja],[draft]),'2026-10-30');
-  expect(doc.paragraphs.some(p=>p.text==='Bloque temático · Edadismo')).toBe(false);
-  expect(doc.paragraphs.some(p=>p.text.includes('Preservar la autonomía'))).toBe(true);
+  expect(thematicBlockNameFor('COMUN-ENV-OG1',loja)).toBe('Edadismo');
+  const oldDraft={...fullDraft(),municipalityId:'loja',version:original.version};
+  oldDraft.decisions['ENV-OG1']={status:'included',sourceText:original.generalObjectives[0].title};
+  const oldDoc=buildPlanDocument('loja',project('loja',[original],[oldDraft]),'2026-10-30');
+  expect(oldDoc.paragraphs.some(p=>p.text==='Bloque temático · Edadismo')).toBe(false);
+  expect(oldDoc.paragraphs.some(p=>p.text.includes('Preservar la autonomía'))).toBe(true);
+  expect(project('loja',[loja],[oldDraft])).toEqual([]);
+  const migrated=prepareMunicipalActionPlanDraft('loja',loja,oldDraft)!;
+  expect(migrated.migration?.draft).toEqual(oldDraft);
+  expect(loja.generalObjectives.map(g=>migrated.decisions[g.code].status)).toEqual(['pending','pending','pending','pending']);
+  const newDoc=buildPlanDocument('loja',project('loja',[loja],[migrated]),'2026-11-04');
+  expect(newDoc.paragraphs.some(p=>p.text==='Bloque temático · Autonomía')).toBe(true);
+  expect(newDoc.status).toBe('draft');
  });
  it('ofrece descargas separadas sin modificar la versión validada anterior',()=>{
   const p=project('zagra',[module],[fullDraft()]);const saved={...buildPlanDocument('zagra',p,'2026-10-01'),status:'validated' as const,validatedBy:'Equipo',paragraphs:[{text:'Plan anterior de nueve grupos'}]};
