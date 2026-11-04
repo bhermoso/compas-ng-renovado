@@ -238,9 +238,8 @@ export function resolveSeedMigration(
       migration.marker
     );
     const hasBaseline = hasExpectedSeedBaseline(current, migration);
-    if (hasMarker && !hasBaseline) {
-      return { kind: "download-and-merge", migration };
-    }
+    // La marca aplicada es definitiva: una baja intencional no debe resucitarse
+    // por caer por debajo de un recuento histórico mínimo.
     if (hasMarker) return { kind: "none" };
     const hasDoc = current.repository.documents.some(
       (d) => d.id === migration.documentId
@@ -382,7 +381,11 @@ export function shouldRestoreIndexedDbWorkspace(
   if (!currentIsEmpty && storedIsEmpty) return false;
   // Si el workspace actual ya contiene la base canónica de un municipio con
   // seed, una copia persistida más pobre no puede sustituirlo por ser más nueva.
-  if (hasSeedBaselineRegression(current, stored)) return false;
+  // Si una copia más reciente tiene la marca de migración, una menor cantidad
+  // de documentos puede reflejar eliminaciones deliberadas y debe respetarse.
+  const migration = INCREMENTAL_SEED_MIGRATIONS.find(m => m.municipalityId === current.municipality.identity.id);
+  const applied = migration !== undefined && (stored.appliedSeedMigrations ?? []).includes(migration.marker);
+  if (hasSeedBaselineRegression(current, stored) && !(applied && stored.updatedAt > current.updatedAt)) return false;
   if (stored.updatedAt > current.updatedAt) return true;
   // La copia ligera de localStorage no lleva los originales del Diagnóstico y
   // se guarda con la misma fecha que la copia de IndexedDB o la remota. A
