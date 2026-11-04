@@ -2,6 +2,7 @@ import { createContext, useContext, useRef, useState, type ReactNode } from 'rea
 import type { MunicipalityWorkspace } from '../../domain/workspace/MunicipalityWorkspace';
 import type { DocumentKind } from '../../domain/repository';
 import { DocumentAccess } from './DocumentAccess.tsx';
+import { DocumentOriginalManagementContext } from './DocumentOriginalManagement';
 import { resolveDocumentReference, type DocumentReferenceTarget } from './documentReferenceResolver';
 
 type Reference = DocumentReferenceTarget & { kinds?: DocumentKind[] };
@@ -19,7 +20,7 @@ export function DocumentReference({ children, documentId, fileName }: Reference 
   return <button type="button" className="document-reference" onClick={() => open({ documentId, fileName })}>{children}</button>;
 }
 
-export function DocumentationProvider({ workspace, children }: { workspace: MunicipalityWorkspace; children: ReactNode }) {
+export function DocumentationProvider({ workspace, children, onStoreOriginal }: { workspace: MunicipalityWorkspace; children: ReactNode; onStoreOriginal?: (documentId: string, file: File) => Promise<void> }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [reference, setReference] = useState<Reference | null>(null);
   const [query, setQuery] = useState('');
@@ -34,7 +35,7 @@ export function DocumentationProvider({ workspace, children }: { workspace: Muni
   const categoryLabel = reference?.kinds?.length ? `Documentos de esta categoría: ${matches.length}` : '';
   function open(next: Reference | null) { setReference(next); setQuery(''); dialog.current?.showModal(); }
   const historical = selected && workspace.previousHealthReports?.find(r => r.linkedDocumentId === selected.id);
-  return <DocumentationContext.Provider value={open}>
+  return <DocumentOriginalManagementContext.Provider value={onStoreOriginal ? { originals: workspace.documentOriginals ?? [], storeOriginal: onStoreOriginal } : null}><DocumentationContext.Provider value={open}>
     {children}
     <button type="button" className="documentation-launcher" onClick={() => open(null)}>Consultar documentación ({documents.length})</button>
     <dialog ref={dialog} className="documentation-dialog" aria-labelledby="documentation-title">
@@ -53,5 +54,5 @@ export function DocumentationProvider({ workspace, children }: { workspace: Muni
         {!filtered.length && <p>No hay documentos que coincidan con la búsqueda.</p>}
       </>}
     </dialog>
-  </DocumentationContext.Provider>;
+  </DocumentationContext.Provider></DocumentOriginalManagementContext.Provider>;
 }
