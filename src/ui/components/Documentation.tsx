@@ -99,7 +99,7 @@ export function DocumentationProvider({ workspace, children, canWrite = false, o
         </div>}
         {operationMessage && <p role="status">{operationMessage}</p>}
 
-        <DocumentAccess key={selected.id} document={selected} retainedTextAvailable={!!historical?.body.originalText} />
+        <DocumentAccess key={selected.id} document={selected} retainedTextAvailable={!!historical?.body.originalText} showManagementActions={false} />
         {historical?.body.originalText && !selected.sourceText && <details><summary>Consultar texto sanitario conservado (no es el DOCX original)</summary><p className="documentation-text">{historical.body.originalText}</p></details>}
         <p><button type="button" onClick={() => setReference(null)}>Ver toda la documentación</button></p>
       </> : <>
