@@ -38,6 +38,7 @@ export interface DuplicateContext {
 const MIN_TEXT_LENGTH = 200;
 
 const isActive = (d: MunicipalDocument) => d.status !== "archived" && d.status !== "rejected";
+const isRevision = (d: MunicipalDocument) => Boolean(d.revisionOf || d.tags.some(t => t.startsWith("revision-of:")));
 const normalize = (s: string) => s.normalize("NFKC").toLowerCase().replace(/\s+/g, " ").trim();
 const normalizeName = (s: string) =>
   normalize(s).replace(/\.(pdf|docx?|csv|xlsx?|txt|md)$/i, "").replace(/[_-]+/g, " ").replace(/\s*\(\d+\)$/, "").trim();
@@ -79,9 +80,9 @@ export function findDuplicateGroups(repository: MunicipalDocumentRepository, ctx
   };
 
   collect("same-file", (d) => documentFingerprint(d, ctx.localHashes));
-  collect("same-text", (d) => (d.sourceText && d.sourceText.trim().length >= MIN_TEXT_LENGTH ? normalize(d.sourceText) : undefined));
-  collect("same-name", (d) => (d.sourceFileName ? `${d.kind}::file::${normalizeName(d.sourceFileName)}` : undefined));
-  collect("same-name", (d) => `${d.kind}::title::${normalizeName(d.title)}`);
+  collect("same-text", (d) => (!isRevision(d) && d.sourceText && d.sourceText.trim().length >= MIN_TEXT_LENGTH ? normalize(d.sourceText) : undefined));
+  collect("same-name", (d) => (!isRevision(d) && d.sourceFileName ? `${d.kind}::file::${normalizeName(d.sourceFileName)}` : undefined));
+  collect("same-name", (d) => isRevision(d) ? undefined : `${d.kind}::title::${normalizeName(d.title)}`);
   return groups;
 }
 
