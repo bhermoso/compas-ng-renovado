@@ -1,6 +1,6 @@
 import { createContext, useContext, useRef, useState, type ReactNode } from 'react';
 import type { MunicipalityWorkspace } from '../../domain/workspace/MunicipalityWorkspace';
-import type { DocumentKind } from '../../domain/repository';
+import type { DocumentKind, MunicipalDocument } from '../../domain/repository';
 import { DocumentAccess } from './DocumentAccess.tsx';
 import { DocumentOriginalManagementContext } from './DocumentOriginalManagement';
 import { resolveDocumentReference, type DocumentReferenceTarget } from './documentReferenceResolver';
@@ -36,7 +36,7 @@ export function DocumentationProvider({ workspace, children, onStoreOriginal, on
   const categoryLabel = reference?.kinds?.length ? `Documentos de esta categoría: ${matches.length}` : '';
   function open(next: Reference | null) { setReference(next); setQuery(''); setOperationMessage(''); if (!dialog.current?.open) dialog.current?.showModal(); }
   const revisionFamily = selected ? documents.filter(d => {
-    const lineage = (candidate: typeof selected): string => {
+    const lineage = (candidate: MunicipalDocument): string => {
       let current = candidate;
       const seen = new Set<string>();
       while (current.revisionOf && !seen.has(current.revisionOf)) {
