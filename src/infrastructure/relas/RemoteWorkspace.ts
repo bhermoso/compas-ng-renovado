@@ -4,6 +4,7 @@ import {
   doc,
   getDocFromServer,
   getDocs,
+  runTransaction,
   serverTimestamp,
   setDoc,
   writeBatch,
@@ -171,18 +172,29 @@ async function persistRemoteWorkspace(client: RelasClient, workspace: Municipali
     workspaceUpdatedAt: workspace.updatedAt,
     savedBy: user.uid,
   };
-  const batch = writeBatch(client.db);
-  batch.set(
-    doc(
-      client.db,
-      "relas_scopes",
-      workspace.municipality.identity.id,
-      "workspace",
-      "current"
-    ),
-    { ...manifest, savedAt: serverTimestamp() }
+  const currentRef = doc(
+    client.db,
+    "relas_scopes",
+    workspace.municipality.identity.id,
+    "workspace",
+    "current"
   );
-  await batch.commit();
+  // No publicar un snapshot construido sobre una versión que otro equipo
+  // haya reemplazado entretanto. Firestore reintenta la transacción ante
+  // cambios concurrentes: el lector debe recuperar y conciliar el expediente.
+  try {
+    await runTransaction(client.db, async (transaction) => {
+      const current = await transaction.get(currentRef);
+      const currentId = current.exists() ? (current.data() as RemoteWorkspaceManifest).snapshotId : null;
+      if (currentId !== (previous?.snapshotId ?? null)) {
+        throw new Error("El expediente de Firebase cambió en otro equipo. Recupera la versión compartida antes de volver a guardar; no se han sobrescrito sus cambios.");
+      }
+      transaction.set(currentRef, { ...manifest, savedAt: serverTimestamp() });
+    });
+  } catch (error) {
+    await deleteSnapshotChunks(client, workspace.municipality.identity.id, manifest).catch(() => undefined);
+    throw error;
+  }
   // La copia anterior ya no es la vigente: se retira para que Firebase no
   // acumule una copia completa por cada guardado. Un fallo aquí no invalida
   // el guardado, que ya está confirmado.
