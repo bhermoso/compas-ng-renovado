@@ -58,7 +58,7 @@ export function DocumentationProvider({ workspace, children, canWrite = false, o
       ? workspace.healthReport
       : workspace.previousHealthReports?.find(r => r.linkedDocumentId === selected.id)
   );
-  return <DocumentOriginalManagementContext.Provider value={canWrite && onStoreOriginal && onCreateRevision && onArchiveDocument && onDeleteDocument ? { originals: workspace.documentOriginals ?? [], storeOriginal: onStoreOriginal, createRevision: onCreateRevision, archiveDocument: onArchiveDocument, deleteDocument: onDeleteDocument } : null}><DocumentationContext.Provider value={open}>
+  return <DocumentOriginalManagementContext.Provider value={canWrite && onStoreOriginal && onCreateRevision && onArchiveDocument && onDeleteDocument ? { municipalityId: workspace.municipality.identity.id, originals: workspace.documentOriginals ?? [], storeOriginal: onStoreOriginal, createRevision: onCreateRevision, archiveDocument: onArchiveDocument, deleteDocument: onDeleteDocument } : null}><DocumentationContext.Provider value={open}>
     {children}
     <button type="button" className="documentation-launcher" onClick={() => open(null)}>Consultar documentación ({documents.length})</button>
     <dialog ref={dialog} className="documentation-dialog" aria-labelledby="documentation-title">
@@ -99,7 +99,7 @@ export function DocumentationProvider({ workspace, children, canWrite = false, o
         </div>}
         {operationMessage && <p role="status">{operationMessage}</p>}
 
-        <DocumentAccess key={selected.id} document={selected} retainedTextAvailable={!!historical?.body.originalText} />
+        <DocumentAccess key={selected.id} document={selected} retainedTextAvailable={!!historical?.body.originalText} showManagementActions={false} />
         {historical?.body.originalText && !selected.sourceText && <details><summary>Consultar texto sanitario conservado (no es el DOCX original)</summary><p className="documentation-text">{historical.body.originalText}</p></details>}
         <p><button type="button" onClick={() => setReference(null)}>Ver toda la documentación</button></p>
       </> : <>

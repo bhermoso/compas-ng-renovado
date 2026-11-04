@@ -9,7 +9,7 @@ import { DiagnosisControlRoom, DiagnosisModuleSection } from "./ui/components/Di
 import { DuplicateDocumentsPanel } from "./ui/components/DuplicateDocumentsPanel";
 import { findDuplicateGroups, findExistingCopy, retireDuplicateDocument } from "./application/document-ingestion/documentDuplicates";
 import { sha256Hex } from "./application/document-ingestion/sha256";
-import { createDocumentRevision } from "./application/document-files/documentRevisions";
+import { canDeleteDocumentVersion, createDocumentRevision } from "./application/document-files/documentRevisions";
 import { MAX_WORKSPACE_ORIGINALS_BYTES, decideOriginalUpload, decodeDocumentOriginal, documentOriginalsBytes, encodeDocumentOriginal, formatMegabytes, mergeDocumentOriginals, profileOriginalsBytes, pruneDocumentOriginals, type StoredDocumentOriginal } from "./application/document-files/documentOriginals";
 import { buildDiagnosisControlSummary, type DiagnosisModuleId } from "./application/diagnosis/diagnosisControlSummary";
 import { replaceZaidinFinalDraft } from "./application/workspace/replaceZaidinFinalDraft";
@@ -3158,6 +3158,10 @@ export default function App() {
   async function handleDeleteDocument(documentId: string): Promise<boolean> {
     const municipalityId = workspace.municipality.identity.id;
     if (!workspace.repository.documents.some(d => d.id === documentId)) return false;
+    if (!canDeleteDocumentVersion(workspace.repository.documents, documentId)) {
+      window.alert("Este documento tiene versiones posteriores. No puede eliminarse sin romper la trazabilidad; puedes archivarlo o consultar sus revisiones.");
+      return false;
+    }
     if (!remoteClient.auth.currentUser) {
       window.alert("Inicia sesión: la eliminación debe confirmarse primero en Firebase.");
       return false;

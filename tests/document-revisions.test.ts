@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { createCompleteMunicipalityWorkspace } from "../src/application/workspace";
 import { addMunicipalDocument } from "../src/domain/repository";
 import { encodeDocumentOriginal } from "../src/application/document-files/documentOriginals";
-import { createDocumentRevision } from "../src/application/document-files/documentRevisions";
+import { canDeleteDocumentVersion, createDocumentRevision } from "../src/application/document-files/documentRevisions";
 
 describe("revisiones documentales sin duplicidad", () => {
   const original = (value: string) => new File([value], "INFORME SALUD.pdf", { type: "application/pdf" });
@@ -30,6 +30,22 @@ describe("revisiones documentales sin duplicidad", () => {
     expect(revision.sourceText).toBeUndefined();
     expect(ws.repository.documents).toHaveLength(1);
     expect(next.evidenceStore).toBe(ws.evidenceStore);
+  });
+
+  it("no hereda una URL del documento anterior al crear una nueva versión", async () => {
+    const ws=await fixture();
+    ws.repository.documents[0].source.url="https://example.com/antiguo.pdf";
+    const newFile=await encodeDocumentOriginal("nuevo",original("informe con otros datos"));
+    const revised=createDocumentRevision(ws,"informe",newFile);
+    expect(revised.repository.documents.find(d=>d.id==="nuevo")?.source.url).toBeUndefined();
+    expect(revised.repository.documents.find(d=>d.id==="informe")?.source.url).toBe("https://example.com/antiguo.pdf");
+  });
+  it("protege el documento padre de una cadena de revisiones ante eliminación", async () => {
+    const ws = await fixture();
+    const r2 = await encodeDocumentOriginal("revision-2", original("actualización"));
+    const updated = createDocumentRevision(ws, "informe", r2);
+    expect(canDeleteDocumentVersion(updated.repository.documents, "informe")).toBe(false);
+    expect(canDeleteDocumentVersion(updated.repository.documents, "revision-2")).toBe(true);
   });
 
   it("bloquea contenidos idénticos aunque cambie el nombre", async () => {

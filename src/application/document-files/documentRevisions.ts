@@ -3,6 +3,14 @@ import { addMunicipalDocument } from "../../domain/repository";
 import type { StoredDocumentOriginal } from "./documentOriginals";
 import { decideOriginalUpload, documentOriginalsBytes, mergeDocumentOriginals, profileOriginalsBytes } from "./documentOriginals";
 
+/** Prevent breaking documentary lineage when deleting a parent file. */
+export function canDeleteDocumentVersion(
+ documents: readonly { id: string; revisionOf?: string }[],
+ documentId: string
+): boolean {
+ return !documents.some(document=>document.revisionOf===documentId);
+}
+
 /**
  * Una revisión es otra ficha y otro original. No sustituye la evidencia ni el
  * informe interpretado vigente: el equipo técnico debe procesar/validar la revisión.
@@ -30,7 +38,9 @@ export function createDocumentRevision(
     id: original.documentId,
     kind: previous.kind,
     title: previous.title,
-    source: { ...previous.source, collectedAt: now },
+    // Do not inherit a URL pointing at an older PDF. This new revision has
+    // its own original bytes in Firebase, separately hashed and dated.
+    source: { ...previous.source, url: undefined, collectedAt: now },
     sourceFileName: original.name,
     contentSha256: original.sha256,
     sourceText: undefined,

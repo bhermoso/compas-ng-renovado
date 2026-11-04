@@ -4,7 +4,7 @@ import { parseProfileStructure, prefillFromStructure } from '../../application/h
 import { ProfileReader } from './ProfileReader';
 import type { ExternalHealthProfile, ExternalProfileLibrary, ProfileAttachment, ProfileResult } from '../../domain/health-profile/ExternalHealthProfile';
 import type { LocalHealthProfileArtifact } from '../../domain/health-profile-artifact';
-import { appendExternalProfile, importProfileFile, prepareImportedProfileRevision, profileAttachmentBlob } from '../../application/health-profile/externalProfiles';
+import { appendExternalProfile, archiveExternalProfileVersion, deleteExternalProfileVersion, importProfileFile, prepareImportedProfileRevision, profileAttachmentBlob } from '../../application/health-profile/externalProfiles';
 import { PSLCArtifactViewer } from './PSLCArtifactViewer';
 import { ProfileResultsDashboard } from './ProfileResultsDashboard';
 import { ProfileEditorialLab } from './ProfileEditorialLab';
@@ -63,6 +63,8 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
  const [fileUrls,setFileUrls]=useState<Record<string,string>>({});
  const [resultDraft,setResultDraft]=useState<ProfileResult>();
  const fileInput=useRef<HTMLInputElement>(null);
+ const draftFileInput=useRef<HTMLInputElement>(null);
+ const replaceAttachmentId=useRef<string|undefined>(undefined);
  const fullProfileRef=useRef<HTMLDivElement>(null);
  const selected=library.profiles.find(p=>p.id===(selectedId ?? library.activeId)) ?? library.profiles.find(p=>p.id===library.activeId);
  useEffect(()=>{onDirtyChange?.(!!draft);return()=>onDirtyChange?.(false);},[draft,onDirtyChange]);
@@ -121,10 +123,51 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
   }catch(e){setError(e instanceof Error?e.message:'No se pudo leer el perfil.');setMessage('');}
   finally{setBusy(false);if(fileInput.current)fileInput.current.value='';}
  }
+ /** Attach or replace a file only in the new draft revision. */
+ async function changeDraftFiles(list: FileList | null) {
+  const file=list?.[0], replacedId=replaceAttachmentId.current;
+  replaceAttachmentId.current=undefined;
+  if(!file||!draft||busy)return;
+  setBusy(true);setError('');setMessage('Comprobando integridad del nuevo archivo…');
+  try {
+   const imported=await importProfileFile(file,municipalityId);
+   const old=replacedId&&[...library.attachments,...newFiles].find(a=>a.id===replacedId);
+   if(replacedId&&!old)throw new Error('El archivo a sustituir ya no está en el borrador.');
+   if(old&&old.mimeType!==imported.attachment.mimeType)throw new Error('Para sustituir un archivo debe conservarse su formato. Para otro formato, añade un archivo.');
+   setNewFiles(current=>[...current.filter(f=>f.id!==replacedId),imported.attachment]);
+   setDraft(current=>current?{...current,attachmentIds:[...current.attachmentIds.filter(id=>id!==replacedId),imported.attachment.id]}:current);
+   setMessage(replacedId?'Sustituido solo en la nueva revisión. El original de las versiones anteriores se conserva; comprueba el texto y los resultados.':'Archivo añadido a esta revisión. Se incorporará a Firebase al guardarla.');
+  }catch(e){setError(e instanceof Error?e.message:'No se pudo incorporar el archivo.');setMessage('');}
+  finally{setBusy(false);}
+ }
+ function openDraftFilePicker(replaceId?:string){
+  replaceAttachmentId.current=replaceId;
+  draftFileInput.current?.click();
+ }
+ function removeDraftAttachment(id:string){
+  setDraft(current=>current?{...current,attachmentIds:current.attachmentIds.filter(x=>x!==id)}:current);
+  setNewFiles(current=>current.filter(file=>file.id!==id));
+  setMessage('Adjunto retirado solo de esta revisión. Las versiones guardadas permanecen intactas.');
+ }
  function edit() {
   if(!selected)return;
-  setDraft({...structuredClone(selected),id:crypto.randomUUID(),revisionOf:selected.id,createdAt:new Date().toISOString(),status:'review',validatedBy:undefined,validatedAt:undefined});
+  setDraft({...structuredClone(selected),id:crypto.randomUUID(),revisionOf:selected.id,createdAt:new Date().toISOString(),status:'review',validatedBy:undefined,validatedAt:undefined,archivedAt:undefined,archivedBy:undefined});
   setNewFiles([]);setResultDraft(undefined);setError('');setMessage('Estás preparando una nueva revisión. La versión anterior y sus originales se conservan.');
+ }
+ async function archiveVersion(profile:ExternalHealthProfile){
+  if(!window.confirm(`¿Archivar «${profile.title}»? Los archivos, las fuentes y la historia permanecerán accesibles.`))return;
+  try{await commit(archiveExternalProfileVersion(library,profile.id,authorName),'Versión archivada y conservada en Firebase.');}catch(e){setError(e instanceof Error?e.message:'No se pudo archivar.');}
+ }
+ async function deleteVersion(profile:ExternalHealthProfile){
+  if(!window.confirm(`¿Eliminar definitivamente «${profile.title}»? Solo se borrarán los adjuntos que ninguna otra versión utilice. Esta operación no se puede deshacer.`))return;
+  setBusy(true);setError('');setMessage('Eliminando del expediente compartido…');
+  try{
+   const next=deleteExternalProfileVersion(library,profile.id);
+   await onSave(next,progress=>setMessage(progress));
+   setSelectedId(library.activeId);
+   setMessage('Versión eliminada en Firebase. Se conservaron las demás versiones y sus archivos.');
+  }catch(e){setError(e instanceof Error?e.message:'No se pudo eliminar.');setMessage('');}
+  finally{setBusy(false);}
  }
  async function saveDraft(e: React.FormEvent) {
   e.preventDefault();if(!draft?.title.trim())return;
@@ -134,7 +177,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
   if(invalidLinks.length){setError(`Hay vínculos a conclusiones que ya no figuran en el documento: ${invalidLinks.join(', ')}. Corrígelos antes de guardar.`);return;}
   setBusy(true);setError('');setMessage('Guardando el documento, los resultados y la versión en Firebase…');
   try{
-   const appended=appendExternalProfile(library,{...draft,title:draft.title.trim()},newFiles,municipalityId);
+   const appended=appendExternalProfile(library,{...draft,title:draft.title.trim()},newFiles.filter(file=>draft.attachmentIds.includes(file.id)),municipalityId);
    // Una nueva revisión no sustituye la versión vigente hasta una promoción explícita.
    const next=draft.revisionOf && library.activeId ? {...appended,activeId:library.activeId} : appended;
    await onSave(next, progress => setMessage(progress));setSelectedId(draft.id);setDraft(undefined);setNewFiles([]);setTab('results');
@@ -161,6 +204,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
  return <section className="external-profile" aria-label="Perfil de Salud Local">
   {!selected && <header className="ep-header"><div className="ep-header__body"><div><p className="ep-eyebrow">PERFIL DE SALUD LOCAL · {municipalityName}</p><h1>Incorporar un perfil</h1></div></div></header>}
   <input className="ep-sr-only" ref={fileInput} type="file" aria-label="Cargar perfil" multiple accept=".pdf,.docx,.txt,.md,.json" disabled={busy} onChange={e=>void loadFiles(e.currentTarget.files)} />
+  <input className="ep-sr-only" ref={draftFileInput} type="file" aria-label="Añadir o sustituir archivo" accept=".pdf,.docx,.txt,.md,.json" disabled={busy} onChange={e=>{const files=e.currentTarget.files;void changeDraftFiles(files);e.currentTarget.value='';}} />
   {message&&<p className="ep-message" role="status">{message}</p>}{error&&<p className="ep-error" role="alert">{error}</p>}
   {draft ? <form className="ep-editor" onSubmit={e=>void saveDraft(e)}>
    <div className="ep-section-heading"><div><p className="ep-eyebrow">{draft.revisionOf?'NUEVA REVISIÓN':'INCORPORAR UN PERFIL EXTERNO'}</p><h2>Revisa el perfil antes de guardarlo</h2></div>
@@ -199,7 +243,23 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
          </label>)}</div>
        </fieldset>)}</div>}
    </section>
-   <div className="ep-attached"><strong>Archivos que se incorporarán al expediente compartido al guardar</strong>{draft.attachmentIds.map(id=><span key={id}>{[...library.attachments,...newFiles].find(a=>a.id===id)?.name}</span>)}{!draft.attachmentIds.length&&<span>Sin archivo adjunto; se conservarán el texto y los resultados.</span>}</div>
+   <section className="ep-attached" aria-label="Archivos de esta revisión">
+      <div className="ep-document-toolbar__top"><strong>Archivos de esta revisión</strong><button type="button" disabled={busy} onClick={()=>openDraftFilePicker()}>Añadir archivo</button></div>
+      {draft.attachmentIds.map(id=>{
+       const file=[...library.attachments,...newFiles].find(a=>a.id===id);
+       if(!file)return <p key={id} role="alert">Referencia de archivo no disponible: {id}</p>;
+       return <div key={id} className="ep-attached__row">
+         <span>{file.name} · {(file.size/1024).toLocaleString('es-ES',{maximumFractionDigits:0})} KB</span>
+         <div className="ep-actions">
+          <button type="button" disabled={busy} onClick={()=>void profileAttachmentBlob(file).then(blob=>download(blob,file.name)).catch(()=>setError('No se ha podido verificar este archivo.'))}>Descargar</button>
+          <button type="button" disabled={busy} onClick={()=>openDraftFilePicker(id)}>Sustituir</button>
+          <button type="button" disabled={busy} onClick={()=>{if(window.confirm('¿Retirar este adjunto solo de la nueva revisión? Las versiones anteriores conservarán su original.'))removeDraftAttachment(id);}}>Retirar</button>
+         </div>
+       </div>;
+      })}
+      {!draft.attachmentIds.length&&<p>Sin adjuntos en esta revisión; se conservarán el texto y los resultados.</p>}
+      <p className="ep-help">Sustituir o retirar aquí no modifica originales anteriores. Los cambios solo son definitivos tras la confirmación de Firebase.</p>
+    </section>
    <div className="ep-editor__footer"><p>Se guardará una versión en revisión. El guardado solo finaliza al confirmarlo Firebase; no cierres la pestaña mientras aparezca «Guardando…».</p><button className="ep-primary" disabled={busy||!draft.title.trim()} type="submit">{busy?'Guardando en Firebase…':'Guardar perfil en Firebase'}</button></div>
    </fieldset>
   </form> : !selected ? <div className="ep-empty"><div className="ep-paper" aria-hidden="true"><span>COMPÁS</span><i/><i/><i/><i/><i/></div>
@@ -209,6 +269,22 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
    <button className="ep-primary" type="button" disabled={busy} onClick={()=>fileInput.current?.click()}>Seleccionar el perfil</button>
    <p className="ep-help">Hasta 20 MB por archivo. Originales, texto, resultados y versiones se guardan en Firebase. El navegador es una caché.</p></div>
   </div> : <>
+   <div className="ep-document-toolbar" aria-label="Acceso a archivos y versiones">
+     <div className="ep-document-toolbar__top">
+       <span><strong>Archivos y versiones</strong> · {selected.status==='validated'?'Validada':'En revisión'}{selected.archivedAt?' · Archivada':''}</span>
+       <button type="button" disabled={busy} onClick={()=>setTab('versions')}>Gestionar archivos y versiones</button>
+       <button type="button" disabled={busy} onClick={edit}>Crear nueva revisión</button>
+     </div>
+     <div className="ep-document-toolbar__files">
+       {files.map(file=><span key={file.id} className="ep-document-toolbar__file">
+         <span>{file.name}</span>
+         {file.mimeType==='application/pdf'&&fileUrls[file.id]&&<a href={fileUrls[file.id]} target="_blank" rel="noopener noreferrer">Abrir</a>}
+         {fileUrls[file.id]&&<a href={fileUrls[file.id]} download={file.name}>Descargar</a>}
+         {!fileUrls[file.id]&&<small>Verificando original…</small>}
+       </span>)}
+       {files.length===0&&<small>No hay archivos adjuntos a esta versión.</small>}
+     </div>
+   </div>
    <nav className="ep-tabs ep-tabs--primary" aria-label="Espacios del perfil">{([['results','Perfil'],['document','Documento completo'],['versions','Gestión y versiones'],['laboratory','Laboratorio experimental']] as const).map(([key,label])=><button key={key} type="button" aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>
    {tab==='results'&&<main className="ep-main ep-main--profile">
     <p className="ep-review-status" role="status">
@@ -240,7 +316,9 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
     </div><button className="ep-primary" disabled={busy} onClick={edit}>Editar una nueva revisión</button>
     <p className="ep-help">Los originales no se modifican. Cada edición conserva la versión anterior.</p>
    </aside>
-    <section className="ep-versions"><p className="ep-eyebrow">HISTORIAL CONSERVADO EN FIREBASE</p><h2>Versiones del perfil</h2>{[...library.profiles].reverse().map(p=><article key={p.id}><div><h3>{p.title}</h3><p>{date(p.createdAt)} · {p.author||'Autoría no declarada'} · {p.status==='validated'?'Validada':'En revisión'}{p.id===library.activeId?' · Vigente':''}</p></div><div className="ep-actions"><button onClick={()=>{setSelectedId(p.id);setTab('document');}}>Consultar versión</button>{p.id!==library.activeId&&<button disabled={busy} onClick={()=>void commit({...library,activeId:p.id},'Versión vigente actualizada en Firebase.')}>Establecer como vigente</button>}</div></article>)}</section></div>
+    <section className="ep-versions"><p className="ep-eyebrow">HISTORIAL CONSERVADO EN FIREBASE</p><h2>Versiones del perfil</h2>{[...library.profiles].reverse().map(p=><article key={p.id}><div><h3>{p.title}</h3><p>{date(p.createdAt)} · {p.author||'Autoría no declarada'} · {p.status==='validated'?'Validada':'En revisión'}{p.id===library.activeId?' · Vigente':''}{p.archivedAt?' · Archivada':''}</p></div><div className="ep-actions"><button onClick={()=>{setSelectedId(p.id);setTab('document');}}>Consultar versión</button>{p.id!==library.activeId&&!p.archivedAt&&<button disabled={busy} onClick={()=>void commit({...library,activeId:p.id},'Versión vigente actualizada en Firebase.')}>Establecer como vigente</button>}
+      {p.id!==library.activeId&&!p.archivedAt&&<button disabled={busy} onClick={()=>void archiveVersion(p)}>Archivar versión</button>}
+      {p.id!==library.activeId&&p.archivedAt&&!library.profiles.some(child=>child.revisionOf===p.id)&&<button disabled={busy} onClick={()=>void deleteVersion(p)}>Eliminar versión archivada</button>}</div></article>)}</section></div>
     {selected.id===library.activeId&&selected.status==='review'&&<section className="ep-validation"><div><h3>Revisión técnica</h3><p>La incorporación no valida el contenido. La validación quedará vinculada a esta versión y a tu cuenta.</p></div><button disabled={busy} onClick={()=>{if(!authorName.trim()){setError('Identifícate para registrar la validación.');return;}if(window.confirm('¿Registrar la validación técnica de esta versión con tu cuenta?'))void commit({...library,profiles:library.profiles.map(p=>p.id===selected.id?{...p,status:'validated',validatedAt:new Date().toISOString(),validatedBy:authorName}:p)},'Validación técnica registrada en Firebase.');}}>Registrar validación técnica</button></section>}
    </main>}
   </>}
