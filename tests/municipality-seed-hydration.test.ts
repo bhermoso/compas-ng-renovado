@@ -565,7 +565,7 @@ describe("recuperación desde almacenamiento ampliado", () => {
         ...current.repository,
         documents: current.repository.documents.slice(0, 3),
       },
-      updatedAt: "2026-10-09T08:00:00.000Z",
+      updatedAt: "2099-10-09T08:00:00.000Z",
     };
     expect(current.repository.documents).toHaveLength(6);
     expect(stored.repository.documents).toHaveLength(3);
