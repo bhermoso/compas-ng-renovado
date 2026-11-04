@@ -7,7 +7,7 @@ export interface DocumentOriginalManagement {
   storeOriginal: (documentId: string, file: File) => Promise<void>;
   createRevision: (documentId: string, file: File) => Promise<void>;
   archiveDocument: (documentId: string) => Promise<void>;
-  deleteDocument: (documentId: string) => Promise<void>;
+  deleteDocument: (documentId: string) => Promise<boolean>;
 }
 
 export const DocumentOriginalManagementContext = createContext<DocumentOriginalManagement | null>(null);
