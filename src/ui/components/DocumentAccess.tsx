@@ -17,6 +17,13 @@ export function DocumentAccess({document:doc,documentLabel}:{document:MunicipalD
  (remoteOriginal ? decodeDocumentOriginal(remoteOriginal) : loadOriginalFile(doc.municipalityId,doc.id)).then(f=>{if(active)setFile(f);}).catch(e=>{if(active)setMessage(e.message);}).finally(()=>{if(active)setLoading(false);});
  return ()=>{active=false;};},[doc.id,doc.municipalityId,remoteOriginal?.sha256]);
  const url=documentAccessUrl(doc.source.url);
+ function openOriginal(){
+  if(!file) return;
+  if(file.type !== 'application/pdf' && !/\.pdf$/i.test(file.name)) { download(); return; }
+  const href=URL.createObjectURL(file);
+  window.open(href,'_blank','noopener,noreferrer');
+  setTimeout(()=>URL.revokeObjectURL(href),60000);
+ }
  function download(){
   if(!file)return;
   const href=URL.createObjectURL(file);const a=window.document.createElement('a');
@@ -29,7 +36,7 @@ export function DocumentAccess({document:doc,documentLabel}:{document:MunicipalD
    <p className="document-access__notice">Si el visor integrado muestra una pestaña vacía, usa la descarga {contextualLabel ? `del ${contextualLabel}` : "del PDF original"}.</p>
   </div>}
   {url && !isPdfDocumentAccess(doc.source.url) && <a className="doc-repo__open" href={url} target="_blank" rel="noopener noreferrer" aria-label={`Abrir documento: ${doc.title} (nueva pestaña)`}>Abrir documento ↗</a>}
-  {file && <p><button type="button" onClick={download}>Descargar original · {file.name}</button> <small>{remoteOriginal ? 'Original guardado en el expediente compartido.' : 'Original solo en este navegador; pendiente de sincronizar.'}</small></p>}
+  {file && <p><button type="button" onClick={openOriginal}>Abrir original</button> <button type="button" onClick={download}>Descargar original · {file.name}</button> <small>{remoteOriginal ? 'Original guardado en el expediente compartido.' : 'Original solo en este navegador; pendiente de sincronizar.'}</small></p>}
   {!loading && !file && !url && <p><strong>Archivo original no disponible.</strong> {doc.sourceText?.trim() ? 'Puedes consultar el texto conservado.' : 'Solo se conserva la referencia o los datos derivados.'}</p>}
   {doc.sourceText?.trim() && <details><summary>Consultar texto conservado</summary><p style={{whiteSpace:'pre-wrap'}}>{doc.sourceText}</p></details>}
   {!url && <label className="document-access__attach">{file ? 'Verificar o reponer original' : 'Adjuntar el archivo original'}
