@@ -12,6 +12,7 @@ import { parseWorkspaceJSON, serializeWorkspaceForStorage } from '../src/infrast
 import { ExternalProfileDashboard } from '../src/ui/components/ExternalProfileDashboard';
 import { ProfileEditorialLab } from '../src/ui/components/ProfileEditorialLab';
 import { externalProfileDocument } from '../src/application/health-profile/externalProfileDocument';
+import { profileSaveErrorMessage, profileSaveProgressMessage } from '../src/application/health-profile/profileSaveFeedback';
 import { externalProfileFixture } from './helpers/externalProfileFixture';
 
 const workspace = () => {const w=structuredClone(seed) as unknown as MunicipalityWorkspace;delete w.validatedPSL;return w;};
@@ -213,5 +214,20 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
   expect(model.sections.find(s=>s.title.startsWith('Texto del perfil'))?.paragraphs.join('\n\n')).toBe(p.text);
   expect(JSON.stringify(model)).toContain(p.results[2].caution);
   expect(model.portada.join(' ')).toContain('En revisión');expect(JSON.stringify(model)).not.toContain('2027–2030');
+ });
+});
+
+describe('Guardado de perfil en Firebase · errores y estados', () => {
+ it('distingue espera, progreso y confirmación del servidor', () => {
+  expect(profileSaveProgressMessage({phase:'waiting',completedChunks:0,totalChunks:0})).toContain('Esperando');
+  expect(profileSaveProgressMessage({phase:'writing',completedChunks:24,totalChunks:120})).toContain('24 de 120');
+  expect(profileSaveProgressMessage({phase:'confirming',completedChunks:120,totalChunks:120})).toContain('Confirmando');
+  expect(profileSaveProgressMessage({phase:'saved',completedChunks:120,totalChunks:120})).toContain('confirmado');
+ });
+ it('ofrece un diagnóstico accionable de permisos, cuota, conexión y conflictos', () => {
+  expect(profileSaveErrorMessage({code:'permission-denied'})).toContain('permisos');
+  expect(profileSaveErrorMessage({code:'resource-exhausted'})).toContain('cuota');
+  expect(profileSaveErrorMessage({code:'unavailable'})).toContain('conexión');
+  expect(profileSaveErrorMessage(new Error('Firebase tiene una versión más reciente'))).toContain('más reciente');
  });
 });

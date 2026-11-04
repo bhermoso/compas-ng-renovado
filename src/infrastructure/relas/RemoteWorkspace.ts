@@ -22,7 +22,17 @@ const CHUNK_SIZE = 180_000;
 // Keep document batches well below the 10 MiB request limit, including UTF-8 and metadata.
 // https://firebase.google.com/docs/firestore/quotas
 const MAX_BATCH_WRITES = 8;
+// Three bounded requests in parallel reduce the latency of large workspaces
+// while preserving the manifest-last, all-fragments-first integrity protocol.
+const MAX_CONCURRENT_BATCHES = 3;
 const saveQueues = new WeakMap<RelasClient, Map<string, Promise<void>>>();
+
+export interface RemoteSaveProgress {
+  phase: "waiting" | "writing" | "confirming" | "saved";
+  completedChunks: number;
+  totalChunks: number;
+}
+export type RemoteSaveProgressListener = (progress: RemoteSaveProgress) => void;
 
 interface RemoteWorkspaceManifest {
   schema: typeof REMOTE_WORKSPACE_SCHEMA;
@@ -113,18 +123,25 @@ export async function readRemoteWorkspace(
 
 export async function saveRemoteWorkspace(
   client: RelasClient,
-  workspace: MunicipalityWorkspace
+  workspace: MunicipalityWorkspace,
+  onProgress?: RemoteSaveProgressListener
 ): Promise<void> {
   let queue = saveQueues.get(client);
   if (!queue) { queue = new Map(); saveQueues.set(client, queue); }
   const key = workspace.municipality.identity.id;
-  const previous = queue.get(key) ?? Promise.resolve();
-  const next = previous.catch(() => undefined).then(() => persistRemoteWorkspace(client, workspace));
+  const pending = queue.get(key);
+  if (pending) onProgress?.({ phase: "waiting", completedChunks: 0, totalChunks: 0 });
+  const previous = pending ?? Promise.resolve();
+  const next = previous.catch(() => undefined).then(() => persistRemoteWorkspace(client, workspace, onProgress));
   queue.set(key, next);
   try { await next; } finally { if (queue.get(key) === next) queue.delete(key); }
 }
 
-async function persistRemoteWorkspace(client: RelasClient, workspace: MunicipalityWorkspace): Promise<void> {
+async function persistRemoteWorkspace(
+  client: RelasClient,
+  workspace: MunicipalityWorkspace,
+  onProgress?: RemoteSaveProgressListener
+): Promise<void> {
   const raw = JSON.stringify(workspace);
   const chunks = splitText(raw);
   if (chunks.length > 400) throw new Error('El expediente supera la capacidad de 400 fragmentos de Firebase. Conserva la versión anterior y reduce el tamaño de los archivos.');
@@ -140,12 +157,26 @@ async function persistRemoteWorkspace(client: RelasClient, workspace: Municipali
   if (previous && previous.workspaceUpdatedAt > workspace.updatedAt) {
     throw new Error("Firebase tiene una versión más reciente del expediente. Recupérala y concilia los cambios antes de guardar.");
   }
-  for (let start = 0; start < chunks.length; start += MAX_BATCH_WRITES) {
-    const batch = writeBatch(client.db);
-    chunks
-      .slice(start, start + MAX_BATCH_WRITES)
-      .forEach((chunk, offset) => {
-        const index = start + offset;
+  const provisional: RemoteWorkspaceManifest = {
+    schema: REMOTE_WORKSPACE_SCHEMA,
+    municipalityId: workspace.municipality.identity.id,
+    snapshotId: id,
+    chunkCount: chunks.length,
+    characterLength: raw.length,
+    workspaceUpdatedAt: workspace.updatedAt,
+    savedBy: user.uid,
+  };
+  onProgress?.({ phase: "writing", completedChunks: 0, totalChunks: chunks.length });
+  // Nothing becomes readable as the current expediente until *all* chunk
+  // batches have succeeded and the manifest transaction commits.
+  for (let start = 0; start < chunks.length; start += MAX_BATCH_WRITES * MAX_CONCURRENT_BATCHES) {
+    const attempts: Promise<void>[] = [];
+    for (let batchStart = start;
+      batchStart < Math.min(start + MAX_BATCH_WRITES * MAX_CONCURRENT_BATCHES, chunks.length);
+      batchStart += MAX_BATCH_WRITES) {
+      const batch = writeBatch(client.db);
+      chunks.slice(batchStart, batchStart + MAX_BATCH_WRITES).forEach((chunk, offset) => {
+        const index = batchStart + offset;
         batch.set(
           doc(
             client.db,
@@ -156,25 +187,28 @@ async function persistRemoteWorkspace(client: RelasClient, workspace: Municipali
             "chunks",
             String(index).padStart(6, "0")
           ),
-          {
-            index,
-            content: chunk,
-            savedBy: user.uid,
-            savedAt: serverTimestamp(),
-          }
+          { index, content: chunk, savedBy: user.uid, savedAt: serverTimestamp() }
         );
       });
-    await batch.commit();
+      attempts.push(batch.commit());
+    }
+    // All writes in this window must settle before failure cleanup starts.
+    const settled = await Promise.allSettled(attempts);
+    const failure = settled.find((result): result is PromiseRejectedResult => result.status === "rejected");
+    if (failure) {
+      // Orphan snapshots are not visible, but best-effort cleanup reduces
+      // storage costs. Never publish a partially written snapshot.
+      void deleteSnapshotChunks(client, workspace.municipality.identity.id, provisional).catch(() => undefined);
+      throw failure.reason;
+    }
+    onProgress?.({
+      phase: "writing",
+      completedChunks: Math.min(start + MAX_BATCH_WRITES * MAX_CONCURRENT_BATCHES, chunks.length),
+      totalChunks: chunks.length,
+    });
   }
-  const manifest: RemoteWorkspaceManifest = {
-    schema: REMOTE_WORKSPACE_SCHEMA,
-    municipalityId: workspace.municipality.identity.id,
-    snapshotId: id,
-    chunkCount: chunks.length,
-    characterLength: raw.length,
-    workspaceUpdatedAt: workspace.updatedAt,
-    savedBy: user.uid,
-  };
+  const manifest: RemoteWorkspaceManifest = provisional;
+  onProgress?.({ phase: "confirming", completedChunks: chunks.length, totalChunks: chunks.length });
   const currentRef = doc(
     client.db,
     "relas_scopes",
@@ -195,14 +229,15 @@ async function persistRemoteWorkspace(client: RelasClient, workspace: Municipali
       transaction.set(currentRef, { ...manifest, savedAt: serverTimestamp() });
     });
   } catch (error) {
-    await deleteSnapshotChunks(client, workspace.municipality.identity.id, manifest).catch(() => undefined);
+    void deleteSnapshotChunks(client, workspace.municipality.identity.id, manifest).catch(() => undefined);
     throw error;
   }
-  // La copia anterior ya no es la vigente: se retira para que Firebase no
-  // acumule una copia completa por cada guardado. Un fallo aquí no invalida
-  // el guardado, que ya está confirmado.
+  // The transaction acknowledgement is the save confirmation. Removing
+  // fragments of an older, no-longer-current snapshot must not delay that
+  // confirmation; its cleanup is independent and best-effort.
+  onProgress?.({ phase: "saved", completedChunks: chunks.length, totalChunks: chunks.length });
   if (previous !== null && previous.snapshotId !== id) {
-    await deleteSnapshotChunks(
+    void deleteSnapshotChunks(
       client,
       workspace.municipality.identity.id,
       previous

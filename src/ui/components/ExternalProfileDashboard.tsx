@@ -18,7 +18,7 @@ interface Props {
  legacyProfiles?: LocalHealthProfileArtifact[];
  legacyText?: string;
  authorName: string;
- onSave: (library: ExternalProfileLibrary) => Promise<void>;
+ onSave: (library: ExternalProfileLibrary, onProgress?: (message: string) => void) => Promise<void>;
  onDirtyChange?: (dirty: boolean) => void;
 }
 const date = (s: string) => new Date(s).toLocaleDateString('es-ES', {day:'numeric',month:'short',year:'numeric'});
@@ -137,7 +137,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
    const appended=appendExternalProfile(library,{...draft,title:draft.title.trim()},newFiles,municipalityId);
    // Una nueva revisión no sustituye la versión vigente hasta una promoción explícita.
    const next=draft.revisionOf && library.activeId ? {...appended,activeId:library.activeId} : appended;
-   await onSave(next);setSelectedId(draft.id);setDraft(undefined);setNewFiles([]);setTab('results');
+   await onSave(next, progress => setMessage(progress));setSelectedId(draft.id);setDraft(undefined);setNewFiles([]);setTab('results');
    setMessage('Revisión guardada con originales y resultados. La versión vigente se establece desde Gestión y versiones.');
   }catch(e){setError(e instanceof Error?e.message:'No se ha podido guardar. Tu borrador permanece en pantalla.');setMessage('');}
   finally{setBusy(false);}
@@ -155,7 +155,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
  }
  async function commit(next:ExternalProfileLibrary,success:string) {
   setBusy(true);setError('');setMessage('Guardando en Firebase…');
-  try{await onSave(next);setMessage(success);}catch(e){setError(e instanceof Error?e.message:'No se ha podido guardar en Firebase.');setMessage('');}finally{setBusy(false);}
+  try{await onSave(next, progress => setMessage(progress));setMessage(success);}catch(e){setError(e instanceof Error?e.message:'No se ha podido guardar en Firebase.');setMessage('');}finally{setBusy(false);}
  }
  function patch(change:Partial<ExternalHealthProfile>){setDraft(p=>p?{...p,...change}:p);}
  return <section className="external-profile" aria-label="Perfil de Salud Local">
@@ -200,7 +200,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
        </fieldset>)}</div>}
    </section>
    <div className="ep-attached"><strong>Archivos que se incorporarán al expediente compartido al guardar</strong>{draft.attachmentIds.map(id=><span key={id}>{[...library.attachments,...newFiles].find(a=>a.id===id)?.name}</span>)}{!draft.attachmentIds.length&&<span>Sin archivo adjunto; se conservarán el texto y los resultados.</span>}</div>
-   <div className="ep-editor__footer"><p>Se guardará una versión en revisión. Subir un archivo no equivale a validarlo.</p><button className="ep-primary" disabled={!draft.title.trim()} type="submit">{busy?'Guardando…':'Guardar perfil en Firebase'}</button></div>
+   <div className="ep-editor__footer"><p>Se guardará una versión en revisión. El guardado solo finaliza al confirmarlo Firebase; no cierres la pestaña mientras aparezca «Guardando…».</p><button className="ep-primary" disabled={busy||!draft.title.trim()} type="submit">{busy?'Guardando en Firebase…':'Guardar perfil en Firebase'}</button></div>
    </fieldset>
   </form> : !selected ? <div className="ep-empty"><div className="ep-paper" aria-hidden="true"><span>COMPÁS</span><i/><i/><i/><i/><i/></div>
    <div><p className="ep-eyebrow">PERFIL DE SALUD LOCAL · EXPEDIENTE MUNICIPAL</p><h2>{legacyProfiles.length>0||legacyText ? "Ya existe un perfil anterior de COMPÁS" : "Incorpora el Perfil de Salud Local"}</h2>
