@@ -86,6 +86,14 @@ describe("expediente remoto: ciclo de vida", () => {
     expect((await readRemoteWorkspace(client, "fv"))?.updatedAt).toBe("2026-10-19T11:00:00.000Z");
   });
 
+  it("un guardado obsoleto no sustituye una copia remota más reciente", async () => {
+    const recent = workspace("fv", "2026-11-04T14:00:00.000Z");
+    await saveRemoteWorkspace(client, recent);
+    await expect(saveRemoteWorkspace(client, workspace("fv", "2026-11-03T14:00:00.000Z"))).rejects.toThrow(/más reciente/);
+    expect((await readRemoteWorkspace(client, "fv"))?.updatedAt).toBe(recent.updatedAt);
+    expect([...store.keys()].filter(k => k.includes("/chunks/"))).toHaveLength(1);
+  });
+
   it("eliminar retira fragmentos y manifiesto", async () => {
     await saveRemoteWorkspace(client, workspace("fv", "2026-10-19T10:00:00.000Z"));
     expect(await deleteRemoteWorkspace(client, "fv")).toEqual({ deleted: true });
