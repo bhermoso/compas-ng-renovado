@@ -579,6 +579,10 @@ describe("recuperación desde almacenamiento ampliado", () => {
         ...current.repository,
         documents: current.repository.documents.slice(0, 3),
       },
+      appliedSeedMigrations: [LOJA_MIGRATION.marker],
+      deletedDocuments: current.repository.documents.slice(3).map(d => ({
+        documentId: d.id, title: d.title, deletedAt: "2099-10-09T08:00:00.000Z"
+      })),
       updatedAt: "2099-10-09T08:00:00.000Z",
     };
     expect(current.repository.documents).toHaveLength(6);
