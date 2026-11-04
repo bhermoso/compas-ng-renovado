@@ -6,6 +6,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const store = new Map<string, Record<string, unknown>>();
 let holdNextBatch: Promise<void> | undefined;
 let batchWaiting = false;
+let holdNextDeleteBatch: Promise<void> | undefined;
+let deleteBatchWaiting = false;
 const ref = (path: string[]) => ({ path: path.join("/"), __ref: true });
 vi.mock("firebase/firestore", () => ({
   doc: (_db: unknown, ...path: string[]) => ref(path),
@@ -37,10 +39,20 @@ vi.mock("firebase/firestore", () => ({
   writeBatch: () => {
     const ops: Array<() => void> = [];
     let payloadBytes = 0;
+    let isDelete = false;
     return {
       set: (r: { path: string }, data: Record<string, unknown>) => { payloadBytes += new TextEncoder().encode(JSON.stringify(data)).length; ops.push(() => store.set(r.path, data)); },
-      delete: (r: { path: string }) => ops.push(() => store.delete(r.path)),
-      commit: async () => { if (payloadBytes > 10 * 1024 * 1024) throw new Error("Firestore request exceeds 10 MiB"); const gate = holdNextBatch; holdNextBatch = undefined; if (gate) { batchWaiting = true; await gate; } ops.forEach((op) => op()); },
+      delete: (r: { path: string }) => { isDelete = true; ops.push(() => store.delete(r.path)); },
+      commit: async () => {
+        if (payloadBytes > 10 * 1024 * 1024) throw new Error("Firestore request exceeds 10 MiB");
+        const gate = holdNextBatch; holdNextBatch = undefined;
+        if (gate) { batchWaiting = true; await gate; }
+        if (isDelete && holdNextDeleteBatch) {
+          const deleteGate = holdNextDeleteBatch; holdNextDeleteBatch = undefined;
+          deleteBatchWaiting = true; await deleteGate;
+        }
+        ops.forEach((op) => op());
+      },
     };
   },
 }));
@@ -73,12 +85,47 @@ function workspace(id: string, updatedAt: string): MunicipalityWorkspace {
 }
 
 describe("expediente remoto: ciclo de vida", () => {
-  beforeEach(() => { store.clear(); administrator = true; holdNextBatch = undefined; batchWaiting = false; });
+  beforeEach(() => {
+    store.clear(); administrator = true; holdNextBatch = undefined; batchWaiting = false;
+    holdNextDeleteBatch = undefined; deleteBatchWaiting = false;
+  });
+
+  it("no bloquea la confirmación del perfil por la limpieza de una copia anterior", async () => {
+    const first = workspace("alfacar", "2026-11-04T10:00:00.000Z");
+    await saveRemoteWorkspace(client, first);
+    let releaseCleanup!: () => void;
+    holdNextDeleteBatch = new Promise<void>(resolve => { releaseCleanup = resolve; });
+    const progress: string[] = [];
+    const second = workspace("alfacar", "2026-11-04T11:00:00.000Z");
+    await saveRemoteWorkspace(client, second, event => progress.push(event.phase));
+    expect(progress.at(-1)).toBe("saved");
+    expect(progress).toContain("confirming");
+    await vi.waitFor(() => expect(deleteBatchWaiting).toBe(true));
+    // The new profile is live despite the old snapshot's cleanup being held.
+    expect((await readRemoteWorkspace(client, "alfacar"))?.updatedAt).toBe(second.updatedAt);
+    releaseCleanup();
+    await vi.waitFor(() => expect([...store.keys()].filter(k => k.includes("/chunks/"))).toHaveLength(1));
+  });
+
+  it("expone el avance por fragmentos y confirma al publicar el manifiesto", async () => {
+    const w = workspace("progress", "2026-11-04T11:30:00.000Z");
+    w.healthReport = { body: { originalText: "A".repeat(700000) } } as never;
+    const updates: Array<{phase:string;completedChunks:number;totalChunks:number}> = [];
+    await saveRemoteWorkspace(client, w, p => updates.push(p));
+    const writing = updates.filter(p => p.phase === "writing");
+    expect(writing.length).toBeGreaterThan(1);
+    expect(writing[0].completedChunks).toBe(0);
+    expect(writing.at(-1)?.completedChunks).toBe(writing.at(-1)?.totalChunks);
+    expect(updates.at(-2)?.phase).toBe("confirming");
+    expect(updates.at(-1)?.phase).toBe("saved");
+    expect((await readRemoteWorkspace(client, "progress"))?.updatedAt).toBe(w.updatedAt);
+  });
 
   it("tras guardar dos veces solo queda la copia vigente en Firebase", async () => {
     await saveRemoteWorkspace(client, workspace("fv", "2026-10-19T10:00:00.000Z"));
     const first = [...store.keys()].filter((k) => k.includes("/chunks/"));
     await saveRemoteWorkspace(client, workspace("fv", "2026-10-19T11:00:00.000Z"));
+    await vi.waitFor(() => expect([...store.keys()].filter((k) => k.includes("/chunks/"))).toHaveLength(1));
     const second = [...store.keys()].filter((k) => k.includes("/chunks/"));
     expect(first.length).toBe(1);
     expect(second.length).toBe(1);
