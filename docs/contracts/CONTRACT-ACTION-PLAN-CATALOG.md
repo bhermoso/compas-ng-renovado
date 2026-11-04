@@ -180,3 +180,49 @@ códigos impresos. La visualización de una ficha guardada puede actualizar sus
 etiquetas dentro de la misma versión sin cambiar su texto, sus datos ni la
 referencia original; una versión distinta sigue marcada como referencia antigua.
 El catálogo original 3.1, Loja y otras líneas mantienen su numeración anterior.
+
+## 11. Plantilla común de dos líneas y envejecimiento en cuatro bloques — 2026-11-04
+
+**Decisión del autor:** la misma herramienta editorial de Plan de Acción que
+se prepara en Granada-Zaidín y Zagra debe estar **disponible en cualquier
+expediente**, incluidos Loja, Alfacar y municipios creados posteriormente.
+
+El catálogo común presenta dos líneas:
+
+1. Envejecimiento saludable: **Edadismo, Soledad no deseada, Autonomía y
+   Participación**, con 18 objetivos específicos e indicadores (2, 7, 4 y 5).
+2. Prevención y abordaje de las adicciones: conserva los 6 objetivos generales,
+   12 específicos y sus indicadores del módulo 3.1 hasta la revisión expresa
+   de esa línea.
+
+**Compatibilidad territorial y procedencia.**
+
+- El Zaidín conserva la edición final y su versión identificada, incluida la
+  redacción municipal y las decisiones ya presentes en el expediente.
+- Zagra conserva su versión territorial y la migración auditada de 2026-10-28.
+- Los demás expedientes usan la plantilla
+  `comun-cuatro-bloques-2026-11-04`, con cuatro grupos de identificadores
+  internos `COMUN-ENV-OG1..4` distintos de los antiguos `ENV-OG1..9`.
+  Los códigos de los 18 objetivos específicos e indicadores originales se
+  mantienen, y sus códigos visibles se presentan con la nueva agrupación.
+- Se explicita el origen Granada-Zaidín. La redacción general se neutraliza
+  territorialmente, sin fabricar datos ni trasladar actuaciones, aprobaciones
+  o compromisos de otros municipios.
+- Un borrador antiguo 3.1 no se sustituye al abrirlo en COMPÁS. Debe aceptarse
+  una acción visible para preparar los cuatro bloques; se archiva el original
+  íntegro y se preservan decisiones individuales, exclusiones, adaptaciones,
+  indicadores y campos de evaluación. Los cuatro bloques **nuevos comienzan
+  pendientes**, sin heredar la aprobación de los anteriores.
+- Las versiones desconocidas siguen bloqueadas para edición y exportación
+  hasta revisión de compatibilidad. Los planes ya validados permanecen
+  disponibles como versiones históricas inmutables.
+- El editor, el Plan resultante, las exportaciones y el esbozo del Plan Local
+  de Salud consumen la misma estructura. La modalidad territorial conectada
+  a Firebase muestra ambas líneas y controla el guardado por cada una.
+- Esta ampliación expresa no hace aplicable ningún módulo a un municipio sin
+  selección ni validación humana. En todo momento se distingue catálogo,
+  borrador y plan validado.
+
+La plantilla nueva solo incorpora estructura, material editorial de catálogo
+y reglas de compatibilidad. **No cambia datos ni el estado institucional
+de ningún expediente municipal.**
