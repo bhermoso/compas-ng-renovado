@@ -30,7 +30,9 @@ export function createDocumentRevision(
     id: original.documentId,
     kind: previous.kind,
     title: previous.title,
-    source: { ...previous.source, collectedAt: now },
+    // Do not inherit a URL pointing at an older PDF. This new revision has
+    // its own original bytes in Firebase, separately hashed and dated.
+    source: { ...previous.source, url: undefined, collectedAt: now },
     sourceFileName: original.name,
     contentSha256: original.sha256,
     sourceText: undefined,
