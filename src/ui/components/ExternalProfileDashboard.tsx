@@ -211,6 +211,10 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
   </div> : <>
    <nav className="ep-tabs ep-tabs--primary" aria-label="Espacios del perfil">{([['results','Perfil'],['document','Documento completo'],['versions','Gestión y versiones'],['laboratory','Laboratorio experimental']] as const).map(([key,label])=><button key={key} type="button" aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>
    {tab==='results'&&<main className="ep-main ep-main--profile">
+    <p className="ep-review-status" role="status">
+      {selected.id!==library.activeId ? 'Revisión no vigente. ' : ''}
+      {selected.status==='review' ? 'Borrador técnico: pendiente de validación.' : 'Versión validada técnicamente.'}
+    </p>
     <div className="ep-complete-download pdp-noprint">
       <div><strong>Perfil de Salud Local completo</strong><span>Datos, interpretación, conclusiones y recomendaciones de esta versión. La exportación de COMPÁS no sustituye el PDF original.</span></div>
       <button type="button" className="ep-primary" onClick={()=>printCompleteProfile(fullProfileRef.current,`${selected.title} · ${municipalityName}`)}>↓ Exportar presentación COMPÁS · PDF</button>
@@ -228,7 +232,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
     <section className="ep-management-upload"><div><p className="ep-eyebrow">ADMINISTRACIÓN DOCUMENTAL</p><h2>Gestionar el perfil de {municipalityName}</h2><p>Para incorporar una revisión, selecciona conjuntamente su PDF original y su paquete JSON de resultados. Se conservará la versión anterior y la nueva quedará en revisión, sin validación automática.</p></div><button type="button" className="ep-primary" disabled={busy} onClick={()=>fileInput.current?.click()}>↑ Incorporar nueva revisión</button></section>
     <div className="ep-management-grid"><aside className="ep-document-card"><p className="ep-eyebrow">DOCUMENTO DE REFERENCIA</p>
     <div className="ep-cover"><span>COMPÁS</span><div><small>{municipalityName}</small><h2>{selected.title}</h2><p>{selected.period||'Periodo no declarado'}</p></div><small>PERFIL DE SALUD LOCAL</small></div>
-    <p className="ep-status">{selected.id===library.activeId?'Versión vigente':'Versión anterior'} · {selected.status==='validated'?'Validada técnicamente':'En revisión'}</p>
+    <p className="ep-status">{selected.id===library.activeId?'Versión de referencia':'Revisión no vigente'} · {selected.status==='validated'?'Validada técnicamente':'En revisión'}</p>
     <dl className="ep-metadata"><div><dt>Autoría</dt><dd>{selected.author||'No declarada'}</dd></div><div><dt>Incorporación</dt><dd>{date(selected.createdAt)}</dd></div>{selected.validatedBy&&<div><dt>Validación</dt><dd>{selected.validatedBy} · {date(selected.validatedAt!)}</dd></div>}</dl>
     <div className="ep-file-actions"><button type="button" disabled={busy} onClick={()=>void exportRevision()}>↓ Descargar esta revisión · Word</button>{files.map(file=><a key={file.id} aria-disabled={!fileUrls[file.id]} href={fileUrls[file.id]} download={file.name}>↓ Descargar original · {file.name}</a>)}
      {selected.text&&<button type="button" onClick={()=>download(new Blob([selected.text],{type:'text/plain;charset=utf-8'}),`${selected.title}.txt`)}>↓ Descargar texto de esta revisión</button>}
