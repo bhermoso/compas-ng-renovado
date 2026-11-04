@@ -237,7 +237,6 @@ export function resolveSeedMigration(
     const hasMarker = (current.appliedSeedMigrations ?? []).includes(
       migration.marker
     );
-    const hasBaseline = hasExpectedSeedBaseline(current, migration);
     // La marca aplicada es definitiva: una baja intencional no debe resucitarse
     // por caer por debajo de un recuento histórico mínimo.
     if (hasMarker) return { kind: "none" };
