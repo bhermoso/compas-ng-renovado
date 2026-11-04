@@ -62,6 +62,8 @@ export interface MunicipalityWorkspace {
   externalProfileLibrary?: import('../health-profile/ExternalHealthProfile').ExternalProfileLibrary;
   /** Originales de los documentos del Diagnóstico, completos y con huella, compartidos en Firebase. */
   documentOriginals?: import('../../application/document-files/documentOriginals').StoredDocumentOriginal[];
+  /** Bajas explícitas de documentos; evita que seeds y copias anteriores resuciten registros. */
+  deletedDocuments?: Array<{ documentId: string; deletedAt: string; title: string }>;
   planPreparationDraftHistory?: { replacedAt: string; replacementVersion: string; draft: PlanPreparationDraft }[];
   validatedActionPlans?: PlanDocument[];
   municipality: MunicipalityContext;

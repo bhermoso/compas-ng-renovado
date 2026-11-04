@@ -9,6 +9,7 @@ import { DiagnosisControlRoom, DiagnosisModuleSection } from "./ui/components/Di
 import { DuplicateDocumentsPanel } from "./ui/components/DuplicateDocumentsPanel";
 import { findDuplicateGroups, findExistingCopy, retireDuplicateDocument } from "./application/document-ingestion/documentDuplicates";
 import { sha256Hex } from "./application/document-ingestion/sha256";
+import { createDocumentRevision } from "./application/document-files/documentRevisions";
 import { MAX_WORKSPACE_ORIGINALS_BYTES, decideOriginalUpload, decodeDocumentOriginal, documentOriginalsBytes, encodeDocumentOriginal, formatMegabytes, mergeDocumentOriginals, profileOriginalsBytes, pruneDocumentOriginals, type StoredDocumentOriginal } from "./application/document-files/documentOriginals";
 import { buildDiagnosisControlSummary, type DiagnosisModuleId } from "./application/diagnosis/diagnosisControlSummary";
 import { replaceZaidinFinalDraft } from "./application/workspace/replaceZaidinFinalDraft";
@@ -127,7 +128,7 @@ import { RemoteSyncPanel } from "./ui/components/RemoteSyncPanel";
 import { syncRemoteCatalog } from "./application/remote-catalog/syncRemoteCatalog";
 import { loadLocalWorkspaces } from "./infrastructure/persistence/local-workspaces";
 import { listTerritorialSpaces } from "./infrastructure/relas/AdminAccounts";
-import { readAccessProfile } from "./infrastructure/relas/RelasClient";
+import { readAccessProfile, readMembership } from "./infrastructure/relas/RelasClient";
 import { createDeliberativePrioritySelection } from "./domain/deliberative-prioritisation";
 import {
   validateModuleReview,
@@ -553,8 +554,29 @@ export default function App() {
   }, []);
   // Huellas de los originales conservados en este navegador, para reconocer
   // copias de documentos anteriores a que se registrara contentSha256.
+  const [documentWriteAllowed, setDocumentWriteAllowed] = useState(false);
+  useEffect(() => {
+    let active = true;
+    const id = workspace.municipality.identity.id;
+    setDocumentWriteAllowed(false);
+    if (!remoteClient.auth.currentUser || remoteHydratedMunicipalityId !== id) return;
+    void readMembership(remoteClient, id)
+      .then(role => { if (active) setDocumentWriteAllowed(role !== "reader"); })
+      .catch(() => { if (active) setDocumentWriteAllowed(false); });
+    return () => { active = false; };
+  }, [remoteClient, remoteHydratedMunicipalityId, workspace.municipality.identity.id]);
+
   const originalHashCache = useRef(new Map<string, string | null>());
   const [localOriginalHashes, setLocalOriginalHashes] = useState<Record<string, string>>({});
+  // Incluye las huellas del expediente compartido, no solo la caché de este navegador.
+  // Así un archivo idéntico no se vuelve a importar desde otro equipo.
+  const knownOriginalHashes = {
+    ...localOriginalHashes,
+    ...(workspace.documentOriginals ?? []).reduce<Record<string, string>>((acc, original) => {
+      acc[original.documentId] = original.sha256;
+      return acc;
+    }, {}),
+  };
   useEffect(() => {
     let cancelled = false;
     const municipalityId = workspace.municipality.identity.id;
@@ -605,7 +627,11 @@ export default function App() {
         if (originalSyncSkip.current.has(key)) continue;
         try {
           const local = await loadOriginalFile(municipalityId, original.documentId);
-          if (!local) await saveOriginalFile(municipalityId, original.documentId, await decodeDocumentOriginal(original));
+          // Firebase es la fuente de verdad. Una caché antigua con el mismo ID
+          // y bytes distintos debe actualizarse, no mantenerse indefinidamente.
+          if (!local || await sha256Hex(local) !== original.sha256) {
+            await saveOriginalFile(municipalityId, original.documentId, await decodeDocumentOriginal(original));
+          }
         } catch (error) {
           console.error("[original-restore-error]", original.documentId, error);
         }
@@ -952,34 +978,28 @@ export default function App() {
       .then((remoteWorkspace) => {
         if (cancelled) return;
         if (remoteWorkspace !== null) {
-          setWorkspace((current) => {
-            if (!shouldRestoreIndexedDbWorkspace(current, remoteWorkspace)) {
-              return withCarriedDocumentOriginals(current, remoteWorkspace);
-            }
-            queueMicrotask(() => {
-              setPendingTopics([
-                ...(remoteWorkspace.thematicPrioritisation?.selectedTopicIds ?? []),
-              ]);
-            });
-            return remoteWorkspace;
-          });
+          // Nunca publicar silenciosamente un trabajo local que pueda
+          // sobrescribir la versión compartida. El conflicto requiere recuperación
+          // manual: ambos snapshots permanecen intactos.
+          if (workspace.updatedAt > remoteWorkspace.updatedAt &&
+              !isEmptyWorkspaceForPersistenceGuard(workspace)) {
+            setRemotePersistenceMessage("Conflicto de versiones: el expediente local es posterior a Firebase. Se ha bloqueado el autoguardado remoto. Conserva una copia del navegador y concilia antes de continuar.");
+            return;
+          }
+          setWorkspace(() => withCarriedDocumentOriginals(remoteWorkspace, workspace));
+          setPendingTopics([...(remoteWorkspace.thematicPrioritisation?.selectedTopicIds ?? [])]);
         }
-        setRemotePersistenceMessage(
-          remoteWorkspace === null
-            ? "No existe todavía una copia compartida; se creará con este expediente."
-            : "Expediente compartido recuperado."
-        );
+        setRemoteHydratedMunicipalityId(municipalityId);
+        setRemotePersistenceMessage(remoteWorkspace === null
+          ? "No existe todavía una copia compartida; se creará con este expediente."
+          : "Expediente compartido recuperado desde Firebase.");
       })
       .catch((error: unknown) => {
         if (cancelled) return;
-        setRemotePersistenceMessage(
-          error instanceof Error
-            ? `No se pudo recuperar la copia compartida: ${error.message}`
-            : "No se pudo recuperar la copia compartida."
-        );
-      })
-      .finally(() => {
-        if (!cancelled) setRemoteHydratedMunicipalityId(municipalityId);
+        // Fallo de lectura: no liberar el autoguardado ni operaciones destructivas.
+        setRemotePersistenceMessage(error instanceof Error
+          ? `No se pudo recuperar Firebase: ${error.message}. El guardado remoto está bloqueado.`
+          : "No se pudo recuperar Firebase. El guardado remoto está bloqueado.");
       });
     return () => {
       cancelled = true;
@@ -1144,6 +1164,110 @@ export default function App() {
 
   const profileDirtyRef = useRef(false);
   const onProfileDirtyChange = useCallback((dirty: boolean) => { profileDirtyRef.current = dirty; }, []);
+  const handleStoreDocumentOriginal = useCallback(async (documentId: string, file: File): Promise<void> => {
+    const municipalityId = workspace.municipality.identity.id;
+    if (!remoteClient.auth.currentUser) throw new Error("Inicia sesión para conservar el original en Firebase.");
+    if (remoteHydratedMunicipalityId !== municipalityId || pendingSeedId || pendingIndexedDbHydrationId) {
+      throw new Error("Recupera primero el expediente compartido para evitar sobrescribir información.");
+    }
+    const doc = workspace.repository.documents.find(d => d.id === documentId);
+    if (!doc) throw new Error("El documento ya no existe en este expediente.");
+    const hash = await sha256Hex(await file.arrayBuffer());
+    const previous = workspace.documentOriginals?.find(o => o.documentId === documentId);
+    if (previous && previous.sha256 !== hash) {
+      throw new Error("Este documento ya tiene un original diferente en Firebase. Incorpóralo como nueva versión documental, sin sustituir silenciosamente sus evidencias.");
+    }
+    if (doc.contentSha256 && doc.contentSha256 !== hash) {
+      throw new Error("El archivo no coincide con la huella registrada para esta fuente. No se puede alterar su contenido sin una nueva versión documental.");
+    }
+    const other = workspace.repository.documents.find(d => d.id !== documentId && d.status !== "archived" && d.status !== "rejected" && (
+      d.contentSha256 === hash || workspace.documentOriginals?.some(o => o.documentId === d.id && o.sha256 === hash)
+    ));
+    if (other) throw new Error(`Archivo idéntico ya registrado: «${other.title}». Utiliza el documento existente, sin crear un duplicado.`);
+    if (previous) {
+      await saveOriginalFile(municipalityId, documentId, file);
+      return;
+    }
+    const used = documentOriginalsBytes(workspace.documentOriginals) + profileOriginalsBytes(workspace.externalProfileLibrary);
+    const decision = decideOriginalUpload(file.size, used);
+    if (decision !== "fits") {
+      throw new Error(decision === "too-large" ? "El original supera el límite de 20 MB por archivo." : "Se supera el límite compartido de 40 MB de originales y perfiles.");
+    }
+    if (profileSaveInFlightRef.current) throw new Error("Hay otra operación documental guardándose en Firebase.");
+    const original = await encodeDocumentOriginal(documentId, file);
+    const next = {
+      ...workspace,
+      documentOriginals: mergeDocumentOriginals(workspace.documentOriginals ?? [], [original]),
+      updatedAt: new Date().toISOString(),
+    };
+    profileSaveInFlightRef.current = true;
+    setRemotePersistenceMessage("Guardando el archivo original en Firebase…");
+    try {
+      await saveRemoteWorkspace(remoteClient, next);
+      setWorkspace(current => current.municipality.identity.id === municipalityId ? ({
+        ...current,
+        documentOriginals: mergeDocumentOriginals(current.documentOriginals ?? [], [original]),
+        updatedAt: next.updatedAt,
+      }) : current);
+      setRemotePersistenceMessage("Archivo original guardado en Firebase.");
+      // IndexedDB es solamente una caché; un fallo local no revierte el guardado remoto.
+      await saveOriginalFile(municipalityId, documentId, file).catch(error => {
+        console.warn("[original-cache-error]", error);
+      });
+    } catch (error) {
+      setRemotePersistenceMessage("El original no se ha guardado en Firebase.");
+      throw error;
+    } finally {
+      profileSaveInFlightRef.current = false;
+    }
+  }, [workspace, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+
+  const handleCreateDocumentRevision = useCallback(async (documentId: string, file: File) => {
+    const municipalityId = workspace.municipality.identity.id;
+    if (!remoteClient.auth.currentUser || remoteHydratedMunicipalityId !== municipalityId || pendingSeedId || pendingIndexedDbHydrationId) {
+      throw new Error("Inicia sesión y recupera el expediente de Firebase antes de añadir una revisión.");
+    }
+    if (profileSaveInFlightRef.current) throw new Error("Otra operación documental está en curso.");
+    const newId = crypto.randomUUID();
+    const original = await encodeDocumentOriginal(newId, file);
+    const next = createDocumentRevision(workspace, documentId, original);
+    profileSaveInFlightRef.current = true;
+    try {
+      await saveRemoteWorkspace(remoteClient, next);
+      setWorkspace(current => current.municipality.identity.id === municipalityId ? next : current);
+      setRemotePersistenceMessage("Nueva versión documental guardada. Sus evidencias están pendientes de revisión.");
+      await saveOriginalFile(municipalityId, newId, file).catch(error => console.warn("[revision-cache]", error));
+    } finally {
+      profileSaveInFlightRef.current = false;
+    }
+  }, [workspace, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+
+  const handleArchiveDocument = useCallback(async (documentId: string) => {
+    const municipalityId = workspace.municipality.identity.id;
+    if (!remoteClient.auth.currentUser || remoteHydratedMunicipalityId !== municipalityId || pendingSeedId || pendingIndexedDbHydrationId) {
+      throw new Error("Inicia sesión y recupera el expediente de Firebase antes de archivar.");
+    }
+    if (profileSaveInFlightRef.current) throw new Error("Otra operación documental está en curso.");
+    const exists = workspace.repository.documents.some(d => d.id === documentId);
+    if (!exists) throw new Error("El documento ya no existe.");
+    const now = new Date().toISOString();
+    const next = {
+      ...workspace,
+      repository: { ...workspace.repository, documents: workspace.repository.documents.map(d =>
+        d.id === documentId ? { ...d, status: "archived" as const, updatedAt: now } : d
+      ), updatedAt: now },
+      updatedAt: now,
+    };
+    profileSaveInFlightRef.current = true;
+    try {
+      await saveRemoteWorkspace(remoteClient, next);
+      setWorkspace(current => current.municipality.identity.id === municipalityId ? next : current);
+      setRemotePersistenceMessage("Documento archivado en Firebase, conservando original y evidencias.");
+    } finally {
+      profileSaveInFlightRef.current = false;
+    }
+  }, [workspace, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+
   const handleSaveExternalProfiles = useCallback(async (library: ExternalProfileLibrary) => {
     const municipalityId = workspace.municipality.identity.id;
     if (!remoteClient.auth.currentUser) throw new Error("Inicia sesión para guardar el perfil y sus archivos en Firebase.");
@@ -1413,7 +1537,7 @@ export default function App() {
     try {
       const arrayBuffer = await file.arrayBuffer();
       const contentSha256 = options.contentSha256 ?? await sha256Hex(arrayBuffer);
-      const existingCopy = findExistingCopy(workspace.repository, { sha256: contentSha256, name: file.name }, localOriginalHashes);
+      const existingCopy = findExistingCopy(workspace.repository, { sha256: contentSha256, name: file.name }, knownOriginalHashes);
       if (existingCopy?.reason === "same-file") {
         setLastHealthReportMessage(`Este archivo ya está en el expediente como «${existingCopy.document.title}». Es el mismo archivo y no se incorpora de nuevo.`);
         return false;
@@ -1573,7 +1697,7 @@ export default function App() {
     try {
       const arrayBuffer = await file.arrayBuffer();
       const contentSha256 = options.contentSha256 ?? await sha256Hex(arrayBuffer);
-      const existingCopy = findExistingCopy(workspace.repository, { sha256: contentSha256, name: file.name }, localOriginalHashes);
+      const existingCopy = findExistingCopy(workspace.repository, { sha256: contentSha256, name: file.name }, knownOriginalHashes);
       if (existingCopy?.reason === "same-file") {
         setDocumentFileMessage(`Este archivo ya está en el expediente como «${existingCopy.document.title}». Es el mismo archivo y no se incorpora de nuevo.`);
         return false;
@@ -3016,81 +3140,21 @@ export default function App() {
     }
   }
 
-  function handleDeleteDocument(documentId: string) {
-    void deleteOriginalFile(workspace.municipality.identity.id, documentId).catch(error => {
-      window.alert('El registro se ha eliminado, pero no se pudo borrar su archivo original: ' + (error as Error).message);
-    });
-    const deletedDocument = workspace.repository.documents.find((d) => d.id === documentId);
-
-    setLastProcessedDocument((prev) => (prev?.id === documentId ? null : prev));
-    if (lastProcessedDocument?.id === documentId) {
-      setLastAtomCount(0);
+  async function handleDeleteDocument(documentId: string): Promise<boolean> {
+    const municipalityId = workspace.municipality.identity.id;
+    if (!workspace.repository.documents.some(d => d.id === documentId)) return false;
+    if (!remoteClient.auth.currentUser) {
+      window.alert("Inicia sesión: la eliminación debe confirmarse primero en Firebase.");
+      return false;
     }
-    if (deletedDocument?.kind === "health-report") {
-      setLastHealthReportMessage(null);
-      setIsLoadingHealthReport(false);
+    if (remoteHydratedMunicipalityId !== municipalityId || pendingSeedId || pendingIndexedDbHydrationId || profileSaveInFlightRef.current) {
+      window.alert("El expediente compartido no está listo o existe otra operación pendiente.");
+      return false;
     }
-    if (isIBSEDocument(deletedDocument)) {
-      setIbseMessage(null);
-      setIsLoadingIBSE(false);
-    }
-    if (isDUKEDocument(deletedDocument)) {
-      setDukeMessage(null);
-      setIsLoadingDUKE(false);
-    }
-    if (isPREDIMEDDocument(deletedDocument)) {
-      setPredimedMessage(null);
-      setIsLoadingPREDIMED(false);
-    }
-    if (isSF12Document(deletedDocument)) {
-      setSf12Message(null);
-      setIsLoadingSF12(false);
-    }
-    if (isSuenoDocument(deletedDocument)) {
-      setSuenoMessage(null);
-      setIsLoadingSueno(false);
-    }
-    if (isCAGEDocument(deletedDocument)) {
-      setCageMessage(null);
-      setIsLoadingCAGE(false);
-    }
-    if (isAUDITCDocument(deletedDocument)) {
-      setAuditcMessage(null);
-      setIsLoadingAUDITC(false);
-    }
-    if (isIPAQDocument(deletedDocument)) {
-      setIpaqMessage(null);
-      setIsLoadingIPAQ(false);
-    }
-    if (isGHQ12Document(deletedDocument)) {
-      setGhq12Message(null);
-      setIsLoadingGHQ12(false);
-    }
-    if (isPHQ9Document(deletedDocument)) {
-      setPhq9Message(null);
-      setIsLoadingPHQ9(false);
-    }
-    if (isPSQIDocument(deletedDocument)) {
-      setPsqiMessage(null);
-      setIsLoadingPSQI(false);
-    }
-    if (isFagerstromDocument(deletedDocument)) {
-      setFagerstromMessage(null);
-      setIsLoadingFagerstrom(false);
-    }
-    if (isSBQDocument(deletedDocument)) {
-      setSbqMessage(null);
-      setIsLoadingSBQ(false);
-    }
-    if (isThematicPrioritisationDocument(deletedDocument)) {
-      setTpImportMessage(null);
-      setPendingTopics([]);
-    }
-
-    setWorkspace((prev) => {
+    const nextWorkspace = ((prev: MunicipalityWorkspace) => {
       const doc = prev.repository.documents.find((d) => d.id === documentId);
       const municipalityId = prev.municipality.identity.id;
-      const deletesHealthReport = doc?.kind === "health-report";
+      const deletesHealthReport = doc?.kind === "health-report" && prev.healthReport?.linkedDocumentId === documentId;
       const deletesCommunityAssets = doc?.kind === "community-asset";
       const deletesIBSE = isIBSEDocument(doc);
       const deletesDUKE = isDUKEDocument(doc);
@@ -3109,6 +3173,11 @@ export default function App() {
 
       return {
         ...prev,
+        deletedDocuments: [
+          ...(prev.deletedDocuments ?? []).filter(row => row.documentId !== documentId),
+          { documentId, title: doc?.title ?? documentId, deletedAt: new Date().toISOString() },
+        ],
+        documentOriginals: (prev.documentOriginals ?? []).filter(o => o.documentId !== documentId),
         repository: removeMunicipalDocument(prev.repository, documentId),
         evidenceStore: {
           ...prev.evidenceStore,
@@ -3236,7 +3305,94 @@ export default function App() {
           : prev.thematicPrioritisationStudy,
         updatedAt: new Date().toISOString(),
       };
-    });
+    })(workspace);
+
+    profileSaveInFlightRef.current = true;
+    setRemotePersistenceMessage("Eliminando documento y evidencias en Firebase…");
+    try {
+      await saveRemoteWorkspace(remoteClient, nextWorkspace);
+      setWorkspace(current => current.municipality.identity.id === municipalityId ? nextWorkspace : current);
+      setRemotePersistenceMessage("Documento y evidencias eliminados del expediente compartido.");
+      await deleteOriginalFile(municipalityId, documentId).catch(error => {
+        console.warn("[original-cache-delete-error]", error);
+        setRemotePersistenceMessage("Documento eliminado en Firebase; no se pudo limpiar su caché local.");
+      });
+    const deletedDocument = workspace.repository.documents.find((d) => d.id === documentId);
+
+    setLastProcessedDocument((prev) => (prev?.id === documentId ? null : prev));
+    if (lastProcessedDocument?.id === documentId) {
+      setLastAtomCount(0);
+    }
+    if (deletedDocument?.kind === "health-report") {
+      setLastHealthReportMessage(null);
+      setIsLoadingHealthReport(false);
+    }
+    if (isIBSEDocument(deletedDocument)) {
+      setIbseMessage(null);
+      setIsLoadingIBSE(false);
+    }
+    if (isDUKEDocument(deletedDocument)) {
+      setDukeMessage(null);
+      setIsLoadingDUKE(false);
+    }
+    if (isPREDIMEDDocument(deletedDocument)) {
+      setPredimedMessage(null);
+      setIsLoadingPREDIMED(false);
+    }
+    if (isSF12Document(deletedDocument)) {
+      setSf12Message(null);
+      setIsLoadingSF12(false);
+    }
+    if (isSuenoDocument(deletedDocument)) {
+      setSuenoMessage(null);
+      setIsLoadingSueno(false);
+    }
+    if (isCAGEDocument(deletedDocument)) {
+      setCageMessage(null);
+      setIsLoadingCAGE(false);
+    }
+    if (isAUDITCDocument(deletedDocument)) {
+      setAuditcMessage(null);
+      setIsLoadingAUDITC(false);
+    }
+    if (isIPAQDocument(deletedDocument)) {
+      setIpaqMessage(null);
+      setIsLoadingIPAQ(false);
+    }
+    if (isGHQ12Document(deletedDocument)) {
+      setGhq12Message(null);
+      setIsLoadingGHQ12(false);
+    }
+    if (isPHQ9Document(deletedDocument)) {
+      setPhq9Message(null);
+      setIsLoadingPHQ9(false);
+    }
+    if (isPSQIDocument(deletedDocument)) {
+      setPsqiMessage(null);
+      setIsLoadingPSQI(false);
+    }
+    if (isFagerstromDocument(deletedDocument)) {
+      setFagerstromMessage(null);
+      setIsLoadingFagerstrom(false);
+    }
+    if (isSBQDocument(deletedDocument)) {
+      setSbqMessage(null);
+      setIsLoadingSBQ(false);
+    }
+    if (isThematicPrioritisationDocument(deletedDocument)) {
+      setTpImportMessage(null);
+      setPendingTopics([]);
+    }
+
+
+      return true;
+    } catch (error) {
+      window.alert("No se ha eliminado el documento. Firebase no confirmó el cambio: " + (error as Error).message);
+      setRemotePersistenceMessage("No se ha confirmado la eliminación del documento en Firebase.");
+      return false;
+    } finally {
+      profileSaveInFlightRef.current = false;
+    }
   }
 
   function switchToMunicipality(
@@ -3410,7 +3566,7 @@ export default function App() {
   // ── Render ──────────────────────────────────────────────────
 
   return (
-    <DocumentationProvider key={municipality.id} workspace={workspace}>
+    <DocumentationProvider key={municipality.id} workspace={workspace} canWrite={documentWriteAllowed} onStoreOriginal={handleStoreDocumentOriginal} onCreateRevision={handleCreateDocumentRevision} onArchiveDocument={handleArchiveDocument} onDeleteDocument={documentWriteAllowed ? handleDeleteDocument : undefined}>
       {municipalityToDelete && <DeleteWorkspaceDialog
         name={municipalityToDelete.name}
         discardDraft={preparationDirtyRef.current && municipalityToDelete.id === municipality.id}
@@ -3912,7 +4068,7 @@ export default function App() {
                   .filter((d) => d.id === runtime.workspace.healthReport?.linkedDocumentId || d.tags.some((t) => studyTags.includes(t)))
                   .map((d) => d.id)
               );
-              const groups = findDuplicateGroups(runtime.workspace.repository, { localHashes: localOriginalHashes, protectedIds, atomCountByDocument });
+              const groups = findDuplicateGroups(runtime.workspace.repository, { localHashes: knownOriginalHashes, protectedIds, atomCountByDocument });
               return (
                 <DuplicateDocumentsPanel
                   groups={groups}
@@ -3935,7 +4091,7 @@ export default function App() {
               connectedInstruments={Object.keys(studyCsvLoaders)}
               registeredHealthReport={runtime.workspace.healthReport ? { title: runtime.workspace.healthReport.title, sourceFileName: runtime.workspace.healthReport.sourceFileName } : undefined}
               storageNotice={storageSummary()}
-              localHashes={localOriginalHashes}
+              localHashes={knownOriginalHashes}
               getLoaderMessage={(route, studyId) =>
                 route === "health-report" ? lastHealthReportMessage
                   : route === "document-file" ? documentFileMessage
@@ -4026,7 +4182,7 @@ export default function App() {
             <DiagnosisModuleSection id="diag-mod-documents" title="Repositorio documental y bibliotecas" description="Documentos del expediente, ciclos, conciliaciones y biblioteca COMPÁS" open={openDiagModules.has("documents")} onToggle={(open) => toggleDiagnosisModule("documents", open)}>
               <DocumentRepositoryPanel
                 repository={runtime.workspace.repository}
-                onDelete={handleDeleteDocument}
+                onDelete={documentWriteAllowed ? handleDeleteDocument : undefined}
                 libraryDocuments={compasDocumentLibrary}
                 libraryMessage={documentLibraryMessage}
                 onAssignLibraryDocument={handleAssignLibraryDocument}

@@ -11000,6 +11000,10 @@ h3 {
 .diagnosis-control__metrics .diagnosis-control__metric--attention dd { color: color-mix(in srgb, var(--naranja) 65%, var(--texto-principal)); }
 .diagnosis-matrix { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; }
 .diagnosis-matrix__card { display: grid; gap: 0.35rem; align-content: start; padding: 0.9rem 1rem; min-width: 0; background: var(--blanco); border: 1px solid var(--borde); border-left: 4px solid var(--borde); border-radius: 8px; }
+.diagnosis-matrix__card-action { display: grid; gap: 0.35rem; align-content: start; width: 100%; text-align: left; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.diagnosis-matrix__card-action:hover .diagnosis-matrix__label { text-decoration: underline; text-underline-offset: 0.16em; }
+.diagnosis-matrix__card-action:focus-visible { outline: 3px solid var(--verde); outline-offset: 4px; border-radius: 4px; }
+.diagnosis-matrix__card-action .diagnosis-matrix__detail { display: block; }
 .diagnosis-matrix__card--ok { border-left-color: var(--verde); }
 .diagnosis-matrix__card--partial { border-left-color: var(--amarillo); }
 .diagnosis-matrix__top { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }

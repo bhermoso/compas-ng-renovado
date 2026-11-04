@@ -11,6 +11,18 @@ vi.mock("firebase/firestore", () => ({
   doc: (_db: unknown, ...path: string[]) => ref(path),
   collection: (_db: unknown, ...path: string[]) => ref(path),
   serverTimestamp: () => "ts",
+  runTransaction: async (_db: unknown, callback: (tx: {
+    get: (ref: { path: string }) => Promise<{ exists: () => boolean; data: () => Record<string, unknown> | undefined }>;
+    set: (ref: { path: string }, value: Record<string, unknown>) => void;
+  }) => Promise<void>) => {
+    // Simulación sin red: el commit del manifiesto ocurre después de leerlo.
+    const writes: Array<() => void> = [];
+    await callback({
+      get: async (r) => ({ exists: () => store.has(r.path), data: () => store.get(r.path) }),
+      set: (r, value) => writes.push(() => store.set(r.path, value)),
+    });
+    for (const write of writes) write();
+  },
   getDocFromServer: async (r: { path: string }) => ({
     exists: () => store.has(r.path),
     data: () => store.get(r.path),
@@ -74,6 +86,14 @@ describe("expediente remoto: ciclo de vida", () => {
     expect((await readRemoteWorkspace(client, "fv"))?.updatedAt).toBe("2026-10-19T11:00:00.000Z");
   });
 
+  it("un guardado obsoleto no sustituye una copia remota más reciente", async () => {
+    const recent = workspace("fv", "2026-11-04T14:00:00.000Z");
+    await saveRemoteWorkspace(client, recent);
+    await expect(saveRemoteWorkspace(client, workspace("fv", "2026-11-03T14:00:00.000Z"))).rejects.toThrow(/más reciente/);
+    expect((await readRemoteWorkspace(client, "fv"))?.updatedAt).toBe(recent.updatedAt);
+    expect([...store.keys()].filter(k => k.includes("/chunks/"))).toHaveLength(1);
+  });
+
   it("eliminar retira fragmentos y manifiesto", async () => {
     await saveRemoteWorkspace(client, workspace("fv", "2026-10-19T10:00:00.000Z"));
     expect(await deleteRemoteWorkspace(client, "fv")).toEqual({ deleted: true });
@@ -100,6 +120,22 @@ describe("expediente remoto: ciclo de vida", () => {
   });
 });
 
+
+describe("documentos del diagnóstico compartidos", () => {
+  it("otro navegador recupera los originales y las bajas del expediente", async () => {
+    store.clear(); administrator = true;
+    const w = workspace("alfacar", "2026-11-04T10:00:00Z");
+    const { encodeDocumentOriginal, decodeDocumentOriginal } = await import("../src/application/document-files/documentOriginals");
+    const original = await encodeDocumentOriginal("informe-v2", new File(["%PDF prueba"], "INFORME SALUD ALFACAR.pdf", {type:"application/pdf"}));
+    w.documentOriginals = [original];
+    w.deletedDocuments = [{ documentId: "informe-v1", title: "Informe anterior", deletedAt: "2026-11-04T09:00:00Z" }];
+    await saveRemoteWorkspace(client, w);
+    const recovered = await readRemoteWorkspace(client, "alfacar");
+    expect(recovered?.documentOriginals?.[0].sha256).toBe(original.sha256);
+    expect(recovered?.deletedDocuments).toEqual(w.deletedDocuments);
+    expect(await (await decodeDocumentOriginal(recovered!.documentOriginals![0])).text()).toBe("%PDF prueba");
+  });
+});
 
 describe('perfil externo en Firebase fragmentado', () => {
  it('recupera originales completos y revisiones en otro navegador sin caché local', async () => {

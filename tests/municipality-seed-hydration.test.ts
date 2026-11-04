@@ -490,7 +490,7 @@ describe("sincronización incremental de expedientes canónicos", () => {
     expect(result.seedMigration).toEqual({ kind: "none" });
   });
 
-  it("Loja recupera el seed aunque una copia local marcada haya perdido documentos", () => {
+  it("una baja en Loja no restaura automáticamente documentos canónicos ya migrados", () => {
     const seed = parseWorkspaceJSON(LOJA_SEED_RAW)!;
     const partial: MunicipalityWorkspace = {
       ...seed,
@@ -501,13 +501,24 @@ describe("sincronización incremental de expedientes canónicos", () => {
       appliedSeedMigrations: [LOJA_MIGRATION.marker],
       updatedAt: "2026-10-09T08:00:00.000Z",
     };
-    expect(resolveSeedMigration(partial)).toEqual({
-      kind: "download-and-merge",
-      migration: LOJA_MIGRATION,
-    });
+    expect(resolveSeedMigration(partial)).toEqual({ kind: "none" });
+    // Una recuperación manual explícita sigue disponible si la pérdida fue accidental.
     const repaired = applySeedDocumentMigration(partial, seed, LOJA_MIGRATION);
     expect(repaired.repository.documents).toHaveLength(seed.repository.documents.length);
-    expect(repaired.appliedSeedMigrations).toContain(LOJA_MIGRATION.marker);
+  });
+
+  it("las bajas explícitas de Loja impiden reintroducir el documento y sus evidencias desde un seed", () => {
+    const seed = parseWorkspaceJSON(LOJA_SEED_RAW)!;
+    const removed = seed.repository.documents[0];
+    const partial: MunicipalityWorkspace = {
+      ...seed,
+      repository: { ...seed.repository, documents: seed.repository.documents.filter(d => d.id !== removed.id) },
+      evidenceStore: { ...seed.evidenceStore, atoms: seed.evidenceStore.atoms.filter(a => a.provenance.documentId !== removed.id) },
+      deletedDocuments: [{ documentId: removed.id, title: removed.title, deletedAt: "2026-11-04T14:00:00Z" }],
+    };
+    const result = applySeedDocumentMigration(partial, seed, LOJA_MIGRATION);
+    expect(result.repository.documents.some(d => d.id === removed.id)).toBe(false);
+    expect(result.evidenceStore.atoms.some(a => a.provenance.documentId === removed.id)).toBe(false);
   });
 
   it("Loja se repara si IndexedDB aporta una copia parcial durante la hidratación del seed", () => {
@@ -560,7 +571,7 @@ describe("recuperación desde almacenamiento ampliado", () => {
     expect(shouldRestoreIndexedDbWorkspace(current, stored)).toBe(false);
   });
 
-  it("no permite que una copia más reciente pero documentalmente más pobre tape Loja", () => {
+  it("respeta una baja posterior en Loja cuando la migración ya está marcada", () => {
     const current = parseWorkspaceJSON(LOJA_SEED_RAW)!;
     const stored: MunicipalityWorkspace = {
       ...current,
@@ -568,11 +579,15 @@ describe("recuperación desde almacenamiento ampliado", () => {
         ...current.repository,
         documents: current.repository.documents.slice(0, 3),
       },
-      updatedAt: "2026-10-09T08:00:00.000Z",
+      appliedSeedMigrations: [LOJA_MIGRATION.marker],
+      deletedDocuments: current.repository.documents.slice(3).map(d => ({
+        documentId: d.id, title: d.title, deletedAt: "2099-10-09T08:00:00.000Z"
+      })),
+      updatedAt: "2099-10-09T08:00:00.000Z",
     };
     expect(current.repository.documents).toHaveLength(6);
     expect(stored.repository.documents).toHaveLength(3);
-    expect(shouldRestoreIndexedDbWorkspace(current, stored)).toBe(false);
+    expect(shouldRestoreIndexedDbWorkspace(current, stored)).toBe(true);
   });
 
   it("no sustituye una copia local más reciente ni mezcla municipios", () => {

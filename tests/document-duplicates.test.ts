@@ -32,6 +32,11 @@ describe("findDuplicateGroups", () => {
     expect(groups).toHaveLength(1);
     expect(groups[0]).toMatchObject({ reason: "same-file", suggestedKeepId: "b" });
   });
+  it("no confunde una revisión explícita con un duplicado por título o fichero", () => {
+    let repo = add(empty, { id: "informe", title: "Informe de Salud", sourceFileName: "informe.pdf" });
+    repo = add(repo, { id: "revision", title: "Informe de Salud", sourceFileName: "informe.pdf", revisionOf: "informe", revisionNumber: 2 });
+    expect(findDuplicateGroups(repo)).toHaveLength(0);
+  });
   it("ignora documentos archivados y propone conservar la copia con más evidencias", () => {
     let repo = add(empty, { id: "a", contentSha256: SHA });
     repo = add(repo, { id: "b", contentSha256: SHA });

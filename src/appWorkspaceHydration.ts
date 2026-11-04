@@ -237,10 +237,8 @@ export function resolveSeedMigration(
     const hasMarker = (current.appliedSeedMigrations ?? []).includes(
       migration.marker
     );
-    const hasBaseline = hasExpectedSeedBaseline(current, migration);
-    if (hasMarker && !hasBaseline) {
-      return { kind: "download-and-merge", migration };
-    }
+    // La marca aplicada es definitiva: una baja intencional no debe resucitarse
+    // por caer por debajo de un recuento histórico mínimo.
     if (hasMarker) return { kind: "none" };
     const hasDoc = current.repository.documents.some(
       (d) => d.id === migration.documentId
@@ -293,11 +291,13 @@ export function applySeedDocumentMigration(
   const existingDocIds = new Set(current.repository.documents.map((d) => d.id));
   const existingAtomIds = new Set(current.evidenceStore.atoms.map((a) => a.id));
   const migratedDocIds = new Set(seedDocs.map((d) => d.id));
-  const docsToAdd = seedDocs.filter((d) => !existingDocIds.has(d.id));
+  const deletedIds = new Set((current.deletedDocuments ?? []).map(d => d.documentId));
+  const docsToAdd = seedDocs.filter((d) => !existingDocIds.has(d.id) && !deletedIds.has(d.id));
   const atomsToAdd = seed.evidenceStore.atoms.filter(
     (a) =>
       a.provenance.documentId !== undefined &&
       migratedDocIds.has(a.provenance.documentId) &&
+      !deletedIds.has(a.provenance.documentId) &&
       !existingAtomIds.has(a.id)
   );
   if (
@@ -382,7 +382,12 @@ export function shouldRestoreIndexedDbWorkspace(
   if (!currentIsEmpty && storedIsEmpty) return false;
   // Si el workspace actual ya contiene la base canónica de un municipio con
   // seed, una copia persistida más pobre no puede sustituirlo por ser más nueva.
-  if (hasSeedBaselineRegression(current, stored)) return false;
+  // Si una copia más reciente tiene la marca de migración, una menor cantidad
+  // de documentos puede reflejar eliminaciones deliberadas y debe respetarse.
+  const migration = INCREMENTAL_SEED_MIGRATIONS.find(m => m.municipalityId === current.municipality.identity.id);
+  const applied = migration !== undefined && (stored.appliedSeedMigrations ?? []).includes(migration.marker);
+  const explicitDeletions = (stored.deletedDocuments?.length ?? 0) > 0;
+  if (hasSeedBaselineRegression(current, stored) && !((applied || explicitDeletions) && stored.updatedAt > current.updatedAt)) return false;
   if (stored.updatedAt > current.updatedAt) return true;
   // La copia ligera de localStorage no lleva los originales del Diagnóstico y
   // se guarda con la misma fecha que la copia de IndexedDB o la remota. A
@@ -408,7 +413,8 @@ export function withCarriedDocumentOriginals(
   if (!other || other.municipality.identity.id !== current.municipality.identity.id) return current;
   const have = new Set((current.documentOriginals ?? []).map((o) => o.documentId));
   const documentIds = new Set(current.repository.documents.map((d) => d.id));
-  const carried = (other.documentOriginals ?? []).filter((o) => !have.has(o.documentId) && documentIds.has(o.documentId));
+  const removed = new Set((current.deletedDocuments ?? []).map(o => o.documentId));
+  const carried = (other.documentOriginals ?? []).filter((o) => !have.has(o.documentId) && documentIds.has(o.documentId) && !removed.has(o.documentId));
   if (carried.length === 0) return current;
   return { ...current, documentOriginals: [...(current.documentOriginals ?? []), ...carried] };
 }

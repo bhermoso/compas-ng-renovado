@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { DocumentReference } from "./Documentation";
 import type { MunicipalDocumentRepository } from "../../domain/repository";
 import type { EvidenceAtom } from "../../domain/evidence";
 import { readLocalizaAssets } from "../../application/localiza-assets";
@@ -95,7 +96,7 @@ export function ActivosSaludPanel({ repository, onDeleteDocument, atoms = [] }: 
                 </ul>
               )}
               <span className="activos-source__label">
-                Fuente: {doc.title}
+                Fuente: <DocumentReference documentId={doc.id}>{doc.title}</DocumentReference>
               </span>
               {onDeleteDocument && (
                 <button
