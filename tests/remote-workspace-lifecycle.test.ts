@@ -121,6 +121,22 @@ describe("expediente remoto: ciclo de vida", () => {
 });
 
 
+describe("documentos del diagnóstico compartidos", () => {
+  it("otro navegador recupera los originales y las bajas del expediente", async () => {
+    store.clear(); administrator = true;
+    const w = workspace("alfacar", "2026-11-04T10:00:00Z");
+    const { encodeDocumentOriginal, decodeDocumentOriginal } = await import("../src/application/document-files/documentOriginals");
+    const original = await encodeDocumentOriginal("informe-v2", new File(["%PDF prueba"], "INFORME SALUD ALFACAR.pdf", {type:"application/pdf"}));
+    w.documentOriginals = [original];
+    w.deletedDocuments = [{ documentId: "informe-v1", title: "Informe anterior", deletedAt: "2026-11-04T09:00:00Z" }];
+    await saveRemoteWorkspace(client, w);
+    const recovered = await readRemoteWorkspace(client, "alfacar");
+    expect(recovered?.documentOriginals?.[0].sha256).toBe(original.sha256);
+    expect(recovered?.deletedDocuments).toEqual(w.deletedDocuments);
+    expect(await (await decodeDocumentOriginal(recovered!.documentOriginals![0])).text()).toBe("%PDF prueba");
+  });
+});
+
 describe('perfil externo en Firebase fragmentado', () => {
  it('recupera originales completos y revisiones en otro navegador sin caché local', async () => {
   store.clear();administrator=true;
