@@ -4,6 +4,7 @@ on:
     paths:
       - 'src/**'
       - 'tests/document-revisions.test.ts'
+      - 'tests/document-access.test.tsx'
       - 'tests/document-originals.test.ts'
       - 'tests/document-duplicates.test.ts'
       - 'tests/plan-document.test.ts'
@@ -31,7 +32,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: npx vitest run tests/healthy-ageing-notation.test.tsx tests/indicator-worksheet.test.ts tests/planning-instruments.test.ts tests/relas-draft-migration.test.ts tests/action-plan-compatibility.test.tsx tests/zagra-four-blocks.test.tsx tests/external-profiles.test.tsx tests/profile-structure.test.ts tests/remote-workspace-lifecycle.test.ts tests/document-originals.test.ts tests/document-duplicates.test.ts tests/document-revisions.test.ts tests/initial-local-health-plan.test.tsx tests/local-health-plan-outline.test.tsx tests/psl-c-canonical-projector.test.ts tests/zaidin-final-replacement.test.ts tests/plan-document.test.ts tests/plan-editor-whitespace.test.tsx tests/definitive-action-plan-preview.test.tsx tests/municipality-seed-hydration.test.ts
+      - run: npx vitest run tests/healthy-ageing-notation.test.tsx tests/indicator-worksheet.test.ts tests/planning-instruments.test.ts tests/relas-draft-migration.test.ts tests/action-plan-compatibility.test.tsx tests/zagra-four-blocks.test.tsx tests/external-profiles.test.tsx tests/profile-structure.test.ts tests/remote-workspace-lifecycle.test.ts tests/document-originals.test.ts tests/document-access.test.tsx tests/document-duplicates.test.ts tests/document-revisions.test.ts tests/initial-local-health-plan.test.tsx tests/local-health-plan-outline.test.tsx tests/psl-c-canonical-projector.test.ts tests/zaidin-final-replacement.test.ts tests/plan-document.test.ts tests/plan-editor-whitespace.test.tsx tests/definitive-action-plan-preview.test.tsx tests/municipality-seed-hydration.test.ts
       - run: npx playwright install --with-deps chromium
       - run: node tests/fuente-vaqueros-hydration.smoke.mjs
       - run: node tests/action-plan-compatibility.smoke.mjs
