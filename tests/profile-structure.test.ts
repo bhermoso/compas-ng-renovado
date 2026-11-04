@@ -214,3 +214,75 @@ describe("Apertura sin número en el Perfil completo", () => {
     expect(html).not.toContain('href="#epr-sec-apertura-editorial"');
   });
 });
+
+describe("Regresión · guardado de Alfacar v0.2/v0.3 con conclusiones contiguas", () => {
+  const headings = [
+    "C1. Demografía y cuidados",
+    "C2. Asma en las comparaciones publicadas",
+    "C3. Otras condiciones crónicas",
+    "C4. Mortalidad por causas",
+    "C5. Invitación y participación en cribados",
+    "C6. Dos medidas del cribado mamográfico",
+    "C7. Vigilancia y protección",
+    "C8. Comunidad, recursos y voz participante",
+  ];
+  const source = [
+    "01. Portada\nAlfacar: población y salud pública con fuentes.",
+    "02. Quién vive aquí\nLa población registrada procede del informe sanitario.",
+    "03. Panel de salud\nLos indicadores conservan los valores publicados.",
+    "04. Desigualdad\nEl expediente no contiene desagregación censal.",
+    "05. Punto de partida\nSe integran el informe, los activos y la encuesta.",
+    "06. Conclusiones\nLectura de conjunto: la documentación fundamenta ocho conclusiones.",
+    ...headings.map((line, i) => line + "\nHallazgo " + (i + 1) + " documentado con su fuente y período."),
+    "07. Convergencias y divergencias\nLas fuentes se interpretan por separado.",
+    "08. Lo que no sabemos\nFalta información sobre desigualdades internas.",
+    "09. Recomendaciones\nR1. Conocer mejor los determinantes.",
+  ].join("\n\n");
+
+  it("detecta ocho identificadores C1–C8 antes de bloquear el envío a Firebase", () => {
+    const parsed = parseProfileStructure(source);
+    expect(parsed.conclusions.map(x => x.id)).toEqual(["C1","C2","C3","C4","C5","C6","C7","C8"]);
+    const linkedIndicators = [
+      ["Población total", "C1"], ["Población de 65 años o más", "C1"],
+      ["Edad media", "C1"], ["Asma", "C2"], ["Dislipemia", "C3"],
+      ["Hipertensión", "C3"], ["Diabetes", "C3"], ["Defunciones", "C4"],
+      ["Defunciones circulatorias", "C4"], ["Defunciones por tumores", "C4"],
+      ["Cribado colorrectal: invitación", "C5"], ["Cribado colorrectal: participación", "C5"],
+      ["Cribado cérvix: invitación", "C5"], ["Cribado cérvix: participación", "C5"],
+      ["Cribado mama: invitación", "C6"], ["Cribado mama: participación", "C6"],
+      ["Clamidia", "C7"], ["Gonococia", "C7"], ["Captación vacunal", "C5"],
+      ["Vacunación completa", "C5"], ["Recursos inventariados", "C8"],
+    ] as const;
+    const conclusionIds = new Set(parsed.conclusions.map(c => c.id));
+    const invalidLinks = linkedIndicators.filter(([,id]) => !conclusionIds.has(id));
+    expect(invalidLinks).toEqual([]);
+    expect(parsed.sections.map(s => s.title)).toContain("06. Conclusiones");
+    expect(parsed.sections.map(s => s.title)).toContain("09. Recomendaciones");
+    expect(parsed.recommendations.map(x => x.id)).toEqual(["R1"]);
+  });
+
+  it("reconoce el estilo v0.2 con encabezado y texto inmediatamente contiguos", () => {
+    const text = "1. Punto de partida\nPresentación del perfil.\n\n2. Conclusiones\nOcho conclusiones.\n\nC1. Envejecimiento y cuidados. Las cifras citadas son locales.\n\nC2. Salud emocional. Se contrastará con la comunidad.\n\n3. Coincidencias y discrepancias\nDatos de fuentes distintas.";
+    const structure = parseProfileStructure(text);
+    expect(structure.sections.some(x => x.title === "2. Conclusiones")).toBe(true);
+    expect(structure.conclusions.map(x => x.id)).toEqual(["C1","C2"]);
+    expect(structure.sections.find(x => x.title === "2. Conclusiones")?.paragraphs.join(" ")).toContain("Ocho conclusiones.");
+  });
+
+  it("conserva la versión declarada en el paquete JSON", () => {
+    const input = {
+      title: "Perfil de Salud Local de Alfacar · versión externa v0.3 · estructura canónica",
+      period: "2024–2026", author: "Equipo redactor", summary: "Resumen aportado",
+      text: "Perfil de Salud Local de Alfacar\n\n" + source,
+      findings: ["C1. Del paquete"], areas: [],
+    };
+    const { content } = prefillFromStructure(input, { preservePackageTitle: true });
+    expect(content.title).toBe(input.title);
+    expect(content.findings).toEqual(input.findings);
+  });
+
+  it("no inventa conclusiones a partir de una referencia C1 aislada", () => {
+    const text = "01. Portada\nUna introducción con referencia a C1 y R1, pero sin conclusiones.";
+    expect(parseProfileStructure(text).conclusions).toEqual([]);
+  });
+});
