@@ -3148,7 +3148,7 @@ export default function App() {
     const nextWorkspace = ((prev: MunicipalityWorkspace) => {
       const doc = prev.repository.documents.find((d) => d.id === documentId);
       const municipalityId = prev.municipality.identity.id;
-      const deletesHealthReport = doc?.kind === "health-report";
+      const deletesHealthReport = doc?.kind === "health-report" && prev.healthReport?.linkedDocumentId === documentId;
       const deletesCommunityAssets = doc?.kind === "community-asset";
       const deletesIBSE = isIBSEDocument(doc);
       const deletesDUKE = isDUKEDocument(doc);
