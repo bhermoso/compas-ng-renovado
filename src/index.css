@@ -1,8 +1,8 @@
 :root {
-  --text: #526070;
-  --text-h: #172033;
+  --text: #64748b;
+  --text-h: #1e293b;
   --bg: #ffffff;
-  --border: #e4eaf3;
+  --border: #e2e8f0;
   --code-bg: #f1f5f9;
   --accent: #0074c8;
   --accent-bg: rgba(0, 116, 200, 0.08);
@@ -97,8 +97,9 @@ code {
   height: 1.7em;
   padding: 0 0.35em;
   margin-right: 7px;
-  border-radius: 999px;
-  border: 1px solid currentColor;
+  border-radius: 0;
+  border: 0;
+  border-bottom: 1px solid currentColor;
   font-size: 0.72rem;
   line-height: 1;
   font-weight: 700;
