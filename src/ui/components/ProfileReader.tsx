@@ -10,9 +10,10 @@ function withCitations(text: string): ReactNode {
 }
 
 const RECO_ORDER = ["Conocer", "Contrastar", "Abordar"] as const;
+const PAGE_CONTINUATION = /(?:[·•–—-]\s*|\()\s*continuaci[oó]n\b/i;
 
 function SectionBody({ section, structure }: { section: ProfileSection; structure: ProfileStructure }) {
-  if (/conclusiones/i.test(section.title) && structure.conclusions.length > 0) {
+  if (/conclusiones/i.test(section.title) && !PAGE_CONTINUATION.test(section.title) && structure.conclusions.length > 0) {
     const firstConclusion = section.paragraphs.findIndex((p) => /^C\d+[.\s]/.test(p));
     const intro = firstConclusion > 0 ? section.paragraphs.slice(0, firstConclusion) : [];
     return (
@@ -30,7 +31,7 @@ function SectionBody({ section, structure }: { section: ProfileSection; structur
       </>
     );
   }
-  if (/recomendaciones/i.test(section.title) && structure.recommendations.length > 0) {
+  if (/recomendaciones/i.test(section.title) && !PAGE_CONTINUATION.test(section.title) && structure.recommendations.length > 0) {
     const intro = section.paragraphs.filter((p) => !/^(R\d+|Tipo\s|C\d+|Deriva de|(?:[A-Z] ){2,}|CONOCER|CONTRASTAR|ABORDAR)/.test(p)).slice(0, 2);
     const groups = RECO_ORDER.map((type) => ({ type, items: structure.recommendations.filter((r) => r.type === type) })).filter((g) => g.items.length);
     const untyped = structure.recommendations.filter((r) => !r.type);
@@ -75,12 +76,18 @@ export function ProfileReader({ structure, pdfUrl, title }: { structure: Profile
   // Las páginas de datos (Art. 17 ter) son parte del Perfil y abren la lectura; no van con los preliminares.
   const isDataPage = (s: ProfileSection) => /^(.+ en datos|Quién vive aquí|Panel de salud|Desigualdad)$/i.test(s.title.trim());
   const before = firstChapterIndex > 0 ? sections.slice(0, firstChapterIndex) : [];
-  const preliminaries = before.filter((s) => !isDataPage(s));
-  const readingSections = firstChapterIndex > 0 ? [...before.filter(isDataPage), ...sections.slice(firstChapterIndex)] : sections;
+  // Solo el material introductorio no numerado queda plegado. Los capítulos
+  // 01–05, si existen, son parte del Perfil y deben figurar en el índice.
+  const isNumberedChapter = (s: ProfileSection) => /^\d{1,2}\.?(?:\s+)/.test(s.title.trim());
+  const preliminaries = before.filter((s) => !isDataPage(s) && !isNumberedChapter(s));
+  const preliminaryIds = new Set(preliminaries.map((s) => s.id));
+  const readingSections = sections.filter((s) => !preliminaryIds.has(s.id));
   const normalizedQuery = query.trim().toLowerCase();
-  const matches = normalizedQuery
-    ? sections.filter((s) => s.title.toLowerCase().includes(normalizedQuery) || s.paragraphs.some((p) => p.toLowerCase().includes(normalizedQuery)))
-    : readingSections;
+  const matchesSection = (s: ProfileSection) =>
+    s.title.toLowerCase().includes(normalizedQuery) || s.paragraphs.some((p) => p.toLowerCase().includes(normalizedQuery));
+  const matches = normalizedQuery ? readingSections.filter(matchesSection) : readingSections;
+  const preliminaryMatches = normalizedQuery ? preliminaries.filter(matchesSection).length : 0;
+  const totalMatches = matches.length + preliminaryMatches;
 
   return (
     <section className="epr" aria-label={`Lector: ${title}`}>
@@ -106,15 +113,15 @@ export function ProfileReader({ structure, pdfUrl, title }: { structure: Profile
           <nav className="epr-toc" aria-label="Índice del perfil">
             <p className="ep-eyebrow">Índice</p>
             <ol>
+              {preliminaries.length > 0 && (
+                <li className="epr-toc__preliminary"><a href="#epr-preliminaries">Presentación y materiales preliminares</a></li>
+              )}
               {readingSections.map((s) => (
                 <li key={s.id} className={s.level === 2 ? "epr-toc__sub" : undefined}>
                   <a href={`#epr-sec-${s.id}`}>{s.title === "Inicio" ? "Presentación" : s.title}</a>
                 </li>
               ))}
             </ol>
-            {preliminaries.length > 0 && (
-              <p className="epr-toc__preliminary"><a href="#epr-preliminaries">Presentación y materiales preliminares</a></p>
-            )}
             {structure.conclusions.length > 0 && (
               <>
                 <p className="ep-eyebrow">Conclusiones</p>
@@ -130,7 +137,7 @@ export function ProfileReader({ structure, pdfUrl, title }: { structure: Profile
           </nav>
           <article className="epr-text">
             {preliminaries.length > 0 && (
-              <details className="epr-preliminaries" id="epr-preliminaries" open={!!normalizedQuery}>
+              <details className="epr-preliminaries" id="epr-preliminaries" open={preliminaryMatches > 0}>
                 <summary>Presentación, resumen, créditos e índice del documento original</summary>
                 <p className="ep-help">Información documental conservada íntegramente. Se muestra aparte para facilitar el acceso directo al contenido del Perfil.</p>
                 {preliminaries.map((section) => (
@@ -141,7 +148,7 @@ export function ProfileReader({ structure, pdfUrl, title }: { structure: Profile
                 ))}
               </details>
             )}
-            {normalizedQuery && <p className="ep-help">{matches.length === 1 ? "1 apartado contiene" : `${matches.length} apartados contienen`} «{query.trim()}».</p>}
+            {normalizedQuery && <p className="ep-help">{totalMatches === 1 ? "1 apartado contiene" : `${totalMatches} apartados contienen`} «{query.trim()}».</p>}
             {matches.map((s) => {
               const Heading = s.level === 1 ? "h2" : "h3";
               return (
