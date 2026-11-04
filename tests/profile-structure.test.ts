@@ -1,4 +1,7 @@
 import { describe, it, expect } from "vitest";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { ProfileReader } from "../src/ui/components/ProfileReader";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parseProfileStructure } from "../src/application/health-profile/profileStructure";
@@ -94,5 +97,66 @@ describe("parseProfileStructure · páginas de datos del Perfil de Loja (Art. 17
   });
   it("no inventa páginas de datos en un perfil que no las declara", () => {
     expect(parseProfileStructure(fixture("zagra-v0.2-docx.txt")).dataPages).toBeUndefined();
+  });
+});
+
+describe("Índice navegable · continuaciones y capítulos previos", () => {
+  const source = [
+    "Portada y créditos",
+    "Documento original y autoría identificada.",
+    "01. ANTECEDENTES",
+    "Información histórica que debe seguir accesible.",
+    "02. DATOS TERRITORIALES",
+    "Segundo capítulo que no puede ocultarse.",
+    "06. PUNTO DE PARTIDA",
+    "Descripción inicial del territorio.",
+    "07. CONCLUSIONES",
+    "Una lectura de conjunto",
+    "La lectura reúne las conclusiones del territorio.",
+    "C1. Primera conclusión sustantiva. Una observación propia de C1.",
+    "07. CONCLUSIONES · CONTINUACIÓN",
+    "C2. Segunda conclusión sustantiva. Una observación propia de C2.",
+    "07. CONCLUSIONES · CONTINUACIÓN",
+    "C3. Tercera conclusión sustantiva. Una observación propia de C3.",
+    "08. COINCIDENCIAS Y DISCREPANCIAS",
+    "Lectura cruzada de fuentes.",
+    "09. ACTIVOS Y COMUNIDAD",
+    "Capacidades del municipio.",
+    "10. RECOMENDACIONES",
+    "R1. Contrastar las conclusiones con la población.",
+  ].join("\n\n");
+
+  const structure = parseProfileStructure(source);
+
+  it("reúne los cortes de página en el capítulo 07 y conserva sus tres conclusiones", () => {
+    const titles = structure.sections.map((s) => s.title);
+    expect(titles.filter((title) => /^07\. CONCLUSIONES/i.test(title))).toEqual(["07. CONCLUSIONES"]);
+    expect(titles).toContain("01. ANTECEDENTES");
+    expect(titles).toContain("02. DATOS TERRITORIALES");
+    expect(structure.conclusions.map((c) => c.id)).toEqual(["C1", "C2", "C3"]);
+    const chapter = structure.sections.find((s) => s.title === "07. CONCLUSIONES");
+    expect(chapter?.paragraphs.join(" ")).toContain("Una observación propia de C1");
+    expect(chapter?.paragraphs.join(" ")).toContain("Una observación propia de C2");
+    expect(chapter?.paragraphs.join(" ")).toContain("Una observación propia de C3");
+  });
+
+  it("presenta un índice único, no oculta los capítulos 01–05 y no duplica conclusiones", () => {
+    const html = renderToStaticMarkup(createElement(ProfileReader, { structure, title: "Perfil de prueba" }));
+    const toc = html.match(/<nav class="epr-toc"[\s\S]*?<\/nav>/)?.[0] ?? "";
+    expect(toc).toContain('href="#epr-sec-01-antecedentes"');
+    expect(toc).toContain('href="#epr-sec-02-datos-territoriales"');
+    expect(toc).toContain('href="#epr-preliminaries"');
+    expect(toc.indexOf("01. ANTECEDENTES")).toBeLessThan(toc.indexOf("06. PUNTO DE PARTIDA"));
+    expect((toc.match(/07\. CONCLUSIONES/g) ?? [])).toHaveLength(1);
+    expect(toc).not.toMatch(/CONTINUACIÓN/i);
+    for (const id of ["C1", "C2", "C3"]) {
+      expect((html.match(new RegExp('id="epr-' + id + '"', "g")) ?? [])).toHaveLength(1);
+    }
+  });
+
+  it("no fusiona una continuación sin el capítulo correspondiente", () => {
+    const other = parseProfileStructure("06. PUNTO DE PARTIDA\\n\\nTexto.\\n\\n07. CONCLUSIONES · CONTINUACIÓN\\n\\nTexto conservado.");
+    expect(other.sections.map((s) => s.title)).toContain("07. CONCLUSIONES · CONTINUACIÓN");
+    expect(other.sections.find((s) => s.title.endsWith("CONTINUACIÓN"))?.paragraphs).toContain("Texto conservado.");
   });
 });
