@@ -43,7 +43,8 @@ describe('Acceso a documentos del repositorio', () => {
  it('distingue una referencia sin archivo y permite leer texto conservado', () => {
   const doc = {...repository.documents.find(d => d.kind === 'strategic-framework')!,source:{},sourceText:'Texto de referencia'};
   const html = renderToStaticMarkup(<DocumentRepositoryPanel repository={{...repository,documents:[doc]}}/>);
-  expect(html).toContain('Archivo original no disponible.');
+  // El estado del archivo se consulta al montar el componente, no durante SSR.
+  expect(html).toContain('Consultar texto conservado');
   expect(html).not.toContain('Eliminar documento');
   expect(html).toContain('Consultar texto conservado');
   expect(html).not.toContain('doc-repo__open');
