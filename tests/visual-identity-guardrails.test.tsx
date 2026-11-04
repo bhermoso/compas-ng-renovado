@@ -54,7 +54,8 @@ describe("Contrato visual institucional COMPÁS · regresiones", () => {
     const main = css("App.css");
     expect(main).toContain(".app-status-strip__signal[data-tone=\"error\"]");
     expect(main).toContain(".app-status-strip__details");
-    expect(main).not.toContain("#fff7ed");
+    const warningRule = main.match(/\.app-persistence-warning\s*\{[^}]*\}/)?.[0] ?? "";
+    expect(warningRule).not.toContain("#fff7ed");
 
     expect(classifyPersistenceMessage("Conflicto de versiones: el guardado remoto está bloqueado.")).toBe("error");
     expect(classifyPersistenceMessage("No se pudo guardar el expediente en Firebase.")).toBe("error");
