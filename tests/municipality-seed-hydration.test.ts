@@ -569,7 +569,7 @@ describe("recuperación desde almacenamiento ampliado", () => {
     };
     expect(current.repository.documents).toHaveLength(6);
     expect(stored.repository.documents).toHaveLength(3);
-    expect(shouldRestoreIndexedDbWorkspace(current, stored)).toBe(false);
+    expect(shouldRestoreIndexedDbWorkspace(current, stored)).toBe(true);
   });
 
   it("no sustituye una copia local más reciente ni mezcla municipios", () => {
