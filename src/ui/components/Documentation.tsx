@@ -2,6 +2,7 @@ import { createContext, useContext, useRef, useState, type ReactNode } from 'rea
 import type { MunicipalityWorkspace } from '../../domain/workspace/MunicipalityWorkspace';
 import type { DocumentKind, MunicipalDocument } from '../../domain/repository';
 import { DocumentAccess } from './DocumentAccess.tsx';
+import { documentCustodyMetadata } from './documentCustody';
 import { DocumentOriginalManagementContext } from './DocumentOriginalManagement';
 import { resolveDocumentReference, type DocumentReferenceTarget } from './documentReferenceResolver';
 
@@ -50,7 +51,13 @@ export function DocumentationProvider({ workspace, children, canWrite = false, o
     return lineage(d) === lineage(selected);
   }).sort((a,b) => (a.revisionNumber ?? 1) - (b.revisionNumber ?? 1)) : [];
   const dependencyCount = selected ? workspace.evidenceStore.atoms.filter(atom => atom.provenance.documentId === selected.id).length : 0;
-  const historical = selected && workspace.previousHealthReports?.find(r => r.linkedDocumentId === selected.id);
+  const original = selected && workspace.documentOriginals?.find(o => o.documentId === selected.id);
+  const custody = selected ? documentCustodyMetadata(selected, original || undefined) : undefined;
+  const historical = selected && (
+    workspace.healthReport?.linkedDocumentId === selected.id
+      ? workspace.healthReport
+      : workspace.previousHealthReports?.find(r => r.linkedDocumentId === selected.id)
+  );
   return <DocumentOriginalManagementContext.Provider value={canWrite && onStoreOriginal && onCreateRevision && onArchiveDocument && onDeleteDocument ? { originals: workspace.documentOriginals ?? [], storeOriginal: onStoreOriginal, createRevision: onCreateRevision, archiveDocument: onArchiveDocument, deleteDocument: onDeleteDocument } : null}><DocumentationContext.Provider value={open}>
     {children}
     <button type="button" className="documentation-launcher" onClick={() => open(null)}>Consultar documentación ({documents.length})</button>
@@ -60,11 +67,13 @@ export function DocumentationProvider({ workspace, children, canWrite = false, o
         <p><strong>Archivo de referencia:</strong> {selected.sourceFileName ?? 'Nombre no registrado'}</p>
         <p>{selected.source.system}</p>
         <dl className="documentation-metadata">
-          <div><dt>Estado</dt><dd>{selected.status}</dd></div>
+          <div><dt>Estado</dt><dd>{custody?.status}</dd></div>
           <div><dt>Incorporación</dt><dd>{selected.createdAt}</dd></div>
-          <div><dt>SHA-256</dt><dd>{selected.contentSha256 ?? 'No registrado'}</dd></div>
-          <div><dt>Evidencias vinculadas</dt><dd>{dependencyCount}</dd></div>
-          <div><dt>Original compartido</dt><dd>{workspace.documentOriginals?.some(o=>o.documentId===selected.id) ? 'Disponible en expediente Firebase' : 'No incorporado al expediente compartido'}</dd></div>
+          <div><dt>SHA-256 de la carga inicial</dt><dd>{custody?.registeredSha256}</dd></div>
+          <div><dt>SHA-256 del original compartido</dt><dd>{custody?.originalSha256}</dd></div>
+          <div><dt>Evidencias atomizadas vinculadas</dt><dd>{dependencyCount}</dd></div>
+          <div><dt>Original compartido</dt><dd>{original ? 'Disponible en expediente Firebase' : 'No incorporado al expediente compartido'}</dd></div>
+          {historical?.body.originalText && <div><dt>Texto sanitario</dt><dd>Conservado como transcripción; no sustituye el DOCX original.</dd></div>}
         </dl>
         {revisionFamily.length > 1 && <section aria-label="Versiones del documento"><h3>Versiones · {revisionFamily.length}</h3><ul>{revisionFamily.map(d=><li key={d.id}><DocumentReference documentId={d.id}>{d.title} · versión {d.revisionNumber ?? 1}</DocumentReference><small>{d.sourceFileName ?? 'Sin original'} · {d.status}</small></li>)}</ul></section>}
         {canWrite && <div className="documentation-operations">
@@ -90,8 +99,8 @@ export function DocumentationProvider({ workspace, children, canWrite = false, o
         </div>}
         {operationMessage && <p role="status">{operationMessage}</p>}
 
-        <DocumentAccess key={selected.id} document={selected} />
-        {historical?.body.originalText && !selected.sourceText && <details><summary>Consultar texto de la conversión histórica</summary><p className="documentation-text">{historical.body.originalText}</p></details>}
+        <DocumentAccess key={selected.id} document={selected} retainedTextAvailable={!!historical?.body.originalText} />
+        {historical?.body.originalText && !selected.sourceText && <details><summary>Consultar texto sanitario conservado (no es el DOCX original)</summary><p className="documentation-text">{historical.body.originalText}</p></details>}
         <p><button type="button" onClick={() => setReference(null)}>Ver toda la documentación</button></p>
       </> : <>
         {reference && !reference.kinds?.length && <p role="status"><strong>{matches.length ? 'Hay varias referencias con ese nombre.' : 'No se ha localizado el documento en este expediente.'}</strong> {reference.fileName ?? reference.documentId}. {matches.length ? 'Selecciona el documento correspondiente.' : 'Puedes buscarlo en el catálogo. Una mención no acredita que el archivo esté disponible.'}</p>}

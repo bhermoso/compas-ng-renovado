@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { documentCustodyMetadata } from "../src/ui/components/documentCustody";
 import {
   MAX_ORIGINAL_FILE_BYTES, MAX_WORKSPACE_ORIGINALS_BYTES, decideOriginalUpload, decodeDocumentOriginal,
   documentOriginalsBytes, encodeDocumentOriginal, mergeDocumentOriginals, profileOriginalsBytes, pruneDocumentOriginals,
@@ -80,5 +81,30 @@ describe("hidratación sin perder originales", () => {
     expect(merged.documentOriginals?.map(o => o.documentId)).toEqual(["a"]);
     expect(withCarriedDocumentOriginals(merged, other)).toBe(merged);
     expect(withCarriedDocumentOriginals(current, null)).toBe(current);
+  });
+});
+
+describe("Metadatos de custodia documental", () => {
+  it("no confunde el registro uploaded con un original almacenado", () => {
+    expect(documentCustodyMetadata({status: "uploaded"})).toEqual({
+      status: "Registrado · original pendiente",
+      registeredSha256: "No registrado",
+      originalSha256: "No disponible (original no incorporado)",
+    });
+  });
+  it("muestra el SHA del original aunque la carga inicial no lo guardara", () => {
+    const hash = "a".repeat(64);
+    expect(documentCustodyMetadata({status: "uploaded"}, {sha256: hash})).toEqual({
+      status: "Registrado · original compartido",
+      registeredSha256: "No registrado",
+      originalSha256: hash,
+    });
+  });
+  it("no atribuye al original una huella antigua si el archivo sigue ausente", () => {
+    const hash = "b".repeat(64);
+    expect(documentCustodyMetadata({status: "uploaded", contentSha256: hash})).toMatchObject({
+      registeredSha256: hash,
+      originalSha256: "No disponible (original no incorporado)",
+    });
   });
 });
