@@ -20,10 +20,11 @@ export function DocumentReference({ children, documentId, fileName }: Reference 
   return <button type="button" className="document-reference" onClick={() => open({ documentId, fileName })}>{children}</button>;
 }
 
-export function DocumentationProvider({ workspace, children, onStoreOriginal }: { workspace: MunicipalityWorkspace; children: ReactNode; onStoreOriginal?: (documentId: string, file: File) => Promise<void> }) {
+export function DocumentationProvider({ workspace, children, onStoreOriginal, onCreateRevision, onArchiveDocument, onDeleteDocument }: { workspace: MunicipalityWorkspace; children: ReactNode; onStoreOriginal?: (documentId: string, file: File) => Promise<void>; onCreateRevision?: (documentId: string, file: File) => Promise<void>; onArchiveDocument?: (documentId: string) => Promise<void>; onDeleteDocument?: (documentId: string) => Promise<void> }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [reference, setReference] = useState<Reference | null>(null);
   const [query, setQuery] = useState('');
+  const [operationMessage, setOperationMessage] = useState('');
   const documents = workspace.repository.documents;
   const matches = reference?.kinds?.length
     ? documents.filter(d => reference.kinds!.includes(d.kind))
@@ -33,9 +34,24 @@ export function DocumentationProvider({ workspace, children, onStoreOriginal }: 
   const searchable = reference?.kinds?.length ? matches : documents;
   const filtered = searchable.filter(d => normalize(`${d.title} ${d.sourceFileName ?? ''} ${d.source.system ?? ''}`).includes(normalize(query)));
   const categoryLabel = reference?.kinds?.length ? `Documentos de esta categoría: ${matches.length}` : '';
-  function open(next: Reference | null) { setReference(next); setQuery(''); dialog.current?.showModal(); }
+  function open(next: Reference | null) { setReference(next); setQuery(''); setOperationMessage(''); if (!dialog.current?.open) dialog.current?.showModal(); }
+  const revisionFamily = selected ? documents.filter(d => {
+    const lineage = (candidate: typeof selected): string => {
+      let current = candidate;
+      const seen = new Set<string>();
+      while (current.revisionOf && !seen.has(current.revisionOf)) {
+        seen.add(current.id);
+        const parent = documents.find(d => d.id === current.revisionOf);
+        if (!parent) break;
+        current = parent;
+      }
+      return current.id;
+    };
+    return lineage(d) === lineage(selected);
+  }).sort((a,b) => (a.revisionNumber ?? 1) - (b.revisionNumber ?? 1)) : [];
+  const dependencyCount = selected ? workspace.evidenceStore.atoms.filter(atom => atom.provenance.documentId === selected.id).length : 0;
   const historical = selected && workspace.previousHealthReports?.find(r => r.linkedDocumentId === selected.id);
-  return <DocumentOriginalManagementContext.Provider value={onStoreOriginal ? { originals: workspace.documentOriginals ?? [], storeOriginal: onStoreOriginal } : null}><DocumentationContext.Provider value={open}>
+  return <DocumentOriginalManagementContext.Provider value={onStoreOriginal && onCreateRevision && onArchiveDocument && onDeleteDocument ? { originals: workspace.documentOriginals ?? [], storeOriginal: onStoreOriginal, createRevision: onCreateRevision, archiveDocument: onArchiveDocument, deleteDocument: onDeleteDocument } : null}><DocumentationContext.Provider value={open}>
     {children}
     <button type="button" className="documentation-launcher" onClick={() => open(null)}>Consultar documentación ({documents.length})</button>
     <dialog ref={dialog} className="documentation-dialog" aria-labelledby="documentation-title">
@@ -43,6 +59,37 @@ export function DocumentationProvider({ workspace, children, onStoreOriginal }: 
       {selected ? <>
         <p><strong>Archivo de referencia:</strong> {selected.sourceFileName ?? 'Nombre no registrado'}</p>
         <p>{selected.source.system}</p>
+        <dl className="documentation-metadata">
+          <div><dt>Estado</dt><dd>{selected.status}</dd></div>
+          <div><dt>Incorporación</dt><dd>{selected.createdAt}</dd></div>
+          <div><dt>SHA-256</dt><dd>{selected.contentSha256 ?? 'No registrado'}</dd></div>
+          <div><dt>Evidencias vinculadas</dt><dd>{dependencyCount}</dd></div>
+          <div><dt>Original compartido</dt><dd>{workspace.documentOriginals?.some(o=>o.documentId===selected.id) ? 'Disponible en expediente Firebase' : 'No incorporado al expediente compartido'}</dd></div>
+        </dl>
+        {revisionFamily.length > 1 && <section aria-label="Versiones del documento"><h3>Versiones · {revisionFamily.length}</h3><ul>{revisionFamily.map(d=><li key={d.id}><DocumentReference documentId={d.id}>{d.title} · versión {d.revisionNumber ?? 1}</DocumentReference><small>{d.sourceFileName ?? 'Sin original'} · {d.status}</small></li>)}</ul></section>}
+        <div className="documentation-operations">
+          <label>Incorporar nueva versión (sin modificar los indicadores anteriores)
+            <input type="file" aria-label="Crear nueva versión documental" onChange={async e => {
+              const file=e.currentTarget.files?.[0];e.currentTarget.value='';
+              if(!file || !onCreateRevision) return;
+              if(!window.confirm('Se creará otra ficha y se conservarán las evidencias anteriores. La nueva versión requerirá revisión técnica. ¿Continuar?')) return;
+              try { setOperationMessage('Guardando nueva versión en Firebase…'); await onCreateRevision(selected.id,file); setOperationMessage('Versión incorporada; revisa y valida sus evidencias.'); }
+              catch(error) { setOperationMessage((error as Error).message); }
+            }}/>
+          </label>
+          {selected.status !== 'archived' && <button type="button" onClick={async()=>{
+            if(!onArchiveDocument || !window.confirm('¿Archivar este documento conservando su original y sus evidencias?')) return;
+            try { setOperationMessage('Archivando en Firebase…'); await onArchiveDocument(selected.id); setOperationMessage('Documento archivado.'); }
+            catch(error) { setOperationMessage((error as Error).message); }
+          }}>Archivar</button>}
+          <button type="button" onClick={async()=>{
+            if(!onDeleteDocument || !window.confirm(`¿Eliminar «${selected.title}» de Firebase y del navegador, incluyendo sus ${dependencyCount} evidencias directas? Los perfiles ya generados pueden requerir revisión.`)) return;
+            try {setOperationMessage('Eliminando en Firebase…'); await onDeleteDocument(selected.id); setReference(null); setOperationMessage('Documento eliminado.');}
+            catch(error) {setOperationMessage((error as Error).message);}
+          }}>Eliminar documento</button>
+        </div>
+        {operationMessage && <p role="status">{operationMessage}</p>}
+
         <DocumentAccess key={selected.id} document={selected} />
         {historical?.body.originalText && !selected.sourceText && <details><summary>Consultar texto de la conversión histórica</summary><p className="documentation-text">{historical.body.originalText}</p></details>}
         <p><button type="button" onClick={() => setReference(null)}>Ver toda la documentación</button></p>
