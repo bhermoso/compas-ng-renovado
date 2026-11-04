@@ -137,6 +137,9 @@ async function persistRemoteWorkspace(client: RelasClient, workspace: Municipali
   await ensureRemoteScope(client, workspace).catch(() => undefined);
   const id = snapshotId();
   const previous = await readManifest(client, workspace.municipality.identity.id);
+  if (previous && previous.workspaceUpdatedAt > workspace.updatedAt) {
+    throw new Error("Firebase tiene una versión más reciente del expediente. Recupérala y concilia los cambios antes de guardar.");
+  }
   for (let start = 0; start < chunks.length; start += MAX_BATCH_WRITES) {
     const batch = writeBatch(client.db);
     chunks
