@@ -490,7 +490,7 @@ describe("sincronización incremental de expedientes canónicos", () => {
     expect(result.seedMigration).toEqual({ kind: "none" });
   });
 
-  it("Loja recupera el seed aunque una copia local marcada haya perdido documentos", () => {
+  it("una baja en Loja no restaura automáticamente documentos canónicos ya migrados", () => {
     const seed = parseWorkspaceJSON(LOJA_SEED_RAW)!;
     const partial: MunicipalityWorkspace = {
       ...seed,
@@ -501,13 +501,10 @@ describe("sincronización incremental de expedientes canónicos", () => {
       appliedSeedMigrations: [LOJA_MIGRATION.marker],
       updatedAt: "2026-10-09T08:00:00.000Z",
     };
-    expect(resolveSeedMigration(partial)).toEqual({
-      kind: "download-and-merge",
-      migration: LOJA_MIGRATION,
-    });
+    expect(resolveSeedMigration(partial)).toEqual({ kind: "none" });
+    // Una recuperación manual explícita sigue disponible si la pérdida fue accidental.
     const repaired = applySeedDocumentMigration(partial, seed, LOJA_MIGRATION);
     expect(repaired.repository.documents).toHaveLength(seed.repository.documents.length);
-    expect(repaired.appliedSeedMigrations).toContain(LOJA_MIGRATION.marker);
   });
 
   it("Loja se repara si IndexedDB aporta una copia parcial durante la hidratación del seed", () => {
@@ -560,7 +557,7 @@ describe("recuperación desde almacenamiento ampliado", () => {
     expect(shouldRestoreIndexedDbWorkspace(current, stored)).toBe(false);
   });
 
-  it("no permite que una copia más reciente pero documentalmente más pobre tape Loja", () => {
+  it("respeta una baja posterior en Loja cuando la migración ya está marcada", () => {
     const current = parseWorkspaceJSON(LOJA_SEED_RAW)!;
     const stored: MunicipalityWorkspace = {
       ...current,
