@@ -155,7 +155,7 @@ describe("Índice navegable · continuaciones y capítulos previos", () => {
   });
 
   it("no fusiona una continuación sin el capítulo correspondiente", () => {
-    const other = parseProfileStructure("06. PUNTO DE PARTIDA\\n\\nTexto.\\n\\n07. CONCLUSIONES · CONTINUACIÓN\\n\\nTexto conservado.");
+    const other = parseProfileStructure("06. PUNTO DE PARTIDA\n\nTexto.\n\n07. CONCLUSIONES · CONTINUACIÓN\n\nTexto conservado.");
     expect(other.sections.map((s) => s.title)).toContain("07. CONCLUSIONES · CONTINUACIÓN");
     expect(other.sections.find((s) => s.title.endsWith("CONTINUACIÓN"))?.paragraphs).toContain("Texto conservado.");
   });
