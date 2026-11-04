@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import type { ActionPlanCatalogModule, CatalogGeneralObjectiveTemplate, CatalogSpecificObjectiveTemplate } from "../../domain/action-plan-catalog/ActionPlanCatalog";
 import type { PLSEvaluationFramework, UnaddressedNeed } from "../../domain/health-plan";
 import { planDecisionWithStatus } from "../../domain/action-plan-catalog/PlanPreparationDraft";
-import { ZAGRA_ACTION_PLAN_VERSION } from "../../domain/action-plan-catalog/MunicipalActionPlanModule";
 import {
   cleanActionPlanProposalText,
   cleanObsoleteActionPlanProgramLabels,
@@ -44,7 +43,7 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
   return <section role="alert">La versión del borrador requiere revisión de compatibilidad. Se conserva sin modificar y no se puede editar.</section>;
  }
  const revised = module.version === ZAIDIN_PROPOSAL_VERSION;
- const fourBlocks = revised || module.version === ZAGRA_ACTION_PLAN_VERSION;
+ const fourBlocks = module.generalObjectives.length === 4 && module.generalObjectives.every(general => Boolean(general.thematicBlockName));
  const finalApprovedText = module.version === ZAIDIN_FINAL_ACTION_PLAN_VERSION;
  const directTerritorialEdit = canEditProposal && !canReview;
  const emphasized = (text: string) => cleanActionPlanProposalText([proposalStrategicText, ...Object.values(proposalObjectiveTexts), ...proposalBlocks.map(b => b.text)].find(candidate => plainProposalText(candidate) === cleanActionPlanProposalText(text)) ?? text);
@@ -269,11 +268,11 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
   </div>}
   {control(module.id, module.strategicObjective, [])}
   {module.generalObjectives.map(general => {
-   const block = proposalBlocks.find(b => b.code === general.code.replace(/^ZAGRA-/, ""));
+   const block = proposalBlocks.find(b => b.name === general.thematicBlockName);
    const sourceGeneral = general.title;
    const visibleGeneral = canReview ? consolidatedText(general.code, sourceGeneral) : territorialText(general.code, (revised ? block?.text : undefined) ?? sourceGeneral);
    return <details className="pcm-general" key={general.code}>
-    <summary>{(fourBlocks ? block?.name : undefined) ?? `${general.code} · ${visibleGeneral}`}</summary>
+    <summary>{(fourBlocks ? general.thematicBlockName : undefined) ?? `${general.code} · ${visibleGeneral}`}</summary>
     {draft?.decisions[general.code]?.status === "pending" && <p className="panel-note">Bloque pendiente de revisión.</p>}
     <p><strong>Objetivo general · {actionPlanElementCode(module,general.code)}:</strong> <ProposalText text={visibleGeneral}/></p>
     {control(general.code, sourceGeneral, [module.id], !finalApprovedText)}
