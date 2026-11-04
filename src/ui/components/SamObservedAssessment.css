@@ -5,3 +5,10 @@
 .sam-observed__range select { padding: 4px 8px; border: 1px solid var(--borde); border-radius: 4px; background: var(--blanco); color: var(--texto-principal); }
 .sam-observed__hint { flex-basis: 100%; font-size: .85rem; color: var(--texto-secundario); }
 .sam-observed .sam-panel { margin-top: 12px; }
+
+
+.sam-observed__range{
+  background:#fff;border:0;border-block:1px solid var(--borde);
+  border-radius:0;padding:12px 0;
+}
+.sam-observed__range select{border-radius:0}
