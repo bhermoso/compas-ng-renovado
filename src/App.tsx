@@ -125,6 +125,7 @@ import {
   saveRemoteWorkspace,
 } from "./infrastructure/relas/RemoteWorkspace";
 import { RemoteSyncPanel } from "./ui/components/RemoteSyncPanel";
+import { profileSaveErrorMessage, profileSaveProgressMessage } from "./application/health-profile/profileSaveFeedback";
 import { syncRemoteCatalog } from "./application/remote-catalog/syncRemoteCatalog";
 import { loadLocalWorkspaces } from "./infrastructure/persistence/local-workspaces";
 import { listTerritorialSpaces } from "./infrastructure/relas/AdminAccounts";
@@ -419,6 +420,9 @@ export default function App() {
   const [agendaFocusId, setAgendaFocusId] = useState<string | undefined>(undefined);
   const [planTab, setPlanTab] = useState<"lineas" | "resultante" | "lectura" | "prioridades" | "borrador">("lineas");
   const profileSaveInFlightRef = useRef(false);
+  // Evita volver a escribir automáticamente el mismo expediente ya confirmado
+  // por el guardado manual (incluidos todos los originales en base64).
+  const lastExplicitProfileWorkspaceRef = useRef<MunicipalityWorkspace | null>(null);
   const preparationDirtyRef = useRef(false);
   const onPreparationDirtyChange = useCallback((dirty: boolean) => { preparationDirtyRef.current = dirty; }, []);
   function canLeavePreparation() {
@@ -1012,7 +1016,8 @@ export default function App() {
       !remoteClient.auth.currentUser ||
       remoteHydratedMunicipalityId !== municipalityId ||
       pendingIndexedDbHydrationId === municipalityId ||
-      pendingSeedId === municipalityId
+      pendingSeedId === municipalityId ||
+      lastExplicitProfileWorkspaceRef.current === workspace
     ) {
       return;
     }
@@ -1268,7 +1273,7 @@ export default function App() {
     }
   }, [workspace, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
 
-  const handleSaveExternalProfiles = useCallback(async (library: ExternalProfileLibrary) => {
+  const handleSaveExternalProfiles = useCallback(async (library: ExternalProfileLibrary, onProgress?: (message: string) => void) => {
     const municipalityId = workspace.municipality.identity.id;
     if (!remoteClient.auth.currentUser) throw new Error("Inicia sesión para guardar el perfil y sus archivos en Firebase.");
     if (pendingSeedId || pendingIndexedDbHydrationId || remoteHydratedMunicipalityId !== municipalityId) throw new Error("Espera a que termine la recuperación del expediente compartido.");
@@ -1280,13 +1285,23 @@ export default function App() {
     if (profileSaveInFlightRef.current) throw new Error("Ya hay un perfil guardándose en Firebase.");
     profileSaveInFlightRef.current = true;
     try {
-      await saveRemoteWorkspace(remoteClient, { ...workspace, externalProfileLibrary: nextLibrary, updatedAt: now });
+      await saveRemoteWorkspace(remoteClient, { ...workspace, externalProfileLibrary: nextLibrary, updatedAt: now }, progress => {
+        const message = profileSaveProgressMessage(progress);
+        setRemotePersistenceMessage(message);
+        onProgress?.(message);
+      });
     } catch (error) {
-      setRemotePersistenceMessage("No se ha guardado el perfil en Firebase. Conserva el borrador y vuelve a intentarlo.");
-      throw error;
+      const message = profileSaveErrorMessage(error);
+      setRemotePersistenceMessage(message);
+      throw new Error(message);
     } finally { profileSaveInFlightRef.current = false; }
-    setWorkspace(prev => prev.municipality.identity.id !== municipalityId ? prev : ({ ...prev, externalProfileLibrary: nextLibrary, updatedAt: now }));
-    setRemotePersistenceMessage("Perfil completo guardado en Firebase.");
+    setWorkspace(prev => {
+      if (prev.municipality.identity.id !== municipalityId) return prev;
+      const saved = { ...prev, externalProfileLibrary: nextLibrary, updatedAt: now };
+      lastExplicitProfileWorkspaceRef.current = saved;
+      return saved;
+    });
+    setRemotePersistenceMessage("Perfil completo guardado y confirmado por Firebase.");
   }, [workspace, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
 
   const handleSaveDeliberativePrioritySelection = useCallback((input: {
