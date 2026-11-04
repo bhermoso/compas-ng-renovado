@@ -103,7 +103,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
    const documentText=imported.find(x=>x.attachment.mimeType!=='application/json'&&x.content.text)?.content.text ?? '';
    const base=packaged ? {...packaged,text:packaged.text||documentText} : imported.find(x=>x.content.text)?.content ?? imported[0].content;
    // Lo que el documento deja vacío se completa con su estructura reconocida (conclusiones, recomendaciones, resumen).
-   const {content,recognized}=prefillFromStructure(base);
+   const {content,recognized}=prefillFromStructure(base, {preservePackageTitle: !!packaged});
    const attachments=imported.map(x=>x.attachment);
    setNewFiles(attachments);setResultDraft(undefined);
    setDraft(prepareImportedProfileRevision(

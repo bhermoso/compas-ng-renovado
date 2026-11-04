@@ -98,7 +98,25 @@ function headingOf(block: string): { title: string; level: 1 | 2 } | null {
 /** Bloques del texto, sin marcas de página, números de página ni cabeceras repetidas. */
 function blocksOf(text: string): { blocks: string[]; fromPdf: boolean; pages?: number } {
   const pageMarks = text.match(/\[Página \d+\]/g);
-  const raw = text.replace(/\r/g, "").split(/\n\s*\n|\n(?=\[Página \d+\])/).map((b) => b.replace(/\s+$/g, "").replace(/^\s+/g, "")).filter(Boolean);
+  const raw = text.replace(/\r/g, "").split(/\n\s*\n|\n(?=\[Página \d+\])/)
+    .flatMap((block) => {
+      // Imported JSON/DOCX texts frequently put a chapter heading directly
+      // above the next sentence, without a blank line. A heading must be a
+      // separate block even in that case; otherwise the conclusion section
+      // is never found and valid C1..C8 links are incorrectly rejected.
+      const pieces: string[] = [];
+      let prose: string[] = [];
+      for (const line of block.split("\n")) {
+        if (headingOf(line)) {
+          if (prose.length) pieces.push(prose.join("\n"));
+          pieces.push(line);
+          prose = [];
+        } else prose.push(line);
+      }
+      if (prose.length) pieces.push(prose.join("\n"));
+      return pieces;
+    })
+    .map((b) => b.replace(/\s+$/g, "").replace(/^\s+/g, "")).filter(Boolean);
   // Un número suelto es número de página solo si cierra una página del PDF.
   const cleaned = raw
     .filter((b, i) => !(pageMarks && /^\d{1,3}$/.test(b) && (i === raw.length - 1 || /^\[Página \d+\]/.test(raw[i + 1] ?? ""))))
@@ -354,13 +372,16 @@ export interface PrefillableProfileContent {
  * nada que ya venga informado, por ejemplo desde un paquete JSON. Devuelve
  * también qué se ha reconocido, para avisar antes de guardar.
  */
-export function prefillFromStructure<T extends PrefillableProfileContent>(content: T): { content: T; recognized: { conclusions: number; recommendations: number; summary: boolean } } {
+export function prefillFromStructure<T extends PrefillableProfileContent>(
+  content: T,
+  options: { preservePackageTitle?: boolean } = {}
+): { content: T; recognized: { conclusions: number; recommendations: number; summary: boolean } } {
   if (!content.text.trim()) return { content, recognized: { conclusions: 0, recommendations: 0, summary: false } };
   const s = parseProfileStructure(content.text);
   const next = { ...content };
   // Título: la primera línea del documento que lo declara, antes de recomponer párrafos.
   const declaredTitle = content.text.slice(0, 2000).split(/\n/).map((l) => l.replace(/^\[Página \d+\]\s*/, "").trim()).find((l) => /^Perfil de Salud Local\b.{0,90}$/i.test(l) && !/[.:]$/.test(l));
-  if (declaredTitle) next.title = declaredTitle;
+  if (declaredTitle && !options.preservePackageTitle) next.title = declaredTitle;
   if ("period" in next && typeof (next as { period?: unknown }).period === "string" && !(next as { period: string }).period.trim()) {
     const version = /Versi[oó]n\s+\d+(?:\.\d+)*[^\n.]{0,60}/.exec(content.text.slice(0, 3000));
     if (version) (next as { period: string }).period = version[0].replace(/\s+/g, " ").replace(/[·,\s]+$/, "").trim();
