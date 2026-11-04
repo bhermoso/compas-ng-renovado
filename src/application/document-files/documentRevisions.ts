@@ -3,6 +3,14 @@ import { addMunicipalDocument } from "../../domain/repository";
 import type { StoredDocumentOriginal } from "./documentOriginals";
 import { decideOriginalUpload, documentOriginalsBytes, mergeDocumentOriginals, profileOriginalsBytes } from "./documentOriginals";
 
+/** Prevent breaking documentary lineage when deleting a parent file. */
+export function canDeleteDocumentVersion(
+ documents: readonly { id: string; revisionOf?: string }[],
+ documentId: string
+): boolean {
+ return !documents.some(document=>document.revisionOf===documentId);
+}
+
 /**
  * Una revisión es otra ficha y otro original. No sustituye la evidencia ni el
  * informe interpretado vigente: el equipo técnico debe procesar/validar la revisión.
