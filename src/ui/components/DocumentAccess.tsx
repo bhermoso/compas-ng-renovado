@@ -5,7 +5,7 @@ import { decodeDocumentOriginal } from '../../application/document-files/documen
 import { useDocumentOriginalManagement } from './DocumentOriginalManagement';
 import { documentAccessUrl, documentDownloadFileName, isPdfDocumentAccess } from './documentAccessUtils';
 
-export function DocumentAccess({document:doc,documentLabel}:{document:MunicipalDocument;documentLabel?:string}){
+export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable=false}:{document:MunicipalDocument;documentLabel?:string;retainedTextAvailable?:boolean}){
  const contextualLabel=documentLabel?.trim();
  const management=useDocumentOriginalManagement();
  const remoteOriginal=management?.originals.find(o=>o.documentId===doc.id);
@@ -37,7 +37,7 @@ export function DocumentAccess({document:doc,documentLabel}:{document:MunicipalD
   </div>}
   {url && !isPdfDocumentAccess(doc.source.url) && <a className="doc-repo__open" href={url} target="_blank" rel="noopener noreferrer" aria-label={`Abrir documento: ${doc.title} (nueva pestaña)`}>Abrir documento ↗</a>}
   {file && <p><button type="button" onClick={openOriginal}>Abrir original</button> <button type="button" onClick={download}>Descargar original · {file.name}</button> <small>{remoteOriginal ? 'Original guardado en el expediente compartido.' : 'Original solo en este navegador; pendiente de sincronizar.'}</small></p>}
-  {!loading && !file && !url && <p><strong>Archivo original no disponible.</strong> {doc.sourceText?.trim() ? 'Puedes consultar el texto conservado.' : 'Solo se conserva la referencia o los datos derivados.'}</p>}
+  {!loading && !file && !url && <p><strong>Archivo original no disponible.</strong> {retainedTextAvailable ? 'Existe una transcripción sanitaria vinculada; no equivale al DOCX original.' : doc.sourceText?.trim() ? 'Puedes consultar el texto conservado.' : 'Solo se conserva la referencia o los datos derivados.'}</p>}
   {doc.sourceText?.trim() && <details><summary>Consultar texto conservado</summary><p style={{whiteSpace:'pre-wrap'}}>{doc.sourceText}</p></details>}
   {management && !url && <label className="document-access__attach">{file ? 'Verificar o reponer original' : 'Adjuntar el archivo original'}
    <input type="file" aria-label={`Adjuntar original: ${doc.title}`} onChange={async e=>{
