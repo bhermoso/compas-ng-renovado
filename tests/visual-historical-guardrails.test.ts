@@ -82,7 +82,7 @@ describe("Contrato COMPÁS · segunda pasada de módulos históricos", () => {
 
   it("la vista aislada de coordinación respeta la paleta canónica", () => {
     const s = css("ui/components/CoordinatorPreview.css");
-    const colors = [...new Set([...s.matchAll(/#[0-9a-fA-F]{3,8}\\b/g)].map(m => m[0].toLowerCase()))];
+    const colors = [...new Set([...s.matchAll(/#[0-9a-fA-F]{3,8}\b/g)].map(m => m[0].toLowerCase()))];
     const allowed = new Set([
       "#0074c8", "#00acd9", "#94d40b", "#ffb61b", "#ff6600", "#dc143c",
       "#f8fafc", "#e2e8f0", "#1e293b", "#64748b", "#fff", "#ffffff",
