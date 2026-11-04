@@ -5,7 +5,7 @@ import { decodeDocumentOriginal } from '../../application/document-files/documen
 import { useDocumentOriginalManagement } from './DocumentOriginalManagement';
 import { documentAccessUrl, documentDownloadFileName, isPdfDocumentAccess } from './documentAccessUtils';
 
-export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable=false}:{document:MunicipalDocument;documentLabel?:string;retainedTextAvailable?:boolean}){
+export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable=false,showManagementActions=true}:{document:MunicipalDocument;documentLabel?:string;retainedTextAvailable?:boolean;showManagementActions?:boolean}){
  const contextualLabel=documentLabel?.trim();
  const management=useDocumentOriginalManagement();
  const remoteOriginal=management?.originals.find(o=>o.documentId===doc.id);
@@ -39,7 +39,7 @@ export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable
   {file && <p><button type="button" onClick={openOriginal}>Abrir original</button> <button type="button" onClick={download}>Descargar original · {file.name}</button> <small>{remoteOriginal ? 'Original guardado en el expediente compartido.' : 'Original solo en este navegador; pendiente de sincronizar.'}</small></p>}
   {!loading && !file && !url && <p><strong>Archivo original no disponible.</strong> {retainedTextAvailable ? 'Existe una transcripción sanitaria vinculada; no equivale al DOCX original.' : doc.sourceText?.trim() ? 'Puedes consultar el texto conservado.' : 'Solo se conserva la referencia o los datos derivados.'}</p>}
   {doc.sourceText?.trim() && <details><summary>Consultar texto conservado</summary><p style={{whiteSpace:'pre-wrap'}}>{doc.sourceText}</p></details>}
-  {management && !url && <label className="document-access__attach">{file ? 'Verificar o reponer original' : 'Adjuntar el archivo original'}
+  {management && <label className="document-access__attach">{file ? 'Verificar o reponer original' : 'Adjuntar el archivo original'}
    <input type="file" aria-label={`Adjuntar original: ${doc.title}`} onChange={async e=>{
     const input=e.currentTarget;const next=input.files?.[0];if(!next)return;
     if(!window.confirm(`¿Vincular «${next.name}» a «${doc.title}»? Comprueba que corresponde a este documento. Si el contenido difiere del original existente debes importar una versión nueva; no se alterarán en silencio las evidencias.`)){input.value='';return;}
@@ -55,6 +55,27 @@ export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable
     input.value='';
    }}/>
   </label>}
+  {management && showManagementActions && <div className="document-access__manage" aria-label={`Gestión documental de ${doc.title}`}>
+    <label>Crear nueva versión
+      <input type="file" aria-label={`Sustituir mediante nueva versión: ${doc.title}`} onChange={async e=>{
+        const input=e.currentTarget, replacement=input.files?.[0];if(!replacement)return;
+        input.value='';
+        if(!window.confirm(`¿Crear una nueva versión de «${doc.title}» con «${replacement.name}»? El documento anterior y todas sus evidencias seguirán conservados.`))return;
+        try{setMessage('Guardando nueva versión en Firebase…');await management.createRevision(doc.id,replacement);setMessage('Nueva versión guardada; el documento original permanece conservado.');}
+        catch(error){setMessage('No se ha guardado la nueva versión: '+(error as Error).message);}
+      }}/>
+    </label>
+    {doc.status!=='archived'&&<button type="button" onClick={async()=>{
+      if(!window.confirm(`¿Archivar «${doc.title}» sin eliminar su archivo ni sus evidencias?`))return;
+      try{setMessage('Archivando en Firebase…');await management.archiveDocument(doc.id);setMessage('Documento archivado y conservado en Firebase.');}
+      catch(error){setMessage('No se ha podido archivar: '+(error as Error).message);}
+    }}>Archivar documento</button>}
+    <button type="button" onClick={async()=>{
+      if(!window.confirm(`¿Eliminar definitivamente «${doc.title}» de Firebase y retirar sus evidencias derivadas? Esta acción no equivale a archivar y no se puede deshacer.`))return;
+      try{setMessage('Eliminando en Firebase…');const deleted=await management.deleteDocument(doc.id);setMessage(deleted?'Eliminación confirmada por Firebase.':'Firebase no ha confirmado la eliminación.');}
+      catch(error){setMessage('No se ha podido eliminar: '+(error as Error).message);}
+    }}>Eliminar documento</button>
+  </div>}
   {message && <p role="status">{message}</p>}
  </div>;
 }
