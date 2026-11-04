@@ -11070,3 +11070,76 @@ h3 {
 .originals-status__line strong { color: var(--texto-principal); }
 .originals-status__warning { margin-top: 0.6rem; padding: 0.6rem 0.8rem; border-left: 4px solid var(--amarillo); background: var(--fondo-principal); font-size: 0.88rem; }
 .originals-status__warning ul { margin: 0.3rem 0 0; padding-left: 1.2rem; }
+
+
+/* Diagnóstico editorial: franja de datos y navegación sin tarjetas KPI sobredimensionadas. */
+.diagnosis-control .diagnosis-control__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin: 1.2rem 0 0.8rem;
+  border-top: 1px solid var(--borde);
+  border-bottom: 1px solid var(--borde);
+}
+.diagnosis-control .diagnosis-control__metrics > div {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.8rem;
+  min-width: 0;
+  padding: 0.75rem 0.85rem;
+  border: 0;
+  border-bottom: 1px solid var(--borde);
+  border-radius: 0;
+  background: transparent;
+}
+.diagnosis-control .diagnosis-control__metrics dt {
+  font-size: 0.88rem;
+  font-weight: 500;
+  overflow-wrap: normal;
+}
+.diagnosis-control .diagnosis-control__metrics dd {
+  flex: 0 0 auto;
+  font-size: 1.08rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--texto-principal);
+}
+.diagnosis-control__metric-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--azul-profundo);
+  font: inherit;
+  font-weight: 700;
+  text-align: right;
+  cursor: pointer;
+}
+.diagnosis-control__metric-link:hover { text-decoration: underline; text-underline-offset: 0.18em; }
+.diagnosis-control__metric-link:focus-visible { outline: 2px solid var(--azul); outline-offset: 4px; }
+.diagnosis-control .diagnosis-matrix {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 0.7rem;
+  border-top: 1px solid var(--borde);
+}
+.diagnosis-control .diagnosis-matrix__card {
+  padding: 0.85rem 1rem;
+  border: 0;
+  border-bottom: 1px solid var(--borde);
+  border-radius: 0;
+  background: transparent;
+}
+.diagnosis-control .diagnosis-matrix__value {
+  font-size: 1.08rem;
+  color: var(--texto-principal);
+}
+.diagnosis-control .diagnosis-matrix__open { font-size: 0.82rem; }
+@media (max-width: 720px) {
+  .diagnosis-control .diagnosis-control__metrics { grid-template-columns: 1fr 1fr; }
+  .diagnosis-control .diagnosis-matrix { grid-template-columns: 1fr; }
+}
+@media (max-width: 460px) {
+  .diagnosis-control .diagnosis-control__metrics { grid-template-columns: 1fr; }
+}
