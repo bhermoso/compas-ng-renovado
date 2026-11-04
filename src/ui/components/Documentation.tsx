@@ -38,7 +38,7 @@ export function DocumentationProvider({ workspace, children }: { workspace: Muni
     {children}
     <button type="button" className="documentation-launcher" onClick={() => open(null)}>Consultar documentación ({documents.length})</button>
     <dialog ref={dialog} className="documentation-dialog" aria-labelledby="documentation-title">
-      <header><h2 id="documentation-title">{selected ? selected.title : 'Documentación del expediente'}</h2><button type="button" autoFocus onClick={() => dialog.current?.close()}>Cerrar</button></header>
+      <header><h2 id="documentation-title">{selected ? selected.title : categoryLabel || 'Documentación del expediente'}</h2><button type="button" autoFocus onClick={() => dialog.current?.close()}>Cerrar</button></header>
       {selected ? <>
         <p><strong>Archivo de referencia:</strong> {selected.sourceFileName ?? 'Nombre no registrado'}</p>
         <p>{selected.source.system}</p>
