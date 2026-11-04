@@ -3087,78 +3087,18 @@ export default function App() {
     }
   }
 
-  function handleDeleteDocument(documentId: string) {
-    void deleteOriginalFile(workspace.municipality.identity.id, documentId).catch(error => {
-      window.alert('El registro se ha eliminado, pero no se pudo borrar su archivo original: ' + (error as Error).message);
-    });
-    const deletedDocument = workspace.repository.documents.find((d) => d.id === documentId);
-
-    setLastProcessedDocument((prev) => (prev?.id === documentId ? null : prev));
-    if (lastProcessedDocument?.id === documentId) {
-      setLastAtomCount(0);
+  async function handleDeleteDocument(documentId: string): Promise<void> {
+    const municipalityId = workspace.municipality.identity.id;
+    if (!workspace.repository.documents.some(d => d.id === documentId)) return;
+    if (!remoteClient.auth.currentUser) {
+      window.alert("Inicia sesión: la eliminación debe confirmarse primero en Firebase.");
+      return;
     }
-    if (deletedDocument?.kind === "health-report") {
-      setLastHealthReportMessage(null);
-      setIsLoadingHealthReport(false);
+    if (remoteHydratedMunicipalityId !== municipalityId || pendingSeedId || pendingIndexedDbHydrationId || profileSaveInFlightRef.current) {
+      window.alert("El expediente compartido no está listo o existe otra operación pendiente.");
+      return;
     }
-    if (isIBSEDocument(deletedDocument)) {
-      setIbseMessage(null);
-      setIsLoadingIBSE(false);
-    }
-    if (isDUKEDocument(deletedDocument)) {
-      setDukeMessage(null);
-      setIsLoadingDUKE(false);
-    }
-    if (isPREDIMEDDocument(deletedDocument)) {
-      setPredimedMessage(null);
-      setIsLoadingPREDIMED(false);
-    }
-    if (isSF12Document(deletedDocument)) {
-      setSf12Message(null);
-      setIsLoadingSF12(false);
-    }
-    if (isSuenoDocument(deletedDocument)) {
-      setSuenoMessage(null);
-      setIsLoadingSueno(false);
-    }
-    if (isCAGEDocument(deletedDocument)) {
-      setCageMessage(null);
-      setIsLoadingCAGE(false);
-    }
-    if (isAUDITCDocument(deletedDocument)) {
-      setAuditcMessage(null);
-      setIsLoadingAUDITC(false);
-    }
-    if (isIPAQDocument(deletedDocument)) {
-      setIpaqMessage(null);
-      setIsLoadingIPAQ(false);
-    }
-    if (isGHQ12Document(deletedDocument)) {
-      setGhq12Message(null);
-      setIsLoadingGHQ12(false);
-    }
-    if (isPHQ9Document(deletedDocument)) {
-      setPhq9Message(null);
-      setIsLoadingPHQ9(false);
-    }
-    if (isPSQIDocument(deletedDocument)) {
-      setPsqiMessage(null);
-      setIsLoadingPSQI(false);
-    }
-    if (isFagerstromDocument(deletedDocument)) {
-      setFagerstromMessage(null);
-      setIsLoadingFagerstrom(false);
-    }
-    if (isSBQDocument(deletedDocument)) {
-      setSbqMessage(null);
-      setIsLoadingSBQ(false);
-    }
-    if (isThematicPrioritisationDocument(deletedDocument)) {
-      setTpImportMessage(null);
-      setPendingTopics([]);
-    }
-
-    setWorkspace((prev) => {
+    const nextWorkspace = ((prev: MunicipalityWorkspace) => {
       const doc = prev.repository.documents.find((d) => d.id === documentId);
       const municipalityId = prev.municipality.identity.id;
       const deletesHealthReport = doc?.kind === "health-report";
@@ -3312,7 +3252,92 @@ export default function App() {
           : prev.thematicPrioritisationStudy,
         updatedAt: new Date().toISOString(),
       };
-    });
+    })(workspace);
+
+    profileSaveInFlightRef.current = true;
+    setRemotePersistenceMessage("Eliminando documento y evidencias en Firebase…");
+    try {
+      await saveRemoteWorkspace(remoteClient, nextWorkspace);
+      setWorkspace(current => current.municipality.identity.id === municipalityId ? nextWorkspace : current);
+      setRemotePersistenceMessage("Documento y evidencias eliminados del expediente compartido.");
+      await deleteOriginalFile(municipalityId, documentId).catch(error => {
+        console.warn("[original-cache-delete-error]", error);
+        setRemotePersistenceMessage("Documento eliminado en Firebase; no se pudo limpiar su caché local.");
+      });
+    const deletedDocument = workspace.repository.documents.find((d) => d.id === documentId);
+
+    setLastProcessedDocument((prev) => (prev?.id === documentId ? null : prev));
+    if (lastProcessedDocument?.id === documentId) {
+      setLastAtomCount(0);
+    }
+    if (deletedDocument?.kind === "health-report") {
+      setLastHealthReportMessage(null);
+      setIsLoadingHealthReport(false);
+    }
+    if (isIBSEDocument(deletedDocument)) {
+      setIbseMessage(null);
+      setIsLoadingIBSE(false);
+    }
+    if (isDUKEDocument(deletedDocument)) {
+      setDukeMessage(null);
+      setIsLoadingDUKE(false);
+    }
+    if (isPREDIMEDDocument(deletedDocument)) {
+      setPredimedMessage(null);
+      setIsLoadingPREDIMED(false);
+    }
+    if (isSF12Document(deletedDocument)) {
+      setSf12Message(null);
+      setIsLoadingSF12(false);
+    }
+    if (isSuenoDocument(deletedDocument)) {
+      setSuenoMessage(null);
+      setIsLoadingSueno(false);
+    }
+    if (isCAGEDocument(deletedDocument)) {
+      setCageMessage(null);
+      setIsLoadingCAGE(false);
+    }
+    if (isAUDITCDocument(deletedDocument)) {
+      setAuditcMessage(null);
+      setIsLoadingAUDITC(false);
+    }
+    if (isIPAQDocument(deletedDocument)) {
+      setIpaqMessage(null);
+      setIsLoadingIPAQ(false);
+    }
+    if (isGHQ12Document(deletedDocument)) {
+      setGhq12Message(null);
+      setIsLoadingGHQ12(false);
+    }
+    if (isPHQ9Document(deletedDocument)) {
+      setPhq9Message(null);
+      setIsLoadingPHQ9(false);
+    }
+    if (isPSQIDocument(deletedDocument)) {
+      setPsqiMessage(null);
+      setIsLoadingPSQI(false);
+    }
+    if (isFagerstromDocument(deletedDocument)) {
+      setFagerstromMessage(null);
+      setIsLoadingFagerstrom(false);
+    }
+    if (isSBQDocument(deletedDocument)) {
+      setSbqMessage(null);
+      setIsLoadingSBQ(false);
+    }
+    if (isThematicPrioritisationDocument(deletedDocument)) {
+      setTpImportMessage(null);
+      setPendingTopics([]);
+    }
+
+
+    } catch (error) {
+      window.alert("No se ha eliminado el documento. Firebase no confirmó el cambio: " + (error as Error).message);
+      setRemotePersistenceMessage("No se ha confirmado la eliminación del documento en Firebase.");
+    } finally {
+      profileSaveInFlightRef.current = false;
+    }
   }
 
   function switchToMunicipality(
