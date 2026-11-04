@@ -3180,6 +3180,11 @@ export default function App() {
 
       return {
         ...prev,
+        deletedDocuments: [
+          ...(prev.deletedDocuments ?? []).filter(row => row.documentId !== documentId),
+          { documentId, title: doc?.title ?? documentId, deletedAt: new Date().toISOString() },
+        ],
+        documentOriginals: (prev.documentOriginals ?? []).filter(o => o.documentId !== documentId),
         repository: removeMunicipalDocument(prev.repository, documentId),
         evidenceStore: {
           ...prev.evidenceStore,
