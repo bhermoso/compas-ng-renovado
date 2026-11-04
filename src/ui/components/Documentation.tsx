@@ -20,7 +20,7 @@ export function DocumentReference({ children, documentId, fileName }: Reference 
   return <button type="button" className="document-reference" onClick={() => open({ documentId, fileName })}>{children}</button>;
 }
 
-export function DocumentationProvider({ workspace, children, onStoreOriginal, onCreateRevision, onArchiveDocument, onDeleteDocument }: { workspace: MunicipalityWorkspace; children: ReactNode; onStoreOriginal?: (documentId: string, file: File) => Promise<void>; onCreateRevision?: (documentId: string, file: File) => Promise<void>; onArchiveDocument?: (documentId: string) => Promise<void>; onDeleteDocument?: (documentId: string) => Promise<boolean> }) {
+export function DocumentationProvider({ workspace, children, canWrite = false, onStoreOriginal, onCreateRevision, onArchiveDocument, onDeleteDocument }: { workspace: MunicipalityWorkspace; children: ReactNode; canWrite?: boolean; onStoreOriginal?: (documentId: string, file: File) => Promise<void>; onCreateRevision?: (documentId: string, file: File) => Promise<void>; onArchiveDocument?: (documentId: string) => Promise<void>; onDeleteDocument?: (documentId: string) => Promise<boolean> }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [reference, setReference] = useState<Reference | null>(null);
   const [query, setQuery] = useState('');
@@ -51,7 +51,7 @@ export function DocumentationProvider({ workspace, children, onStoreOriginal, on
   }).sort((a,b) => (a.revisionNumber ?? 1) - (b.revisionNumber ?? 1)) : [];
   const dependencyCount = selected ? workspace.evidenceStore.atoms.filter(atom => atom.provenance.documentId === selected.id).length : 0;
   const historical = selected && workspace.previousHealthReports?.find(r => r.linkedDocumentId === selected.id);
-  return <DocumentOriginalManagementContext.Provider value={onStoreOriginal && onCreateRevision && onArchiveDocument && onDeleteDocument ? { originals: workspace.documentOriginals ?? [], storeOriginal: onStoreOriginal, createRevision: onCreateRevision, archiveDocument: onArchiveDocument, deleteDocument: onDeleteDocument } : null}><DocumentationContext.Provider value={open}>
+  return <DocumentOriginalManagementContext.Provider value={canWrite && onStoreOriginal && onCreateRevision && onArchiveDocument && onDeleteDocument ? { originals: workspace.documentOriginals ?? [], storeOriginal: onStoreOriginal, createRevision: onCreateRevision, archiveDocument: onArchiveDocument, deleteDocument: onDeleteDocument } : null}><DocumentationContext.Provider value={open}>
     {children}
     <button type="button" className="documentation-launcher" onClick={() => open(null)}>Consultar documentación ({documents.length})</button>
     <dialog ref={dialog} className="documentation-dialog" aria-labelledby="documentation-title">
@@ -67,7 +67,7 @@ export function DocumentationProvider({ workspace, children, onStoreOriginal, on
           <div><dt>Original compartido</dt><dd>{workspace.documentOriginals?.some(o=>o.documentId===selected.id) ? 'Disponible en expediente Firebase' : 'No incorporado al expediente compartido'}</dd></div>
         </dl>
         {revisionFamily.length > 1 && <section aria-label="Versiones del documento"><h3>Versiones · {revisionFamily.length}</h3><ul>{revisionFamily.map(d=><li key={d.id}><DocumentReference documentId={d.id}>{d.title} · versión {d.revisionNumber ?? 1}</DocumentReference><small>{d.sourceFileName ?? 'Sin original'} · {d.status}</small></li>)}</ul></section>}
-        <div className="documentation-operations">
+        {canWrite && <div className="documentation-operations">
           <label>Incorporar nueva versión (sin modificar los indicadores anteriores)
             <input type="file" aria-label="Crear nueva versión documental" onChange={async e => {
               const file=e.currentTarget.files?.[0];e.currentTarget.value='';
@@ -87,7 +87,7 @@ export function DocumentationProvider({ workspace, children, onStoreOriginal, on
             try {setOperationMessage('Eliminando en Firebase…'); const deleted=await onDeleteDocument(selected.id); if(deleted) {setReference(null); setOperationMessage('Documento eliminado.');} else setOperationMessage('No se ha confirmado la eliminación en Firebase.');}
             catch(error) {setOperationMessage((error as Error).message);}
           }}>Eliminar documento</button>
-        </div>
+        </div>}
         {operationMessage && <p role="status">{operationMessage}</p>}
 
         <DocumentAccess key={selected.id} document={selected} />
