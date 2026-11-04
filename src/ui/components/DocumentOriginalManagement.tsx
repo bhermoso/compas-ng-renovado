@@ -5,6 +5,9 @@ export interface DocumentOriginalManagement {
   originals: readonly StoredDocumentOriginal[];
   /** Only resolves after the shared expediente has been saved in Firebase. */
   storeOriginal: (documentId: string, file: File) => Promise<void>;
+  createRevision: (documentId: string, file: File) => Promise<void>;
+  archiveDocument: (documentId: string) => Promise<void>;
+  deleteDocument: (documentId: string) => Promise<void>;
 }
 
 export const DocumentOriginalManagementContext = createContext<DocumentOriginalManagement | null>(null);
