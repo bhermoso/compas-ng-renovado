@@ -507,6 +507,20 @@ describe("sincronización incremental de expedientes canónicos", () => {
     expect(repaired.repository.documents).toHaveLength(seed.repository.documents.length);
   });
 
+  it("las bajas explícitas de Loja impiden reintroducir el documento y sus evidencias desde un seed", () => {
+    const seed = parseWorkspaceJSON(LOJA_SEED_RAW)!;
+    const removed = seed.repository.documents[0];
+    const partial: MunicipalityWorkspace = {
+      ...seed,
+      repository: { ...seed.repository, documents: seed.repository.documents.filter(d => d.id !== removed.id) },
+      evidenceStore: { ...seed.evidenceStore, atoms: seed.evidenceStore.atoms.filter(a => a.provenance.documentId !== removed.id) },
+      deletedDocuments: [{ documentId: removed.id, title: removed.title, deletedAt: "2026-11-04T14:00:00Z" }],
+    };
+    const result = applySeedDocumentMigration(partial, seed, LOJA_MIGRATION);
+    expect(result.repository.documents.some(d => d.id === removed.id)).toBe(false);
+    expect(result.evidenceStore.atoms.some(a => a.provenance.documentId === removed.id)).toBe(false);
+  });
+
   it("Loja se repara si IndexedDB aporta una copia parcial durante la hidratación del seed", () => {
     const seed = parseWorkspaceJSON(LOJA_SEED_RAW)!;
     const placeholder = createCompleteMunicipalityWorkspace(LOJA_INPUT);
