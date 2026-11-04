@@ -43,6 +43,9 @@ export interface ExternalHealthProfile {
  status: 'review' | 'validated';
  validatedBy?: string;
  validatedAt?: string;
+ /** Archiving is reversible by a separate explicit revision; it retains all files. */
+ archivedAt?: string;
+ archivedBy?: string;
  summary: string;
  /** Literal imported text or manually edited content, never an automatic diagnosis. */
  text: string;
