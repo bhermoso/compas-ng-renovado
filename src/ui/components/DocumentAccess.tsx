@@ -39,7 +39,7 @@ export function DocumentAccess({document:doc,documentLabel}:{document:MunicipalD
   {file && <p><button type="button" onClick={openOriginal}>Abrir original</button> <button type="button" onClick={download}>Descargar original · {file.name}</button> <small>{remoteOriginal ? 'Original guardado en el expediente compartido.' : 'Original solo en este navegador; pendiente de sincronizar.'}</small></p>}
   {!loading && !file && !url && <p><strong>Archivo original no disponible.</strong> {doc.sourceText?.trim() ? 'Puedes consultar el texto conservado.' : 'Solo se conserva la referencia o los datos derivados.'}</p>}
   {doc.sourceText?.trim() && <details><summary>Consultar texto conservado</summary><p style={{whiteSpace:'pre-wrap'}}>{doc.sourceText}</p></details>}
-  {!url && <label className="document-access__attach">{file ? 'Verificar o reponer original' : 'Adjuntar el archivo original'}
+  {management && !url && <label className="document-access__attach">{file ? 'Verificar o reponer original' : 'Adjuntar el archivo original'}
    <input type="file" aria-label={`Adjuntar original: ${doc.title}`} onChange={async e=>{
     const input=e.currentTarget;const next=input.files?.[0];if(!next)return;
     if(!window.confirm(`¿Vincular «${next.name}» a «${doc.title}»? Comprueba que corresponde a este documento. Si el contenido difiere del original existente debes importar una versión nueva; no se alterarán en silencio las evidencias.`)){input.value='';return;}
