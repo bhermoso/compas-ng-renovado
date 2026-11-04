@@ -555,6 +555,15 @@ export default function App() {
   // copias de documentos anteriores a que se registrara contentSha256.
   const originalHashCache = useRef(new Map<string, string | null>());
   const [localOriginalHashes, setLocalOriginalHashes] = useState<Record<string, string>>({});
+  // Incluye las huellas del expediente compartido, no solo la caché de este navegador.
+  // Así un archivo idéntico no se vuelve a importar desde otro equipo.
+  const knownOriginalHashes = {
+    ...localOriginalHashes,
+    ...(workspace.documentOriginals ?? []).reduce<Record<string, string>>((acc, original) => {
+      acc[original.documentId] = original.sha256;
+      return acc;
+    }, {}),
+  };
   useEffect(() => {
     let cancelled = false;
     const municipalityId = workspace.municipality.identity.id;
@@ -605,7 +614,11 @@ export default function App() {
         if (originalSyncSkip.current.has(key)) continue;
         try {
           const local = await loadOriginalFile(municipalityId, original.documentId);
-          if (!local) await saveOriginalFile(municipalityId, original.documentId, await decodeDocumentOriginal(original));
+          // Firebase es la fuente de verdad. Una caché antigua con el mismo ID
+          // y bytes distintos debe actualizarse, no mantenerse indefinidamente.
+          if (!local || await sha256Hex(local) !== original.sha256) {
+            await saveOriginalFile(municipalityId, original.documentId, await decodeDocumentOriginal(original));
+          }
         } catch (error) {
           console.error("[original-restore-error]", original.documentId, error);
         }
@@ -1413,7 +1426,7 @@ export default function App() {
     try {
       const arrayBuffer = await file.arrayBuffer();
       const contentSha256 = options.contentSha256 ?? await sha256Hex(arrayBuffer);
-      const existingCopy = findExistingCopy(workspace.repository, { sha256: contentSha256, name: file.name }, localOriginalHashes);
+      const existingCopy = findExistingCopy(workspace.repository, { sha256: contentSha256, name: file.name }, knownOriginalHashes);
       if (existingCopy?.reason === "same-file") {
         setLastHealthReportMessage(`Este archivo ya está en el expediente como «${existingCopy.document.title}». Es el mismo archivo y no se incorpora de nuevo.`);
         return false;
@@ -1573,7 +1586,7 @@ export default function App() {
     try {
       const arrayBuffer = await file.arrayBuffer();
       const contentSha256 = options.contentSha256 ?? await sha256Hex(arrayBuffer);
-      const existingCopy = findExistingCopy(workspace.repository, { sha256: contentSha256, name: file.name }, localOriginalHashes);
+      const existingCopy = findExistingCopy(workspace.repository, { sha256: contentSha256, name: file.name }, knownOriginalHashes);
       if (existingCopy?.reason === "same-file") {
         setDocumentFileMessage(`Este archivo ya está en el expediente como «${existingCopy.document.title}». Es el mismo archivo y no se incorpora de nuevo.`);
         return false;
@@ -3912,7 +3925,7 @@ export default function App() {
                   .filter((d) => d.id === runtime.workspace.healthReport?.linkedDocumentId || d.tags.some((t) => studyTags.includes(t)))
                   .map((d) => d.id)
               );
-              const groups = findDuplicateGroups(runtime.workspace.repository, { localHashes: localOriginalHashes, protectedIds, atomCountByDocument });
+              const groups = findDuplicateGroups(runtime.workspace.repository, { localHashes: knownOriginalHashes, protectedIds, atomCountByDocument });
               return (
                 <DuplicateDocumentsPanel
                   groups={groups}
@@ -3935,7 +3948,7 @@ export default function App() {
               connectedInstruments={Object.keys(studyCsvLoaders)}
               registeredHealthReport={runtime.workspace.healthReport ? { title: runtime.workspace.healthReport.title, sourceFileName: runtime.workspace.healthReport.sourceFileName } : undefined}
               storageNotice={storageSummary()}
-              localHashes={localOriginalHashes}
+              localHashes={knownOriginalHashes}
               getLoaderMessage={(route, studyId) =>
                 route === "health-report" ? lastHealthReportMessage
                   : route === "document-file" ? documentFileMessage
