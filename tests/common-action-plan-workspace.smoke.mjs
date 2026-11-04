@@ -129,7 +129,7 @@ try{
   assert.equal(await page.evaluate(()=>window.mockSaved),undefined);
  }
  await page.goto(origin+"?scope=loja&unknown=1");
- await page.getByText(/Versión de borrador desconocida/).waitFor();
+ await page.getByText(/La versión del borrador requiere revisión de compatibilidad/).waitFor();
  assert.equal(await page.locator(".pcm-preparation").count(),0);
  assert.equal(await page.evaluate(()=>window.mockSaved),undefined);
 
