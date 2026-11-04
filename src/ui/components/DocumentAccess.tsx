@@ -1,17 +1,21 @@
 import { useEffect,useState } from 'react';
 import type { MunicipalDocument } from '../../domain/repository';
-import { loadOriginalFile,saveOriginalFile } from '../../infrastructure/document-files/originalFiles';
+import { loadOriginalFile } from '../../infrastructure/document-files/originalFiles';
+import { decodeDocumentOriginal } from '../../application/document-files/documentOriginals';
+import { useDocumentOriginalManagement } from './DocumentOriginalManagement';
 import { documentAccessUrl, documentDownloadFileName, isPdfDocumentAccess } from './documentAccessUtils';
 
 export function DocumentAccess({document:doc,documentLabel}:{document:MunicipalDocument;documentLabel?:string}){
  const contextualLabel=documentLabel?.trim();
+ const management=useDocumentOriginalManagement();
+ const remoteOriginal=management?.originals.find(o=>o.documentId===doc.id);
  const [file,setFile]=useState<File>();const [message,setMessage]=useState('');
  const [loading,setLoading]=useState(true);
  // La consulta IndexedDB depende del documento; el reset evita mostrar un original anterior.
  // eslint-disable-next-line react-hooks/set-state-in-effect
  useEffect(()=>{let active=true;setFile(undefined);setLoading(true);setMessage('');
- loadOriginalFile(doc.municipalityId,doc.id).then(f=>{if(active)setFile(f);}).catch(e=>{if(active)setMessage(e.message);}).finally(()=>{if(active)setLoading(false);});
- return ()=>{active=false;};},[doc.id,doc.municipalityId]);
+ (remoteOriginal ? decodeDocumentOriginal(remoteOriginal) : loadOriginalFile(doc.municipalityId,doc.id)).then(f=>{if(active)setFile(f);}).catch(e=>{if(active)setMessage(e.message);}).finally(()=>{if(active)setLoading(false);});
+ return ()=>{active=false;};},[doc.id,doc.municipalityId,remoteOriginal?.sha256]);
  const url=documentAccessUrl(doc.source.url);
  function download(){
   if(!file)return;
@@ -25,15 +29,22 @@ export function DocumentAccess({document:doc,documentLabel}:{document:MunicipalD
    <p className="document-access__notice">Si el visor integrado muestra una pestaña vacía, usa la descarga {contextualLabel ? `del ${contextualLabel}` : "del PDF original"}.</p>
   </div>}
   {url && !isPdfDocumentAccess(doc.source.url) && <a className="doc-repo__open" href={url} target="_blank" rel="noopener noreferrer" aria-label={`Abrir documento: ${doc.title} (nueva pestaña)`}>Abrir documento ↗</a>}
-  {file && <p><button type="button" onClick={download}>Descargar original · {file.name}</button> <small>Conservado en este navegador.</small></p>}
+  {file && <p><button type="button" onClick={download}>Descargar original · {file.name}</button> <small>{remoteOriginal ? 'Original guardado en el expediente compartido.' : 'Original solo en este navegador; pendiente de sincronizar.'}</small></p>}
   {!loading && !file && !url && <p><strong>Archivo original no disponible.</strong> {doc.sourceText?.trim() ? 'Puedes consultar el texto conservado.' : 'Solo se conserva la referencia o los datos derivados.'}</p>}
   {doc.sourceText?.trim() && <details><summary>Consultar texto conservado</summary><p style={{whiteSpace:'pre-wrap'}}>{doc.sourceText}</p></details>}
-  {!url && <label className="document-access__attach">{file ? 'Sustituir archivo conservado' : 'Adjuntar el archivo original'}
+  {!url && <label className="document-access__attach">{file ? 'Verificar o reponer original' : 'Adjuntar el archivo original'}
    <input type="file" aria-label={`Adjuntar original: ${doc.title}`} onChange={async e=>{
     const input=e.currentTarget;const next=input.files?.[0];if(!next)return;
-    if(!window.confirm(`¿Vincular «${next.name}» a «${doc.title}»? Comprueba que corresponde a este documento. Sus datos y evidencias no se recalcularán.`)){input.value='';return;}
-    try{await saveOriginalFile(doc.municipalityId,doc.id,next);setFile(next);setMessage('Archivo conservado. Para trasladarlo junto al expediente, utiliza «Copias y recuperación del trabajo» y descarga la copia con originales.');}
-    catch(error){setMessage((error as Error).message);}
+    if(!window.confirm(`¿Vincular «${next.name}» a «${doc.title}»? Comprueba que corresponde a este documento. Si el contenido difiere del original existente debes importar una versión nueva; no se alterarán en silencio las evidencias.`)){input.value='';return;}
+    try {
+      if (!management) throw new Error('El expediente compartido no permite guardar originales desde esta vista.');
+      setMessage('Comprobando archivo y guardando en Firebase…');
+      await management.storeOriginal(doc.id,next);
+      setFile(next);
+      setMessage('Original verificado y guardado en Firebase. La copia del navegador es una caché.');
+    } catch(error) {
+      setMessage('No se ha confirmado el guardado en Firebase: '+(error as Error).message);
+    }
     input.value='';
    }}/>
   </label>}
