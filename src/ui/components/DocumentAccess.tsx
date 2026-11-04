@@ -19,7 +19,9 @@ export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable
  useEffect(()=>{let active=true;setFile(undefined);setLoading(true);setMessage('');
  (remoteOriginal ? decodeDocumentOriginal(remoteOriginal) : loadOriginalFile(doc.municipalityId,doc.id)).then(f=>{if(active)setFile(f);}).catch(e=>{if(active)setMessage(e.message);}).finally(()=>{if(active)setLoading(false);});
  return ()=>{active=false;};},[doc.id,doc.municipalityId,remoteOriginal?.sha256]);
- const url=documentAccessUrl(doc.source.url);
+ // The stored original is authoritative. An external URL may point to an
+ // older revision and must not be presented as this file's original.
+ const url=remoteOriginal ? undefined : documentAccessUrl(doc.source.url);
  function openOriginal(){
   if(!file) return;
   if(file.type !== 'application/pdf' && !/\.pdf$/i.test(file.name)) { download(); return; }
