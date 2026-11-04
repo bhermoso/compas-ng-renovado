@@ -15,6 +15,7 @@ import {
   type CompasLibraryDocument,
 } from "../../application/document-library";
 import { DocumentAccess } from './DocumentAccess.tsx';
+import { useDocumentOriginalManagement } from "./DocumentOriginalManagement";
 import { getCategory, KIND_LABEL, STUDY_LABEL_BY_TAG } from "./documentRepositoryCategorization";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -81,6 +82,7 @@ function DocumentRow({
   onDelete?: (documentId: string) => void;
   onSetCycle?: (documentId: string, cycle: DocumentCycle | undefined) => void;
 }) {
+  const managed = useDocumentOriginalManagement();
   return (
     <article
       className="document-row"
@@ -106,7 +108,7 @@ function DocumentRow({
         <span className="status-pill">
           {document.status === 'uploaded' ? 'Registrado' : STATUS_LABEL[document.status] ?? document.status}
         </span>
-        {onDelete && (
+        {onDelete && !managed && (
           <button
             type="button"
             className="doc-repo__delete"
