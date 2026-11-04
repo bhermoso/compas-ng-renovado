@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import seed from '../public/seeds/compas-ng-workspace-granada-zaidin.json';
 import type { MunicipalityWorkspace } from '../src/domain/workspace';
-import { EMPTY_PROFILE_LIBRARY, appendExternalProfile, importProfileFile, isExternalProfileLibrary, prepareImportedProfileRevision, profileAttachmentBlob, readExternalProfilePackage } from '../src/application/health-profile/externalProfiles';
+import { EMPTY_PROFILE_LIBRARY, appendExternalProfile, archiveExternalProfileVersion, deleteExternalProfileVersion, importProfileFile, isExternalProfileLibrary, prepareImportedProfileRevision, profileAttachmentBlob, readExternalProfilePackage } from '../src/application/health-profile/externalProfiles';
 import { createMunicipalityRuntime } from '../src/application/runtime';
 import { parseWorkspaceJSON, serializeWorkspaceForStorage } from '../src/infrastructure/persistence/local-storage';
 import { ExternalProfileDashboard } from '../src/ui/components/ExternalProfileDashboard';
@@ -229,5 +229,50 @@ describe('Guardado de perfil en Firebase · errores y estados', () => {
   expect(profileSaveErrorMessage({code:'resource-exhausted'})).toContain('cuota');
   expect(profileSaveErrorMessage({code:'unavailable'})).toContain('conexión');
   expect(profileSaveErrorMessage(new Error('Firebase tiene una versión más reciente'))).toContain('más reciente');
+ });
+});
+
+describe('Gestión documental de perfiles · custodia y eliminación sin reapariciones',()=>{
+ it('no archiva ni elimina la versión vigente ni una revisión que tenga descendientes',async()=>{
+  const id='alfacar';
+  const original=await importProfileFile(new File(['Documento A'],'original.txt'),id);
+  const first={...externalProfileFixture(id),id:'alfacar-v01',attachmentIds:[original.attachment.id]};
+  const second={...first,id:'alfacar-v02',revisionOf:first.id,attachmentIds:[original.attachment.id],createdAt:'2026-11-04T09:00:00.000Z'};
+  const third={...first,id:'alfacar-v03',revisionOf:second.id,attachmentIds:[original.attachment.id],createdAt:'2026-11-04T10:00:00.000Z'};
+  const library={profiles:[first,second,third],attachments:[original.attachment],activeId:third.id};
+  expect(()=>archiveExternalProfileVersion(library,third.id,'Revisión')).toThrow(/vigente/);
+  const archived=archiveExternalProfileVersion(library,second.id,'Autoría');
+  expect(archived.profiles[1].archivedAt).toBeTruthy();
+  expect(isExternalProfileLibrary(archived,id)).toBe(true);
+  expect(()=>deleteExternalProfileVersion(archived,second.id)).toThrow(/revisiones posteriores/);
+  expect(()=>deleteExternalProfileVersion(library,first.id)).toThrow(/Archiva primero/);
+  expect(library.profiles[1].archivedAt).toBeUndefined();
+ });
+ it('elimina un borrador archivado terminal y solo libera originales no referenciados',async()=>{
+  const id='alfacar';
+  const original=await importProfileFile(new File(['Fuente compartida'],'compartido.txt'),id);
+  const extra=await importProfileFile(new File(['Borrador descartado'],'solo-borrador.txt'),id);
+  const first={...externalProfileFixture(id),id:'alfacar-v01',attachmentIds:[original.attachment.id]};
+  const second={...first,id:'alfacar-v02',revisionOf:first.id,attachmentIds:[original.attachment.id,extra.attachment.id],createdAt:'2026-11-04T12:00:00.000Z'};
+  const library={profiles:[first,second],attachments:[original.attachment,extra.attachment],activeId:first.id};
+  const archived=archiveExternalProfileVersion(library,second.id,'Equipo técnico','2026-11-04T13:00:00.000Z');
+  const restored=JSON.parse(JSON.stringify(archived));
+  expect(isExternalProfileLibrary(restored,id)).toBe(true);
+  const deleted=deleteExternalProfileVersion(restored,second.id);
+  expect(deleted.profiles.map(p=>p.id)).toEqual(['alfacar-v01']);
+  expect(deleted.attachments.map(a=>a.id)).toEqual([original.attachment.id]);
+  expect(deleted.activeId).toBe('alfacar-v01');
+  expect(isExternalProfileLibrary(deleted,id)).toBe(true);
+  expect(await (await profileAttachmentBlob(deleted.attachments[0])).text()).toBe('Fuente compartida');
+  expect(library.profiles).toHaveLength(2);
+ });
+ it('ofrece gestión visible junto al Perfil, no solo en un diálogo oculto',()=>{
+  const p=externalProfileFixture('alfacar');
+  const html=renderToStaticMarkup(createElement(ExternalProfileDashboard,{
+   municipalityId:'alfacar',municipalityName:'Alfacar',library:{profiles:[p],attachments:[],activeId:p.id},authorName:'Equipo',onSave:async()=>{}
+  }));
+  expect(html).toContain('Gestionar archivos y versiones');
+  expect(html).toContain('Crear nueva revisión');
+  expect(html).toContain('Archivos y versiones');
  });
 });
