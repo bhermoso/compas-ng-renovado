@@ -9,6 +9,7 @@ import { DiagnosisControlRoom, DiagnosisModuleSection } from "./ui/components/Di
 import { DuplicateDocumentsPanel } from "./ui/components/DuplicateDocumentsPanel";
 import { findDuplicateGroups, findExistingCopy, retireDuplicateDocument } from "./application/document-ingestion/documentDuplicates";
 import { sha256Hex } from "./application/document-ingestion/sha256";
+import { createDocumentRevision } from "./application/document-files/documentRevisions";
 import { MAX_WORKSPACE_ORIGINALS_BYTES, decideOriginalUpload, decodeDocumentOriginal, documentOriginalsBytes, encodeDocumentOriginal, formatMegabytes, mergeDocumentOriginals, profileOriginalsBytes, pruneDocumentOriginals, type StoredDocumentOriginal } from "./application/document-files/documentOriginals";
 import { buildDiagnosisControlSummary, type DiagnosisModuleId } from "./application/diagnosis/diagnosisControlSummary";
 import { replaceZaidinFinalDraft } from "./application/workspace/replaceZaidinFinalDraft";
@@ -1210,6 +1211,52 @@ export default function App() {
     } catch (error) {
       setRemotePersistenceMessage("El original no se ha guardado en Firebase.");
       throw error;
+    } finally {
+      profileSaveInFlightRef.current = false;
+    }
+  }, [workspace, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+
+  const handleCreateDocumentRevision = useCallback(async (documentId: string, file: File) => {
+    const municipalityId = workspace.municipality.identity.id;
+    if (!remoteClient.auth.currentUser || remoteHydratedMunicipalityId !== municipalityId || pendingSeedId || pendingIndexedDbHydrationId) {
+      throw new Error("Inicia sesión y recupera el expediente de Firebase antes de añadir una revisión.");
+    }
+    if (profileSaveInFlightRef.current) throw new Error("Otra operación documental está en curso.");
+    const newId = crypto.randomUUID();
+    const original = await encodeDocumentOriginal(newId, file);
+    const next = createDocumentRevision(workspace, documentId, original);
+    profileSaveInFlightRef.current = true;
+    try {
+      await saveRemoteWorkspace(remoteClient, next);
+      setWorkspace(current => current.municipality.identity.id === municipalityId ? next : current);
+      setRemotePersistenceMessage("Nueva versión documental guardada. Sus evidencias están pendientes de revisión.");
+      await saveOriginalFile(municipalityId, newId, file).catch(error => console.warn("[revision-cache]", error));
+    } finally {
+      profileSaveInFlightRef.current = false;
+    }
+  }, [workspace, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+
+  const handleArchiveDocument = useCallback(async (documentId: string) => {
+    const municipalityId = workspace.municipality.identity.id;
+    if (!remoteClient.auth.currentUser || remoteHydratedMunicipalityId !== municipalityId || pendingSeedId || pendingIndexedDbHydrationId) {
+      throw new Error("Inicia sesión y recupera el expediente de Firebase antes de archivar.");
+    }
+    if (profileSaveInFlightRef.current) throw new Error("Otra operación documental está en curso.");
+    const exists = workspace.repository.documents.some(d => d.id === documentId);
+    if (!exists) throw new Error("El documento ya no existe.");
+    const now = new Date().toISOString();
+    const next = {
+      ...workspace,
+      repository: { ...workspace.repository, documents: workspace.repository.documents.map(d =>
+        d.id === documentId ? { ...d, status: "archived" as const, updatedAt: now } : d
+      ), updatedAt: now },
+      updatedAt: now,
+    };
+    profileSaveInFlightRef.current = true;
+    try {
+      await saveRemoteWorkspace(remoteClient, next);
+      setWorkspace(current => current.municipality.identity.id === municipalityId ? next : current);
+      setRemotePersistenceMessage("Documento archivado en Firebase, conservando original y evidencias.");
     } finally {
       profileSaveInFlightRef.current = false;
     }
@@ -3511,7 +3558,7 @@ export default function App() {
   // ── Render ──────────────────────────────────────────────────
 
   return (
-    <DocumentationProvider key={municipality.id} workspace={workspace} onStoreOriginal={handleStoreDocumentOriginal}>
+    <DocumentationProvider key={municipality.id} workspace={workspace} onStoreOriginal={handleStoreDocumentOriginal} onCreateRevision={handleCreateDocumentRevision} onArchiveDocument={handleArchiveDocument} onDeleteDocument={handleDeleteDocument}>
       {municipalityToDelete && <DeleteWorkspaceDialog
         name={municipalityToDelete.name}
         discardDraft={preparationDirtyRef.current && municipalityToDelete.id === municipality.id}
