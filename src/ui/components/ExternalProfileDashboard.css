@@ -323,3 +323,19 @@
   .ep-management-upload>.ep-primary{width:100%}
   .ep-document-toolbar__top{align-items:flex-start}
 }
+
+/* Conjunto de indicadores del Perfil: tabla editorial de lectura rápida. */
+.epd-kpis {gap:8px 24px}
+.epd-kpis .epd-kpi {
+  border-top:1px solid var(--ep-line);
+  padding:11px 0;
+  gap:3px;
+}
+.epd-kpi__value {font-size:clamp(21px,2vw,25px);color:var(--ep-ink)}
+.epd-topic {
+  border:0;border-top:1px solid var(--ep-line);
+  padding:16px 0;
+}
+.epd-topics {gap:0 24px}
+.epd-topic h3{border-bottom:1px solid var(--ep-line)}
+.epd-row__value {font-size:15px;color:var(--ep-ink)}
