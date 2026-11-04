@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { DocumentOriginalManagementContext } from '../src/ui/components/DocumentOriginalManagement';
 import { renderToStaticMarkup } from 'react-dom/server';
 import seed from '../public/seeds/compas-ng-workspace-granada-zaidin.json';
 import { documentAccessUrl, documentDownloadFileName, isPdfDocumentAccess } from '../src/ui/components/documentAccessUtils';
@@ -45,5 +46,31 @@ describe('Acceso a documentos del repositorio', () => {
   expect(html).toContain('Adjuntar el archivo original');
   expect(html).toContain('Consultar texto conservado');
   expect(html).not.toContain('doc-repo__open');
+ });
+});
+
+describe('Gestión documental contextual en todas las fichas',()=>{
+ it('expone versión, archivo y eliminación a usuarios con permisos de escritura',()=>{
+  const document=seed.repository.documents.find(d=>d.kind==='health-report')!;
+  const tools={
+   originals:[],storeOriginal:async()=>{},createRevision:async()=>{},
+   archiveDocument:async()=>{},deleteDocument:async()=>true,
+  };
+  const html=renderToStaticMarkup(
+   <DocumentOriginalManagementContext.Provider value={tools}>
+    <DocumentAccess document={document}/>
+   </DocumentOriginalManagementContext.Provider>
+  );
+  expect(html).toContain('Adjuntar el archivo original');
+  expect(html).toContain('Crear nueva versión');
+  expect(html).toContain('Archivar documento');
+  expect(html).toContain('Eliminar documento');
+  expect(html).toContain('Descargar PDF original');
+ });
+ it('oculta acciones destructivas en una ficha de solo lectura',()=>{
+  const document=seed.repository.documents.find(d=>d.kind==='health-report')!;
+  const html=renderToStaticMarkup(<DocumentAccess document={document}/>);
+  expect(html).not.toContain('Eliminar documento');
+  expect(html).not.toContain('Archivar documento');
  });
 });
