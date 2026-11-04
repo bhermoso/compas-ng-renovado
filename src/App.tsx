@@ -3134,16 +3134,16 @@ export default function App() {
     }
   }
 
-  async function handleDeleteDocument(documentId: string): Promise<void> {
+  async function handleDeleteDocument(documentId: string): Promise<boolean> {
     const municipalityId = workspace.municipality.identity.id;
-    if (!workspace.repository.documents.some(d => d.id === documentId)) return;
+    if (!workspace.repository.documents.some(d => d.id === documentId)) return false;
     if (!remoteClient.auth.currentUser) {
       window.alert("Inicia sesión: la eliminación debe confirmarse primero en Firebase.");
-      return;
+      return false;
     }
     if (remoteHydratedMunicipalityId !== municipalityId || pendingSeedId || pendingIndexedDbHydrationId || profileSaveInFlightRef.current) {
       window.alert("El expediente compartido no está listo o existe otra operación pendiente.");
-      return;
+      return false;
     }
     const nextWorkspace = ((prev: MunicipalityWorkspace) => {
       const doc = prev.repository.documents.find((d) => d.id === documentId);
@@ -3379,9 +3379,11 @@ export default function App() {
     }
 
 
+      return true;
     } catch (error) {
       window.alert("No se ha eliminado el documento. Firebase no confirmó el cambio: " + (error as Error).message);
       setRemotePersistenceMessage("No se ha confirmado la eliminación del documento en Firebase.");
+      return false;
     } finally {
       profileSaveInFlightRef.current = false;
     }
