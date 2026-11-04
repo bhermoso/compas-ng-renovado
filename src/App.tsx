@@ -128,7 +128,7 @@ import { RemoteSyncPanel } from "./ui/components/RemoteSyncPanel";
 import { syncRemoteCatalog } from "./application/remote-catalog/syncRemoteCatalog";
 import { loadLocalWorkspaces } from "./infrastructure/persistence/local-workspaces";
 import { listTerritorialSpaces } from "./infrastructure/relas/AdminAccounts";
-import { readAccessProfile } from "./infrastructure/relas/RelasClient";
+import { readAccessProfile, readMembership } from "./infrastructure/relas/RelasClient";
 import { createDeliberativePrioritySelection } from "./domain/deliberative-prioritisation";
 import {
   validateModuleReview,
@@ -554,6 +554,18 @@ export default function App() {
   }, []);
   // Huellas de los originales conservados en este navegador, para reconocer
   // copias de documentos anteriores a que se registrara contentSha256.
+  const [documentWriteAllowed, setDocumentWriteAllowed] = useState(false);
+  useEffect(() => {
+    let active = true;
+    const id = workspace.municipality.identity.id;
+    setDocumentWriteAllowed(false);
+    if (!remoteClient.auth.currentUser || remoteHydratedMunicipalityId !== id) return;
+    void readMembership(remoteClient, id)
+      .then(role => { if (active) setDocumentWriteAllowed(role !== "reader"); })
+      .catch(() => { if (active) setDocumentWriteAllowed(false); });
+    return () => { active = false; };
+  }, [remoteClient, remoteHydratedMunicipalityId, workspace.municipality.identity.id]);
+
   const originalHashCache = useRef(new Map<string, string | null>());
   const [localOriginalHashes, setLocalOriginalHashes] = useState<Record<string, string>>({});
   // Incluye las huellas del expediente compartido, no solo la caché de este navegador.
@@ -3560,7 +3572,7 @@ export default function App() {
   // ── Render ──────────────────────────────────────────────────
 
   return (
-    <DocumentationProvider key={municipality.id} workspace={workspace} onStoreOriginal={handleStoreDocumentOriginal} onCreateRevision={handleCreateDocumentRevision} onArchiveDocument={handleArchiveDocument} onDeleteDocument={handleDeleteDocument}>
+    <DocumentationProvider key={municipality.id} workspace={workspace} canWrite={documentWriteAllowed} onStoreOriginal={handleStoreDocumentOriginal} onCreateRevision={handleCreateDocumentRevision} onArchiveDocument={handleArchiveDocument} onDeleteDocument={documentWriteAllowed ? handleDeleteDocument : undefined}>
       {municipalityToDelete && <DeleteWorkspaceDialog
         name={municipalityToDelete.name}
         discardDraft={preparationDirtyRef.current && municipalityToDelete.id === municipality.id}
@@ -4176,7 +4188,7 @@ export default function App() {
             <DiagnosisModuleSection id="diag-mod-documents" title="Repositorio documental y bibliotecas" description="Documentos del expediente, ciclos, conciliaciones y biblioteca COMPÁS" open={openDiagModules.has("documents")} onToggle={(open) => toggleDiagnosisModule("documents", open)}>
               <DocumentRepositoryPanel
                 repository={runtime.workspace.repository}
-                onDelete={handleDeleteDocument}
+                onDelete={documentWriteAllowed ? handleDeleteDocument : undefined}
                 libraryDocuments={compasDocumentLibrary}
                 libraryMessage={documentLibraryMessage}
                 onAssignLibraryDocument={handleAssignLibraryDocument}
