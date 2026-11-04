@@ -50,7 +50,9 @@ export function isExternalProfileLibrary(value: unknown, municipalityId: string)
   (p.status !== 'validated' || (string(p.validatedBy) && !!p.validatedBy.trim() && string(p.validatedAt) && Number.isFinite(Date.parse(p.validatedAt)))) &&
   strings(p.attachmentIds) && p.attachmentIds.every(id => fileIds.has(id)) && strings(p.findings) && strings(p.limitations) &&
   Array.isArray(p.results) && p.results.every(isProfileResult) && Array.isArray(p.areas) && p.areas.every(a => object(a) && textFields(a,['id','title','rationale'])) &&
-  (p.evidenceVersion === undefined || string(p.evidenceVersion)) && (p.revisionOf === undefined || string(p.revisionOf)) && (p.validatedBy === undefined || string(p.validatedBy)) && (p.validatedAt === undefined || string(p.validatedAt)))) return false;
+  (p.evidenceVersion === undefined || string(p.evidenceVersion)) && (p.revisionOf === undefined || string(p.revisionOf)) && (p.validatedBy === undefined || string(p.validatedBy)) && (p.validatedAt === undefined || string(p.validatedAt)) &&
+  (p.archivedAt === undefined || (string(p.archivedAt) && Number.isFinite(Date.parse(p.archivedAt)))) &&
+  (p.archivedBy === undefined || string(p.archivedBy)))) return false;
  const ids = new Set(profiles.map(p => p.id));
  return ids.size === profiles.length && profiles.every(p => !p.revisionOf || (p.revisionOf !== p.id && ids.has(p.revisionOf))) &&
   (value.activeId === undefined || (string(value.activeId) && ids.has(value.activeId)));
@@ -61,6 +63,42 @@ export function appendExternalProfile(library: ExternalProfileLibrary, profile: 
  const next = { profiles: [...library.profiles, profile], attachments: [...library.attachments, ...attachments], activeId: profile.revisionOf && library.activeId ? library.activeId : profile.id };
  if (!isExternalProfileLibrary(next, municipalityId)) throw new Error('El perfil contiene datos incompatibles o supera el límite de 40 MB de archivos por expediente.');
  return next;
+}
+
+/** Archive a non-current profile without discarding its evidence or originals. */
+export function archiveExternalProfileVersion(
+ library: ExternalProfileLibrary,
+ profileId: string,
+ by: string,
+ at: string = new Date().toISOString()
+): ExternalProfileLibrary {
+ const profile=library.profiles.find(p=>p.id===profileId);
+ if (!profile) throw new Error('La versión ya no existe.');
+ if (library.activeId===profileId) throw new Error('Establece antes otra versión de referencia; no puedes archivar la vigente.');
+ if (profile.archivedAt) return library;
+ if (!Number.isFinite(Date.parse(at))) throw new Error('La fecha de archivo es inválida.');
+ return {...library,profiles:library.profiles.map(p=>p.id===profileId?{...p,archivedAt:at,archivedBy:by}:p)};
+}
+
+/**
+ * Permanently remove an already archived, non-active leaf revision.
+ * Other versions retain their bytes; only attachments with no remaining
+ * references are released from Firebase. Never leave broken revisionOf links.
+ */
+export function deleteExternalProfileVersion(
+ library: ExternalProfileLibrary,
+ profileId: string
+): ExternalProfileLibrary {
+ const profile=library.profiles.find(p=>p.id===profileId);
+ if (!profile) throw new Error('La versión ya no existe.');
+ if (!profile.archivedAt) throw new Error('Archiva primero la versión para confirmar que ya no se utiliza.');
+ if (library.activeId===profileId) throw new Error('No puedes eliminar la versión de referencia.');
+ if (library.profiles.some(p=>p.revisionOf===profileId)) {
+  throw new Error('No puedes eliminar una versión que tenga revisiones posteriores. Su historial debe conservarse.');
+ }
+ const profiles=library.profiles.filter(p=>p.id!==profileId);
+ const referenced=new Set(profiles.flatMap(p=>p.attachmentIds));
+ return {...library,profiles,attachments:library.attachments.filter(a=>referenced.has(a.id))};
 }
 
 /** Strict data import; never takes authority/validation or executable HTML from a package. */
