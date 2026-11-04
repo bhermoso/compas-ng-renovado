@@ -125,6 +125,7 @@ import {
   saveRemoteWorkspace,
 } from "./infrastructure/relas/RemoteWorkspace";
 import { RemoteSyncPanel } from "./ui/components/RemoteSyncPanel";
+import { WorkspacePersistenceIndicator } from "./ui/components/WorkspacePersistenceIndicator";
 import { profileSaveErrorMessage, profileSaveProgressMessage } from "./application/health-profile/profileSaveFeedback";
 import { syncRemoteCatalog } from "./application/remote-catalog/syncRemoteCatalog";
 import { loadLocalWorkspaces } from "./infrastructure/persistence/local-workspaces";
@@ -3670,20 +3671,14 @@ export default function App() {
       )}
 
       <main className="app-shell">
-        <div className="app-status-strip">
-        <details className="app-status-strip__tool"><summary>Copias y recuperación del trabajo</summary><BackupPanel workspace={workspace} ready={pendingSeedId === null && pendingMigration === null} /></details>
-        {persistenceMessage !== null && (
-          <div className="app-persistence-warning" role="alert">
-            {persistenceMessage}
-          </div>
-        )}
-        {remotePersistenceMessage !== null && (
-          <div className="app-persistence-warning" role="status">
-            {remotePersistenceMessage}
-          </div>
-        )}
-        <RemoteSyncPanel client={remoteClient} />
-        </div>
+        <WorkspacePersistenceIndicator
+          localMessage={persistenceMessage}
+          remoteMessage={remotePersistenceMessage}
+          signedIn={remoteClient.auth.currentUser !== null}
+        >
+          <BackupPanel workspace={workspace} ready={pendingSeedId === null && pendingMigration === null} />
+          <RemoteSyncPanel client={remoteClient} />
+        </WorkspacePersistenceIndicator>
 
         {/* Selector de municipio (se muestra sobre cualquier vista) */}
         {showMunicipalitySelector && (

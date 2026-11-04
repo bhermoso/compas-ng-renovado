@@ -1,21 +1,50 @@
 .relas-access form { display: grid; gap: 1.25rem; max-width: 30rem; margin: 1.5rem 0; }
 .relas-access form label { display: grid; gap: .45rem; font-weight: 600; }
-.relas-access form input { padding: .8rem; border: 1px solid #94a3b8; border-radius: .5rem; font: inherit; width: 100%; box-sizing: border-box; }
+.relas-access form input { padding: .8rem; border: 1px solid var(--borde); border-radius: .5rem; font: inherit; width: 100%; box-sizing: border-box; }
 .relas-access button { min-height: 44px; padding: .65rem 1rem; cursor: pointer; }
 .relas-access button:disabled { cursor: default; opacity: .6; }
-.relas-access [role=status] { padding: 1rem; border-left: 4px solid #2563eb; background: #eff6ff; color: #172554; }
+.relas-access [role=status] { padding: 1rem; border-left: 4px solid var(--azul); background: var(--fondo-principal); color: var(--texto-principal); }
 .relas-access .backup-panel__actions { display: flex; gap: .75rem; flex-wrap: wrap; margin: 1rem 0; }
-.admin-banner { padding: 1.25rem; border-radius: .6rem; background: linear-gradient(110deg,#e0f2fe,#f0fdf4,#fef3c7); color: #172554; margin: 1rem 0 2rem; }
+.admin-banner { padding: 1.25rem; border-radius: .6rem; background: #fff; color: var(--texto-principal); margin: 1rem 0 2rem; }
 .admin-banner strong { font-size: 1.4rem; }
-.admin-section { padding: 1.5rem 0; border-top: 1px solid #cbd5e1; }
+.admin-section { padding: 1.5rem 0; border-top: 1px solid var(--borde); }
 .admin-section h2 { margin-top: 0; }
 .admin-scope { display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; margin-top: 1.5rem; }
 .admin-scope label { display: grid; gap: .5rem; }
 .relas-access select { padding: .7rem; font: inherit; max-width: 100%; }
-.admin-full-nav { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; padding: 1rem; background: #172554; color: white; }
+.admin-full-nav { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; padding: 1rem; background: var(--texto-principal); color: white; }
 
-.admin-credentials { padding: 1.5rem; margin: 1.5rem 0; border: 2px solid #16766b; border-radius: .75rem; background: #f0fdfa; overflow-wrap: anywhere; }
+.admin-credentials { padding: 1.5rem; margin: 1.5rem 0; border: 2px solid var(--texto-secundario); border-radius: .75rem; background: var(--fondo-principal); overflow-wrap: anywhere; }
 .admin-credentials label { display: grid; gap: .5rem; font-weight: 600; }
 .admin-credentials input { padding: .75rem; font: inherit; width: 100%; box-sizing: border-box; }
 .admin-accounts { padding: 0; list-style: none; display: grid; gap: 1rem; }
-.admin-accounts li { border: 1px solid #cbd5e1; border-radius: .6rem; padding: 1rem; overflow-wrap: anywhere; }
+.admin-accounts li { border: 1px solid var(--borde); border-radius: .6rem; padding: 1rem; overflow-wrap: anywhere; }
+
+
+/* Administración y acceso: mismos neutros que Diagnóstico/Perfil. */
+.relas-access [role=status] {
+  background:transparent;border:0;border-left:2px solid var(--borde);
+  padding:8px 0 8px 12px;color:var(--texto-secundario);
+}
+.relas-access input,.relas-access select{
+  border:1px solid var(--borde);border-radius:0;background:#fff;color:var(--texto-principal);
+}
+.relas-access button{
+  background:#fff;color:var(--azul);
+  border:1px solid var(--borde);border-left:3px solid var(--azul);
+  border-radius:0;padding:7px 12px;
+}
+.admin-banner{
+  background:#fff;border:0;border-top:1px solid var(--borde);border-bottom:1px solid var(--borde);
+  border-radius:0;padding:18px 0;margin:14px 0 24px;color:var(--texto-principal);
+}
+.admin-banner strong{font-size:1.1rem}
+.admin-full-nav{
+  background:#fff;border:0;border-bottom:1px solid var(--borde);
+  color:var(--texto-principal);padding:12px 0;
+}
+.admin-credentials {
+  background:#fff;border:1px solid var(--borde);border-radius:0;
+  padding:16px 0;margin:16px 0;
+}
+.admin-accounts li{border:0;border-bottom:1px solid var(--borde);border-radius:0;padding:12px 0}

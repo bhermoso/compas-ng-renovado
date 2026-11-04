@@ -22,6 +22,15 @@
   --tinta-azul:        #172033;
   --azul-profundo:     #1e3a5f;
   --blanco:            #ffffff;
+
+  /* Gramática visual única. Los seis colores del ciclo no se reutilizan
+     como fondos de avisos, controles ni tarjetas. */
+  --compas-interactivo: var(--azul);
+  --compas-superficie: var(--blanco);
+  --compas-superficie-alterna: var(--fondo-principal);
+  --compas-linea: var(--borde);
+  --compas-metadata: var(--texto-terciario);
+  --compas-enfasis: var(--texto-principal);
 }
 
 body {
@@ -46,15 +55,15 @@ select {
 }
 
 .app-persistence-warning {
-  margin: 16px auto 0;
-  max-width: 1120px;
-  border: 1px solid rgba(180, 83, 9, 0.35);
-  border-radius: 10px;
-  background: #fff7ed;
-  color: #92400e;
-  padding: 12px 16px;
-  font-size: 0.92rem;
-  font-weight: 700;
+  margin: 8px 0;
+  border: 0;
+  border-left: 2px solid var(--compas-linea);
+  border-radius: 0;
+  background: transparent;
+  color: var(--texto-secundario);
+  padding: 5px 0 5px 12px;
+  font-size: 0.82rem;
+  font-weight: 400;
 }
 
 .hero,
@@ -10876,13 +10885,100 @@ h3 {
 .pcm-preparation .pcm-decision textarea { width: 100%; }
 .pcm-catalog-header { padding-block: 10px; }
 
-/* Barra de estado compacta: copias, guardado y Firebase en una sola franja */
-.app-status-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-bottom: 8px; font-size: 0.85rem; }
-.app-status-strip > * { margin: 0; }
-.app-status-strip .app-persistence-warning { padding: 4px 10px; border-radius: 999px; font-size: 0.82rem; }
-.app-status-strip__tool > summary { cursor: pointer; color: var(--texto-secundario); }
-.app-status-strip details[open] { flex-basis: 100%; }
-.app-status-strip details.app-persistence-warning[open] { border-radius: 8px; padding: 8px 12px; }
+/* Estado del expediente: metadatos en una línea, no avisos amarillos ni pills. */
+.app-status-strip {
+  max-width: 1120px;
+  margin: 0 auto 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--compas-linea);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 18px;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  text-align: left;
+  color: var(--compas-metadata);
+}
+.app-status-strip__heading {
+  color: var(--compas-enfasis);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.app-status-strip__signal {
+  color: var(--texto-secundario);
+  overflow-wrap: anywhere;
+}
+.app-status-strip__signal[data-tone="confirmed"]::before {
+  content: "✓";
+  margin-right: 6px;
+  font-weight: 600;
+  color: var(--compas-interactivo);
+}
+.app-status-strip__signal[data-tone="progress"]::before {
+  content: "·";
+  margin-right: 6px;
+  color: var(--compas-interactivo);
+}
+.app-status-strip__signal[data-tone="error"] {
+  border-left: 2px solid var(--rojo);
+  padding-left: 9px;
+  color: var(--texto-principal);
+}
+.app-status-strip__signal[data-tone="caution"] {
+  border-left: 2px solid var(--amarillo);
+  padding-left: 9px;
+}
+.app-status-strip__details {
+  margin-left: auto;
+  color: var(--compas-metadata);
+  min-width: 0;
+}
+.app-status-strip__details > summary {
+  cursor: pointer;
+  color: var(--compas-interactivo);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  list-style-position: inside;
+}
+.app-status-strip__details[open] {
+  flex-basis: 100%;
+  margin-left: 0;
+}
+.app-status-strip__expanded {
+  max-width: 100%;
+  padding: 12px 0 16px;
+  border-top: 1px solid var(--compas-linea);
+  display: grid;
+  gap: 10px;
+  color: var(--texto-secundario);
+}
+.app-status-strip__expanded > p { margin: 0; }
+.app-status-strip__expanded > .backup-panel,
+.app-status-strip__expanded .backup-panel {
+  max-width: 100%;
+  border: 1px solid var(--compas-linea);
+  border-radius: 0;
+  border-top-width: 1px;
+  box-shadow: none;
+}
+.app-status-strip__expanded details.app-persistence-warning {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.app-status-strip__expanded details.app-persistence-warning > summary {
+  cursor: pointer;
+  color: var(--compas-interactivo);
+}
+.app-status-strip__expanded details.app-persistence-warning[open] {
+  border-top: 1px solid var(--compas-linea);
+  padding: 10px 0;
+}
+@media (max-width: 700px) {
+  .app-status-strip { gap: 5px 12px; }
+  .app-status-strip__details { flex-basis: 100%; margin-left: 0; }
+}
 
 /* ===== Identidad COMPÁS: caja de logos de portada (herencia del histórico) ===== */
 .ilogo-band--cover {

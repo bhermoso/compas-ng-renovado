@@ -1,11 +1,26 @@
-.backup-panel { text-align: left; margin: 20px 0; padding: 22px; border: 1px solid #0074c8; border-top: 5px solid #00acd9; border-radius: 9px; background: #fff; color: #193044; }
+.backup-panel { text-align: left; margin: 20px 0; padding: 22px; border: 1px solid #0074c8; border-top: 5px solid #00acd9; border-radius: 9px; background: #fff; color: var(--texto-principal); }
 .backup-panel h2 { margin-top: 0; }
 .backup-panel p { max-width: 90ch; line-height: 1.55; }
 .backup-panel__actions { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin: 18px 0; }
 .backup-panel button { padding: 10px 16px; border: 1px solid #0074c8; border-radius: 6px; background: #0074c8; color: white; cursor: pointer; }
 .backup-panel button:disabled { opacity: .55; cursor: default; }
-.backup-panel a { color: #005f9f; text-decoration: underline; }
+.backup-panel a { color: var(--azul); text-decoration: underline; }
 .backup-panel input { display: block; margin: 12px 0; max-width: 100%; }
 .backup-panel li { margin: 7px 0; overflow-wrap: anywhere; }
-.backup-panel__note { font-size: .9rem; color: #495b69; }
+.backup-panel__note { font-size: .9rem; color: var(--texto-secundario); }
 .backup-recovery { max-width: 1000px; padding: 16px; margin: auto; }
+
+
+/* Copias: espacio técnico discreto; se despliega solo por decisión del usuario. */
+.backup-panel{
+  background:#fff;color:var(--texto-principal);text-align:left;
+  padding:14px 16px;border:1px solid var(--borde);border-radius:0;
+  box-shadow:none;
+}
+.backup-panel button{
+  background:#fff;border:1px solid var(--borde);
+  border-left:3px solid var(--azul);border-radius:0;color:var(--azul);
+  padding:7px 11px;
+}
+.backup-panel a{color:var(--azul)}
+.backup-panel__note{color:var(--texto-secundario)}
