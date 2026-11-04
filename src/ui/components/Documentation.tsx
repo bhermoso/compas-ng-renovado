@@ -1,9 +1,16 @@
 import { createContext, useContext, useRef, useState, type ReactNode } from 'react';
 import type { MunicipalityWorkspace } from '../../domain/workspace/MunicipalityWorkspace';
+import type { DocumentKind } from '../../domain/repository';
 import { DocumentAccess } from './DocumentAccess.tsx';
 import { resolveDocumentReference, type DocumentReferenceTarget } from './documentReferenceResolver';
 
-type Reference = DocumentReferenceTarget;
+type Reference = DocumentReferenceTarget & { kinds?: DocumentKind[] };
+/** Abre la ficha si hay un único documento o el listado cuando existen varias versiones. */
+export function DocumentCollectionReference({ children, kinds, className }: { children: ReactNode; kinds: DocumentKind[]; className?: string }) {
+  const open = useContext(DocumentationContext);
+  if (!open) return <>{children}</>;
+  return <button type="button" className={className ?? 'document-reference'} onClick={() => open({ kinds })}>{children}</button>;
+}
 const DocumentationContext = createContext<((reference: Reference) => void) | null>(null);
 
 export function DocumentReference({ children, documentId, fileName }: Reference & { children: ReactNode }) {
@@ -17,10 +24,14 @@ export function DocumentationProvider({ workspace, children }: { workspace: Muni
   const [reference, setReference] = useState<Reference | null>(null);
   const [query, setQuery] = useState('');
   const documents = workspace.repository.documents;
-  const matches = reference ? resolveDocumentReference(documents, reference) : [];
+  const matches = reference?.kinds?.length
+    ? documents.filter(d => reference.kinds!.includes(d.kind))
+    : reference ? resolveDocumentReference(documents, reference) : [];
   const selected = matches.length === 1 ? matches[0] : undefined;
   const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-  const filtered = documents.filter(d => normalize(`${d.title} ${d.sourceFileName ?? ''} ${d.source.system ?? ''}`).includes(normalize(query)));
+  const searchable = reference?.kinds?.length ? matches : documents;
+  const filtered = searchable.filter(d => normalize(`${d.title} ${d.sourceFileName ?? ''} ${d.source.system ?? ''}`).includes(normalize(query)));
+  const categoryLabel = reference?.kinds?.length ? `Documentos de esta categoría: ${matches.length}` : '';
   function open(next: Reference | null) { setReference(next); setQuery(''); dialog.current?.showModal(); }
   const historical = selected && workspace.previousHealthReports?.find(r => r.linkedDocumentId === selected.id);
   return <DocumentationContext.Provider value={open}>
@@ -35,7 +46,8 @@ export function DocumentationProvider({ workspace, children }: { workspace: Muni
         {historical?.body.originalText && !selected.sourceText && <details><summary>Consultar texto de la conversión histórica</summary><p className="documentation-text">{historical.body.originalText}</p></details>}
         <p><button type="button" onClick={() => setReference(null)}>Ver toda la documentación</button></p>
       </> : <>
-        {reference && <p role="status"><strong>{matches.length ? 'Hay varias referencias con ese nombre.' : 'No se ha localizado el documento en este expediente.'}</strong> {reference.fileName ?? reference.documentId}. {matches.length ? 'Selecciona el documento correspondiente.' : 'Puedes buscarlo en el catálogo. Una mención no acredita que el archivo esté disponible.'}</p>}
+        {reference && !reference.kinds?.length && <p role="status"><strong>{matches.length ? 'Hay varias referencias con ese nombre.' : 'No se ha localizado el documento en este expediente.'}</strong> {reference.fileName ?? reference.documentId}. {matches.length ? 'Selecciona el documento correspondiente.' : 'Puedes buscarlo en el catálogo. Una mención no acredita que el archivo esté disponible.'}</p>}
+        {reference?.kinds?.length && <p role="status">{matches.length} documentos registrados en esta categoría, incluidos los archivados. Selecciona un documento para consultar sus originales y sus datos de procedencia.</p>}
         <label>Buscar por título o nombre de archivo<input type="search" value={query} onChange={e => setQuery(e.target.value)} /></label>
         <ul>{(matches.length > 1 && !query ? matches : filtered).map(d => <li key={d.id}><DocumentReference documentId={d.id}>{d.title}</DocumentReference><small>{d.sourceFileName ?? 'Sin nombre de archivo'}{d.status === 'archived' ? ' · Referencia histórica' : ''}</small></li>)}</ul>
         {!filtered.length && <p>No hay documentos que coincidan con la búsqueda.</p>}
