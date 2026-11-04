@@ -5,7 +5,7 @@
 .relas-access button:disabled { cursor: default; opacity: .6; }
 .relas-access [role=status] { padding: 1rem; border-left: 4px solid var(--azul); background: var(--fondo-principal); color: var(--texto-principal); }
 .relas-access .backup-panel__actions { display: flex; gap: .75rem; flex-wrap: wrap; margin: 1rem 0; }
-.admin-banner { padding: 1.25rem; border-radius: .6rem; background: linear-gradient(110deg,var(--fondo-principal),var(--fondo-principal),var(--fondo-principal)); color: var(--texto-principal); margin: 1rem 0 2rem; }
+.admin-banner { padding: 1.25rem; border-radius: .6rem; background: #fff; color: var(--texto-principal); margin: 1rem 0 2rem; }
 .admin-banner strong { font-size: 1.4rem; }
 .admin-section { padding: 1.5rem 0; border-top: 1px solid var(--borde); }
 .admin-section h2 { margin-top: 0; }
