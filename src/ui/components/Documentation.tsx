@@ -20,7 +20,7 @@ export function DocumentReference({ children, documentId, fileName }: Reference 
   return <button type="button" className="document-reference" onClick={() => open({ documentId, fileName })}>{children}</button>;
 }
 
-export function DocumentationProvider({ workspace, children, onStoreOriginal, onCreateRevision, onArchiveDocument, onDeleteDocument }: { workspace: MunicipalityWorkspace; children: ReactNode; onStoreOriginal?: (documentId: string, file: File) => Promise<void>; onCreateRevision?: (documentId: string, file: File) => Promise<void>; onArchiveDocument?: (documentId: string) => Promise<void>; onDeleteDocument?: (documentId: string) => Promise<void> }) {
+export function DocumentationProvider({ workspace, children, onStoreOriginal, onCreateRevision, onArchiveDocument, onDeleteDocument }: { workspace: MunicipalityWorkspace; children: ReactNode; onStoreOriginal?: (documentId: string, file: File) => Promise<void>; onCreateRevision?: (documentId: string, file: File) => Promise<void>; onArchiveDocument?: (documentId: string) => Promise<void>; onDeleteDocument?: (documentId: string) => Promise<boolean> }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [reference, setReference] = useState<Reference | null>(null);
   const [query, setQuery] = useState('');
@@ -84,7 +84,7 @@ export function DocumentationProvider({ workspace, children, onStoreOriginal, on
           }}>Archivar</button>}
           <button type="button" onClick={async()=>{
             if(!onDeleteDocument || !window.confirm(`¿Eliminar «${selected.title}» de Firebase y del navegador, incluyendo sus ${dependencyCount} evidencias directas? Los perfiles ya generados pueden requerir revisión.`)) return;
-            try {setOperationMessage('Eliminando en Firebase…'); await onDeleteDocument(selected.id); setReference(null); setOperationMessage('Documento eliminado.');}
+            try {setOperationMessage('Eliminando en Firebase…'); const deleted=await onDeleteDocument(selected.id); if(deleted) {setReference(null); setOperationMessage('Documento eliminado.');} else setOperationMessage('No se ha confirmado la eliminación en Firebase.');}
             catch(error) {setOperationMessage((error as Error).message);}
           }}>Eliminar documento</button>
         </div>
