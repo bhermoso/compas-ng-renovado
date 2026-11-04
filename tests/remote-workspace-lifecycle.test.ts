@@ -11,6 +11,18 @@ vi.mock("firebase/firestore", () => ({
   doc: (_db: unknown, ...path: string[]) => ref(path),
   collection: (_db: unknown, ...path: string[]) => ref(path),
   serverTimestamp: () => "ts",
+  runTransaction: async (_db: unknown, callback: (tx: {
+    get: (ref: { path: string }) => Promise<{ exists: () => boolean; data: () => Record<string, unknown> | undefined }>;
+    set: (ref: { path: string }, value: Record<string, unknown>) => void;
+  }) => Promise<void>) => {
+    // Simulación sin red: el commit del manifiesto ocurre después de leerlo.
+    const writes: Array<() => void> = [];
+    await callback({
+      get: async (r) => ({ exists: () => store.has(r.path), data: () => store.get(r.path) }),
+      set: (r, value) => writes.push(() => store.set(r.path, value)),
+    });
+    for (const write of writes) write();
+  },
   getDocFromServer: async (r: { path: string }) => ({
     exists: () => store.has(r.path),
     data: () => store.get(r.path),
