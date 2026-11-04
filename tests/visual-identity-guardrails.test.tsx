@@ -104,6 +104,6 @@ describe("Contrato visual institucional COMPÁS · regresiones", () => {
     const lab = css("ui/components/ProfileEditorialLab.css");
     expect(lab).toContain("background:transparent");
     const admin = css("ui/components/RelasAccess.css");
-    expect(admin).toContain(".admin-banner{") || expect(admin).toContain(".admin-banner {");
+    expect(admin).toContain(".admin-banner{");
   });
 });
