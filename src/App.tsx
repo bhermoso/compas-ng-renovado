@@ -1331,12 +1331,35 @@ export default function App() {
   }, [runtime.lectura, setWorkspace, workspace.thematicPrioritisation]);
 
   const handlePlanPreparationChange = useCallback((draft: PlanPreparationDraft) => {
-    setWorkspace(prev => draft.municipalityId !== prev.municipality.identity.id ? prev : ({...prev,
-      planPreparationDrafts: [...(prev.planPreparationDrafts ?? []).filter(item =>
-        item.moduleId !== draft.moduleId || item.municipalityId !== draft.municipalityId
-      ), draft],
-      updatedAt: new Date().toISOString(),
-    }));
+    setWorkspace(prev => {
+      if (draft.municipalityId !== prev.municipality.identity.id) return prev;
+      const prior = (prev.planPreparationDrafts ?? []).find(item =>
+        item.moduleId === draft.moduleId && item.municipalityId === draft.municipalityId);
+      const archivedOriginal = draft.migration?.draft;
+      // Archive the exact predecessor once, before replacing it in the
+      // shared workspace. Never trust an unrelated or stale migration blob.
+      if (prior && prior.version !== draft.version &&
+        (!archivedOriginal || archivedOriginal.municipalityId !== prior.municipalityId ||
+          archivedOriginal.moduleId !== prior.moduleId ||
+          archivedOriginal.version !== prior.version ||
+          draft.migration?.replacementVersion !== draft.version ||
+          JSON.stringify(archivedOriginal) !== JSON.stringify(prior))) {
+        window.alert("La versión anterior no coincide con el original archivado. Recarga el expediente antes de transformar el Plan de Acción.");
+        return prev;
+      }
+      const archive = prior && prior.version !== draft.version && archivedOriginal
+        ? [{replacedAt: draft.migration!.replacedAt, replacementVersion: draft.version,
+            draft: JSON.parse(JSON.stringify(prior)) as PlanPreparationDraft}]
+        : [];
+      return {
+        ...prev,
+        planPreparationDraftHistory: [...(prev.planPreparationDraftHistory ?? []), ...archive],
+        planPreparationDrafts: [...(prev.planPreparationDrafts ?? []).filter(item =>
+          item.moduleId !== draft.moduleId || item.municipalityId !== draft.municipalityId
+        ), draft],
+        updatedAt: new Date().toISOString(),
+      };
+    });
   }, [setWorkspace]);
 
   const handleIndicatorWorksheetChange = useCallback((sheet: IndicatorWorksheet) => {

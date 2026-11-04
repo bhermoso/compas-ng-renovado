@@ -98,8 +98,11 @@ describe('Notación jerárquica de los cuatro bloques de envejecimiento saludabl
   expect(JSON.stringify(prior)).toBe(before);
   expect(planActionParagraphs(prior).some(p=>p.text.startsWith('Indicador · ENV-I5.1'))).toBe(true);
  });
- it('Loja, el catálogo original y otras líneas conservan su notación',()=>{
-  expect(municipalActionPlanModule('loja',HEALTHY_AGING_MODULE)).toBe(HEALTHY_AGING_MODULE);
+ it('Loja adopta la notación visible de cuatro bloques sin reescribir ni el catálogo histórico ni adicciones',()=>{
+  const loja = municipalActionPlanModule('loja',HEALTHY_AGING_MODULE);
+  expect(loja.generalObjectives.map(g=>actionPlanElementCode(loja,g.code))).toEqual(['ENV-OG1','ENV-OG2','ENV-OG3','ENV-OG4']);
+  expect(actionPlanElementCode(loja,'ENV-OE5.1')).toBe('ENV-OE1.1');
+  expect(actionPlanElementCode(loja,'ENV-I5.1')).toBe('ENV-I1.1');
   expect(actionPlanElementCode(HEALTHY_AGING_MODULE,'ENV-OE5.1')).toBe('ENV-OE5.1');
   expect(actionPlanElementCode(ADDICTIONS_MODULE,'ADI-OE1.1')).toBe('ADI-OE1.1');
   expect(HEALTHY_AGING_MODULE.generalObjectives.flatMap(g=>g.specificObjectives).every(s=>!s.displayCode&&!s.indicator.displayCode)).toBe(true);

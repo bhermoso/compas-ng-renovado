@@ -1,11 +1,11 @@
 import { actionPlanElementCode } from "../../domain/action-plan-catalog/ActionPlanNotation";
 import { PlanPreparationPanel } from "./PlanPreparationPanel";
 import { type PlanPreparationDraft } from "../../domain/action-plan-catalog/PlanPreparationDraft";
-import { municipalActionPlanModule } from "../../domain/action-plan-catalog/MunicipalActionPlanModule";
+import { municipalActionPlanModule, prepareMunicipalActionPlanDraft } from "../../domain/action-plan-catalog/MunicipalActionPlanModule";
 import { useState, type ReactNode } from "react";
 import { IndicatorWorksheetEditor } from "./IndicatorWorksheetEditor";
 import { worksheetKey, type IndicatorWorksheet, type WorksheetContext } from "../../domain/action-plan-catalog/IndicatorWorksheet";
-import type { CatalogGeneralObjectiveTemplate, CatalogSpecificObjectiveTemplate } from "../../domain/action-plan-catalog/ActionPlanCatalog";
+import { HEALTHY_AGING_MODULE, type CatalogGeneralObjectiveTemplate, type CatalogSpecificObjectiveTemplate } from "../../domain/action-plan-catalog/ActionPlanCatalog";
 type RenderWorksheet = (module: ActionPlanCatalogModule, general: CatalogGeneralObjectiveTemplate, specific: CatalogSpecificObjectiveTemplate) => ReactNode;
 import type {
   CatalogDecisionStatus,
@@ -310,7 +310,7 @@ export function LegacyActionPlanCatalogPanel(props: LegacyActionPlanCatalogPanel
     <div className="pcm-root">
       <section className="workspace-panel pcm-catalog-header">
         <p className="eyebrow">Catálogo RELAS de Plan de Acción</p>
-        <h2>Biblioteca reutilizable de planificación · Granada-Zaidín y marcos estratégicos</h2>
+        <h2>Dos líneas reutilizables de Plan de Acción · envejecimiento saludable y adicciones</h2>
         <p className="panel-note">Consulta en cualquier expediente las propuestas documentadas de Granada-Zaidín y los demás módulos del catálogo: objetivos estratégicos, objetivos generales y específicos, indicadores y fichas técnicas. Selecciona y adapta los elementos en el borrador propio del territorio; nunca se importan como acuerdos aprobados.</p>
         <p className="pcm-source">Cada módulo indica fuente y versión. Las fichas de indicador y de actuación permiten preparar instrumentos de medición y recogida de datos. Los planes de acción, programas y compromisos operativos deben concretarse localmente, sin copiarlos automáticamente de otro expediente.</p>
         <details className="pcm-help-fold"><summary>Cómo funciona</summary>
@@ -323,8 +323,27 @@ export function LegacyActionPlanCatalogPanel(props: LegacyActionPlanCatalogPanel
       </section>
       {props.onDraftChange && ACTION_PLAN_CATALOG.map(original => {
         const module = municipalActionPlanModule(props.municipalityId, original);
-        return <PlanPreparationPanel key={`${props.municipalityId}-${module.id}`} municipalityId={props.municipalityId} module={module}
-          draft={props.drafts?.find(d => d.moduleId === module.id && d.municipalityId === props.municipalityId)} onChange={props.onDraftChange!} renderWorksheet={worksheetRenderer(true)}/>;
+        const savedDraft = props.drafts?.find(d => d.moduleId === module.id && d.municipalityId === props.municipalityId);
+        const incompatible = Boolean(savedDraft && savedDraft.version !== module.version);
+        const canRegroup = incompatible && original.id === HEALTHY_AGING_MODULE.id && savedDraft?.version === HEALTHY_AGING_MODULE.version;
+        return <div key={`${props.municipalityId}-${module.id}`}>
+          {incompatible && <section className="workspace-panel pcm-compatibility-notice" aria-label={`Versiones del módulo ${module.title}`}>
+            <h3>{module.title} · nueva organización del catálogo</h3>
+            <p>El expediente conserva un borrador de versión {savedDraft?.version}. La plantilla disponible es {module.version}. No se sustituye ni se valida automáticamente ningún contenido.</p>
+            {canRegroup ? <button type="button" onClick={() => {
+              if (!window.confirm("¿Preparar la estructura de cuatro bloques en este expediente? Se conservará íntegro el borrador anterior; las redacciones, fichas e indicadores se mantienen y los nuevos bloques quedan pendientes de revisión.")) return;
+              try {
+                const next = prepareMunicipalActionPlanDraft(props.municipalityId, module, savedDraft);
+                if (next) props.onDraftChange?.(next);
+              } catch (error) {
+                window.alert(error instanceof Error ? error.message : "No se pudo preparar la nueva estructura.");
+              }
+            }}>Preparar cuatro bloques y conservar la versión anterior</button>
+              : <p role="alert">Versión desconocida: requiere revisión documental antes de migrar. El borrador anterior se conserva sin cambios.</p>}
+          </section>}
+          <PlanPreparationPanel municipalityId={props.municipalityId} module={module}
+            draft={savedDraft} onChange={props.onDraftChange!} renderWorksheet={worksheetRenderer(true)}/>
+        </div>;
       })}
       {!directTerritorialEdit && <>
       <details><summary>Revisión formal y catálogo original · versión 3.1</summary>

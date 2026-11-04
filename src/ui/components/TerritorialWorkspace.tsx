@@ -1,13 +1,15 @@
 import {actionPlanElementCode} from '../../domain/action-plan-catalog/ActionPlanNotation';
-import {useEffect,useState} from 'react';
+import {useEffect,useMemo,useState} from 'react';
 import {readRelasDraft,readRelasReview,saveRelasDraft,saveRelasReview,type RelasClient} from '../../infrastructure/relas/RelasClient';
 import {type PlanPreparationDraft,type PlanPreparationReview,type PlanPreparationReviewStatus} from '../../domain/action-plan-catalog/PlanPreparationDraft';
 import {municipalActionPlanModule,prepareMunicipalActionPlanDraft} from '../../domain/action-plan-catalog/MunicipalActionPlanModule';
-import {HEALTHY_AGING_MODULE} from '../../domain/action-plan-catalog/ActionPlanCatalog';
+import {ACTION_PLAN_CATALOG,HEALTHY_AGING_MODULE} from '../../domain/action-plan-catalog/ActionPlanCatalog';
 import {PlanPreparationPanel} from './PlanPreparationPanel';
 
 export default function TerritorialWorkspace({client,scope,role,onBack}:{client:RelasClient;scope:string;role:string;onBack:()=>void}) {
- const module=municipalActionPlanModule(scope,HEALTHY_AGING_MODULE);
+ const [selectedModuleId,setSelectedModuleId]=useState<string>(HEALTHY_AGING_MODULE.id);
+ const originalModule=ACTION_PLAN_CATALOG.find(candidate=>candidate.id===selectedModuleId) ?? HEALTHY_AGING_MODULE;
+ const module=useMemo(()=>municipalActionPlanModule(scope,originalModule),[scope,originalModule]);
  const [draft,setDraft]=useState<PlanPreparationDraft>();
  const [version,setVersion]=useState<number|null>(null);
  const [dirty,setDirty]=useState(false);
@@ -113,6 +115,18 @@ export default function TerritorialWorkspace({client,scope,role,onBack}:{client:
 
  return <section><button onClick={()=>{if(!hasUnsaved||window.confirm('Hay cambios sin guardar. ¿Volver y descartarlos?'))onBack();}}>Volver al panel</button>
   <h2>Ámbito: {scope}</h2>
+  <nav className="plan-tabs" aria-label="Líneas del Plan de Acción">
+    {ACTION_PLAN_CATALOG.map(candidate=><button key={candidate.id} type="button"
+      className={`plan-tabs__tab${selectedModuleId===candidate.id?' plan-tabs__tab--active':''}`}
+      aria-current={selectedModuleId===candidate.id?'page':undefined}
+      onClick={()=>{
+        if(candidate.id===selectedModuleId)return;
+        if(hasUnsaved&&!window.confirm('Hay cambios sin guardar en esta línea. ¿Descartarlos para abrir la otra?'))return;
+        setLoadedScope(undefined);setDraft(undefined);setVersion(null);setReview(undefined);setReviewVersion(null);
+        setDirty(false);setReviewDirty(false);setMigrationPending(false);setBusy(true);setMessage('Recuperando línea…');
+        setSelectedModuleId(candidate.id);
+      }}>{candidate.title}</button>)}
+  </nav>
   <p>{isAdministrator?'Edición administrativa del Plan. Puedes modificar directamente objetivos e indicadores y consolidar esos cambios sin generar una propuesta para revisión. Si existe una propuesta territorial, puedes aceptarla, rechazarla o reformularla.':'Preparación del Plan. Guardar una modificación crea una propuesta territorial y no cambia por sí sola el texto consolidado.'}</p>
   {actionBar}
   {ready&&migrationPending&&<p role="status">Borrador reagrupado con el original archivado. El coordinador debe guardar la migración antes de consolidar una revisión administrativa.</p>}

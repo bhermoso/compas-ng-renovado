@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { ACTION_PLAN_CATALOG, HEALTHY_AGING_MODULE } from "../src/domain/action-plan-catalog/ActionPlanCatalog";
-import { municipalActionPlanModule, ZAGRA_AGING_PROPOSAL } from "../src/domain/action-plan-catalog/MunicipalActionPlanModule";
+import { municipalActionPlanModule, ZAGRA_AGING_PROPOSAL, COMMON_AGING_FOUR_BLOCKS_VERSION } from "../src/domain/action-plan-catalog/MunicipalActionPlanModule";
 import { ZAIDIN_AGING_PROPOSAL, thematicBlockNameFor, type PlanPreparationDraft } from "../src/domain/action-plan-catalog/PlanPreparationDraft";
 import { regroupZagraActionPlan } from "../src/application/workspace/regroupZagraActionPlan";
 import { createCompleteMunicipalityWorkspace } from "../src/application/workspace";
@@ -28,9 +28,14 @@ describe("Plan de Acción de Zagra en cuatro bloques", () => {
     }
   });
 
-  it("no extiende el cambio a Loja, otros ámbitos ni otras líneas", () => {
+  it("conserva la edición territorial de Zaidín y Zagra y ofrece cuatro bloques al resto, sin cambiar adicciones", () => {
     expect(municipalActionPlanModule("granada-zaidin", HEALTHY_AGING_MODULE)).toBe(ZAIDIN_AGING_PROPOSAL);
-    expect(municipalActionPlanModule("loja", HEALTHY_AGING_MODULE)).toBe(HEALTHY_AGING_MODULE);
+    const loja = municipalActionPlanModule("loja", HEALTHY_AGING_MODULE);
+    expect(loja.version).toBe(COMMON_AGING_FOUR_BLOCKS_VERSION);
+    expect(loja.generalObjectives.map(g => g.thematicBlockName)).toEqual(["Edadismo", "Soledad no deseada", "Autonomía", "Participación"]);
+    expect(loja.generalObjectives.map(g => g.specificObjectives.length)).toEqual([2,7,4,5]);
+    expect(HEALTHY_AGING_MODULE.generalObjectives).toHaveLength(9);
+    expect(loja.generalObjectives[0].code).not.toBe(HEALTHY_AGING_MODULE.generalObjectives[0].code);
     for (const module of ACTION_PLAN_CATALOG.filter(m => m.id !== HEALTHY_AGING_MODULE.id)) {
       expect(municipalActionPlanModule("zagra", module)).toBe(module);
     }
