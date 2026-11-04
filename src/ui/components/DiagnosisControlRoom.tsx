@@ -1,6 +1,5 @@
 import { useState, type ReactNode } from "react";
 import { DocumentCollectionReference, DocumentReference } from "./Documentation";
-import type { DocumentKind } from "../../domain/repository";
 import type { DocumentKind, TemporalScope } from "../../domain/repository";
 import type {
   DiagnosisControlSummary,
