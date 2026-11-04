@@ -978,34 +978,28 @@ export default function App() {
       .then((remoteWorkspace) => {
         if (cancelled) return;
         if (remoteWorkspace !== null) {
-          setWorkspace((current) => {
-            if (!shouldRestoreIndexedDbWorkspace(current, remoteWorkspace)) {
-              return withCarriedDocumentOriginals(current, remoteWorkspace);
-            }
-            queueMicrotask(() => {
-              setPendingTopics([
-                ...(remoteWorkspace.thematicPrioritisation?.selectedTopicIds ?? []),
-              ]);
-            });
-            return remoteWorkspace;
-          });
+          // Nunca publicar silenciosamente un trabajo local que pueda
+          // sobrescribir la versión compartida. El conflicto requiere recuperación
+          // manual: ambos snapshots permanecen intactos.
+          if (workspace.updatedAt > remoteWorkspace.updatedAt &&
+              !isEmptyWorkspaceForPersistenceGuard(workspace)) {
+            setRemotePersistenceMessage("Conflicto de versiones: el expediente local es posterior a Firebase. Se ha bloqueado el autoguardado remoto. Conserva una copia del navegador y concilia antes de continuar.");
+            return;
+          }
+          setWorkspace(() => withCarriedDocumentOriginals(remoteWorkspace, workspace));
+          setPendingTopics([...(remoteWorkspace.thematicPrioritisation?.selectedTopicIds ?? [])]);
         }
-        setRemotePersistenceMessage(
-          remoteWorkspace === null
-            ? "No existe todavía una copia compartida; se creará con este expediente."
-            : "Expediente compartido recuperado."
-        );
+        setRemoteHydratedMunicipalityId(municipalityId);
+        setRemotePersistenceMessage(remoteWorkspace === null
+          ? "No existe todavía una copia compartida; se creará con este expediente."
+          : "Expediente compartido recuperado desde Firebase.");
       })
       .catch((error: unknown) => {
         if (cancelled) return;
-        setRemotePersistenceMessage(
-          error instanceof Error
-            ? `No se pudo recuperar la copia compartida: ${error.message}`
-            : "No se pudo recuperar la copia compartida."
-        );
-      })
-      .finally(() => {
-        if (!cancelled) setRemoteHydratedMunicipalityId(municipalityId);
+        // Fallo de lectura: no liberar el autoguardado ni operaciones destructivas.
+        setRemotePersistenceMessage(error instanceof Error
+          ? `No se pudo recuperar Firebase: ${error.message}. El guardado remoto está bloqueado.`
+          : "No se pudo recuperar Firebase. El guardado remoto está bloqueado.");
       });
     return () => {
       cancelled = true;
