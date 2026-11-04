@@ -79,6 +79,9 @@ const slug = (s: string) =>
 /** «C O N O C E R» → «CONOCER». */
 const unspace = (s: string) => (/^(?:[A-ZÁÉÍÓÚÑ] ){2,}[A-ZÁÉÍÓÚÑ]\b/.test(s) ? s.replace(/^((?:[A-ZÁÉÍÓÚÑ] )+[A-ZÁÉÍÓÚÑ])/, (m) => m.replace(/ /g, "")) : s);
 
+/** La continuación de una página no inaugura otro capítulo del documento. */
+const CONTINUATION_SUFFIX = /\s*(?:[·•–—-]\s*|\(\s*)continuaci[oó]n(?:\s+\d+)?\s*\)?$/i;
+
 function headingOf(block: string): { title: string; level: 1 | 2 } | null {
   const line = block.replace(/\s+/g, " ").trim();
   if (line.length > 80 || /[.,;:]$/.test(line)) return null;
@@ -300,6 +303,13 @@ export function parseProfileStructure(text: string): ProfileStructure {
   for (const p of paragraphs) {
     const h = headingOf(p);
     if (h) {
+      // Un encabezado «07. CONCLUSIONES · CONTINUACIÓN» reanuda el mismo
+      // capítulo. Se conserva íntegro el texto que sigue y no se crea otro
+      // índice ni se duplica su representación en el lector.
+      const continuationBase = h.title.replace(CONTINUATION_SUFFIX, "").trim();
+      if (continuationBase !== h.title && slug(current.title) === slug(continuationBase)) {
+        continue;
+      }
       if (current.paragraphs.length || current.id !== "inicio") sections.push(current);
       let id = slug(h.title);
       while (used.has(id)) id = `${id}-2`;
