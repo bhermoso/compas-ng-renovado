@@ -265,6 +265,9 @@ export interface MunicipalDocument {
   cycle?: DocumentCycle;
   /** Declaración temporal ampliada: opcional para preservar expedientes anteriores. */
   temporal?: DocumentTemporalMetadata;
+  /** Revisión documental anterior, por ID; no implica recalcular evidencias. */
+  revisionOf?: DocumentId;
+  revisionNumber?: number;
   /** Huella SHA-256 del archivo original cargado. Ausente en documentos anteriores. */
   contentSha256?: string;
   createdAt: string;
@@ -312,6 +315,8 @@ export interface AddMunicipalDocumentInput {
   cycle?: DocumentCycle;
   temporal?: DocumentTemporalMetadata;
   contentSha256?: string;
+  revisionOf?: DocumentId;
+  revisionNumber?: number;
 }
 
 function defaultCanGenerateEvidence(kind: DocumentKind): boolean {
@@ -346,6 +351,8 @@ export function addMunicipalDocument(
     source: input.source ?? {},
     sourceFileName: input.sourceFileName,
     sourceText: input.sourceText,
+    ...(input.revisionOf ? { revisionOf: input.revisionOf } : {}),
+    ...(input.revisionNumber ? { revisionNumber: input.revisionNumber } : {}),
     canGenerateEvidence:
       input.canGenerateEvidence ?? defaultCanGenerateEvidence(input.kind),
     tags: input.tags ?? [],
