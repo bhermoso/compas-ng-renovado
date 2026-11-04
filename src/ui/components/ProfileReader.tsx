@@ -88,10 +88,16 @@ export function ProfileReader({ structure, pdfUrl, title }: { structure: Profile
     && !sections.some((s) => /^0?1\.\s+/.test(s.title.trim()));
   const openingSections = sourceStartsAtTwo ? sections.slice(0, firstNumberedIndex) : [];
   const hasEditorialOpening = openingSections.some((s) => s.paragraphs.length > 0);
+  // «La salud en resumen» es un rótulo literal en la primera página del
+  // Perfil externo de Alfacar. No atribuirlo a otros documentos que no lo declaran.
+  const hasSourceSummary = openingSections.some((s) =>
+    s.title.toLowerCase().includes("la salud en resumen")
+    || s.paragraphs.some((p) => /\bla salud en resumen\b/i.test(p))
+  );
   const openingIds = new Set(hasEditorialOpening ? openingSections.map((s) => s.id) : []);
   const editorialOpening: ProfileSection = {
     id: "apertura-editorial",
-    title: "01. Apertura y síntesis",
+    title: hasSourceSummary ? "01. La salud en resumen" : "01. Apertura y síntesis",
     level: 1,
     paragraphs: openingSections.flatMap((s) => s.paragraphs),
   };
@@ -175,7 +181,12 @@ export function ProfileReader({ structure, pdfUrl, title }: { structure: Profile
                   {s.title !== "Inicio" && <Heading>{s.title}</Heading>}
                   {hasEditorialOpening && s.id === editorialOpening.id ? (
                     <>
-                      <p className="ep-help">Rótulo de navegación añadido por COMPÁS: el texto incorporado no contiene un encabezado «01». El documento original no se ha modificado.</p>
+                      <p className="ep-help">
+                        {hasSourceSummary
+                          ? "«La salud en resumen» consta en el texto incorporado. Solo el número 01 se añade para facilitar la navegación; el documento original no se ha modificado."
+                          : "Rótulo de navegación añadido por COMPÁS: el texto incorporado no contiene un encabezado «01». El documento original no se ha modificado."}
+                      </p>
+                      {pdfUrl && <p className="ep-help"><a href={pdfUrl} target="_blank" rel="noopener noreferrer">Abrir el PDF original para cotejar la apertura</a></p>}
                       {openingSections.map((original) => (
                         <section key={original.id} className="epr-section epr-section--opening-source">
                           {original.title !== "Inicio" && <h3>{original.title}</h3>}

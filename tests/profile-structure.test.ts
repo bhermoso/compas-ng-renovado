@@ -181,12 +181,23 @@ describe("Apertura sin número en el Perfil completo", () => {
     const html = renderToStaticMarkup(createElement(ProfileReader, { structure, title: "Alfacar" }));
     const toc = html.match(/<nav class="epr-toc"[\s\S]*?<\/nav>/)?.[0] ?? "";
     expect(toc).toContain('href="#epr-sec-apertura-editorial"');
-    expect(toc).toContain("01. Apertura y síntesis");
-    expect(toc.indexOf("01. Apertura y síntesis")).toBeLessThan(toc.indexOf("02. CUADRO DE INDICADORES"));
-    expect(html).toContain("Rótulo de navegación añadido por COMPÁS");
+    expect(toc).toContain("01. La salud en resumen");
+    expect(toc.indexOf("01. La salud en resumen")).toBeLessThan(toc.indexOf("02. CUADRO DE INDICADORES"));
+    expect(html).toContain("Solo el número 01 se añade para facilitar la navegación");
     expect((html.match(/La salud en resumen: población, prevención y activos/g) ?? [])).toHaveLength(1);
     expect((html.match(/5.840 habitantes/g) ?? [])).toHaveLength(1);
     expect(html).not.toContain('id="epr-preliminaries"');
+  });
+
+  it("enlaza el original disponible sin alterar el texto incorporado", () => {
+    const structure = parseProfileStructure(alfacarLike);
+    const html = renderToStaticMarkup(createElement(ProfileReader, {
+      structure, title: "Alfacar", pdfUrl: "blob:https://example.test/perfil-original",
+    }));
+    expect(html).toContain("Abrir el PDF original para cotejar la apertura");
+    expect(html).toContain('href="blob:https://example.test/perfil-original"');
+    expect(html).toContain("La salud en resumen");
+    expect(structure.sections.some((s) => /^01\./.test(s.title))).toBe(false);
   });
 
   it("no añade un segundo 01 cuando el documento lo contiene realmente", () => {
