@@ -4,7 +4,7 @@ import { parseProfileStructure, prefillFromStructure } from '../../application/h
 import { ProfileReader } from './ProfileReader';
 import type { ExternalHealthProfile, ExternalProfileLibrary, ProfileAttachment, ProfileResult } from '../../domain/health-profile/ExternalHealthProfile';
 import type { LocalHealthProfileArtifact } from '../../domain/health-profile-artifact';
-import { appendExternalProfile, importProfileFile, prepareImportedProfileRevision, profileAttachmentBlob } from '../../application/health-profile/externalProfiles';
+import { appendExternalProfile, archiveExternalProfileVersion, deleteExternalProfileVersion, importProfileFile, prepareImportedProfileRevision, profileAttachmentBlob } from '../../application/health-profile/externalProfiles';
 import { PSLCArtifactViewer } from './PSLCArtifactViewer';
 import { ProfileResultsDashboard } from './ProfileResultsDashboard';
 import { ProfileEditorialLab } from './ProfileEditorialLab';
@@ -63,6 +63,8 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
  const [fileUrls,setFileUrls]=useState<Record<string,string>>({});
  const [resultDraft,setResultDraft]=useState<ProfileResult>();
  const fileInput=useRef<HTMLInputElement>(null);
+ const draftFileInput=useRef<HTMLInputElement>(null);
+ const replaceAttachmentId=useRef<string>();
  const fullProfileRef=useRef<HTMLDivElement>(null);
  const selected=library.profiles.find(p=>p.id===(selectedId ?? library.activeId)) ?? library.profiles.find(p=>p.id===library.activeId);
  useEffect(()=>{onDirtyChange?.(!!draft);return()=>onDirtyChange?.(false);},[draft,onDirtyChange]);
@@ -121,10 +123,51 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
   }catch(e){setError(e instanceof Error?e.message:'No se pudo leer el perfil.');setMessage('');}
   finally{setBusy(false);if(fileInput.current)fileInput.current.value='';}
  }
+ /** Attach or replace a file only in the new draft revision. */
+ async function changeDraftFiles(list: FileList | null) {
+  const file=list?.[0], replacedId=replaceAttachmentId.current;
+  replaceAttachmentId.current=undefined;
+  if(!file||!draft||busy)return;
+  setBusy(true);setError('');setMessage('Comprobando integridad del nuevo archivo…');
+  try {
+   const imported=await importProfileFile(file,municipalityId);
+   const old=replacedId&&[...library.attachments,...newFiles].find(a=>a.id===replacedId);
+   if(replacedId&&!old)throw new Error('El archivo a sustituir ya no está en el borrador.');
+   if(old&&old.mimeType!==imported.attachment.mimeType)throw new Error('Para sustituir un archivo debe conservarse su formato. Para otro formato, añade un archivo.');
+   setNewFiles(current=>[...current.filter(f=>f.id!==replacedId),imported.attachment]);
+   setDraft(current=>current?{...current,attachmentIds:[...current.attachmentIds.filter(id=>id!==replacedId),imported.attachment.id]}:current);
+   setMessage(replacedId?'Sustituido solo en la nueva revisión. El original de las versiones anteriores se conserva; comprueba el texto y los resultados.':'Archivo añadido a esta revisión. Se incorporará a Firebase al guardarla.');
+  }catch(e){setError(e instanceof Error?e.message:'No se pudo incorporar el archivo.');setMessage('');}
+  finally{setBusy(false);}
+ }
+ function openDraftFilePicker(replaceId?:string){
+  replaceAttachmentId.current=replaceId;
+  draftFileInput.current?.click();
+ }
+ function removeDraftAttachment(id:string){
+  setDraft(current=>current?{...current,attachmentIds:current.attachmentIds.filter(x=>x!==id)}:current);
+  setNewFiles(current=>current.filter(file=>file.id!==id));
+  setMessage('Adjunto retirado solo de esta revisión. Las versiones guardadas permanecen intactas.');
+ }
  function edit() {
   if(!selected)return;
-  setDraft({...structuredClone(selected),id:crypto.randomUUID(),revisionOf:selected.id,createdAt:new Date().toISOString(),status:'review',validatedBy:undefined,validatedAt:undefined});
+  setDraft({...structuredClone(selected),id:crypto.randomUUID(),revisionOf:selected.id,createdAt:new Date().toISOString(),status:'review',validatedBy:undefined,validatedAt:undefined,archivedAt:undefined,archivedBy:undefined});
   setNewFiles([]);setResultDraft(undefined);setError('');setMessage('Estás preparando una nueva revisión. La versión anterior y sus originales se conservan.');
+ }
+ async function archiveVersion(profile:ExternalHealthProfile){
+  if(!window.confirm(`¿Archivar «${profile.title}»? Los archivos, las fuentes y la historia permanecerán accesibles.`))return;
+  try{await commit(archiveExternalProfileVersion(library,profile.id,authorName),'Versión archivada y conservada en Firebase.');}catch(e){setError(e instanceof Error?e.message:'No se pudo archivar.');}
+ }
+ async function deleteVersion(profile:ExternalHealthProfile){
+  if(!window.confirm(`¿Eliminar definitivamente «${profile.title}»? Solo se borrarán los adjuntos que ninguna otra versión utilice. Esta operación no se puede deshacer.`))return;
+  setBusy(true);setError('');setMessage('Eliminando del expediente compartido…');
+  try{
+   const next=deleteExternalProfileVersion(library,profile.id);
+   await onSave(next,progress=>setMessage(progress));
+   setSelectedId(library.activeId);
+   setMessage('Versión eliminada en Firebase. Se conservaron las demás versiones y sus archivos.');
+  }catch(e){setError(e instanceof Error?e.message:'No se pudo eliminar.');setMessage('');}
+  finally{setBusy(false);}
  }
  async function saveDraft(e: React.FormEvent) {
   e.preventDefault();if(!draft?.title.trim())return;
@@ -134,7 +177,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
   if(invalidLinks.length){setError(`Hay vínculos a conclusiones que ya no figuran en el documento: ${invalidLinks.join(', ')}. Corrígelos antes de guardar.`);return;}
   setBusy(true);setError('');setMessage('Guardando el documento, los resultados y la versión en Firebase…');
   try{
-   const appended=appendExternalProfile(library,{...draft,title:draft.title.trim()},newFiles,municipalityId);
+   const appended=appendExternalProfile(library,{...draft,title:draft.title.trim()},newFiles.filter(file=>draft.attachmentIds.includes(file.id)),municipalityId);
    // Una nueva revisión no sustituye la versión vigente hasta una promoción explícita.
    const next=draft.revisionOf && library.activeId ? {...appended,activeId:library.activeId} : appended;
    await onSave(next, progress => setMessage(progress));setSelectedId(draft.id);setDraft(undefined);setNewFiles([]);setTab('results');
