@@ -177,9 +177,9 @@ describe("Apertura sin número en el Perfil completo", () => {
 
   it("hace navegable la síntesis anterior al 02, sin inventar un epígrafe en el texto", () => {
     const structure = parseProfileStructure(alfacarLike);
-    expect(structure.sections.some((s) => /^01\\./.test(s.title))).toBe(false);
+    expect(structure.sections.some((s) => /^01\./.test(s.title))).toBe(false);
     const html = renderToStaticMarkup(createElement(ProfileReader, { structure, title: "Alfacar" }));
-    const toc = html.match(/<nav class="epr-toc"[\\s\\S]*?<\\/nav>/)?.[0] ?? "";
+    const toc = html.match(/<nav class="epr-toc"[\s\S]*?<\/nav>/)?.[0] ?? "";
     expect(toc).toContain('href="#epr-sec-apertura-editorial"');
     expect(toc).toContain("01. Apertura y síntesis");
     expect(toc.indexOf("01. Apertura y síntesis")).toBeLessThan(toc.indexOf("02. CUADRO DE INDICADORES"));
@@ -190,7 +190,7 @@ describe("Apertura sin número en el Perfil completo", () => {
   });
 
   it("no añade un segundo 01 cuando el documento lo contiene realmente", () => {
-    const source = "01. RESUMEN\\n\\nTexto de apertura.\\n\\n02. CUADRO DE INDICADORES\\n\\nDatos.";
+    const source = "01. RESUMEN\n\nTexto de apertura.\n\n02. CUADRO DE INDICADORES\n\nDatos.";
     const s = parseProfileStructure(source);
     const html = renderToStaticMarkup(createElement(ProfileReader, { structure: s, title: "Perfil" }));
     expect(html).toContain('href="#epr-sec-01-resumen"');
@@ -198,7 +198,7 @@ describe("Apertura sin número en el Perfil completo", () => {
   });
 
   it("no fabrica un 01 cuando no hay texto inicial que organizar", () => {
-    const s = parseProfileStructure("02. CUADRO DE INDICADORES\\n\\nDatos.");
+    const s = parseProfileStructure("02. CUADRO DE INDICADORES\n\nDatos.");
     const html = renderToStaticMarkup(createElement(ProfileReader, { structure: s, title: "Perfil" }));
     expect(html).not.toContain('href="#epr-sec-apertura-editorial"');
   });
