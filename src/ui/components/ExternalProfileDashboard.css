@@ -190,3 +190,7 @@
 .ep-original-check__input{display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:13px;font-weight:650;padding:10px 0}
 .ep-original-check__input input{max-width:100%;font:inherit;font-size:12px}
 @media print{.ep-original-check{display:none!important}}
+
+/* Descarga original verificable separada de la exportación editorial derivada. */
+.ep-original-download{font-size:13px;font-weight:600;color:var(--ep-blue);text-decoration:underline;text-underline-offset:2px;overflow-wrap:anywhere;align-self:center}
+.ep-review-status{font-size:12px;color:var(--ep-muted);margin:0 0 8px!important}

@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import seed from '../public/seeds/compas-ng-workspace-granada-zaidin.json';
 import type { MunicipalityWorkspace } from '../src/domain/workspace';
-import { EMPTY_PROFILE_LIBRARY, appendExternalProfile, importProfileFile, isExternalProfileLibrary, profileAttachmentBlob, readExternalProfilePackage } from '../src/application/health-profile/externalProfiles';
+import { EMPTY_PROFILE_LIBRARY, appendExternalProfile, importProfileFile, isExternalProfileLibrary, prepareImportedProfileRevision, profileAttachmentBlob, readExternalProfilePackage } from '../src/application/health-profile/externalProfiles';
 import { createMunicipalityRuntime } from '../src/application/runtime';
 import { parseWorkspaceJSON, serializeWorkspaceForStorage } from '../src/infrastructure/persistence/local-storage';
 import { ExternalProfileDashboard } from '../src/ui/components/ExternalProfileDashboard';
@@ -133,9 +133,38 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
   const p=externalProfileFixture();
   const html=renderToStaticMarkup(createElement(ExternalProfileDashboard,{municipalityId:p.municipalityId,municipalityName:'Municipio de pruebas',library:{profiles:[p],attachments:[],activeId:p.id},authorName:'Pruebas',onSave:async()=>{}}));
   // Decisión del autor (2026-11-01): los datos epidemiológicos no se cuestionan; COMPÁS no añade advertencias propias.
-  expect(html).not.toContain('Antecedente histórico');expect(html).not.toContain('no describe por sí solo');expect(html).toContain('Denominador no documentado');expect(html).toContain('Atlas ficticio');expect(html).toContain('Gestión y versiones');expect(html).toContain('Laboratorio experimental');expect(html).not.toContain('Descargar esta revisión · Word');expect(html).toContain('Perfil completo · PDF');
+  expect(html).not.toContain('Antecedente histórico');expect(html).not.toContain('no describe por sí solo');expect(html).toContain('Denominador no documentado');expect(html).toContain('Atlas ficticio');expect(html).toContain('Gestión y versiones');expect(html).toContain('Laboratorio experimental');expect(html).not.toContain('Descargar esta revisión · Word');expect(html).toContain('Exportar presentación COMPÁS · PDF');
   expect(html).not.toContain('prevalencia actual');
  });
+ it('una v0.2 importada mantiene la v0.1 activa y en revisión hasta promoción explícita',()=>{
+  const first=externalProfileFixture('alfacar');
+  const incoming={...externalProfileFixture('alfacar'),id:'alfacar-v02-imported',status:'validated' as const,validatedBy:'No autorizado',validatedAt:'2026-11-03T12:00:00Z'};
+  const second=prepareImportedProfileRevision(incoming,first);
+  const library=appendExternalProfile({profiles:[first],attachments:[],activeId:first.id},second,[],'alfacar');
+  expect(second.revisionOf).toBe(first.id);
+  expect(second.status).toBe('review');
+  expect(second.validatedBy).toBeUndefined();
+  expect(second.validatedAt).toBeUndefined();
+  expect(library.activeId).toBe(first.id);
+  expect(library.profiles[0]).toEqual(first);
+  expect(library.profiles[1].id).toBe('alfacar-v02-imported');
+ });
+ it('al importar el primer perfil no crea una revisión sin antecedente',()=>{
+  const profile=externalProfileFixture('alfacar');
+  expect(prepareImportedProfileRevision(profile)).toBe(profile);
+ });
+ it('identifica claramente la exportación derivada y la ausencia del PDF fuente',()=>{
+  const p=externalProfileFixture('alfacar');
+  const html=renderToStaticMarkup(createElement(ExternalProfileDashboard,{
+   municipalityId:'alfacar',municipalityName:'Alfacar',
+   library:{profiles:[p],attachments:[],activeId:p.id},authorName:'Pruebas',onSave:async()=>{}
+  }));
+  expect(html).toContain('Exportar presentación COMPÁS · PDF');
+  expect(html).toContain('PDF original no adjunto a esta versión.');
+  expect(html).toContain('Borrador técnico: pendiente de validación.');
+  expect(html).not.toContain('Perfil completo · PDF');
+ });
+
  it('el laboratorio permite revisar C3, C6 y C7 sin escribir en el perfil original',()=>{
   const p=externalProfileFixture();
   p.text=readFileSync(resolve('tests/fixtures/profile-text/loja-v0.3-package.txt'),'utf8');
@@ -155,7 +184,7 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
   expect(html).toContain('Contenido literal aportado por el equipo.');
   expect(html).toContain('epd-print-topics');
   expect(html).toContain('epd-screen-topics');
-  expect(html).toContain('Perfil completo · PDF');
+  expect(html).toContain('Exportar presentación COMPÁS · PDF');
  });
  it('reconoce un perfil anterior de COMPÁS sin exigir que se convierta en perfil externo',()=>{
   const html=renderToStaticMarkup(createElement(ExternalProfileDashboard,{

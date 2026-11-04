@@ -3,6 +3,20 @@ import type { ExternalHealthProfile, ExternalProfileLibrary, ProfileAttachment, 
 export const MAX_PROFILE_FILE_BYTES = 20 * 1024 * 1024;
 export const MAX_PROFILE_LIBRARY_BYTES = 40 * 1024 * 1024;
 export const EMPTY_PROFILE_LIBRARY: ExternalProfileLibrary = { profiles: [], attachments: [] };
+/**
+ * When a municipality already has an external profile, importing a later
+ * document creates a traceable review. The previous version remains active
+ * until a separate user action promotes the new review.
+ */
+export function prepareImportedProfileRevision(
+ profile: ExternalHealthProfile,
+ previous?: Pick<ExternalHealthProfile, 'id'>
+): ExternalHealthProfile {
+ if (!previous) return profile;
+ return {...profile,revisionOf:previous.id,status:'review',validatedAt:undefined,validatedBy:undefined};
+}
+
+
 const object = (x: unknown): x is Record<string, unknown> => typeof x === 'object' && x !== null && !Array.isArray(x);
 const string = (x: unknown): x is string => typeof x === 'string';
 const strings = (x: unknown): x is string[] => Array.isArray(x) && x.every(string);
