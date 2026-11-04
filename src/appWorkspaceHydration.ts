@@ -291,11 +291,13 @@ export function applySeedDocumentMigration(
   const existingDocIds = new Set(current.repository.documents.map((d) => d.id));
   const existingAtomIds = new Set(current.evidenceStore.atoms.map((a) => a.id));
   const migratedDocIds = new Set(seedDocs.map((d) => d.id));
-  const docsToAdd = seedDocs.filter((d) => !existingDocIds.has(d.id));
+  const deletedIds = new Set((current.deletedDocuments ?? []).map(d => d.documentId));
+  const docsToAdd = seedDocs.filter((d) => !existingDocIds.has(d.id) && !deletedIds.has(d.id));
   const atomsToAdd = seed.evidenceStore.atoms.filter(
     (a) =>
       a.provenance.documentId !== undefined &&
       migratedDocIds.has(a.provenance.documentId) &&
+      !deletedIds.has(a.provenance.documentId) &&
       !existingAtomIds.has(a.id)
   );
   if (
@@ -384,7 +386,8 @@ export function shouldRestoreIndexedDbWorkspace(
   // de documentos puede reflejar eliminaciones deliberadas y debe respetarse.
   const migration = INCREMENTAL_SEED_MIGRATIONS.find(m => m.municipalityId === current.municipality.identity.id);
   const applied = migration !== undefined && (stored.appliedSeedMigrations ?? []).includes(migration.marker);
-  if (hasSeedBaselineRegression(current, stored) && !(applied && stored.updatedAt > current.updatedAt)) return false;
+  const explicitDeletions = (stored.deletedDocuments?.length ?? 0) > 0;
+  if (hasSeedBaselineRegression(current, stored) && !((applied || explicitDeletions) && stored.updatedAt > current.updatedAt)) return false;
   if (stored.updatedAt > current.updatedAt) return true;
   // La copia ligera de localStorage no lleva los originales del Diagnóstico y
   // se guarda con la misma fecha que la copia de IndexedDB o la remota. A
@@ -410,7 +413,8 @@ export function withCarriedDocumentOriginals(
   if (!other || other.municipality.identity.id !== current.municipality.identity.id) return current;
   const have = new Set((current.documentOriginals ?? []).map((o) => o.documentId));
   const documentIds = new Set(current.repository.documents.map((d) => d.id));
-  const carried = (other.documentOriginals ?? []).filter((o) => !have.has(o.documentId) && documentIds.has(o.documentId));
+  const removed = new Set((current.deletedDocuments ?? []).map(o => o.documentId));
+  const carried = (other.documentOriginals ?? []).filter((o) => !have.has(o.documentId) && documentIds.has(o.documentId) && !removed.has(o.documentId));
   if (carried.length === 0) return current;
   return { ...current, documentOriginals: [...(current.documentOriginals ?? []), ...carried] };
 }
