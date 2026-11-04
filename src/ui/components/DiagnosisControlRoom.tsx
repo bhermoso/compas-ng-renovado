@@ -1,4 +1,6 @@
 import { useState, type ReactNode } from "react";
+import { DocumentCollectionReference, DocumentReference } from "./Documentation";
+import type { DocumentKind } from "../../domain/repository";
 import type { DocumentKind, TemporalScope } from "../../domain/repository";
 import type {
   DiagnosisControlSummary,
@@ -81,17 +83,26 @@ export function DiagnosisControlRoom({ municipalityName, summary, kindLabels = [
       <ul className="diagnosis-matrix" aria-label="Módulos del diagnóstico">
         {summary.modules.map((module) => (
           <li key={module.id} className={`diagnosis-matrix__card diagnosis-matrix__card--${module.state}`}>
-            <div className="diagnosis-matrix__top">
-              <span className="diagnosis-matrix__label">{module.label}</span>
-              <span className={`diagnosis-matrix__pill diagnosis-matrix__pill--${module.state}`}>{STATE_LABEL[module.state]}</span>
-            </div>
-            <strong className="diagnosis-matrix__value">{module.value}</strong>
-            <p className="diagnosis-matrix__detail">{module.detail}</p>
-            {onOpenModule && (
-              <button type="button" className="diagnosis-matrix__open" onClick={() => onOpenModule(module.id)} aria-label={`Ver detalle: ${module.label}`}>
-                Ver detalle
-              </button>
-            )}
+            {(() => {
+              const kinds: DocumentKind[] | undefined =
+                module.id === "health-report" ? ["health-report"] :
+                module.id === "assets" ? ["community-asset", "localiza-salud"] :
+                module.id === "frameworks" ? ["strategic-framework"] : undefined;
+              const contents = <>
+                <span className="diagnosis-matrix__top">
+                  <span className="diagnosis-matrix__label">{module.label}</span>
+                  <span className={`diagnosis-matrix__pill diagnosis-matrix__pill--${module.state}`}>{STATE_LABEL[module.state]}</span>
+                </span>
+                <strong className="diagnosis-matrix__value">{module.value}</strong>
+                <span className="diagnosis-matrix__detail">{module.detail}</span>
+                <span className="diagnosis-matrix__open">{kinds ? "Consultar documentos" : "Ver detalle"}</span>
+              </>;
+              return kinds
+                ? <DocumentCollectionReference kinds={kinds} className="diagnosis-matrix__card-action">{contents}</DocumentCollectionReference>
+                : onOpenModule
+                  ? <button type="button" className="diagnosis-matrix__card-action" onClick={() => onOpenModule(module.id)} aria-label={`Ver detalle: ${module.label}`}>{contents}</button>
+                  : contents;
+            })()}
           </li>
         ))}
       </ul>
@@ -125,7 +136,7 @@ function DiagnosisTimeline({ summary, kindLabels }: { summary: DiagnosisControlS
           {entries.map((entry) => (
             <li key={entry.documentId} className={`diagnosis-timeline__item diagnosis-timeline__item--${entry.scope}`}>
               <span className="diagnosis-timeline__date">{entry.dateLabel ?? "Fecha no declarada"}</span>
-              <span className="diagnosis-timeline__title">{entry.title}</span>
+              <span className="diagnosis-timeline__title"><DocumentReference documentId={entry.documentId}>{entry.title}</DocumentReference></span>
               <span className="diagnosis-timeline__meta">{labelOf(entry.kind)} · {SCOPE_LABEL[entry.scope]}{entry.scopeSource === "cycle" ? " (ciclo declarado)" : ""}</span>
             </li>
           ))}
