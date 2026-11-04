@@ -57,6 +57,18 @@ interface DiagnosisControlRoomProps {
 /** Cabecera, resumen factual y matriz de módulos del Diagnóstico territorial. */
 export function DiagnosisControlRoom({ municipalityName, summary, kindLabels = [], onOpenModule }: DiagnosisControlRoomProps) {
   const { metrics } = summary;
+  const [timelineFilter, setTimelineFilter] = useState<TemporalScope | "all">("all");
+  const allDocumentKinds = Object.keys(FALLBACK_KIND_LABELS) as DocumentKind[];
+  const openTimelineWithoutScope = () => {
+    setTimelineFilter("undetermined");
+    document.getElementById("diagnosis-timeline")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+  const metricValue = (value: number | string, label: string, target: "documents" | "studies" | "assets" | "evidence" | "temporal") => {
+    if (target === "documents") return <DocumentCollectionReference kinds={allDocumentKinds} className="diagnosis-control__metric-link" >{value}<span aria-hidden="true"> ↗</span><span className="sr-only"> · Consultar documentación: {label}</span></DocumentCollectionReference>;
+    if (target === "temporal") return <button type="button" className="diagnosis-control__metric-link" onClick={openTimelineWithoutScope}>{value}<span aria-hidden="true"> ↘</span><span className="sr-only"> · Filtrar la cronología por documentos sin alcance temporal</span></button>;
+    if (!onOpenModule) return <span>{value}</span>;
+    return <button type="button" className="diagnosis-control__metric-link" onClick={() => onOpenModule(target === "studies" ? "studies" : target === "assets" ? "assets" : "evidence")}>{value}<span aria-hidden="true"> ↘</span><span className="sr-only"> · Abrir detalle de {label}</span></button>;
+  };
   return (
     <section className="workspace-panel diagnosis-control" aria-labelledby="diagnosis-control-title">
       <div className="diagnosis-control__head">
@@ -67,13 +79,13 @@ export function DiagnosisControlRoom({ municipalityName, summary, kindLabels = [
         </div>
       </div>
 
-      <dl className="diagnosis-control__metrics" aria-label="Resumen factual del expediente">
-        <div><dt>Documentos activos</dt><dd>{metrics.activeDocuments}</dd></div>
-        <div><dt>Estudios</dt><dd>{metrics.studiesLoaded}/{metrics.totalStudies}</dd></div>
-        <div><dt>Activos</dt><dd>{metrics.assets}</dd></div>
-        <div><dt>Evidencias</dt><dd>{metrics.evidence}</dd></div>
-        <div className={metrics.withoutTemporalDeclaration ? "diagnosis-control__metric--attention" : undefined}><dt>Sin alcance temporal declarado</dt><dd>{metrics.withoutTemporalDeclaration}</dd></div>
-        <div className={metrics.pendingValidation ? "diagnosis-control__metric--attention" : undefined}><dt>Pendientes de validación</dt><dd>{metrics.pendingValidation}</dd></div>
+      <dl className="diagnosis-control__metrics" aria-label="Resumen navegable del expediente">
+        <div><dt>Documentos activos</dt><dd>{metricValue(metrics.activeDocuments, "documentos", "documents")}</dd></div>
+        <div><dt>Estudios</dt><dd>{metricValue(`${metrics.studiesLoaded}/${metrics.totalStudies}`, "estudios", "studies")}</dd></div>
+        <div><dt>Activos</dt><dd>{metricValue(metrics.assets, "activos", "assets")}</dd></div>
+        <div><dt>Evidencias</dt><dd>{metricValue(metrics.evidence, "evidencias", "evidence")}</dd></div>
+        <div className={metrics.withoutTemporalDeclaration ? "diagnosis-control__metric--attention" : undefined}><dt>Sin alcance temporal</dt><dd>{metricValue(metrics.withoutTemporalDeclaration, "sin alcance temporal", "temporal")}</dd></div>
+        <div className={metrics.pendingValidation ? "diagnosis-control__metric--attention" : undefined}><dt>Pendientes de validación</dt><dd>{metricValue(metrics.pendingValidation, "pendientes de validación", "documents")}</dd></div>
       </dl>
       <p className="panel-note">Las cifras cuentan registros y declaraciones del expediente; no certifican calidad, vigencia ni suficiencia metodológica.</p>
 
@@ -105,17 +117,16 @@ export function DiagnosisControlRoom({ municipalityName, summary, kindLabels = [
         ))}
       </ul>
 
-      <DiagnosisTimeline summary={summary} kindLabels={kindLabels} />
+      <DiagnosisTimeline summary={summary} kindLabels={kindLabels} filter={timelineFilter} setFilter={setTimelineFilter} />
     </section>
   );
 }
 
-function DiagnosisTimeline({ summary, kindLabels }: { summary: DiagnosisControlSummary; kindLabels: ReadonlyArray<{ value: DocumentKind; label: string }> }) {
-  const [filter, setFilter] = useState<TemporalScope | "all">("all");
+function DiagnosisTimeline({ summary, kindLabels, filter, setFilter }: { summary: DiagnosisControlSummary; kindLabels: ReadonlyArray<{ value: DocumentKind; label: string }>; filter: TemporalScope | "all"; setFilter: (next: TemporalScope | "all") => void }) {
   const entries = filter === "all" ? summary.timeline : summary.timeline.filter((entry) => entry.scope === filter);
   const labelOf = (kind: DocumentKind) => kindLabels.find((entry) => entry.value === kind)?.label ?? FALLBACK_KIND_LABELS[kind] ?? kind;
   return (
-    <div className="diagnosis-timeline">
+    <div className="diagnosis-timeline" id="diagnosis-timeline">
       <h3 className="diagnosis-control__subtitle">Línea temporal de las fuentes</h3>
       <div className="diagnosis-timeline__filters" role="group" aria-label="Filtrar por alcance temporal">
         {SCOPE_FILTERS.map((option) => {
