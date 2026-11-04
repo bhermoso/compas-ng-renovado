@@ -59,7 +59,6 @@ export function DiagnosisControlRoom({ municipalityName, summary, kindLabels = [
   const { metrics } = summary;
   return (
     <section className="workspace-panel diagnosis-control" aria-labelledby="diagnosis-control-title">
-      <div className="gradient-bar" aria-hidden="true" />
       <div className="diagnosis-control__head">
         <div>
           <p className="eyebrow">01 · Diagnóstico territorial · Sala de control</p>
