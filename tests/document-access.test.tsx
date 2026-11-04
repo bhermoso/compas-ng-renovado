@@ -54,6 +54,7 @@ describe('Gestión documental contextual en todas las fichas',()=>{
  it('expone versión, archivo y eliminación a usuarios con permisos de escritura',()=>{
   const document=seed.repository.documents.find(d=>d.kind==='health-report')!;
   const tools={
+   municipalityId: document.municipalityId,
    originals:[],storeOriginal:async()=>{},createRevision:async()=>{},
    archiveDocument:async()=>{},deleteDocument:async()=>true,
   };
@@ -67,6 +68,22 @@ describe('Gestión documental contextual en todas las fichas',()=>{
   expect(html).toContain('Archivar documento');
   expect(html).toContain('Eliminar documento');
   expect(html).toContain('Descargar PDF original');
+ });
+ it('no permite alterar un documento de otro municipio desde la biblioteca transversal',()=>{
+  const document=seed.repository.documents.find(d=>d.kind==='health-report')!;
+  const manager={
+   municipalityId:'municipio-distinto', originals:[],
+   storeOriginal:async()=>{},createRevision:async()=>{},archiveDocument:async()=>{},deleteDocument:async()=>true,
+  };
+  const html=renderToStaticMarkup(
+   <DocumentOriginalManagementContext.Provider value={manager}>
+    <DocumentAccess document={document}/>
+   </DocumentOriginalManagementContext.Provider>
+  );
+  expect(html).not.toContain('Eliminar documento');
+  expect(html).not.toContain('Archivar documento');
+  expect(html).not.toContain('Crear nueva versión');
+  expect(html).not.toContain('Adjuntar el archivo original');
  });
  it('oculta acciones destructivas en una ficha de solo lectura',()=>{
   const document=seed.repository.documents.find(d=>d.kind==='health-report')!;
