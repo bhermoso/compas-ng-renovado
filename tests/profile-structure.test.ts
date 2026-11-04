@@ -160,3 +160,46 @@ describe("Índice navegable · continuaciones y capítulos previos", () => {
     expect(other.sections.find((s) => s.title.endsWith("CONTINUACIÓN"))?.paragraphs).toContain("Texto conservado.");
   });
 });
+
+describe("Apertura sin número en el Perfil completo", () => {
+  const alfacarLike = [
+    "LOCAL HEALTH PROFILE / PERFIL LOCAL DE SALUD",
+    "Alfacar · datos 2024–2026",
+    "5.840 habitantes · 17,0 % de población de 65 años o más.",
+    "La salud en resumen: población, prevención y activos.",
+    "02. CUADRO DE INDICADORES",
+    "Indicadores del municipio.",
+    "03. POBLACIÓN Y ENFERMEDAD REGISTRADA",
+    "Datos sanitarios originales.",
+    "06. PUNTO DE PARTIDA",
+    "Fuentes y escala.",
+  ].join("\n\n");
+
+  it("hace navegable la síntesis anterior al 02, sin inventar un epígrafe en el texto", () => {
+    const structure = parseProfileStructure(alfacarLike);
+    expect(structure.sections.some((s) => /^01\./.test(s.title))).toBe(false);
+    const html = renderToStaticMarkup(createElement(ProfileReader, { structure, title: "Alfacar" }));
+    const toc = html.match(/<nav class="epr-toc"[\s\S]*?<\/nav>/)?.[0] ?? "";
+    expect(toc).toContain('href="#epr-sec-apertura-editorial"');
+    expect(toc).toContain("01. Apertura y síntesis");
+    expect(toc.indexOf("01. Apertura y síntesis")).toBeLessThan(toc.indexOf("02. CUADRO DE INDICADORES"));
+    expect(html).toContain("Rótulo de navegación añadido por COMPÁS");
+    expect((html.match(/La salud en resumen: población, prevención y activos/g) ?? [])).toHaveLength(1);
+    expect((html.match(/5.840 habitantes/g) ?? [])).toHaveLength(1);
+    expect(html).not.toContain('id="epr-preliminaries"');
+  });
+
+  it("no añade un segundo 01 cuando el documento lo contiene realmente", () => {
+    const source = "01. RESUMEN\n\nTexto de apertura.\n\n02. CUADRO DE INDICADORES\n\nDatos.";
+    const s = parseProfileStructure(source);
+    const html = renderToStaticMarkup(createElement(ProfileReader, { structure: s, title: "Perfil" }));
+    expect(html).toContain('href="#epr-sec-01-resumen"');
+    expect(html).not.toContain('href="#epr-sec-apertura-editorial"');
+  });
+
+  it("no fabrica un 01 cuando no hay texto inicial que organizar", () => {
+    const s = parseProfileStructure("02. CUADRO DE INDICADORES\n\nDatos.");
+    const html = renderToStaticMarkup(createElement(ProfileReader, { structure: s, title: "Perfil" }));
+    expect(html).not.toContain('href="#epr-sec-apertura-editorial"');
+  });
+});

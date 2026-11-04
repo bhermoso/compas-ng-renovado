@@ -79,9 +79,28 @@ export function ProfileReader({ structure, pdfUrl, title }: { structure: Profile
   // Solo el material introductorio no numerado queda plegado. Los capítulos
   // 01–05, si existen, son parte del Perfil y deben figurar en el índice.
   const isNumberedChapter = (s: ProfileSection) => /^\d{1,2}\.?(?:\s+)/.test(s.title.trim());
-  const preliminaries = before.filter((s) => !isDataPage(s) && !isNumberedChapter(s));
+  const firstNumberedIndex = sections.findIndex(isNumberedChapter);
+  // Algunos PDF externos comienzan con una síntesis sin título numerado y
+  // continúan directamente en «02». La lectura de COMPÁS le ofrece navegación
+  // propia, pero declara que «01» es un rótulo editorial, no texto del original.
+  const sourceStartsAtTwo = firstNumberedIndex > 0
+    && /^0?2\.\s+/.test(sections[firstNumberedIndex].title.trim())
+    && !sections.some((s) => /^0?1\.\s+/.test(s.title.trim()));
+  const openingSections = sourceStartsAtTwo ? sections.slice(0, firstNumberedIndex) : [];
+  const hasEditorialOpening = openingSections.some((s) => s.paragraphs.length > 0);
+  const openingIds = new Set(hasEditorialOpening ? openingSections.map((s) => s.id) : []);
+  const editorialOpening: ProfileSection = {
+    id: "apertura-editorial",
+    title: "01. Apertura y síntesis",
+    level: 1,
+    paragraphs: openingSections.flatMap((s) => s.paragraphs),
+  };
+  const preliminaries = before.filter((s) => !isDataPage(s) && !isNumberedChapter(s) && !openingIds.has(s.id));
   const preliminaryIds = new Set(preliminaries.map((s) => s.id));
-  const readingSections = sections.filter((s) => !preliminaryIds.has(s.id));
+  const readingSections = [
+    ...(hasEditorialOpening ? [editorialOpening] : []),
+    ...sections.filter((s) => !preliminaryIds.has(s.id) && !openingIds.has(s.id)),
+  ];
   const normalizedQuery = query.trim().toLowerCase();
   const matchesSection = (s: ProfileSection) =>
     s.title.toLowerCase().includes(normalizedQuery) || s.paragraphs.some((p) => p.toLowerCase().includes(normalizedQuery));
@@ -154,7 +173,17 @@ export function ProfileReader({ structure, pdfUrl, title }: { structure: Profile
               return (
                 <section key={s.id} id={`epr-sec-${s.id}`} className={`epr-section epr-section--${s.level}`}>
                   {s.title !== "Inicio" && <Heading>{s.title}</Heading>}
-                  <SectionBody section={s} structure={structure} />
+                  {hasEditorialOpening && s.id === editorialOpening.id ? (
+                    <>
+                      <p className="ep-help">Rótulo de navegación añadido por COMPÁS: el texto incorporado no contiene un encabezado «01». El documento original no se ha modificado.</p>
+                      {openingSections.map((original) => (
+                        <section key={original.id} className="epr-section epr-section--opening-source">
+                          {original.title !== "Inicio" && <h3>{original.title}</h3>}
+                          <SectionBody section={original} structure={structure} />
+                        </section>
+                      ))}
+                    </>
+                  ) : <SectionBody section={s} structure={structure} />}
                 </section>
               );
             })}
