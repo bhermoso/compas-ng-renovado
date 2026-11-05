@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DocumentReference } from "./Documentation";
+import { LocalizaAssetPreview } from "./LocalizaAssetPreview";
 import type { MunicipalDocumentRepository } from "../../domain/repository";
 import type { EvidenceAtom } from "../../domain/evidence";
 import { readLocalizaAssets } from "../../application/localiza-assets";
@@ -32,6 +33,8 @@ export function ActivosSaludPanel({ repository, onDeleteDocument, atoms = [] }: 
           a la salud de la población.
         </p>
       </div>
+
+      <LocalizaAssetPreview repository={repository} />
 
       {assetDocs.some((d) => d.kind === "localiza-salud") && (
         <p className="study-institutional-note">
