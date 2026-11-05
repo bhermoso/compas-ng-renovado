@@ -3737,15 +3737,6 @@ export default function App() {
       )}
 
       <main className="app-shell">
-        <WorkspacePersistenceIndicator
-          localMessage={persistenceMessage}
-          remoteMessage={remotePersistenceMessage}
-          signedIn={remoteClient.auth.currentUser !== null}
-        >
-          <BackupPanel workspace={workspace} ready={pendingSeedId === null && pendingMigration === null} />
-          <RemoteSyncPanel client={remoteClient} />
-        </WorkspacePersistenceIndicator>
-
         {/* Selector de municipio (se muestra sobre cualquier vista) */}
         {showMunicipalitySelector && (
           <section className="municipality-selector">
@@ -4662,6 +4653,17 @@ export default function App() {
         )}
 
       </main>
+
+      <footer className="app-persistence-footer" aria-label="Herramientas de custodia del expediente">
+        <WorkspacePersistenceIndicator
+          localMessage={persistenceMessage}
+          remoteMessage={remotePersistenceMessage}
+          signedIn={remoteClient.auth.currentUser !== null}
+        >
+          <BackupPanel workspace={workspace} ready={pendingSeedId === null && pendingMigration === null} />
+          <RemoteSyncPanel client={remoteClient} />
+        </WorkspacePersistenceIndicator>
+      </footer>
 
       <ThematicPrioritisationModal
         isOpen={isThematicModalOpen}
