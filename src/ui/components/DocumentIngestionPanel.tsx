@@ -285,9 +285,9 @@ export function DocumentIngestionPanel({
             Pega el listado de activos copiado desde Localiza Salud.
             Formatos admitidos: <strong>Nombre | Descripción</strong> (recomendado)
             o copia directa tabulada desde la aplicación.
-            Una línea por ficha. La sustitución manual de inventarios Localiza Salud
-            está bloqueada temporalmente para proteger originales, evidencias y
-            validaciones existentes. Se incorporarán mediante conciliación incremental.
+            Una línea por ficha. Si existe un inventario previo, COMPÁS mostrará
+            las opciones Cancelar, Añadir o Archivar la fuente anterior y usar
+            la nueva. Los originales, evidencias históricas y validaciones se conservan.
           </p>
           <p className="ingestion-hint">
             Ejemplo:{" "}
@@ -322,8 +322,8 @@ export function DocumentIngestionPanel({
             <button
               type="button"
               onClick={onProcessDocument}
-              disabled
-              title="Bloqueado temporalmente: la sustitución manual de Localiza Salud podría eliminar validaciones existentes."
+              disabled={!canSubmit}
+              title={canSubmit ? "Revisar opciones de incorporación" : submissionHint}
             >
               Registrar activos
             </button>
