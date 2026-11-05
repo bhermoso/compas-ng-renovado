@@ -139,6 +139,7 @@ import {
 } from "./domain/action-plan-catalog";
 import { LocalHealthPlanningCycle, DocumentIngestionPanel, DocumentRepositoryPanel, EvidenceStorePanel, HealthReportViewer, EstudiosComplementariosPanel, ActivosSaludPanel, ThematicPrioritisationPanel, CitizenParticipationSummary, ThematicPrioritisationModal, PipelineTracePanel, LT1Panel, OITPanel, ReconciliacionPanel, PrioritizationPanel, LecturaEstrategicaView, PAIView, DeliberativePrioritySelectionPanel, ActionPlanCatalogPanel, GESPanel, LocalHealthPlanOutline, AgendaBoard } from "./ui/components";
 import type { AgendaActuation } from "./domain/agenda/AgendaActuation";
+import { removeSupersededValidatedPlan, type PlanDocument } from "./domain/action-plan-catalog/PlanDocument";
 import "./App.css";
 
 // ── Tipos de ámbito territorial ──────────────────────────────
@@ -1329,6 +1330,43 @@ export default function App() {
     }));
     return [];
   }, [runtime.lectura, setWorkspace, workspace.thematicPrioritisation]);
+
+  /**
+   * A historical Plan may be retired only when Firebase confirms an updated
+   * workspace manifest. Never remove the last validated version or RELAS audit.
+   */
+  const handleDeleteValidatedPlanVersion = useCallback(async (target: PlanDocument): Promise<boolean> => {
+    const municipalityId = workspace.municipality.identity.id;
+    if (!remoteClient.auth.currentUser || !documentWriteAllowed ||
+        remoteHydratedMunicipalityId !== municipalityId ||
+        pendingSeedId === municipalityId || pendingIndexedDbHydrationId === municipalityId) {
+      throw new Error("Inicia sesión con permisos de edición y recupera el expediente compartido antes de eliminar versiones.");
+    }
+    if (profileSaveInFlightRef.current) {
+      throw new Error("Hay otra escritura en curso. La versión permanece conservada.");
+    }
+    const validatedActionPlans = removeSupersededValidatedPlan(
+      workspace.validatedActionPlans ?? [], municipalityId, target
+    );
+    const next: MunicipalityWorkspace = {
+      ...workspace, validatedActionPlans, updatedAt: new Date().toISOString()
+    };
+    profileSaveInFlightRef.current = true;
+    setRemotePersistenceMessage("Eliminando versión antigua del Plan en Firebase…");
+    try {
+      await saveRemoteWorkspace(remoteClient, next, undefined, workspace.updatedAt);
+      lastExplicitProfileWorkspaceRef.current = next;
+      setWorkspace(prev => prev.municipality.identity.id === municipalityId ? next : prev);
+      setRemotePersistenceMessage("Versión del Plan eliminada y confirmada en Firebase.");
+      return true;
+    } catch(error) {
+      setRemotePersistenceMessage("No se ha confirmado la eliminación de la versión del Plan en Firebase.");
+      throw error;
+    } finally {
+      profileSaveInFlightRef.current = false;
+    }
+  }, [workspace, documentWriteAllowed, remoteClient, remoteHydratedMunicipalityId,
+      pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
 
   const handlePlanPreparationChange = useCallback((draft: PlanPreparationDraft) => {
     setWorkspace(prev => {
@@ -4413,6 +4451,7 @@ export default function App() {
               eligibleModules={runtime.eligibleActionPlanModules}
               reviews={workspace.actionPlanModuleReviews ?? []}
               validatedActionPlans={workspace.validatedActionPlans ?? []}
+              onDeletePlanVersion={documentWriteAllowed ? handleDeleteValidatedPlanVersion : undefined}
               onValidatePlan={(document) => {
                 if (document.municipalityId !== workspace.municipality.identity.id) return false;
                 const next = {...workspace, validatedActionPlans: [...(workspace.validatedActionPlans ?? []), document], updatedAt: new Date().toISOString()};
@@ -4438,6 +4477,7 @@ export default function App() {
               eligibleModules={runtime.eligibleActionPlanModules}
               reviews={workspace.actionPlanModuleReviews ?? []}
               validatedActionPlans={workspace.validatedActionPlans ?? []}
+              onDeletePlanVersion={documentWriteAllowed ? handleDeleteValidatedPlanVersion : undefined}
               onValidatePlan={(document) => {
                 if (document.municipalityId !== workspace.municipality.identity.id) return false;
                 const next = {...workspace, validatedActionPlans: [...(workspace.validatedActionPlans ?? []), document], updatedAt: new Date().toISOString()};
@@ -4528,6 +4568,7 @@ export default function App() {
                 eligibleModules={[]}
                 reviews={workspace.actionPlanModuleReviews ?? []}
               validatedActionPlans={workspace.validatedActionPlans ?? []}
+              onDeletePlanVersion={documentWriteAllowed ? handleDeleteValidatedPlanVersion : undefined}
               onValidatePlan={(document) => {
                 if (document.municipalityId !== workspace.municipality.identity.id) return false;
                 const next = {...workspace, validatedActionPlans: [...(workspace.validatedActionPlans ?? []), document], updatedAt: new Date().toISOString()};

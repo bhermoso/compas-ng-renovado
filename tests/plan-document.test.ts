@@ -5,6 +5,8 @@ import { buildDefinitiveActionPlanProjection } from "../src/domain/action-plan-c
 import {
   validatePlanDocument,
   latestValidatedPlan,
+  canRemoveValidatedPlan,
+  removeSupersededValidatedPlan,
   buildPlanDocument,
   validatePlanDocumentForLocalHealthPlan,
 } from "../src/domain/action-plan-catalog/PlanDocument";
@@ -57,6 +59,32 @@ describe("Versiones documentales del Plan",()=>{
   expect(doc.paragraphs.some(p=>p.text.startsWith("Indicador · "+objective.indicator.code+" ·"))).toBe(false);
   const later={...doc,generatedAt:"2026-09-17"};
   expect(latestValidatedPlan([later,doc],draft.municipalityId)).toBe(later);
+ });
+ it("permite retirar una copia validada antigua sin modificar la vigente ni otros municipios",()=>{
+  const original={schemaVersion:1 as const,municipalityId:"loja",generatedAt:"2026-10-01T00:00:00Z",status:"validated" as const,validatedBy:"Equipo técnico",paragraphs:[{text:"Versión 1"}]};
+  const newer={...original,generatedAt:"2026-11-05T10:00:00Z",paragraphs:[{text:"Versión 2"}]};
+  const other={...original,municipalityId:"zagra",paragraphs:[{text:"Plan de Zagra"}]};
+  const documents=[other,original,newer];
+  expect(canRemoveValidatedPlan(documents,"loja",original)).toBe(true);
+  expect(canRemoveValidatedPlan(documents,"loja",newer)).toBe(false);
+  expect(canRemoveValidatedPlan(documents,"loja",other)).toBe(false);
+  const remaining=removeSupersededValidatedPlan(documents,"loja",original);
+  expect(remaining).toEqual([other,newer]);
+  expect(documents).toHaveLength(3);
+  expect(latestValidatedPlan(remaining,"loja")).toBe(newer);
+  expect(()=>removeSupersededValidatedPlan(documents,"loja",newer)).toThrow(/última versión/);
+  expect(()=>removeSupersededValidatedPlan(documents,"loja",other)).toThrow(/expediente/);
+  expect(()=>removeSupersededValidatedPlan(documents,"loja",{...original,generatedAt:"2026-10-02T00:00:00Z"})).toThrow();
+ });
+
+ it("bloquea versiones duplicadas con fecha y autoría idénticas para no borrar la incorrecta",()=>{
+  const first={schemaVersion:1 as const,municipalityId:"loja",generatedAt:"2026-10-01",status:"validated" as const,validatedBy:"Equipo",paragraphs:[{text:"A"}]};
+  const duplicate={...first,paragraphs:[{text:"B"}]};
+  const latest={...first,generatedAt:"2026-10-15",paragraphs:[{text:"C"}]};
+  const documents=[first,duplicate,latest];
+  expect(canRemoveValidatedPlan(documents,"loja",first)).toBe(false);
+  expect(canRemoveValidatedPlan(documents,"loja",duplicate)).toBe(false);
+  expect(()=>removeSupersededValidatedPlan(documents,"loja",first)).toThrow(/identificada inequívocamente/);
  });
  it("genera archivos Word y PDF desde la misma versión",async()=>{
   const draft=fixture();const doc=validatePlanDocument(draft.municipalityId,buildDefinitiveActionPlanProjection(draft.municipalityId,[module],[draft]),"Equipo","2026-09-16");

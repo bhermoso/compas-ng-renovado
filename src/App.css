@@ -11510,3 +11510,61 @@ h3 {
   background:#fff;border:0;border-left:2px solid var(--amarillo);
   border-bottom:1px solid var(--borde);border-radius:0;
 }
+
+/* Historial del Plan: gestor editorial, sin tarjetas saturadas ni acciones destructivas prominentes. */
+.plan-document-versions{
+  margin:18px 0;
+  padding:12px 0;
+  border:0;
+  border-top:1px solid var(--borde);
+  border-bottom:1px solid var(--borde);
+}
+.plan-document-versions > summary{
+  cursor:pointer;
+  color:var(--azul);
+  font-size:14px;
+  font-weight:600;
+  padding:7px 0;
+}
+.plan-document-versions__list{
+  list-style:none;
+  margin:10px 0 0;
+  padding:0;
+}
+.plan-document-versions__row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  flex-wrap:wrap;
+  margin:0;
+  padding:12px 0;
+  border-top:1px solid var(--borde);
+}
+.plan-document-versions__row > div:first-child{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  min-width:230px;
+}
+.plan-document-versions__row strong{color:var(--texto-principal);font-size:14px}
+.plan-document-versions__row span,.plan-document-versions__row small{
+  color:var(--texto-secundario);
+  font-size:12px;
+}
+.plan-document-versions__row .backup-panel__actions{margin:0;gap:8px}
+.plan-document-versions__row button{
+  border:1px solid var(--borde);
+  border-radius:0;
+  background:#fff;
+  color:var(--azul);
+  min-height:31px;
+  font-size:12px;
+  padding:5px 10px;
+}
+.plan-document-versions__row button.plan-document-versions__delete{
+  border-left:2px solid var(--rojo);
+  color:var(--texto-principal);
+}
+.plan-document-versions__row button:disabled{opacity:.5;cursor:not-allowed}
+.plan-document-versions__row button:focus-visible{outline:2px solid var(--azul);outline-offset:2px}

@@ -141,6 +141,19 @@ describe("expediente remoto: ciclo de vida", () => {
     expect([...store.keys()].filter(k => k.includes("/chunks/"))).toHaveLength(1);
   });
 
+  it("una eliminación histórica no sobrescribe versiones remotas cambiadas por otro navegador", async () => {
+    const first=workspace("loja", "2026-11-05T08:00:00Z");
+    await saveRemoteWorkspace(client, first);
+    const otherUser=workspace("loja", "2026-11-05T08:15:00Z");
+    await saveRemoteWorkspace(client, otherUser);
+    const destructive=workspace("loja", "2026-11-05T08:20:00Z");
+    await expect(saveRemoteWorkspace(client, destructive, undefined, first.updatedAt))
+      .rejects.toThrow(/revisión diferente/);
+    expect((await readRemoteWorkspace(client, "loja"))?.updatedAt).toBe(otherUser.updatedAt);
+    await saveRemoteWorkspace(client, destructive, undefined, otherUser.updatedAt);
+    expect((await readRemoteWorkspace(client, "loja"))?.updatedAt).toBe(destructive.updatedAt);
+  });
+
   it("eliminar retira fragmentos y manifiesto", async () => {
     await saveRemoteWorkspace(client, workspace("fv", "2026-10-19T10:00:00.000Z"));
     expect(await deleteRemoteWorkspace(client, "fv")).toEqual({ deleted: true });

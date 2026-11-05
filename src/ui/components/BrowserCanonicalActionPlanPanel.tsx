@@ -12,7 +12,7 @@ export function ActionPlanCatalogPanel(props:LegacyActionPlanCatalogPanelProps){
   ? [...(props.drafts ?? []).filter(draft => draft.moduleId !== ZAIDIN_AGING_PROPOSAL.id), createZaidinFinalActionPlanDraft(previous)]
   : props.drafts;
  return <div className="action-plan-workspace">
-  {props.section !== 'lineas' && <DefinitiveActionPlanPreview municipalityId={props.municipalityId} modules={modules} drafts={drafts} worksheets={props.worksheets} validatedActionPlans={props.validatedActionPlans} onValidatePlan={props.onValidatePlan} onDraftChange={props.onDraftChange}/>}
+  {props.section !== 'lineas' && <DefinitiveActionPlanPreview municipalityId={props.municipalityId} modules={modules} drafts={drafts} worksheets={props.worksheets} validatedActionPlans={props.validatedActionPlans} onValidatePlan={props.onValidatePlan} onDeletePlanVersion={props.onDeletePlanVersion} onDraftChange={props.onDraftChange}/>}
   {props.section !== 'resultante' && <LegacyActionPlanCatalogPanel {...props} drafts={drafts}/>}
  </div>;
 }

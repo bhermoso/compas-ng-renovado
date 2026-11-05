@@ -23,6 +23,7 @@ export interface LegacyActionPlanCatalogPanelProps {
   section?: "lineas" | "resultante" | "todo";
   validatedActionPlans?: import("../../domain/action-plan-catalog/PlanDocument").PlanDocument[];
   onValidatePlan?: (document: import("../../domain/action-plan-catalog/PlanDocument").PlanDocument) => boolean;
+  onDeletePlanVersion?: (document: import("../../domain/action-plan-catalog/PlanDocument").PlanDocument) => Promise<boolean>;
   municipalityId: string;
   drafts?: PlanPreparationDraft[];
   onDraftChange?: (draft: PlanPreparationDraft) => void;

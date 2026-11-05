@@ -118,6 +118,37 @@ export function latestValidatedPlan(documents: PlanDocument[], municipalityId: s
  return documents.filter(d=>d.schemaVersion===1&&d.municipalityId===municipalityId&&d.status==="validated")
   .reduce<PlanDocument|undefined>((latest,d)=>!latest||d.generatedAt>=latest.generatedAt?d:latest,undefined);
 }
+export function canRemoveValidatedPlan(
+ documents: readonly PlanDocument[],
+ municipalityId: string,
+ target: PlanDocument
+): boolean {
+ if (target.schemaVersion !== 1 || target.municipalityId !== municipalityId || target.status !== "validated") return false;
+ const matches = documents.filter(document => document.schemaVersion===1 &&
+  document.status==="validated" && document.municipalityId===municipalityId &&
+  document.generatedAt===target.generatedAt && document.validatedBy===target.validatedBy);
+ return matches.length===1 && latestValidatedPlan([...documents],municipalityId)!==matches[0];
+}
+
+/**
+ * Delete only an unambiguous, superseded validated copy. This operation
+ * never mutates the current draft, the most recent approved document or
+ * immutable RELAS/Firebase history.
+ */
+export function removeSupersededValidatedPlan(
+ documents: readonly PlanDocument[],
+ municipalityId: string,
+ selected: PlanDocument
+): PlanDocument[] {
+ if (!canRemoveValidatedPlan(documents, municipalityId, selected)) {
+  throw new Error("Solo se puede eliminar una versión anterior, identificada inequívocamente y perteneciente a este expediente. La última versión validada está protegida.");
+ }
+ const match = documents.find(d => d.schemaVersion===1 && d.status==="validated" &&
+  d.municipalityId===municipalityId && d.generatedAt===selected.generatedAt &&
+  d.validatedBy===selected.validatedBy)!;
+ return documents.filter(d=>d!==match);
+}
+
 export function validatePlanDocumentForLocalHealthPlan(plan: PlanDocument): PlanDocumentPLSReadinessViolation[] {
  const violations: PlanDocumentPLSReadinessViolation[] = [];
  if (!plan.unaddressedNeeds?.length || plan.unaddressedNeeds.some((need) => !need.justification.trim())) {
