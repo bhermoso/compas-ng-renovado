@@ -1614,6 +1614,15 @@ export default function App() {
   }
 
   function handleRemoveAssetValidation(validationId: string) {
+    const record = workspace.repository.assetValidations?.find(v => v.id === validationId);
+    if (!record) return;
+    if (!window.confirm(
+      "Vas a retirar una declaración de validación de activos.\n" +
+      "Documento: " + (workspace.repository.documents.find(d => d.id === record.documentId)?.title ?? record.documentId) + "\n" +
+      "Criterio: " + record.criteria.title + " · " + record.criteria.version + "\n" +
+      "Se conservarán las fichas y sus evidencias; cambiará la constancia formal de validación.\n" +
+      "Aceptar: retirar la declaración · Cancelar: mantenerla."
+    )) return;
     setWorkspace((prev) => ({
       ...prev,
       repository: removeAssetValidation(prev.repository, validationId),
