@@ -335,12 +335,11 @@ export function transformDocumentToEvidence(
       tags: [input.document.kind, kind],
     });
 
-    if (input.document.kind === "localiza-salud") {
-      const key = stableAssetKey(atom.municipalityId, atom.provenance.origin, atom.title);
-      store = upsertEvidenceAtom(store, atom, key);
-    } else {
-      store = addEvidenceAtom(store, atom);
-    }
+    // Cada fila de Localiza Salud es una ficha individual. Dos actividades pueden
+    // compartir nombre/equipamiento y tener ID de origen diferente; el upsert por
+    // título fusionaba fichas y falseaba el recuento. La sustitución por fuente,
+    // cuando proceda, se gestiona a nivel documental, nunca por nombre de activo.
+    store = addEvidenceAtom(store, atom);
     atomsCreated.push(atom);
   }
 
