@@ -254,7 +254,7 @@ describe('Guardado de perfil en Firebase · errores y estados', () => {
 });
 
 describe('Gestión documental de perfiles · custodia y eliminación sin reapariciones',()=>{
- it('no archiva ni elimina la versión vigente ni una revisión que tenga descendientes',async()=>{
+ it('impide archivar la vigente, pero permite eliminar cualquier versión conservando descendientes',async()=>{
   const id='alfacar';
   const original=await importProfileFile(new File(['Documento A'],'original.txt'),id);
   const first={...externalProfileFixture(id),id:'alfacar-v01',attachmentIds:[original.attachment.id]};
@@ -265,8 +265,13 @@ describe('Gestión documental de perfiles · custodia y eliminación sin reapari
   const archived=archiveExternalProfileVersion(library,second.id,'Autoría');
   expect(archived.profiles[1].archivedAt).toBeTruthy();
   expect(isExternalProfileLibrary(archived,id)).toBe(true);
-  expect(()=>deleteExternalProfileVersion(archived,second.id)).toThrow(/revisiones posteriores/);
-  expect(()=>deleteExternalProfileVersion(library,first.id)).toThrow(/Archiva primero/);
+  const withoutMiddle=deleteExternalProfileVersion(archived,second.id);
+  expect(withoutMiddle.profiles.find(p=>p.id===third.id)?.revisionOf).toBe(first.id);
+  expect(withoutMiddle.attachments).toHaveLength(1);
+  expect(isExternalProfileLibrary(withoutMiddle,id)).toBe(true);
+  const withoutRoot=deleteExternalProfileVersion(library,first.id);
+  expect(withoutRoot.profiles.find(p=>p.id===second.id)?.revisionOf).toBeUndefined();
+  expect(isExternalProfileLibrary(withoutRoot,id)).toBe(true);
   expect(library.profiles[1].archivedAt).toBeUndefined();
  });
  it('elimina un borrador archivado terminal y solo libera originales no referenciados',async()=>{
