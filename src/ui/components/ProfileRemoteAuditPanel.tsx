@@ -11,15 +11,19 @@ function shortDate(value?:string){
  return Number.isNaN(date.valueOf())?'Fecha no válida':date.toLocaleString('es-ES',{dateStyle:'short',timeStyle:'short'});
 }
 type Scope = {id:string;name:string};
-type Diagnostic = {documents:number;reports:number;studies:number;prioritisation:boolean;attachments:string[];results:number;jsonFiles:number;resultsWithSource:number;resultsWithPeriod:number;resultsWithPage:number;resultsWithComparators:number};
+type Diagnostic = {documents:number;reports:number;studies:number;studyRecords:string[];prioritisation:boolean;prioritisationStudy:boolean;attachments:string[];results:number;jsonFiles:number;resultsWithSource:number;resultsWithPeriod:number;resultsWithPage:number;resultsWithComparators:number};
 function diagnosticOf(remote:NonNullable<Awaited<ReturnType<typeof readRemoteWorkspace>>>):Diagnostic{
  const documents=remote.repository?.documents??[];
  const active=remote.externalProfileLibrary?.profiles.find(p=>p.id===remote.externalProfileLibrary?.activeId);
+ const namedStudyFields=['ibseStudy','dukeStudy','predimedStudy','sf12Study','suenoStudy','cageStudy','auditcStudy','ipaqStudy','ghq12Study','phq9Study','psqiStudy','fagerstromStudy','sbqStudy'] as const;
+ const studyRecords=namedStudyFields.filter(name=>Boolean(remote[name]));
  return {
   documents:documents.length,
   reports:documents.filter(d=>d.kind==='health-report').length + (remote.healthReport && !documents.some(d=>d.kind==='health-report')?1:0),
   studies:documents.filter(d=>d.kind==='complementary-study').length,
+  studyRecords:[...studyRecords],
   prioritisation:Boolean(remote.thematicPrioritisation),
+  prioritisationStudy:Boolean(remote.thematicPrioritisationStudy),
   attachments:(remote.externalProfileLibrary?.attachments??[]).map(a=>a.name),
   results:active?.results.length??0,
   jsonFiles:(remote.externalProfileLibrary?.attachments??[]).filter(a=>a.mimeType==='application/json').length,
@@ -116,7 +120,7 @@ export function ProfileRemoteAuditPanel({client}:{client:RelasClient}){
       <td>{x.activePdf?'PDF original':'Sin PDF'} · {x.activeText?'Texto':'Sin texto'} · {x.activeResults?'Resultados':'Sin resultados'}</td>
       <td>{x.remote!=='ok'?'No verificados':x.originalsVerified?'Correctos':'Con incidencias'}
        <small>{x.originalsChecked} comprobados; {x.originalsFailed} fallidos</small></td>
-      <td>{diagnostics[scope.id] ? <>{diagnostics[scope.id].documents} documentos · {diagnostics[scope.id].reports} informes · {diagnostics[scope.id].studies} estudios<small>Priorización: {diagnostics[scope.id].prioritisation?'registrada':'no registrada'}</small></> : 'No verificadas'}</td>
+      <td>{diagnostics[scope.id] ? <>{diagnostics[scope.id].documents} documentos · {diagnostics[scope.id].reports} informes · {diagnostics[scope.id].studies} estudios<small>Estudios cargados: {diagnostics[scope.id].studyRecords.length} · Prioridad adoptada: {diagnostics[scope.id].prioritisation?'sí':'no'} · Estudio temático: {diagnostics[scope.id].prioritisationStudy?'sí':'no'}</small></> : 'No verificadas'}</td>
       <td>{diagnostics[scope.id] ? <>{diagnostics[scope.id].jsonFiles} JSON adjuntos · {diagnostics[scope.id].results} indicadores<small>{diagnostics[scope.id].resultsWithSource} con fuente · {diagnostics[scope.id].resultsWithPeriod} con periodo · {diagnostics[scope.id].resultsWithPage} con página · {diagnostics[scope.id].resultsWithComparators} comparables</small></> : 'No evaluable'}</td>
       </>}
      </tr>;
@@ -131,13 +135,13 @@ export function ProfileRemoteAuditPanel({client}:{client:RelasClient}){
    <summary>{row.name} · {row.externalVersions} versiones externas · {row.observations.length} observaciones</summary>
    {row.error&&<p role="alert">{row.error}</p>}
    {row.observations.map((note,i)=><p key={i}>{note}</p>)}
-   {diagnostics[row.scope]&&<p>Fuentes registradas: {diagnostics[row.scope].documents} documentos, {diagnostics[row.scope].reports} informes de salud, {diagnostics[row.scope].studies} estudios complementarios catalogados y priorización {diagnostics[row.scope].prioritisation?'registrada':'no registrada'}.</p>}
+   {diagnostics[row.scope]&&<p>Fuentes registradas: {diagnostics[row.scope].documents} documentos, {diagnostics[row.scope].reports} informes de salud, {diagnostics[row.scope].studies} estudios complementarios catalogados ; estudios cargados {diagnostics[row.scope].studyRecords.join(', ')||'ninguno'}; priorización adoptada {diagnostics[row.scope].prioritisation?'sí':'no'}; estudio temático {diagnostics[row.scope].prioritisationStudy?'sí':'no'}.</p>}
    {diagnostics[row.scope]&&<p>Resultados del perfil vigente: {diagnostics[row.scope].results} indicadores; {diagnostics[row.scope].resultsWithSource} con fuente; {diagnostics[row.scope].resultsWithPeriod} con periodo; {diagnostics[row.scope].resultsWithPage} con página; {diagnostics[row.scope].resultsWithComparators} con comparadores; {diagnostics[row.scope].jsonFiles} archivos JSON adjuntos.</p>}
    {diagnostics[row.scope]&&diagnostics[row.scope].attachments.length>0&&<p>Archivos del paquete: {diagnostics[row.scope].attachments.join(' · ')}</p>}
    {row.versions.length>0?<table><thead><tr><th>Versión</th><th>Estado</th><th>Texto</th><th>PDF</th><th>Indicadores</th></tr></thead><tbody>
     {row.versions.map(p=><tr key={p.id}><td>{p.title}</td><td>{p.active?'Vigente':'Histórica'} · {p.archived?'Archivada':p.status==='validated'?'Validada':'En revisión'}</td><td>{p.textPresent?'Sí':'No'}</td><td>{p.pdfs}</td><td>{p.results}</td></tr>)}
    </tbody></table>:<p>No hay revisiones externas que mostrar.</p>}
   </details>)}
-  <p className="audit-profiles__caveat">La ausencia de un perfil externo no implica que falten fuentes diagnósticas; los estudios se cuentan aquí según su catalogación documental. Esta comprobación verifica conservación e integridad estructural. No certifica que la transcripción coincida palabra por palabra con el PDF original ni que los datos epidemiológicos estén científicamente validados. No usa copias del navegador ni semillas de demostración como prueba de Firebase.</p>
+  <p className="audit-profiles__caveat">La ausencia de un perfil externo no implica que falten fuentes diagnósticas. Los estudios se distinguen entre documentos catalogados y módulos de estudio cargados; el estudio de priorización no equivale a una selección de prioridades adoptada. Esta comprobación verifica conservación e integridad estructural. No certifica que la transcripción coincida palabra por palabra con el PDF original ni que los datos epidemiológicos estén científicamente validados. No usa copias del navegador ni semillas de demostración como prueba de Firebase.</p>
  </section>;
 }
