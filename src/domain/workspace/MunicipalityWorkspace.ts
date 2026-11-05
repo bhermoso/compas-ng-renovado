@@ -58,6 +58,9 @@ export interface TerritorialStateRecord {
 }
 
 export interface MunicipalityWorkspace {
+  /** Evidencias de inventarios de activos archivados por decisión del administrador.
+   * No alimentan el diagnóstico vigente, pero pueden recuperarse con su fuente. */
+  archivedAssetEvidence?: import("../evidence").EvidenceAtom[];
   /** Complete external profiles, original files and revisions, shared in Firebase. */
   externalProfileLibrary?: import('../health-profile/ExternalHealthProfile').ExternalProfileLibrary;
   /** Originales de los documentos del Diagnóstico, completos y con huella, compartidos en Firebase. */
