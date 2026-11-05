@@ -1354,7 +1354,7 @@ export default function App() {
     profileSaveInFlightRef.current = true;
     setRemotePersistenceMessage("Eliminando versión antigua del Plan en Firebase…");
     try {
-      await saveRemoteWorkspace(remoteClient, next);
+      await saveRemoteWorkspace(remoteClient, next, undefined, workspace.updatedAt);
       lastExplicitProfileWorkspaceRef.current = next;
       setWorkspace(prev => prev.municipality.identity.id === municipalityId ? next : prev);
       setRemotePersistenceMessage("Versión del Plan eliminada y confirmada en Firebase.");
