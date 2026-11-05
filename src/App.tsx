@@ -1282,6 +1282,11 @@ export default function App() {
     const nextLibrary = { ...library, profiles: library.profiles.map(p => workspace.externalProfileLibrary?.profiles.some(old => old.id === p.id)
       ? p : { ...p, evidenceVersion: workspace.evidenceStore.updatedAt }) };
     if (!isExternalProfileLibrary(nextLibrary, municipalityId)) throw new Error("La versión del perfil no supera la comprobación de integridad.");
+    // Un borrado de versiones debe partir de exactamente el expediente remoto
+    // que el usuario revisó. No pisar cambios hechos desde otro navegador.
+    const isRemovingVersion = (workspace.externalProfileLibrary?.profiles ?? [])
+      .some(old => !nextLibrary.profiles.some(current => current.id === old.id));
+    const expectedRemoteRevision = isRemovingVersion ? workspace.updatedAt : undefined;
     const now = new Date().toISOString();
     setRemotePersistenceMessage("Guardando el perfil completo y sus archivos en Firebase…");
     if (profileSaveInFlightRef.current) throw new Error("Ya hay un perfil guardándose en Firebase.");
@@ -1291,7 +1296,7 @@ export default function App() {
         const message = profileSaveProgressMessage(progress);
         setRemotePersistenceMessage(message);
         onProgress?.(message);
-      });
+      }, expectedRemoteRevision);
     } catch (error) {
       const message = profileSaveErrorMessage(error);
       setRemotePersistenceMessage(message);
