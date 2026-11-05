@@ -4,6 +4,7 @@ import {
   doc,
   getDocFromServer,
   getDocs,
+  getDocsFromServer,
   runTransaction,
   serverTimestamp,
   setDoc,
@@ -81,7 +82,7 @@ export async function readRemoteWorkspace(
   ) {
     throw new Error("El expediente remoto tiene un manifiesto no compatible.");
   }
-  const chunksSnapshot = await getDocs(
+  const chunksSnapshot = await getDocsFromServer(
     collection(
       client.db,
       "relas_scopes",
