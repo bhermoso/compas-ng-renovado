@@ -118,6 +118,27 @@ export function latestValidatedPlan(documents: PlanDocument[], municipalityId: s
  return documents.filter(d=>d.schemaVersion===1&&d.municipalityId===municipalityId&&d.status==="validated")
   .reduce<PlanDocument|undefined>((latest,d)=>!latest||d.generatedAt>=latest.generatedAt?d:latest,undefined);
 }
+/**
+ * Delete only an unambiguous, superseded validated copy. This operation
+ * never mutates the current draft, the most recent approved document or
+ * immutable RELAS/Firebase history.
+ */
+export function removeSupersededValidatedPlan(
+ documents: readonly PlanDocument[],
+ municipalityId: string,
+ selected: PlanDocument
+): PlanDocument[] {
+ if (selected.schemaVersion !== 1 || selected.status !== "validated" || selected.municipalityId !== municipalityId)
+  throw new Error("La versión no pertenece al historial validado de este expediente.");
+ const matches = documents.filter(d => d.schemaVersion===1 && d.status==="validated" &&
+   d.municipalityId===municipalityId && d.generatedAt===selected.generatedAt &&
+   d.validatedBy===selected.validatedBy);
+ if (matches.length!==1) throw new Error("No se puede identificar inequívocamente la versión: actualiza el expediente antes de eliminar.");
+ const current=latestValidatedPlan([...documents],municipalityId);
+ if (current===matches[0]) throw new Error("No se puede eliminar la última versión validada. Guarda una versión posterior antes de retirar esta.");
+ return documents.filter(d=>d!==matches[0]);
+}
+
 export function validatePlanDocumentForLocalHealthPlan(plan: PlanDocument): PlanDocumentPLSReadinessViolation[] {
  const violations: PlanDocumentPLSReadinessViolation[] = [];
  if (!plan.unaddressedNeeds?.length || plan.unaddressedNeeds.some((need) => !need.justification.trim())) {
