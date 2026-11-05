@@ -1512,9 +1512,18 @@ export default function App() {
         ? {...d,status:"archived" as const,updatedAt:now} : d),
       updatedAt:now,
     } : workspace.repository;
+    const oldDocumentIds = new Set(oldLocaliza.map(d => d.id));
+    const retiredAtoms = decision === "archive" && isLocaliza
+      ? workspace.evidenceStore.atoms.filter(a => a.provenance.documentId !== undefined && oldDocumentIds.has(a.provenance.documentId))
+      : [];
+    const baseEvidence = retiredAtoms.length ? {
+      ...workspace.evidenceStore,
+      atoms: workspace.evidenceStore.atoms.filter(a => !retiredAtoms.some(old => old.id === a.id)),
+      updatedAt: now,
+    } : workspace.evidenceStore;
     const result = ingestManualDocument({
       repository: baseRepository,
-      evidenceStore: workspace.evidenceStore,
+      evidenceStore: baseEvidence,
       kind,
       title,
       plainText,
@@ -1539,6 +1548,7 @@ export default function App() {
       ...prev,
       repository: nextRepository,
       evidenceStore: result.evidenceStore,
+      ...(retiredAtoms.length ? { archivedAssetEvidence: [...(prev.archivedAssetEvidence ?? []), ...retiredAtoms] } : {}),
       updatedAt: new Date().toISOString(),
     }));
     setLastProcessedDocument(result.document);
