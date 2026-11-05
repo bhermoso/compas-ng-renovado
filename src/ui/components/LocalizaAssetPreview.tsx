@@ -3,7 +3,7 @@ import type { MunicipalDocumentRepository } from '../../domain/repository';
 import { assetEntriesOfDocument } from '../../application/evidence-pipeline/DocumentToEvidencePipeline';
 
 type Incoming = {id_localiza_salud:string;nombre:string;url_origen:string};
-type Row = Incoming & {status:'ya registrado (ID)'|'mismo nombre; ID distinto o desconocido'|'no localizado';detail:string};
+type Row = Incoming & {status:'ya registrado (ID)'|'mismo nombre: comprobar centro y actividad'|'no localizado';detail:string};
 const norm = (s:string)=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const sourceId = (s:string) => /(?:[?&]id=)(\d+)/.exec(s)?.[1] ?? '';
 const isObj = (v:unknown):v is Record<string,unknown>=>!!v&&typeof v==='object'&&!Array.isArray(v);
@@ -33,7 +33,7 @@ export function LocalizaAssetPreview({repository}:{repository:MunicipalDocumentR
     const byId=existing.find(e=>e.id&&e.id===r.id_localiza_salud);
     const byName=existing.find(e=>e.name&&e.name===norm(r.nombre));
     return {...r,
-      status:(byId?'ya registrado (ID)':byName?'mismo nombre; ID distinto o desconocido':'no localizado') as Row['status'],
+      status:(byId?'ya registrado (ID)':byName?'mismo nombre: comprobar centro y actividad':'no localizado') as Row['status'],
       detail:(byId??byName)?.document??''};
    });
    setRows(result);setChecked(true);
@@ -47,8 +47,8 @@ export function LocalizaAssetPreview({repository}:{repository:MunicipalDocumentR
   </label>
   {error&&<p role="alert">{error}</p>}
   {checked&&<div aria-live="polite">
-   <p><strong>{rows.length} fichas revisadas</strong> · {rows.filter(r=>r.status==='ya registrado (ID)').length} coincidencias por ID · {rows.filter(r=>r.status==='mismo nombre; ID distinto o desconocido').length} con nombre compartido · {rows.filter(r=>r.status==='no localizado').length} no localizadas.</p>
-   <p className="panel-note">El nombre compartido no es duplicidad: dos fichas con ID distintos se computan como activos diferentes si están validadas. «No localizado» solo significa ausencia de coincidencia reconocible en este expediente. No se autoriza importación automática.</p>
+   <p><strong>{rows.length} fichas revisadas</strong> · {rows.filter(r=>r.status==='ya registrado (ID)').length} coincidencias por ID · {rows.filter(r=>r.status==='mismo nombre: comprobar centro y actividad').length} que requieren cotejo de centro y actividad · {rows.filter(r=>r.status==='no localizado').length} no localizadas.</p>
+   <p className="panel-note">Dos fichas pueden describir un mismo activo si coinciden actividad y centro, aunque tengan ID distintos. Actividades distintas en un centro, o la misma actividad en centros distintos, son activos diferentes. Esta pantalla compara fichas, NO determina el número de activos únicos ni su validación. «No localizado» solo expresa ausencia de coincidencia reconocible. No se autoriza importación automática.</p>
    <div className="table-wrap"><table><thead><tr><th>ID Localiza</th><th>Recurso</th><th>Cotejo</th><th>Fuente existente</th></tr></thead><tbody>
     {rows.map((r,i)=><tr key={r.id_localiza_salud+'-'+i}><td>{r.id_localiza_salud}</td><td>{r.nombre}</td><td>{r.status}</td><td>{r.detail||'—'}</td></tr>)}
    </tbody></table></div>
