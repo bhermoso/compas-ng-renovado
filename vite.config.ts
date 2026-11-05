@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
+import {resolve} from 'node:path'
 
 export default defineConfig({
   base: '/compas-ng-renovado/',
@@ -10,6 +11,10 @@ export default defineConfig({
   server: { port: 5173, strictPort: true },
   preview: { port: 4173, strictPort: true },
   plugins: [react()],
+  build: { rollupOptions: {input: {
+    main: resolve(process.cwd(), 'index.html'),
+    verificarPerfiles: resolve(process.cwd(), 'verificar-perfiles.html'),
+  }}},
   test: {
     environment: 'node',
     include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx'],
