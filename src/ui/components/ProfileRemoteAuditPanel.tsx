@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import type {RelasClient} from '../../infrastructure/relas/RelasClient';
 import {readRemoteWorkspace} from '../../infrastructure/relas/RemoteWorkspace';
+import {listTerritorialSpaces} from '../../infrastructure/relas/AdminAccounts';
 import {inspectRemoteProfile,PROFILE_AUDIT_SCOPES,profileParity,type ProfileAuditResult} from '../../application/health-profile/profileRemoteAudit';
 import './ProfileRemoteAuditPanel.css';
 
@@ -9,9 +10,23 @@ function shortDate(value?:string){
  const date=new Date(value);
  return Number.isNaN(date.valueOf())?'Fecha no válida':date.toLocaleString('es-ES',{dateStyle:'short',timeStyle:'short'});
 }
-function summary(rows:ProfileAuditResult[]):string{
+type Scope = {id:string;name:string};
+type Diagnostic = {documents:number;reports:number;studies:number;prioritisation:boolean;attachments:string[];results:number};
+function diagnosticOf(remote:NonNullable<Awaited<ReturnType<typeof readRemoteWorkspace>>>):Diagnostic{
+ const documents=remote.repository?.documents??[];
+ const active=remote.externalProfileLibrary?.profiles.find(p=>p.id===remote.externalProfileLibrary?.activeId);
+ return {
+  documents:documents.length,
+  reports:documents.filter(d=>d.kind==='health-report').length + (remote.healthReport && !documents.some(d=>d.kind==='health-report')?1:0),
+  studies:documents.filter(d=>d.kind==='complementary-study').length,
+  prioritisation:Boolean(remote.thematicPrioritisation),
+  attachments:(remote.externalProfileLibrary?.attachments??[]).map(a=>a.name),
+  results:active?.results.length??0,
+ };
+}
+function summary(rows:ProfileAuditResult[],scopes:Scope[],diagnostics:Record<string,Diagnostic>):string{
  const lines=['Auditoría solo lectura de perfiles COMPÁS / Firebase',''];
- for(const scope of PROFILE_AUDIT_SCOPES){
+ for(const scope of scopes){
   const row=rows.find(x=>x.scope===scope.id);
   if(!row){lines.push(scope.name+': no comprobado');continue;}
   lines.push(scope.name+': '+row.remote+'; estructura externa '+(row.libraryValid?'válida':'no confirmada')+
@@ -20,28 +35,39 @@ function summary(rows:ProfileAuditResult[]):string{
    '; texto vigente '+(row.activeText?'sí':'no')+'; resultados estructurados '+(row.activeResults?'sí':'no')+
    '; originales verificados '+row.originalsChecked+'; fallidos '+row.originalsFailed+
    (row.remoteUpdatedAt?'; actualización '+row.remoteUpdatedAt:''));
+  const d=diagnostics[scope.id];if(d)lines.push('  Documentos '+d.documents+'; informes '+d.reports+'; estudios complementarios catalogados '+d.studies+'; priorización '+(d.prioritisation?'sí':'no')+'; resultados perfil '+d.results+'; adjuntos '+d.attachments.length); 
   for(const issue of row.observations)lines.push('  - '+issue);
   if(row.error)lines.push('  - Error de lectura: '+row.error);
  }
- lines.push('', 'Equivalencia documental: '+profileParity(rows).status);
- for(const note of profileParity(rows).notes)lines.push('- '+note);
+ const reference=rows.filter(r=>PROFILE_AUDIT_SCOPES.some(scope=>scope.id===r.scope));
+ if(reference.length===3){lines.push('', 'Tres casos de referencia: '+profileParity(reference).status);for(const note of profileParity(reference).notes)lines.push('- '+note);}
  lines.push('No comprueba igualdad textual entre PDF y transcripción ni calidad científica del contenido.');
  return lines.join('\n');
 }
 export function ProfileRemoteAuditPanel({client}:{client:RelasClient}){
  const [rows,setRows]=useState<ProfileAuditResult[]>([]);
+ const [scopes,setScopes]=useState<Scope[]>([]);
+ const [diagnostics,setDiagnostics]=useState<Record<string,Diagnostic>>({});
  const [running,setRunning]=useState(false);
  const [completed,setCompleted]=useState(false);
  const [message,setMessage]=useState('');
  async function run(){
   if(running)return;
-  setRunning(true);setCompleted(false);setRows([]);setMessage('Consultando Firebase, sin modificar expedientes…');
+  setRunning(true);setCompleted(false);setRows([]);setScopes([]);setDiagnostics({});setMessage('Consultando catálogo y expedientes de Firebase, sin modificar datos…');
   const found:ProfileAuditResult[]=[];
-  for(const scope of PROFILE_AUDIT_SCOPES){
+  let targets:Scope[];
+  try { targets=(await listTerritorialSpaces(client)).map(s=>({id:s.id,name:s.name})); }
+  catch(error){setMessage('No se pudo leer el catálogo de ámbitos: '+(error instanceof Error?error.message:'Error de permisos'));setRunning(false);return;}
+  // Los tres ejemplos se incluyen incluso cuando el catálogo todavía no los expone.
+  targets=[...targets,...PROFILE_AUDIT_SCOPES.filter(f=>!targets.some(x=>x.id===f.id))];
+  setScopes(targets);
+  const details:Record<string,Diagnostic>={};
+  for(const scope of targets){
    let item:ProfileAuditResult;
    try{
     const remote=await readRemoteWorkspace(client,scope.id);
     item=await inspectRemoteProfile(remote,scope.id,scope.name);
+    if(remote){details[scope.id]=diagnosticOf(remote);setDiagnostics({...details});}
    }catch(error){
     item={scope:scope.id,name:scope.name,remote:'error',error:error instanceof Error?error.message:'Lectura no disponible',
      libraryValid:false,originalsVerified:false,originalsChecked:0,originalsFailed:0,
@@ -50,32 +76,33 @@ export function ProfileRemoteAuditPanel({client}:{client:RelasClient}){
    }
    found.push(item);
    setRows([...found]);
-   setMessage('Consultados '+found.length+' de '+PROFILE_AUDIT_SCOPES.length+' expedientes directamente desde Firebase.');
+   setMessage('Consultados '+found.length+' de '+targets.length+' expedientes directamente desde Firebase.');
   }
   setCompleted(true);setRunning(false);
   setMessage('Auditoría terminada. No se ha escrito ni eliminado ningún expediente.');
  }
  async function copy(){
-  try{await navigator.clipboard.writeText(summary(rows));setMessage('Resumen de diagnóstico copiado, sin texto ni archivos de los perfiles.');}
+  try{await navigator.clipboard.writeText(summary(rows,scopes,diagnostics));setMessage('Resumen de diagnóstico copiado, sin texto ni archivos de los perfiles.');}
   catch{setMessage('No se pudo copiar automáticamente. Puedes consultar los resultados en la tabla.');}
  }
- const parity=profileParity(rows);
+ const reference=rows.filter(r=>PROFILE_AUDIT_SCOPES.some(scope=>scope.id===r.scope));
+ const parity=profileParity(reference);
  return <section className="admin-section audit-profiles" aria-labelledby="audit-profiles-title">
-  <h2 id="audit-profiles-title">Verificación de expedientes y perfiles · Alfacar, Loja y Zagra</h2>
-  <p>Comprobación <strong>de solo lectura</strong> de los tres expedientes compartidos. Se obtienen directamente del servidor los fragmentos de Firebase y se verifica su integridad; los originales adjuntos se comprueban con SHA-256. No se comparan cifras de municipios distintos ni se modifican sus versiones.</p>
+  <h2 id="audit-profiles-title">Verificación de expedientes y perfiles · Todos los ámbitos</h2>
+  <p>Comprobación <strong>de solo lectura</strong> de todos los ámbitos disponibles en el catálogo de Firebase, incluidos los tres casos de referencia. Se obtienen directamente del servidor los fragmentos de Firebase y se verifica su integridad; los originales adjuntos se comprueban con SHA-256. No se comparan cifras de municipios distintos ni se modifican sus versiones.</p>
   <div className="audit-profiles__actions">
-   <button type="button" onClick={()=>void run()} disabled={running}>{running?'Verificando expedientes…':completed?'Repetir comprobación en Firebase':'Comprobar los tres expedientes en Firebase'}</button>
+   <button type="button" onClick={()=>void run()} disabled={running}>{running?'Verificando expedientes…':completed?'Repetir comprobación en Firebase':'Comprobar todos los expedientes en Firebase'}</button>
    {completed&&<button className="secondary" type="button" onClick={()=>void copy()}>Copiar resumen del diagnóstico</button>}
   </div>
   <p role="status" aria-live="polite">{message||'Aún no se ha consultado Firebase desde esta pantalla.'}</p>
   {rows.length>0&&<div className="table-wrap">
    <table className="audit-profiles__table">
     <caption>Resultados leídos en esta sesión administrativa; «no comprobado» no equivale a expediente ausente.</caption>
-    <thead><tr><th>Municipio</th><th>Expediente Firebase</th><th>Perfiles</th><th>Versión externa vigente</th><th>Documento y resultados</th><th>Originales</th></tr></thead>
-    <tbody>{PROFILE_AUDIT_SCOPES.map(scope=>{
+    <thead><tr><th>Municipio</th><th>Expediente Firebase</th><th>Perfiles</th><th>Versión externa vigente</th><th>Documento y resultados</th><th>Originales</th><th>Fuentes del expediente</th></tr></thead>
+    <tbody>{scopes.map(scope=>{
      const x=rows.find(row=>row.scope===scope.id);
      return <tr key={scope.id}><th scope="row">{scope.name}</th>
-      {!x?<td colSpan={5}>Pendiente de comprobación</td>:<>
+      {!x?<td colSpan={6}>Pendiente de comprobación</td>:<>
       <td><strong>{x.remote==='ok'?'Cargado íntegramente':x.remote==='missing'?'Sin expediente remoto':'Error de lectura'}</strong>
        <small>{x.remote==='ok'?shortDate(x.remoteUpdatedAt):x.error||'No existe una copia compartida'}</small></td>
       <td>{x.externalVersions} externos · {x.legacyVersions} legado
@@ -84,12 +111,13 @@ export function ProfileRemoteAuditPanel({client}:{client:RelasClient}){
       <td>{x.activePdf?'PDF original':'Sin PDF'} · {x.activeText?'Texto':'Sin texto'} · {x.activeResults?'Resultados':'Sin resultados'}</td>
       <td>{x.remote!=='ok'?'No verificados':x.originalsVerified?'Correctos':'Con incidencias'}
        <small>{x.originalsChecked} comprobados; {x.originalsFailed} fallidos</small></td>
+      <td>{diagnostics[scope.id] ? <>{diagnostics[scope.id].documents} documentos · {diagnostics[scope.id].reports} informes · {diagnostics[scope.id].studies} estudios<small>Priorización: {diagnostics[scope.id].prioritisation?'registrada':'no registrada'}</small></> : 'No verificadas'}</td>
       </>}
      </tr>;
     })}</tbody></table>
    </div>}
-  {completed&&<div className="audit-profiles__conclusion">
-   <h3>Equivalencia técnica y documental</h3>
+  {completed&&reference.length===3&&<div className="audit-profiles__conclusion">
+   <h3>Comparación técnica de los tres casos de referencia</h3>
    <p><strong>{parity.status==='equivalentes'?'Equivalentes en los mínimos técnicos':parity.status==='distintos'?'No equivalentes o con carencias':'No evaluable todavía'}</strong></p>
    {parity.notes.map((note,i)=><p key={i}>{note}</p>)}
   </div>}
