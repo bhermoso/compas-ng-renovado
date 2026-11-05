@@ -1521,9 +1521,23 @@ export default function App() {
       structure: declaresOpenAnswers ? "open-answers" : undefined,
     });
     if (result === null) return;
+    // El acto explícito de cargar bajo «Localiza Salud» por el responsable
+    // acredita la selección de las fichas incorporadas. No exigir otra validación.
+    const nextRepository = isLocaliza
+      ? addAssetValidation(result.repository, {
+          id: crypto.randomUUID(),
+          documentId: result.document.id,
+          atomIds: result.evidenceStore.atoms
+            .filter(a => a.provenance.documentId === result.document.id && a.kind === "asset")
+            .map(a => a.id),
+          criteria: { title: "Selección expresa del inventario Activos Localiza Salud", version: "1" },
+          declaredBy: remoteClient.auth.currentUser?.email || "Responsable del expediente",
+          note: "Registro incorporado expresamente como listado de activos validados.",
+        })
+      : result.repository;
     setWorkspace(prev => prev.municipality.identity.id !== workspace.municipality.identity.id ? prev : ({
       ...prev,
-      repository: result.repository,
+      repository: nextRepository,
       evidenceStore: result.evidenceStore,
       updatedAt: new Date().toISOString(),
     }));
