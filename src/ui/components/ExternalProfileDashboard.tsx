@@ -159,12 +159,12 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
   try{await commit(archiveExternalProfileVersion(library,profile.id,authorName),'Versión archivada y conservada en Firebase.');}catch(e){setError(e instanceof Error?e.message:'No se pudo archivar.');}
  }
  async function deleteVersion(profile:ExternalHealthProfile){
-  if(!window.confirm(`¿Eliminar definitivamente «${profile.title}»? Solo se borrarán los adjuntos que ninguna otra versión utilice. Esta operación no se puede deshacer.`))return;
+  if(!window.confirm(`¿Eliminar definitivamente «${profile.title}»${library.activeId===profile.id?' (versión vigente)':''}? Las demás versiones y sus archivos compartidos se conservarán. Si es vigente se designará otra versión disponible. Esta operación no se puede deshacer.`))return;
   setBusy(true);setError('');setMessage('Eliminando del expediente compartido…');
   try{
    const next=deleteExternalProfileVersion(library,profile.id);
    await onSave(next,progress=>setMessage(progress));
-   setSelectedId(library.activeId);
+   setSelectedId(next.activeId); if(!next.profiles.length)setTab('results');
    setMessage('Versión eliminada en Firebase. Se conservaron las demás versiones y sus archivos.');
   }catch(e){setError(e instanceof Error?e.message:'No se pudo eliminar.');setMessage('');}
   finally{setBusy(false);}
@@ -318,7 +318,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
    </aside>
     <section className="ep-versions"><p className="ep-eyebrow">HISTORIAL CONSERVADO EN FIREBASE</p><h2>Versiones del perfil</h2>{[...library.profiles].reverse().map(p=><article key={p.id}><div><h3>{p.title}</h3><p>{date(p.createdAt)} · {p.author||'Autoría no declarada'} · {p.status==='validated'?'Validada':'En revisión'}{p.id===library.activeId?' · Vigente':''}{p.archivedAt?' · Archivada':''}</p></div><div className="ep-actions"><button onClick={()=>{setSelectedId(p.id);setTab('document');}}>Consultar versión</button>{p.id!==library.activeId&&!p.archivedAt&&<button disabled={busy} onClick={()=>void commit({...library,activeId:p.id},'Versión vigente actualizada en Firebase.')}>Establecer como vigente</button>}
       {p.id!==library.activeId&&!p.archivedAt&&<button disabled={busy} onClick={()=>void archiveVersion(p)}>Archivar versión</button>}
-      {p.id!==library.activeId&&p.archivedAt&&!library.profiles.some(child=>child.revisionOf===p.id)&&<button disabled={busy} onClick={()=>void deleteVersion(p)}>Eliminar versión archivada</button>}</div></article>)}</section></div>
+      <button type="button" disabled={busy} onClick={()=>void deleteVersion(p)}>Eliminar versión</button></div></article>)}</section></div>
     {selected.id===library.activeId&&selected.status==='review'&&<section className="ep-validation"><div><h3>Revisión técnica</h3><p>La incorporación no valida el contenido. La validación quedará vinculada a esta versión y a tu cuenta.</p></div><button disabled={busy} onClick={()=>{if(!authorName.trim()){setError('Identifícate para registrar la validación.');return;}if(window.confirm('¿Registrar la validación técnica de esta versión con tu cuenta?'))void commit({...library,profiles:library.profiles.map(p=>p.id===selected.id?{...p,status:'validated',validatedAt:new Date().toISOString(),validatedBy:authorName}:p)},'Validación técnica registrada en Firebase.');}}>Registrar validación técnica</button></section>}
    </main>}
   </>}
