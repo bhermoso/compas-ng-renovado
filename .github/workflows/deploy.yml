@@ -33,10 +33,15 @@ jobs:
         run: npm ci
 
       - name: Test profile revisions and evidence links
-        run: npx vitest run tests/external-profiles.test.tsx tests/profile-structure.test.ts tests/profile-remote-audit.test.ts
+        run: npx vitest run tests/external-profiles.test.tsx tests/profile-structure.test.ts tests/profile-remote-audit.test.ts tests/profile-audit-direct-entry.test.ts
 
       - name: Build
         run: npm run build
+
+      - name: Comprobar que existe la página independiente de auditoría
+        run: |
+          test -s dist/verificar-perfiles.html
+          grep -q 'type="module"' dist/verificar-perfiles.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

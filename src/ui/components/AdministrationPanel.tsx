@@ -28,6 +28,7 @@ export default function AdministrationPanel({client,onOpenApp,onOpenScope}:{clie
  }
  return <>
   <div className="admin-banner"><strong>Administración general</strong><p>Tú conservas el control de todos los planes. Los accesos de cada responsable no pueden modificar tu cuenta ni tus permisos.</p></div>
+  <div className="admin-audit-quicklink"><p><strong>Verificación de expedientes y perfiles</strong> · Alfacar, Loja y Zagra</p><p><a href={`${import.meta.env.BASE_URL}verificar-perfiles.html`}>Abrir comprobación independiente de Firebase</a></p></div>
   <section className="admin-section"><h2>Espacios territoriales</h2><p>Crea un espacio independiente para cada municipio, mancomunidad o distrito municipal. Tú puedes acceder a todos. Cada responsable recibe únicamente el ámbito que le asignes.</p>
    {groupSpaces(spaces).map(g=><div key={g.type}><h3>{g.label} ({g.spaces.length})</h3><ul>{g.spaces.map(x=><li key={x.id}><strong>{x.name}</strong> · <code>{x.id}</code></li>)}</ul></div>)}
    <form onSubmit={async e=>{e.preventDefault();if(!candidate||duplicate)return;setBusy(true);setMessage('Creando espacio…');try{await createTerritorialSpace(client,candidate);setSpaces(rows=>[...rows,candidate]);setSelectedScope(candidate.id);setIneCode('');setDistrictName('');setMancName('');setMessage('Espacio territorial creado. Ya aparece en todos los desplegables y puedes asignar su responsable.');}catch(error){setMessage(accessError(error));}finally{setBusy(false);}}}>
