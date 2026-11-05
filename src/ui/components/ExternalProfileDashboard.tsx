@@ -1,4 +1,5 @@
 import { externalProfileDocument } from '../../application/health-profile/externalProfileDocument';
+import { prepareZagraHistoricalRevision, ZAGRA_HISTORICAL_RESULTS } from '../../application/health-profile/zagraHistoricalEvidence';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { parseProfileStructure, prefillFromStructure } from '../../application/health-profile/profileStructure';
 import { ProfileReader } from './ProfileReader';
@@ -149,6 +150,16 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
   setNewFiles(current=>current.filter(file=>file.id!==id));
   setMessage('Adjunto retirado solo de esta revisión. Las versiones guardadas permanecen intactas.');
  }
+ function prepareZagraRevision() {
+  if(!selected || municipalityId.toLowerCase() !== 'zagra')return;
+  if(draft && !window.confirm('Ya hay un borrador sin guardar. ¿Descartarlo para preparar la revisión histórica de Zagra?'))return;
+  const missing=ZAGRA_HISTORICAL_RESULTS.filter(r=>!selected.results.some(x=>x.id===r.id)).length;
+  if(!missing){setMessage('Esta versión ya contiene los nueve indicadores RELAS identificados.');return;}
+  if(!window.confirm('Se preparará una NUEVA REVISIÓN del perfil vigente de Zagra con '+missing+' indicadores históricos documentados (2008–2015). El perfil actual, sus fuentes, archivos y validación no cambiarán. Los datos no se presentarán como cifras de 2026. Podrás revisar el borrador antes de guardarlo. ¿Continuar?'))return;
+  setDraft(prepareZagraHistoricalRevision(selected,crypto.randomUUID(),new Date().toISOString()));
+  setNewFiles([]);setResultDraft(undefined);setError('');
+  setMessage('Borrador preparado con '+missing+' indicadores RELAS y sus cautelas. Comprueba los resultados y guarda la revisión solo si la apruebas.');
+ }
  function edit() {
   if(!selected)return;
   setDraft({...structuredClone(selected),id:crypto.randomUUID(),revisionOf:selected.id,createdAt:new Date().toISOString(),status:'review',validatedBy:undefined,validatedAt:undefined,archivedAt:undefined,archivedBy:undefined});
@@ -206,6 +217,13 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
   <input className="ep-sr-only" ref={fileInput} type="file" aria-label="Cargar perfil" multiple accept=".pdf,.docx,.txt,.md,.json" disabled={busy} onChange={e=>void loadFiles(e.currentTarget.files)} />
   <input className="ep-sr-only" ref={draftFileInput} type="file" aria-label="Añadir o sustituir archivo" accept=".pdf,.docx,.txt,.md,.json" disabled={busy} onChange={e=>{const files=e.currentTarget.files;void changeDraftFiles(files);e.currentTarget.value='';}} />
   {message&&<p className="ep-message" role="status">{message}</p>}{error&&<p className="ep-error" role="alert">{error}</p>}
+  {!draft && selected && municipalityId.toLowerCase()==='zagra' && (
+   <section className="ep-section" aria-label="Recuperación de indicadores históricos de Zagra">
+    <p className="ep-help">El Perfil de Salud Local RELAS contiene indicadores epidemiológicos de 2008–2015. Pueden incorporarse como resultados históricos de una nueva revisión, sin modificar el perfil vigente.</p>
+    <button type="button" disabled={busy || ZAGRA_HISTORICAL_RESULTS.every(r=>selected.results.some(x=>x.id===r.id))}
+      onClick={prepareZagraRevision}>Preparar revisión con indicadores históricos RELAS</button>
+   </section>
+  )}
   {draft ? <form className="ep-editor" onSubmit={e=>void saveDraft(e)}>
    <div className="ep-section-heading"><div><p className="ep-eyebrow">{draft.revisionOf?'NUEVA REVISIÓN':'INCORPORAR UN PERFIL EXTERNO'}</p><h2>Revisa el perfil antes de guardarlo</h2></div>
     <button type="button" disabled={busy} onClick={()=>{if(window.confirm('¿Descartar este borrador sin guardar?')){setDraft(undefined);setNewFiles([]);setResultDraft(undefined);setMessage('');}}}>Cancelar</button></div>
