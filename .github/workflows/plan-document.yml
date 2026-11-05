@@ -20,6 +20,7 @@ on:
       - 'tests/relas-draft-migration.test.ts'
       - 'tests/action-plan-compatibility.smoke.mjs'
       - 'tests/common-action-plan-workspace.smoke.mjs'
+      - 'tests/plan-version-delete.smoke.mjs'
       - 'tests/municipality-seed-hydration.test.ts'
       - 'tests/fuente-vaqueros-hydration.smoke.mjs'
       - 'public/seeds/**'
@@ -42,3 +43,4 @@ jobs:
       - run: node tests/fuente-vaqueros-hydration.smoke.mjs
       - run: node tests/action-plan-compatibility.smoke.mjs
       - run: node tests/common-action-plan-workspace.smoke.mjs
+      - run: node tests/plan-version-delete.smoke.mjs
