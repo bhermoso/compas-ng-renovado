@@ -29,8 +29,8 @@ export function ActivosSaludPanel({ repository, onDeleteDocument, atoms = [] }: 
           <h2>Activos para la salud</h2>
         </div>
         <p className="panel-note">
-          Recursos comunitarios, equipamientos y redes del territorio que contribuyen
-          a la salud de la población.
+          Fichas de recursos, actividades y redes del territorio que contribuyen
+          a la salud de la población. Varias fichas pueden corresponder al mismo activo.
         </p>
       </div>
 
@@ -53,7 +53,7 @@ export function ActivosSaludPanel({ repository, onDeleteDocument, atoms = [] }: 
         <div className="activos-body">
           <div className="activos-summary">
             <span className="activos-summary__count">
-              <strong>{assetNames.length}</strong> activos comunitarios incorporados
+              <strong>{assetNames.length}</strong> fichas de activos registradas
             </span>
             <button
               type="button"
