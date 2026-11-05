@@ -2,6 +2,7 @@ import {useState} from 'react';
 import type {RelasClient} from '../../infrastructure/relas/RelasClient';
 import {readRemoteWorkspace} from '../../infrastructure/relas/RemoteWorkspace';
 import {listTerritorialSpaces} from '../../infrastructure/relas/AdminAccounts';
+import {inspectProfilePackage,type ProfilePackageReadiness} from '../../application/health-profile/profilePackageReadiness';
 import {inspectRemoteProfile,PROFILE_AUDIT_SCOPES,profileParity,type ProfileAuditResult} from '../../application/health-profile/profileRemoteAudit';
 import './ProfileRemoteAuditPanel.css';
 
@@ -57,12 +58,13 @@ export function ProfileRemoteAuditPanel({client}:{client:RelasClient}){
  const [rows,setRows]=useState<ProfileAuditResult[]>([]);
  const [scopes,setScopes]=useState<Scope[]>([]);
  const [diagnostics,setDiagnostics]=useState<Record<string,Diagnostic>>({});
+ const [packageReadiness,setPackageReadiness]=useState<Record<string,ProfilePackageReadiness>>({});
  const [running,setRunning]=useState(false);
  const [completed,setCompleted]=useState(false);
  const [message,setMessage]=useState('');
  async function run(){
   if(running)return;
-  setRunning(true);setCompleted(false);setRows([]);setScopes([]);setDiagnostics({});setMessage('Consultando catálogo y expedientes de Firebase, sin modificar datos…');
+  setRunning(true);setCompleted(false);setRows([]);setScopes([]);setDiagnostics({});setPackageReadiness({});setMessage('Consultando catálogo y expedientes de Firebase, sin modificar datos…');
   const found:ProfileAuditResult[]=[];
   let targets:Scope[];
   try { targets=(await listTerritorialSpaces(client)).map(s=>({id:s.id,name:s.name})); }
@@ -71,12 +73,13 @@ export function ProfileRemoteAuditPanel({client}:{client:RelasClient}){
   targets=[...targets,...PROFILE_AUDIT_SCOPES.filter(f=>!targets.some(x=>x.id===f.id))];
   setScopes(targets);
   const details:Record<string,Diagnostic>={};
+  const packages:Record<string,ProfilePackageReadiness>={};
   for(const scope of targets){
    let item:ProfileAuditResult;
    try{
     const remote=await readRemoteWorkspace(client,scope.id);
     item=await inspectRemoteProfile(remote,scope.id,scope.name);
-    if(remote){details[scope.id]=diagnosticOf(remote);setDiagnostics({...details});}
+    if(remote){details[scope.id]=diagnosticOf(remote);setDiagnostics({...details});packages[scope.id]=inspectProfilePackage(remote);setPackageReadiness({...packages});}
    }catch(error){
     item={scope:scope.id,name:scope.name,remote:'error',error:error instanceof Error?error.message:'Lectura no disponible',
      libraryValid:false,originalsVerified:false,originalsChecked:0,originalsFailed:0,
@@ -138,6 +141,8 @@ export function ProfileRemoteAuditPanel({client}:{client:RelasClient}){
    {diagnostics[row.scope]&&<p>Fuentes registradas: {diagnostics[row.scope].documents} documentos, {diagnostics[row.scope].reports} informes de salud, {diagnostics[row.scope].studies} estudios complementarios catalogados ; estudios cargados {diagnostics[row.scope].studyRecords.join(', ')||'ninguno'}; priorización adoptada {diagnostics[row.scope].prioritisation?'sí':'no'}; estudio temático {diagnostics[row.scope].prioritisationStudy?'sí':'no'}.</p>}
    {diagnostics[row.scope]&&<p>Resultados del perfil vigente: {diagnostics[row.scope].results} indicadores; {diagnostics[row.scope].resultsWithSource} con fuente; {diagnostics[row.scope].resultsWithPeriod} con periodo; {diagnostics[row.scope].resultsWithPage} con página; {diagnostics[row.scope].resultsWithComparators} con comparadores; {diagnostics[row.scope].jsonFiles} archivos JSON adjuntos.</p>}
    {diagnostics[row.scope]&&diagnostics[row.scope].attachments.length>0&&<p>Archivos del paquete: {diagnostics[row.scope].attachments.join(' · ')}</p>}
+   {packageReadiness[row.scope]&&<p><strong>Lectura de suficiencia:</strong> {packageReadiness[row.scope].stage==='sin-perfil'?'Sin perfil externo':packageReadiness[row.scope].stage==='documental'?'Perfil documental':'Perfil con indicadores estructurados'} · Original vinculado: {packageReadiness[row.scope].hasOriginal?'sí':'no'} · JSON adjunto: {packageReadiness[row.scope].hasPackageJson?'sí':'no'} · Cuatro páginas reconocidas: {packageReadiness[row.scope].hasFourDataPages?'sí':'no'} · Indicadores numéricos: {packageReadiness[row.scope].numericIndicators} · Con denominador: {packageReadiness[row.scope].withDenominator}.</p>}
+   {packageReadiness[row.scope]?.warnings.map((warning,i)=><p key={i}>Revisión pendiente: {warning}</p>)}
    {row.versions.length>0?<table><thead><tr><th>Versión</th><th>Estado</th><th>Texto</th><th>PDF</th><th>Indicadores</th></tr></thead><tbody>
     {row.versions.map(p=><tr key={p.id}><td>{p.title}</td><td>{p.active?'Vigente':'Histórica'} · {p.archived?'Archivada':p.status==='validated'?'Validada':'En revisión'}</td><td>{p.textPresent?'Sí':'No'}</td><td>{p.pdfs}</td><td>{p.results}</td></tr>)}
    </tbody></table>:<p>No hay revisiones externas que mostrar.</p>}
