@@ -150,6 +150,27 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
   expect(library.profiles[0]).toEqual(first);
   expect(library.profiles[1].id).toBe('alfacar-v02-imported');
  });
+ it('Alfacar: permite eliminar cualquiera de tres versiones, incluso la vigente o la antecesora',()=>{
+  const a=externalProfileFixture('alfacar');
+  const b={...a,id:'alfacar-v2',revisionOf:a.id};
+  const c={...a,id:'alfacar-v3',revisionOf:b.id};
+  const library={profiles:[a,b,c],attachments:[],activeId:c.id};
+  for(const target of [a.id,b.id,c.id]){
+   const next=deleteExternalProfileVersion(library,target);
+   expect(next.profiles).toHaveLength(2);
+   expect(next.profiles.some(p=>p.id===target)).toBe(false);
+   expect(isExternalProfileLibrary(next,'alfacar')).toBe(true);
+  }
+  const withoutMiddle=deleteExternalProfileVersion(library,b.id);
+  expect(withoutMiddle.profiles.find(p=>p.id===c.id)?.revisionOf).toBe(a.id);
+  const withoutActive=deleteExternalProfileVersion(library,c.id);
+  expect(withoutActive.activeId).toBe(b.id);
+  const withoutRoot=deleteExternalProfileVersion(library,a.id);
+  expect(withoutRoot.profiles.find(p=>p.id===b.id)?.revisionOf).toBeUndefined();
+  const empty=deleteExternalProfileVersion({profiles:[a],attachments:[],activeId:a.id},a.id);
+  expect(empty.profiles).toHaveLength(0);
+  expect(empty.activeId).toBeUndefined();
+ });
  it('al importar el primer perfil no crea una revisión sin antecedente',()=>{
   const profile=externalProfileFixture('alfacar');
   expect(prepareImportedProfileRevision(profile)).toBe(profile);
