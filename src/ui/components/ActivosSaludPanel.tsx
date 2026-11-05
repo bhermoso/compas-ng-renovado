@@ -17,7 +17,7 @@ export function ActivosSaludPanel({ repository, onDeleteDocument, atoms = [] }: 
   const [showList, setShowList] = useState(false);
 
   const assetDocs = repository.documents.filter(
-    (d) => d.kind === "community-asset" || d.kind === "localiza-salud"
+    (d) => (d.kind === "community-asset" || d.kind === "localiza-salud") && d.status !== "archived" && d.status !== "rejected"
   );
   const assetNames = assetDocs.flatMap(assetEntriesOfDocument);
 
