@@ -19,11 +19,11 @@ export function PlanDocumentActions({municipalityId,active,versions=[],worksheet
   .sort((a,b)=>b.generatedAt.localeCompare(a.generatedAt));
  const latest=latestValidatedPlan(versions,municipalityId);
 
- async function download(format:"docx"|"pdf", document:PlanDocument){
+ async function download(format:"docx"|"pdf", document?:PlanDocument){
   setBusy(true);setMessage("");
   try{
    const {downloadPlanDocument}=await import("../../application/action-plan/exportPlanDocument");
-   await downloadPlanDocument(document,format);
+   await downloadPlanDocument(document ?? buildPlanDocument(municipalityId,active,new Date().toISOString(),{worksheets}),format);
   }catch{setMessage("No se pudo descargar el documento. Inténtalo de nuevo.");}
   finally{setBusy(false);}
  }
@@ -59,8 +59,8 @@ export function PlanDocumentActions({municipalityId,active,versions=[],worksheet
   <label>Persona que valida técnicamente<input value={name} onChange={e=>setName(e.target.value)}/></label>
   <button type="button" disabled={busy||!onValidate} onClick={validate}>Validar y guardar versión actual</button>
   <div className="backup-panel__actions">
-   <button type="button" disabled={busy||!active.some(x=>x.rows.length)} onClick={()=>download("docx",buildPlanDocument(municipalityId,active,new Date().toISOString(),{worksheets}))}>Descargar borrador actual · Word</button>
-   <button type="button" disabled={busy||!active.some(x=>x.rows.length)} onClick={()=>download("pdf",buildPlanDocument(municipalityId,active,new Date().toISOString(),{worksheets}))}>Descargar borrador actual · PDF</button>
+   <button type="button" disabled={busy||!active.some(x=>x.rows.length)} onClick={()=>download("docx",undefined)}>Descargar borrador actual · Word</button>
+   <button type="button" disabled={busy||!active.some(x=>x.rows.length)} onClick={()=>download("pdf",undefined)}>Descargar borrador actual · PDF</button>
    {latest&&<>
     <button type="button" disabled={busy} onClick={()=>download("docx",latest)}>Descargar última versión validada · Word</button>
     <button type="button" disabled={busy} onClick={()=>download("pdf",latest)}>Descargar última versión validada · PDF</button>
