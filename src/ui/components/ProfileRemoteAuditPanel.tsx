@@ -11,7 +11,7 @@ function shortDate(value?:string){
  return Number.isNaN(date.valueOf())?'Fecha no válida':date.toLocaleString('es-ES',{dateStyle:'short',timeStyle:'short'});
 }
 type Scope = {id:string;name:string};
-type Diagnostic = {documents:number;reports:number;studies:number;prioritisation:boolean;attachments:string[];results:number};
+type Diagnostic = {documents:number;reports:number;studies:number;prioritisation:boolean;attachments:string[];results:number;jsonFiles:number;resultsWithSource:number;resultsWithPeriod:number;resultsWithPage:number;resultsWithComparators:number};
 function diagnosticOf(remote:NonNullable<Awaited<ReturnType<typeof readRemoteWorkspace>>>):Diagnostic{
  const documents=remote.repository?.documents??[];
  const active=remote.externalProfileLibrary?.profiles.find(p=>p.id===remote.externalProfileLibrary?.activeId);
@@ -22,6 +22,11 @@ function diagnosticOf(remote:NonNullable<Awaited<ReturnType<typeof readRemoteWor
   prioritisation:Boolean(remote.thematicPrioritisation),
   attachments:(remote.externalProfileLibrary?.attachments??[]).map(a=>a.name),
   results:active?.results.length??0,
+  jsonFiles:(remote.externalProfileLibrary?.attachments??[]).filter(a=>a.mimeType==='application/json').length,
+  resultsWithSource:active?.results.filter(r=>r.source.trim()).length??0,
+  resultsWithPeriod:active?.results.filter(r=>r.period.trim()).length??0,
+  resultsWithPage:active?.results.filter(r=>r.page.trim()).length??0,
+  resultsWithComparators:active?.results.filter(r=>(r.comparisons?.length??0)>0||Boolean(r.comparison)).length??0,
  };
 }
 function summary(rows:ProfileAuditResult[],scopes:Scope[],diagnostics:Record<string,Diagnostic>):string{
@@ -98,11 +103,11 @@ export function ProfileRemoteAuditPanel({client}:{client:RelasClient}){
   {rows.length>0&&<div className="table-wrap">
    <table className="audit-profiles__table">
     <caption>Resultados leídos en esta sesión administrativa; «no comprobado» no equivale a expediente ausente.</caption>
-    <thead><tr><th>Municipio</th><th>Expediente Firebase</th><th>Perfiles</th><th>Versión externa vigente</th><th>Documento y resultados</th><th>Originales</th><th>Fuentes del expediente</th></tr></thead>
+    <thead><tr><th>Municipio</th><th>Expediente Firebase</th><th>Perfiles</th><th>Versión externa vigente</th><th>Documento y resultados</th><th>Originales</th><th>Fuentes del expediente</th><th>Paquete estructurado</th></tr></thead>
     <tbody>{scopes.map(scope=>{
      const x=rows.find(row=>row.scope===scope.id);
      return <tr key={scope.id}><th scope="row">{scope.name}</th>
-      {!x?<td colSpan={6}>Pendiente de comprobación</td>:<>
+      {!x?<td colSpan={7}>Pendiente de comprobación</td>:<>
       <td><strong>{x.remote==='ok'?'Cargado íntegramente':x.remote==='missing'?'Sin expediente remoto':'Error de lectura'}</strong>
        <small>{x.remote==='ok'?shortDate(x.remoteUpdatedAt):x.error||'No existe una copia compartida'}</small></td>
       <td>{x.externalVersions} externos · {x.legacyVersions} legado
@@ -112,6 +117,7 @@ export function ProfileRemoteAuditPanel({client}:{client:RelasClient}){
       <td>{x.remote!=='ok'?'No verificados':x.originalsVerified?'Correctos':'Con incidencias'}
        <small>{x.originalsChecked} comprobados; {x.originalsFailed} fallidos</small></td>
       <td>{diagnostics[scope.id] ? <>{diagnostics[scope.id].documents} documentos · {diagnostics[scope.id].reports} informes · {diagnostics[scope.id].studies} estudios<small>Priorización: {diagnostics[scope.id].prioritisation?'registrada':'no registrada'}</small></> : 'No verificadas'}</td>
+      <td>{diagnostics[scope.id] ? <>{diagnostics[scope.id].jsonFiles} JSON adjuntos · {diagnostics[scope.id].results} indicadores<small>{diagnostics[scope.id].resultsWithSource} con fuente · {diagnostics[scope.id].resultsWithPeriod} con periodo · {diagnostics[scope.id].resultsWithPage} con página · {diagnostics[scope.id].resultsWithComparators} comparables</small></> : 'No evaluable'}</td>
       </>}
      </tr>;
     })}</tbody></table>
