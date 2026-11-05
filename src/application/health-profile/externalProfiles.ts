@@ -81,9 +81,10 @@ export function archiveExternalProfileVersion(
 }
 
 /**
- * Permanently remove an already archived, non-active leaf revision.
- * Other versions retain their bytes; only attachments with no remaining
- * references are released from Firebase. Never leave broken revisionOf links.
+ * Remove any selected profile version, including the current one or a parent
+ * revision. Preserve the remaining lineage by linking direct descendants to
+ * the removed revision's parent (or making them roots).
+ * Shared attachments are retained until no surviving version references them.
  */
 export function deleteExternalProfileVersion(
  library: ExternalProfileLibrary,
@@ -91,14 +92,18 @@ export function deleteExternalProfileVersion(
 ): ExternalProfileLibrary {
  const profile=library.profiles.find(p=>p.id===profileId);
  if (!profile) throw new Error('La versión ya no existe.');
- if (!profile.archivedAt) throw new Error('Archiva primero la versión para confirmar que ya no se utiliza.');
- if (library.activeId===profileId) throw new Error('No puedes eliminar la versión de referencia.');
- if (library.profiles.some(p=>p.revisionOf===profileId)) {
-  throw new Error('No puedes eliminar una versión que tenga revisiones posteriores. Su historial debe conservarse.');
- }
- const profiles=library.profiles.filter(p=>p.id!==profileId);
+ const profiles=library.profiles.filter(p=>p.id!==profileId).map(p=>
+  p.revisionOf===profileId
+   ? {...p,revisionOf:profile.revisionOf}
+   : p
+ );
  const referenced=new Set(profiles.flatMap(p=>p.attachmentIds));
- return {...library,profiles,attachments:library.attachments.filter(a=>referenced.has(a.id))};
+ const activeId=library.activeId===profileId
+  ? (profiles.find(p=>p.id===profile.revisionOf && !p.archivedAt)?.id
+    ?? [...profiles].reverse().find(p=>!p.archivedAt)?.id
+    ?? profiles.at(-1)?.id)
+  : library.activeId;
+ return {...library,profiles,attachments:library.attachments.filter(a=>referenced.has(a.id)),activeId};
 }
 
 /** Strict data import; never takes authority/validation or executable HTML from a package. */
