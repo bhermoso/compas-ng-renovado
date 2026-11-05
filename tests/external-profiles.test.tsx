@@ -171,6 +171,33 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
   expect(empty.profiles).toHaveLength(0);
   expect(empty.activeId).toBeUndefined();
  });
+ it('Alfacar, Loja y Zagra comparten eliminación de cualquier revisión con linaje íntegro',()=>{
+  for(const municipality of ['alfacar','loja','zagra']){
+   const a={...externalProfileFixture(municipality),id:municipality+'-r1',title:'Perfil '+municipality+' v0.1'};
+   const b={...a,id:municipality+'-r2',revisionOf:a.id,archivedAt:'2026-11-01T00:00:00Z',archivedBy:'Equipo'};
+   const c={...a,id:municipality+'-r3',revisionOf:b.id};
+   const source={profiles:[a,b,c],attachments:[],activeId:c.id};
+   expect(isExternalProfileLibrary(source,municipality)).toBe(true);
+   for(const target of source.profiles){
+    const after=deleteExternalProfileVersion(source,target.id);
+    expect(after.profiles).toHaveLength(2);
+    expect(after.profiles.some(p=>p.id===target.id)).toBe(false);
+    expect(after.activeId===undefined||after.profiles.some(p=>p.id===after.activeId)).toBe(true);
+    expect(isExternalProfileLibrary(after,municipality)).toBe(true);
+   }
+   const none=deleteExternalProfileVersion(deleteExternalProfileVersion(
+     deleteExternalProfileVersion(source,c.id),b.id),a.id);
+   expect(none.profiles).toHaveLength(0);
+   expect(none.activeId).toBeUndefined();
+  }
+ });
+ it('el historial ofrece Eliminar sin condición por versión activa y solo Archivar en no vigentes',()=>{
+  const code=readFileSync(resolve(__dirname,'../src/ui/components/ExternalProfileDashboard.tsx'),'utf8');
+  expect(code).toContain('className="ep-delete-version"');
+  expect(code).toContain('onClick={()=>void deleteVersion(p)}>Eliminar versión');
+  expect(code).toContain('p.id!==library.activeId&&!p.archivedAt&&<button disabled={busy} onClick={()=>void archiveVersion(p)}');
+  expect(code).toContain('versiones · {library.activeId?1:0} vigente');
+ });
  it('al importar el primer perfil no crea una revisión sin antecedente',()=>{
   const profile=externalProfileFixture('alfacar');
   expect(prepareImportedProfileRevision(profile)).toBe(profile);
