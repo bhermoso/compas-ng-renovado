@@ -335,10 +335,11 @@ export function transformDocumentToEvidence(
       tags: [input.document.kind, kind],
     });
 
-    // Cada fila de Localiza Salud es una ficha individual. Dos actividades pueden
-    // compartir nombre/equipamiento y tener ID de origen diferente; el upsert por
-    // título fusionaba fichas y falseaba el recuento. La sustitución por fuente,
-    // cuando proceda, se gestiona a nivel documental, nunca por nombre de activo.
+    // Cada fila de Localiza Salud conserva su ficha de procedencia. Dos fichas
+    // pueden describir un mismo activo (misma actividad y mismo centro), y
+    // actividades diferentes pueden compartir equipamiento. No se fusiona por
+    // título ni se considera que una ficha sea un activo único validado.
+    // La identidad de los activos requiere cotejo de actividad y centro.
     store = addEvidenceAtom(store, atom);
     atomsCreated.push(atom);
   }
