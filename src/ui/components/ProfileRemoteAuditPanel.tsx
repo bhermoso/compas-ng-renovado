@@ -131,10 +131,13 @@ export function ProfileRemoteAuditPanel({client}:{client:RelasClient}){
    <summary>{row.name} · {row.externalVersions} versiones externas · {row.observations.length} observaciones</summary>
    {row.error&&<p role="alert">{row.error}</p>}
    {row.observations.map((note,i)=><p key={i}>{note}</p>)}
+   {diagnostics[row.scope]&&<p>Fuentes registradas: {diagnostics[row.scope].documents} documentos, {diagnostics[row.scope].reports} informes de salud, {diagnostics[row.scope].studies} estudios complementarios catalogados y priorización {diagnostics[row.scope].prioritisation?'registrada':'no registrada'}.</p>}
+   {diagnostics[row.scope]&&<p>Resultados del perfil vigente: {diagnostics[row.scope].results} indicadores; {diagnostics[row.scope].resultsWithSource} con fuente; {diagnostics[row.scope].resultsWithPeriod} con periodo; {diagnostics[row.scope].resultsWithPage} con página; {diagnostics[row.scope].resultsWithComparators} con comparadores; {diagnostics[row.scope].jsonFiles} archivos JSON adjuntos.</p>}
+   {diagnostics[row.scope]&&diagnostics[row.scope].attachments.length>0&&<p>Archivos del paquete: {diagnostics[row.scope].attachments.join(' · ')}</p>}
    {row.versions.length>0?<table><thead><tr><th>Versión</th><th>Estado</th><th>Texto</th><th>PDF</th><th>Indicadores</th></tr></thead><tbody>
     {row.versions.map(p=><tr key={p.id}><td>{p.title}</td><td>{p.active?'Vigente':'Histórica'} · {p.archived?'Archivada':p.status==='validated'?'Validada':'En revisión'}</td><td>{p.textPresent?'Sí':'No'}</td><td>{p.pdfs}</td><td>{p.results}</td></tr>)}
    </tbody></table>:<p>No hay revisiones externas que mostrar.</p>}
   </details>)}
-  <p className="audit-profiles__caveat">Esta comprobación verifica conservación e integridad estructural. No certifica que la transcripción coincida palabra por palabra con el PDF original ni que los datos epidemiológicos estén científicamente validados. No usa copias del navegador ni semillas de demostración como prueba de Firebase.</p>
+  <p className="audit-profiles__caveat">La ausencia de un perfil externo no implica que falten fuentes diagnósticas; los estudios se cuentan aquí según su catalogación documental. Esta comprobación verifica conservación e integridad estructural. No certifica que la transcripción coincida palabra por palabra con el PDF original ni que los datos epidemiológicos estén científicamente validados. No usa copias del navegador ni semillas de demostración como prueba de Firebase.</p>
  </section>;
 }
