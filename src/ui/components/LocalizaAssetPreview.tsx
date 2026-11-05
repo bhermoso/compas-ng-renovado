@@ -25,7 +25,7 @@ export function LocalizaAssetPreview({repository}:{repository:MunicipalDocumentR
      throw new Error('Hay una ficha sin identificador, nombre o enlace.');
     return {id_localiza_salud:v.id_localiza_salud,nombre:v.nombre,url_origen:v.url_origen};
    });
-   const existing=repository.documents.filter(d=>d.kind==='community-asset'||d.kind==='localiza-salud')
+   const existing=repository.documents.filter(d=>(d.kind==='community-asset'||d.kind==='localiza-salud')&&d.status!=='archived'&&d.status!=='rejected')
     .flatMap(d=>assetEntriesOfDocument(d).map(line=>({
      id:sourceId(line),name:norm(line.split('\t')[0]||line),document:d.title
     })));
