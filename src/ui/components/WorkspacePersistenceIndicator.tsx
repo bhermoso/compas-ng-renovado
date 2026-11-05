@@ -37,24 +37,17 @@ export function WorkspacePersistenceIndicator({
     : "Sin sesión remota · solo este navegador";
   return (
     <section className="app-status-strip" aria-label="Conservación del expediente">
-      <span className="app-status-strip__heading">Expediente</span>
-      <span className="app-status-strip__signal" data-tone={remoteTone} role={remoteTone === "error" ? "alert" : "status"}>
-        {remoteLabel}
-      </span>
-      {localMessage && (
-        <span className="app-status-strip__signal" data-tone={localTone} role={localTone === "error" ? "alert" : "status"}>
-          {persistenceSummary(localMessage, "browser")}
-        </span>
-      )}
       <details className="app-status-strip__details">
-        <summary>Copias y detalles</summary>
+        <summary>Conservación y copias <span className="app-status-strip__signal" data-tone={remoteTone}>{remoteLabel}</span></summary>
         <div className="app-status-strip__expanded">
           <p>Firebase conserva el expediente compartido. La copia del navegador permite recuperar el trabajo de este equipo.</p>
           {remoteMessage && <p><strong>Firebase:</strong> {remoteMessage}</p>}
-          {localMessage && <p><strong>Navegador:</strong> {localMessage}</p>}
+          {localMessage && <p><strong>Navegador:</strong> {persistenceSummary(localMessage, "browser")}</p>}
           {children}
         </div>
       </details>
+      {remoteTone === "error" && <p className="app-status-strip__warning" role="alert">{remoteMessage}</p>}
+      {localTone === "error" && <p className="app-status-strip__warning" role="alert">{localMessage}</p>}
     </section>
   );
 }
