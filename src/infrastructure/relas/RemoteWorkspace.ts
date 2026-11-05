@@ -124,7 +124,8 @@ export async function readRemoteWorkspace(
 export async function saveRemoteWorkspace(
   client: RelasClient,
   workspace: MunicipalityWorkspace,
-  onProgress?: RemoteSaveProgressListener
+  onProgress?: RemoteSaveProgressListener,
+  expectedPreviousUpdatedAt?: string
 ): Promise<void> {
   let queue = saveQueues.get(client);
   if (!queue) { queue = new Map(); saveQueues.set(client, queue); }
@@ -132,7 +133,7 @@ export async function saveRemoteWorkspace(
   const pending = queue.get(key);
   if (pending) onProgress?.({ phase: "waiting", completedChunks: 0, totalChunks: 0 });
   const previous = pending ?? Promise.resolve();
-  const next = previous.catch(() => undefined).then(() => persistRemoteWorkspace(client, workspace, onProgress));
+  const next = previous.catch(() => undefined).then(() => persistRemoteWorkspace(client, workspace, onProgress, expectedPreviousUpdatedAt));
   queue.set(key, next);
   try { await next; } finally { if (queue.get(key) === next) queue.delete(key); }
 }
@@ -140,7 +141,8 @@ export async function saveRemoteWorkspace(
 async function persistRemoteWorkspace(
   client: RelasClient,
   workspace: MunicipalityWorkspace,
-  onProgress?: RemoteSaveProgressListener
+  onProgress?: RemoteSaveProgressListener,
+  expectedPreviousUpdatedAt?: string
 ): Promise<void> {
   const raw = JSON.stringify(workspace);
   const chunks = splitText(raw);
@@ -154,6 +156,12 @@ async function persistRemoteWorkspace(
   await ensureRemoteScope(client, workspace).catch(() => undefined);
   const id = snapshotId();
   const previous = await readManifest(client, workspace.municipality.identity.id);
+  // Destructive edits must start from the exact remote revision the user
+  // inspected. A refreshed updatedAt is not sufficient to rule out a stale UI.
+  if (expectedPreviousUpdatedAt !== undefined &&
+      previous?.workspaceUpdatedAt !== expectedPreviousUpdatedAt) {
+    throw new Error("Firebase contiene una revisión diferente del expediente. Recupérala antes de eliminar la versión; no se ha modificado nada.");
+  }
   if (previous && previous.workspaceUpdatedAt > workspace.updatedAt) {
     throw new Error("Firebase tiene una versión más reciente del expediente. Recupérala y concilia los cambios antes de guardar.");
   }
