@@ -29,8 +29,7 @@ export function ActivosSaludPanel({ repository, onDeleteDocument, atoms = [] }: 
           <h2>Activos para la salud</h2>
         </div>
         <p className="panel-note">
-          Fichas de recursos, actividades y redes del territorio que contribuyen
-          a la salud de la población. Varias fichas pueden corresponder al mismo activo.
+          Activos para la salud seleccionados e incorporados por la persona responsable del expediente. La identificación y el control de duplicidades se realizan antes de su incorporación.
         </p>
       </div>
 
@@ -38,7 +37,7 @@ export function ActivosSaludPanel({ repository, onDeleteDocument, atoms = [] }: 
 
       {assetDocs.some((d) => d.kind === "localiza-salud") && (
         <p className="study-institutional-note">
-          Los activos incorporados desde Localiza Salud se añaden como base de trabajo para el equipo técnico.
+          Los activos incorporados deliberadamente desde Localiza Salud se consideran seleccionados por la persona responsable. Las declaraciones formales de validación, cuando constan, se conservan por separado.
           En ámbitos inframunicipales —distritos o barrios—, los recursos identificados pueden pertenecer
           al ámbito o a su entorno funcional y requieren validación territorial antes de ser
           interpretados como activos propios del ámbito.
@@ -53,7 +52,7 @@ export function ActivosSaludPanel({ repository, onDeleteDocument, atoms = [] }: 
         <div className="activos-body">
           <div className="activos-summary">
             <span className="activos-summary__count">
-              <strong>{assetNames.length}</strong> fichas de activos registradas
+              <strong>{assetNames.length}</strong> activos incorporados
             </span>
             <button
               type="button"
@@ -91,7 +90,7 @@ export function ActivosSaludPanel({ repository, onDeleteDocument, atoms = [] }: 
                     <li key={r.atomId} className="activos-list__item">
                       <strong>{r.nombre}</strong>
                       {" · "}
-                      {r.estado === "validado" ? "Validado (declarado por el equipo técnico)" : "Registrado en Localiza"}
+                      {r.estado === "validado" ? "Validado (declarado por el equipo técnico)" : "Incorporado desde Localiza Salud"}
                       {r.tematicas.length > 0 && <> · Temáticas: {r.tematicas.join(", ")}</>}
                       {r.poblacionDestinataria.length > 0 && <> · Población: {r.poblacionDestinataria.join(", ")}</>}
                     </li>
