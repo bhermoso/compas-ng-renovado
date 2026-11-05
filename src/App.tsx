@@ -1482,51 +1482,46 @@ export default function App() {
   }, [workspace.municipality.identity.id]);
 
   function handleProcessDocument() {
-    // community-asset es un tipo canónico: una sola versión activa por municipio.
-    // Se eliminan entradas previas del mismo tipo antes de registrar la nueva.
-    // community-asset y localiza-salud son tipos canónicos: una sola versión activa por municipio.
-    // Se eliminan entradas y átomos previos del mismo tipo antes de registrar la nueva.
-    const repositoryForIngestion =
-      kind === "community-asset" || kind === "localiza-salud"
-        ? {
-            ...workspace.repository,
-            documents: workspace.repository.documents.filter(
-              (d) => d.kind !== kind
-            ),
-          }
-        : workspace.repository;
-
-    const evidenceStoreForIngestion =
-      kind === "community-asset"
-        ? {
-            ...workspace.evidenceStore,
-            atoms: workspace.evidenceStore.atoms.filter(
-              (a) => a.provenance.origin !== "community-assets"
-            ),
-            updatedAt: new Date().toISOString(),
-          }
-        : kind === "localiza-salud"
-        ? {
-            ...workspace.evidenceStore,
-            atoms: workspace.evidenceStore.atoms.filter(
-              (a) => a.provenance.origin !== "localiza-salud"
-            ),
-            updatedAt: new Date().toISOString(),
-          }
-        : workspace.evidenceStore;
-
+    const isLocaliza = kind === "localiza-salud";
+    const oldLocaliza = workspace.repository.documents.filter(d => d.kind === "localiza-salud" && d.status !== "archived" && d.status !== "rejected");
+    // Warning + choice: the administrator owns every change. No silent deletion.
+    let decision: "append" | "archive" = "append";
+    if (isLocaliza && oldLocaliza.length) {
+      const choice = window.prompt(
+        "Ya hay " + oldLocaliza.length + " listado(s) de Localiza Salud en este expediente.\n" +
+        "La nueva carga ha sido seleccionada como Activos Localiza Salud por el responsable.\n" +
+        "1 · Cancelar; nada cambia.\n" +
+        "2 · Añadir una fuente adicional (puede repetir fichas; revisar después).\n" +
+        "3 · Archivar el/los listado(s) anteriores y utilizar el nuevo (se conservan documentos, evidencias históricas y validaciones).\n" +
+        "Escribe 1, 2 o 3:", "1"
+      );
+      if (!choice || choice.trim() === "1") return;
+      if (choice.trim() !== "2" && choice.trim() !== "3") {
+        window.alert("Opción no reconocida. No se ha modificado el expediente.");
+        return;
+      }
+      decision = choice.trim() === "3" ? "archive" : "append";
+    } else if (kind === "community-asset" && workspace.repository.documents.some(d=>d.kind==="community-asset" && d.status!=="archived")) {
+      if (!window.confirm("Ya hay una fuente de activos comunitarios. La nueva se añadirá sin eliminar la anterior; revisa después los posibles registros repetidos. ¿Continuar?")) return;
+    }
+    // Archiving never destroys a source, evidence or human validation.
+    const now = new Date().toISOString();
+    const baseRepository = decision === "archive" && isLocaliza ? {
+      ...workspace.repository,
+      documents: workspace.repository.documents.map(d => oldLocaliza.some(o=>o.id===d.id)
+        ? {...d,status:"archived" as const,updatedAt:now} : d),
+      updatedAt:now,
+    } : workspace.repository;
     const result = ingestManualDocument({
-      repository: repositoryForIngestion,
-      evidenceStore: evidenceStoreForIngestion,
+      repository: baseRepository,
+      evidenceStore: workspace.evidenceStore,
       kind,
       title,
       plainText,
       structure: declaresOpenAnswers ? "open-answers" : undefined,
     });
-
     if (result === null) return;
-
-    setWorkspace((prev) => ({
+    setWorkspace(prev => prev.municipality.identity.id !== workspace.municipality.identity.id ? prev : ({
       ...prev,
       repository: result.repository,
       evidenceStore: result.evidenceStore,
@@ -4081,7 +4076,7 @@ export default function App() {
                 runtime.workspace.sbqStudy,
               ];
               const assetDocs = runtime.workspace.repository.documents.filter(
-                (d) => d.kind === "community-asset" || d.kind === "localiza-salud"
+                (d) => (d.kind === "community-asset" || d.kind === "localiza-salud") && d.status !== "archived" && d.status !== "rejected"
               );
               const summary = buildDiagnosisControlSummary({
                 repository: runtime.workspace.repository,
