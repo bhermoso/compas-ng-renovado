@@ -3,6 +3,7 @@ import {readAccessProfile,type AccessProfile} from '../../infrastructure/relas/R
 import {createBrowserRelasClient} from '../../infrastructure/relas/BrowserRelasClient';
 import {logoutRelas} from '../../infrastructure/relas/BrowserRelasLogin';
 import AdministrationPanel from './AdministrationPanel';
+import {ProfileRemoteAuditPanel} from './ProfileRemoteAuditPanel';
 import TerritorialWorkspace from './TerritorialWorkspace';
 import RelasLoginForm from './RelasLoginForm';
 import './BackupPanel.css';
@@ -11,7 +12,8 @@ const FullApp=lazy(()=>import('../../App'));
 
 export default function BrowserRelasAccess(){
  const view=new URLSearchParams(window.location.search).get('vista');
- const adminEntry=view==='administracion';const appEntry=!adminEntry;
+ const auditEntry=window.location.pathname.endsWith('/verificar-perfiles.html');
+ const adminEntry=view==='administracion'||auditEntry;const appEntry=!adminEntry;
  const client=useMemo(()=>createBrowserRelasClient(),[]);
  const [profile,setProfile]=useState<AccessProfile>();const [scope,setScope]=useState<string>();const [busy,setBusy]=useState(true);const [fullApp,setFullApp]=useState(appEntry);
  useEffect(()=>client.auth.onAuthStateChanged(user=>{
@@ -20,6 +22,7 @@ export default function BrowserRelasAccess(){
  }),[client,appEntry]);
  function openFullApp(){window.history.replaceState(null,'',`${import.meta.env.BASE_URL}?vista=app`);setFullApp(true);}
  function openAdministration(){window.history.replaceState(null,'',`${import.meta.env.BASE_URL}?vista=administracion`);setFullApp(false);}
+ if(profile?.administrator&&auditEntry)return <main className="backup-recovery relas-access"><section className="backup-panel"><nav className="admin-full-nav"><a href={`${import.meta.env.BASE_URL}?vista=administracion`}>Volver a Administración general</a></nav><h1>Comprobar expedientes y perfiles en Firebase</h1><ProfileRemoteAuditPanel client={client}/><button type="button" onClick={()=>void logoutRelas(client)}>Cerrar sesión</button></section></main>;
  if(profile?.administrator&&fullApp)return <><nav className="admin-full-nav"><strong>Administración general · COMPAS completo</strong><button onClick={openAdministration}>Volver al panel de administración</button></nav><Suspense fallback={<p>Cargando COMPAS…</p>}><FullApp/></Suspense></>;
  if(busy)return <main className="backup-recovery relas-access"><section className="backup-panel"><p>Recuperando sesión…</p></section></main>;
  return <main className="backup-recovery relas-access"><section className="backup-panel">
