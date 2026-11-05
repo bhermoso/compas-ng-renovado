@@ -11568,3 +11568,15 @@ h3 {
 }
 .plan-document-versions__row button:disabled{opacity:.5;cursor:not-allowed}
 .plan-document-versions__row button:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
+
+/* Custodia discreta, fuera de la escala de planificación. */
+.app-persistence-footer{max-width:1120px;margin:38px auto 18px;padding:0 16px;}
+.app-persistence-footer .app-status-strip{margin:0;border-top:1px solid var(--compas-linea);border-bottom:0;display:block;padding:12px 0;}
+.app-persistence-footer .app-status-strip__details{margin:0;}
+.app-persistence-footer .app-status-strip__details > summary{display:flex;align-items:baseline;flex-wrap:wrap;gap:12px;list-style:none;text-decoration:none;font-size:.75rem;color:var(--compas-metadata);}
+.app-persistence-footer .app-status-strip__details > summary::-webkit-details-marker{display:none;}
+.app-persistence-footer .app-status-strip__details > summary::before{content:"▸";color:var(--compas-interactivo);}
+.app-persistence-footer .app-status-strip__details[open] > summary::before{content:"▾";}
+.app-persistence-footer .app-status-strip__signal{font-size:.74rem;font-weight:400;}
+.app-persistence-footer .app-status-strip__expanded{padding-top:18px;}
+.app-persistence-footer .app-status-strip__warning{margin:8px 0;color:var(--texto-principal);border-left:2px solid var(--rojo);padding-left:10px;font-size:.8rem;}
