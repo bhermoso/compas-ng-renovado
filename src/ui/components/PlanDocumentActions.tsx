@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { DefinitiveActionPlanModuleProjection } from "../../domain/action-plan-catalog/DefinitiveActionPlanProjection";
-import { buildPlanDocument, latestValidatedPlan, validatePlanDocument, type PlanDocument } from "../../domain/action-plan-catalog/PlanDocument";
+import { buildPlanDocument, canRemoveValidatedPlan, latestValidatedPlan, validatePlanDocument, type PlanDocument } from "../../domain/action-plan-catalog/PlanDocument";
 import type { IndicatorWorksheet } from "../../domain/action-plan-catalog/IndicatorWorksheet";
 
 /** Versions stored in the complete municipal expediente, not Firestore's immutable RELAS audit. */
@@ -37,7 +37,7 @@ export function PlanDocumentActions({municipalityId,active,versions=[],worksheet
  }
 
  async function remove(document:PlanDocument){
-  if(!onDeleteVersion||busy||document===latest)return;
+  if(!onDeleteVersion||busy||!canRemoveValidatedPlan(versions,municipalityId,document))return;
   if(!window.confirm(
    `¿Eliminar la versión validada del Plan de Acción de ${document.generatedAt}, validada por ${document.validatedBy ?? "autoría no indicada"}?\n\nEsta operación elimina esa copia antigua del expediente compartido. La última versión validada y el historial de auditoría RELAS no se modifican. No se puede deshacer.`
   ))return;
@@ -81,6 +81,8 @@ export function PlanDocumentActions({municipalityId,active,versions=[],worksheet
       <button type="button" disabled={busy} onClick={()=>download("docx",version)} aria-label={`Descargar Word de versión ${version.generatedAt}`}>Word</button>
       {version===latest
        ? <small>Protegida: versión más reciente</small>
+       : !canRemoveValidatedPlan(versions,municipalityId,version)
+        ? <small>Versión duplicada o ambigua: requiere revisión</small>
        : onDeleteVersion
         ? <button type="button" disabled={busy} className="plan-document-versions__delete"
            aria-label={`Eliminar versión validada de ${version.generatedAt}`}
