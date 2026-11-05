@@ -55,7 +55,6 @@ import {
 import { createMunicipalityRuntime } from "./application/runtime";
 import { ingestManualDocument, extractDocxText, removeEquivalentStrategicFramework } from "./application/document-ingestion";
 import { assetEntriesOfDocument } from "./application/evidence-pipeline";
-import { validatedAssetCounts } from "./application/localiza-assets/validatedAssetCounts";
 import {
   assignLibraryDocumentToWorkspace,
   collectCompasDocumentLibrary,
@@ -4090,7 +4089,7 @@ export default function App() {
                 healthReportLoaded: runtime.workspace.healthReport !== undefined,
                 studiesLoaded: studies.map(Boolean),
                 studyEvidenceCount: atoms.filter(a => a.provenance.origin === "ibse" || a.provenance.origin === "complementary-study").length,
-                assetCount: validatedAssetCounts(atoms, runtime.workspace.repository.assetValidations).validated,
+                assetCount: assetDocs.flatMap(assetEntriesOfDocument).length,
               });
               return (
                 <DiagnosisControlRoom
