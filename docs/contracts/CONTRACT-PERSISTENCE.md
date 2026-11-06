@@ -10,6 +10,12 @@
 
 ## 1. Propósito
 
+### Desarrollo para renta territorial — 2026-11-06
+
+La incorporación de renta por sección conserva en el workspace municipal la fuente y las observaciones vinculadas al expediente y a su revisión del Perfil. El CUSEC se conserva como texto, sin perder ceros; se preservan periodo, unidad, valor literal, notas, condición de cota y referencia a la geometría de su periodo. Guardar y volver a cargar no convierte cotas o ausencias en números exactos ni mezcla secciones de municipios distintos.
+
+Antes de declarar completada una incorporación en Firebase se relee la revisión desde el servidor y se contrasta la identidad municipal, las secciones, los indicadores y sus notas con el original. Se comprueba también que la revisión vigente sea la prevista y que las anteriores permanezcan conservadas. Una descarga local, una vista del navegador o este desarrollo contractual no acreditan por sí solos esa persistencia. No se migra ni sobrescribe automáticamente un expediente histórico por añadir estas reglas.
+
 Este contrato establece cómo COMPÁS NG guarda, carga, normaliza y migra el
 estado completo de un municipio entre sesiones de trabajo. El objetivo es que
 el equipo técnico pueda cerrar y abrir la aplicación sin perder la información

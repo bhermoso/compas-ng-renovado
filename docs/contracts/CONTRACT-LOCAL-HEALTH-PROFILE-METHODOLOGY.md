@@ -546,6 +546,16 @@ Una representación nueva con estatuto propio solo puede añadirse por reforma e
 4. **Eje de desigualdad interna.** En los municipios con dos o más secciones censales, el eje de desigualdad interna es la renta por sección censal del Atlas de Distribución de Renta de los Hogares del INE. El Perfil declara que es un eje de renta, no un índice de privación múltiple. En los municipios con una sola sección, la página de desigualdad se limita a sexo, edad, origen y comparación con los ámbitos superiores, y lo dice.
 5. **Tendencia.** Cuando existe un ciclo anterior medido de la misma manera, el panel muestra el sentido del cambio. Si la definición, la fuente o la escala cambiaron, no se comparan (Art. 12).
 
+#### Desarrollo del eje de renta — 2026-11-06
+
+La renta se incorpora al expediente como fuente territorial y al único Perfil como evidencia de desigualdad. Se mantienen la renta neta media por persona, la renta neta media por hogar y el porcentaje de población con ingresos por unidad de consumo por debajo del 60 % de la mediana cuando la fuente los publique. Cada indicador conserva su definición, unidad, año de referencia, código completo de sección censal (CUSEC), fuente y notas originales. El año del dato se distingue de la fecha de publicación o consulta.
+
+Las tablas y mapas utilizan las secciones y su geometría correspondientes al periodo publicado. Localizar una calle dentro de una sección permite consultar el dato agregado de esa sección; no convierte ese dato en una estimación propia de la calle, vivienda o persona. Una fuente que publique datos por calle requiere identificación y comprobación separadas antes de incorporarse a esa escala.
+
+Una cota publicada por secreto estadístico se identifica como cota, conserva la nota de la fuente y no se representa como un porcentaje exacto ni se utiliza como tal en cálculos. Un dato ausente no se sustituye por cero. Con una única sección puede mostrarse su dato, indicando que no permite analizar diferencias internas de renta. La asociación territorial con salud, prioridades o activos no demuestra una relación causal ni modifica por sí sola las decisiones del Grupo Motor.
+
+La revisión del Perfil incorpora la fuente registrada en su expediente y conserva las revisiones anteriores. Pantalla, exportaciones y paquete estructurado deben referirse a la misma revisión; un archivo original anterior se identifica como antecedente y no acredita la actualización de las otras representaciones. La incorporación no implica validación institucional.
+
 *Consecuencia si se viola:* los perfiles de distintos municipios y ciclos dejan de poder compararse, o el panel atribuye diferencias que la fuente no sostiene.
 
 ---

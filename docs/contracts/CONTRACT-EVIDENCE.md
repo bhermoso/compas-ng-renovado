@@ -15,6 +15,12 @@
 
 ## 1. Propósito
 
+### Desarrollo para renta territorial — 2026-11-06
+
+La evidencia de renta mantiene la referencia al documento o conjunto de datos registrado en el expediente y distingue indicador, unidad, periodo, municipio y CUSEC completo. Conserva el valor literal y las notas publicadas; solo declara un valor numérico exacto cuando la fuente lo proporciona como tal. Las cotas por secreto estadístico no se convierten en observaciones exactas y las ausencias no se convierten en ceros.
+
+La identidad de una observación distingue fuente, indicador, periodo y sección: indicadores de una misma sección o ciclos diferentes no deben sobrescribirse por compartir título. Una corrección preserva su antecedente y su procedencia. El dato agregado de sección no acredita renta individual ni de calle. Estas reglas desarrollan el Art. 17 quater del contrato metodológico; no declaran que exista ya una nueva canalización automática de evidencia.
+
 La **evidencia estructurada** es la representación analítica del contenido
 de los documentos del repositorio. Ocupa el **Nivel 1 tardío** del sistema:
 se genera a partir de documentos registrados, cruza la frontera de explotación

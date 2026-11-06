@@ -452,6 +452,14 @@ propios contratos:
 
 ---
 
+## Fuente territorial de renta — desarrollo de 2026-11-06
+
+El expediente municipal conserva la fuente oficial de renta que sustenta el Art. 17 quater del contrato metodológico del Perfil. Se registran el organismo, conjunto de datos, URL de origen, fecha de consulta, periodo de referencia y ámbito municipal. El archivo original recuperado se conserva íntegro con SHA-256; su integridad no certifica la interpretación de los datos.
+
+Las tablas y geometrías derivadas conservan el CUSEC completo como texto, las unidades y las notas de cada observación, incluidas las de secreto estadístico. Se documenta la transformación desde el original y se verifica la pertenencia de cada sección al municipio. Los datos de otro municipio no rellenan ausencias locales. La fuente de renta no se registra como un activo de Localiza Salud ni sustituye al Informe sobre la situación de salud.
+
+Una actualización conserva el original y las revisiones anteriores; se vincula explícitamente a la nueva revisión del Perfil. La existencia de un archivo preparado fuera del expediente no acredita su incorporación a Firebase.
+
 ## Historial de revisiones
 
 | Fecha | Motivo |
