@@ -46,13 +46,14 @@ function selection(
 }
 
 describe("PA-RELAS-02 — catálogo temático del Plan de Acción", () => {
-  it("conserva las 2 líneas, 15 OG, 30 OE y 30 indicadores documentados", () => {
-    expect(ACTION_PLAN_CATALOG).toHaveLength(2);
+  it("conserva las 2 líneas documentadas (15 OG, 30 OE, 30 indicadores) y añade la línea de bienestar emocional", () => {
+    expect(ACTION_PLAN_CATALOG).toHaveLength(3);
     expect(HEALTHY_AGING_MODULE.generalObjectives).toHaveLength(9);
     expect(ADDICTIONS_MODULE.generalObjectives).toHaveLength(6);
     expect(HEALTHY_AGING_MODULE.generalObjectives.flatMap((goal) => goal.specificObjectives)).toHaveLength(18);
     expect(ADDICTIONS_MODULE.generalObjectives.flatMap((goal) => goal.specificObjectives)).toHaveLength(12);
-    expect(new Set(ACTION_PLAN_CATALOG.flatMap(getCatalogElementIds)).size).toBe(77);
+    expect(new Set([HEALTHY_AGING_MODULE, ADDICTIONS_MODULE].flatMap(getCatalogElementIds)).size).toBe(77);
+    expect(new Set(ACTION_PLAN_CATALOG.flatMap(getCatalogElementIds)).size).toBe(77 + 42);
   });
 
   it("propone solo módulos vinculados expresamente mediante identificadores estables", () => {

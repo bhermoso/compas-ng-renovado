@@ -33,13 +33,13 @@ function previousDraft(municipalityId: string): PlanPreparationDraft {
 }
 
 describe("Plan de Acción común para cualquier expediente", () => {
-  it("expone exactamente dos líneas para municipios existentes y expedientes futuros", () => {
+  it("expone las tres líneas para municipios existentes y expedientes futuros", () => {
     expect(ACTION_PLAN_CATALOG.map(m => m.title)).toEqual([
-      "Envejecimiento saludable", "Prevención y abordaje de las adicciones",
+      "Envejecimiento saludable", "Prevención y abordaje de las adicciones", "Bienestar emocional y salud mental",
     ]);
     for (const municipalityId of ["loja","alfacar","atarfe","granada","municipio-nuevo-2027"]) {
       const modules=ACTION_PLAN_CATALOG.map(m=>municipalActionPlanModule(municipalityId,m));
-      expect(modules).toHaveLength(2);
+      expect(modules).toHaveLength(3);
       const [aging,addictions]=modules;
       expect(aging.version).toBe(COMMON_AGING_FOUR_BLOCKS_VERSION);
       expect(aging.generalObjectives.map(g=>g.thematicBlockName)).toEqual(four);

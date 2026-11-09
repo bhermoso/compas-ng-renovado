@@ -8,7 +8,7 @@ export interface CatalogIndicatorTemplate {
   /** Visible notation; code remains the persistent identifier. */
   displayCode?: string;
   title: string;
-  unit: "%" | "Nº";
+  unit: "%" | "Nº" | "Puntos";
   suggestedSource: string;
   direction: "ascending" | "descending";
   periodicity: "Anual";
@@ -87,8 +87,9 @@ function indicator(
   code: string,
   title: string,
   source: string,
-  unit: "%" | "Nº" = "%",
-  direction: "ascending" | "descending" = "ascending"
+  unit: "%" | "Nº" | "Puntos" = "%",
+  direction: "ascending" | "descending" = "ascending",
+  overrides: Partial<Omit<CatalogIndicatorTemplate, "code" | "title" | "unit" | "suggestedSource" | "direction">> = {}
 ): CatalogIndicatorTemplate {
   return {
     code,
@@ -107,6 +108,7 @@ function indicator(
     dataOwner: "Pendiente de asignación formal a la entidad o recurso que custodie la fuente primaria.",
     qualityCriterion: "Evitar dobles recuentos; documentar numerador y denominador; mantener estable la definición; registrar datos faltantes y cambios de fuente.",
     limitation: "Evalúa el objetivo específico definido y no debe interpretarse aisladamente como medida global de la línea estratégica.",
+    ...overrides,
   };
 }
 
@@ -195,7 +197,69 @@ export const ADDICTIONS_MODULE: ActionPlanCatalogModule = {
   ],
 };
 
-export const ACTION_PLAN_CATALOG = [HEALTHY_AGING_MODULE, ADDICTIONS_MODULE] as const;
+
+const BEM_IBSE = "Monitor municipal de bienestar socioemocional (IBSE, Bericat 2014), escala común 0–100";
+const BEM_EAS = "Encuesta Andaluza de Salud (referencia no local) o estudio municipal con el mismo instrumento";
+const BEM_EDU = "Registro del Plan con los centros educativos";
+const BEM_FAMILY = "Evaluación pre/post de competencias familiares";
+const BEM_ASSETS = "Localiza Salud y registro de activos del Plan";
+const BEM_LINK = "Registro de orientación y derivación del Plan";
+const BEM_TRAINING = "Registro formativo del Plan";
+const BEM_ATTITUDES = "Cuestionario pre/post de actitudes";
+
+const IBSE_POPULATION_INDICATOR = {
+  operationalDefinition:
+    "Media de la puntuación del Índice de Bienestar Socioemocional (IBSE) de las personas participantes en el monitor municipal. Cada pregunta se lleva a una escala 0–100 en la que más es mejor; cada factor es la media de sus dos preguntas y el índice, la media de los cuatro factores.",
+  calculationMethod:
+    "Suma de las puntuaciones IBSE de los registros válidos (ocho preguntas contestadas) / nº de registros válidos. Se informa también la media reponderada por edad y sexo con el padrón, separada de la observada.",
+  disaggregation: "Sexo; grupos de edad 13–15, 16–24, 25–44, 45–64 y 65 o más; factores Vínculo, Situación, Control y Persona.",
+  baseline: "Primer monitor municipal con el instrumento, la escala común y el procedimiento de recogida que se mantendrán en las mediciones siguientes.",
+  qualityCriterion: "Mismo instrumento, escala y procedimiento en cada medición; declarar modo de respuesta, periodo y composición de la muestra (SAM).",
+  limitation: "Con muestra voluntaria no estima la media de la población. Solo es comparable con mediciones que usen el mismo procedimiento; no con encuestas de otro modo de administración sin declararlo.",
+} as const;
+
+export const EMOTIONAL_WELLBEING_MODULE: ActionPlanCatalogModule = {
+  id: "bem-2027-2030",
+  version: "0.1",
+  title: "Bienestar emocional y salud mental",
+  strategicObjective: "Mejorar el bienestar emocional de la población y prevenir los problemas de salud mental, fortaleciendo los factores que lo protegen —vínculos, competencias personales, participación, entornos y activos comunitarios— y reduciendo las diferencias de bienestar entre grupos de población.",
+  sourceLabel: "Propuesta COMPÁS a partir del I Plan Estratégico de Salud Mental y Adicciones de Andalucía 2026–2029 (líneas 1, 2 y 5), la Estrategia de Promoción de una Vida Saludable en Andalucía (objetivos 1.4, 1.6 y 1.7), la Estrategia de Salud Mental del SNS 2022–2026 (líneas 2 y 3) y el Monitor de bienestar socioemocional de Atarfe 2026",
+  sourceDate: "2026-11-09",
+  cautions: [
+    "Línea en construcción (versión 0.1): propuesta para revisión técnica y deliberación del Grupo Motor; no es un módulo validado.",
+    "La línea se orienta a la promoción del bienestar emocional y a la prevención desde el ámbito local. La atención clínica es competencia del Sistema Sanitario Público de Andalucía; el Plan local coordina y no la sustituye.",
+    "Los indicadores de bienestar de población solo son comparables entre mediciones con el mismo instrumento, escala y procedimiento de recogida.",
+    ...sharedCautions,
+  ],
+  generalObjectives: [
+    og("BEM-OG1", "Mejorar el bienestar socioemocional de la población y reducir sus desigualdades",
+      oe("BEM-OE1.1", "Aumentar el bienestar socioemocional de la población del municipio.", indicator("BEM-I1.1", "Puntuación media del IBSE (0–100) en el monitor municipal.", BEM_IBSE, "Puntos", "ascending", IBSE_POPULATION_INDICATOR)),
+      oe("BEM-OE1.2", "Reducir las diferencias de bienestar socioemocional entre mujeres y hombres y entre grupos de edad.", indicator("BEM-I1.2", "Diferencia, en puntos, entre la media del IBSE de mujeres y hombres y entre el grupo de edad con media más alta y el de media más baja.", BEM_IBSE, "Puntos", "descending", { ...IBSE_POPULATION_INDICATOR, operationalDefinition: "Valor absoluto de la diferencia entre medias IBSE (0–100) de mujeres y hombres, y entre el grupo de edad de media más alta y el de media más baja, con los mismos grupos en cada medición.", calculationMethod: "|media mujeres − media hombres|; |media del grupo de edad más alta − media del grupo más baja|. Se informan por separado." })),
+      oe("BEM-OE1.3", "Aumentar la proporción de población que se siente tranquila y con energía.", indicator("BEM-I1.3", "% de participantes en el monitor que se sintieron tranquilos/as y relajados/as buena parte del tiempo o casi siempre durante la última semana.", BEM_IBSE, "%", "ascending", { ...IBSE_POPULATION_INDICATOR, operationalDefinition: "Respuestas 3 («buena parte del tiempo») o 4 («todo o casi todo el tiempo») a la pregunta «tranquilo/a y relajado/a» del IBSE.", calculationMethod: "(nº de registros válidos con respuesta 3 o 4 / nº de registros válidos) × 100." }))),
+    og("BEM-OG2", "Fortalecer los vínculos y prevenir la soledad no deseada",
+      oe("BEM-OE2.1", "Reducir la proporción de población que se siente sola con frecuencia.", indicator("BEM-I2.1", "% de participantes en el monitor que se sintieron solos/as buena parte del tiempo o casi siempre durante la última semana.", BEM_IBSE, "%", "descending", { ...IBSE_POPULATION_INDICATOR, operationalDefinition: "Respuestas 3 o 4 a la pregunta «solo/a» del IBSE.", calculationMethod: "(nº de registros válidos con respuesta 3 o 4 / nº de registros válidos) × 100." })),
+      oe("BEM-OE2.2", "Mejorar el apoyo social percibido de las personas con apoyo bajo.", indicator("BEM-I2.2", "% de población con apoyo social y afectivo percibido bajo (Duke-UNC-11).", BEM_EAS, "%", "descending"))),
+    og("BEM-OG3", "Desarrollar competencias para el bienestar emocional a lo largo de la vida",
+      oe("BEM-OE3.1", "Desarrollar las competencias socioemocionales de la infancia y la adolescencia en los centros educativos.", indicator("BEM-I3.1", "% de centros educativos del municipio que desarrollan un programa de educación emocional con fundamento técnico documentado.", BEM_EDU)),
+      oe("BEM-OE3.2", "Mejorar las competencias de las familias para cuidar el bienestar emocional de hijas e hijos.", indicator("BEM-I3.2", "% de participantes que mejoran sus competencias entre la evaluación inicial y la final.", BEM_FAMILY)),
+      oe("BEM-OE3.3", "Reducir el tiempo de pantallas que desplaza la relación con familiares y amistades en la infancia y la adolescencia.", indicator("BEM-I3.3", "% de población de 8 a 15 años que dedica más de dos horas diarias a aparatos electrónicos fuera de los deberes.", BEM_EAS, "%", "descending"))),
+    og("BEM-OG4", "Reforzar los entornos y los activos comunitarios que sostienen el bienestar emocional",
+      oe("BEM-OE4.1", "Aumentar los activos para la salud validados que se relacionan con el bienestar emocional.", indicator("BEM-I4.1", "Nº de activos para la salud del municipio validados en Localiza Salud con la temática «Bienestar emocional».", BEM_ASSETS, "Nº")),
+      oe("BEM-OE4.2", "Aumentar la recomendación de activos comunitarios desde los servicios sanitarios, sociales y educativos.", indicator("BEM-I4.2", "Nº de recomendaciones de activos comunitarios registradas por los servicios participantes.", BEM_LINK, "Nº")),
+      oe("BEM-OE4.3", "Ampliar la oferta comunitaria para los grupos de población que el Perfil identifica sin recursos registrados.", indicator("BEM-I4.3", "Nº de activos validados dirigidos a los grupos de población sin recursos registrados en el Perfil de Salud Local.", BEM_ASSETS, "Nº"))),
+    og("BEM-OG5", "Mejorar la detección temprana del malestar emocional y la continuidad entre comunidad y servicios",
+      oe("BEM-OE5.1", "Aumentar la capacidad de los agentes comunitarios para reconocer el malestar emocional y orientar hacia el recurso adecuado.", indicator("BEM-I5.1", "% de agentes comunitarios formados que aplican el procedimiento de orientación acordado durante el periodo evaluado.", BEM_TRAINING)),
+      oe("BEM-OE5.2", "Aumentar el acceso a las intervenciones grupales de atención primaria de las personas orientadas desde la comunidad.", indicator("BEM-I5.2", "% de personas orientadas desde la comunidad de las que consta contacto con el recurso de destino.", BEM_LINK))),
+    og("BEM-OG6", "Prevenir la conducta suicida desde la comunidad",
+      oe("BEM-OE6.1", "Aumentar el número de personas de la comunidad capacitadas para identificar señales de riesgo y orientar.", indicator("BEM-I6.1", "Nº de personas capacitadas como agentes comunitarios de prevención de la conducta suicida.", BEM_TRAINING, "Nº")),
+      oe("BEM-OE6.2", "Aumentar la difusión de los recursos de ayuda ante la conducta suicida en los espacios comunitarios.", indicator("BEM-I6.2", "% de espacios y equipamientos comunitarios del Plan que muestran información de la línea 024 y de los recursos locales de ayuda.", BEM_ASSETS))),
+    og("BEM-OG7", "Reducir el estigma y favorecer la participación de las personas con problemas de salud mental",
+      oe("BEM-OE7.1", "Reducir las actitudes estigmatizantes hacia los problemas de salud mental en las personas participantes en acciones de sensibilización.", indicator("BEM-I7.1", "% de participantes que reducen sus actitudes estigmatizantes entre la evaluación inicial y la final.", BEM_ATTITUDES)),
+      oe("BEM-OE7.2", "Aumentar la participación de personas con experiencia propia en salud mental en las iniciativas comunitarias del Plan.", indicator("BEM-I7.2", "% de iniciativas comunitarias del Plan en cuyo diseño o desarrollo participan personas con experiencia propia en salud mental.", BEM_LINK))),
+  ],
+};
+
+export const ACTION_PLAN_CATALOG = [HEALTHY_AGING_MODULE, ADDICTIONS_MODULE, EMOTIONAL_WELLBEING_MODULE] as const;
 
 export function getEligibleActionPlanModules(
   lectura: LecturaEstrategicaLocal,
