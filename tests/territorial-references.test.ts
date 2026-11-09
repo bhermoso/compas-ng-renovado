@@ -8,7 +8,8 @@ describe("referencias territoriales de Estudios Complementarios", () => {
   it("calcula Granada con los parsers canónicos", async () => {
     const references = await loadGranadaTerritorialReferences();
 
-    expect(references.ibse.meanTotal).toBe(76.2);
+    // Escala común 0–100 (conversión exacta de las fórmulas de REDCap, 2026-11-09).
+    expect(references.ibse.meanTotal).toBe(78.4);
     expect(references.duke.meanGlobal).toBe(49.2);
     expect(references.predimed.meanScore).toBe(7.6);
     expect(references.sf12.meanPCS).toBeCloseTo(49.552, 3);

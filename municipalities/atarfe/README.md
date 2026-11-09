@@ -43,7 +43,20 @@ Verificado en la suite (caso 13): si una fuente cambia, la validación falla.
 | Fuente | SHA-256 |
 |---|---|
 | `fixtures/health-reports/Informe_Salud_Atarfe.docx` | `597fcacf0342eeb8970ef61b3a9b1d58cfe9eeb1c6703af7639e843a6c5b8e2c` |
-| `fixtures/ibse-atarfe.csv` | `b2c6126c937b88de55c6aaae6c611f6c4bec75cd90e968916732c577039fa703` |
+| `fixtures/ibse-atarfe.csv` | `3f23693fb62f80bbfd12c55a6da054110deb2d48dca9eaa5599b0a75c36f25be` (CRLF) |
+
+## Actualización 2026-11-09
+
+- **IBSE recalculado.** Las fórmulas del proyecto REDCap Monitor IBSE Atarfe 2026 no dejan los
+  cuatro factores en la misma escala (Vínculo 0–75; Situación y Control 25–100; Persona 0–100).
+  El parser puntúa ahora desde los ocho ítems en una escala común 0–100 y, para exports sin
+  ítems, convierte de forma lineal y exacta. Diccionario corregido para REDCap:
+  `redcap/MonitorIBSEAtarfe2026_DataDictionary_escala_corregida.csv`.
+- **Export del 05/11/2026** (910 registros; sin marca temporal ni identificador de encuesta en la
+  copia pública). Trae sexo y edad: SAM puede describir la composición por edad y sexo.
+- **17 fichas de Localiza Salud** (tabla aportada el 05/11/2026). No se ha verificado en línea su vigencia.
+- Migración `atarfe-documentacion-canonica-v3` para expedientes ya persistidos: añade las fichas
+  que faltan y sustituye el estudio IBSE canónico (no toca un IBSE importado por la persona usuaria).
 
 ## Recuentos deterministas
 
@@ -52,11 +65,11 @@ Verificado en la suite (caso 13): si una fuente cambia, la validación falla.
 | Identidad | `atarfe` · Atarfe · Granada · INE 18022 |
 | Documentos del repositorio | **3** (Informe de Salud + IBSE + Localiza Salud) |
 | Estudios | **1** (IBSE municipal) |
-| Activos para la salud (Localiza Salud) | **5** (EvidenceAtoms `asset`, origen `localiza-salud`) |
-| EvidenceAtoms totales | **11** (6 IBSE [5 `indicator` + 1 `qualitative-observation`] + 5 `asset` de Localiza Salud) |
+| Activos para la salud (Localiza Salud) | **17** fichas (EvidenceAtoms `asset`, origen `localiza-salud`; 61419 y 61585 comparten título, posible duplicado) |
+| EvidenceAtoms totales | **23** (6 IBSE [5 `indicator` + 1 `qualitative-observation`] + 17 `asset` de Localiza Salud) |
 | Átomos del Informe de Salud | **0** (D-HR-01 / Art. 7 bis §3) |
 | Autoría del Informe | **2 firmantes** (Carlos del Moral Campaña, María José Molina Rueda — Epidemiología, Distrito Granada-Metropolitano) |
-| IBSE (muestra **mixta**) | n=909 · nValid=811 · media IBSE total=63,2 · `sampleScope: "mixed"` · sin desglose etario |
+| IBSE (muestra **mixta**) | n=910 · nValid=811 · IBSE total 62,2 · Vínculo 72,4 · Situación 60,3 · Control 51,1 · Persona 65,0 (escala común 0–100) · `sampleScope: "mixed"` · distribución edad×sexo (810 asignables) |
 
 ## Fuentes incluidas
 

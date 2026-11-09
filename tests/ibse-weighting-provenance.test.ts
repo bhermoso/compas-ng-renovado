@@ -9,12 +9,11 @@ const csv = readFileSync("fixtures/ibse-atarfe.csv", "utf8");
 describe("IBSE weighting provenance before methodological approval", () => {
   it("declares the absence of demographic adjustment in the available Atarfe export", () => {
     const parsed = parseIBSECSV(csv);
-    expect(parsed.aggregates.n).toBe(909);
+    expect(parsed.aggregates.n).toBe(910);
     expect(parsed.aggregates.nValid).toBe(811);
-    expect(parsed.aggregates.meanTotal).toBe(63.2);
+    expect(parsed.aggregates.meanTotal).toBe(62.2);
     expect(parsed.ageSexObserved).toBeUndefined();
     expect(parsed.methodologicalCautions.join(" ")).toContain("No se ha aplicado ponderación demográfica");
-    expect(parsed.methodologicalCautions.join(" ")).toContain("no permite calcular pesos individuales");
   });
 
   it.each(["atarfe", "18022", "loja", "zagra"])("keeps sample means and limitations in all six atoms for %s", (municipalityId) => {

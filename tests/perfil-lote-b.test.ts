@@ -146,7 +146,7 @@ describe("Lote B · F7 — fallback OIT nombra el déficit real, sin gate change
     expect(fallback!.rationale).toContain("determinantes con evidencia directa");
     expect(fallback!.rationale).toContain("participación");
     // Reconoce lo que YA existe y no aconseja re-incorporarlo (concordancia real, Lote C-1/O3).
-    expect(fallback!.rationale).toContain("ya incorpora 5 activos y 5 indicadores");
+    expect(fallback!.rationale).toContain("ya incorpora 17 activos y 5 indicadores");
     expect(fallback!.rationale).not.toContain("incorporar determinantes, activos, indicadores");
   });
 

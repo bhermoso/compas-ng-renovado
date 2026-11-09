@@ -124,8 +124,8 @@ describe("SAM histórico y filtros", () => {
 
 describe("perfiles reales — sin cambios en datos y conclusiones guardadas", () => {
   it.each([
-    ["public/seeds/compas-ng-workspace-atarfe.json", 11],
-    ["municipalities/atarfe/exports/compas-ng-workspace-atarfe.json", 11],
+    ["public/seeds/compas-ng-workspace-atarfe.json", 23],
+    ["municipalities/atarfe/exports/compas-ng-workspace-atarfe.json", 23],
     ["public/seeds/compas-ng-workspace-granada-zaidin.json", 56],
     ["municipalities/granada-zaidin/exports/compas-ng-workspace-granada-zaidin.json", 56],
     ["municipalities/granada-zaidin/exports/compas-ng-workspace-granada-zaidin-MANUAL-56-92.json", 56],

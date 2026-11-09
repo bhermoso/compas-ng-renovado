@@ -65,7 +65,10 @@ export function IBSEPanel({ ibseStudy, municipalityName }: IBSEPanelProps) {
   const hasValidBreakdown =
     ibseStudy.sampleScope === "mixed" &&
     validateIBSEStrataCounts(ibseStudy.strataCounts, ibseStudy.aggregates).valid;
-  const scopeDesc = describeIBSESampleScope(ibseStudy.sampleScope, { hasValidBreakdown });
+  const scopeDesc = describeIBSESampleScope(ibseStudy.sampleScope, {
+    hasValidBreakdown,
+    hasAgeSexDistribution: (ibseStudy.ageSexObserved?.assignedCount ?? 0) > 0,
+  });
 
   const totalLevel = getIBSELevel(agg.meanTotal);
 
