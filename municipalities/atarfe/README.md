@@ -54,7 +54,7 @@ Verificado en la suite (caso 13): si una fuente cambia, la validación falla.
   `redcap/MonitorIBSEAtarfe2026_DataDictionary_escala_corregida.csv`.
 - **Export del 05/11/2026** (910 registros; sin marca temporal ni identificador de encuesta en la
   copia pública). Trae sexo y edad: SAM puede describir la composición por edad y sexo.
-- **17 fichas de Localiza Salud** (tabla aportada el 05/11/2026). No se ha verificado en línea su vigencia.
+- **20 registros de Localiza Salud** (tablas aportadas el 05/11/2026 y el 09/11/2026; tres sin identificador). No se ha verificado en línea su vigencia.
 - Migración `atarfe-documentacion-canonica-v3` para expedientes ya persistidos: añade las fichas
   que faltan y sustituye el estudio IBSE canónico (no toca un IBSE importado por la persona usuaria).
 
@@ -65,8 +65,8 @@ Verificado en la suite (caso 13): si una fuente cambia, la validación falla.
 | Identidad | `atarfe` · Atarfe · Granada · INE 18022 |
 | Documentos del repositorio | **3** (Informe de Salud + IBSE + Localiza Salud) |
 | Estudios | **1** (IBSE municipal) |
-| Activos para la salud (Localiza Salud) | **17** fichas (EvidenceAtoms `asset`, origen `localiza-salud`; 61419 y 61585 comparten título, posible duplicado) |
-| EvidenceAtoms totales | **23** (6 IBSE [5 `indicator` + 1 `qualitative-observation`] + 17 `asset` de Localiza Salud) |
+| Activos para la salud (Localiza Salud) | **20** registros (EvidenceAtoms `asset`, origen `localiza-salud`; 61419 y 61585 comparten título, posible duplicado) |
+| EvidenceAtoms totales | **26** (6 IBSE [5 `indicator` + 1 `qualitative-observation`] + 20 `asset` de Localiza Salud) |
 | Átomos del Informe de Salud | **0** (D-HR-01 / Art. 7 bis §3) |
 | Autoría del Informe | **2 firmantes** (Carlos del Moral Campaña, María José Molina Rueda — Epidemiología, Distrito Granada-Metropolitano) |
 | IBSE (muestra **mixta**) | n=910 · nValid=811 · IBSE total 62,2 · Vínculo 72,4 · Situación 60,3 · Control 51,1 · Persona 65,0 (escala común 0–100) · `sampleScope: "mixed"` · distribución edad×sexo (810 asignables) |

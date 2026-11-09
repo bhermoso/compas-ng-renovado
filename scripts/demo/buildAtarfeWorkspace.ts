@@ -153,7 +153,7 @@ export const ATARFE_IBSE_SAMPLE_CAUTIONS: readonly string[] = [
 // forzar uno. Las erratas de origen ("útliles", "MUNUMENTOS") se preservan sin
 // corrección silenciosa. El título del átomo es la primera columna (Nombre).
 export const LOCALIZA_DOCUMENT_ID = "doc-localiza-atarfe"; // documento del repositorio (estable)
-export const LOCALIZA_ASSET_COUNT = 17; // 61419 y 61585 comparten título: posible duplicado sin confirmar
+export const LOCALIZA_ASSET_COUNT = 20; // 61419 y 61585 comparten título: posible duplicado sin confirmar
 // Marca versionada de migración incremental. El seed canónico la lleva estampada,
 // de modo que una hidratación limpia o un reemplazo completo quedan marcados como
 // aplicados y no vuelven a proponer la migración. Debe coincidir con la entrada de
@@ -185,6 +185,11 @@ export const LOCALIZA_SALUD_ATARFE_TEXT = [
   "Radio Ilíberis 101.5 FM de Atrafe | Emisora de radio municipal que ofrece música y programas informativos en salud y cuidados. | Cualquiera | Población general | Participación y acción comunitaria, Cultura y ocio | Granada | Atarfe | 61944 | https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=61944",
   "Taller de sueño saludable | Talleres grupales que se imparten de manera periódica en el Centro de Salud de Atarfe, dirigidos a población general con interés en mejorar su higiene de sueño. | Cualquiera | Mayores de 64 años, Jóvenes (18-29 años), Adultos (30-64 años) | Bienestar emocional, Enfermedades crónicas, Participación y acción comunitaria | Granada | Atarfe | 63552 | https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=63552",
   "Talleres Artísticos Ciudad de Atarfe | Talleres artísticos con inscripción a través de la Escuela de Música y Danza Ciudad de Atarfe (C/ Alfonso Bailón Verdejo nº4). Cuentan con clases de manualidades, a partir de los 12 años y con restauración a partir de los 18. El precio es de 30 euros al año por la matrícula y 30 euros al mes por tres horas semanales. | Cualquiera | Mayores de 64 años, Adolescentes (12-17 años), Jóvenes (18-29 años), Adultos (30-64 años) | Bienestar emocional, Envejecimiento activo, Cultura y ocio | Granada | Atarfe | 61922 | https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=61922",
+  // Ampliación 2026-11-09 (tabla de 20 registros aportada por el usuario): tres recursos sin
+  // identificador ni URL de detalle en la tabla; las columnas IdLocaliza y UrlDetalle quedan vacías.
+  "Centro Cultural Medina Elvira | El Centro Cultural Medina Elvira es un espacio destinado al desarrollo de actividades y espectáculos. | Cualquiera | Población general | Cultura y ocio, Participación y acción comunitaria | Granada | Atarfe |  | ",
+  "Club de senderismo Castillejo | Club de Senderismo Castillejo de Atarfe. Entrenamiento en paraje de Sierra Elvira y los Tres Juanes. También rutas programadas por municipios de Granada. | Cualquiera | Población general | Actividad física, Envejecimiento activo, Participación y acción comunitaria | Granada | Atarfe |  | ",
+  "Unidad de salud mental comunitaria de Atarfe | Atiende a pacientes ambulatorios con necesidad de seguimiento por parte de Salud Mental. Cuenta con psiquiatras, enfermero, psicólogo y trabajador social. Ubicado en el Centro de Salud Atarfe (entrada por Avda. de la Libertad, s/n). Pertenece al Hospital Universitario Virgen de las Nieves. | Cualquiera | Población general | Prevención del suicidio, Otras adicciones, Enfermedades crónicas, Escuela de salud/formación, Bienestar emocional | Granada | Atarfe |  | ",
 ].join("\n");
 
 // Correspondencia identificador externo → título (para trazabilidad de pruebas).

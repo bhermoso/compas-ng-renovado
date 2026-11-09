@@ -63,11 +63,11 @@ export const INCREMENTAL_SEED_MIGRATIONS: readonly SeedDocumentMigration[] = [
     municipalityId: "atarfe",
     documentId: "__all__",
     // v3 (2026-11-09): IBSE recalculado desde los ítems en escala común 0–100 y
-    // 17 fichas de Localiza Salud. Sustituye a v2 (IBSE con escalas de REDCap, 5 fichas).
+    // 20 recursos de Localiza Salud. Sustituye a v2 (IBSE con escalas de REDCap, 5 fichas).
     marker: "atarfe-documentacion-canonica-v3",
     mergeAllDocuments: true,
     expectedMinDocuments: 3,
-    expectedMinEvidenceAtoms: 23,
+    expectedMinEvidenceAtoms: 26,
     refreshCanonicalIbseStudy: true,
   },
   {

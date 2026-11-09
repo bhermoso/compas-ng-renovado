@@ -29,7 +29,7 @@ describe("listado de Localiza Salud", () => {
   });
 
   it("el recuento de las semillas no cambia", () => {
-    const expected: Record<string, number> = { alfacar: 7, atarfe: 17, "granada-zaidin": 56 };
+    const expected: Record<string, number> = { alfacar: 7, atarfe: 20, "granada-zaidin": 56 };
     for (const [id, n] of Object.entries(expected)) {
       const ws = parseWorkspaceJSON(readFileSync(`public/seeds/compas-ng-workspace-${id}.json`, "utf8"))!;
       const docs = ws.repository.documents.filter((d) => d.kind === "localiza-salud");

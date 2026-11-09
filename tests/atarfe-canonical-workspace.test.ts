@@ -138,10 +138,10 @@ describe("expediente canónico de Atarfe", () => {
     expect(ws.municipality.identity.ineCode).toBe("18022");
   });
 
-  it("3. recuentos exactos y deterministas (3 documentos, 23 evidencias, 1 estudio IBSE)", () => {
+  it("3. recuentos exactos y deterministas (3 documentos, 26 evidencias, 1 estudio IBSE)", () => {
     const ws = parseWorkspaceJSON(EXPORT_RAW)!;
     expect(ws.repository.documents).toHaveLength(3);
-    expect(ws.evidenceStore.atoms).toHaveLength(23);
+    expect(ws.evidenceStore.atoms).toHaveLength(26);
     const kinds = ws.repository.documents.map((d) => d.kind).sort();
     expect(kinds).toEqual(["health-report", "localiza-salud", "redcap-export"]);
     expect(ws.ibseStudy?.aggregates.n).toBe(910);
@@ -159,11 +159,11 @@ describe("expediente canónico de Atarfe", () => {
     expect(ws).not.toBeNull();
     expect(ws!.municipality.identity.id).toBe("atarfe");
     expect(ws!.repository.documents).toHaveLength(3);
-    expect(ws!.evidenceStore.atoms).toHaveLength(23);
+    expect(ws!.evidenceStore.atoms).toHaveLength(26);
     expect(MUNICIPALITY_SEEDS["atarfe"].path).toBe("seeds/compas-ng-workspace-atarfe.json");
   });
 
-  it("6. placeholder vacío de Atarfe → migra al seed (3 docs / 23 evidencias)", async () => {
+  it("6. placeholder vacío de Atarfe → migra al seed (3 docs / 26 evidencias)", async () => {
     const placeholder = createCompleteMunicipalityWorkspace(ATARFE_INPUT);
     expect(isEmptyWorkspaceForPersistenceGuard(placeholder)).toBe(true);
     expect(saveWorkspaceToLocalStorage(placeholder)).toBe(true);
@@ -178,11 +178,11 @@ describe("expediente canónico de Atarfe", () => {
     });
     const hydrated = shouldReplaceWithSeed(result.workspace, "atarfe") ? seed : result.workspace;
     expect(hydrated?.repository.documents).toHaveLength(3);
-    expect(hydrated?.evidenceStore.atoms).toHaveLength(23);
+    expect(hydrated?.evidenceStore.atoms).toHaveLength(26);
   });
 
   it("7. workspace local no vacío de Atarfe → preservado (no se sustituye)", () => {
-    const local = parseWorkspaceJSON(EXPORT_RAW)!; // 3 docs, 23 atoms (contenido real)
+    const local = parseWorkspaceJSON(EXPORT_RAW)!; // 3 docs, 26 atoms (contenido real)
     expect(saveWorkspaceToLocalStorage(local)).toBe(true);
     const result = loadOrCreateMunicipalityWorkspace("atarfe", ATARFE_INPUT);
     expect(result.seedPending).toBe(false);
@@ -249,7 +249,7 @@ describe("expediente canónico de Atarfe", () => {
     });
     expect(requested).toBe("/COMPAS_NG/seeds/compas-ng-workspace-atarfe.json");
     expect(ws?.municipality.identity.id).toBe("atarfe");
-    expect(ws?.evidenceStore.atoms).toHaveLength(23);
+    expect(ws?.evidenceStore.atoms).toHaveLength(26);
   });
 
   it("12. el builder real, serializado por la capa de persistencia, reproduce el export byte a byte", async () => {
@@ -478,18 +478,21 @@ describe("expediente canónico de Atarfe", () => {
     { id: "61922", title: "Talleres Artísticos Ciudad de Atarfe" },
   ];
 
-  it("19. Atarfe contiene EXACTAMENTE diecisiete fichas de Localiza Salud", () => {
+  const ASSETS_WITHOUT_ID: readonly string[] = ["Centro Cultural Medina Elvira", "Club de senderismo Castillejo", "Unidad de salud mental comunitaria de Atarfe"];
+
+  it("19. Atarfe contiene EXACTAMENTE veinte registros de Localiza Salud", () => {
     const ws = parseWorkspaceJSON(EXPORT_RAW)!;
     const assets = ws.evidenceStore.atoms.filter(
       (a) => a.provenance.origin === "localiza-salud"
     );
     expect(assets).toHaveLength(LOCALIZA_ASSET_COUNT);
-    expect(LOCALIZA_ASSET_COUNT).toBe(17);
+    expect(LOCALIZA_ASSET_COUNT).toBe(20);
     // Todos son EvidenceAtom de tipo "asset" enlazados al documento localiza-salud.
     expect(assets.every((a) => a.kind === "asset")).toBe(true);
     expect(assets.every((a) => a.provenance.documentId === LOCALIZA_DOCUMENT_ID)).toBe(true);
-    // Los nombres (títulos) coinciden con la primera columna de la ficha.
-    expect(assets.map((a) => a.title)).toEqual(EXPECTED_ASSETS.map((e) => e.title));
+    // Los nombres (títulos) coinciden con la primera columna de la ficha: primero los
+    // registros con identificador y después los tres sin identificador en la tabla.
+    expect(assets.map((a) => a.title)).toEqual([...EXPECTED_ASSETS.map((e) => e.title), ...ASSETS_WITHOUT_ID]);
   });
 
   it("20. los diecisiete nombres, identificadores externos y URLs de detalle se preservan verbatim", () => {
@@ -520,8 +523,8 @@ describe("expediente canónico de Atarfe", () => {
     expect(doc.territorialScale).toBe("municipio");
     // sourceText == texto fuente TSV íntegro, byte a byte.
     expect(doc.sourceText).toBe(LOCALIZA_SALUD_ATARFE_TEXT);
-    // Diecisiete líneas (una por ficha) y columnas IdLocaliza/UrlDetalle presentes.
-    expect(doc.sourceText!.split("\n")).toHaveLength(17);
+    // Veinte líneas (una por registro) y columnas IdLocaliza/UrlDetalle presentes.
+    expect(doc.sourceText!.split("\n")).toHaveLength(20);
     expect(doc.sourceText).toContain("ResourcesSearchDetail.action?id=");
     // Erratas de origen preservadas SIN corrección silenciosa.
     expect(doc.sourceText).toContain("útliles");
@@ -552,20 +555,20 @@ describe("expediente canónico de Atarfe", () => {
   });
 
   it("23. la hidratación es idempotente: reconstruir no multiplica los activos", async () => {
-    // Dos construcciones + dos hidrataciones del seed → siempre 17 fichas, sin duplicar.
+    // Dos construcciones + dos hidrataciones del seed → siempre 20 registros, sin duplicar.
     const a = await buildAtarfeWorkspace();
     const b = await buildAtarfeWorkspace();
     for (const built of [a, b]) {
       const assets = built.workspace.evidenceStore.atoms.filter(
         (x) => x.provenance.origin === "localiza-salud"
       );
-      expect(assets).toHaveLength(17);
+      expect(assets).toHaveLength(20);
       // Ids de átomo estables y únicos (dedup por clave estable, sin colisión).
       const ids = assets.map((x) => x.id);
-      expect(new Set(ids).size).toBe(17);
+      expect(new Set(ids).size).toBe(20);
     }
-    expect(a.counts.localizaAssets).toBe(17);
-    expect(b.counts.localizaAssets).toBe(17);
+    expect(a.counts.localizaAssets).toBe(20);
+    expect(b.counts.localizaAssets).toBe(20);
   });
 
   it("24. el Informe de Salud y el IBSE de Atarfe permanecen intactos junto a los activos", () => {

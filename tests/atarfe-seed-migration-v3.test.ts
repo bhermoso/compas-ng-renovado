@@ -34,7 +34,7 @@ describe("Atarfe · migración v3 (IBSE por ítems y 17 fichas de Localiza Salud
   it("sustituye el IBSE canónico y añade las fichas que faltan sin perder nada", () => {
     const migrated = applySeedDocumentMigration(previousWorkspace(), seed, migration);
     expect(migrated.ibseStudy!.aggregates).toEqual(seed.ibseStudy!.aggregates);
-    expect(migrated.evidenceStore.atoms).toHaveLength(23);
+    expect(migrated.evidenceStore.atoms).toHaveLength(26);
     const vinculo = migrated.evidenceStore.atoms.find((a) => a.id === "ibse:atarfe:meanFactorVinculo")!;
     expect(vinculo.content).not.toContain("valor antiguo");
     expect(migrated.appliedSeedMigrations).toContain("atarfe-documentacion-canonica-v3");

@@ -102,11 +102,11 @@ describe("Lote A · F5 — conflicto multiescala solo con indicadores no-IBSE", 
 });
 
 describe("Lote A · F6 — conflicto temporal solo por descensos significativos", () => {
-  it("F6.1 Atarfe: la incorporación aditiva 6→23 NO genera conflicto temporal", () => {
+  it("F6.1 Atarfe: la incorporación aditiva 6→26 NO genera conflicto temporal", () => {
     const runtime = createMunicipalityRuntime({ workspace: atarfe });
     const mit = runtime.mit;
-    // 23 átomos; el MIT reúne las dos fichas del Centro de Participación Activa (mismo título).
-    expect(mit.totalEvidencias).toBe(22);
+    // 26 átomos; el MIT reúne las dos fichas del Centro de Participación Activa (mismo título).
+    expect(mit.totalEvidencias).toBe(25);
     // Estado anterior a la incorporación de activos: 6 evidencias (IBSE solo).
     const anterior = { ...buildEstadoResumen(mit), totalEvidencias: 6 };
     const result = runReconciliacionInterpretativa(mit, [anterior]);
@@ -116,8 +116,8 @@ describe("Lote A · F6 — conflicto temporal solo por descensos significativos"
 
   it("F6.2 un DESCENSO significativo de evidencia SÍ genera conflicto temporal", () => {
     const runtime = createMunicipalityRuntime({ workspace: atarfe });
-    const mit = runtime.mit; // 23 evidencias actuales
-    // Estado anterior con 60 evidencias → descenso 60→23 (>50%): posible pérdida.
+    const mit = runtime.mit; // 25 evidencias actuales
+    // Estado anterior con 60 evidencias → descenso 60→25 (>50%): posible pérdida.
     const anterior = { ...buildEstadoResumen(mit), totalEvidencias: 60 };
     const result = runReconciliacionInterpretativa(mit, [anterior]);
     const temporal = result.conflictos.find((c) => c.id === CONFLICTO_TEMPORAL);

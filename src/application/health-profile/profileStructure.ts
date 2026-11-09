@@ -196,7 +196,8 @@ function parseRecommendations(paragraphs: string[]): ProfileRecommendation[] {
       current = {
         id: `R${item[1]}`,
         type: (item[2] as ProfileRecommendationType | undefined) ?? group,
-        text: clean(trailing ? trailing[1] : item[3]),
+        // «R1. Texto»: el punto tras el número no forma parte de la recomendación.
+        text: clean(trailing ? trailing[1] : item[3]).replace(/^[.:]\s*/, ""),
         ...(trailing ? { derivesFrom: trailing[2] } : {}),
       };
       out.push(current);
