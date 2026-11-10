@@ -34,7 +34,7 @@ function previousWorkspace() {
 
 describe("Atarfe · migración v4 (IBSE por ítems y 20 recursos de Localiza Salud)", () => {
   it("un expediente con la marca v2 o v3 recibe la migración v4", () => {
-    expect(migration.marker).toBe("atarfe-documentacion-canonica-v4");
+    expect(migration.marker).toBe("atarfe-documentacion-canonica-v5");
     const v3 = previousWorkspace();
     v3.appliedSeedMigrations = ["atarfe-localiza-v1", "atarfe-documentacion-canonica-v3"];
     expect(resolveSeedMigration(v3).kind).toBe("download-and-merge");
@@ -47,7 +47,7 @@ describe("Atarfe · migración v4 (IBSE por ítems y 20 recursos de Localiza Sal
     expect(migrated.evidenceStore.atoms).toHaveLength(26);
     const vinculo = migrated.evidenceStore.atoms.find((a) => a.id === "ibse:atarfe:meanFactorVinculo")!;
     expect(vinculo.content).not.toContain("valor antiguo");
-    expect(migrated.appliedSeedMigrations).toContain("atarfe-documentacion-canonica-v4");
+    expect(migrated.appliedSeedMigrations).toContain("atarfe-documentacion-canonica-v5");
   });
 
   it("no toca un IBSE importado por la persona usuaria", () => {

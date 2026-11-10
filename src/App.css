@@ -11580,3 +11580,9 @@ h3 {
 .app-persistence-footer .app-status-strip__signal{font-size:.74rem;font-weight:400;}
 .app-persistence-footer .app-status-strip__expanded{padding-top:18px;}
 .app-persistence-footer .app-status-strip__warning{margin:8px 0;color:var(--texto-principal);border-left:2px solid var(--rojo);padding-left:10px;font-size:.8rem;}
+
+/* IBSE — medias por estrato de edad */
+.study-strata-table { width: 100%; border-collapse: collapse; margin: 14px 0 6px; font-size: 13px; }
+.study-strata-table caption { text-align: left; font-weight: 600; padding-bottom: 6px; }
+.study-strata-table th, .study-strata-table td { padding: 6px 8px; border-bottom: 1px solid var(--fondo-secundario); text-align: right; font-variant-numeric: tabular-nums; }
+.study-strata-table th:first-child, .study-strata-table thead th:first-child { text-align: left; }

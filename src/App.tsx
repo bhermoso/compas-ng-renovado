@@ -2110,7 +2110,7 @@ export default function App() {
     setIsLoadingIBSE(true);
     try {
       const text = await file.text();
-      const { aggregates, methodologicalCautions, warnings, ageSexObserved, demographicAdjustment } = await prepareIBSEImport(text, workspace.municipality.identity.id, target);
+      const { aggregates, methodologicalCautions, warnings, ageSexObserved, strataCounts, demographicAdjustment } = await prepareIBSEImport(text, workspace.municipality.identity.id, target);
       const documentId = crypto.randomUUID();
       await saveOriginalFile(workspace.municipality.identity.id, documentId, file);
       const study = createIBSEStudy({
@@ -2118,6 +2118,7 @@ export default function App() {
         sourceFileName: file.name,
         aggregates,
         demographicAdjustment,
+        strataCounts,
         ageSexObserved:
           ageSexObserved === undefined
             ? undefined

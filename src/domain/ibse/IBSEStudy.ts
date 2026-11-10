@@ -24,14 +24,30 @@ export type IBSESampleScope = "under-16" | "16-plus" | "mixed" | "unknown";
  * Nunca se derivan ni se inventan: su ausencia significa "no disponible" y
  * bloquea cualquier dictamen SAM por estrato.
  */
+/** Medias del estrato en la escala común 0–100, sobre sus registros válidos. */
+export interface IBSEStratumMeans {
+  meanTotal: number;
+  meanFactorVinculo: number;
+  meanFactorSituacion: number;
+  meanFactorControl: number;
+  meanFactorPersona: number;
+}
+
 export interface IBSEStratumCount {
   n: number;
   nValid: number;
+  /** Medias del estrato, si el export permite calcularlas. */
+  means?: IBSEStratumMeans;
 }
 
 export interface IBSEStrataCounts {
   under16?: IBSEStratumCount;
   plus16?: IBSEStratumCount;
+  /**
+   * Registros sin edad determinable. Solo cuadra el desglose si ninguno es válido:
+   * todos quedan fuera de las medias por estar incompletos.
+   */
+  noAge?: { n: number; nValid: number };
 }
 
 /**

@@ -119,17 +119,18 @@ const HEALTH_REPORT_AUTHORS: HealthReportAuthor[] = [
 ];
 
 // Discriminador de la muestra IBSE de Atarfe. El CSV `ibse-atarfe.csv` es una
-// muestra MIXTA (menores de 16 y personas de 16 o más) y NO trae desglose etario:
-// el export no permite recuentos válidos por estrato. Por eso el estudio se marca
-// "mixed" y NO se afirma "población escolar".
+// muestra MIXTA (menores de 16 y personas de 16 o más) con edad y sexo de cada
+// registro: el estudio se marca "mixed", con recuentos y medias por estrato, y NO
+// se afirma "población escolar".
 export const ATARFE_IBSE_SAMPLE_SCOPE = "mixed" as const;
 
 // Cautelas de muestra que viajan en el estudio y en cada átomo IBSE.
 export const ATARFE_IBSE_MIXED_SAMPLE_SENTENCE =
   "Muestra municipal mixta, de 13 a 88 años, recogida entre el 6 de marzo y el 26 de abril de 2026 " +
   "con cuestionario en papel y por QR, en institutos y otros espacios del municipio; no probabilística. " +
-  "El export trae sexo y edad de cada registro: 810 de los 811 válidos tienen edad asignable " +
-  "(uno registra 1993 y se declara fuera de banda).";
+  "El export trae sexo y edad de cada registro; los 811 válidos se analizan por separado en " +
+  "menores de 16 y personas de 16 o más (un registro traía el año de nacimiento, 1993, en lugar " +
+  "de la edad y se convierte en 33 años).";
 export const ATARFE_IBSE_SAMPLE_CAUTIONS: readonly string[] = [
   ATARFE_IBSE_MIXED_SAMPLE_SENTENCE,
   IBSE_PARTICIPANT_SAMPLE_CAUTION,
@@ -160,7 +161,7 @@ export const LOCALIZA_ASSET_COUNT = 20; // 61419 y 61585 comparten título: posi
 // INCREMENTAL_SEED_MIGRATIONS en src/appWorkspaceHydration.ts (verificado en tests).
 export const LOCALIZA_MIGRATION_MARKER = "atarfe-localiza-v1";
 // Marca de la actualización del 2026-11-09 (IBSE recalculado por ítems + 17 fichas Localiza).
-export const ATARFE_UPDATE_MARKER = "atarfe-documentacion-canonica-v4";
+export const ATARFE_UPDATE_MARKER = "atarfe-documentacion-canonica-v5";
 export const LOCALIZA_SALUD_ATARFE_URL_BASE =
   "https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=";
 export const LOCALIZA_SALUD_ATARFE_TEXT = [
@@ -348,15 +349,17 @@ export async function buildAtarfeWorkspace(): Promise<AtarfeBuildResult> {
   // del parser, de modo que viajen con el estudio y con cada átomo (limitations).
   const ibseParsed = parseIBSECSV(readFileSync(IBSE_CSV, "utf-8"), {
     ageBands: ageBandsForMunicipality(ATARFE_ID),
+    // Encuesta pasada entre el 6 de marzo y el 26 de abril de 2026.
+    surveyYear: 2026,
   });
   const ibseStudy = createIBSEStudy({
     municipalityId: ATARFE_ID,
     sourceFileName: "ibse-atarfe.csv",
     aggregates: ibseParsed.aggregates,
     sampleScope: ATARFE_IBSE_SAMPLE_SCOPE,
-    // Sin `strataCounts`: un registro válido tiene una edad imposible (1993), de modo
-    // que los estratos <16 y 16+ no cuadran con nValid. La distribución edad×sexo sí
-    // se conserva (`ageSexObserved`) para que SAM describa la composición.
+    // Estratos <16 y 16+ con sus medias; el registro con año de nacimiento (1993) se
+    // convierte en edad (2026 − 1993). Los 11 registros sin edad son incompletos.
+    strataCounts: ibseParsed.strataCounts,
     ageSexObserved: ibseParsed.ageSexObserved && {
       cells: ibseParsed.ageSexObserved.cells,
       assignedCount: ibseParsed.ageSexObserved.assignedCount,

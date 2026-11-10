@@ -113,10 +113,17 @@ export function validateIBSEStrataCounts(
       reason: "Desglose por estrato incompleto o incoherente (n/nValid inválidos o nValid > n).",
     };
   }
-  if (under16.n + plus16.n !== aggregates.n) {
+  const noAge = strata.noAge ?? { n: 0, nValid: 0 };
+  if (!Number.isInteger(noAge.n) || noAge.n < 0 || noAge.nValid !== 0) {
     return {
       valid: false,
-      reason: `La suma de n por estrato (${under16.n + plus16.n}) no coincide con aggregates.n (${aggregates.n}).`,
+      reason: "Hay registros válidos sin edad determinable: no pueden asignarse a ningún estrato.",
+    };
+  }
+  if (under16.n + plus16.n + noAge.n !== aggregates.n) {
+    return {
+      valid: false,
+      reason: `La suma de n por estrato (${under16.n + plus16.n + noAge.n}) no coincide con aggregates.n (${aggregates.n}).`,
     };
   }
   if (under16.nValid + plus16.nValid !== aggregates.nValid) {
