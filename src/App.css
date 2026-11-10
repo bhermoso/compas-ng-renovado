@@ -11586,3 +11586,8 @@ h3 {
 .study-strata-table caption { text-align: left; font-weight: 600; padding-bottom: 6px; }
 .study-strata-table th, .study-strata-table td { padding: 6px 8px; border-bottom: 1px solid var(--fondo-secundario); text-align: right; font-variant-numeric: tabular-nums; }
 .study-strata-table th:first-child, .study-strata-table thead th:first-child { text-align: left; }
+
+/* Procedencia declarada de cada elemento del catálogo de Plan de Acción */
+.pcm-element-provenance { font-size: 0.8rem; color: var(--texto-secundario, #4b5563); margin: 2px 0 8px; }
+.pcm-element-provenance span { font-weight: 600; margin-right: 4px; }
+.pcm-element-provenance[data-provenance="propio"] span { color: #8a5a12; }
