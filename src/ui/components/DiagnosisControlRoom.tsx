@@ -82,7 +82,9 @@ export function DiagnosisControlRoom({ municipalityName, summary, kindLabels = [
       <dl className="diagnosis-control__metrics" aria-label="Resumen navegable del expediente">
         <div><dt>Documentos activos</dt><dd>{metricValue(metrics.activeDocuments, "documentos", "documents")}</dd></div>
         <div><dt>Estudios</dt><dd>{metricValue(`${metrics.studiesLoaded}/${metrics.totalStudies}`, "estudios", "studies")}</dd></div>
-        <div><dt>Activos</dt><dd>{metricValue(metrics.assets, "activos", "assets")}</dd></div>
+        {metrics.validatedAssets !== undefined
+          ? <div><dt>Activos validados</dt><dd>{metricValue(`${metrics.validatedAssets} de ${metrics.assets}`, "activos validados", "assets")}</dd></div>
+          : <div><dt>Recursos de activos</dt><dd>{metricValue(metrics.assets, "recursos de activos", "assets")}</dd></div>}
         <div><dt>Evidencias</dt><dd>{metricValue(metrics.evidence, "evidencias", "evidence")}</dd></div>
         <div className={metrics.withoutTemporalDeclaration ? "diagnosis-control__metric--attention" : undefined}><dt>Sin alcance temporal</dt><dd>{metricValue(metrics.withoutTemporalDeclaration, "sin alcance temporal", "temporal")}</dd></div>
         <div className={metrics.pendingValidation ? "diagnosis-control__metric--attention" : undefined}><dt>Pendientes de validación</dt><dd>{metricValue(metrics.pendingValidation, "pendientes de validación", "documents")}</dd></div>

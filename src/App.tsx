@@ -1,3 +1,4 @@
+import { readLocalizaAssets } from "./application/localiza-assets";
 import { ExternalProfileDashboard } from "./ui/components/ExternalProfileDashboard";
 import { EMPTY_PROFILE_LIBRARY, isExternalProfileLibrary } from "./application/health-profile/externalProfiles";
 import type { ExternalProfileLibrary } from "./domain/health-profile/ExternalHealthProfile";
@@ -28,7 +29,7 @@ import { DocumentationProvider } from "./ui/components/Documentation";
 import type { PlanPreparationDraft } from "./domain/action-plan-catalog/PlanPreparationDraft";
 import { worksheetKey, type IndicatorWorksheet } from "./domain/action-plan-catalog/IndicatorWorksheet";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { type CycleConciliation, type AssetValidationDeclaration, type DocumentCycle, type DocumentKind, type DocumentTemporalMetadata, type MunicipalDocument, type MunicipalDocumentRepository, addMunicipalDocument, setMunicipalDocumentCycle, addCycleConciliation, addAssetValidation, removeAssetValidation, removeCycleConciliation, replaceMunicipalDocumentByKind, removeMunicipalDocument, setMunicipalDocumentTemporalMetadata } from "./domain/repository";
+import { type CycleConciliation, type AssetValidationDeclaration, type DocumentCycle, type DocumentKind, type DocumentTemporalMetadata, type MunicipalDocument, type MunicipalDocumentRepository, addMunicipalDocument, setMunicipalDocumentCycle, addCycleConciliation, addAssetValidation, removeAssetValidation, renameMunicipalDocument, removeCycleConciliation, replaceMunicipalDocumentByKind, removeMunicipalDocument, setMunicipalDocumentTemporalMetadata } from "./domain/repository";
 import { type MunicipalityWorkspace } from "./domain/workspace";
 import { type QuestionnaireProject } from "./domain/questionnaire";
 import { importProjectDataset } from "./application/questionnaire";
@@ -3262,6 +3263,25 @@ export default function App() {
     }
   }
 
+  function handleRenameDocument(documentId: string, title: string) {
+    const previous = workspace.repository.documents.find((d) => d.id === documentId)?.title;
+    const clean = title.trim();
+    if (previous === undefined || clean === "" || clean === previous) return;
+    setWorkspace((prev) => ({
+      ...prev,
+      repository: renameMunicipalDocument(prev.repository, documentId, clean),
+      evidenceStore: {
+        ...prev.evidenceStore,
+        atoms: prev.evidenceStore.atoms.map((a) =>
+          a.provenance?.documentId === documentId && a.provenance.sourceLabel === previous
+            ? { ...a, provenance: { ...a.provenance, sourceLabel: clean } }
+            : a
+        ),
+      },
+      updatedAt: new Date().toISOString(),
+    }));
+  }
+
   async function handleDeleteDocument(documentId: string): Promise<boolean> {
     const municipalityId = workspace.municipality.identity.id;
     if (!workspace.repository.documents.some(d => d.id === documentId)) return false;
@@ -4130,6 +4150,14 @@ export default function App() {
                 studiesLoaded: studies.map(Boolean),
                 studyEvidenceCount: atoms.filter(a => a.provenance.origin === "ibse" || a.provenance.origin === "complementary-study").length,
                 assetCount: assetDocs.flatMap(assetEntriesOfDocument).length,
+                ...((runtime.workspace.repository.assetValidations ?? []).length > 0
+                  ? {
+                      validatedAssetCount: readLocalizaAssets(
+                        atoms.filter((a) => a.kind === "asset" && assetDocs.some((d) => d.id === a.provenance?.documentId)),
+                        runtime.workspace.repository.assetValidations
+                      ).records.filter((r) => r.estado === "validado").length,
+                    }
+                  : {}),
               });
               return (
                 <DiagnosisControlRoom
@@ -4288,6 +4316,7 @@ export default function App() {
                 repository={runtime.workspace.repository}
                 atoms={runtime.workspace.evidenceStore.atoms}
                 onDeleteDocument={handleDeleteDocument}
+                onRenameDocument={handleRenameDocument}
               />
             </DiagnosisModuleSection>
             <DiagnosisModuleSection id="diag-mod-documents" title="Repositorio documental y bibliotecas" description="Documentos del expediente, ciclos, conciliaciones y biblioteca COMPÁS" open={openDiagModules.has("documents")} onToggle={(open) => toggleDiagnosisModule("documents", open)}>

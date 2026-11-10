@@ -59,6 +59,8 @@ export interface DiagnosisControlSummary {
     studiesLoaded: number;
     totalStudies: number;
     assets: number;
+    /** Recursos con validación declarada; ausente si no consta ninguna declaración. */
+    validatedAssets?: number;
     evidence: number;
     withoutTemporalDeclaration: number;
     pendingValidation: number;
@@ -76,7 +78,13 @@ export interface DiagnosisControlInput {
   studiesLoaded: readonly boolean[];
   /** Evidencias derivadas de estudios complementarios (IBSE incluido). */
   studyEvidenceCount: number;
+  /** Recursos de activos incorporados (Localiza Salud u otro inventario). */
   assetCount: number;
+  /**
+   * Recursos con declaración formal de validación como activos. Sin dato, no
+   * consta ninguna declaración y el recuento no distingue recursos de activos.
+   */
+  validatedAssetCount?: number;
 }
 
 function isActive(document: MunicipalDocument): boolean {
@@ -175,9 +183,13 @@ export function buildDiagnosisControlSummary(input: DiagnosisControlInput): Diag
       id: "assets",
       label: "Activos para la salud",
       count: input.assetCount,
-      value: String(input.assetCount),
-      state: input.assetCount > 0 ? "ok" : "empty",
-      detail: input.assetCount > 0 ? "Activos identificados en el territorio." : "Sin activos registrados.",
+      value: input.validatedAssetCount !== undefined ? `${input.validatedAssetCount} de ${input.assetCount}` : String(input.assetCount),
+      state: input.assetCount === 0 ? "empty" : input.validatedAssetCount === undefined || input.validatedAssetCount === input.assetCount ? "ok" : "partial",
+      detail: input.assetCount === 0
+        ? "Sin activos registrados."
+        : input.validatedAssetCount !== undefined
+          ? `${input.assetCount} ${input.assetCount === 1 ? "recurso registrado" : "recursos registrados"}; ${input.validatedAssetCount} ${input.validatedAssetCount === 1 ? "validado" : "validados"} como ${input.validatedAssetCount === 1 ? "activo" : "activos"}.`
+          : "Recursos identificados en el territorio, sin declaración de validación.",
     },
     {
       id: "frameworks",
@@ -212,6 +224,7 @@ export function buildDiagnosisControlSummary(input: DiagnosisControlInput): Diag
       studiesLoaded,
       totalStudies,
       assets: input.assetCount,
+      ...(input.validatedAssetCount !== undefined ? { validatedAssets: input.validatedAssetCount } : {}),
       evidence: input.evidenceCount,
       withoutTemporalDeclaration: scopeCounts.undetermined,
       pendingValidation: active.filter((d) => d.status !== "validated").length,

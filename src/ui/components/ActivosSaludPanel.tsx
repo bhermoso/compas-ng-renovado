@@ -9,17 +9,27 @@ import { assetEntriesOfDocument } from "../../application/evidence-pipeline/Docu
 interface ActivosSaludPanelProps {
   repository: MunicipalDocumentRepository;
   onDeleteDocument?: (documentId: string) => void;
+  /** Cambia el título de una fuente de activos (por ejemplo, para no llamar «activos validados» a un listado de recursos). */
+  onRenameDocument?: (documentId: string, title: string) => void;
   /** Átomos del expediente: permiten leer cada activo de Localiza por separado. */
   atoms?: ReadonlyArray<EvidenceAtom>;
 }
 
-export function ActivosSaludPanel({ repository, onDeleteDocument, atoms = [] }: ActivosSaludPanelProps) {
+export function ActivosSaludPanel({ repository, onDeleteDocument, onRenameDocument, atoms = [] }: ActivosSaludPanelProps) {
   const [showList, setShowList] = useState(false);
+  const [renaming, setRenaming] = useState<{ id: string; title: string } | null>(null);
 
   const assetDocs = repository.documents.filter(
     (d) => (d.kind === "community-asset" || d.kind === "localiza-salud") && d.status !== "archived" && d.status !== "rejected"
   );
   const assetNames = assetDocs.flatMap(assetEntriesOfDocument);
+  const hasValidations = (repository.assetValidations ?? []).some((v) => assetDocs.some((d) => d.id === v.documentId));
+  const validatedCount = hasValidations
+    ? readLocalizaAssets(
+        atoms.filter((a) => assetDocs.some((d) => d.id === a.provenance?.documentId)),
+        repository.assetValidations
+      ).records.filter((r) => r.estado === "validado").length
+    : undefined;
 
   return (
     <section className="workspace-panel activos-panel">
@@ -52,7 +62,9 @@ export function ActivosSaludPanel({ repository, onDeleteDocument, atoms = [] }: 
         <div className="activos-body">
           <div className="activos-summary">
             <span className="activos-summary__count">
-              <strong>{assetNames.length}</strong> activos incorporados
+              {validatedCount !== undefined
+                ? <><strong>{assetNames.length}</strong> recursos incorporados · <strong>{validatedCount}</strong> validados como activos</>
+                : <><strong>{assetNames.length}</strong> activos incorporados</>}
             </span>
             <button
               type="button"
@@ -97,9 +109,38 @@ export function ActivosSaludPanel({ repository, onDeleteDocument, atoms = [] }: 
                   ))}
                 </ul>
               )}
-              <span className="activos-source__label">
-                Fuente: <DocumentReference documentId={doc.id}>{doc.title}</DocumentReference>
-              </span>
+              {renaming?.id === doc.id ? (
+                <span className="activos-source__label">
+                  <label>
+                    Título de la fuente
+                    <input
+                      type="text"
+                      value={renaming.title}
+                      onChange={(e) => setRenaming({ id: doc.id, title: e.target.value })}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    disabled={renaming.title.trim() === "" || renaming.title.trim() === doc.title}
+                    onClick={() => { onRenameDocument?.(doc.id, renaming.title); setRenaming(null); }}
+                  >
+                    Guardar título
+                  </button>
+                  <button type="button" onClick={() => setRenaming(null)}>Cancelar</button>
+                </span>
+              ) : (
+                <span className="activos-source__label">
+                  Fuente: <DocumentReference documentId={doc.id}>{doc.title}</DocumentReference>
+                  {onRenameDocument && (
+                    <>
+                      {" "}
+                      <button type="button" className="activos-source__rename" onClick={() => setRenaming({ id: doc.id, title: doc.title })}>
+                        Cambiar título
+                      </button>
+                    </>
+                  )}
+                </span>
+              )}
               {onDeleteDocument && (
                 <button
                   type="button"
