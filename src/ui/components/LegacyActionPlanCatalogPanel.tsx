@@ -311,7 +311,7 @@ export function LegacyActionPlanCatalogPanel(props: LegacyActionPlanCatalogPanel
     <div className="pcm-root">
       <section className="workspace-panel pcm-catalog-header">
         <p className="eyebrow">Catálogo RELAS de Plan de Acción</p>
-        <h2>Dos líneas reutilizables de Plan de Acción · envejecimiento saludable y adicciones</h2>
+        <h2>Tres líneas reutilizables de Plan de Acción · envejecimiento saludable, adicciones y bienestar emocional y salud mental</h2>
         <p className="panel-note">Consulta en cualquier expediente las propuestas documentadas de Granada-Zaidín y los demás módulos del catálogo: objetivos estratégicos, objetivos generales y específicos, indicadores y fichas técnicas. Selecciona y adapta los elementos en el borrador propio del territorio; nunca se importan como acuerdos aprobados.</p>
         <p className="pcm-source">Cada módulo indica fuente y versión. Las fichas de indicador y de actuación permiten preparar instrumentos de medición y recogida de datos. Los planes de acción, programas y compromisos operativos deben concretarse localmente, sin copiarlos automáticamente de otro expediente.</p>
         <details className="pcm-help-fold"><summary>Cómo funciona</summary>

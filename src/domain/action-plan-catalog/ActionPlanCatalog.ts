@@ -212,7 +212,7 @@ const IBSE_POPULATION_INDICATOR = {
     "Media de la puntuación del Índice de Bienestar Socioemocional (IBSE) de las personas participantes en el monitor municipal. Cada pregunta se lleva a una escala 0–100 en la que más es mejor; cada factor es la media de sus dos preguntas y el índice, la media de los cuatro factores.",
   calculationMethod:
     "Suma de las puntuaciones IBSE de los registros válidos (ocho preguntas contestadas) / nº de registros válidos. Se informa también la media reponderada por edad y sexo con el padrón, separada de la observada.",
-  disaggregation: "Sexo; grupos de edad 13–15, 16–24, 25–44, 45–64 y 65 o más; factores Vínculo, Situación, Control y Persona.",
+  disaggregation: "Estrato de edad, analizado por separado: menores de 16 y 16 o más; dentro de cada estrato, sexo y grupos de edad (13–15, 16–24, 25–44, 45–64 y 65 o más); factores Vínculo, Situación, Control y Persona.",
   baseline: "Primer monitor municipal con el instrumento, la escala común y el procedimiento de recogida que se mantendrán en las mediciones siguientes.",
   qualityCriterion: "Mismo instrumento, escala y procedimiento en cada medición; declarar modo de respuesta, periodo y composición de la muestra (SAM).",
   limitation: "Con muestra voluntaria no estima la media de la población. Solo es comparable con mediciones que usen el mismo procedimiento; no con encuestas de otro modo de administración sin declararlo.",
