@@ -46,6 +46,20 @@ cada elemento en el Plan de Acción. Se orienta a la promoción y
 la prevención desde el ámbito local; la atención clínica corresponde al SSPA.
 Hasta su revisión técnica es una propuesta para deliberación, no un módulo validado.
 
+Procedencia y documentación de apoyo (2026-11-10). Los tres módulos declaran la
+procedencia de cada objetivo e indicador (`CatalogElementProvenance`: literal,
+adaptado o propio, con la fuente citada) y enlazan los documentos del repositorio
+común de documentación de apoyo (`src/domain/strategy/SupportDocuments.ts`): EPVSA,
+ESCA y Plan Estratégico Integral para Personas Mayores en Andalucía 2020–2023
+(originales en COMPÁS), PESMA-A 2026–2029, Estrategia de Salud Mental del SNS
+2022–2026 y Estrategia Nacional sobre Adicciones 2017–2024 (dirección pública). En
+envejecimiento saludable y adicciones, el origen directo sigue siendo el Plan Local
+del Zaidín, declarado en el módulo y no en cada elemento, porque sus textos se
+reutilizan en otros expedientes; la procedencia indica de qué estrategia procede
+cada contenido, contrastada con los documentos. El registro
+`StrategicFrameworkRegistry` no reproduce fielmente las líneas de esos marcos y no
+se usa para la procedencia; su corrección queda pendiente de decisión.
+
 Cada módulo conserva versión, procedencia, códigos y cautelas. La fuente es una
 propuesta reutilizable, no evidencia de que sus contenidos sean adecuados para
 otro municipio.

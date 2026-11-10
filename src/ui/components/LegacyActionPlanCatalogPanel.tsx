@@ -1,5 +1,5 @@
 import { actionPlanElementCode } from "../../domain/action-plan-catalog/ActionPlanNotation";
-import { PlanPreparationPanel } from "./PlanPreparationPanel";
+import { PlanPreparationPanel, SupportDocumentLink } from "./PlanPreparationPanel";
 import { type PlanPreparationDraft } from "../../domain/action-plan-catalog/PlanPreparationDraft";
 import { municipalActionPlanModule, prepareMunicipalActionPlanDraft } from "../../domain/action-plan-catalog/MunicipalActionPlanModule";
 import { useState, type ReactNode } from "react";
@@ -15,6 +15,7 @@ import type {
 } from "../../domain/action-plan-catalog";
 import { createPendingModuleReview, isModuleReviewStale } from "../../domain/action-plan-catalog";
 import { ACTION_PLAN_CATALOG, type ActionPlanCatalogModule } from "../../domain/action-plan-catalog";
+import { SUPPORT_DOCUMENTS } from "../../domain/strategy/SupportDocuments";
 import type { DeliberativePrioritySelection } from "../../domain/deliberative-prioritisation";
 import type { LecturaEstrategicaLocal } from "../../domain/strategic-scenario";
 
@@ -314,6 +315,10 @@ export function LegacyActionPlanCatalogPanel(props: LegacyActionPlanCatalogPanel
         <h2>Tres líneas reutilizables de Plan de Acción · envejecimiento saludable, adicciones y bienestar emocional y salud mental</h2>
         <p className="panel-note">Consulta en cualquier expediente las propuestas documentadas de Granada-Zaidín y los demás módulos del catálogo: objetivos estratégicos, objetivos generales y específicos, indicadores y fichas técnicas. Selecciona y adapta los elementos en el borrador propio del territorio; nunca se importan como acuerdos aprobados.</p>
         <p className="pcm-source">Cada módulo indica fuente y versión. Las fichas de indicador y de actuación permiten preparar instrumentos de medición y recogida de datos. Los planes de acción, programas y compromisos operativos deben concretarse localmente, sin copiarlos automáticamente de otro expediente.</p>
+        <details className="pcm-help-fold pcm-support-docs" data-support-documents="true"><summary>Documentación de apoyo</summary>
+          <p className="panel-note">Estrategias y planes de los que proceden los objetivos e indicadores del catálogo. Cada elemento indica su procedencia: literal, adaptada o propia de COMPÁS.</p>
+          <ul>{SUPPORT_DOCUMENTS.map(doc => <li key={doc.id}><SupportDocumentLink doc={doc}/> · {doc.title}. {doc.issuer}. {doc.period}.{doc.location.kind === "compas" ? " Original conservado en COMPÁS." : " Consulta en la dirección pública."}{doc.note ? ` ${doc.note}` : ""}</li>)}</ul>
+        </details>
         <details className="pcm-help-fold"><summary>Cómo funciona</summary>
         <p className="panel-note">
           {directTerritorialEdit

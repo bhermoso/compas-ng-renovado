@@ -1,5 +1,7 @@
 import { actionPlanElementCode } from "../../domain/action-plan-catalog/ActionPlanNotation";
 import type { ReactNode } from "react";
+import { getSupportDocument, type SupportDocument } from "../../domain/strategy/SupportDocuments";
+import { documentAccessUrl } from "./documentAccessUtils";
 import type { ActionPlanCatalogModule, CatalogElementProvenance, CatalogGeneralObjectiveTemplate, CatalogSpecificObjectiveTemplate } from "../../domain/action-plan-catalog/ActionPlanCatalog";
 import type { PLSEvaluationFramework, UnaddressedNeed } from "../../domain/health-plan";
 import { planDecisionWithStatus } from "../../domain/action-plan-catalog/PlanPreparationDraft";
@@ -30,7 +32,19 @@ const PROVENANCE_LABEL = { literal: "Literal", adaptado: "Adaptado", propio: "Pr
 /** Procedencia declarada del elemento del catálogo (fuente y tipo), si la tiene. */
 function ElementProvenance({ p }: { p?: CatalogElementProvenance }) {
   if (!p) return null;
-  return <p className="pcm-element-provenance" data-provenance={p.kind}><span>Procedencia · {PROVENANCE_LABEL[p.kind]}</span> {p.source}</p>;
+  const docs = (p.documents ?? []).map(getSupportDocument).filter((d): d is NonNullable<typeof d> => d !== undefined);
+  return <p className="pcm-element-provenance" data-provenance={p.kind}>
+    <span>Procedencia · {PROVENANCE_LABEL[p.kind]}</span> {p.source}
+    {p.via && <> <em>Tomado del {p.via}.</em></>}
+    {docs.length > 0 && <> Documentación: {docs.map((d, i) => <span key={d.id} className="pcm-support-doc">{i > 0 && " · "}<SupportDocumentLink doc={d}/></span>)}</>}
+  </p>;
+}
+
+/** Enlace al documento de apoyo: el PDF conservado en COMPÁS o su dirección pública. */
+export function SupportDocumentLink({ doc }: { doc: SupportDocument }) {
+  const href = doc.location.kind === "compas" ? documentAccessUrl(doc.location.path) : doc.location.url;
+  if (!href) return <>{doc.shortName}</>;
+  return <a href={href} target="_blank" rel="noopener noreferrer" title={`${doc.title} · ${doc.period}`}>{doc.shortName}</a>;
 }
 
 export function PlanPreparationPanel({module, municipalityId, draft, onChange, review, onReviewChange, canEditProposal=true, canReview=false, reviewIsCurrent=true, renderWorksheet, persistenceMessage}: {

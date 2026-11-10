@@ -1,5 +1,6 @@
 import type { DeliberativePrioritySelection } from "../deliberative-prioritisation";
 import type { LecturaEstrategicaLocal } from "../strategic-scenario";
+import { supportDocumentIdsCitedIn } from "../strategy/SupportDocuments";
 
 export type CatalogDecisionStatus = "pending" | "accepted" | "adapted" | "rejected";
 
@@ -11,6 +12,10 @@ export type CatalogDecisionStatus = "pending" | "accepted" | "adapted" | "reject
 export interface CatalogElementProvenance {
   kind: "literal" | "adaptado" | "propio";
   source: string;
+  /** Documentos del repositorio común de documentación de apoyo citados en `source`. */
+  documents?: readonly string[];
+  /** Documento del que el catálogo toma el elemento, si no es la fuente de fondo (p. ej. un Plan Local). */
+  via?: string;
 }
 
 export interface CatalogIndicatorTemplate {
@@ -142,7 +147,7 @@ const ADI_CONTROL = "Registros de control/inspección";
 const ADI_ACCESS = "Registros de detección, derivación y acceso";
 const ADI_COORDINATION = "Memoria técnica y registros de coordinación";
 
-export const HEALTHY_AGING_MODULE: ActionPlanCatalogModule = {
+const HEALTHY_AGING_BASE: ActionPlanCatalogModule = {
   id: "env-2027-2030",
   version: "3.1",
   title: "Envejecimiento saludable",
@@ -181,7 +186,7 @@ export const HEALTHY_AGING_MODULE: ActionPlanCatalogModule = {
   ],
 };
 
-export const ADDICTIONS_MODULE: ActionPlanCatalogModule = {
+const ADDICTIONS_BASE: ActionPlanCatalogModule = {
   id: "adi-2027-2030",
   version: "3.1",
   title: "Prevención y abordaje de las adicciones",
@@ -325,7 +330,15 @@ export const BEM_PROVENANCE: Readonly<Record<string, CatalogElementProvenance>> 
   "BEM-I7.2": pro("Registro de iniciativas del Plan."),
 };
 
-function withProvenance(module: ActionPlanCatalogModule, map: Readonly<Record<string, CatalogElementProvenance>>): ActionPlanCatalogModule {
+function withProvenance(
+  module: ActionPlanCatalogModule,
+  map: Readonly<Record<string, CatalogElementProvenance>>,
+  via?: string
+): ActionPlanCatalogModule {
+  const complete = (p: CatalogElementProvenance | undefined): CatalogElementProvenance | undefined =>
+    p && { ...p, documents: p.documents ?? supportDocumentIdsCitedIn(p.source), ...(via && !p.via ? { via } : {}) };
+  const raw = map;
+  map = Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, complete(v)!]));
   return {
     ...module,
     strategicObjectiveProvenance: map[module.id],
@@ -342,6 +355,100 @@ function withProvenance(module: ActionPlanCatalogModule, map: Readonly<Record<st
 }
 
 export const EMOTIONAL_WELLBEING_MODULE: ActionPlanCatalogModule = withProvenance(BEM_EMOTIONAL_WELLBEING_BASE, BEM_PROVENANCE);
+
+// ── Procedencia de las líneas de envejecimiento saludable y de adicciones ─────
+// Ambas proceden del I Plan Local de Salud del Distrito Zaidín 2027–2030 (arquitectura
+// y fichas técnicas, 26/08/2026), declarado en `sourceLabel` de cada módulo; el original no
+// está en COMPÁS y no se ha comparado con él la redacción del catálogo. Los elementos no
+// nombran el Zaidín: sus textos se reutilizan en otros expedientes. La procedencia de fondo se contrastó el 10/11/2026 con el
+// Plan de mayores, la EPVSA y la ESCA (PDF en COMPÁS), y con el PESMA-A y la ENA 2017–2024.
+
+export const HEALTHY_AGING_PROVENANCE: Readonly<Record<string, CatalogElementProvenance>> = {
+  "env-2027-2030": ada("Plan de mayores, objetivo estratégico 5.1 «Reducir el porcentaje de personas mayores que sufren soledad no deseada» y líneas L1 (Prevención de la dependencia) y L5 (Lucha contra la soledad no deseada); EPVSA, OE 1.4 (bienestar emocional)."),
+  "ENV-OG1": ada("Plan de mayores, línea L1 «Prevención de la dependencia»; EPVSA, OE 1.4 «Incrementar la percepción de calidad de vida y de bienestar emocional»."),
+  "ENV-OE1.1": ada("Plan de mayores, línea L1 «Prevención de la dependencia» (objetivos estratégicos 1.1 y 1.2, ejercicio físico y alimentación en mayores de 55 años)."),
+  "ENV-I1.1": pro("Valoración inicial y de seguimiento de la autonomía funcional; sin indicador equivalente en las fuentes."),
+  "ENV-OE1.2": ada("EPVSA, OE 1.4 «Incrementar la percepción de calidad de vida y de bienestar emocional», aplicado a personas mayores participantes."),
+  "ENV-I1.2": pro("Valoración inicial y de seguimiento del bienestar emocional; la EPVSA mide el OE 1.4 en población general con la Encuesta Andaluza de Salud."),
+  "ENV-OG2": ada("Plan de mayores, objetivo estratégico 5.1 «Reducir el porcentaje de personas mayores que sufren soledad no deseada» y línea L5."),
+  "ENV-OE2.1": ada("Plan de mayores, programa P5_1, objetivo 4 «Establecer mecanismos y criterios para la detección, intervención, seguimiento y protección sobre la soledad no deseada y el aislamiento social»."),
+  "ENV-I2.1": ada("Plan de mayores, P5_1, indicador de resultado «N.º de personas … detectadas»; COMPÁS lo expresa como porcentaje de personas valoradas con el procedimiento acordado (CEL Tool/UCLA-3)."),
+  "ENV-OE2.2": ada("Plan de mayores, objetivo estratégico 5.1, aplicado a las personas incorporadas a una intervención."),
+  "ENV-I2.2": pro("Escala de soledad de De Jong Gierveld antes y después; sin indicador equivalente en las fuentes."),
+  "ENV-OG3": ada("EPVSA, indicador 1.4.5 (apoyo social y afectivo); Plan de mayores, P5_1 (programas que fomenten la convivencia, la integración y la relación con el medio social)."),
+  "ENV-OE3.1": pro("Red social de las personas con riesgo de aislamiento; sin objetivo equivalente en las fuentes (el Plan de mayores trata el aislamiento dentro de la soledad no deseada, P5_1)."),
+  "ENV-I3.1": pro("Escala LSNS-6 antes y después."),
+  "ENV-OE3.2": ada("EPVSA, OE 1.4, indicador 1.4.5 «Porcentaje de población adulta que percibe como bajo su apoyo social y afectivo», aplicado a participantes."),
+  "ENV-I3.2": ada("EPVSA, indicador 1.4.5 (Duke-UNC-11 en la Encuesta Andaluza de Salud); COMPÁS mide el cambio en participantes con apoyo insuficiente."),
+  "ENV-OG4": ada("Plan de mayores, P5_1 y P5_2 (participación, convivencia y voluntariado de las personas mayores)."),
+  "ENV-OE4.1": ada("Plan de mayores, P5_1 (programas que fomenten la participación y la relación con el medio social de las personas mayores)."),
+  "ENV-I4.1": pro("Actividad comunitaria significativa incorporada o recuperada; sin indicador equivalente en las fuentes."),
+  "ENV-OE4.2": ada("Plan de mayores, programa P5_2, objetivo 1 «Aumentar el n.º de personas mayores voluntarias en Andalucía»."),
+  "ENV-I4.2": ada("Plan de mayores, P5_2, indicador «Incremento porcentual del voluntariado social» por parte de personas mayores; COMPÁS lo amplía a organización, dinamización, formación, representación y apoyo mutuo."),
+  "ENV-OG5": ada("Plan de mayores, línea L4 y programa P4_1 «Sensibilización hacia el buen trato», que plantea «estrategias que combatan el edadismo» y una imagen positiva de las personas mayores."),
+  "ENV-OE5.1": ada("Plan de mayores, P4_1 (campañas que cuestionen los mitos y estereotipos que dificultan la participación de las personas mayores)."),
+  "ENV-I5.1": pro("Actitudes edadistas antes y después; los indicadores de P4_1 son de realización (campañas, anuncios, guías)."),
+  "ENV-OE5.2": ada("Plan de mayores, P4_1, objetivo 2 «Incrementar la presencia en medios de comunicación la idea de fomentar el buen trato hacia las personas mayores»."),
+  "ENV-I5.2": pro("Participación directa de personas mayores en las iniciativas de sensibilización; sin indicador equivalente en las fuentes."),
+  "ENV-OG6": ada("Plan de mayores, P5_1, objetivos 2 (sensibilizar a profesionales), 3 (coordinación) y 4 (detección); ESCA, objetivo específico 2.4 «Facilitar el desarrollo del nivel comunitario en el territorio de adscripción»."),
+  "ENV-OE6.1": ada("Plan de mayores, P5_1, objetivo 2 «Sensibilizar a los y las profesionales que intervienen con personas mayores sobre la realidad actual de la Soledad no Deseada» y objetivo 4 (detección)."),
+  "ENV-I6.1": ada("Plan de mayores, P5_1, indicador «N.º de profesionales sensibilizados y formados en la detección y atención de personas mayores en situación de soledad no deseada»; COMPÁS cuenta agentes que detectan, orientan o derivan."),
+  "ENV-OE6.2": ada("ESCA, líneas de acción 2.1.2 (mapa de activos para la salud de cada UGC) y 2.2.3 (recomendación de activos); EPVSA, OE 1.7."),
+  "ENV-I6.2": pro("Activos que participan de forma efectiva en una actuación; sin indicador equivalente en las fuentes."),
+  "ENV-OG7": ada("Plan de mayores, P5_1, objetivo 3 «Mejorar la coordinación entre los profesionales que atienden a las personas mayores en relación con la soledad no deseada»; ESCA, línea de acción 2.4.1."),
+  "ENV-OE7.1": ada("ESCA, línea de acción 2.4.1 «Realizar acciones de participación y coordinación entre los actores del SSPA y su entorno comunitario en las redes intersectoriales existentes»."),
+  "ENV-I7.1": pro("Participación regular en la estructura de coordinación; sin indicador equivalente en las fuentes."),
+  "ENV-OE7.2": ada("Plan de mayores, P5_1, objetivo 4 (detección, intervención, seguimiento y protección)."),
+  "ENV-I7.2": pro("Valoración y respuesta del recurso receptor en plazo; sin indicador equivalente en las fuentes."),
+  "ENV-OG8": ada("Plan de mayores, programa P3_2 «Mejorar las condiciones de accesibilidad y eficiencia energética de los edificios donde residan personas mayores»; COMPÁS lo extiende a espacios y recursos comunitarios."),
+  "ENV-OE8.1": pro("Barreras de accesibilidad en espacios y equipamientos comunitarios; el Plan de mayores trata la accesibilidad de los edificios de viviendas (P3_2)."),
+  "ENV-I8.1": pro("Inventario de barreras priorizadas; sin indicador equivalente en las fuentes."),
+  "ENV-OE8.2": pro("Accesibilidad de recursos y actividades comunitarias; sin objetivo equivalente en las fuentes."),
+  "ENV-I8.2": pro("Criterios de accesibilidad previamente establecidos; sin indicador equivalente en las fuentes."),
+  "ENV-OG9": pro("El Plan de mayores señala en su diagnóstico la necesidad de «superar la persistente brecha digital», pero no la formula como objetivo."),
+  "ENV-OE9.1": pro("Competencias digitales funcionales; sin objetivo equivalente en las fuentes."),
+  "ENV-I9.1": pro("Prueba práctica de tareas digitales; sin indicador equivalente en las fuentes."),
+  "ENV-OE9.2": pro("Gestiones digitales esenciales; sin objetivo equivalente en las fuentes."),
+  "ENV-I9.2": pro("Prueba práctica de gestiones digitales; sin indicador equivalente en las fuentes."),
+};
+
+export const ADDICTIONS_PROVENANCE: Readonly<Record<string, CatalogElementProvenance>> = {
+  "adi-2027-2030": ada("ENA, área 10.1 «Prevención y reducción del riesgo»; PESMA-A, línea 1 «Promoción y prevención en Salud Mental y Adicciones» y programa P.01.01 «Programa ciudades ante las adicciones»."),
+  "ADI-OG1": ada("PESMA-A, programas P.01.02 (asesoramiento, información y formación a familias) y P.02.01 («para reforzar sus habilidades y herramientas parentales»); ENA, objetivo 10.1.5."),
+  "ADI-OE1.1": ada("PESMA-A, P.02.01, «para reforzar sus habilidades y herramientas parentales»; P.01.02, programa de familias."),
+  "ADI-I1.1": pro("Competencias preventivas de las familias antes y después; sin indicador equivalente en las fuentes."),
+  "ADI-OE1.2": ada("PESMA-A, P.01.02 («que contribuya a la detección temprana de casos»); ENA, objetivo 10.1.7 «Detectar precozmente y prevenir los consumos de mayor riesgo»."),
+  "ADI-I1.2": pro("Identificación de situaciones de riesgo en la evaluación final; sin indicador equivalente en las fuentes."),
+  "ADI-OG2": ada("ENA, objetivo 10.1.6 «Promover conductas y hábitos de vida saludables, uso saludable de las nuevas tecnologías y alternativas de ocio sanas»; PESMA-A, P.01.02 (actividades que promueven «alternativas al consumo de sustancias»)."),
+  "ADI-OE2.1": ada("ENA, objetivo 10.1.6 (alternativas de ocio sanas)."),
+  "ADI-I2.1": pro("Frecuencia mínima de participación en ocio saludable; sin indicador equivalente en las fuentes."),
+  "ADI-OE2.2": pro("Participación juvenil en el diseño del ocio; sin objetivo equivalente en las fuentes."),
+  "ADI-I2.2": pro("Iniciativas de ocio con participación activa de jóvenes; sin indicador equivalente en las fuentes."),
+  "ADI-OG3": ada("ENA, objetivos 10.1.3 (percepción del riesgo) y 10.1.4 (percepción injustificada en la sociedad, especialmente en menores)."),
+  "ADI-OE3.1": ada("ENA, objetivo 10.1.3: «aumentar la percepción del riesgo asociado al consumo y a determinadas conductas adictivas (juego, TICs)»."),
+  "ADI-I3.1": pro("Percepción de riesgo antes y después; sin indicador equivalente en las fuentes."),
+  "ADI-OE3.2": ada("ENA, objetivo 10.1.4 «Reducir la injustificada percepción en la sociedad y especialmente en menores»."),
+  "ADI-I3.2": pro("Aceptación o normalización antes y después; sin indicador equivalente en las fuentes."),
+  "ADI-OG4": ada("ENA, objetivo 10.1.2 «Limitar la accesibilidad de los menores a las drogas y a otras conductas susceptibles de adicción»."),
+  "ADI-OE4.1": ada("ENA, objetivo 10.1.2, aplicado a alcohol, tabaco, nicotina y vapeadores en los ámbitos sometidos a control preventivo."),
+  "ADI-I4.1": pro("Incumplimientos detectados en los controles; sin indicador equivalente en las fuentes."),
+  "ADI-OE4.2": ada("ENA, objetivo 10.1.2, aplicado al juego con dinero."),
+  "ADI-I4.2": pro("Incumplimientos de las restricciones de acceso de menores al juego; sin indicador equivalente en las fuentes."),
+  "ADI-OG5": ada("PESMA-A, OE02 «Mejorar la detección y atención precoz de las personas con problemas de adicciones y/o salud mental» y programa P.02.01; ENA, objetivo 10.1.7."),
+  "ADI-OE5.1": ada("ENA, objetivo 10.1.7 «Detectar precozmente y prevenir los consumos de mayor riesgo»; PESMA-A, P.02.01 «Implementar sistemas de detección temprana para identificar a adolescentes y jóvenes en riesgo de desarrollar adicciones»."),
+  "ADI-I5.1": pro("Aplicación del procedimiento de detección a la población diana atendida; sin indicador equivalente en las fuentes."),
+  "ADI-OE5.2": ada("PESMA-A, P.02.01 «Aumentar el número de adolescentes y jóvenes y familias con esta problemática derivados al programa»."),
+  "ADI-I5.2": pro("Primer contacto o atención en el recurso receptor; sin indicador equivalente en las fuentes."),
+  "ADI-OG6": ada("PESMA-A, P.01.01 «Planificar y coordinar todas las actuaciones que en materia de prevención de adicciones se desarrollen a nivel local»; ENA, área 10.1 (cobertura de los programas «avalados por la evidencia»)."),
+  "ADI-OE6.1": ada("ENA, área 10.1 («garantizando la cobertura universal de aquellos avalados por la evidencia»); PESMA-A, P.01.01 (actuaciones que «la comunidad científica acepta de forma mayoritaria»)."),
+  "ADI-I6.1": pro("Intervenciones que cumplen criterios técnicos previamente establecidos; sin indicador equivalente en las fuentes."),
+  "ADI-OE6.2": ada("PESMA-A, P.01.01 «Planificar y coordinar todas las actuaciones que en materia de prevención de adicciones se desarrollen a nivel local», «creando estructuras de coordinación»."),
+  "ADI-I6.2": pro("Intervenciones desarrolladas por dos o más agentes; sin indicador equivalente en las fuentes."),
+};
+
+export const HEALTHY_AGING_MODULE: ActionPlanCatalogModule = withProvenance(HEALTHY_AGING_BASE, HEALTHY_AGING_PROVENANCE);
+export const ADDICTIONS_MODULE: ActionPlanCatalogModule = withProvenance(ADDICTIONS_BASE, ADDICTIONS_PROVENANCE);
+
 
 export const ACTION_PLAN_CATALOG = [HEALTHY_AGING_MODULE, ADDICTIONS_MODULE, EMOTIONAL_WELLBEING_MODULE] as const;
 
