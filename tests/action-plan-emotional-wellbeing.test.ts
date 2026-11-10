@@ -62,3 +62,43 @@ describe("Línea «Bienestar emocional y salud mental» (versión 0.2)", () => {
     expect(byCode.get("BEM-I3.3")).toMatch(/8 a 15 años que usa más de dos horas al día aparatos electrónicos\.$/);
   });
 });
+
+import { ADDICTIONS_MODULE, HEALTHY_AGING_MODULE } from "../src/domain/action-plan-catalog/ActionPlanCatalog";
+import { SUPPORT_DOCUMENTS, getSupportDocument } from "../src/domain/strategy/SupportDocuments";
+
+describe("Procedencia del catálogo y documentación de apoyo", () => {
+  const all = (mod: typeof HEALTHY_AGING_MODULE) => [
+    mod.strategicObjectiveProvenance,
+    ...mod.generalObjectives.map((g) => g.provenance),
+    ...mod.generalObjectives.flatMap((g) => g.specificObjectives.flatMap((o) => [o.provenance, o.indicator.provenance])),
+  ];
+
+  it("las tres líneas declaran procedencia en todos sus elementos", () => {
+    expect(all(HEALTHY_AGING_MODULE)).toHaveLength(1 + 9 + 36);
+    expect(all(ADDICTIONS_MODULE)).toHaveLength(1 + 6 + 24);
+    for (const mod of [HEALTHY_AGING_MODULE, ADDICTIONS_MODULE, EMOTIONAL_WELLBEING_MODULE]) {
+      for (const p of all(mod)) {
+        expect(["literal", "adaptado", "propio"]).toContain(p?.kind);
+        expect(p?.source.length).toBeGreaterThan(10);
+      }
+    }
+  });
+
+  it("envejecimiento y adicciones conservan su versión; el Plan Local del Zaidín figura en la línea, no en cada elemento", () => {
+    expect(HEALTHY_AGING_MODULE.version).toBe("3.1");
+    expect(ADDICTIONS_MODULE.version).toBe("3.1");
+    expect(HEALTHY_AGING_MODULE.sourceLabel).toMatch(/Zaidín/);
+    expect(ADDICTIONS_MODULE.sourceLabel).toMatch(/Zaidín/);
+    expect(JSON.stringify([...all(HEALTHY_AGING_MODULE), ...all(ADDICTIONS_MODULE)])).not.toMatch(/Zaidín/);
+  });
+
+  it("cada documento citado existe en el repositorio común, y los adaptados citan al menos uno", () => {
+    for (const mod of [HEALTHY_AGING_MODULE, ADDICTIONS_MODULE, EMOTIONAL_WELLBEING_MODULE]) {
+      for (const p of all(mod)) {
+        for (const id of p?.documents ?? []) expect(getSupportDocument(id)).toBeDefined();
+        if (p?.kind !== "propio") expect((p?.documents ?? []).length).toBeGreaterThan(0);
+      }
+    }
+    expect(SUPPORT_DOCUMENTS.filter((d) => d.location.kind === "compas").map((d) => d.id).sort()).toEqual(["epvsa", "esca", "mayores"]);
+  });
+});
