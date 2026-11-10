@@ -593,7 +593,7 @@ describe("expediente canónico de Atarfe", () => {
     const ws = parseWorkspaceJSON(EXPORT_RAW)!;
     expect(ws.appliedSeedMigrations).toEqual([LOCALIZA_MIGRATION_MARKER, ATARFE_UPDATE_MARKER]);
     expect(LOCALIZA_MIGRATION_MARKER).toBe("atarfe-localiza-v1");
-    expect(ATARFE_UPDATE_MARKER).toBe("atarfe-documentacion-canonica-v3");
+    expect(ATARFE_UPDATE_MARKER).toBe("atarfe-documentacion-canonica-v4");
     // El seed público lleva las mismas marcas (copia byte a byte del export).
     expect(parseWorkspaceJSON(SEED_RAW)!.appliedSeedMigrations).toEqual([
       LOCALIZA_MIGRATION_MARKER,

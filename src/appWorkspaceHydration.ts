@@ -44,6 +44,12 @@ export interface SeedDocumentMigration {
    * importado por la persona usuaria (otro id) o un documento IBSE eliminado no se tocan.
    */
   refreshCanonicalIbseStudy?: boolean;
+  /**
+   * Documentos canónicos cuyo texto fuente se actualiza al del seed. Solo si el
+   * documento sigue en el expediente, no se ha eliminado y cada línea que conserva
+   * figura en el texto del seed (la persona usuaria no ha añadido nada propio).
+   */
+  refreshCanonicalDocumentIds?: readonly string[];
 }
 
 /**
@@ -62,13 +68,16 @@ export const INCREMENTAL_SEED_MIGRATIONS: readonly SeedDocumentMigration[] = [
   {
     municipalityId: "atarfe",
     documentId: "__all__",
-    // v3 (2026-11-09): IBSE recalculado desde los ítems en escala común 0–100 y
-    // 20 recursos de Localiza Salud. Sustituye a v2 (IBSE con escalas de REDCap, 5 fichas).
-    marker: "atarfe-documentacion-canonica-v3",
+    // v4 (2026-11-10): como v3 (IBSE recalculado desde los ítems en escala común
+    // 0–100 y 20 recursos de Localiza Salud) y, además, actualiza el texto del
+    // documento de Localiza Salud, del que sale el recuento de activos. v3 añadía
+    // las fichas como evidencias, pero dejaba el documento con cinco líneas.
+    marker: "atarfe-documentacion-canonica-v4",
     mergeAllDocuments: true,
     expectedMinDocuments: 3,
     expectedMinEvidenceAtoms: 26,
     refreshCanonicalIbseStudy: true,
+    refreshCanonicalDocumentIds: ["doc-localiza-atarfe"],
   },
   {
     municipalityId: "alfacar",
@@ -290,7 +299,8 @@ export function backfillSeedMigrationMarker(
 export function applySeedDocumentMigration(
   current: MunicipalityWorkspace,
   seed: MunicipalityWorkspace,
-  migration: SeedDocumentMigration
+  migration: SeedDocumentMigration,
+  options: { stamp?: string } = {}
 ): MunicipalityWorkspace {
   const seedDocs = migration.mergeAllDocuments
     ? seed.repository.documents
@@ -315,6 +325,19 @@ export function applySeedDocumentMigration(
     ? seed.evidenceStore.atoms.filter((a) => a.id.startsWith(ibseAtomPrefix))
     : [];
   const refreshedIbseIds = new Set(seedIbseAtoms.map((a) => a.id));
+  const linesOf = (text: string | undefined) =>
+    (text ?? "").split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const refreshedDocs = new Map(
+    (migration.refreshCanonicalDocumentIds ?? []).flatMap((id) => {
+      const mine = current.repository.documents.find((d) => d.id === id);
+      const theirs = seed.repository.documents.find((d) => d.id === id);
+      if (!mine || !theirs || deletedIds.has(id) || mine.sourceText === theirs.sourceText) return [];
+      if (mine.status === "archived" || mine.status === "rejected") return [];
+      const seedLines = new Set(linesOf(theirs.sourceText));
+      if (!linesOf(mine.sourceText).every((l) => seedLines.has(l))) return [];
+      return [[id, theirs.sourceText] as const];
+    })
+  );
   const atomsToAdd = seed.evidenceStore.atoms.filter(
     (a) =>
       a.provenance.documentId !== undefined &&
@@ -326,11 +349,21 @@ export function applySeedDocumentMigration(
     (current.appliedSeedMigrations ?? []).includes(migration.marker) &&
     docsToAdd.length === 0 &&
     atomsToAdd.length === 0 &&
-    !refreshIbse
+    !refreshIbse &&
+    refreshedDocs.size === 0
   ) {
     return current;
   }
-  const stamp = seed.updatedAt;
+  // Nunca retroceder la fecha del expediente: una fecha anterior haría que una copia
+  // compartida más reciente lo sustituyera y bloquearía su guardado en Firebase.
+  const stamp =
+    options.stamp ??
+    (current.updatedAt > seed.updatedAt ? current.updatedAt : seed.updatedAt);
+  const currentDocuments = refreshedDocs.size === 0
+    ? current.repository.documents
+    : current.repository.documents.map((d) =>
+        refreshedDocs.has(d.id) ? { ...d, sourceText: refreshedDocs.get(d.id)! } : d
+      );
   const baseAtoms = refreshIbse
     ? current.evidenceStore.atoms.map((a) => (refreshedIbseIds.has(a.id) ? seedIbseAtoms.find((s) => s.id === a.id)! : a))
     : current.evidenceStore.atoms;
@@ -338,11 +371,11 @@ export function applySeedDocumentMigration(
   const merged: MunicipalityWorkspace = {
     ...current,
     repository:
-      docsToAdd.length === 0
+      docsToAdd.length === 0 && refreshedDocs.size === 0
         ? current.repository
         : {
             ...current.repository,
-            documents: [...current.repository.documents, ...docsToAdd],
+            documents: [...currentDocuments, ...docsToAdd],
             updatedAt: stamp,
           },
     evidenceStore:
