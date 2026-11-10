@@ -492,6 +492,24 @@ export function removeMunicipalDocument(
   };
 }
 
+/** Cambia el título visible de un documento; no altera su contenido ni su procedencia. */
+export function renameMunicipalDocument(
+  repository: MunicipalDocumentRepository,
+  documentId: DocumentId,
+  title: string
+): MunicipalDocumentRepository {
+  const clean = title.trim();
+  if (clean === "") return repository;
+  const now = new Date().toISOString();
+  return {
+    ...repository,
+    documents: repository.documents.map((document) =>
+      document.id === documentId ? { ...document, title: clean, updatedAt: now } : document
+    ),
+    updatedAt: now,
+  };
+}
+
 export function archiveMunicipalDocument(
   repository: MunicipalDocumentRepository,
   documentId: DocumentId
