@@ -28,8 +28,8 @@ variación —sin alterar el comportamiento normal de la aplicación— aplicand
 - **Identificadores estables**: `doc-health-report-atarfe` (documento del
   Informe), `health-report-atarfe` (HealthReportDocument), `ibse-study-atarfe`
   (IBSEStudy), `doc-ibse-atarfe` (documento IBSE) y `doc-localiza-atarfe`
-  (documento Localiza Salud). Los cinco activos usan IDs de átomo estables
-  `doc-localiza-atarfe-atom-1..5` (no `crypto.randomUUID()`).
+  (documento Localiza Salud). Los veinte activos usan IDs de átomo estables
+  `doc-localiza-atarfe-atom-1..20` (no `crypto.randomUUID()`).
 
 Ejecutar `npm run rebuild:atarfe` dos veces sin cambiar las fuentes produce el
 **mismo SHA-256** y deja `git diff` vacío. La prueba `atarfe-canonical-workspace`
@@ -43,7 +43,20 @@ Verificado en la suite (caso 13): si una fuente cambia, la validación falla.
 | Fuente | SHA-256 |
 |---|---|
 | `fixtures/health-reports/Informe_Salud_Atarfe.docx` | `597fcacf0342eeb8970ef61b3a9b1d58cfe9eeb1c6703af7639e843a6c5b8e2c` |
-| `fixtures/ibse-atarfe.csv` | `b2c6126c937b88de55c6aaae6c611f6c4bec75cd90e968916732c577039fa703` |
+| `fixtures/ibse-atarfe.csv` | `3f23693fb62f80bbfd12c55a6da054110deb2d48dca9eaa5599b0a75c36f25be` (CRLF) |
+
+## Actualización 2026-11-09
+
+- **IBSE recalculado.** Las fórmulas del proyecto REDCap Monitor IBSE Atarfe 2026 no dejan los
+  cuatro factores en la misma escala (Vínculo 0–75; Situación y Control 25–100; Persona 0–100).
+  El parser puntúa ahora desde los ocho ítems en una escala común 0–100 y, para exports sin
+  ítems, convierte de forma lineal y exacta. Diccionario corregido para REDCap:
+  `redcap/MonitorIBSEAtarfe2026_DataDictionary_escala_corregida.csv`.
+- **Export del 05/11/2026** (910 registros; sin marca temporal ni identificador de encuesta en la
+  copia pública). Trae sexo y edad: SAM puede describir la composición por edad y sexo.
+- **20 registros de Localiza Salud** (tablas aportadas el 05/11/2026 y el 09/11/2026; tres sin identificador). No se ha verificado en línea su vigencia.
+- Migración `atarfe-documentacion-canonica-v3` para expedientes ya persistidos: añade las fichas
+  que faltan y sustituye el estudio IBSE canónico (no toca un IBSE importado por la persona usuaria).
 
 ## Recuentos deterministas
 
@@ -52,11 +65,11 @@ Verificado en la suite (caso 13): si una fuente cambia, la validación falla.
 | Identidad | `atarfe` · Atarfe · Granada · INE 18022 |
 | Documentos del repositorio | **3** (Informe de Salud + IBSE + Localiza Salud) |
 | Estudios | **1** (IBSE municipal) |
-| Activos para la salud (Localiza Salud) | **5** (EvidenceAtoms `asset`, origen `localiza-salud`) |
-| EvidenceAtoms totales | **11** (6 IBSE [5 `indicator` + 1 `qualitative-observation`] + 5 `asset` de Localiza Salud) |
+| Activos para la salud (Localiza Salud) | **20** registros (EvidenceAtoms `asset`, origen `localiza-salud`; 61419 y 61585 comparten título, posible duplicado) |
+| EvidenceAtoms totales | **26** (6 IBSE [5 `indicator` + 1 `qualitative-observation`] + 20 `asset` de Localiza Salud) |
 | Átomos del Informe de Salud | **0** (D-HR-01 / Art. 7 bis §3) |
 | Autoría del Informe | **2 firmantes** (Carlos del Moral Campaña, María José Molina Rueda — Epidemiología, Distrito Granada-Metropolitano) |
-| IBSE (muestra **mixta**) | n=909 · nValid=811 · media IBSE total=63,2 · `sampleScope: "mixed"` · sin desglose etario |
+| IBSE (muestra **mixta**) | n=910 · nValid=811 · IBSE total 62,2 · Vínculo 72,4 · Situación 60,3 · Control 51,1 · Persona 65,0 (escala común 0–100) · `sampleScope: "mixed"` · distribución edad×sexo (810 asignables) |
 
 ## Fuentes incluidas
 
@@ -64,12 +77,13 @@ Verificado en la suite (caso 13): si una fuente cambia, la validación falla.
 |---|---|---|---|
 | `fixtures/health-reports/Informe_Salud_Atarfe.docx` | municipal real (documento primario) | Base epidemiológica oficial (**N**), preservada sin atomizar y con su autoría (Art. 16) | `health-report`, `territorialScale: municipio`, `contentMode: full-text-non-atomized` |
 | `fixtures/ibse-atarfe.csv` | `municipal-demo` (REDCap Monitor IBSE Atarfe 2026) | Único estudio genuinamente municipal (**+1**) → cumple la regla N+1. Muestra **mixta** (`sampleScope: "mixed"`) | `redcap-export` + tag `ibse`, `territorialScale: municipio`, `contentMode: atomized` |
-| Localiza Salud — 5 activos para la salud de Atarfe (portal del Ministerio de Sanidad, [maparecursos](https://localizasalud.sanidad.gob.es/maparecursos/main/)) | municipal real (recursos comunitarios publicados) | Activos para la salud (**+1** comunitario adicional, Art. 7 bis A) | `localiza-salud`, origen `localiza-salud`, `territorialScale: municipio`, `contentMode: atomized`; texto fuente verbatim en `sourceText` |
+| Localiza Salud — 20 activos para la salud de Atarfe (portal del Ministerio de Sanidad, [maparecursos](https://localizasalud.sanidad.gob.es/maparecursos/main/)) | municipal real (recursos comunitarios publicados) | Activos para la salud (**+1** comunitario adicional, Art. 7 bis A) | `localiza-salud`, origen `localiza-salud`, `territorialScale: municipio`, `contentMode: atomized`; texto fuente verbatim en `sourceText` |
 
 ### Activos para la salud — Localiza Salud (Opción B)
 
-Cinco recursos comunitarios publicados en el portal **Localiza Salud** del
-Ministerio de Sanidad para Atarfe. Se ingieren por la **misma ruta documental**
+Veinte recursos comunitarios publicados en el portal **Localiza Salud** del
+Ministerio de Sanidad para Atarfe (los cinco iniciales y quince añadidos con las tablas
+aportadas el 05/11/2026 y el 09/11/2026; tres sin identificador del portal). Se ingieren por la **misma ruta documental**
 que Granada-Zaidín (`kind: "localiza-salud"` → un `EvidenceAtom` `asset` por
 línea, origen `localiza-salud`), sin ampliar `EvidenceAtom` ni ningún contrato
 compartido y sin crear un modelo paralelo.
@@ -88,7 +102,9 @@ de su columna, porque `EvidenceAtom` no admite arrays y **no se extiende** para
 forzar uno. Las **erratas de origen** («útliles», «MUNUMENTOS») se preservan sin
 corrección silenciosa. El **título** de cada átomo es la primera columna (Nombre).
 
-Correspondencia identificador externo (IdLocaliza) → ID interno de átomo:
+Correspondencia identificador externo (IdLocaliza) → ID interno de átomo de los
+cinco activos iniciales (los quince añadidos llevan IdLocaliza y UrlDetalle en el
+TSV cuando la tabla de origen los trae; los tres sin identificador, columnas vacías):
 
 | Nombre | IdLocaliza (externo) | ID interno de átomo | UrlDetalle |
 |---|---|---|---|
@@ -135,21 +151,22 @@ marcada** (`src/appWorkspaceHydration.ts`): añade únicamente `doc-localiza-ata
 - El Informe de Salud es la fuente diagnóstica primaria; se conserva íntegro y no
   genera evidencia atomizada (D-HR-01).
 - El IBSE es un instrumento de **origen escolar**, pero la muestra de Atarfe es
-  **mixta**: incluye menores de 16 y personas de 16 o más. El export **no** aporta
-  desglose etario (`strataCounts` ausente), por lo que **SAM no es evaluable por
-  estrato con este export**: no se produce dictamen de representatividad ni para
-  menores ni para 16+. Nunca se reutiliza el `nValid` total (811) contra dos
-  poblaciones distintas. La ausencia de SAM etario **no invalida** el estudio: el
-  IBSE sigue siendo un +1 municipal válido para la regla N+1.
+  **mixta**: personas de 13 a 88 años. Desde el export del 05/11/2026 trae sexo y
+  edad de cada registro (`ageSexObserved`: 810 de los 811 válidos asignables; uno
+  registra 1993 y queda fuera de banda), de modo que SAM describe la composición
+  por edad y sexo frente al padrón. La muestra sigue siendo no probabilística:
+  la descripción no equivale a un dictamen de representatividad. Nunca se
+  reutiliza el `nValid` total (811) contra dos poblaciones distintas. El IBSE
+  sigue siendo un +1 municipal válido para la regla N+1.
 - **Cautelas de muestra (dentro del propio artefacto)**: el estudio IBSE y **cada
-  uno de sus átomos** llevan dos cautelas: (1) «Muestra municipal mixta: incluye
-  menores de 16 y personas de 16 o más; el export disponible no permite desglosar
-  los resultados por edad»; (2) «Los valores corresponden a la muestra municipal
+  uno de sus átomos** llevan, entre otras, dos cautelas: (1) «Muestra municipal
+  mixta, de 13 a 88 años, recogida entre el 6 de marzo y el 26 de abril de 2026…;
+  no probabilística»; (2) «Los valores corresponden a la muestra municipal
   participante; no se ha demostrado representatividad poblacional por estrato con
   este export». Los átomos cuantitativos dicen «Media de la muestra municipal
   participante», nunca «Media municipal». El documento se titula «Monitor IBSE
   Atarfe 2026 (muestra mixta)».
-- Regla N+1 (Art. 7 bis A): Informe (N) + IBSE municipal + 5 activos Localiza Salud.
+- Regla N+1 (Art. 7 bis A): Informe (N) + IBSE municipal + 20 activos Localiza Salud.
   Hay **dos caminos +1 independientes** (estudio complementario y activos): el
   Perfil sigue siendo compilable con cualquiera de ellos por separado. El gate
   `G-LHC-8` solo dispara si se retiran **ambas** fuentes; no se ha alterado el gate

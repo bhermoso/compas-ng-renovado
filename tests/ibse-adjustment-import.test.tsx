@@ -50,10 +50,10 @@ describe("IBSE import with a separate demographic adjustment", () => {
     expect(html).toContain("pendiente de validación humana");
   });
 
-  it("blocks missing demographic data in the real repository fixture", async () => {
+  it("blocks the adjustment when a real record has an impossible age (Atarfe, edad 1993)", async () => {
     const parsed = await prepareIBSEImport(readFileSync("fixtures/ibse-atarfe.csv", "utf8"), "atarfe", "15-plus");
     expect(parsed.demographicAdjustment.status).toBe("blocked");
-    expect(parsed.aggregates.meanTotal).toBe(63.2);
+    expect(parsed.aggregates.meanTotal).toBe(62.2);
   });
 
   it.each([

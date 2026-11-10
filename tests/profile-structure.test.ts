@@ -286,3 +286,10 @@ describe("Regresión · guardado de Alfacar v0.2/v0.3 con conclusiones contiguas
     expect(parseProfileStructure(text).conclusions).toEqual([]);
   });
 });
+
+describe("Recomendaciones numeradas con punto («R1. …»)", () => {
+  it("no incorpora el punto del número al texto de la recomendación", () => {
+    const s = parseProfileStructure(["5. Recomendaciones del Perfil", "Conocer. Recuperar los datos que faltan", "R1. Incorporar la renta por sección censal.", "Deriva de C1."].join("\n\n"));
+    expect(s.recommendations[0]).toMatchObject({ id: "R1", type: "Conocer", derivesFrom: "C1", text: "Incorporar la renta por sección censal." });
+  });
+});

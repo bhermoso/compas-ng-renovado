@@ -1,6 +1,6 @@
 # CONTRATO DEL CATÁLOGO TEMÁTICO DEL PLAN DE ACCIÓN
 
-> PA-RELAS-02 · Versión 1.0 — 2026-09-04  
+> PA-RELAS-02 · Versión 1.1 — 2026-11-09 (versión 1.0: 2026-09-04)  
 > Estado: VIGENTE
 
 ## 1. Posición en la cadena
@@ -21,6 +21,20 @@ de Salud del Distrito Zaidín 2027–2030:
 |---|---:|---:|---:|
 | Envejecimiento saludable | 9 | 18 | 18 |
 | Prevención y abordaje de las adicciones | 6 | 12 | 12 |
+
+Versión 1.1 (2026-11-09): se añade un tercer módulo, en construcción:
+
+| Módulo | Objetivos generales | Objetivos específicos | Indicadores trazadores |
+|---|---:|---:|---:|
+| Bienestar emocional y salud mental (versión 0.1) | 7 | 17 | 17 |
+
+Procede de una propuesta de COMPÁS elaborada a partir del I Plan Estratégico de
+Salud Mental y Adicciones de Andalucía 2026–2029 (líneas 1, 2 y 5), la
+Estrategia de Promoción de una Vida Saludable en Andalucía (objetivos 1.4, 1.6 y
+1.7), la Estrategia de Salud Mental del SNS 2022–2026 (líneas 2 y 3) y el
+Monitor de bienestar socioemocional de Atarfe 2026. Se orienta a la promoción y
+la prevención desde el ámbito local; la atención clínica corresponde al SSPA.
+Hasta su revisión técnica es una propuesta para deliberación, no un módulo validado.
 
 Cada módulo conserva versión, procedencia, códigos y cautelas. La fuente es una
 propuesta reutilizable, no evidencia de que sus contenidos sean adecuados para

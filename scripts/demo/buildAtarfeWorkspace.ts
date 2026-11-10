@@ -37,9 +37,9 @@ import { fileURLToPath } from "node:url";
 import { createCompleteMunicipalityWorkspace } from "../../src/application/workspace";
 import { createHealthReportDocumentFromDocx } from "../../src/application/health-report";
 import { parseIBSECSV, ibseStudyToEvidenceAtoms } from "../../src/application/ibse";
+import { ageBandsForMunicipality } from "../../src/application/sam/ageBandsForMunicipality";
 import {
   createIBSEStudy,
-  IBSE_MIXED_SAMPLE_SENTENCE,
   IBSE_PARTICIPANT_SAMPLE_CAUTION,
 } from "../../src/domain/ibse";
 import {
@@ -85,7 +85,7 @@ export const IBSE_DOCUMENT_ID = "doc-ibse-atarfe"; // documento del repositorio 
 export const ATARFE_INPUT_SHA256 = {
   healthReportDocx:
     "597fcacf0342eeb8970ef61b3a9b1d58cfe9eeb1c6703af7639e843a6c5b8e2c",
-  ibseCsv: "982098071c19ef43df8ed8123f0999115a1361f32b096e5fc53e077a5f6c9256",
+  ibseCsv: "3f23693fb62f80bbfd12c55a6da054110deb2d48dca9eaa5599b0a75c36f25be",
 } as const;
 
 const HEALTH_REPORT_DOCX = fixturePath("health-reports/Informe_Salud_Atarfe.docx");
@@ -125,8 +125,13 @@ const HEALTH_REPORT_AUTHORS: HealthReportAuthor[] = [
 export const ATARFE_IBSE_SAMPLE_SCOPE = "mixed" as const;
 
 // Cautelas de muestra que viajan en el estudio y en cada átomo IBSE.
+export const ATARFE_IBSE_MIXED_SAMPLE_SENTENCE =
+  "Muestra municipal mixta, de 13 a 88 años, recogida entre el 6 de marzo y el 26 de abril de 2026 " +
+  "con cuestionario en papel y por QR, en institutos y otros espacios del municipio; no probabilística. " +
+  "El export trae sexo y edad de cada registro: 810 de los 811 válidos tienen edad asignable " +
+  "(uno registra 1993 y se declara fuera de banda).";
 export const ATARFE_IBSE_SAMPLE_CAUTIONS: readonly string[] = [
-  IBSE_MIXED_SAMPLE_SENTENCE,
+  ATARFE_IBSE_MIXED_SAMPLE_SENTENCE,
   IBSE_PARTICIPANT_SAMPLE_CAUTION,
 ];
 
@@ -148,12 +153,14 @@ export const ATARFE_IBSE_SAMPLE_CAUTIONS: readonly string[] = [
 // forzar uno. Las erratas de origen ("útliles", "MUNUMENTOS") se preservan sin
 // corrección silenciosa. El título del átomo es la primera columna (Nombre).
 export const LOCALIZA_DOCUMENT_ID = "doc-localiza-atarfe"; // documento del repositorio (estable)
-export const LOCALIZA_ASSET_COUNT = 5;
+export const LOCALIZA_ASSET_COUNT = 20; // 61419 y 61585 comparten título: posible duplicado sin confirmar
 // Marca versionada de migración incremental. El seed canónico la lleva estampada,
 // de modo que una hidratación limpia o un reemplazo completo quedan marcados como
 // aplicados y no vuelven a proponer la migración. Debe coincidir con la entrada de
 // INCREMENTAL_SEED_MIGRATIONS en src/appWorkspaceHydration.ts (verificado en tests).
 export const LOCALIZA_MIGRATION_MARKER = "atarfe-localiza-v1";
+// Marca de la actualización del 2026-11-09 (IBSE recalculado por ítems + 17 fichas Localiza).
+export const ATARFE_UPDATE_MARKER = "atarfe-documentacion-canonica-v3";
 export const LOCALIZA_SALUD_ATARFE_URL_BASE =
   "https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=";
 export const LOCALIZA_SALUD_ATARFE_TEXT = [
@@ -162,6 +169,27 @@ export const LOCALIZA_SALUD_ATARFE_TEXT = [
   "Punto Vuela Atarfe | Los Puntos Vuela son espacios digitales que ofrecen equipamiento, acceso y formación en competencias digitales y tecnologías emergentes a toda la ciudadanía. Con apoyo personalizado, facilitan el acceso a servicios electrónicos y herramientas digitales útliles para la vida diaria, educación, empleo, salud, finanzas o administración. | Cualquiera | Población general | Otros | Granada | Atarfe | 60152 | https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=60152",
   "Taller de Coro del Centro de Participación Activa de Atarfe | Los Centros de Participación Activa son recursos destinados a mejorar la calidad de vida de las personas mayores, favoreciendo su bienestar, la convivencia, la integración social y su participación en la comunidad. Además sirven de apoyo para la prestación de Servicios Sociales y Asistenciales a otros sectores de la población. Destacan sus talleres de envejecimiento activo, orientados a mantener la autonomía, prevenir la dependencia y el aislamiento, y promover hábitos saludables. Algunos de sus talleres son: Gimnasia de mantenimiento, taller de memoria, baile, castañuelas, manualidades, coro, cocina, informática...(cada centro poner los talleres que ofrece) | Cualquiera | Otros | Bienestar emocional, Cultura y ocio, Alimentación saludable, Envejecimiento activo, Participación y acción comunitaria | Granada | Atarfe | 61425 | https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=61425",
   "Taller de Senderismo del Centro de Participación Activa de Atarfe | EN ESTE TALLER SE RECOGE DOS PARTES UNA LA ACTIVIDAD FISICA Y LA OTRA LAS VISITAS QUE SE HACEN A LOS DIFERENTES MUNICIPIOS O MUNUMENTOS | Cualquiera | Otros | Actividad física | Granada | Atarfe | 61429 | https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=61429",
+  // Ampliación 2026-11-09: doce fichas más de la tabla de Localiza Salud aportada el 05/11/2026
+  // (17 fichas en total). Textos verbatim de esa tabla; no se ha verificado en línea su vigencia.
+  // «Centro de Participación Activa de Atarfe» figura con dos ID (61419 y 61585): se conservan
+  // las dos fichas, cada una con su átomo, como posible duplicado pendiente de comprobar.
+  "Asociación Artística y Cultural Ciudad Atarfe | Lugar en el que se imparten Enseñanzas elementales básicas de música, Práctica Instrumental y Práctica de Danza. | Cualquiera | Población general | Escuela de salud/formación, Bienestar emocional, Actividad física, Envejecimiento activo, Cultura y ocio | Granada | Atarfe | 61948 | https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=61948",
+  "Biblioteca Pública Municipal Marian Pineda de Atarfe | Biblioteca municipal de Atarfe que cuenta con el siguiente horario: Invierno: L-V de 10 A 14 horas . Tardes: martes y jueves de 16 a21 horas. SABADOS Cerrado . Verano: L-V de 9 A 14. | Cualquiera | Población general | Escuela de salud/formación, Participación y acción comunitaria, Cultura y ocio | Granada | Atarfe | 61912 | https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=61912",
+  "Centro Cívico Almudena Grandes de Atarfe | Espacio que cuenta con diferentes salas, donde se desarrollan actividades a través de instituciones como el Centro de Salud o Cruz Roja. También tiene sala de estudio y es punto de reunión para la población con la finalidad de incrementar la participación ciudadana en ciertos ámbitos. Su horario es de lunes a viernes de 9 - 14h y de 16 - 21h. Acceso adaptado para sillas de ruedas. | Cualquiera | Población general | Escuela de salud/formación, Bienestar emocional, Personas en riesgo de exclusión, Envejecimiento activo, Participación y acción comunitaria | Granada | Atarfe | 61919 | https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=61919",
+  "Centro de Participación Activa de Atarfe | Los Centros de Participación Activa son recursos destinados a mejorar la calidad de vida de las personas mayores, favoreciendo su bienestar, la convivencia, la integración social y su participación en la comunidad. Además sirven de apoyo para la prestación de Servicios Sociales y Asistenciales a otros sectores de la población. Destacan sus talleres de envejecimiento activo, orientados a mantener la autonomía, prevenir la dependencia y el aislamiento, y promover hábitos saludables. Algunos de sus talleres son: Gimnasia de mantenimiento, taller de memoria, senderismo, pintura... | Cualquiera | Mayores de 64 años | Bienestar emocional, Actividad física, Alimentación saludable, Envejecimiento activo, Participación y acción comunitaria | Granada | Atarfe | 61585 | https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=61585",
+  "Centro Público de Educación de Personas Adultas Mariana Pineda de Atarfe | El Centro de Educación para Personas Adultas ofrece Educación Básica, Educación Secundaria Obligatoria, Informática e Inglés Básico para Personas Adultas. | Cualquiera | Mayores de 64 años, Adultos (30-64 años) | Escuela de salud/formación, Bienestar emocional, Alimentación saludable, Envejecimiento activo, Participación y acción comunitaria | Granada | Atarfe | 61587 | https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=61587",
+  "Espacio Joven Atarfe | Espacio que ofrece los siguientes servicios: Información y asesoramiento juvenil, ocio y tiempo libre, formación y empleo, carné joven, participación (voluntariado) y ayudas y subvenciones. | Cualquiera | Adolescentes (12-17 años), Jóvenes (18-29 años) | Bienestar emocional, Participación y acción comunitaria, Cultura y ocio | Granada | Atarfe | 61945 | https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=61945",
+  "GIMNASIA MENTAL | Un taller de estimulación cognitiva para personas mayores mejora la memoria, la atención y el razonamiento. Ayuda a frenar el deterioro mental, fomenta la autonomía personal y reduce el aislamiento social a través de dinámicas grupales y ejercicios prácticos adaptados. | Cualquiera | Otros | Otros | Granada | Atarfe | 61427 | https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=61427",
+  "Grupo de Afrontamiento de la Ansiedad en Atención Primaria (GRAFA) | Grupo de afrontamiento de la ansiedad (GRAFA) en el Centro de Salud de Atarfe dirigidos a hombres y mujeres con la finalidad de mejorar la gestión emocional y aliviar los niveles de estrés. | Cualquiera | Mayores de 64 años, Jóvenes (18-29 años), Adultos (30-64 años) | Bienestar emocional | Granada | Atarfe | 47600 | https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=47600",
+  "Grupo Socioeducativo (GRUSE - Centro de Salud de Atarfe) | Los Grupos Socioeducativos de Atención Primaria de Salud (GRUSE) son grupos de ayuda para personas con malestar emocional que proporcionan recursos para resolver los problemas del día a día. Se trata de grupos de 8 a 15 personas (hombres o mujeres) que se reúnen en sesiones semanales, moderadas por el trabajador o la trabajadora social del Centro de Salud y en las que se abordan temas como la comunicación, la autoestima, la resolución de problemas, etc… | Cualquiera | Mayores de 64 años, Jóvenes (18-29 años), Adultos (30-64 años) | Bienestar emocional, Participación y acción comunitaria, Género/identidad | Granada | Atarfe | 61584 | https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=61584",
+  "Radio Ilíberis 101.5 FM de Atrafe | Emisora de radio municipal que ofrece música y programas informativos en salud y cuidados. | Cualquiera | Población general | Participación y acción comunitaria, Cultura y ocio | Granada | Atarfe | 61944 | https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=61944",
+  "Taller de sueño saludable | Talleres grupales que se imparten de manera periódica en el Centro de Salud de Atarfe, dirigidos a población general con interés en mejorar su higiene de sueño. | Cualquiera | Mayores de 64 años, Jóvenes (18-29 años), Adultos (30-64 años) | Bienestar emocional, Enfermedades crónicas, Participación y acción comunitaria | Granada | Atarfe | 63552 | https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=63552",
+  "Talleres Artísticos Ciudad de Atarfe | Talleres artísticos con inscripción a través de la Escuela de Música y Danza Ciudad de Atarfe (C/ Alfonso Bailón Verdejo nº4). Cuentan con clases de manualidades, a partir de los 12 años y con restauración a partir de los 18. El precio es de 30 euros al año por la matrícula y 30 euros al mes por tres horas semanales. | Cualquiera | Mayores de 64 años, Adolescentes (12-17 años), Jóvenes (18-29 años), Adultos (30-64 años) | Bienestar emocional, Envejecimiento activo, Cultura y ocio | Granada | Atarfe | 61922 | https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=61922",
+  // Ampliación 2026-11-09 (tabla de 20 registros aportada por el usuario): tres recursos sin
+  // identificador ni URL de detalle en la tabla; las columnas IdLocaliza y UrlDetalle quedan vacías.
+  "Centro Cultural Medina Elvira | El Centro Cultural Medina Elvira es un espacio destinado al desarrollo de actividades y espectáculos. | Cualquiera | Población general | Cultura y ocio, Participación y acción comunitaria | Granada | Atarfe |  | ",
+  "Club de senderismo Castillejo | Club de Senderismo Castillejo de Atarfe. Entrenamiento en paraje de Sierra Elvira y los Tres Juanes. También rutas programadas por municipios de Granada. | Cualquiera | Población general | Actividad física, Envejecimiento activo, Participación y acción comunitaria | Granada | Atarfe |  | ",
+  "Unidad de salud mental comunitaria de Atarfe | Atiende a pacientes ambulatorios con necesidad de seguimiento por parte de Salud Mental. Cuenta con psiquiatras, enfermero, psicólogo y trabajador social. Ubicado en el Centro de Salud Atarfe (entrada por Avda. de la Libertad, s/n). Pertenece al Hospital Universitario Virgen de las Nieves. | Cualquiera | Población general | Prevención del suicidio, Otras adicciones, Enfermedades crónicas, Escuela de salud/formación, Bienestar emocional | Granada | Atarfe |  | ",
 ].join("\n");
 
 // Correspondencia identificador externo → título (para trazabilidad de pruebas).
@@ -171,6 +199,18 @@ export const LOCALIZA_ATARFE_EXTERNAL_IDS: readonly string[] = [
   "60152",
   "61425",
   "61429",
+  "61948",
+  "61912",
+  "61919",
+  "61585",
+  "61587",
+  "61945",
+  "61427",
+  "47600",
+  "61584",
+  "61944",
+  "63552",
+  "61922",
 ];
 
 export interface AtarfeBuildResult {
@@ -306,13 +346,22 @@ export async function buildAtarfeWorkspace(): Promise<AtarfeBuildResult> {
   // Muestra MIXTA (menores de 16 y 16 o más) sin desglose etario en el export:
   // se marca `sampleScope: "mixed"` y se anteponen las cautelas de muestra a las
   // del parser, de modo que viajen con el estudio y con cada átomo (limitations).
-  const ibseParsed = parseIBSECSV(readFileSync(IBSE_CSV, "utf-8"));
+  const ibseParsed = parseIBSECSV(readFileSync(IBSE_CSV, "utf-8"), {
+    ageBands: ageBandsForMunicipality(ATARFE_ID),
+  });
   const ibseStudy = createIBSEStudy({
     municipalityId: ATARFE_ID,
     sourceFileName: "ibse-atarfe.csv",
     aggregates: ibseParsed.aggregates,
     sampleScope: ATARFE_IBSE_SAMPLE_SCOPE,
-    // Sin `strataCounts`: el CSV no aporta recuentos válidos por edad.
+    // Sin `strataCounts`: un registro válido tiene una edad imposible (1993), de modo
+    // que los estratos <16 y 16+ no cuadran con nValid. La distribución edad×sexo sí
+    // se conserva (`ageSexObserved`) para que SAM describa la composición.
+    ageSexObserved: ibseParsed.ageSexObserved && {
+      cells: ibseParsed.ageSexObserved.cells,
+      assignedCount: ibseParsed.ageSexObserved.assignedCount,
+      unassignableCount: ibseParsed.ageSexObserved.unassignableCount,
+    },
     methodologicalCautions: [
       ...ATARFE_IBSE_SAMPLE_CAUTIONS,
       ...ibseParsed.methodologicalCautions,
@@ -385,7 +434,7 @@ export async function buildAtarfeWorkspace(): Promise<AtarfeBuildResult> {
   // El seed canónico ya contiene Localiza Salud: se marca la migración incremental
   // como aplicada, de modo que una hidratación limpia o un reemplazo completo del
   // seed queden marcados y no vuelvan a proponer la migración (App.tsx).
-  ws = { ...ws, appliedSeedMigrations: [LOCALIZA_MIGRATION_MARKER] };
+  ws = { ...ws, appliedSeedMigrations: [LOCALIZA_MIGRATION_MARKER, ATARFE_UPDATE_MARKER] };
 
   const healthReportAtoms = ws.evidenceStore.atoms.filter(
     (a) => a.provenance.origin === "health-report"

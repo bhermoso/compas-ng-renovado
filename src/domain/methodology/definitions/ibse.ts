@@ -295,10 +295,11 @@ export const IBSE_MODULE: MethodologicalModule = {
     completionCriteria:
       "Registro completo: respuesta válida a los 8 ítems del instrumento.",
     notes:
-      "La implementación actual recibe de REDCap puntuaciones de factor e índice ya calculadas " +
-      "a nivel individual (pasos 2-3 ejecutados por REDCap). El parser realiza el filtrado " +
-      "y la agregación municipal (pasos 4-5). Esta es una limitación del adaptador actual, " +
-      "no del algoritmo canónico.",
+      "Cuando el export trae los ocho ítems, el parser ejecuta los pasos 2 a 5 desde las respuestas " +
+      "individuales: cada ítem se lleva a 0–100 (más es mejor), cada factor es la media de sus dos ítems " +
+      "y el total, la media de los cuatro factores. Las puntuaciones calculadas por el proyecto REDCap " +
+      "Monitor IBSE Atarfe 2026 no se usan: sus fórmulas no comparten escala (Vínculo 0–75; Situación y " +
+      "Control 25–100; Persona 0–100). Sin ítems, el parser lee las columnas calculadas por compatibilidad.",
   },
 
   interpretation: {
@@ -341,8 +342,7 @@ export const IBSE_MODULE: MethodologicalModule = {
         "Andalucía ≈ 75.94 · Granada ≈ 81.78. Pendiente contraste con EAS oficial.",
     },
     contextualNotes: [
-      "Escala 0–100. REDCap calcula los factores individuales (pre-aggregated); " +
-      "el parser agrega al nivel municipal.",
+      "Escala 0–100 común a los cuatro factores y al total, calculada desde los ítems cuando el export los incluye.",
       "Los umbrales (alto ≥75, medio 60–74, medio-bajo 50–59, bajo <50) son heurísticos " +
       "del sistema, NO normativos ni clínicos. No tienen validez científica independiente.",
       "Valores de referencia históricos (pendientes de contraste con EAS oficial): " +

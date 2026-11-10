@@ -38,6 +38,12 @@ export interface SeedDocumentMigration {
   expectedMinDocuments?: number;
   /** Umbral mínimo esperable de átomos de evidencia derivados del seed. */
   expectedMinEvidenceAtoms?: number;
+  /**
+   * Sustituye el estudio IBSE canónico (mismo id que el del seed) y sus átomos por
+   * los del seed. Solo actúa si el expediente conserva el estudio canónico: un IBSE
+   * importado por la persona usuaria (otro id) o un documento IBSE eliminado no se tocan.
+   */
+  refreshCanonicalIbseStudy?: boolean;
 }
 
 /**
@@ -56,10 +62,13 @@ export const INCREMENTAL_SEED_MIGRATIONS: readonly SeedDocumentMigration[] = [
   {
     municipalityId: "atarfe",
     documentId: "__all__",
-    marker: "atarfe-documentacion-canonica-v2",
+    // v3 (2026-11-09): IBSE recalculado desde los ítems en escala común 0–100 y
+    // 20 recursos de Localiza Salud. Sustituye a v2 (IBSE con escalas de REDCap, 5 fichas).
+    marker: "atarfe-documentacion-canonica-v3",
     mergeAllDocuments: true,
     expectedMinDocuments: 3,
-    expectedMinEvidenceAtoms: 11,
+    expectedMinEvidenceAtoms: 26,
+    refreshCanonicalIbseStudy: true,
   },
   {
     municipalityId: "alfacar",
@@ -293,6 +302,19 @@ export function applySeedDocumentMigration(
   const migratedDocIds = new Set(seedDocs.map((d) => d.id));
   const deletedIds = new Set((current.deletedDocuments ?? []).map(d => d.documentId));
   const docsToAdd = seedDocs.filter((d) => !existingDocIds.has(d.id) && !deletedIds.has(d.id));
+  // Estudio IBSE canónico desactualizado: se sustituyen estudio y átomos por los del seed.
+  const refreshIbse =
+    migration.refreshCanonicalIbseStudy === true &&
+    seed.ibseStudy !== undefined &&
+    current.ibseStudy !== undefined &&
+    current.ibseStudy.id === seed.ibseStudy.id &&
+    JSON.stringify(current.ibseStudy.aggregates) !== JSON.stringify(seed.ibseStudy.aggregates) &&
+    !deletedIds.has("doc-ibse-" + current.municipality.identity.id);
+  const ibseAtomPrefix = `ibse:${current.municipality.identity.id}:`;
+  const seedIbseAtoms = refreshIbse
+    ? seed.evidenceStore.atoms.filter((a) => a.id.startsWith(ibseAtomPrefix))
+    : [];
+  const refreshedIbseIds = new Set(seedIbseAtoms.map((a) => a.id));
   const atomsToAdd = seed.evidenceStore.atoms.filter(
     (a) =>
       a.provenance.documentId !== undefined &&
@@ -303,11 +325,15 @@ export function applySeedDocumentMigration(
   if (
     (current.appliedSeedMigrations ?? []).includes(migration.marker) &&
     docsToAdd.length === 0 &&
-    atomsToAdd.length === 0
+    atomsToAdd.length === 0 &&
+    !refreshIbse
   ) {
     return current;
   }
   const stamp = seed.updatedAt;
+  const baseAtoms = refreshIbse
+    ? current.evidenceStore.atoms.map((a) => (refreshedIbseIds.has(a.id) ? seedIbseAtoms.find((s) => s.id === a.id)! : a))
+    : current.evidenceStore.atoms;
 
   const merged: MunicipalityWorkspace = {
     ...current,
@@ -320,13 +346,14 @@ export function applySeedDocumentMigration(
             updatedAt: stamp,
           },
     evidenceStore:
-      atomsToAdd.length === 0
+      atomsToAdd.length === 0 && !refreshIbse
         ? current.evidenceStore
         : {
             ...current.evidenceStore,
-            atoms: [...current.evidenceStore.atoms, ...atomsToAdd],
+            atoms: [...baseAtoms, ...atomsToAdd],
             updatedAt: stamp,
           },
+    ...(refreshIbse ? { ibseStudy: seed.ibseStudy } : {}),
     updatedAt: stamp,
   };
   return withMarker(merged, migration.marker);

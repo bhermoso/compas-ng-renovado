@@ -47,6 +47,11 @@ export const IBSE_MIXED_SAMPLE_SENTENCE_WITH_BREAKDOWN =
 // Cautela de "muestra participante": los valores describen a quien respondió, no
 // a una población representada. Viaja en el estudio y en cada átomo cuando no hay
 // representatividad demostrada por estrato.
+export const IBSE_MIXED_SAMPLE_SENTENCE_WITH_AGE_SEX =
+  "Muestra municipal mixta: incluye menores de 16 y personas de 16 o más; el export trae " +
+  "edad y sexo de los participantes y permite describir su composición, aunque los recuentos " +
+  "por estrato no cuadran con los totales (hay registros sin edad asignable).";
+
 export const IBSE_PARTICIPANT_SAMPLE_CAUTION =
   "Los valores corresponden a la muestra municipal participante; no se ha " +
   "demostrado representatividad poblacional por estrato con este export.";
@@ -132,6 +137,8 @@ export interface DescribeIBSESampleScopeOptions {
    * debe pasar `true` para no contradecir a la UI que muestra ambos dictámenes.
    */
   hasValidBreakdown?: boolean;
+  /** Para `mixed` sin desglose válido: ¿trae el estudio la distribución edad×sexo? */
+  hasAgeSexDistribution?: boolean;
 }
 
 export function describeIBSESampleScope(
@@ -158,7 +165,9 @@ export function describeIBSESampleScope(
         shortLabel: "Muestra municipal mixta",
         sampleSentence: options.hasValidBreakdown === true
           ? IBSE_MIXED_SAMPLE_SENTENCE_WITH_BREAKDOWN
-          : IBSE_MIXED_SAMPLE_SENTENCE,
+          : options.hasAgeSexDistribution === true
+            ? IBSE_MIXED_SAMPLE_SENTENCE_WITH_AGE_SEX
+            : IBSE_MIXED_SAMPLE_SENTENCE,
       };
     case "unknown":
     default:
