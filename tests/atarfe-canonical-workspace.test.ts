@@ -1,3 +1,4 @@
+import { validateIBSEStrataCounts } from "../src/domain/ibse/ibseSampleScope";
 /**
  * Expediente canónico de Atarfe — validación e hidratación.
  *
@@ -327,9 +328,15 @@ describe("expediente canónico de Atarfe", () => {
     const { workspace } = await buildAtarfeWorkspace();
     const study = workspace.ibseStudy!;
 
-    // Discriminador de muestra explícito: mixta, sin desglose por estrato.
+    // Discriminador de muestra explícito: mixta, con desglose por estrato que cuadra
+    // (el registro con año de nacimiento 1993 pasa a 33 años; 11 incompletos sin edad).
     expect(study.sampleScope).toBe("mixed");
-    expect(study.strataCounts).toBeUndefined();
+    expect(study.strataCounts).toMatchObject({
+      under16: { n: 162, nValid: 145, means: { meanTotal: 67.6 } },
+      plus16: { n: 737, nValid: 666, means: { meanTotal: 61 } },
+      noAge: { n: 11, nValid: 0 },
+    });
+    expect(validateIBSEStrataCounts(study.strataCounts, study.aggregates).valid).toBe(true);
 
     // Las cautelas de muestra mixta y de "muestra participante" viajan con el estudio…
     expect(study.methodologicalCautions).toContain(ATARFE_IBSE_MIXED_SAMPLE_SENTENCE);
@@ -452,8 +459,8 @@ describe("expediente canónico de Atarfe", () => {
       plus16: { n: 389, nValid: 341 },
     });
 
-    // El export real de Atarfe no trae strataCounts (muestra mixta sin desglose).
-    expect((base.ibseStudy as Record<string, unknown>).strataCounts).toBeUndefined();
+    // El export real de Atarfe trae strataCounts (menores de 16 y 16 o más).
+    expect((base.ibseStudy as Record<string, unknown>).strataCounts).toBeDefined();
   });
 
   // ── VALIDACIÓN — activos para la salud de Localiza Salud (+1) ───────────────
@@ -593,7 +600,7 @@ describe("expediente canónico de Atarfe", () => {
     const ws = parseWorkspaceJSON(EXPORT_RAW)!;
     expect(ws.appliedSeedMigrations).toEqual([LOCALIZA_MIGRATION_MARKER, ATARFE_UPDATE_MARKER]);
     expect(LOCALIZA_MIGRATION_MARKER).toBe("atarfe-localiza-v1");
-    expect(ATARFE_UPDATE_MARKER).toBe("atarfe-documentacion-canonica-v4");
+    expect(ATARFE_UPDATE_MARKER).toBe("atarfe-documentacion-canonica-v5");
     // El seed público lleva las mismas marcas (copia byte a byte del export).
     expect(parseWorkspaceJSON(SEED_RAW)!.appliedSeedMigrations).toEqual([
       LOCALIZA_MIGRATION_MARKER,

@@ -68,11 +68,11 @@ export const INCREMENTAL_SEED_MIGRATIONS: readonly SeedDocumentMigration[] = [
   {
     municipalityId: "atarfe",
     documentId: "__all__",
-    // v4 (2026-11-10): como v3 (IBSE recalculado desde los ítems en escala común
-    // 0–100 y 20 recursos de Localiza Salud) y, además, actualiza el texto del
-    // documento de Localiza Salud, del que sale el recuento de activos. v3 añadía
-    // las fichas como evidencias, pero dejaba el documento con cinco líneas.
-    marker: "atarfe-documentacion-canonica-v4",
+    // v5 (2026-11-10): IBSE por estratos (menores de 16 y 16 o más, con sus medias;
+    // el registro con año de nacimiento 1993 pasa a 33 años). Incluye v4: documento
+    // de Localiza Salud con 20 recursos (recuento de activos) e IBSE recalculado
+    // desde los ítems en escala común 0–100.
+    marker: "atarfe-documentacion-canonica-v5",
     mergeAllDocuments: true,
     expectedMinDocuments: 3,
     expectedMinEvidenceAtoms: 26,
@@ -296,6 +296,12 @@ export function backfillSeedMigrationMarker(
  * documentos, evidencias y trabajo del usuario. Determinista: usa el sello canónico
  * del documento del seed (no `new Date()`). Idempotente por marca y por id de átomo.
  */
+/** Contenido comparable del estudio IBSE (sin fechas). */
+function ibseContent(study: NonNullable<MunicipalityWorkspace["ibseStudy"]>): string {
+  const { aggregates, strataCounts, ageSexObserved, methodologicalCautions, sampleScope } = study;
+  return JSON.stringify({ aggregates, strataCounts, ageSexObserved, methodologicalCautions, sampleScope });
+}
+
 export function applySeedDocumentMigration(
   current: MunicipalityWorkspace,
   seed: MunicipalityWorkspace,
@@ -318,7 +324,7 @@ export function applySeedDocumentMigration(
     seed.ibseStudy !== undefined &&
     current.ibseStudy !== undefined &&
     current.ibseStudy.id === seed.ibseStudy.id &&
-    JSON.stringify(current.ibseStudy.aggregates) !== JSON.stringify(seed.ibseStudy.aggregates) &&
+    ibseContent(current.ibseStudy) !== ibseContent(seed.ibseStudy) &&
     !deletedIds.has("doc-ibse-" + current.municipality.identity.id);
   const ibseAtomPrefix = `ibse:${current.municipality.identity.id}:`;
   const seedIbseAtoms = refreshIbse

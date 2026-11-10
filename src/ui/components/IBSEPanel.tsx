@@ -223,6 +223,32 @@ export function IBSEPanel({ ibseStudy, municipalityName }: IBSEPanelProps) {
           )}
         </p>
 
+        {/* Por estrato de edad: menores de 16 y 16 o más, cada uno con sus medias. */}
+        {hasValidBreakdown && ibseStudy.strataCounts?.under16?.means && ibseStudy.strataCounts?.plus16?.means && (
+          <table className="study-strata-table" data-ibse-strata="true">
+            <caption>Por estrato de edad (medias de cada estrato, escala 0–100)</caption>
+            <thead>
+              <tr>
+                <th scope="col">Estrato</th>
+                <th scope="col">Válidos</th>
+                {IBSE_FACTORS.map(({ label, field }) => <th key={field} scope="col">{label}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {([
+                ["Menores de 16", ibseStudy.strataCounts.under16],
+                ["16 años o más", ibseStudy.strataCounts.plus16],
+              ] as const).map(([label, stratum]) => (
+                <tr key={label}>
+                  <th scope="row">{label}</th>
+                  <td>{stratum.nValid}</td>
+                  {IBSE_FACTORS.map(({ field }) => <td key={field}>{stratum.means![field]}</td>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
         {/* Muestra */}
         <p className="study-report__footnote">
           n válido = {agg.nValid} · n bruto = {agg.n}

@@ -1,4 +1,5 @@
 import type { IBSEAggregates } from "../../domain/ibse";
+import type { IBSEStrataCounts, IBSEStratumMeans } from "../../domain/ibse/IBSEStudy";
 import type { IBSEMeanField } from "../../domain/ibse/IBSEAdjustment";
 import { getMethodologicalModule } from "../../domain/methodology";
 import { splitRow } from "../csv-utils/splitRow";
@@ -128,6 +129,12 @@ const EMPTY_AGGREGATES: IBSEAggregates = {
 export interface IBSECSVParseOptions {
   ageBands: AgeBand[];
   collectAdjustmentRows?: boolean;
+  /**
+   * Año de la encuesta. Si se indica, una «edad» con forma de año de nacimiento
+   * (entre 1900 y ese año, imposible como edad) se convierte en años: año de la
+   * encuesta menos año de nacimiento. Se declara en las cautelas.
+   */
+  surveyYear?: number;
 }
 
 export interface IBSECSVParseResult {
@@ -142,6 +149,11 @@ export interface IBSECSVParseResult {
    * Solo incluye filas válidas: monitor_ibse_complete=2 y puntuaciones numéricas (misma exclusión que los agregados; suma nValid).
    */
   ageSexObserved?: AgeSexObservedResult;
+  /**
+   * Recuentos y medias por estrato (menores de 16 / 16 o más), si el CSV trae
+   * `edad` y se pasaron opciones demográficas.
+   */
+  strataCounts?: IBSEStrataCounts;
 }
 
 export function parseIBSECSV(
@@ -204,10 +216,31 @@ export function parseIBSECSV(
   let onRedcapGrid = true;
   const onGrid = (x: number) => Math.abs(x / 12.5 - Math.round(x / 12.5)) < 1e-9;
   const adjustmentRows: NonNullable<IBSECSVParseResult["adjustmentRows"]> = [];
+  // Estratos de edad: recuentos de todos los registros y sumas de los válidos.
+  type StratumAcc = { n: number; nValid: number; t: number; v: number; s: number; c: number; p: number };
+  const newAcc = (): StratumAcc => ({ n: 0, nValid: 0, t: 0, v: 0, s: 0, c: 0, p: 0 });
+  const strata = { under16: newAcc(), plus16: newAcc(), noAge: newAcc() };
+  const birthYearAges: Array<{ raw: number; age: number }> = [];
+  const ageOf = (row: string[]): number | undefined => {
+    if (idxEdad === -1) return undefined;
+    const raw = row[idxEdad]?.trim();
+    const parsed = raw ? parseInt(raw, 10) : NaN;
+    if (!Number.isFinite(parsed)) return undefined;
+    const year = options?.surveyYear;
+    if (year !== undefined && parsed > 120 && parsed >= 1900 && parsed <= year) {
+      return year - parsed;
+    }
+    return parsed;
+  };
 
   for (let i = 1; i < lines.length; i++) {
     const row = splitRow(lines[i]);
     n++;
+    const rowAge = ageOf(row);
+    const stratum = rowAge === undefined || rowAge > 120
+      ? strata.noAge
+      : rowAge < 16 ? strata.under16 : strata.plus16;
+    stratum.n++;
 
     if (idx.completed !== -1 && row[idx.completed] !== COLS.completedValue) {
       continue;
@@ -239,18 +272,25 @@ export function parseIBSECSV(
     // puntuaciones numéricas (misma exclusión que los agregados, de modo que el recuento
     // por edad y sexo suma nValid).
     if (hasDemographics && options?.ageBands) {
-      const rawEdad = row[idxEdad]?.trim();
-      const parsedAge = rawEdad ? parseInt(rawEdad, 10) : undefined;
       demographicRows.push({
         sex: row[idxSexo]?.trim() || undefined,
-        age: parsedAge !== undefined && Number.isFinite(parsedAge) ? parsedAge : undefined,
+        age: rowAge,
       });
+    }
+    const rawAge = idxEdad >= 0 ? parseInt(row[idxEdad]?.trim() ?? "", 10) : NaN;
+    if (rowAge !== undefined && Number.isFinite(rawAge) && rawAge !== rowAge) {
+      birthYearAges.push({ raw: rawAge, age: rowAge });
     }
 
     nValid++;
+    stratum.nValid++;
+    stratum.t += total; stratum.v += vinculo; stratum.s += situacion; stratum.c += control; stratum.p += persona;
     if (options?.collectAdjustmentRows) {
       adjustmentRows.push({
-        age: idxEdad >= 0 ? row[idxEdad]?.trim() ?? "" : "",
+        // Solo se sustituye el valor leído cuando era un año de nacimiento convertido.
+        age: idxEdad >= 0
+          ? (rowAge !== undefined && Number.isFinite(rawAge) && rawAge !== rowAge ? String(rowAge) : row[idxEdad]?.trim() ?? "")
+          : "",
         sex: idxSexo >= 0 ? row[idxSexo]?.trim() ?? "" : "",
         // Con puntuación por ítems, los valores ya están validados ítem a ítem. Sin ítems,
         // se conserva la lectura estricta (Number) para no reparar sufijos no numéricos.
@@ -334,7 +374,35 @@ export function parseIBSECSV(
     if (!hasDemographics) {
       cautions.push("El archivo no contiene ambas columnas de edad y sexo; no permite calcular pesos individuales por edad y sexo.");
     }
+    if (birthYearAges.length > 0 && options?.surveyYear !== undefined) {
+      const list = birthYearAges.map((b) => `${b.raw} → ${b.age} años`).join("; ");
+      cautions.push(
+        `${birthYearAges.length === 1 ? "Un registro válido trae" : `${birthYearAges.length} registros válidos traen`} el año de nacimiento en el campo de edad; ` +
+        `se convierte en años restando del año de la encuesta (${options.surveyYear}): ${list}. ` +
+        "Sin fecha de nacimiento, la edad puede ser un año menor."
+      );
+    }
   }
+
+  // Medias por estrato en la escala común (conversión lineal si procede).
+  const stratumMeans = (a: StratumAcc): IBSEStratumMeans | undefined => {
+    if (a.nValid === 0) return undefined;
+    const r = (x: number) => Math.round(x * 10) / 10;
+    let m = { total: a.t / a.nValid, vinculo: a.v / a.nValid, situacion: a.s / a.nValid, control: a.c / a.nValid, persona: a.p / a.nValid };
+    if (convertFromRedcap) m = convertRedcapScores(m);
+    return {
+      meanTotal: r(m.total), meanFactorVinculo: r(m.vinculo), meanFactorSituacion: r(m.situacion),
+      meanFactorControl: r(m.control), meanFactorPersona: r(m.persona),
+    };
+  };
+  const strataCounts: IBSEStrataCounts | undefined =
+    idxEdad !== -1 && options?.ageBands && nValid > 0
+      ? {
+          under16: { n: strata.under16.n, nValid: strata.under16.nValid, ...(stratumMeans(strata.under16) ? { means: stratumMeans(strata.under16) } : {}) },
+          plus16: { n: strata.plus16.n, nValid: strata.plus16.nValid, ...(stratumMeans(strata.plus16) ? { means: stratumMeans(strata.plus16) } : {}) },
+          ...(strata.noAge.n > 0 ? { noAge: { n: strata.noAge.n, nValid: strata.noAge.nValid } } : {}),
+        }
+      : undefined;
 
   let ageSexObserved: AgeSexObservedResult | undefined;
   if (hasDemographics && options?.ageBands && demographicRows.length > 0) {
@@ -367,6 +435,7 @@ export function parseIBSECSV(
     methodologicalCautions: cautions,
     warnings,
     ageSexObserved,
+    ...(strataCounts ? { strataCounts } : {}),
     ...(options?.collectAdjustmentRows ? { adjustmentRows } : {}),
   };
 }
