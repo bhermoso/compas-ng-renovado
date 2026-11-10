@@ -517,6 +517,8 @@ export default function App() {
   );
   // Migración incremental pendiente de descarga+fusión para el municipio actual
   // (p. ej. añadir doc-localiza-atarfe y sus 5 átomos a un Atarfe ya persistido).
+  // Fecha que debe llevar la próxima migración (copia remota recuperada); null = la del expediente.
+  const migrationStampRef = useRef<string | null>(null);
   const [pendingMigration, setPendingMigration] = useState<SeedDocumentMigration | null>(
     initialWorkspaceLoad.seedMigration.kind === "download-and-merge"
       ? initialWorkspaceLoad.seedMigration.migration
@@ -994,6 +996,13 @@ export default function App() {
           }
           setWorkspace(() => withCarriedDocumentOriginals(remoteWorkspace, workspace));
           setPendingTopics([...(remoteWorkspace.thematicPrioritisation?.selectedTopicIds ?? [])]);
+          // La copia compartida puede ser anterior a una migración del seed: se le
+          // aplica también, con fecha actual, para que el autoguardado la publique.
+          const remoteMigration = resolveSeedMigration(remoteWorkspace);
+          if (remoteMigration.kind === "download-and-merge") {
+            migrationStampRef.current = new Date().toISOString();
+            setPendingMigration(remoteMigration.migration);
+          }
         }
         setRemoteHydratedMunicipalityId(municipalityId);
         setRemotePersistenceMessage(remoteWorkspace === null
@@ -1124,9 +1133,11 @@ export default function App() {
     }).then((seedWorkspace) => {
       if (cancelled) return;
       if (seedWorkspace !== null) {
+        const stamp = migrationStampRef.current ?? undefined;
+        migrationStampRef.current = null;
         setWorkspace((current) =>
           current.municipality.identity.id === migration.municipalityId
-            ? applySeedDocumentMigration(current, seedWorkspace, migration)
+            ? applySeedDocumentMigration(current, seedWorkspace, migration, { stamp })
             : current
         );
       }

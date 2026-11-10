@@ -55,8 +55,11 @@ Verificado en la suite (caso 13): si una fuente cambia, la validación falla.
 - **Export del 05/11/2026** (910 registros; sin marca temporal ni identificador de encuesta en la
   copia pública). Trae sexo y edad: SAM puede describir la composición por edad y sexo.
 - **20 registros de Localiza Salud** (tablas aportadas el 05/11/2026 y el 09/11/2026; tres sin identificador). No se ha verificado en línea su vigencia.
-- Migración `atarfe-documentacion-canonica-v3` para expedientes ya persistidos: añade las fichas
-  que faltan y sustituye el estudio IBSE canónico (no toca un IBSE importado por la persona usuaria).
+- Migración `atarfe-documentacion-canonica-v4` (2026-11-10, sustituye a v3) para expedientes ya
+  persistidos: añade las fichas que faltan, actualiza el texto del documento de Localiza Salud (del
+  que sale el recuento de activos) si no tiene líneas propias, sustituye el estudio IBSE canónico (no
+  toca un IBSE importado por la persona usuaria) y no retrocede la fecha del expediente. Se aplica
+  también a la copia recuperada de Firebase, con fecha actual, para que el autoguardado la publique.
 
 ## Recuentos deterministas
 

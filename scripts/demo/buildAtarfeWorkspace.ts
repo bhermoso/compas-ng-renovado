@@ -160,7 +160,7 @@ export const LOCALIZA_ASSET_COUNT = 20; // 61419 y 61585 comparten título: posi
 // INCREMENTAL_SEED_MIGRATIONS en src/appWorkspaceHydration.ts (verificado en tests).
 export const LOCALIZA_MIGRATION_MARKER = "atarfe-localiza-v1";
 // Marca de la actualización del 2026-11-09 (IBSE recalculado por ítems + 17 fichas Localiza).
-export const ATARFE_UPDATE_MARKER = "atarfe-documentacion-canonica-v3";
+export const ATARFE_UPDATE_MARKER = "atarfe-documentacion-canonica-v4";
 export const LOCALIZA_SALUD_ATARFE_URL_BASE =
   "https://localizasalud.sanidad.gob.es/maparecursos/main/ResourcesSearchDetail.action?id=";
 export const LOCALIZA_SALUD_ATARFE_TEXT = [
