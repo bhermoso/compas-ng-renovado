@@ -28,8 +28,8 @@ variación —sin alterar el comportamiento normal de la aplicación— aplicand
 - **Identificadores estables**: `doc-health-report-atarfe` (documento del
   Informe), `health-report-atarfe` (HealthReportDocument), `ibse-study-atarfe`
   (IBSEStudy), `doc-ibse-atarfe` (documento IBSE) y `doc-localiza-atarfe`
-  (documento Localiza Salud). Los cinco activos usan IDs de átomo estables
-  `doc-localiza-atarfe-atom-1..5` (no `crypto.randomUUID()`).
+  (documento Localiza Salud). Los veinte activos usan IDs de átomo estables
+  `doc-localiza-atarfe-atom-1..20` (no `crypto.randomUUID()`).
 
 Ejecutar `npm run rebuild:atarfe` dos veces sin cambiar las fuentes produce el
 **mismo SHA-256** y deja `git diff` vacío. La prueba `atarfe-canonical-workspace`
@@ -77,12 +77,13 @@ Verificado en la suite (caso 13): si una fuente cambia, la validación falla.
 |---|---|---|---|
 | `fixtures/health-reports/Informe_Salud_Atarfe.docx` | municipal real (documento primario) | Base epidemiológica oficial (**N**), preservada sin atomizar y con su autoría (Art. 16) | `health-report`, `territorialScale: municipio`, `contentMode: full-text-non-atomized` |
 | `fixtures/ibse-atarfe.csv` | `municipal-demo` (REDCap Monitor IBSE Atarfe 2026) | Único estudio genuinamente municipal (**+1**) → cumple la regla N+1. Muestra **mixta** (`sampleScope: "mixed"`) | `redcap-export` + tag `ibse`, `territorialScale: municipio`, `contentMode: atomized` |
-| Localiza Salud — 5 activos para la salud de Atarfe (portal del Ministerio de Sanidad, [maparecursos](https://localizasalud.sanidad.gob.es/maparecursos/main/)) | municipal real (recursos comunitarios publicados) | Activos para la salud (**+1** comunitario adicional, Art. 7 bis A) | `localiza-salud`, origen `localiza-salud`, `territorialScale: municipio`, `contentMode: atomized`; texto fuente verbatim en `sourceText` |
+| Localiza Salud — 20 activos para la salud de Atarfe (portal del Ministerio de Sanidad, [maparecursos](https://localizasalud.sanidad.gob.es/maparecursos/main/)) | municipal real (recursos comunitarios publicados) | Activos para la salud (**+1** comunitario adicional, Art. 7 bis A) | `localiza-salud`, origen `localiza-salud`, `territorialScale: municipio`, `contentMode: atomized`; texto fuente verbatim en `sourceText` |
 
 ### Activos para la salud — Localiza Salud (Opción B)
 
-Cinco recursos comunitarios publicados en el portal **Localiza Salud** del
-Ministerio de Sanidad para Atarfe. Se ingieren por la **misma ruta documental**
+Veinte recursos comunitarios publicados en el portal **Localiza Salud** del
+Ministerio de Sanidad para Atarfe (los cinco iniciales y quince añadidos con las tablas
+aportadas el 05/11/2026 y el 09/11/2026; tres sin identificador del portal). Se ingieren por la **misma ruta documental**
 que Granada-Zaidín (`kind: "localiza-salud"` → un `EvidenceAtom` `asset` por
 línea, origen `localiza-salud`), sin ampliar `EvidenceAtom` ni ningún contrato
 compartido y sin crear un modelo paralelo.
@@ -101,7 +102,9 @@ de su columna, porque `EvidenceAtom` no admite arrays y **no se extiende** para
 forzar uno. Las **erratas de origen** («útliles», «MUNUMENTOS») se preservan sin
 corrección silenciosa. El **título** de cada átomo es la primera columna (Nombre).
 
-Correspondencia identificador externo (IdLocaliza) → ID interno de átomo:
+Correspondencia identificador externo (IdLocaliza) → ID interno de átomo de los
+cinco activos iniciales (los quince añadidos llevan IdLocaliza y UrlDetalle en el
+TSV cuando la tabla de origen los trae; los tres sin identificador, columnas vacías):
 
 | Nombre | IdLocaliza (externo) | ID interno de átomo | UrlDetalle |
 |---|---|---|---|
@@ -148,21 +151,22 @@ marcada** (`src/appWorkspaceHydration.ts`): añade únicamente `doc-localiza-ata
 - El Informe de Salud es la fuente diagnóstica primaria; se conserva íntegro y no
   genera evidencia atomizada (D-HR-01).
 - El IBSE es un instrumento de **origen escolar**, pero la muestra de Atarfe es
-  **mixta**: incluye menores de 16 y personas de 16 o más. El export **no** aporta
-  desglose etario (`strataCounts` ausente), por lo que **SAM no es evaluable por
-  estrato con este export**: no se produce dictamen de representatividad ni para
-  menores ni para 16+. Nunca se reutiliza el `nValid` total (811) contra dos
-  poblaciones distintas. La ausencia de SAM etario **no invalida** el estudio: el
-  IBSE sigue siendo un +1 municipal válido para la regla N+1.
+  **mixta**: personas de 13 a 88 años. Desde el export del 05/11/2026 trae sexo y
+  edad de cada registro (`ageSexObserved`: 810 de los 811 válidos asignables; uno
+  registra 1993 y queda fuera de banda), de modo que SAM describe la composición
+  por edad y sexo frente al padrón. La muestra sigue siendo no probabilística:
+  la descripción no equivale a un dictamen de representatividad. Nunca se
+  reutiliza el `nValid` total (811) contra dos poblaciones distintas. El IBSE
+  sigue siendo un +1 municipal válido para la regla N+1.
 - **Cautelas de muestra (dentro del propio artefacto)**: el estudio IBSE y **cada
-  uno de sus átomos** llevan dos cautelas: (1) «Muestra municipal mixta: incluye
-  menores de 16 y personas de 16 o más; el export disponible no permite desglosar
-  los resultados por edad»; (2) «Los valores corresponden a la muestra municipal
+  uno de sus átomos** llevan, entre otras, dos cautelas: (1) «Muestra municipal
+  mixta, de 13 a 88 años, recogida entre el 6 de marzo y el 26 de abril de 2026…;
+  no probabilística»; (2) «Los valores corresponden a la muestra municipal
   participante; no se ha demostrado representatividad poblacional por estrato con
   este export». Los átomos cuantitativos dicen «Media de la muestra municipal
   participante», nunca «Media municipal». El documento se titula «Monitor IBSE
   Atarfe 2026 (muestra mixta)».
-- Regla N+1 (Art. 7 bis A): Informe (N) + IBSE municipal + 5 activos Localiza Salud.
+- Regla N+1 (Art. 7 bis A): Informe (N) + IBSE municipal + 20 activos Localiza Salud.
   Hay **dos caminos +1 independientes** (estudio complementario y activos): el
   Perfil sigue siendo compilable con cualquiera de ellos por separado. El gate
   `G-LHC-8` solo dispara si se retiran **ambas** fuentes; no se ha alterado el gate
