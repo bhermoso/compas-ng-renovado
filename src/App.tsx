@@ -3791,6 +3791,20 @@ export default function App() {
           pslIsStale={runtime.pslIsStale}
           pslCompiled={!!workspace.externalProfileLibrary?.activeId || (runtime.workspace.compiledProfiles?.length ?? 0) > 0}
           thematicPrioritisationDone={runtime.workspace.thematicPrioritisation !== undefined}
+          {...(() => {
+            const lib = workspace.externalProfileLibrary;
+            const active = lib?.activeId ? lib.profiles.find((p) => p.id === lib.activeId) : undefined;
+            const selection = runtime.workspace.deliberativePrioritySelection;
+            const withoutParticipation =
+              selection !== undefined &&
+              runtime.workspace.thematicPrioritisation !== undefined &&
+              selection.citizenTopicIds.length === 0;
+            return {
+              ...(active ? { externalProfileStatus: active.status === "validated" ? "validated" as const : "review" as const } : {}),
+              prioritySelectionDone: selection !== undefined && !withoutParticipation,
+              prioritySelectionWithoutParticipation: withoutParticipation,
+            };
+          })()}
           agendaCount={workspace.agendaActuations?.length ?? 0}
           onNavigate={(v) => setView(v as AppView)}
         />

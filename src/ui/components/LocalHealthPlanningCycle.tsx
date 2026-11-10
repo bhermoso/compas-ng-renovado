@@ -34,6 +34,17 @@ export interface LocalHealthPlanningCycleProps {
   thematicPrioritisationDone: boolean;
   /** Seleccion deliberativa del Grupo Motor ya adoptada; opcional hasta consolidar App.tsx. */
   prioritySelectionDone?: boolean;
+  /**
+   * Estado de la versión vigente del Perfil externo (biblioteca de perfiles).
+   * Cuando consta, manda sobre el PSL compilado heredado: el Perfil vigente es
+   * el documento de referencia y su validación técnica cierra la fase.
+   */
+  externalProfileStatus?: "review" | "validated";
+  /**
+   * La selección del Grupo Motor existe pero se adoptó sin incorporar la
+   * participación ciudadana que ya consta en el expediente.
+   */
+  prioritySelectionWithoutParticipation?: boolean;
   /** Actuaciones registradas en la agenda (instrumento de la fase Implantación). */
   agendaCount?: number;
   onNavigate?: (view: AppViewId) => void;
@@ -61,10 +72,17 @@ function derivePhases({
   pslCompiled,
   thematicPrioritisationDone,
   prioritySelectionDone = false,
+  externalProfileStatus,
+  prioritySelectionWithoutParticipation = false,
   agendaCount = 0,
 }: LocalHealthPlanningCycleProps): CyclePhase[] {
-  const pslReady = (pslStatus === "validated" || pslStatus === "approved") && !pslIsStale;
-  const pslStaleNote = pslIsStale ? "La evidencia ha cambiado" : undefined;
+  const external = externalProfileStatus !== undefined;
+  const pslReady = external
+    ? externalProfileStatus === "validated"
+    : (pslStatus === "validated" || pslStatus === "approved") && !pslIsStale;
+  // El aviso de evidencia cambiada compara con el PSL compilado heredado; no
+  // describe una versión externa vigente.
+  const pslStaleNote = !external && pslIsStale ? "La evidencia ha cambiado" : undefined;
 
   // 2 - Perfil de salud local
   // "Completada" exige el artefacto institucional PSL-C compilado/congelado:
@@ -72,7 +90,11 @@ function derivePhases({
   let pslPhase: PhaseStatus;
   let pslStatusLabel: string | undefined;
   let pslNote = pslStaleNote;
-  if ((pslStatus === "validated" || pslStatus === "approved") && pslIsStale) {
+  if (external) {
+    pslPhase = externalProfileStatus === "validated" ? "completed" : "current";
+    pslStatusLabel = externalProfileStatus === "validated" ? "Validado técnicamente" : "En revisión";
+    pslNote = externalProfileStatus === "validated" ? undefined : "Versión vigente pendiente de validación técnica";
+  } else if ((pslStatus === "validated" || pslStatus === "approved") && pslIsStale) {
     pslPhase = "requires-validation";
   } else if (pslReady && pslCompiled) {
     pslPhase = "completed";
@@ -92,7 +114,10 @@ function derivePhases({
   // permite preparar participacion, ver candidaturas y documentar lo que falta.
   let prioPhase: PhaseStatus;
   let prioNote: string | undefined;
-  if (pslReady && prioritySelectionDone) {
+  if (prioritySelectionWithoutParticipation) {
+    prioPhase = "current";
+    prioNote = "Participación ciudadana recibida; la selección del Grupo Motor es anterior y no la incorpora";
+  } else if (pslReady && prioritySelectionDone) {
     prioPhase = "completed";
   } else if (pslReady) {
     prioPhase = "current";
