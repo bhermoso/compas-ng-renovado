@@ -26,13 +26,23 @@ Versión 1.1 (2026-11-09): se añade un tercer módulo, en construcción:
 
 | Módulo | Objetivos generales | Objetivos específicos | Indicadores trazadores |
 |---|---:|---:|---:|
-| Bienestar emocional y salud mental (versión 0.1) | 7 | 17 | 17 |
+| Bienestar emocional y salud mental (versión 0.2) | 7 | 17 | 17 |
 
 Procede de una propuesta de COMPÁS elaborada a partir del I Plan Estratégico de
 Salud Mental y Adicciones de Andalucía 2026–2029 (líneas 1, 2 y 5), la
 Estrategia de Promoción de una Vida Saludable en Andalucía (objetivos 1.4, 1.6 y
-1.7), la Estrategia de Salud Mental del SNS 2022–2026 (líneas 2 y 3) y el
-Monitor de bienestar socioemocional de Atarfe 2026. Se orienta a la promoción y
+1.7), la Estrategia de Salud Mental del SNS 2022–2026 (líneas 2, 3 y 8) y el
+Monitor de bienestar socioemocional de Atarfe 2026.
+
+Versión 0.2 (2026-11-10): cada elemento declara su procedencia
+(`CatalogElementProvenance`), contrastada con los textos fuente: **literal**
+(reproduce un objetivo o indicador oficial), **adaptado** (parte de un objetivo o
+programa concreto con redacción de COMPÁS) o **propio** (redacción de COMPÁS sin
+texto oficial equivalente). De 41 elementos (7 objetivos generales, 17 específicos y
+17 indicadores), 2 son literales de la EPVSA (indicadores 1.4.5 y 1.6.3).
+Se corrigen OE1.3 e I5.2 para que objetivo e indicador midan lo mismo, e I2.2 e
+I3.3 para que reproduzcan la redacción de la EPVSA. La procedencia se muestra junto a
+cada elemento en el Plan de Acción. Se orienta a la promoción y
 la prevención desde el ámbito local; la atención clínica corresponde al SSPA.
 Hasta su revisión técnica es una propuesta para deliberación, no un módulo validado.
 

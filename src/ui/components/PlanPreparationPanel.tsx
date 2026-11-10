@@ -1,6 +1,6 @@
 import { actionPlanElementCode } from "../../domain/action-plan-catalog/ActionPlanNotation";
 import type { ReactNode } from "react";
-import type { ActionPlanCatalogModule, CatalogGeneralObjectiveTemplate, CatalogSpecificObjectiveTemplate } from "../../domain/action-plan-catalog/ActionPlanCatalog";
+import type { ActionPlanCatalogModule, CatalogElementProvenance, CatalogGeneralObjectiveTemplate, CatalogSpecificObjectiveTemplate } from "../../domain/action-plan-catalog/ActionPlanCatalog";
 import type { PLSEvaluationFramework, UnaddressedNeed } from "../../domain/health-plan";
 import { planDecisionWithStatus } from "../../domain/action-plan-catalog/PlanPreparationDraft";
 import {
@@ -24,6 +24,13 @@ import {
 
 export function ProposalText({text}: {text: string}) {
   return <>{text.split(/(\*\*.*?\*\*)/g).map((part, i) => part.startsWith("**") ? <strong key={i}>{part.slice(2,-2)}</strong> : part)}</>;
+}
+
+const PROVENANCE_LABEL = { literal: "Literal", adaptado: "Adaptado", propio: "Propio de COMPÁS" } as const;
+/** Procedencia declarada del elemento del catálogo (fuente y tipo), si la tiene. */
+function ElementProvenance({ p }: { p?: CatalogElementProvenance }) {
+  if (!p) return null;
+  return <p className="pcm-element-provenance" data-provenance={p.kind}><span>Procedencia · {PROVENANCE_LABEL[p.kind]}</span> {p.source}</p>;
 }
 
 export function PlanPreparationPanel({module, municipalityId, draft, onChange, review, onReviewChange, canEditProposal=true, canReview=false, reviewIsCurrent=true, renderWorksheet, persistenceMessage}: {
@@ -260,6 +267,7 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
   <section className="pcm-strategic" aria-label="Objetivo estratégico vigente">
    <h3>{directTerritorialEdit ? "Objetivo estratégico vigente" : "Objetivo estratégico propuesto"}</h3>
    <p><ProposalText text={canReview ? consolidatedText(module.id, revised ? plainProposalText(proposalStrategicText) : module.strategicObjective) : territorialText(module.id, revised ? proposalStrategicText : module.strategicObjective)}/></p>
+   <ElementProvenance p={module.strategicObjectiveProvenance}/>
   </section>
   {canEditProposal && <div className="pcm-bulk-actions" role="group" aria-label={`Incorporación de propuestas de ${module.title}`}>
    <button type="button" onClick={() => applyModuleSelection("included")}>Incorporar módulo completo al borrador</button>
@@ -275,6 +283,7 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
     <summary>{(fourBlocks ? general.thematicBlockName : undefined) ?? `${general.code} · ${visibleGeneral}`}</summary>
     {draft?.decisions[general.code]?.status === "pending" && <p className="panel-note">Bloque pendiente de revisión.</p>}
     <p><strong>Objetivo general · {actionPlanElementCode(module,general.code)}:</strong> <ProposalText text={visibleGeneral}/></p>
+    <ElementProvenance p={general.provenance}/>
     {control(general.code, sourceGeneral, [module.id], !finalApprovedText)}
     {general.specificObjectives.map(specific => {
      const indicator = specific.indicator;
@@ -287,9 +296,11 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
      const draftSpecific = {...specific, title: plainProposalText(visibleSpecific), indicator: {...indicator, title: plainProposalText(visibleIndicator)}};
      return <section className="pcm-specific" key={specific.code}>
       <h3>Objetivo específico · {specific.displayCode ?? specific.code}</h3><p><ProposalText text={visibleSpecific}/></p>
+      <ElementProvenance p={specific.provenance}/>
       {control(specific.code, sourceSpecific, [module.id, general.code])}
       <details className="pcm-sheet" id={`ficha-${indicator.code}`}><summary>Indicador y ficha · {actionPlanElementCode(module,indicator.code)}</summary>
        <p>{visibleIndicator}</p>
+       <ElementProvenance p={indicator.provenance}/>
        <p className="panel-note">Indicador vigente del territorio. Su ficha técnica puede seguir desarrollándose sin alterar el texto fuente histórico.</p>
        {control(indicator.code, sourceIndicator, [module.id, general.code, specific.code])}
        <dl><dt>Definición operacional de referencia</dt><dd>{indicator.operationalDefinition}</dd><dt>Método de referencia</dt><dd>{indicator.calculationMethod}</dd><dt>Fuente propuesta</dt><dd>{indicator.suggestedSource}</dd></dl>

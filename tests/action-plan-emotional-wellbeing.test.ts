@@ -5,10 +5,10 @@ import { municipalActionPlanModule } from "../src/domain/action-plan-catalog/Mun
 const m = EMOTIONAL_WELLBEING_MODULE;
 const specific = m.generalObjectives.flatMap((g) => g.specificObjectives);
 
-describe("Línea «Bienestar emocional y salud mental» (versión 0.1)", () => {
+describe("Línea «Bienestar emocional y salud mental» (versión 0.2)", () => {
   it("forma parte del catálogo con identificador estable", () => {
     expect(ACTION_PLAN_CATALOG.map((x) => x.id)).toContain("bem-2027-2030");
-    expect(m.version).toBe("0.1");
+    expect(m.version).toBe("0.2");
   });
 
   it("tiene 7 objetivos generales, 17 específicos y un indicador por cada uno, con códigos únicos", () => {
@@ -37,5 +37,28 @@ describe("Línea «Bienestar emocional y salud mental» (versión 0.1)", () => {
     for (const id of ["atarfe", "loja", "zagra", "municipio-nuevo-2027"]) {
       expect(municipalActionPlanModule(id, m)).toBe(m);
     }
+  });
+
+  it("cada objetivo e indicador declara su procedencia, con fuente y tipo", () => {
+    expect(m.strategicObjectiveProvenance?.source).toBeTruthy();
+    const elements = [
+      ...m.generalObjectives.map((g) => g.provenance),
+      ...specific.map((o) => o.provenance),
+      ...specific.map((o) => o.indicator.provenance),
+    ];
+    expect(elements).toHaveLength(7 + 17 + 17);
+    for (const p of elements) {
+      expect(["literal", "adaptado", "propio"]).toContain(p?.kind);
+      expect(p?.source.length).toBeGreaterThan(10);
+    }
+    // Solo dos elementos reproducen textos oficiales (EPVSA: indicadores 1.4.5 y 1.6.3).
+    expect(elements.filter((p) => p?.kind === "literal")).toHaveLength(2);
+    expect(m.sourceLabel).toMatch(/líneas 2, 3 y 8/);
+  });
+
+  it("los indicadores literales conservan la redacción de la EPVSA", () => {
+    const byCode = new Map(specific.map((o) => [o.indicator.code, o.indicator.title]));
+    expect(byCode.get("BEM-I2.2")).toMatch(/población adulta que percibe como bajo su apoyo social y afectivo/);
+    expect(byCode.get("BEM-I3.3")).toMatch(/8 a 15 años que usa más de dos horas al día aparatos electrónicos\.$/);
   });
 });
