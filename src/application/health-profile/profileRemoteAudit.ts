@@ -10,6 +10,7 @@ import { EMPTY_PROFILE_LIBRARY, isExternalProfileLibrary, profileAttachmentBlob 
 
 export const PROFILE_AUDIT_SCOPES = [
  {id:'alfacar',name:'Alfacar'},
+ {id:'atarfe',name:'Atarfe'},
  {id:'loja',name:'Loja'},
  {id:'zagra',name:'Zagra'},
 ] as const;
@@ -25,6 +26,8 @@ export interface ProfileAuditVersion {
  files: number;
  results: number;
  textPresent: boolean;
+ createdAt: string;
+ attachmentNames: string[];
 }
 export interface ProfileAuditResult {
  scope: string;
@@ -91,7 +94,8 @@ export async function inspectRemoteProfile(
   archived:Boolean(p.archivedAt),parentFound:!p.revisionOf||ids.has(p.revisionOf),
   pdfs:p.attachmentIds.filter(id=>attachments.get(id)?.mimeType==='application/pdf'||
      attachments.get(id)?.name.toLowerCase().endsWith('.pdf')).length,
-  files:p.attachmentIds.length,results:p.results.length,textPresent:Boolean(p.text.trim())
+  files:p.attachmentIds.length,results:p.results.length,textPresent:Boolean(p.text.trim()),
+  createdAt:p.createdAt,attachmentNames:p.attachmentIds.flatMap(id=>attachments.get(id)?[attachments.get(id)!.name]:[])
  }));
  // No basta comprobar el hash anunciado: se recalcula SHA-256 de cada original.
  for(const file of library.attachments){
@@ -115,8 +119,8 @@ export async function inspectRemoteProfile(
 }
 
 export function profileParity(rows:ProfileAuditResult[]):ProfileAuditParity{
- if(rows.length!==3||rows.some(r=>r.remote!=='ok')){
-  return {status:'no_evaluable',notes:['No se han podido recuperar del servidor los tres expedientes. No cabe concluir equivalencia.']};
+ if(rows.length!==PROFILE_AUDIT_SCOPES.length||rows.some(r=>r.remote!=='ok')){
+  return {status:'no_evaluable',notes:['No se han podido recuperar del servidor los cuatro expedientes. No cabe concluir equivalencia.']};
  }
  if(rows.some(r=>!r.libraryValid||!r.originalsVerified)){
   return {status:'distintos',notes:['Alguna biblioteca u original no supera la verificación de integridad.']};
@@ -140,8 +144,8 @@ export function profileParity(rows:ProfileAuditResult[]):ProfileAuditParity{
   )};
  }
  return {status:'equivalentes',notes:[
-  'Los tres expedientes se leen desde Firebase y conservan el mismo soporte técnico: versión externa vigente, PDF original con integridad verificada, texto y resultados.',
-  'Esto no acredita que el contenido del PDF y su transcripción sean idénticos ni que los indicadores de los tres municipios tengan la misma cobertura.',
+  'Los cuatro expedientes se leen desde Firebase y conservan el mismo soporte técnico: versión externa vigente, PDF original con integridad verificada, texto y resultados.',
+  'Esto no acredita que el contenido del PDF y su transcripción sean idénticos ni que los indicadores de los cuatro municipios tengan la misma cobertura.',
   'La validación técnica, número de versiones y amplitud del contenido se muestran por separado.'
  ]};
 }

@@ -1,3 +1,5 @@
+> **Alcance histórico — aclaración 12-11-2026.** Las reglas de generación automática de este documento se conservan para artefactos heredados y sus pruebas. No gobiernan la producción externa ni reactivan el generador en la pestaña Perfil. Para los perfiles externos rigen el [contrato metodológico](../contracts/CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md), la [propuesta de contrato externo](../contracts/CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION.md) y la [guía de entrega](../guides/ENTREGA-PERFIL-EXTERNO.md). La prohibición histórica de recomendaciones no se aplica a las recomendaciones Conocer, Contrastar o Abordar del contrato vigente.
+
 # Contrato de escritura del Perfil Local de Salud
 
 > Documento operativo, no académico. Gobierna cómo COMPÁS NG escribe el
