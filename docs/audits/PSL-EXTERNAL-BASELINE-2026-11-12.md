@@ -55,3 +55,8 @@ No se exige igualdad entre estudios catalogados y módulos cargados. La consulta
 - Separar adjuntos de la vigente y custodia de toda la biblioteca; identificar cada revisión y sus originales en la tabla de versiones.
 - No fijar una selección de lectura al ID de la copia inicial antes de llegar la biblioteca remota. Sin elección explícita se sigue la vigente; consultar una histórica sigue siendo posible y se rotula como tal.
 - Revisar el contrato externo, añadir una guía única de entrega y aclarar el alcance histórico de los contratos del generador. Mantener explícita la aprobación técnica pendiente del contrato externo.
+
+
+## Evaluación posterior del contenido
+
+La lectura completa de las cuatro versiones vigentes se evalúa en [el dictamen de contenido](PSL-CONTENT-REVIEW-2026-11-12.md). Distingue las bases aprovechables de Alfacar y Atarfe de las inconsistencias editoriales de Loja y Zagra; identifica las correcciones y los límites del cotejo. Los mínimos técnicos de esta línea de base no acreditan conformidad metodológica.
