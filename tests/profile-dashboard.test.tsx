@@ -106,7 +106,7 @@ describe("ProfileResultsDashboard · páginas de datos (Art. 17 ter)", () => {
   });
   it("explora las secciones censales y ofrece las dos descargas", () => {
     expect(html).toContain("03002 (Alfaguara)");
-    expect(html).toContain("Descargar estas páginas · PDF");
+    expect(html).toContain("Guardar páginas en PDF");
     expect(html).toContain('href="blob:perfil" download="Perfil.pdf"');
   });
   it("acepta en el paquete varios comparadores y rechaza los mal formados", () => {
