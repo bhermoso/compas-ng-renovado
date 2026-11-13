@@ -1,5 +1,7 @@
 # Perfil externo de Salud Local
 
+Referencia de contenido: [contrato metodológico vigente](../contracts/CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md). Entrega y cotejo: [contrato externo, propuesta v1.1](../contracts/CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION.md) y [guía de entrega](../guides/ENTREGA-PERFIL-EXTERNO.md). No confundir compatibilidad de importación con aceptación metodológica.
+
 Decisión del 29 de octubre de 2026: COMPÁS recibe un documento elaborado fuera de la aplicación. No construye un diagnóstico ni redacta perfiles desde el expediente. El tab ofrece un cargador, un panel de resultados, consulta del documento, descarga y revisiones con la identidad visual COMPÁS.
 
 ## Contenido y conservación
@@ -12,7 +14,7 @@ Una edición crea otra revisión y conserva el original sin modificar. La valida
 
 ## Paquete preparado fuera de COMPÁS
 
-El JSON usa `schema: "compas-profile-package/v1"`, `municipalityId`, `title`, `period`, `author`, `summary`, `text`, `results`, `findings`, `limitations` y `areas`. No acepta validaciones de terceros ni introduce contenido HTML ejecutable. El identificador municipal debe coincidir con el expediente abierto. Cada resultado contiene `id`, `title`, `value` literal, `unit`, `source`, `page`, `period` y `caution`. Puede añadir `topic`, `scale`, `denominator`, `temporalContext` (`current`, `historical`, `not-stated`), `chartValue` numérico y `comparison: {label, value}`. El gráfico solo aparece con cifras comparables declaradas. El paquete y el documento original pueden cargarse juntos en una única versión.
+El JSON usa `schema: "compas-profile-package/v1"`, `municipalityId`, `title`, `period`, `author`, `summary`, `text`, `results`, `findings`, `limitations` y `areas`. No acepta validaciones de terceros ni introduce contenido HTML ejecutable. El identificador municipal debe coincidir con el expediente abierto. Cada resultado contiene `id`, `title`, `value` literal, `unit`, `source`, `page`, `period` y `caution`. Puede añadir `topic`, `scale`, `denominator`, `temporalContext` (`current`, `historical`, `not-stated`), `chartValue` numérico y `comparison: {label, value}`, `comparisons: [{label, value}]` (hasta seis; prevalece sobre `comparison`) y `supportsConclusions: ["C1"]` (vínculos explícitos a conclusiones). El gráfico solo aparece con cifras comparables declaradas. El paquete y el documento original pueden cargarse juntos en una única versión.
 
 ## Aprendizaje de «Modelos de Perfil de salud local»
 
@@ -25,3 +27,10 @@ El runtime proyecta el perfil externo activo exclusivamente para los consumidore
 ## Validación
 
 Pruebas de bytes y huella, aislamiento municipal, versiones, importación no validante, conservación remota fragmentada, guardados simultáneos, runtime sin generación y presentación con cautelas. La página `tests/fixtures/external-profile.html` es exclusivamente una comprobación local con datos ficticios y guardado simulado; no forma parte del punto de entrada publicado ni se incluye en `dist`. Las pruebas de esta transformación no escriben expedientes reales.
+
+
+## Identidad y selección de revisión
+
+`id` identifica el registro; `createdAt` su incorporación; `revisionOf` su linaje; `activeId` la revisión de referencia y `status` su validación. El modelo aún no separa versión editorial y fecha del documento: deben constar en portada, texto y acta de entrega. Los nombres de fichero, incluso repetidos, no bastan para elegir una versión. Se conserva una nueva carga como revisión sin promoverla automáticamente si ya existe una vigente.
+
+La auditoría toma archivos y JSON de `active.attachmentIds` para describir la vigente; el total de originales comprobados corresponde a la biblioteca y se rotula aparte. Atarfe forma parte de los casos de referencia junto con Alfacar, Loja y Zagra. Véase la [línea de base leída de Firebase](../audits/PSL-EXTERNAL-BASELINE-2026-11-12.md).

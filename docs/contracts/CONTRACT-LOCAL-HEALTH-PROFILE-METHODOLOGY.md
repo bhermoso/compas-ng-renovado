@@ -16,6 +16,9 @@
 
 ## Alcance
 
+**Aplicación a producción externa (aclaración 12-11-2026).** El contenido, las cautelas, la estructura y el modelo canónico se aplican también al Perfil elaborado fuera de COMPÁS. En esa ruta, la redacción, elección de conclusiones/recomendaciones y preparación del anexo corresponden al equipo redactor externo; las menciones a generación o anexo compilado describen el mecanismo histórico, no una instrucción para completar el documento al cargarlo. La importación conserva y representa; no produce diagnóstico nuevo. La [guía de entrega](../guides/ENTREGA-PERFIL-EXTERNO.md) desarrolla esta ruta y el [contrato externo](CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION.md) mantiene su aprobación técnica pendiente. Esta aclaración no valida perfiles ni altera la frontera con la priorización y el Plan.
+
+
 Este contrato aplica a:
 - El `LocalHealthProfile` como objeto analítico del sistema.
 - El `LocalHealthProfileArtifact` (PSL-C) como documento institucional compilado.

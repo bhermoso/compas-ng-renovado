@@ -56,7 +56,8 @@ function emptyProfile(municipalityId: string): ExternalHealthProfile {
   status:'review',summary:'',text:'',results:[],findings:[],limitations:[],areas:[],attachmentIds:[]};
 }
 export function ExternalProfileDashboard({municipalityId,municipalityName,library,legacyProfiles=[],legacyText,authorName,onSave,onDirtyChange}: Props) {
- const [selectedId,setSelectedId]=useState(library.activeId);
+ // Sigue la vigente cuando llega Firebase; solo una consulta explícita fija otra revisión.
+ const [selectedId,setSelectedId]=useState<string>();
  const [tab,setTab]=useState<'results'|'document'|'versions'|'laboratory'>('results');
  const [draft,setDraft]=useState<ExternalHealthProfile>();
  const [newFiles,setNewFiles]=useState<ProfileAttachment[]>([]);

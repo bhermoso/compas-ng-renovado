@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ProfileDataPages } from "./ProfileDataPages";
+import { ProfileText } from './ProfileText';
 import type { ProfileStructure } from "../../application/health-profile/profileStructure";
 import type { ExternalHealthProfile, ProfileResult } from "../../domain/health-profile/ExternalHealthProfile";
 import {
@@ -19,7 +20,7 @@ function Headline({ result }: { result: ProfileResult }) {
     <div className="epd-kpi">
       <span className="epd-kpi__value">{result.value}<small>{displayUnit(result.unit)}</small></span>
       <span className="epd-kpi__label">{result.title}</span>
-      <span className="epd-kpi__meta">{result.period}{result.comparison ? ` · ${result.comparison.label}: ${formatComparisonValue(result.comparison.value)}${displayUnit(result.unit)}` : ""}</span>
+      <span className="epd-kpi__meta">{result.period}{result.comparison ? ` · ${result.comparison.label}: ${formatComparisonValue(result.comparison.value)}` : ""}</span>
     </div>
   );
 }
@@ -35,10 +36,10 @@ function ResultRow({ result, scale }: { result: ProfileResult; scale?: number })
         <span className="epd-row__value">{result.value}{unit}</span>
       </div>
       {hasBar && (
-        <div className="epd-row__bars" title={`${result.title}: ${result.value}${unit}${result.comparison ? ` · ${result.comparison.label}: ${formatComparisonValue(result.comparison.value)}${unit}` : ""}`}>
+        <div className="epd-row__bars" title={`${result.title}: ${result.value}${unit}${result.comparison ? ` · ${result.comparison.label}: ${formatComparisonValue(result.comparison.value)}` : ""}`}>
           <div className="epd-bar"><span>{result.scale || "Municipio"}</span><div className="epd-bar__track"><i style={{ width: width(result.chartValue!) }} /></div></div>
           {result.comparison && result.comparison.value >= 0 && (
-            <div className="epd-bar epd-bar--ref"><span>{result.comparison.label} · {formatComparisonValue(result.comparison.value)}{unit}</span><div className="epd-bar__track"><i style={{ width: width(result.comparison.value) }} /></div></div>
+            <div className="epd-bar epd-bar--ref"><span>{result.comparison.label} · {formatComparisonValue(result.comparison.value)}</span><div className="epd-bar__track"><i style={{ width: width(result.comparison.value) }} /></div></div>
           )}
         </div>
       )}
@@ -245,7 +246,7 @@ export function ProfileResultsDashboard({ profile, municipalityName, onAddResult
         <section className="epd-full-document pdp-print-only" aria-label="Documento íntegro incorporado al perfil">
           <header><p className="ep-eyebrow">DOCUMENTO FUENTE · TRANSCRIPCIÓN DISPONIBLE</p><h2>Texto completo del perfil incorporado</h2>
           <p>Se reproduce el texto guardado en esta revisión. Los archivos originales adjuntos se conservan independientemente.</p></header>
-          {profile.text.split(/\n\s*\n/).filter(Boolean).map((p,i)=><p key={i}>{p}</p>)}
+          <ProfileText paragraphs={profile.text.split(/\n\s*\n/).filter(Boolean)} />
         </section>
       )}
       {profile.limitations.filter(Boolean).length > 0 && (

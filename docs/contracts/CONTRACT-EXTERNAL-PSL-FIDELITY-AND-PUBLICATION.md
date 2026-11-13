@@ -1,6 +1,7 @@
 # Contrato de elaboración externa, fidelidad documental y publicación del Perfil de Salud Local
 
-> **Propuesta v1.0 — 3 de noviembre de 2026. Estado: PENDIENTE DE APROBACIÓN TÉCNICA.**
+> **Revisión de propuesta v1.1 — 12 de noviembre de 2026. Estado: PENDIENTE DE APROBACIÓN TÉCNICA.**
+> Revisión solicitada para Alfacar, Atarfe, Loja y Zagra. Esta actualización no registra aprobación institucional ni valida sus perfiles.
 >
 > Alcance: perfiles de salud local redactados fuera de COMPÁS NG, importados en `MunicipalityWorkspace.externalProfileLibrary`, sus originales, revisiones y representaciones.
 >
@@ -41,7 +42,7 @@ La información exhaustiva, referencias, tablas, limitaciones metodológicas, fu
 
 **Permitido, siempre identificado:** extracción de texto, corrección técnica de saltos de línea para lectura, índices y enlaces de navegación, separación de capítulos, marcadores de conclusiones/recomendaciones, tablas y gráficos construidos solo a partir de datos explícitos con fuente, fecha, escala y denominador; ajustes de accesibilidad y paginación.
 
-**No permitido sin nueva revisión aprobada:** cambiar cifras, porcentajes, denominadores, poblaciones, periodos, fuentes, comparadores, autorías, cautelas, grados de certeza o relaciones causales; generar o eliminar conclusiones; resumir como si fuera transcripción literal; introducir nuevos hallazgos, recomendaciones, gráficos no sustentados ni conexiones inferidas por coincidencia semántica.
+**No permitido sobre la misma revisión; exige una nueva revisión identificada y revisión técnica antes de declararla aprobada:** cambiar cifras, porcentajes, denominadores, poblaciones, periodos, fuentes, comparadores, autorías, cautelas, grados de certeza o relaciones causales; generar o eliminar conclusiones; resumir como si fuera transcripción literal; introducir nuevos hallazgos, recomendaciones, gráficos no sustentados ni conexiones inferidas por coincidencia semántica.
 
 La representación debe distinguir: **transcripción/lectura del documento**, **componentes derivados identificados** y **elementos gráficos/editoriales añadidos**. Si la extracción reordena o pierde material (tablas, notas, imágenes, encabezados, anexos), esa representación se marca como **no verificada** hasta comparar con el original. No se promete equivalencia solo por coincidir el recuento de conclusiones.
 
@@ -78,13 +79,69 @@ Resultados posibles: **conforme**, **conforme con salvedades**, **no conforme** 
 
 ## 8. Casos iniciales y transición
 
-Los casos de contraste son Loja v0.3, Zagra v0.1 y Zagra v0.2. Véase `docs/audits/PSL-EXTERNAL-FIDELITY-BASELINE-2026-11-03.md`.
+Los casos de trabajo son **Alfacar, Atarfe, Loja y Zagra**, sobre la revisión vigente que Firebase devuelva en cada comprobación. La línea de base actual figura en [la auditoría del 12 de noviembre](../audits/PSL-EXTERNAL-BASELINE-2026-11-12.md). El [cotejo del 3 de noviembre](../audits/PSL-EXTERNAL-FIDELITY-BASELINE-2026-11-03.md) se conserva como antecedente, sin describir el estado actual.
 
 Los documentos preexistentes se conservan sin reescritura. Su adaptación al contrato se tramita mediante nueva versión explícita si implica contenido, o como representación derivada identificada si solo cambia la presentación.
 
 ## 9. Pendientes de aceptación
 
-- Aprobar esta propuesta v1.0 por el responsable metodológico.
+- Aprobar esta revisión v1.1 por el responsable metodológico; no se infiere aprobación de su incorporación al repositorio.
 - Definir qué campos de identidad documental adicionales exige el modelo de datos; hoy `ExternalHealthProfile` no almacena de forma separada el número de versión editorial ni la fecha declarada del documento.
 - Determinar el procedimiento de validación de las cuatro páginas iniciales en perfiles externos de transición.
 - Ejecutar cotejos de originales de Firebase y PDF editorial reales; no se ha realizado una certificación visual completa.
+
+
+## 10. Encargo y entrega externa reproducibles
+
+La instrucción de trabajo para la persona o equipo redactor es la [guía de entrega y aceptación](../guides/ENTREGA-PERFIL-EXTERNO.md). El encargo identifica un municipio y un corte documental; no parte de una copia de otro municipio. Se entrega un único paquete por revisión, con:
+
+1. **PDF canónico completo**, con las cuatro páginas iniciales, cuerpo, anexos y referencias. El DOCX editable es opcional; si se aporta como original, queda vinculado a esa misma revisión.
+2. **JSON `compas-profile-package/v1`**, con el texto completo de la misma revisión y los datos necesarios para representarla. El JSON no sustituye al PDF, y un PDF por sí solo no proporciona datos estructurados.
+3. **Acta de entrega en Markdown**, con municipio, título, versión editorial, fecha del documento, corte de fuentes, autoría, archivos y SHA-256, revisión que sucede, diferencias respecto a ella y resultado de los cotejos. Puede adjuntarse y custodiarse sin atribuirle campos que el importador no lee.
+
+La versión editorial y la fecha del documento constan también en portada y texto. Hoy el modelo no las almacena en campos propios: `createdAt` es incorporación, `id` identifica el registro y `revisionOf` su linaje. Ninguno sustituye la versión editorial o la fecha declarada. No se inventan propiedades JSON como si el importador las conservara. La especificación operativa enumera los campos soportados.
+
+El corte de fuentes distingue documento catalogado, estudio cargado, priorización histórica, selección adoptada y activos del inventario vigente. Las fuentes opcionales ausentes se declaran, sin penalizar con cifras cero ni crear contenido de relleno. La regla N+1 y la suficiencia se comprueban con el contrato metodológico: el Informe solo no se convierte en Perfil por cambiar el título. Para la ruta externa, el anexo se elabora y coteja fuera de COMPÁS; no se invoca el compilador histórico para completar su contenido.
+
+## 11. Indicadores, renta, activos y participación
+
+- Cada cifra conserva valor literal, unidad, definición/población de referencia, periodo, escala y localizador de fuente. Un denominador desconocido se declara como desconocido; contar campos no vacíos no demuestra que esté documentado. Un recuento absoluto o una media declara su base y no exige inventar una fracción.
+- `chartValue` se aporta solo para cifras numéricas exactas representables. Una cota por secreto estadístico conserva el literal y su nota; no lleva un `chartValue` que la haga pasar por estimación exacta.
+- `comparisons` admite hasta seis referencias explícitas y prevalece sobre `comparison`. Solo se incluyen cuando coinciden definición, unidad, periodo y población de referencia o cuando la diferencia está metodológicamente justificada y visible. No se rellenan provincias ni municipios con datos autonómicos. No se usa color de mejor/peor sin sustento publicado por la fuente.
+- La renta censal conserva CUSEC completo, año, definición y notas del INE. Una dirección localiza una sección: no convierte su renta agregada en renta de la calle o persona. No se promedian secciones sin ponderación adecuada. Las revisiones de renta no actualizan retroactivamente originales anteriores.
+- Los activos se describen con fuente, fecha, ámbito y estado de contraste. Localiza Salud, inventario activo validado e inventarios históricos se distinguen; su número no acredita acceso, cobertura ni efecto sanitario. La correspondencia con necesidades es declarada, no inferida por coincidencia de palabras.
+- Consulta participativa, estudio de priorización y selección adoptada por el Grupo Motor son hechos distintos. La incorporación de nueva participación puede exigir revisar decisiones anteriores, pero el Perfil no las cambia automáticamente.
+- `supportsConclusions` enlaza indicadores con C1, C2… solo cuando lo declara el equipo; no implica causalidad. Las recomendaciones se identifican R1, R2… con tipo Conocer, Contrastar o Abordar y derivación explícita de conclusiones o lagunas. `areas` es una lista de orientaciones fundamentadas para deliberación, no un conjunto de líneas ya aprobadas.
+
+## 12. Aceptación por revisión y publicación
+
+Se registran resultados separados, sin convertir uno en prueba de otro:
+
+| Comprobación | Evidencia exigida | Lo que no acredita |
+|---|---|---|
+| Importabilidad | JSON compatible, municipio correcto y límites de tamaño | Calidad científica |
+| Conservación remota | Relectura del expediente desde Firebase y SHA-256 de originales | Fidelidad del texto extraído |
+| Correspondencia documental | Cotejo PDF ↔ texto ↔ JSON ↔ exportación; diferencias inventariadas | Aprobación institucional |
+| Suficiencia metodológica | Estructura, fuentes, conclusiones y recomendaciones justificadas; lagunas declaradas | Priorización adoptada |
+| Validación técnica | Acto humano explícito con cuenta, fecha y revisión exacta | Decisión del Grupo Motor sobre el Plan |
+
+Reconocer los cuatro rótulos de páginas o contar indicadores es un diagnóstico técnico preliminar, nunca aceptación completa. Se cotejan tablas, imágenes, notas y anexos; las salidas derivadas pueden perder elementos del original y esa limitación se declara. No se anuncia fidelidad completa sin cotejo reproducible.
+
+La auditoría distingue **biblioteca completa**, **versión vigente** y **versión consultada**. Los JSON, originales e indicadores de revisiones históricas no se suman a la cobertura de la vigente. La versión más reciente no se promueve por fecha, nombre o cantidad de datos. Cambiar la vigente requiere una acción explícita distinta de cargar o validar.
+
+Antes de entregar o distribuir: confirmar municipio y revisión; eliminar filtros de la exportación; comprobar original, cuerpo y anexos; conservar etiquetas de borrador o validación; identificar el medio y el destino. Una síntesis para una reunión, como la comparativa ESdE del Aula de Loja, identifica su perfil de referencia y sus fuentes añadidas; no sustituye al Perfil canónico ni se carga como si fuera una nueva revisión de él. Introducir esos datos en el Perfil exige revisión explícita y cotejo de todas sus representaciones.
+
+## 13. Dependencias y cambios de fuentes
+
+El expediente, la pestaña Perfil y el Plan Local de Salud deben identificar el mismo perfil vigente. Consultar una revisión histórica no cambia el perfil que consume la planificación. El estado de revisión o validación acompaña a cada salida; trabajar en el Plan no valida retroactivamente el Perfil.
+
+Una nueva fuente o corrección abre una revisión de impacto: qué conclusiones, recomendaciones, indicadores, activos o decisiones podrían requerir contraste. No se reescribe el perfil vigente ni el Plan de forma automática. Los acuerdos de priorización y las selecciones del catálogo se registran en sus módulos, con trazabilidad al perfil y a la deliberación. El contrato de perfiles no impone una línea estratégica a todos los municipios.
+
+Las versiones se conservan por defecto. La aplicación permite eliminación explícita con confirmación; esta operación excepcional no equivale a archivar ni forma parte de una armonización. No se usa para igualar recuentos ni limpiar divergencias entre revisiones. El cotejo de referencia es de solo lectura y no borra, promueve ni valida perfiles.
+
+## Registro de revisión
+
+| Fecha | Versión | Cambio |
+|---|---|---|
+| 2026-11-03 | Propuesta 1.0 | Elaboración externa, custodia y fidelidad de representaciones |
+| 2026-11-12 | Propuesta 1.1 | Entrega reproducible, cuatro casos actuales, distinción vigente/histórico, renta, activos, participación, aceptación y dependencias; pendiente de aprobación técnica |

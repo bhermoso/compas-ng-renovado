@@ -1,5 +1,6 @@
 import { Fragment, useMemo, useState, type ReactNode } from "react";
 import type { ProfileStructure, ProfileSection } from "../../application/health-profile/profileStructure";
+import { ProfileText } from './ProfileText';
 
 /** Marca las citas [1], [3, tabla 31033] sin alterar el texto. */
 function withCitations(text: string): ReactNode {
@@ -57,7 +58,7 @@ function SectionBody({ section, structure }: { section: ProfileSection; structur
   if (/referencias/i.test(section.title) && structure.references.length > 0) {
     return <ol className="epr-references">{structure.references.map((r, i) => <li key={i}>{r}</li>)}</ol>;
   }
-  return <>{section.paragraphs.map((p, i) => <p key={i}>{withCitations(p)}</p>)}</>;
+  return <ProfileText paragraphs={section.paragraphs} renderText={withCitations} />;
 }
 
 /**

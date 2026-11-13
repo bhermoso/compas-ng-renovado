@@ -16,6 +16,7 @@ type Diagnostic = {documents:number;reports:number;studies:number;studyRecords:s
 function diagnosticOf(remote:NonNullable<Awaited<ReturnType<typeof readRemoteWorkspace>>>):Diagnostic{
  const documents=remote.repository?.documents??[];
  const active=remote.externalProfileLibrary?.profiles.find(p=>p.id===remote.externalProfileLibrary?.activeId);
+ const activeAttachments=(remote.externalProfileLibrary?.attachments??[]).filter(a=>active?.attachmentIds.includes(a.id));
  const namedStudyFields=['ibseStudy','dukeStudy','predimedStudy','sf12Study','suenoStudy','cageStudy','auditcStudy','ipaqStudy','ghq12Study','phq9Study','psqiStudy','fagerstromStudy','sbqStudy'] as const;
  const studyRecords=namedStudyFields.filter(name=>Boolean(remote[name]));
  return {
@@ -25,9 +26,9 @@ function diagnosticOf(remote:NonNullable<Awaited<ReturnType<typeof readRemoteWor
   studyRecords:[...studyRecords],
   prioritisation:Boolean(remote.thematicPrioritisation),
   prioritisationStudy:Boolean(remote.thematicPrioritisationStudy),
-  attachments:(remote.externalProfileLibrary?.attachments??[]).map(a=>a.name),
+  attachments:activeAttachments.map(a=>a.name),
   results:active?.results.length??0,
-  jsonFiles:(remote.externalProfileLibrary?.attachments??[]).filter(a=>a.mimeType==='application/json').length,
+  jsonFiles:activeAttachments.filter(a=>a.mimeType==='application/json').length,
   resultsWithSource:active?.results.filter(r=>r.source.trim()).length??0,
   resultsWithPeriod:active?.results.filter(r=>r.period.trim()).length??0,
   resultsWithPage:active?.results.filter(r=>r.page.trim()).length??0,
@@ -50,7 +51,7 @@ function summary(rows:ProfileAuditResult[],scopes:Scope[],diagnostics:Record<str
   if(row.error)lines.push('  - Error de lectura: '+row.error);
  }
  const reference=rows.filter(r=>PROFILE_AUDIT_SCOPES.some(scope=>scope.id===r.scope));
- if(reference.length===3){lines.push('', 'Tres casos de referencia: '+profileParity(reference).status);for(const note of profileParity(reference).notes)lines.push('- '+note);}
+ if(reference.length===PROFILE_AUDIT_SCOPES.length){lines.push('', 'Cuatro casos de referencia: '+profileParity(reference).status);for(const note of profileParity(reference).notes)lines.push('- '+note);}
  lines.push('No comprueba igualdad textual entre PDF y transcripción ni calidad científica del contenido.');
  return lines.join('\n');
 }
@@ -69,7 +70,7 @@ export function ProfileRemoteAuditPanel({client}:{client:RelasClient}){
   let targets:Scope[];
   try { targets=(await listTerritorialSpaces(client)).map(s=>({id:s.id,name:s.name})); }
   catch(error){setMessage('No se pudo leer el catálogo de ámbitos: '+(error instanceof Error?error.message:'Error de permisos'));setRunning(false);return;}
-  // Los tres ejemplos se incluyen incluso cuando el catálogo todavía no los expone.
+  // Los cuatro ejemplos se incluyen incluso cuando el catálogo todavía no los expone.
   targets=[...targets,...PROFILE_AUDIT_SCOPES.filter(f=>!targets.some(x=>x.id===f.id))];
   setScopes(targets);
   const details:Record<string,Diagnostic>={};
@@ -101,7 +102,7 @@ export function ProfileRemoteAuditPanel({client}:{client:RelasClient}){
  const parity=profileParity(reference);
  return <section className="admin-section audit-profiles" aria-labelledby="audit-profiles-title">
   <h2 id="audit-profiles-title">Verificación de expedientes y perfiles · Todos los ámbitos</h2>
-  <p>Comprobación <strong>de solo lectura</strong> de todos los ámbitos disponibles en el catálogo de Firebase, incluidos los tres casos de referencia. Se obtienen directamente del servidor los fragmentos de Firebase y se verifica su integridad; los originales adjuntos se comprueban con SHA-256. No se comparan cifras de municipios distintos ni se modifican sus versiones.</p>
+  <p>Comprobación <strong>de solo lectura</strong> de todos los ámbitos disponibles en el catálogo de Firebase, incluidos los cuatro casos de referencia. Se obtienen directamente del servidor los fragmentos de Firebase y se verifica su integridad; los originales adjuntos se comprueban con SHA-256. No se comparan cifras de municipios distintos ni se modifican sus versiones.</p>
   <div className="audit-profiles__actions">
    <button type="button" onClick={()=>void run()} disabled={running}>{running?'Verificando expedientes…':completed?'Repetir comprobación en Firebase':'Comprobar todos los expedientes en Firebase'}</button>
    {completed&&<button className="secondary" type="button" onClick={()=>void copy()}>Copiar resumen del diagnóstico</button>}
@@ -110,7 +111,7 @@ export function ProfileRemoteAuditPanel({client}:{client:RelasClient}){
   {rows.length>0&&<div className="table-wrap">
    <table className="audit-profiles__table">
     <caption>Resultados leídos en esta sesión administrativa; «no comprobado» no equivale a expediente ausente.</caption>
-    <thead><tr><th>Municipio</th><th>Expediente Firebase</th><th>Perfiles</th><th>Versión externa vigente</th><th>Documento y resultados</th><th>Originales</th><th>Fuentes del expediente</th><th>Paquete estructurado</th></tr></thead>
+    <thead><tr><th>Municipio</th><th>Expediente Firebase</th><th>Perfiles</th><th>Versión externa vigente</th><th>Documento y resultados</th><th>Originales</th><th>Fuentes del expediente</th><th>Paquete de la versión vigente</th></tr></thead>
     <tbody>{scopes.map(scope=>{
      const x=rows.find(row=>row.scope===scope.id);
      return <tr key={scope.id}><th scope="row">{scope.name}</th>
@@ -121,7 +122,7 @@ export function ProfileRemoteAuditPanel({client}:{client:RelasClient}){
        <small>{x.libraryValid?'Biblioteca validada':'Biblioteca no confirmada'}</small></td>
       <td>{x.activeFound?'Sí · '+(x.activeStatus==='validated'?'Validado':'En revisión'):'No'}</td>
       <td>{x.activePdf?'PDF original':'Sin PDF'} · {x.activeText?'Texto':'Sin texto'} · {x.activeResults?'Resultados':'Sin resultados'}</td>
-      <td>{x.remote!=='ok'?'No verificados':x.originalsVerified?'Correctos':'Con incidencias'}
+      <td>{x.remote!=='ok'?'No verificados':x.originalsChecked===0?'Sin originales que comprobar':x.originalsVerified?'Correctos':'Con incidencias'}
        <small>{x.originalsChecked} comprobados; {x.originalsFailed} fallidos</small></td>
       <td>{diagnostics[scope.id] ? <>{diagnostics[scope.id].documents} documentos · {diagnostics[scope.id].reports} informes · {diagnostics[scope.id].studies} estudios<small>Estudios cargados: {diagnostics[scope.id].studyRecords.length} · Prioridad adoptada: {diagnostics[scope.id].prioritisation?'sí':'no'} · Estudio temático: {diagnostics[scope.id].prioritisationStudy?'sí':'no'}</small></> : 'No verificadas'}</td>
       <td>{diagnostics[scope.id] ? <>{diagnostics[scope.id].jsonFiles} JSON adjuntos · {diagnostics[scope.id].results} indicadores<small>{diagnostics[scope.id].resultsWithSource} con fuente · {diagnostics[scope.id].resultsWithPeriod} con periodo · {diagnostics[scope.id].resultsWithPage} con página · {diagnostics[scope.id].resultsWithComparators} comparables</small></> : 'No evaluable'}</td>
@@ -129,8 +130,8 @@ export function ProfileRemoteAuditPanel({client}:{client:RelasClient}){
      </tr>;
     })}</tbody></table>
    </div>}
-  {completed&&reference.length===3&&<div className="audit-profiles__conclusion">
-   <h3>Comparación técnica de los tres casos de referencia</h3>
+  {completed&&reference.length===PROFILE_AUDIT_SCOPES.length&&<div className="audit-profiles__conclusion">
+   <h3>Comparación técnica de los cuatro casos de referencia</h3>
    <p><strong>{parity.status==='equivalentes'?'Equivalentes en los mínimos técnicos':parity.status==='distintos'?'No equivalentes o con carencias':'No evaluable todavía'}</strong></p>
    {parity.notes.map((note,i)=><p key={i}>{note}</p>)}
   </div>}
@@ -140,11 +141,11 @@ export function ProfileRemoteAuditPanel({client}:{client:RelasClient}){
    {row.observations.map((note,i)=><p key={i}>{note}</p>)}
    {diagnostics[row.scope]&&<p>Fuentes registradas: {diagnostics[row.scope].documents} documentos, {diagnostics[row.scope].reports} informes de salud, {diagnostics[row.scope].studies} estudios complementarios catalogados ; estudios cargados {diagnostics[row.scope].studyRecords.join(', ')||'ninguno'}; priorización adoptada {diagnostics[row.scope].prioritisation?'sí':'no'}; estudio temático {diagnostics[row.scope].prioritisationStudy?'sí':'no'}.</p>}
    {diagnostics[row.scope]&&<p>Resultados del perfil vigente: {diagnostics[row.scope].results} indicadores; {diagnostics[row.scope].resultsWithSource} con fuente; {diagnostics[row.scope].resultsWithPeriod} con periodo; {diagnostics[row.scope].resultsWithPage} con página; {diagnostics[row.scope].resultsWithComparators} con comparadores; {diagnostics[row.scope].jsonFiles} archivos JSON adjuntos.</p>}
-   {diagnostics[row.scope]&&diagnostics[row.scope].attachments.length>0&&<p>Archivos del paquete: {diagnostics[row.scope].attachments.join(' · ')}</p>}
-   {packageReadiness[row.scope]&&<p><strong>Lectura de suficiencia:</strong> {packageReadiness[row.scope].stage==='sin-perfil'?'Sin perfil externo':packageReadiness[row.scope].stage==='documental'?'Perfil documental':'Perfil con indicadores estructurados'} · Original vinculado: {packageReadiness[row.scope].hasOriginal?'sí':'no'} · JSON adjunto: {packageReadiness[row.scope].hasPackageJson?'sí':'no'} · Cuatro páginas reconocidas: {packageReadiness[row.scope].hasFourDataPages?'sí':'no'} · Indicadores numéricos: {packageReadiness[row.scope].numericIndicators} · Con denominador: {packageReadiness[row.scope].withDenominator}.</p>}
+   {diagnostics[row.scope]&&diagnostics[row.scope].attachments.length>0&&<p>Archivos de la versión vigente: {diagnostics[row.scope].attachments.join(' · ')}</p>}
+   {packageReadiness[row.scope]&&<p><strong>Lectura de suficiencia:</strong> {packageReadiness[row.scope].stage==='sin-perfil'?'Sin perfil externo':packageReadiness[row.scope].stage==='documental'?'Perfil documental':'Perfil con indicadores estructurados'} · Original vinculado: {packageReadiness[row.scope].hasOriginal?'sí':'no'} · JSON adjunto: {packageReadiness[row.scope].hasPackageJson?'sí':'no'} · Cuatro páginas reconocidas: {packageReadiness[row.scope].hasFourDataPages?'sí':'no'} · Indicadores numéricos: {packageReadiness[row.scope].numericIndicators} · Campo de base con texto: {packageReadiness[row.scope].withDenominator} (no acredita que la base sea conocida o esté verificada).</p>}
    {packageReadiness[row.scope]?.warnings.map((warning,i)=><p key={i}>Revisión pendiente: {warning}</p>)}
-   {row.versions.length>0?<table><thead><tr><th>Versión</th><th>Estado</th><th>Texto</th><th>PDF</th><th>Indicadores</th></tr></thead><tbody>
-    {row.versions.map(p=><tr key={p.id}><td>{p.title}</td><td>{p.active?'Vigente':'Histórica'} · {p.archived?'Archivada':p.status==='validated'?'Validada':'En revisión'}</td><td>{p.textPresent?'Sí':'No'}</td><td>{p.pdfs}</td><td>{p.results}</td></tr>)}
+   {row.versions.length>0?<table><thead><tr><th>Versión</th><th>Identidad y archivos</th><th>Estado</th><th>Texto</th><th>PDF</th><th>Indicadores</th></tr></thead><tbody>
+    {row.versions.map(p=><tr key={p.id}><td>{p.title}</td><td><code>{p.id}</code><br/>Incorporación: {shortDate(p.createdAt)}<br/>{p.attachmentNames.join(' · ')||'Sin adjuntos'}</td><td>{p.active?'Vigente':'Histórica'} · {p.archived?'Archivada':p.status==='validated'?'Validada':'En revisión'}</td><td>{p.textPresent?'Sí':'No'}</td><td>{p.pdfs}</td><td>{p.results}</td></tr>)}
    </tbody></table>:<p>No hay revisiones externas que mostrar.</p>}
   </details>)}
   <p className="audit-profiles__caveat">La ausencia de un perfil externo no implica que falten fuentes diagnósticas. Los estudios se distinguen entre documentos catalogados y módulos de estudio cargados; el estudio de priorización no equivale a una selección de prioridades adoptada. Esta comprobación verifica conservación e integridad estructural. No certifica que la transcripción coincida palabra por palabra con el PDF original ni que los datos epidemiológicos estén científicamente validados. No usa copias del navegador ni semillas de demostración como prueba de Firebase.</p>
