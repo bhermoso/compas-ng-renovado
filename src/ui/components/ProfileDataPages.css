@@ -377,3 +377,74 @@
 }
 .pdp-domain-chart>summary{cursor:pointer;font-weight:600;color:var(--pdp-ink);padding:2px 0}
 .pdp-domain-chart:not([open]){padding-top:10px;padding-bottom:10px}
+
+/* Prueba: panel por dominios, repartible en columnas de página (16/11/2026). */
+.pdp-domains{overflow-x:visible}
+.pdp-dtable{table-layout:fixed;width:100%;margin:0 0 10px}
+.pdp-dtable__cap{caption-side:top;text-align:left;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--pdp-ink);padding:8px 7px 4px;background:var(--fondo-principal)}
+.pdp-dtable thead th{font-size:11px}
+.pdp-dtable th,.pdp-dtable td{overflow:hidden;text-overflow:ellipsis}
+.pdp-dtable th:first-child{width:var(--pdp-w-title,34%)}
+.pdp-dtable thead th:nth-child(2){width:9%}
+.pdp-dtable thead th:nth-child(3){width:18%}
+.pdp-dtable thead th.pdp-num:not(:nth-child(3)){width:9%}
+.pdp-dtable thead th.pdp-chart-col{width:10%}
+.pdp-dtable thead th.pdp-srcref{width:4%}
+.pdp-dtable .pdp-strip{width:100%}
+@media print{
+ #pdp-3 .pdp-domains{columns:var(--pdp-print-cols,2);column-gap:5mm;column-fill:auto;height:auto}
+ #pdp-3 .pdp-dtable{font-size:6.3pt;margin:0 0 2mm;break-inside:auto}
+ #pdp-3 .pdp-dtable__cap{font-size:6.3pt;padding:1.2mm 1mm .4mm;letter-spacing:.05em;break-after:avoid}
+ #pdp-3 .pdp-dtable thead th{font-size:5.6pt;padding:.2mm 1mm}
+ #pdp-3 .pdp-dtable th,#pdp-3 .pdp-dtable td{padding:.15mm 1mm;line-height:1.15}
+ #pdp-3 .pdp-dtable .pdp-strip{height:7px}
+ #pdp-3 .pdp-sources{column-span:all;font-size:5.4pt;columns:3;column-gap:4mm}
+}
+.pdp-dtable__unit{font-weight:500;text-transform:none;letter-spacing:0;color:var(--pdp-muted)}
+@media print{
+ /* el panel del propio Perfil repite indicadores de la tabla: en la hoja del cuadro de mandos queda su texto, no su tabla */
+ #pdp-3>.pdp-text table{display:none}
+ #pdp-3 .pdp-interpretation{break-before:page}
+ #pdp-3 .pdp-dtable thead th:nth-child(2){width:10%}
+}
+@media print{
+ #pdp-3 .pdp-dtable{table-layout:auto}
+ #pdp-3 .pdp-dtable th,#pdp-3 .pdp-dtable td{overflow:visible}
+ #pdp-3 .pdp-dtable thead th{width:auto!important}
+ #pdp-3 .pdp-dtable .pdp-chart-col,#pdp-3 .pdp-dtable thead th.pdp-chart-col{width:34px!important;max-width:34px}
+ #pdp-3 .pdp-dtable .pdp-strip{width:32px}
+}
+@media print{
+ #pdp-3 .profile-text-table{display:none}
+ #pdp-3 .pdp-dtable thead th{white-space:normal;line-height:1.05;vertical-align:bottom}
+}
+@media print{
+ /* una sola cabecera de columnas para todo el panel; las tablas de dominio comparten anchos */
+ #pdp-3 .pdp-domains{columns:var(--pdp-print-cols,1)}
+ #pdp-3 .pdp-dtable{table-layout:fixed;width:100%}
+ #pdp-3 .pdp-dtable~.pdp-dtable thead{display:none}
+ #pdp-3 .pdp-dtable th[scope=row]{width:auto}
+ #pdp-3 .pdp-dtable thead th:first-child{width:40%!important}
+ #pdp-3 .pdp-dtable thead th:nth-child(2){width:8%!important}
+ #pdp-3 .pdp-dtable thead th:nth-child(3){width:20%!important}
+ #pdp-3 .pdp-dtable thead th.pdp-num:not(:nth-child(3)){width:9%!important}
+ #pdp-3 .pdp-dtable thead th.pdp-chart-col{width:7%!important;max-width:none}
+ #pdp-3 .pdp-dtable thead th.pdp-srcref{width:3%!important}
+ #pdp-3 .pdp-dtable .pdp-chart-col{width:auto!important;max-width:none}
+ #pdp-3 .pdp-dtable .pdp-strip{width:100%;height:6px}
+ #pdp-3 .pdp-dtable{margin:0}
+ #pdp-3 .pdp-dtable__cap{padding:.8mm 1mm .2mm}
+}
+.pdp-dtable .pdp-c-title{width:36%}.pdp-dtable .pdp-c-period{width:9%}.pdp-dtable .pdp-c-local{width:18%}
+.pdp-dtable .pdp-c-geo{width:9%}.pdp-dtable .pdp-c-chart{width:10%}.pdp-dtable .pdp-c-before{width:12%}.pdp-dtable .pdp-c-ref{width:4%}
+@media print{
+ #pdp-3 .pdp-dtable thead th{width:auto!important}
+ #pdp-3 .pdp-dtable .pdp-c-title{width:40%}#pdp-3 .pdp-dtable .pdp-c-period{width:8%}#pdp-3 .pdp-dtable .pdp-c-local{width:20%}
+ #pdp-3 .pdp-dtable .pdp-c-geo{width:9%}#pdp-3 .pdp-dtable .pdp-c-chart{width:6%}#pdp-3 .pdp-dtable .pdp-c-ref{width:3%}
+}
+@media print{
+ #pdp-3 .pdp-dtable th,#pdp-3 .pdp-dtable td{padding:0 1mm;line-height:1.08;border-bottom-width:.4px}
+ #pdp-3 .pdp-dtable__cap{padding:.6mm 1mm 0;line-height:1.1}
+ #pdp-3 .pdp-dtable .pdp-strip{height:5px}
+ #pdp-3>.pdp-text,#pdp-3 .pdp-note{font-size:7.5pt;line-height:1.3;margin:0 0 1.2mm}
+}

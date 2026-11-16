@@ -74,50 +74,78 @@ function IndicatorTable({ results, municipalityName, geo, caption, grouped, id }
   const topics = grouped ? groupResultsByTopic(results) : [{ topic: "", results, scaleByUnit: {} }];
   const beforeOf = (r: ProfileResult) => comparatorsOf(r).filter((c) => !geo.includes(c.label));
   const hasBefore = results.some((r) => beforeOf(r).length > 0);
+  // Prueba 17/11: la lista agrupa por fuente; página y base quedan en el título de la referencia.
+  const sourceOf = (r: ProfileResult) => r.source || provenanceOf(r);
   const sources: string[] = [];
-  for (const r of results) { const s = provenanceOf(r); if (s && !sources.includes(s)) sources.push(s); }
-  const cols = 4 + geo.length + (hasBefore ? 1 : 0) + (sources.length ? 1 : 0);
+  for (const r of results) { const s = sourceOf(r); if (s && !sources.includes(s)) sources.push(s); }
+  const cols = (
+    <colgroup>
+      <col className="pdp-c-title" /><col className="pdp-c-period" /><col className="pdp-c-local" />
+      {geo.map((g) => <col key={g} className="pdp-c-geo" />)}
+      <col className="pdp-c-chart" />
+      {hasBefore && <col className="pdp-c-before" />}
+      {sources.length > 0 && <col className="pdp-c-ref" />}
+    </colgroup>
+  );
+  const head = (
+    <thead>
+      <tr>
+        <th scope="col">Indicador</th><th scope="col">Periodo</th><th scope="col" className="pdp-num">{municipalityName}</th>
+        {geo.map((g) => <th key={g} scope="col" className="pdp-num">{g}</th>)}
+        <th scope="col" className="pdp-chart-col">Comparación</th>
+        {hasBefore && <th scope="col">Antes</th>}
+        {sources.length > 0 && <th scope="col" className="pdp-srcref"><abbr title="Fuente">F.</abbr></th>}
+      </tr>
+    </thead>
+  );
+  const row = (r: ProfileResult, sharedUnit = false) => {
+    const unit = sharedUnit ? "" : unitOf(r.unit);
+    const comps = comparatorsOf(r);
+    const before = beforeOf(r);
+    const n = sources.indexOf(sourceOf(r)) + 1;
+    return (
+      <tr key={r.id}>
+        <th scope="row" title={r.title}>{r.title}</th>
+        <td className="pdp-muted">{r.period || "—"}</td>
+        <td className="pdp-num pdp-local">{r.value}{unit}</td>
+        {geo.map((g) => { const c = comps.find((x) => x.label === g); return <td key={g} className="pdp-num">{c ? formatComparisonValue(c.value) : "—"}</td>; })}
+        <td className="pdp-chart-col"><DotStrip result={r} geo={geo} /></td>
+        {hasBefore && <td className="pdp-muted">{before.length ? before.map((c) => `${c.label}: ${formatComparisonValue(c.value)}`).join(" · ") : "—"}</td>}
+        {sources.length > 0 && <td className="pdp-srcref">{n > 0 ? <a href={`#${id}-f${n}`} title={provenanceOf(r)}>{n}</a> : "—"}</td>}
+      </tr>
+    );
+  };
+  const sourceList = sources.length > 0 && (
+    <ol className="pdp-sources" aria-label={`Fuentes · ${caption}`}>
+      {sources.map((s, i) => <li key={s} id={`${id}-f${i + 1}`}>{s}</li>)}
+    </ol>
+  );
+  // Agrupada: una tabla por dominio, con las mismas columnas, para poder repartirlas en columnas de página.
+  if (grouped) return (
+    <div className="pdp-table-wrap pdp-domains" role="group" aria-label={caption}>
+      {topics.map((t, i) => {
+        const units = new Set(t.results.map((r) => unitOf(r.unit).trim()));
+        const shared = units.size === 1 && [...units][0] !== "" ? [...units][0] : "";
+        return (
+          <table key={t.topic} id={`pdp-domain-${i}`} className="pdp-table pdp-table--line pdp-dtable">
+            <caption className="pdp-dtable__cap">{t.topic}{shared && <span className="pdp-dtable__unit"> · {shared}</span>}</caption>
+            {cols}
+            {head}
+            <tbody>{t.results.map((r) => row(r, !!shared))}</tbody>
+          </table>
+        );
+      })}
+      {sourceList}
+    </div>
+  );
   return (
     <div className="pdp-table-wrap">
       <table className="pdp-table pdp-table--line">
         <caption className="ep-sr-only">{caption}</caption>
-        <thead>
-          <tr>
-            <th scope="col">Indicador</th><th scope="col">Periodo</th><th scope="col" className="pdp-num">{municipalityName}</th>
-            {geo.map((g) => <th key={g} scope="col" className="pdp-num">{g}</th>)}
-            <th scope="col" className="pdp-chart-col">Comparación</th>
-            {hasBefore && <th scope="col">Antes</th>}
-            {sources.length > 0 && <th scope="col" className="pdp-srcref"><abbr title="Fuente">F.</abbr></th>}
-          </tr>
-        </thead>
-        {topics.map((t) => (
-          <tbody key={t.topic || "all"} id={grouped ? `pdp-domain-${topics.indexOf(t)}` : undefined}>
-            {grouped && <tr className="pdp-table__group"><th scope="rowgroup" colSpan={cols}>{t.topic}</th></tr>}
-            {t.results.map((r) => {
-              const unit = unitOf(r.unit);
-              const comps = comparatorsOf(r);
-              const before = beforeOf(r);
-              const n = sources.indexOf(provenanceOf(r)) + 1;
-              return (
-                <tr key={r.id}>
-                  <th scope="row">{r.title}</th>
-                  <td className="pdp-muted">{r.period || "—"}</td>
-                  <td className="pdp-num pdp-local">{r.value}{unit}</td>
-                  {geo.map((g) => { const c = comps.find((x) => x.label === g); return <td key={g} className="pdp-num">{c ? formatComparisonValue(c.value) : "—"}</td>; })}
-                  <td className="pdp-chart-col"><DotStrip result={r} geo={geo} /></td>
-                  {hasBefore && <td className="pdp-muted">{before.length ? before.map((c) => `${c.label}: ${formatComparisonValue(c.value)}`).join(" · ") : "—"}</td>}
-                  {sources.length > 0 && <td className="pdp-srcref">{n > 0 ? <a href={`#${id}-f${n}`}>{n}</a> : "—"}</td>}
-                </tr>
-              );
-            })}
-          </tbody>
-        ))}
+        {head}
+        <tbody>{results.map((r) => row(r))}</tbody>
       </table>
-      {sources.length > 0 && (
-        <ol className="pdp-sources" aria-label={`Fuentes · ${caption}`}>
-          {sources.map((s, i) => <li key={s} id={`${id}-f${i + 1}`}>{s}</li>)}
-        </ol>
-      )}
+      {sourceList}
     </div>
   );
 }
@@ -301,7 +329,7 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
           <ProfileText paragraphs={pages.healthPanel} className="pdp-text" />
           {split.healthPanel.length > 0 ? (
             <>
-              <div className="pdp-health-summary" aria-label="Cobertura del sistema de indicadores">
+              <div className="pdp-health-summary pdp-noprint" aria-label="Cobertura del sistema de indicadores">
                 <div><strong>{split.healthPanel.length}</strong><span>indicadores documentados</span></div>
                 <div><strong>{healthDomains.length}</strong><span>dominios de salud</span></div>
                 <div><strong>{comparedCount}</strong><span>con referencia territorial</span></div>

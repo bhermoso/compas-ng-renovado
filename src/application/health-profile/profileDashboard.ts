@@ -91,6 +91,8 @@ export function splitDataPageResults(results: ProfileResult[]): DataPageResults 
     const topic = norm(r.topic);
     if (topic === "quien vive aqui") out.whoLivesHere.push(r);
     else if (topic === "desigualdad") out.inequality.push(r);
+    // Prueba 17/11: los resultados por sección censal se leen en la página 4 (sectionMetrics), no en el panel.
+    else if (/^secci[oó]n/i.test(r.scale ?? "") && r.chartValue !== undefined) continue;
     else out.healthPanel.push(r);
   }
   return out;
