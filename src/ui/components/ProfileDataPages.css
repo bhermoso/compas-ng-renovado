@@ -358,9 +358,9 @@
 .pdp-table--line .pdp-chart-col{width:112px}
 .pdp-table--line .pdp-strip{width:110px}
 .pdp-table--line th[scope=row]{min-width:0;font-weight:600}
-.pdp-table--line .pdp-ref{text-align:center;width:28px;font-size:11px}
-.pdp-table--line .pdp-ref a{color:var(--pdp-muted);text-decoration:none}
-.pdp-table--line .pdp-ref abbr{text-decoration:none}
+.pdp-table--line .pdp-srcref{text-align:center;width:28px;font-size:11px}
+.pdp-table--line .pdp-srcref a{color:var(--pdp-muted);text-decoration:none}
+.pdp-table--line .pdp-srcref abbr{text-decoration:none}
 .pdp-table--line .pdp-strip{height:14px}
 #pdp-3{page:pdp-panel}
 @page pdp-panel{size:A4 landscape;margin:8mm 10mm}
@@ -370,7 +370,7 @@
 @media print{
  .pdp-table--line th,.pdp-table--line td{padding:.6px 3px;line-height:1.2}
  .pdp-table--line tbody th{width:auto;position:static}
- .pdp-table--line .pdp-ref{font-size:6.8pt;width:auto}
+ .pdp-table--line .pdp-srcref{font-size:6.8pt;width:auto}
  .pdp-table--line .pdp-strip{width:70px;height:9px}
  .pdp-table--line .pdp-chart-col{width:72px}
  .pdp-sources{font-size:6.6pt;line-height:1.25;columns:2;column-gap:12px;margin-top:3px}

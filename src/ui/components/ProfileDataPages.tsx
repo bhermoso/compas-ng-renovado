@@ -87,7 +87,7 @@ function IndicatorTable({ results, municipalityName, geo, caption, grouped, id }
             {geo.map((g) => <th key={g} scope="col" className="pdp-num">{g}</th>)}
             <th scope="col" className="pdp-chart-col">Comparación</th>
             {hasBefore && <th scope="col">Antes</th>}
-            {sources.length > 0 && <th scope="col" className="pdp-ref"><abbr title="Fuente">F.</abbr></th>}
+            {sources.length > 0 && <th scope="col" className="pdp-srcref"><abbr title="Fuente">F.</abbr></th>}
           </tr>
         </thead>
         {topics.map((t) => (
@@ -106,7 +106,7 @@ function IndicatorTable({ results, municipalityName, geo, caption, grouped, id }
                   {geo.map((g) => { const c = comps.find((x) => x.label === g); return <td key={g} className="pdp-num">{c ? formatComparisonValue(c.value) : "—"}</td>; })}
                   <td className="pdp-chart-col"><DotStrip result={r} geo={geo} /></td>
                   {hasBefore && <td className="pdp-muted">{before.length ? before.map((c) => `${c.label}: ${formatComparisonValue(c.value)}`).join(" · ") : "—"}</td>}
-                  {sources.length > 0 && <td className="pdp-ref">{n > 0 ? <a href={`#${id}-f${n}`}>{n}</a> : "—"}</td>}
+                  {sources.length > 0 && <td className="pdp-srcref">{n > 0 ? <a href={`#${id}-f${n}`}>{n}</a> : "—"}</td>}
                 </tr>
               );
             })}

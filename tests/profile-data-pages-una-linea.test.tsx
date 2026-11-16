@@ -26,6 +26,8 @@ describe("Panel de salud · una línea por indicador", () => {
     const sources = [...panel.matchAll(/<li id="pdp-t3-f(\d)">([^<]*)<\/li>/g)].map((m) => m[2]);
     expect(sources).toEqual(["Informe de salud, Tabla 3", "Informe de salud, Tabla 3 · Base: Población asignada", "Informe de salud, Tabla 4"]);
     expect(rows.map((row) => row.match(/href="#pdp-t3-f(\d)"/)?.[1])).toEqual(["1", "2", "3"]);
+    // clase propia: «pdp-ref» ya es la línea de referencia de los gráficos (posición absoluta, ancho 0)
+    for (const row of rows) expect(row).toMatch(/<td class="pdp-srcref"><a href=/);
   });
   it("no añade columna «Antes» si ningún indicador tiene ciclo anterior", () => {
     expect(panel).not.toMatch(/<th scope="col">Antes<\/th>/);
