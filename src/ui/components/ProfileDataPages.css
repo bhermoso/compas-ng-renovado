@@ -392,7 +392,7 @@
 .pdp-matrix{min-width:max-content}
 .pdp-matrix th[scope=row] .pdp-muted{font-weight:400}
 .pdp-matrix__ref{color:var(--pdp-muted)}
-#pdp-4{page:pdp-panel}
+.pdp-matrix-wrap{page:pdp-panel}
 @media print{
  #pdp-3 .pdp-dtable,#pdp-4 .pdp-matrix{font-size:6.3pt;min-width:0}
  #pdp-3 .pdp-dtable th,#pdp-3 .pdp-dtable td,#pdp-4 .pdp-matrix th,#pdp-4 .pdp-matrix td{padding:0 1mm;line-height:1.08;border-bottom-width:.4px}
@@ -405,4 +405,8 @@
  #pdp-3>.pdp-text,#pdp-3 .pdp-note{font-size:7.5pt;line-height:1.3;margin:0 0 1.2mm}
  #pdp-3 .pdp-interpretation{break-before:page}
  .pdp-sources{font-size:5.6pt;line-height:1.2;columns:3;column-gap:4mm;margin-top:1.5mm}
+}
+@media print{
+ #pdp-4 .pdp-matrix{font-size:5.9pt}
+ #pdp-4 .pdp-matrix th,#pdp-4 .pdp-matrix td{padding:0 .6mm}
 }

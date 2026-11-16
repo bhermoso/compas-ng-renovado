@@ -73,7 +73,7 @@ const provenanceOf = (r: ProfileResult) =>
  * reúne las páginas y bases que el perfil declara para esa fuente, de modo que
  * la procedencia no se pierde aunque la lista sea corta.
  */
-function sourceIndex(results: ProfileResult[]) {
+function sourceIndex(results: ProfileResult[], pagesAs: "all" | "urls" = "all") {
   const keyOf = (r: ProfileResult) => r.source || provenanceOf(r);
   const order: string[] = [];
   const pages = new Map<string, string[]>();
@@ -82,7 +82,9 @@ function sourceIndex(results: ProfileResult[]) {
     const k = keyOf(r);
     if (!k) continue;
     if (!order.includes(k)) { order.push(k); pages.set(k, []); bases.set(k, []); }
-    if (r.source && r.page && !pages.get(k)!.includes(r.page)) pages.get(k)!.push(r.page);
+    // «urls»: en la matriz, la página repite la sección (columna) y la categoría (fila); basta su dirección.
+    const refs = !r.source || !r.page ? [] : pagesAs === "urls" ? (r.page.match(/https?:\/\/\S+/g) ?? [r.page]) : [r.page];
+    for (const ref of refs) if (!pages.get(k)!.includes(ref)) pages.get(k)!.push(ref);
     if (r.denominator && !bases.get(k)!.includes(r.denominator)) bases.get(k)!.push(r.denominator);
   }
   const entries = order.map((k) => `${k}${pages.get(k)!.length ? ` — ${pages.get(k)!.join("; ")}` : ""}${bases.get(k)!.length ? ` · Base: ${bases.get(k)!.join("; ")}` : ""}`);
@@ -174,11 +176,11 @@ function SectionMatrixTable({ results, id }: { results: ProfileResult[]; id: str
   const { sections, rows } = sectionMatrix(results);
   const refs: string[] = [];
   for (const row of rows) for (const c of row.references) if (!refs.includes(c.label)) refs.push(c.label);
-  const { entries, numberOf } = sourceIndex(results);
+  const { entries, numberOf } = sourceIndex(results, "urls");
   if (!rows.length) return null;
   const caption = "Indicadores por sección censal";
   return (
-    <div className="pdp-table-wrap">
+    <div className="pdp-table-wrap pdp-matrix-wrap">
       <table className="pdp-table pdp-table--line pdp-matrix">
         <caption className="pdp-dtable__cap">{caption} · distrito y sección</caption>
         <thead>
@@ -196,7 +198,7 @@ function SectionMatrixTable({ results, id }: { results: ProfileResult[]; id: str
               <tr key={`${row.title}|${row.unit}`}>
                 <th scope="row">{row.title}{row.unit && <span className="pdp-muted"> · {unitOf(row.unit).trim()}</span>}</th>
                 <td className="pdp-muted">{row.period || "—"}</td>
-                {sections.map((s) => <td key={s.code} className="pdp-num">{row.values[s.code] ?? "—"}</td>)}
+                {sections.map((s) => { const cell = row.results.find((x) => (x.scale ?? "").endsWith(s.code)); return <td key={s.code} className="pdp-num" title={cell ? provenanceOf(cell) : undefined}>{row.values[s.code] ?? "—"}</td>; })}
                 {refs.map((g) => { const c = row.references.find((x) => x.label === g); return <td key={g} className="pdp-num pdp-matrix__ref">{c ? formatComparisonValue(c.value) : "—"}</td>; })}
                 {entries.length > 0 && <td className="pdp-srcref">{n > 0 ? <a href={`#${id}-f${n}`} title={provenanceOf(row.results[0])}>{n}</a> : "—"}</td>}
               </tr>

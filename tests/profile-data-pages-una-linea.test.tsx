@@ -11,8 +11,8 @@ const results: ProfileResult[] = [
   r({ id: "a", title: "Asma", value: "1.589,56", unit: "casos por 10.000", chartValue: 1589.56, comparisons: [{ label: "Provincia de Granada", value: 1448.67 }, { label: "Andalucía", value: 1187.09 }] }),
   r({ id: "b", title: "Diabetes", value: "745,21", unit: "casos por 10.000", chartValue: 745.21, comparisons: [{ label: "Provincia de Granada", value: 906.66 }], denominator: "Población asignada" }),
   r({ id: "c", title: "Defunciones", value: "45", unit: "personas", topic: "Mortalidad", source: "Registro de mortalidad", page: "Tabla 4", chartValue: 45 }),
-  r({ id: "s1", title: "Población total", value: "1.376", unit: "personas", topic: "Territorio", scale: "Sección censal 1801101001", source: "INE", page: "Tabla 69181; CUSEC 1801101001", chartValue: 1376, comparisons: [{ label: "Provincia de Granada", value: 945797 }] }),
-  r({ id: "s2", title: "Población total", value: "1.968", unit: "personas", topic: "Territorio", scale: "Sección censal 1801101002", source: "INE", page: "Tabla 69181; CUSEC 1801101002", chartValue: 1968, comparisons: [{ label: "Provincia de Granada", value: 945797 }] }),
+  r({ id: "s1", title: "Población total", value: "1.376", unit: "personas", topic: "Territorio", scale: "Sección censal 1801101001", source: "INE · tabla 69181", page: "CUSEC 1801101001; Todas las edades; https://www.ine.es/jaxiT3/Tabla.htm?t=69181", chartValue: 1376, comparisons: [{ label: "Provincia de Granada", value: 945797 }] }),
+  r({ id: "s2", title: "Población total", value: "1.968", unit: "personas", topic: "Territorio", scale: "Sección censal 1801101002", source: "INE · tabla 69181", page: "CUSEC 1801101002; Todas las edades; https://www.ine.es/jaxiT3/Tabla.htm?t=69181", chartValue: 1968, comparisons: [{ label: "Provincia de Granada", value: 945797 }] }),
 ];
 const pages = { cover: [], whoLivesHere: [], healthPanel: ["Resultados del Informe.", "| Indicador | Alfacar |\n|---|---|\n| Asma | 1.589,56 |\n| Diabetes | 745,21 |"], inequality: { intro: [], blocks: [] } };
 const html = renderToStaticMarkup(<ProfileDataPages pages={pages} results={results} municipalityName="Alfacar" title="Perfil" period="0.8.1" metrics={[]} />);
@@ -40,7 +40,11 @@ describe("Panel de salud · una línea por indicador", () => {
     expect(panel).not.toContain("Población total");
     expect(page4).toMatch(/<table class="pdp-table pdp-table--line pdp-matrix">/);
     expect(page4).toMatch(/<th scope="col" class="pdp-num" title="Sección censal 1801101001">01001<\/th>/);
-    expect(page4).toMatch(/<th scope="row">Población total<span class="pdp-muted"> · personas<\/span><\/th><td class="pdp-muted">2025<\/td><td class="pdp-num">1.376<\/td><td class="pdp-num">1.968<\/td>/);
+    expect(page4).toMatch(/<th scope="row">Población total<span class="pdp-muted"> · personas<\/span><\/th><td class="pdp-muted">2025<\/td><td class="pdp-num" title="INE · tabla 69181, CUSEC 1801101001; Todas las edades; https:\/\/www.ine.es\/jaxiT3\/Tabla.htm\?t=69181">1.376<\/td>/);
+  });
+  it("la lista de fuentes de la matriz da cada fuente con su dirección una sola vez; el detalle queda en la celda", () => {
+    const sources = [...page4.matchAll(/<li id="pdp-t4s-f(\d)">([^<]*)<\/li>/g)].map((m) => m[2]);
+    expect(sources).toEqual(["INE · tabla 69181 — https://www.ine.es/jaxiT3/Tabla.htm?t=69181"]);
   });
   it("la tabla del propio perfil no se repite si todas sus filas están en el panel; su texto sí", () => {
     expect(panel).toContain("Resultados del Informe.");
