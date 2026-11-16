@@ -76,24 +76,68 @@ export interface DataPageResults {
   whoLivesHere: ProfileResult[];
   inequality: ProfileResult[];
   healthPanel: ProfileResult[];
+  /** Resultados por sección censal que no son de «Desigualdad»: se leen en la matriz de la página 4, no en el panel. */
+  bySection: ProfileResult[];
 }
+
+const isSectionScale = (r: ProfileResult) => /^secci[oó]n/i.test(r.scale ?? "");
 
 const norm = (s: string | undefined) => (s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
 
 /**
  * Reparte los resultados entre las páginas de datos (Art. 17 ter) según el
  * tema que declara el perfil: «Quién vive aquí», «Desigualdad» y, el resto,
- * el panel de salud, en el orden en que el perfil los entrega.
+ * el panel de salud, en el orden en que el perfil los entrega. Los resultados
+ * cuyo ámbito declarado es una sección censal y tienen valor numérico no
+ * describen el municipio: van a la matriz por sección de la página 4
+ * (desigualdad interna, Art. 17 quater), no al panel.
  */
 export function splitDataPageResults(results: ProfileResult[]): DataPageResults {
-  const out: DataPageResults = { whoLivesHere: [], inequality: [], healthPanel: [] };
+  const out: DataPageResults = { whoLivesHere: [], inequality: [], healthPanel: [], bySection: [] };
   for (const r of results) {
     const topic = norm(r.topic);
     if (topic === "quien vive aqui") out.whoLivesHere.push(r);
     else if (topic === "desigualdad") out.inequality.push(r);
+    else if (isSectionScale(r) && r.chartValue !== undefined) out.bySection.push(r);
     else out.healthPanel.push(r);
   }
   return out;
+}
+
+const numbersIn = (text: string) => (text.match(/[−-]?\d[\d.]*(?:,\d+)?/g) ?? []).map((x) => x.replace("−", "-"));
+
+/**
+ * Las tablas del texto del panel pueden omitirse en la página del panel solo
+ * si cada una de sus filas tiene en `results` un indicador con el mismo valor
+ * local (primera cifra de la segunda columna). Si falta alguna, se muestran.
+ */
+export function profileTablesCovered(tables: string[][][], results: ProfileResult[]): boolean {
+  const values = new Set(results.map((r) => numbersIn(r.value)[0]).filter(Boolean));
+  return tables.every((rows) => rows.slice(1).every((row) => { const v = numbersIn(row[1] ?? "")[0]; return v !== undefined && values.has(v); }));
+}
+
+export interface SectionMatrix {
+  /** Código completo (CUSEC) y rótulo corto distrito+sección, como lo usan los perfiles («01002»). */
+  sections: Array<{ code: string; label: string }>;
+  rows: Array<{ title: string; unit: string; period: string; topic: string; values: Record<string, string>; references: Comparator[]; results: ProfileResult[] }>;
+}
+
+/** Matriz indicador × sección censal, en el orden del perfil; una fila por indicador. */
+export function sectionMatrix(results: ProfileResult[]): SectionMatrix {
+  const codeOf = (r: ProfileResult) => (r.scale ?? "").replace(/^secci[oó]n( censal)?\s*/i, "").trim();
+  const sections: SectionMatrix["sections"] = [];
+  const rows: SectionMatrix["rows"] = [];
+  for (const r of results) {
+    const code = codeOf(r);
+    if (!sections.some((x) => x.code === code)) sections.push({ code, label: /^\d{10}$/.test(code) ? code.slice(5) : code });
+    let row = rows.find((x) => x.title === r.title && x.unit === r.unit);
+    if (!row) { row = { title: r.title, unit: r.unit, period: r.period, topic: r.topic ?? "", values: {}, references: comparatorsOf(r), results: [] }; rows.push(row); }
+    if (!(code in row.values)) row.values[code] = r.value;
+    if (r.period && !row.period.split(" · ").includes(r.period)) row.period = row.period ? `${row.period} · ${r.period}` : r.period;
+    row.results.push(r);
+  }
+  sections.sort((a, b) => a.code.localeCompare(b.code));
+  return { sections, rows };
 }
 
 export type Comparator = { label: string; value: number };

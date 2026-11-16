@@ -1,3 +1,4 @@
+import { profileTextBlocks } from "../../application/health-profile/profileTextBlocks";
 import { ProfileText } from "./ProfileText";
 import { useMemo, useRef, useState } from "react";
 import type { ProfileDataPages as DataPages, ProfileStructure } from "../../application/health-profile/profileStructure";
@@ -7,6 +8,8 @@ import {
   formatComparisonValue,
   geographicComparators,
   groupResultsByTopic,
+  sectionMatrix,
+  profileTablesCovered,
   headlineResults,
   sectionMetrics,
   splitDataPageResults,
@@ -66,58 +69,144 @@ const provenanceOf = (r: ProfileResult) =>
   `${[r.source, r.page].filter(Boolean).join(", ")}${r.denominator ? ` · Base: ${r.denominator}` : ""}`;
 
 /**
+ * Fuentes de una tabla, numeradas una vez y agrupadas por fuente: cada entrada
+ * reúne las páginas y bases que el perfil declara para esa fuente, de modo que
+ * la procedencia no se pierde aunque la lista sea corta.
+ */
+function sourceIndex(results: ProfileResult[], pagesAs: "all" | "urls" = "all") {
+  const keyOf = (r: ProfileResult) => r.source || provenanceOf(r);
+  const order: string[] = [];
+  const pages = new Map<string, string[]>();
+  const bases = new Map<string, string[]>();
+  for (const r of results) {
+    const k = keyOf(r);
+    if (!k) continue;
+    if (!order.includes(k)) { order.push(k); pages.set(k, []); bases.set(k, []); }
+    // «urls»: en la matriz, la página repite la sección (columna) y la categoría (fila); basta su dirección.
+    const refs = !r.source || !r.page ? [] : pagesAs === "urls" ? (r.page.match(/https?:\/\/\S+/g) ?? [r.page]) : [r.page];
+    for (const ref of refs) if (!pages.get(k)!.includes(ref)) pages.get(k)!.push(ref);
+    if (r.denominator && !bases.get(k)!.includes(r.denominator)) bases.get(k)!.push(r.denominator);
+  }
+  const entries = order.map((k) => `${k}${pages.get(k)!.length ? ` — ${pages.get(k)!.join("; ")}` : ""}${bases.get(k)!.length ? ` · Base: ${bases.get(k)!.join("; ")}` : ""}`);
+  return { entries, numberOf: (r: ProfileResult) => order.indexOf(keyOf(r)) + 1 };
+}
+
+function SourceList({ entries, id, caption }: { entries: string[]; id: string; caption: string }) {
+  if (!entries.length) return null;
+  return <ol className="pdp-sources" aria-label={`Fuentes · ${caption}`}>{entries.map((s, i) => <li key={s} id={`${id}-f${i + 1}`}>{s}</li>)}</ol>;
+}
+
+/**
  * Tabla tipo «spine» sin colores de juicio: valor local, comparadores, gráfico
- * de puntos y cambio. Cada indicador ocupa una sola línea; la procedencia
- * (fuente, página y base) se numera una vez bajo la tabla y la fila la cita.
+ * de puntos y cambio. Cada indicador ocupa una sola línea; la procedencia se
+ * numera bajo la tabla y la fila la cita. Agrupada, cada dominio es una tabla
+ * con las mismas columnas, para que el panel pueda maquetarse compacto.
  */
 function IndicatorTable({ results, municipalityName, geo, caption, grouped, id }: { results: ProfileResult[]; municipalityName: string; geo: string[]; caption: string; grouped: boolean; id: string }) {
   const topics = grouped ? groupResultsByTopic(results) : [{ topic: "", results, scaleByUnit: {} }];
   const beforeOf = (r: ProfileResult) => comparatorsOf(r).filter((c) => !geo.includes(c.label));
   const hasBefore = results.some((r) => beforeOf(r).length > 0);
-  const sources: string[] = [];
-  for (const r of results) { const s = provenanceOf(r); if (s && !sources.includes(s)) sources.push(s); }
-  const cols = 4 + geo.length + (hasBefore ? 1 : 0) + (sources.length ? 1 : 0);
-  return (
+  const { entries, numberOf } = sourceIndex(results);
+  const cols = (
+    <colgroup>
+      <col className="pdp-c-title" /><col className="pdp-c-period" /><col className="pdp-c-local" />
+      {geo.map((g) => <col key={g} className="pdp-c-geo" />)}
+      <col className="pdp-c-chart" />
+      {hasBefore && <col className="pdp-c-before" />}
+      {entries.length > 0 && <col className="pdp-c-ref" />}
+    </colgroup>
+  );
+  const head = (
+    <thead>
+      <tr>
+        <th scope="col">Indicador</th><th scope="col">Periodo</th><th scope="col" className="pdp-num">{municipalityName}</th>
+        {geo.map((g) => <th key={g} scope="col" className="pdp-num">{g}</th>)}
+        <th scope="col" className="pdp-chart-col">Comparación</th>
+        {hasBefore && <th scope="col">Antes</th>}
+        {entries.length > 0 && <th scope="col" className="pdp-srcref"><abbr title="Fuente">F.</abbr></th>}
+      </tr>
+    </thead>
+  );
+  const row = (r: ProfileResult, sharedUnit: boolean) => {
+    const comps = comparatorsOf(r);
+    const before = beforeOf(r);
+    const n = numberOf(r);
+    return (
+      <tr key={r.id}>
+        <th scope="row">{r.title}</th>
+        <td className="pdp-muted">{r.period || "—"}</td>
+        <td className="pdp-num pdp-local">{r.value}{sharedUnit ? "" : unitOf(r.unit)}</td>
+        {geo.map((g) => { const c = comps.find((x) => x.label === g); return <td key={g} className="pdp-num">{c ? formatComparisonValue(c.value) : "—"}</td>; })}
+        <td className="pdp-chart-col"><DotStrip result={r} geo={geo} /></td>
+        {hasBefore && <td className="pdp-muted">{before.length ? before.map((c) => `${c.label}: ${formatComparisonValue(c.value)}`).join(" · ") : "—"}</td>}
+        {entries.length > 0 && <td className="pdp-srcref">{n > 0 ? <a href={`#${id}-f${n}`} title={provenanceOf(r)}>{n}</a> : "—"}</td>}
+      </tr>
+    );
+  };
+  if (!grouped) return (
     <div className="pdp-table-wrap">
       <table className="pdp-table pdp-table--line">
         <caption className="ep-sr-only">{caption}</caption>
+        {cols}{head}
+        <tbody>{results.map((r) => row(r, false))}</tbody>
+      </table>
+      <SourceList entries={entries} id={id} caption={caption} />
+    </div>
+  );
+  return (
+    <div className="pdp-table-wrap pdp-domains" role="group" aria-label={caption}>
+      {topics.map((t, i) => {
+        const units = new Set(t.results.map((r) => unitOf(r.unit).trim()));
+        const shared = units.size === 1 ? [...units][0] : "";
+        return (
+          <table key={t.topic} id={`pdp-domain-${i}`} className="pdp-table pdp-table--line pdp-dtable">
+            <caption className="pdp-dtable__cap">{t.topic}{shared && <span className="pdp-dtable__unit"> · {shared}</span>}</caption>
+            {cols}{head}
+            <tbody>{t.results.map((r) => row(r, !!shared))}</tbody>
+          </table>
+        );
+      })}
+      <SourceList entries={entries} id={id} caption={caption} />
+    </div>
+  );
+}
+
+/** Indicadores por sección censal: una fila por indicador y una columna por sección, con las referencias que declara la fuente. */
+function SectionMatrixTable({ results, id }: { results: ProfileResult[]; id: string }) {
+  const { sections, rows } = sectionMatrix(results);
+  const refs: string[] = [];
+  for (const row of rows) for (const c of row.references) if (!refs.includes(c.label)) refs.push(c.label);
+  const { entries, numberOf } = sourceIndex(results, "urls");
+  if (!rows.length) return null;
+  const caption = "Indicadores por sección censal";
+  return (
+    <div className="pdp-table-wrap pdp-matrix-wrap">
+      <table className="pdp-table pdp-table--line pdp-matrix">
+        <caption className="pdp-dtable__cap">{caption} · distrito y sección</caption>
         <thead>
           <tr>
-            <th scope="col">Indicador</th><th scope="col">Periodo</th><th scope="col" className="pdp-num">{municipalityName}</th>
-            {geo.map((g) => <th key={g} scope="col" className="pdp-num">{g}</th>)}
-            <th scope="col" className="pdp-chart-col">Comparación</th>
-            {hasBefore && <th scope="col">Antes</th>}
-            {sources.length > 0 && <th scope="col" className="pdp-srcref"><abbr title="Fuente">F.</abbr></th>}
+            <th scope="col">Indicador</th><th scope="col">Periodo</th>
+            {sections.map((s) => <th key={s.code} scope="col" className="pdp-num" title={`Sección censal ${s.code}`}>{s.label}</th>)}
+            {refs.map((g) => <th key={g} scope="col" className="pdp-num pdp-matrix__ref">{g}</th>)}
+            {entries.length > 0 && <th scope="col" className="pdp-srcref"><abbr title="Fuente">F.</abbr></th>}
           </tr>
         </thead>
-        {topics.map((t) => (
-          <tbody key={t.topic || "all"} id={grouped ? `pdp-domain-${topics.indexOf(t)}` : undefined}>
-            {grouped && <tr className="pdp-table__group"><th scope="rowgroup" colSpan={cols}>{t.topic}</th></tr>}
-            {t.results.map((r) => {
-              const unit = unitOf(r.unit);
-              const comps = comparatorsOf(r);
-              const before = beforeOf(r);
-              const n = sources.indexOf(provenanceOf(r)) + 1;
-              return (
-                <tr key={r.id}>
-                  <th scope="row">{r.title}</th>
-                  <td className="pdp-muted">{r.period || "—"}</td>
-                  <td className="pdp-num pdp-local">{r.value}{unit}</td>
-                  {geo.map((g) => { const c = comps.find((x) => x.label === g); return <td key={g} className="pdp-num">{c ? formatComparisonValue(c.value) : "—"}</td>; })}
-                  <td className="pdp-chart-col"><DotStrip result={r} geo={geo} /></td>
-                  {hasBefore && <td className="pdp-muted">{before.length ? before.map((c) => `${c.label}: ${formatComparisonValue(c.value)}`).join(" · ") : "—"}</td>}
-                  {sources.length > 0 && <td className="pdp-srcref">{n > 0 ? <a href={`#${id}-f${n}`}>{n}</a> : "—"}</td>}
-                </tr>
-              );
-            })}
-          </tbody>
-        ))}
+        <tbody>
+          {rows.map((row) => {
+            const n = numberOf(row.results[0]);
+            return (
+              <tr key={`${row.title}|${row.unit}`}>
+                <th scope="row">{row.title}{row.unit && <span className="pdp-muted"> · {unitOf(row.unit).trim()}</span>}</th>
+                <td className="pdp-muted">{row.period || "—"}</td>
+                {sections.map((s) => { const cell = row.results.find((x) => (x.scale ?? "").endsWith(s.code)); return <td key={s.code} className="pdp-num" title={cell ? provenanceOf(cell) : undefined}>{row.values[s.code] ?? "—"}</td>; })}
+                {refs.map((g) => { const c = row.references.find((x) => x.label === g); return <td key={g} className="pdp-num pdp-matrix__ref">{c ? formatComparisonValue(c.value) : "—"}</td>; })}
+                {entries.length > 0 && <td className="pdp-srcref">{n > 0 ? <a href={`#${id}-f${n}`} title={provenanceOf(row.results[0])}>{n}</a> : "—"}</td>}
+              </tr>
+            );
+          })}
+        </tbody>
       </table>
-      {sources.length > 0 && (
-        <ol className="pdp-sources" aria-label={`Fuentes · ${caption}`}>
-          {sources.map((s, i) => <li key={s} id={`${id}-f${i + 1}`}>{s}</li>)}
-        </ol>
-      )}
+      <SourceList entries={entries} id={id} caption={caption} />
     </div>
   );
 }
@@ -240,6 +329,8 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
   const inequalityOther = split.inequality.filter((r) => !/^secci[oó]n/i.test(r.scale ?? ""));
   const sectionResults = split.inequality.filter((r) => /^secci[oó]n/i.test(r.scale ?? ""));
   const healthDomains = groupResultsByTopic(split.healthPanel);
+  const panelTables = profileTextBlocks(pages.healthPanel).flatMap((b) => (b.kind === "table" ? [b.rows] : []));
+  const panelTablesCovered = split.healthPanel.length > 0 && panelTables.length > 0 && profileTablesCovered(panelTables, split.healthPanel);
   const comparedCount = split.healthPanel.filter((r) => comparatorsOf(r).some((c) => geo.includes(c.label))).length;
   const pageHead = (n: number, heading: string) => (
     <header className="pdp-page__head"><span>{municipalityName} en datos · {n} de 4</span><h2>{heading}</h2></header>
@@ -298,10 +389,10 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
 
         <section id="pdp-3" className="pdp-page" aria-label="Panel de salud">
           {pageHead(3, "Panel de salud")}
-          <ProfileText paragraphs={pages.healthPanel} className="pdp-text" />
+          <ProfileText paragraphs={pages.healthPanel} className="pdp-text" withTables={!panelTablesCovered} />
           {split.healthPanel.length > 0 ? (
             <>
-              <div className="pdp-health-summary" aria-label="Cobertura del sistema de indicadores">
+              <div className="pdp-health-summary pdp-noprint" aria-label="Cobertura del sistema de indicadores">
                 <div><strong>{split.healthPanel.length}</strong><span>indicadores documentados</span></div>
                 <div><strong>{healthDomains.length}</strong><span>dominios de salud</span></div>
                 <div><strong>{comparedCount}</strong><span>con referencia territorial</span></div>
@@ -344,6 +435,7 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
           {pageHead(4, "Desigualdad")}
           <ProfileText paragraphs={pages.inequality.intro} className="pdp-text" />
           <SectionExplorer results={sectionResults} municipalityName={municipalityName} />
+          <SectionMatrixTable results={split.bySection} id="pdp-t4s" />
           {inequalityOther.length > 0 && <IndicatorTable results={inequalityOther} municipalityName={municipalityName} geo={geo} caption="Otros indicadores de desigualdad" grouped={false} id="pdp-t4" />}
           {pages.inequality.blocks.length > 0 && (
             <div className="pdp-blocks pdp-blocks--plain">
