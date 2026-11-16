@@ -350,3 +350,30 @@
   .pdp-toolbar {display:none}
   .pdp-health-summary>div {padding:6px 9px}
 }
+
+/* Una línea por indicador (16/11/2026): la procedencia se numera bajo la tabla. */
+.pdp-table--line{font-size:12.5px}
+.pdp-table--line th,.pdp-table--line td{white-space:nowrap;padding:4px 7px;line-height:1.3}
+.pdp-table--line tbody th[scope=row]{position:sticky;left:0;z-index:1;background:var(--bg)}
+.pdp-table--line .pdp-chart-col{width:112px}
+.pdp-table--line .pdp-strip{width:110px}
+.pdp-table--line th[scope=row]{min-width:0;font-weight:600}
+.pdp-table--line .pdp-ref{text-align:center;width:28px;font-size:11px}
+.pdp-table--line .pdp-ref a{color:var(--pdp-muted);text-decoration:none}
+.pdp-table--line .pdp-ref abbr{text-decoration:none}
+.pdp-table--line .pdp-strip{height:14px}
+#pdp-3{page:pdp-panel}
+@page pdp-panel{size:A4 landscape;margin:8mm 10mm}
+.pdp-sources{margin:6px 0 0;padding-left:22px;font-size:11px;line-height:1.35;color:var(--pdp-muted);columns:2 360px;column-gap:28px}
+.pdp-sources li{break-inside:avoid;margin:0 0 2px}
+.pdp-sources li:target{color:var(--pdp-ink);background:var(--fondo-principal)}
+@media print{
+ .pdp-table--line th,.pdp-table--line td{padding:.6px 3px;line-height:1.2}
+ .pdp-table--line tbody th{width:auto;position:static}
+ .pdp-table--line .pdp-ref{font-size:6.8pt;width:auto}
+ .pdp-table--line .pdp-strip{width:70px;height:9px}
+ .pdp-table--line .pdp-chart-col{width:72px}
+ .pdp-sources{font-size:6.6pt;line-height:1.25;columns:2;column-gap:12px;margin-top:3px}
+}
+.pdp-domain-chart>summary{cursor:pointer;font-weight:600;color:var(--pdp-ink);padding:2px 0}
+.pdp-domain-chart:not([open]){padding-top:10px;padding-bottom:10px}

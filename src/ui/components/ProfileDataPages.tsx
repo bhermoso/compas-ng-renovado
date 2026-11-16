@@ -61,19 +61,33 @@ function Legend({ municipalityName, geo }: { municipalityName: string; geo: stri
   );
 }
 
-/** Tabla tipo «spine» sin colores de juicio: valor local, comparadores, gráfico de puntos y cambio. */
-function IndicatorTable({ results, municipalityName, geo, caption, grouped }: { results: ProfileResult[]; municipalityName: string; geo: string[]; caption: string; grouped: boolean }) {
+/** Procedencia de una fila: fuente, página y base, tal como las declara el perfil. */
+const provenanceOf = (r: ProfileResult) =>
+  `${[r.source, r.page].filter(Boolean).join(", ")}${r.denominator ? ` · Base: ${r.denominator}` : ""}`;
+
+/**
+ * Tabla tipo «spine» sin colores de juicio: valor local, comparadores, gráfico
+ * de puntos y cambio. Cada indicador ocupa una sola línea; la procedencia
+ * (fuente, página y base) se numera una vez bajo la tabla y la fila la cita.
+ */
+function IndicatorTable({ results, municipalityName, geo, caption, grouped, id }: { results: ProfileResult[]; municipalityName: string; geo: string[]; caption: string; grouped: boolean; id: string }) {
   const topics = grouped ? groupResultsByTopic(results) : [{ topic: "", results, scaleByUnit: {} }];
-  const cols = 5 + geo.length;
+  const beforeOf = (r: ProfileResult) => comparatorsOf(r).filter((c) => !geo.includes(c.label));
+  const hasBefore = results.some((r) => beforeOf(r).length > 0);
+  const sources: string[] = [];
+  for (const r of results) { const s = provenanceOf(r); if (s && !sources.includes(s)) sources.push(s); }
+  const cols = 4 + geo.length + (hasBefore ? 1 : 0) + (sources.length ? 1 : 0);
   return (
     <div className="pdp-table-wrap">
-      <table className="pdp-table">
+      <table className="pdp-table pdp-table--line">
         <caption className="ep-sr-only">{caption}</caption>
         <thead>
           <tr>
             <th scope="col">Indicador</th><th scope="col">Periodo</th><th scope="col" className="pdp-num">{municipalityName}</th>
             {geo.map((g) => <th key={g} scope="col" className="pdp-num">{g}</th>)}
-            <th scope="col" className="pdp-chart-col">Comparación</th><th scope="col" className="pdp-before-col">Antes</th>
+            <th scope="col" className="pdp-chart-col">Comparación</th>
+            {hasBefore && <th scope="col">Antes</th>}
+            {sources.length > 0 && <th scope="col" className="pdp-ref"><abbr title="Fuente">F.</abbr></th>}
           </tr>
         </thead>
         {topics.map((t) => (
@@ -82,21 +96,28 @@ function IndicatorTable({ results, municipalityName, geo, caption, grouped }: { 
             {t.results.map((r) => {
               const unit = unitOf(r.unit);
               const comps = comparatorsOf(r);
-              const before = comps.filter((c) => !geo.includes(c.label));
+              const before = beforeOf(r);
+              const n = sources.indexOf(provenanceOf(r)) + 1;
               return (
                 <tr key={r.id}>
-                  <th scope="row">{r.title}<small>{[r.source, r.page].filter(Boolean).join(", ")}{r.denominator ? ` · Base: ${r.denominator}` : ""}</small>{before.length > 0 && <small className="pdp-before">Antes: {before.map((c) => `${c.label}: ${formatComparisonValue(c.value)}`).join(" · ")}</small>}</th>
+                  <th scope="row">{r.title}</th>
                   <td className="pdp-muted">{r.period || "—"}</td>
                   <td className="pdp-num pdp-local">{r.value}{unit}</td>
                   {geo.map((g) => { const c = comps.find((x) => x.label === g); return <td key={g} className="pdp-num">{c ? formatComparisonValue(c.value) : "—"}</td>; })}
                   <td className="pdp-chart-col"><DotStrip result={r} geo={geo} /></td>
-                  <td className="pdp-muted pdp-before-col">{before.length ? before.map((c) => `${c.label}: ${formatComparisonValue(c.value)}`).join(" · ") : "—"}</td>
+                  {hasBefore && <td className="pdp-muted">{before.length ? before.map((c) => `${c.label}: ${formatComparisonValue(c.value)}`).join(" · ") : "—"}</td>}
+                  {sources.length > 0 && <td className="pdp-ref">{n > 0 ? <a href={`#${id}-f${n}`}>{n}</a> : "—"}</td>}
                 </tr>
               );
             })}
           </tbody>
         ))}
       </table>
+      {sources.length > 0 && (
+        <ol className="pdp-sources" aria-label={`Fuentes · ${caption}`}>
+          {sources.map((s, i) => <li key={s} id={`${id}-f${i + 1}`}>{s}</li>)}
+        </ol>
+      )}
     </div>
   );
 }
@@ -110,10 +131,10 @@ function DomainComparison({ domains, geo, municipalityName }: {
   const [chosen, setChosen] = useState(0);
   const domain = domains[Math.min(chosen, domains.length - 1)];
   if (!domain) return null;
-  const renderDomain = (d: typeof domain, printable = false) => { const domainRows = d.results.filter((r) =>
+  const renderDomain = (d: typeof domain) => { const domainRows = d.results.filter((r) =>
     r.chartValue !== undefined && Number.isFinite(r.chartValue) && r.chartValue >= 0 &&
     comparatorsOf(r).some((c) => geo.includes(c.label) && Number.isFinite(c.value) && c.value >= 0));
-    return <div className={printable ? "pdp-domain-print" : undefined} key={d.topic}><h4>{d.topic}</h4>{domainRows.length ? <div className="pdp-domain-chart__rows">{domainRows.map((r) => {
+    return <div key={d.topic}><h4>{d.topic}</h4>{domainRows.length ? <div className="pdp-domain-chart__rows">{domainRows.map((r) => {
       const refs = comparatorsOf(r).filter((c) => geo.includes(c.label) && c.value >= 0 && Number.isFinite(c.value));
       const max = Math.max(r.chartValue!, ...refs.map((c) => c.value), 1) * 1.06;
       return <div className="pdp-domain-chart__item" key={r.id}><div className="pdp-domain-chart__title"><b>{r.title}</b><small>{r.period || "Periodo no declarado"} · {unitOf(r.unit).trim() || "sin unidad declarada"}</small></div>
@@ -121,7 +142,7 @@ function DomainComparison({ domains, geo, municipalityName }: {
         <details><summary>Procedencia y cautelas</summary><p>{[r.source,r.page,r.denominator ? `Base: ${r.denominator}`:undefined,r.caution].filter(Boolean).join(" · ") || "No consta detalle adicional de procedencia."}</p></details></div>;
     })}</div> : <p className="pdp-note">Sin pares numéricos comparables; consultar la tabla completa.</p>}</div>;
   };
-  return <section className="pdp-domain-chart" aria-label="Comparador gráfico por dominio">
+  return <details className="pdp-domain-chart pdp-noprint" aria-label="Comparador gráfico por dominio"><summary>Comparar por dominio · un gráfico por indicador</summary>
     <div className="pdp-domain-chart__header">
       <div><p className="pdp-domain-chart__eyebrow">LECTURA COMPARADA</p>
         <h3>Indicadores por dominio</h3>
@@ -134,8 +155,7 @@ function DomainComparison({ domains, geo, municipalityName }: {
       </label>
     </div>
     <div className="pdp-domain-screen">{renderDomain(domain)}</div>
-    <div className="pdp-domain-print-all">{domains.map((d)=>renderDomain(d,true))}</div>
-  </section>;
+  </details>;
 }
 
 function SectionExplorer({ results, municipalityName }: { results: ProfileResult[]; municipalityName: string }) {
@@ -271,7 +291,7 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
           {split.whoLivesHere.length > 0 && (
             <>
               <Legend municipalityName={municipalityName} geo={geo} />
-              <IndicatorTable results={split.whoLivesHere} municipalityName={municipalityName} geo={geo} caption="Población, hogares y origen" grouped={false} />
+              <IndicatorTable results={split.whoLivesHere} municipalityName={municipalityName} geo={geo} caption="Población, hogares y origen" grouped={false} id="pdp-t2" />
             </>
           )}
         </section>
@@ -294,7 +314,7 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
               <p className="pdp-note">Los dominios organizan los indicadores incluidos en el perfil guardado. La ausencia de una referencia se muestra como «—»; no se estiman datos faltantes.</p>
               <DomainComparison domains={healthDomains} geo={geo} municipalityName={municipalityName} />
               <Legend municipalityName={municipalityName} geo={geo} />
-              <IndicatorTable results={split.healthPanel} municipalityName={municipalityName} geo={geo} caption="Indicadores del panel de salud" grouped />
+              <IndicatorTable results={split.healthPanel} municipalityName={municipalityName} geo={geo} caption="Indicadores del panel de salud" grouped id="pdp-t3" />
             </>
           ) : <p className="pdp-text">El perfil no trae indicadores para el panel.</p>}
           {interpretation && (interpretation.overallReading.length > 0 || interpretation.conclusions.length > 0) && (
@@ -324,7 +344,7 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
           {pageHead(4, "Desigualdad")}
           <ProfileText paragraphs={pages.inequality.intro} className="pdp-text" />
           <SectionExplorer results={sectionResults} municipalityName={municipalityName} />
-          {inequalityOther.length > 0 && <IndicatorTable results={inequalityOther} municipalityName={municipalityName} geo={geo} caption="Otros indicadores de desigualdad" grouped={false} />}
+          {inequalityOther.length > 0 && <IndicatorTable results={inequalityOther} municipalityName={municipalityName} geo={geo} caption="Otros indicadores de desigualdad" grouped={false} id="pdp-t4" />}
           {pages.inequality.blocks.length > 0 && (
             <div className="pdp-blocks pdp-blocks--plain">
               {pages.inequality.blocks.map((b) => <div key={b.title} className="pdp-block"><h3>{b.title}</h3><ProfileText paragraphs={[b.text]} /></div>)}
