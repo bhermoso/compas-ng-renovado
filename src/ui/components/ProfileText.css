@@ -1,0 +1,5 @@
+.profile-text-table{max-width:100%;overflow-x:auto;margin:16px 0}
+.profile-text-table table{border-collapse:collapse;width:100%;font-size:.85em;line-height:1.5;text-align:left}
+.profile-text-table th,.profile-text-table td{padding:8px 10px;border:1px solid #d5dfda;vertical-align:top;overflow-wrap:anywhere;white-space:normal}
+.profile-text-table th{background:#edf3ef;font-weight:700}
+@media print{.profile-text-table{overflow:visible}.profile-text-table table{font-size:8pt}.profile-text-table thead{display:table-header-group}.profile-text-table tr{break-inside:avoid}}

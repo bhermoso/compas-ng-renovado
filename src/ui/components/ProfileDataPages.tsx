@@ -1,3 +1,4 @@
+import { ProfileText } from "./ProfileText";
 import { useMemo, useRef, useState } from "react";
 import type { ProfileDataPages as DataPages, ProfileStructure } from "../../application/health-profile/profileStructure";
 import type { ProfileResult } from "../../domain/health-profile/ExternalHealthProfile";
@@ -258,7 +259,7 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
           )}
           {pages.cover.length > 0 && (
             <div className="pdp-blocks">
-              {pages.cover.map((b) => <div key={b.title} className="pdp-block"><h3>{b.title}</h3><p>{b.text}</p></div>)}
+              {pages.cover.map((b) => <div key={b.title} className="pdp-block"><h3>{b.title}</h3><ProfileText paragraphs={[b.text]} /></div>)}
             </div>
           )}
           {metrics.length > 0 && <p className="pdp-metrics">{metrics.join(" · ")}</p>}
@@ -266,7 +267,7 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
 
         <section id="pdp-2" className="pdp-page" aria-label="Quién vive aquí">
           {pageHead(2, "Quién vive aquí")}
-          {pages.whoLivesHere.map((p, i) => <p key={i} className="pdp-text">{p}</p>)}
+          <ProfileText paragraphs={pages.whoLivesHere} className="pdp-text" />
           {split.whoLivesHere.length > 0 && (
             <>
               <Legend municipalityName={municipalityName} geo={geo} />
@@ -277,7 +278,7 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
 
         <section id="pdp-3" className="pdp-page" aria-label="Panel de salud">
           {pageHead(3, "Panel de salud")}
-          {pages.healthPanel.map((p, i) => <p key={i} className="pdp-text">{p}</p>)}
+          <ProfileText paragraphs={pages.healthPanel} className="pdp-text" />
           {split.healthPanel.length > 0 ? (
             <>
               <div className="pdp-health-summary" aria-label="Cobertura del sistema de indicadores">
@@ -321,12 +322,12 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
 
         <section id="pdp-4" className="pdp-page" aria-label="Desigualdad">
           {pageHead(4, "Desigualdad")}
-          {pages.inequality.intro.map((p, i) => <p key={i} className="pdp-text">{p}</p>)}
+          <ProfileText paragraphs={pages.inequality.intro} className="pdp-text" />
           <SectionExplorer results={sectionResults} municipalityName={municipalityName} />
           {inequalityOther.length > 0 && <IndicatorTable results={inequalityOther} municipalityName={municipalityName} geo={geo} caption="Otros indicadores de desigualdad" grouped={false} />}
           {pages.inequality.blocks.length > 0 && (
             <div className="pdp-blocks pdp-blocks--plain">
-              {pages.inequality.blocks.map((b) => <div key={b.title} className="pdp-block"><h3>{b.title}</h3><p>{b.text}</p></div>)}
+              {pages.inequality.blocks.map((b) => <div key={b.title} className="pdp-block"><h3>{b.title}</h3><ProfileText paragraphs={[b.text]} /></div>)}
             </div>
           )}
         </section>
