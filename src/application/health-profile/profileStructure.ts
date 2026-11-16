@@ -187,25 +187,34 @@ function parseRecommendations(paragraphs: string[]): ProfileRecommendation[] {
   for (const raw of paragraphs) {
     const p = unspace(raw);
     if (/^Tipo\s+Recomendaci/i.test(p)) continue;
-    const groupHead = TYPES.find((t) => p.toUpperCase().startsWith(t.toUpperCase()) && (p.length === t.length || /\s{2,}|\s[A-ZÁÉÍÓÚ]/.test(p.slice(t.length, t.length + 3))));
+    const groupHead = TYPES.find((t) => p.toUpperCase().startsWith(t.toUpperCase()) && (p.length === t.length || ((!current || !/^[.:]/.test(p.slice(t.length))) && /\s{2,}|\s[A-ZÁÉÍÓÚ]/.test(p.slice(t.length, t.length + 3)))));
     if (groupHead && !/^R\d/.test(p)) { group = groupHead; current = undefined; continue; }
     // El tipo solo cuenta como columna (seguido de dos o más espacios): «Contrastar con…» es texto.
     const item = /^R(\d+)\b\s*(?:(Conocer|Contrastar|Abordar)(?=\s{2,}|$)\s*)?(.*)$/s.exec(p);
     if (item) {
-      const trailing = /^(.*?)\s{2,}(C\d+(?:,\s*C\d+)*)$/.exec(item[3].trim());
+      const explicit = /^(.*?)\s+(?:Deriva de|Fundamento:)\s*(C\d+(?:(?:,\s*| y )C\d+)*)\.?$/i.exec(item[3].trim());
+      const trailing = explicit ?? /^(.*?)\s{2,}(C\d+(?:,\s*C\d+)*)$/.exec(item[3].trim());
+      const body = clean(trailing ? trailing[1] : item[3]).replace(/^[.:]\s*/, "");
+      const declaredType = /^(Conocer|Contrastar|Abordar)[.:]\s+(.+)$/s.exec(body);
       current = {
         id: `R${item[1]}`,
-        type: (item[2] as ProfileRecommendationType | undefined) ?? group,
+        type: (item[2] as ProfileRecommendationType | undefined) ?? (declaredType?.[1] as ProfileRecommendationType | undefined) ?? group,
         // «R1. Texto»: el punto tras el número no forma parte de la recomendación.
-        text: clean(trailing ? trailing[1] : item[3]).replace(/^[.:]\s*/, ""),
+        text: declaredType ? declaredType[2] : body,
         ...(trailing ? { derivesFrom: trailing[2] } : {}),
       };
       out.push(current);
       continue;
     }
     if (!current) continue;
-    const derives = /^(?:Deriva de\s+)?(C\d+(?:(?:,\s*| y )C\d+)*)\.?$/.exec(p.trim());
+    const derives = /^(?:(?:Deriva de|Fundamento:)\s*)?(C\d+(?:(?:,\s*| y )C\d+)*)\.?$/.exec(p.trim());
     if (derives) { current.derivesFrom = derives[1]; current = undefined; continue; }
+    const typedBody = /^(Conocer|Contrastar|Abordar)[.:](?:\s+(.+))?$/s.exec(p);
+    if (typedBody) {
+      current.type = typedBody[1] as ProfileRecommendationType;
+      current.text = clean(`${current.text} ${typedBody[2] ?? ""}`);
+      continue;
+    }
     const inlineDerives = /^(.*?)\s+(C\d+(?:,\s*C\d+)*)$/.exec(p.trim());
     if (inlineDerives && inlineDerives[1] && !current.derivesFrom) { current.text = clean(`${current.text} ${inlineDerives[1]}`); current.derivesFrom = inlineDerives[2]; current = undefined; continue; }
     current.text = clean(`${current.text} ${p}`);
