@@ -8,6 +8,17 @@
 > y §5 bis alineados con el contrato metodológico v2.3.1 el 2026-11-17. Implementación
 > testeable: `src/application/health-profile/profileWritingContract.ts` y
 > `tests/profile-writing-contract.test.ts`.
+>
+> **Alcance (aclaración 12-11-2026, armonizada el 17-11-2026).** El §0 (lector,
+> voz, estructura y comprobación) rige para todo Perfil, también el elaborado
+> fuera de COMPÁS. Las reglas de generación automática de los §2 a §5 bis y su
+> verificador se conservan para artefactos heredados y sus pruebas: no reactivan
+> el generador en la pestaña Perfil ni completan perfiles externos al cargarlos.
+> Para la entrega externa rigen además el [contrato metodológico](../contracts/CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md),
+> la [propuesta de contrato externo](../contracts/CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION.md)
+> y la [guía de entrega](../guides/ENTREGA-PERFIL-EXTERNO.md). La prohibición histórica
+> de recomendaciones no se aplica a las recomendaciones Conocer, Contrastar o
+> Abordar del contrato vigente.
 
 ## 0. Para quién se escribe y cómo suena
 
