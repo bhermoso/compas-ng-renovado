@@ -1,4 +1,6 @@
 import { readLocalizaAssets } from "./application/localiza-assets";
+import { isTerritorialStatisticsSnapshot } from "./application/territorial-statistics/snapshots";
+import type { TerritorialStatisticsSnapshot } from "./domain/territorial-statistics/TerritorialStatistics";
 import { ExternalProfileDashboard } from "./ui/components/ExternalProfileDashboard";
 import { EMPTY_PROFILE_LIBRARY, isExternalProfileLibrary } from "./application/health-profile/externalProfiles";
 import type { ExternalProfileLibrary } from "./domain/health-profile/ExternalHealthProfile";
@@ -1321,6 +1323,35 @@ export default function App() {
       return saved;
     });
     setRemotePersistenceMessage("Perfil completo guardado y confirmado por Firebase.");
+  }, [workspace, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+
+  /** Guarda las descargas de estadística territorial (CONTRACT-TERRITORIAL-STATISTICS). */
+  const handleSaveTerritorialStatistics = useCallback(async (snapshots: TerritorialStatisticsSnapshot[], onProgress?: (message: string) => void) => {
+    const municipalityId = workspace.municipality.identity.id;
+    if (!remoteClient.auth.currentUser) throw new Error("Inicia sesión para guardar la descarga en el expediente compartido.");
+    if (pendingSeedId || pendingIndexedDbHydrationId || remoteHydratedMunicipalityId !== municipalityId) throw new Error("Espera a que termine la recuperación del expediente compartido.");
+    if (!snapshots.every(s => isTerritorialStatisticsSnapshot(s, municipalityId))) throw new Error("La descarga no supera la comprobación de integridad.");
+    if (profileSaveInFlightRef.current) throw new Error("Ya hay un guardado del perfil en curso.");
+    const now = new Date().toISOString();
+    profileSaveInFlightRef.current = true;
+    try {
+      await saveRemoteWorkspace(remoteClient, { ...workspace, territorialStatistics: snapshots, updatedAt: now }, progress => {
+        const message = profileSaveProgressMessage(progress);
+        setRemotePersistenceMessage(message);
+        onProgress?.(message);
+      });
+    } catch (error) {
+      const message = profileSaveErrorMessage(error);
+      setRemotePersistenceMessage(message);
+      throw new Error(message, { cause: error });
+    } finally { profileSaveInFlightRef.current = false; }
+    setWorkspace(prev => {
+      if (prev.municipality.identity.id !== municipalityId) return prev;
+      const saved = { ...prev, territorialStatistics: snapshots, updatedAt: now };
+      lastExplicitProfileWorkspaceRef.current = saved;
+      return saved;
+    });
+    setRemotePersistenceMessage("Estadística territorial guardada y confirmada por Firebase.");
   }, [workspace, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
 
   const handleSaveDeliberativePrioritySelection = useCallback((input: {
@@ -4424,6 +4455,10 @@ export default function App() {
               legacyProfiles={workspace.compiledProfiles}
               legacyText={workspace.validatedPSL?.conclusiones.content}
               onSave={handleSaveExternalProfiles}
+              ineCode={workspace.municipality.identity.ineCode}
+              province={workspace.municipality.identity.province}
+              territorialStatistics={workspace.territorialStatistics}
+              onSaveTerritorialStatistics={handleSaveTerritorialStatistics}
               onDirtyChange={onProfileDirtyChange}
             />
           </>

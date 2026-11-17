@@ -1,7 +1,7 @@
 # CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY
 
 > Contrato metodológico canónico del Perfil de Salud Local (PSL) en COMPÁS NG.
-> Versión 2.3.1 — 2026-11-17 (historial en el registro de revisiones)
+> Versión 2.4.0 — 2026-11-17 (historial en el registro de revisiones)
 > Estado: VIGENTE
 >
 > Este contrato define qué debe ser metodológicamente un Perfil de Salud Local,
@@ -560,6 +560,12 @@ Una cota publicada por secreto estadístico se identifica como cota, conserva la
 
 La revisión del Perfil incorpora la fuente registrada en su expediente y conserva las revisiones anteriores. Pantalla, exportaciones y paquete estructurado deben referirse a la misma revisión; un archivo original anterior se identifica como antecedente y no acredita la actualización de las otras representaciones. La incorporación no implica validación institucional.
 
+#### Desarrollo del dominio de determinantes sociales — 2026-11-17
+
+Los indicadores de determinantes sociales y de desigualdad del núcleo se obtienen de las fuentes oficiales con el circuito de `CONTRACT-TERRITORIAL-STATISTICS`: Atlas de Distribución de Renta de los Hogares y Censo anual del INE, Banco de Datos Estadísticos de Andalucía y malla de 250 m del IECA. Su catálogo fija, para cada indicador, la ficha que exige el apartado 1 y la tabla o consulta exacta en cada provincia andaluza, de modo que el mismo indicador se toma igual en todos los municipios.
+
+Una descarga es material para la próxima revisión del Perfil: no modifica la revisión vigente ni genera evidencia del expediente. El valor publicado se conserva sin redondear; un porcentaje que la fuente no publica y COMPÁS calcula a partir de dos recuentos publicados se declara como derivado. La comparación con el Perfil vigente señala qué indicadores faltan y cuáles tienen un dato más reciente; qué se incorpora lo decide el equipo redactor.
+
 *Consecuencia si se viola:* los perfiles de distintos municipios y ciclos dejan de poder compararse, o el panel atribuye diferencias que la fuente no sostiene.
 
 ---
@@ -882,3 +888,4 @@ El panel de salud usa el núcleo común de indicadores, declara sus comparadores
 | 2026-10-24 | 2.1.0 | Distinción entre recurso y activo (Art. 9 bis, I-LHPM-12): un registro de Localiza Salud es un recurso; es activo para la salud cuando consta su validación con los criterios de registro y validación de activos para la salud en Andalucía, que incluyen la identificación comunitaria. Los patrones de cruce se nombran con «recurso registrado». Decisión del autor del 2026-10-24, contrastada con Loja (162 recursos, 5 activos identificados comunitariamente) | COMPÁS NG |
 | 2026-11-17 | 2.3.1 | Coherencia con CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT §3.1 bis (2026-10-19): el Plan de Acción comprende líneas estratégicas, objetivos e indicadores; las actuaciones, con responsables, recursos y plazos, pertenecen a las agendas anuales de implantación, instrumento separado. Se ajustan Art. 3, 7 quater, 8 quater (reglas 2, 5 y 6), 16 bis, 16 quater (apartado 6, con redacción de referencia), I-LHPM-9 e I-LHPM-15. Motivo: las revisiones externas del 16/11/2026 de Alfacar, Atarfe, Loja y Zagra atribuían al Plan de Acción actuaciones, responsables, recursos y plazos. Decisión del autor | COMPÁS NG |
 | 2026-11-17 | 2.3.1 (aclaración) | Se incorpora la aclaración de aplicación a producción externa redactada el 12-11-2026 (procedente de la PR #120, no fusionada): contenido, cautelas, estructura y modelo canónico rigen también para el Perfil elaborado fuera de COMPÁS; la importación conserva y representa, no produce diagnóstico nuevo | COMPÁS NG |
+| 2026-11-17 | 2.4.0 | Art. 17 quater: desarrollo del dominio de determinantes sociales y del eje de desigualdad mediante `CONTRACT-TERRITORIAL-STATISTICS` (catálogo de 37 indicadores con ficha y tabla por provincia; descarga del INE y del IECA conservada como material para la revisión, sin modificar la vigente). Motivo: los cuatro Perfiles vigentes usan una parte pequeña de la estadística oficial disponible (sin Gini, P80/P20 ni fuentes de ingreso). Encargo del autor del 2026-11-17 | COMPÁS NG |

@@ -1,0 +1,27 @@
+.tsp{display:grid;gap:22px;margin-top:8px}
+.tsp-head{background:white;border:1px solid var(--ep-line);padding:24px 26px}
+.tsp-head>p{max-width:80ch}
+.tsp-run{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-top:6px}
+.tsp-run label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600}
+.tsp-run input{font:inherit;width:9em;padding:9px 11px;border:1px solid var(--borde);border-radius:3px;font-variant-numeric:tabular-nums}
+.tsp-progress{display:flex;gap:10px;align-items:center;margin-top:14px;font-size:13px}
+.tsp-progress progress{width:220px}
+.tsp-history{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px}
+.external-profile .tsp-history button{min-height:32px;padding:4px 10px;font-size:12px;border:1px solid var(--ep-line)}
+.external-profile .tsp-history button[aria-pressed="true"]{background:var(--ep-blue);color:white}
+.tsp-meta{font-size:13px;color:var(--ep-muted);margin:0}
+.tsp-empty{background:white;border:1px solid var(--ep-line);padding:20px;color:var(--ep-muted)}
+.tsp-downloads{display:flex;flex-wrap:wrap;gap:10px}
+.tsp-block{background:white;border:1px solid var(--ep-line);padding:20px 22px;min-width:0}
+.tsp-block h3{font-size:17px;margin:0 0 10px}
+.tsp-scroll{overflow-x:auto}
+.tsp-table{border-collapse:collapse;width:100%;font-size:13.5px}
+.tsp-table th,.tsp-table td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--ep-line)}
+.tsp-table th{font-size:12px;color:var(--ep-muted);font-weight:600;border-bottom:1px solid var(--ep-line)}
+.tsp-table td small{display:block;font-size:11.5px;color:var(--ep-muted);margin-top:3px;line-height:1.4}
+.tsp-num{white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:600}
+.tsp-num span{font-weight:400;color:var(--ep-muted);font-size:12px}
+.tsp-table tr[data-status="ausente"] td:last-child,.tsp-table tr[data-status="actualizable"] td:last-child,.tsp-table tr[data-status="revisar-valor"] td:last-child{font-weight:600}
+.tsp-failures li{font-size:13px}
+.tsp-sources{font-size:13px;padding-left:18px}
+.tsp-sources small{display:block;color:var(--ep-muted);white-space:pre-line;margin:4px 0 8px}

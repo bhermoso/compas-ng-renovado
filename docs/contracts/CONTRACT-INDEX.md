@@ -1,7 +1,7 @@
 # CONTRACT-INDEX — Índice maestro de contratos arquitectónicos
 
 > COMPÁS NG — Referencia de arquitectura contractual
-> Última actualización: 2026-11-12 — referencias de producción externa y cuatro casos de contraste
+> Última actualización: 2026-11-17 — estadística territorial oficial (INE, IECA) para la revisión del Perfil
 
 Este documento es la puerta de entrada a la arquitectura contractual de COMPÁS NG.
 No duplica contenido de los contratos. Cada entrada contiene: propósito, alcance, estado y relaciones.
@@ -42,6 +42,17 @@ Contrato de persistencia y rehidratación del workspace municipal en localStorag
 **Productores:** `LocalStorageWorkspacePersistence`.
 **Consumidores:** UI (rehidratación al arrancar).
 **Relacionado con:** CONTRACT-REPOSITORY.
+
+---
+
+### CONTRACT-TERRITORIAL-STATISTICS
+**Estado:** VIGENTE — 1.0.0, 2026-11-17
+
+Búsqueda, descarga, conservación e integración de la estadística territorial oficial (Atlas de Renta y Censo anual del INE; BADEA y malla de 250 m del IECA) para los indicadores de determinantes sociales y desigualdad del Art. 17 quater. Catálogo de 37 indicadores con ficha; regla del valor literal, secreto estadístico y derivados declarados; comparadores solo publicados; instantáneas inmutables en el expediente; paquete para la revisión con cobertura frente al Perfil vigente. No modifica el Perfil vigente ni genera evidencia.
+
+**Productores:** panel «Estadística territorial» del expediente.
+**Consumidores:** equipo redactor de la revisión del Perfil.
+**Relacionado con:** CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY (Art. 17 quater), CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION, CONTRACT-SOURCE-CAPABILITY-MATRIX.
 
 ---
 
