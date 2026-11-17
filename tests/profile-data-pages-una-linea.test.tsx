@@ -25,10 +25,17 @@ describe("Panel de salud · una línea por indicador", () => {
     expect(rows).toHaveLength(3);
     for (const row of rows) expect(row.split("</th>")[0]).not.toMatch(/<small|<br/);
   });
-  it("cada dominio es una tabla con las mismas columnas; la unidad común pasa a la cabecera del dominio", () => {
-    expect((panel.match(/<table id="pdp-domain-\d" class="pdp-table pdp-table--line pdp-dtable"/g) ?? []).length).toBe(2);
-    expect(panel).toMatch(/<caption class="pdp-dtable__cap">Morbilidad<span class="pdp-dtable__unit"> · casos por 10.000<\/span><\/caption>/);
+  it("una sola tabla con filas de dominio; la unidad común pasa a la fila del dominio", () => {
+    expect((panel.match(/<table class="pdp-table pdp-table--line">/g) ?? []).length).toBe(1);
+    expect(panel).toMatch(/<tr class="pdp-table__group"><th scope="rowgroup" colSpan="\d">Morbilidad<span class="pdp-dtable__unit"> · casos por 10.000<\/span><\/th><\/tr>/);
     expect(rows[0]).toContain('<td class="pdp-num pdp-local">1.589,56</td>');
+  });
+  it("las columnas se ajustan al contenido: ningún ancho fijo que recorte celdas en pantalla", async () => {
+    const { readFileSync } = await import("node:fs");
+    const css = readFileSync("src/ui/components/ProfileDataPages.css", "utf8");
+    expect(panel).not.toContain("<colgroup");
+    expect(css).not.toMatch(/table-layout:\s*fixed/);
+    expect(css).toMatch(/\.pdp-page \.profile-text-table th,\.pdp-page \.profile-text-table td\{white-space:nowrap/);
   });
   it("las fuentes se agrupan por fuente sin perder páginas ni bases; cada fila cita la suya", () => {
     const sources = [...panel.matchAll(/<li id="pdp-t3-f(\d)">([^<]*)<\/li>/g)].map((m) => m[2]);
