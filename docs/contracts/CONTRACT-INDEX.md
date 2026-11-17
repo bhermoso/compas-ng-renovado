@@ -1,7 +1,7 @@
 # CONTRACT-INDEX — Índice maestro de contratos arquitectónicos
 
 > COMPÁS NG — Referencia de arquitectura contractual
-> Última actualización: 2026-10-23 — retirada del PSL-NHS y de la salida comparativa breve
+> Última actualización: 2026-11-12 — referencias de producción externa y cuatro casos de contraste
 
 Este documento es la puerta de entrada a la arquitectura contractual de COMPÁS NG.
 No duplica contenido de los contratos. Cada entrada contiene: propósito, alcance, estado y relaciones.
@@ -574,3 +574,14 @@ deuda sigue viva, prevalecen este índice, los contratos específicos vigentes y
 ---
 
 *Este índice es el punto de entrada obligatorio antes de crear o modificar cualquier contrato en COMPÁS NG.*
+
+
+## Producción externa del Perfil de Salud Local
+
+- **Norma metodológica vigente:** [CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY](CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md), v2.3.0 y desarrollo de renta del 06-11-2026; aclaración de la ruta externa del 12-11-2026.
+- **Propuesta pendiente de aprobación técnica:** [CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION](CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION.md), revisión v1.1, 12-11-2026. Define entrega, custodia, cotejo, publicación y dependencias. No acredita aprobación científica de los casos.
+- **Implementación de carga y conservación:** [EXTERNAL-PROFILE](../architecture/EXTERNAL-PROFILE.md).
+- **Instrucción para el equipo redactor:** [Guía de entrega y aceptación](../guides/ENTREGA-PERFIL-EXTERNO.md).
+- **Contraste actual:** [Alfacar, Atarfe, Loja y Zagra, 12-11-2026](../audits/PSL-EXTERNAL-BASELINE-2026-11-12.md).
+
+Los contratos del compilador y de escritura automática son históricos para esta ruta. No pueden prohibir las recomendaciones permitidas por el contrato metodológico ni completar perfiles externos automáticamente. La identidad semántica se conserva entre pantalla, documento y exportaciones; no se exige identidad de paginación. Las nuevas fuentes y la promoción de vigente se revisan expresamente.

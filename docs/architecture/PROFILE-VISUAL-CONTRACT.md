@@ -1,3 +1,5 @@
+> **Aclaración 12-11-2026.** Para elaboración externa, entrega y cotejo consultar [la guía única](../guides/ENTREGA-PERFIL-EXTERNO.md). Las afirmaciones posteriores sobre fuentes o desagregaciones inexistentes describen el expediente histórico del generador: no prohíben mostrar renta censal, sexo, edad o series cuando el perfil externo las aporta con evidencia explícita conforme al contrato metodológico vigente.
+
 > Actualización 29-10-2026: el tab activo usa perfiles elaborados fuera de COMPÁS. Para carga, edición, conservación en Firebase y presentación rige [EXTERNAL-PROFILE.md](EXTERNAL-PROFILE.md). Las reglas de composición automática que siguen documentan exclusivamente los artefactos históricos.
 
 # Contrato visual del Perfil Local de Salud
