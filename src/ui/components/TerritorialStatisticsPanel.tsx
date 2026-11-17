@@ -1,0 +1,195 @@
+/**
+ * Estadística territorial oficial del expediente (CONTRACT-TERRITORIAL-STATISTICS).
+ * Descarga del INE y del IECA, guarda la instantánea en el expediente y prepara
+ * el paquete para la próxima revisión del Perfil. No modifica el Perfil vigente.
+ */
+import { useMemo, useState } from 'react';
+import type { ExternalHealthProfile } from '../../domain/health-profile/ExternalHealthProfile';
+import type { TerritorialStatisticsSnapshot } from '../../domain/territorial-statistics/TerritorialStatistics';
+import {
+  DOMAIN_LABEL, TERRITORIAL_INDICATORS, appendSnapshot, findAndalusianIneCodes, latestSnapshot, profileCoverage, provenanceCsv,
+  retrieveTerritorialStatistics, revisionPackage, revisionResults, sectionCsv, sectionTable, type CoverageStatus,
+} from '../../application/territorial-statistics';
+import './TerritorialStatisticsPanel.css';
+
+interface Props {
+  municipalityId: string;
+  municipalityName: string;
+  ineCode?: string;
+  province?: string;
+  snapshots?: TerritorialStatisticsSnapshot[];
+  activeProfile?: ExternalHealthProfile;
+  authorName?: string;
+  onSave?: (snapshots: TerritorialStatisticsSnapshot[], onProgress?: (message: string) => void) => Promise<void>;
+}
+
+const STATUS_LABEL: Record<CoverageStatus, string> = {
+  ausente: 'No figura en el Perfil',
+  actualizable: 'Hay un dato más reciente',
+  'al-dia': 'Al día',
+  'revisar-valor': 'Mismo periodo, valor distinto',
+  'sin-dato': 'Sin dato descargado',
+};
+
+async function fetchJson(url: string): Promise<unknown> {
+  const response = await fetch(url, { headers: { Accept: 'application/json' } });
+  if (!response.ok) throw new Error(`La fuente respondió ${response.status}.`);
+  return response.json();
+}
+
+function download(content: string, name: string, type: string) {
+  const url = URL.createObjectURL(new Blob([content], { type }));
+  const a = document.createElement('a'); a.href = url; a.download = name; a.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+const when = (iso: string) => new Date(iso).toLocaleString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+const slug = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+export function TerritorialStatisticsPanel({ municipalityId, municipalityName, ineCode, province, snapshots, activeProfile, authorName, onSave }: Props) {
+  const [code, setCode] = useState(ineCode ?? '');
+  const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState<{ label: string; done: number; total: number }>();
+  const [fresh, setFresh] = useState<TerritorialStatisticsSnapshot>();
+  const [selectedId, setSelectedId] = useState<string>();
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [candidates, setCandidates] = useState<Array<{ code: string; name: string }>>();
+
+  const saved = snapshots ?? [];
+  const shown = fresh ?? saved.find(s => s.id === selectedId) ?? latestSnapshot(saved);
+  const coverage = useMemo(() => shown ? profileCoverage(shown, activeProfile) : [], [shown, activeProfile]);
+  const results = useMemo(() => shown ? revisionResults(shown) : [], [shown]);
+  const sections = useMemo(() => shown ? sectionTable(shown) : undefined, [shown]);
+
+  async function run() {
+    setError(''); setMessage(''); setBusy(true);
+    try {
+      const snapshot = await retrieveTerritorialStatistics({
+        municipalityId, municipalityName, ineCode: code.trim(), retrievedBy: authorName || undefined, fetchJson,
+        onProgress: (label, done, total) => setProgress({ label, done, total }),
+      });
+      setFresh(snapshot);
+      setMessage(`Descarga terminada: ${snapshot.observations.length} valores de ${snapshot.sources.length} tablas y consultas${snapshot.failures.length ? `, con ${snapshot.failures.length} incidencias` : ''}. Revísala y guárdala en el expediente.`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally { setBusy(false); setProgress(undefined); }
+  }
+
+  async function lookup() {
+    setError(''); setBusy(true);
+    try {
+      const found = await findAndalusianIneCodes(municipalityName, province, fetchJson);
+      setCandidates(found);
+      if (found.length === 1) setCode(found[0].code);
+    } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
+    finally { setBusy(false); }
+  }
+
+  async function save() {
+    if (!fresh || !onSave) return;
+    setBusy(true); setError('');
+    try {
+      await onSave(appendSnapshot(saved, fresh), m => setMessage(m));
+      setSelectedId(fresh.id); setFresh(undefined);
+      setMessage('Descarga guardada en el expediente y confirmada por Firebase.');
+    } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
+    finally { setBusy(false); }
+  }
+
+  const base = shown ? `${slug(municipalityName)}-estadistica-territorial-${shown.retrievedAt.slice(0, 10)}` : '';
+  const domains = (['determinantes-sociales', 'desigualdad', 'poblacion'] as const);
+
+  return <section className="tsp" aria-labelledby="tsp-title">
+    <header className="tsp-head">
+      <p className="ep-eyebrow">Estadística territorial oficial · INE e IECA</p>
+      <h2 id="tsp-title">Datos para la próxima revisión del Perfil</h2>
+      <p>Descarga de las fuentes oficiales los indicadores de determinantes sociales y desigualdad del catálogo ({TERRITORIAL_INDICATORS.length} indicadores), con su procedencia y fecha de consulta. La descarga se guarda en el expediente y se compara con el Perfil vigente, que no cambia.</p>
+      <div className="tsp-run">
+        <label>Código INE del municipio
+          <input value={code} onChange={e => setCode(e.target.value)} inputMode="numeric" maxLength={5} disabled={busy} placeholder="18011"/>
+        </label>
+        <button type="button" className="ep-primary" disabled={busy || !/^\d{5}$/.test(code.trim())} onClick={() => void run()}>Descargar indicadores</button>
+        {fresh && onSave && <button type="button" className="ep-primary" disabled={busy} onClick={() => void save()}>Guardar en el expediente</button>}
+        {fresh && <button type="button" disabled={busy} onClick={() => { setFresh(undefined); setMessage(''); }}>Descartar descarga</button>}
+      </div>
+      {!ineCode && <p className="ep-help">El expediente no tiene código INE registrado: indícalo para esta descarga o búscalo por el nombre del municipio. El código usado queda guardado con la descarga. <button type="button" disabled={busy} onClick={() => void lookup()}>Buscar el código de «{municipalityName}»</button></p>}
+      {candidates && <p className="ep-help" role="status">{candidates.length === 0 ? `El INE no publica ningún municipio andaluz llamado «${municipalityName}». Si el ámbito no es un municipio, indica el código del municipio matriz.` : candidates.length === 1 ? `Código encontrado: ${candidates[0].code} (${candidates[0].name}). Compruébalo antes de descargar.` : `Varios municipios con ese nombre: ${candidates.map(c => `${c.code} (${c.name})`).join(', ')}.`}</p>}
+      {progress && <div className="tsp-progress" role="status"><progress max={progress.total} value={progress.done}/> <span>{progress.label} ({progress.done + 1} de {progress.total})</span></div>}
+      {message && <p className="ep-message" role="status">{message}</p>}
+      {error && <p className="ep-error" role="alert">{error}</p>}
+    </header>
+
+    {saved.length > 0 && <nav className="tsp-history" aria-label="Descargas guardadas">
+      <span>Descargas guardadas:</span>
+      {[...saved].reverse().map(s => <button key={s.id} type="button" aria-pressed={!fresh && shown?.id === s.id} onClick={() => { setFresh(undefined); setSelectedId(s.id); }}>{when(s.retrievedAt)}</button>)}
+    </nav>}
+
+    {!shown ? <p className="tsp-empty">Aún no hay ninguna descarga en este expediente.</p> : <>
+      <p className="tsp-meta">{fresh ? 'Descarga sin guardar' : 'Descarga guardada'} del {when(shown.retrievedAt)} · código INE {shown.ineCode} · catálogo {shown.catalogVersion}{shown.retrievedBy ? ` · ${shown.retrievedBy}` : ''}</p>
+
+      <div className="tsp-downloads">
+        <button type="button" onClick={() => download(JSON.stringify(revisionPackage(shown, activeProfile), null, 2), `${base}-paquete-revision.json`, 'application/json')}>↓ Paquete para la revisión (JSON)</button>
+        <button type="button" onClick={() => download(provenanceCsv(shown), `${base}-procedencia.csv`, 'text/csv;charset=utf-8')}>↓ Valores y procedencia (CSV)</button>
+        {sections && sections.rows.length > 0 && <button type="button" onClick={() => download(sectionCsv(shown), `${base}-secciones.csv`, 'text/csv;charset=utf-8')}>↓ Secciones censales (CSV)</button>}
+        {shown.grid && <button type="button" onClick={() => download(shown.grid!.geojson, `${base}-malla-250m.geojson`, 'application/geo+json')}>↓ Malla de 250 m (GeoJSON)</button>}
+      </div>
+
+      <section className="tsp-block">
+        <h3>Cobertura frente al Perfil vigente</h3>
+        <p className="ep-help">{activeProfile ? `Comparado con «${activeProfile.title}». La coincidencia se busca por el nombre del indicador; conviene comprobarla.` : 'El expediente no tiene Perfil vigente: todos los indicadores figuran como ausentes.'}</p>
+        <div className="tsp-scroll"><table className="tsp-table">
+          <thead><tr><th>Indicador</th><th>Descargado</th><th>En el Perfil vigente</th><th>Estado</th></tr></thead>
+          <tbody>{coverage.map(c => <tr key={c.indicatorId} data-status={c.status}>
+            <td>{c.title}</td>
+            <td>{c.downloaded ? `${c.downloaded.literal} (${c.downloaded.period})` : '—'}</td>
+            <td>{c.inProfile ? `${c.inProfile.value} (${c.inProfile.period || 'periodo no declarado'})` : '—'}</td>
+            <td>{STATUS_LABEL[c.status]}</td>
+          </tr>)}</tbody>
+        </table></div>
+      </section>
+
+      {domains.map(d => {
+        const rows = results.filter(r => r.topic === DOMAIN_LABEL[d]);
+        if (!rows.length) return null;
+        return <section key={d} className="tsp-block">
+          <h3>{DOMAIN_LABEL[d]}</h3>
+          <div className="tsp-scroll"><table className="tsp-table tsp-table--values">
+            <thead><tr><th>Indicador</th><th>{municipalityName}</th><th>Comparadores publicados</th><th>Año</th><th>Fuente</th></tr></thead>
+            <tbody>{rows.map(r => <tr key={r.id}>
+              <td>{r.title}<small>{r.caution}</small></td>
+              <td className="tsp-num">{r.value} <span>{r.unit}</span></td>
+              <td>{r.comparisons?.map(c => `${c.label}: ${c.value.toLocaleString('es-ES', { maximumFractionDigits: 10 })}`).join(' · ') || 'No publicados'}</td>
+              <td>{r.period}</td>
+              <td><small>{r.source} · {r.page}</small></td>
+            </tr>)}</tbody>
+          </table></div>
+        </section>;
+      })}
+
+      {sections && sections.rows.length > 0 && <section className="tsp-block">
+        <h3>Por sección censal ({sections.rows.length})</h3>
+        <p className="ep-help">Datos agregados de cada sección; no se atribuyen a calles, viviendas ni personas.{sections.rows.length < 2 ? ' Con una sola sección no hay diferencias internas que analizar.' : ''}</p>
+        <div className="tsp-scroll"><table className="tsp-table">
+          <thead><tr><th>Sección</th>{sections.fichas.map(f => <th key={f.id}>{f.title} <small>({f.unit})</small></th>)}</tr></thead>
+          <tbody>{sections.rows.map(r => <tr key={r.code}><td>{r.code}</td>{r.values.map((v, i) => <td key={i} className="tsp-num">{v ? v.literal : '—'}</td>)}</tr>)}</tbody>
+        </table></div>
+      </section>}
+
+      {shown.grid && <section className="tsp-block">
+        <h3>Malla de 250 m ({shown.grid.year})</h3>
+        <p>{shown.grid.cellCount} celdas con población en el término municipal. Sumas de las celdas publicadas: {shown.grid.totals.map(t => `${t.label.toLowerCase()} ${t.sum.toLocaleString('es-ES')}${t.secretCells ? ` (${t.secretCells} celdas con secreto estadístico, no sumadas)` : ''}`).join('; ')}.</p>
+        <p className="ep-help">Las sumas de la malla no sustituyen a las cifras oficiales del municipio; sirven para localizar dónde vive la población dentro del término.</p>
+      </section>}
+
+      {shown.failures.length > 0 && <section className="tsp-block tsp-failures">
+        <h3>Incidencias de la descarga</h3>
+        <ul>{shown.failures.map((f, i) => <li key={i}><strong>{f.scope}</strong>: {f.message}</li>)}</ul>
+      </section>}
+
+      <details className="tsp-block"><summary>Fuentes consultadas ({shown.sources.length})</summary>
+        <ul className="tsp-sources">{shown.sources.map(s => <li key={s.id}><strong>{s.provider}</strong> · {s.product} · {s.title} ({s.table}) · <a href={s.url} target="_blank" rel="noopener noreferrer">dirección de consulta</a>{s.notes ? <small>{s.notes}</small> : null}</li>)}</ul>
+      </details>
+    </>}
+  </section>;
+}

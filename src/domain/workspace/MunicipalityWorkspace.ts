@@ -63,6 +63,12 @@ export interface MunicipalityWorkspace {
   archivedAssetEvidence?: import("../evidence").EvidenceAtom[];
   /** Complete external profiles, original files and revisions, shared in Firebase. */
   externalProfileLibrary?: import('../health-profile/ExternalHealthProfile').ExternalProfileLibrary;
+  /**
+   * Descargas de estadística territorial oficial (INE, IECA) para la próxima
+   * revisión del Perfil (CONTRACT-TERRITORIAL-STATISTICS). No son evidencia del
+   * Perfil vigente ni lo modifican. Acumulativas; se conservan las más recientes.
+   */
+  territorialStatistics?: import('../territorial-statistics/TerritorialStatistics').TerritorialStatisticsSnapshot[];
   /** Originales de los documentos del Diagnóstico, completos y con huella, compartidos en Firebase. */
   documentOriginals?: import('../../application/document-files/documentOriginals').StoredDocumentOriginal[];
   /** Bajas explícitas de documentos; evita que seeds y copias anteriores resuciten registros. */

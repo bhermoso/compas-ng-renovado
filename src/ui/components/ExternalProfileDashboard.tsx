@@ -10,6 +10,8 @@ import { PSLCArtifactViewer } from './PSLCArtifactViewer';
 import { ProfileResultsDashboard } from './ProfileResultsDashboard';
 import { ProfileEditorialLab } from './ProfileEditorialLab';
 import { ProfileOriginalVerifier } from './ProfileOriginalVerifier';
+import { TerritorialStatisticsPanel } from './TerritorialStatisticsPanel';
+import type { TerritorialStatisticsSnapshot } from '../../domain/territorial-statistics/TerritorialStatistics';
 import './ExternalProfileDashboard.css';
 
 interface Props {
@@ -21,6 +23,10 @@ interface Props {
  authorName: string;
  onSave: (library: ExternalProfileLibrary, onProgress?: (message: string) => void) => Promise<void>;
  onDirtyChange?: (dirty: boolean) => void;
+ ineCode?: string;
+ province?: string;
+ territorialStatistics?: TerritorialStatisticsSnapshot[];
+ onSaveTerritorialStatistics?: (snapshots: TerritorialStatisticsSnapshot[], onProgress?: (message: string) => void) => Promise<void>;
 }
 const date = (s: string) => new Date(s).toLocaleDateString('es-ES', {day:'numeric',month:'short',year:'numeric'});
 const lines = (s: string) => s.split('\n').map(v => v.trim()).filter(Boolean);
@@ -55,9 +61,9 @@ function emptyProfile(municipalityId: string): ExternalHealthProfile {
  return {schema:'compas-external-profile/v1',id:crypto.randomUUID(),municipalityId,title:'',period:'',author:'',createdAt:new Date().toISOString(),
   status:'review',summary:'',text:'',results:[],findings:[],limitations:[],areas:[],attachmentIds:[]};
 }
-export function ExternalProfileDashboard({municipalityId,municipalityName,library,legacyProfiles=[],legacyText,authorName,onSave,onDirtyChange}: Props) {
+export function ExternalProfileDashboard({municipalityId,municipalityName,library,legacyProfiles=[],legacyText,authorName,onSave,onDirtyChange,ineCode,province,territorialStatistics,onSaveTerritorialStatistics}: Props) {
  const [selectedId,setSelectedId]=useState(library.activeId);
- const [tab,setTab]=useState<'results'|'document'|'versions'|'laboratory'>('results');
+ const [tab,setTab]=useState<'results'|'document'|'versions'|'laboratory'|'statistics'>('results');
  const [draft,setDraft]=useState<ExternalHealthProfile>();
  const [newFiles,setNewFiles]=useState<ProfileAttachment[]>([]);
  const [busy,setBusy]=useState(false); const [message,setMessage]=useState(''); const [error,setError]=useState('');
@@ -68,6 +74,8 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
  const replaceAttachmentId=useRef<string|undefined>(undefined);
  const fullProfileRef=useRef<HTMLDivElement>(null);
  const selected=library.profiles.find(p=>p.id===(selectedId ?? library.activeId)) ?? library.profiles.find(p=>p.id===library.activeId);
+ const activeProfile=library.profiles.find(p=>p.id===library.activeId);
+ const statisticsPanel=<TerritorialStatisticsPanel municipalityId={municipalityId} municipalityName={municipalityName} ineCode={ineCode} province={province} snapshots={territorialStatistics} activeProfile={activeProfile} authorName={authorName} onSave={onSaveTerritorialStatistics}/>;
  useEffect(()=>{onDirtyChange?.(!!draft);return()=>onDirtyChange?.(false);},[draft,onDirtyChange]);
  useEffect(()=>{
   if(!draft)return;
@@ -280,13 +288,13 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
     </section>
    <div className="ep-editor__footer"><p>Se guardará una versión en revisión. El guardado solo finaliza al confirmarlo Firebase; no cierres la pestaña mientras aparezca «Guardando…».</p><button className="ep-primary" disabled={busy||!draft.title.trim()} type="submit">{busy?'Guardando en Firebase…':'Guardar perfil en Firebase'}</button></div>
    </fieldset>
-  </form> : !selected ? <div className="ep-empty"><div className="ep-paper" aria-hidden="true"><span>COMPÁS</span><i/><i/><i/><i/><i/></div>
+  </form> : !selected ? <><div className="ep-empty"><div className="ep-paper" aria-hidden="true"><span>COMPÁS</span><i/><i/><i/><i/><i/></div>
    <div><p className="ep-eyebrow">PERFIL DE SALUD LOCAL · EXPEDIENTE MUNICIPAL</p><h2>{legacyProfiles.length>0||legacyText ? "Ya existe un perfil anterior de COMPÁS" : "Incorpora el Perfil de Salud Local"}</h2>
    <p>{legacyProfiles.length>0||legacyText ? "El expediente conserva un perfil elaborado previamente en COMPÁS. Puedes consultarlo más abajo, en «Perfiles anteriores de COMPÁS». Si también deseas incorporar un documento externo, se guardará por separado y no sustituirá el anterior." : "Carga el documento elaborado fuera de COMPÁS. Podrás consultarlo, descargar sus originales, editar una revisión y presentar sus resultados con la identidad institucional."}</p>
    <p className="ep-formats">PDF · Word DOCX · texto · Markdown · paquete de resultados JSON</p>
    <button className="ep-primary" type="button" disabled={busy} onClick={()=>fileInput.current?.click()}>Seleccionar el perfil</button>
    <p className="ep-help">Hasta 20 MB por archivo. Originales, texto, resultados y versiones se guardan en Firebase. El navegador es una caché.</p></div>
-  </div> : <>
+  </div>{statisticsPanel}</> : <>
    <div className="ep-document-toolbar" aria-label="Acceso a archivos y versiones">
      <div className="ep-document-toolbar__top">
        <span><strong>Archivos y versiones</strong> · {selected.status==='validated'?'Validada':'En revisión'}{selected.archivedAt?' · Archivada':''}</span>
@@ -303,7 +311,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
        {files.length===0&&<small>No hay archivos adjuntos a esta versión.</small>}
      </div>
    </div>
-   <nav className="ep-tabs ep-tabs--primary" aria-label="Espacios del perfil">{([['results','Perfil'],['document','Documento completo'],['versions','Gestión y versiones'],['laboratory','Laboratorio experimental']] as const).map(([key,label])=><button key={key} type="button" aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>
+   <nav className="ep-tabs ep-tabs--primary" aria-label="Espacios del perfil">{([['results','Perfil'],['document','Documento completo'],['versions','Gestión y versiones'],['statistics','Estadística territorial'],['laboratory','Laboratorio experimental']] as const).map(([key,label])=><button key={key} type="button" aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>
    {tab==='results'&&<main className="ep-main ep-main--profile">
     <p className="ep-review-status" role="status">
       {selected.id!==library.activeId ? 'Revisión no vigente. ' : ''}
@@ -321,6 +329,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
      : pdf&&fileUrls[pdf.id] ? <><p><a href={fileUrls[pdf.id]} target="_blank" rel="noopener noreferrer">Abrir PDF original en otra pestaña</a></p><iframe title="PDF original del Perfil de Salud Local" src={fileUrls[pdf.id]}/></>
      : <p>No hay texto extraíble. Consulta el archivo original o incorpora una transcripción.</p>}
    </section></main>}
+   {tab==='statistics'&&<main className="ep-main ep-main--statistics">{statisticsPanel}</main>}
    {tab==='laboratory'&&<main className="ep-main ep-main--laboratory"><ProfileEditorialLab key={selected.id} profile={selected}/></main>}
    {tab==='versions'&&<main className="ep-main ep-main--management">
     <section className="ep-management-upload"><div><p className="ep-eyebrow">ADMINISTRACIÓN DOCUMENTAL</p><h2>Gestionar el perfil de {municipalityName}</h2><p>Para incorporar una revisión, selecciona conjuntamente su PDF original y su paquete JSON de resultados. Se conservará la versión anterior y la nueva quedará en revisión, sin validación automática.</p></div><button type="button" className="ep-primary" disabled={busy} onClick={()=>fileInput.current?.click()}>↑ Incorporar nueva revisión</button></section>
