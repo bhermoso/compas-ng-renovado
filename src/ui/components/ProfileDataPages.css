@@ -378,35 +378,31 @@
 .pdp-domain-chart>summary{cursor:pointer;font-weight:600;color:var(--pdp-ink);padding:2px 0}
 .pdp-domain-chart:not([open]){padding-top:10px;padding-bottom:10px}
 
-/* Panel compacto (17/11/2026): una tabla por dominio con columnas compartidas;
-   en impresión, una sola cabecera de columnas, filas apretadas y A4 apaisado. */
+/* Panel compacto (17/11/2026): una sola tabla con filas de dominio; las columnas
+   se ajustan a su contenido y ninguna celda se recorta. En impresión, filas
+   apretadas y A4 apaisado; la matriz por sección, también en apaisado. */
 .pdp-domains{overflow-x:auto}
-.pdp-dtable{table-layout:fixed;width:100%;min-width:900px;margin:0}
-.pdp-dtable__cap{caption-side:top;text-align:left;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--pdp-ink);padding:10px 7px 3px}
 .pdp-dtable__unit{font-weight:500;text-transform:none;letter-spacing:0;color:var(--pdp-muted)}
-.pdp-dtable~.pdp-dtable thead{display:none}
-.pdp-dtable th,.pdp-dtable td{overflow:hidden;text-overflow:ellipsis}
-.pdp-dtable .pdp-c-title{width:34%}.pdp-dtable .pdp-c-period{width:9%}.pdp-dtable .pdp-c-local{width:19%}
-.pdp-dtable .pdp-c-geo{width:10%}.pdp-dtable .pdp-c-chart{width:11%}.pdp-dtable .pdp-c-before{width:12%}.pdp-dtable .pdp-c-ref{width:4%}
-.pdp-dtable .pdp-strip{width:100%}
+.pdp-dtable__cap{caption-side:top;text-align:left;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--pdp-ink);padding:10px 7px 3px}
 .pdp-matrix{min-width:max-content}
 .pdp-matrix th[scope=row] .pdp-muted{font-weight:400}
 .pdp-matrix__ref{color:var(--pdp-muted)}
 .pdp-matrix-wrap{page:pdp-panel}
 @media print{
- #pdp-3 .pdp-dtable,#pdp-4 .pdp-matrix{font-size:6.3pt;min-width:0}
- #pdp-3 .pdp-dtable th,#pdp-3 .pdp-dtable td,#pdp-4 .pdp-matrix th,#pdp-4 .pdp-matrix td{padding:0 1mm;line-height:1.08;border-bottom-width:.4px}
- #pdp-3 .pdp-dtable thead th,#pdp-4 .pdp-matrix thead th{font-size:5.6pt;white-space:normal;line-height:1.05;vertical-align:bottom;padding:.3mm 1mm}
- #pdp-3 .pdp-dtable__cap,#pdp-4 .pdp-dtable__cap{font-size:6.3pt;padding:.6mm 1mm 0;line-height:1.1;letter-spacing:.05em}
- #pdp-3 .pdp-dtable .pdp-c-title{width:40%}#pdp-3 .pdp-dtable .pdp-c-period{width:8%}#pdp-3 .pdp-dtable .pdp-c-local{width:20%}
- #pdp-3 .pdp-dtable .pdp-c-geo{width:9%}#pdp-3 .pdp-dtable .pdp-c-chart{width:6%}#pdp-3 .pdp-dtable .pdp-c-ref{width:3%}
- #pdp-3 .pdp-dtable .pdp-chart-col{width:auto;max-width:none}
- #pdp-3 .pdp-dtable .pdp-strip{width:100%;height:5px}
+ #pdp-3 .pdp-table--line,#pdp-4 .pdp-matrix{font-size:6.3pt;min-width:0}
+ #pdp-3 .pdp-table--line th,#pdp-3 .pdp-table--line td,#pdp-4 .pdp-matrix th,#pdp-4 .pdp-matrix td{padding:0 1mm;line-height:1.08;border-bottom-width:.4px}
+ #pdp-3 .pdp-table--line thead th,#pdp-4 .pdp-matrix thead th{font-size:5.6pt;white-space:normal;line-height:1.05;vertical-align:bottom;padding:.3mm 1mm}
+ #pdp-3 .pdp-table__group th{font-size:6.3pt;padding:.6mm 1mm 0;line-height:1.1;letter-spacing:.05em}
+ #pdp-3 .pdp-table--line .pdp-chart-col{width:40px}
+ #pdp-3 .pdp-table--line .pdp-strip{width:38px;height:5px}
+ #pdp-4 .pdp-dtable__cap{font-size:6.3pt;padding:.6mm 1mm 0;line-height:1.1;letter-spacing:.05em}
  #pdp-3>.pdp-text,#pdp-3 .pdp-note{font-size:7.5pt;line-height:1.3;margin:0 0 1.2mm}
  #pdp-3 .pdp-interpretation{break-before:page}
  .pdp-sources{font-size:5.6pt;line-height:1.2;columns:3;column-gap:4mm;margin-top:1.5mm}
-}
-@media print{
  #pdp-4 .pdp-matrix{font-size:5.9pt}
  #pdp-4 .pdp-matrix th,#pdp-4 .pdp-matrix td{padding:0 .6mm}
 }
+/* En las páginas de datos, las tablas del propio perfil también llevan cada indicador en una línea. */
+.pdp-page .profile-text-table th,.pdp-page .profile-text-table td{white-space:nowrap;overflow-wrap:normal}
+.pdp-page .profile-text-table thead th{white-space:normal}
+@media print{.pdp-page .profile-text-table table{font-size:7pt}.pdp-page .profile-text-table th,.pdp-page .profile-text-table td{padding:3px 6px}}

@@ -107,15 +107,6 @@ function IndicatorTable({ results, municipalityName, geo, caption, grouped, id }
   const beforeOf = (r: ProfileResult) => comparatorsOf(r).filter((c) => !geo.includes(c.label));
   const hasBefore = results.some((r) => beforeOf(r).length > 0);
   const { entries, numberOf } = sourceIndex(results);
-  const cols = (
-    <colgroup>
-      <col className="pdp-c-title" /><col className="pdp-c-period" /><col className="pdp-c-local" />
-      {geo.map((g) => <col key={g} className="pdp-c-geo" />)}
-      <col className="pdp-c-chart" />
-      {hasBefore && <col className="pdp-c-before" />}
-      {entries.length > 0 && <col className="pdp-c-ref" />}
-    </colgroup>
-  );
   const head = (
     <thead>
       <tr>
@@ -143,29 +134,24 @@ function IndicatorTable({ results, municipalityName, geo, caption, grouped, id }
       </tr>
     );
   };
-  if (!grouped) return (
-    <div className="pdp-table-wrap">
+  const cols = 4 + geo.length + (hasBefore ? 1 : 0) + (entries.length ? 1 : 0);
+  // Una sola tabla: cada columna se ajusta a su contenido más largo y ninguna celda se recorta.
+  return (
+    <div className={`pdp-table-wrap${grouped ? " pdp-domains" : ""}`}>
       <table className="pdp-table pdp-table--line">
         <caption className="ep-sr-only">{caption}</caption>
-        {cols}{head}
-        <tbody>{results.map((r) => row(r, false))}</tbody>
+        {head}
+        {topics.map((t, i) => {
+          const units = new Set(t.results.map((r) => unitOf(r.unit).trim()));
+          const shared = grouped && units.size === 1 ? [...units][0] : "";
+          return (
+            <tbody key={t.topic || "all"} id={grouped ? `pdp-domain-${i}` : undefined}>
+              {grouped && <tr className="pdp-table__group"><th scope="rowgroup" colSpan={cols}>{t.topic}{shared && <span className="pdp-dtable__unit"> · {shared}</span>}</th></tr>}
+              {t.results.map((r) => row(r, !!shared))}
+            </tbody>
+          );
+        })}
       </table>
-      <SourceList entries={entries} id={id} caption={caption} />
-    </div>
-  );
-  return (
-    <div className="pdp-table-wrap pdp-domains" role="group" aria-label={caption}>
-      {topics.map((t, i) => {
-        const units = new Set(t.results.map((r) => unitOf(r.unit).trim()));
-        const shared = units.size === 1 ? [...units][0] : "";
-        return (
-          <table key={t.topic} id={`pdp-domain-${i}`} className="pdp-table pdp-table--line pdp-dtable">
-            <caption className="pdp-dtable__cap">{t.topic}{shared && <span className="pdp-dtable__unit"> · {shared}</span>}</caption>
-            {cols}{head}
-            <tbody>{t.results.map((r) => row(r, !!shared))}</tbody>
-          </table>
-        );
-      })}
       <SourceList entries={entries} id={id} caption={caption} />
     </div>
   );
