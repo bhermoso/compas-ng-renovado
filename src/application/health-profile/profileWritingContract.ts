@@ -90,7 +90,7 @@ const FORBIDDEN_WRITING_PATTERNS: Array<{
   {
     id: "actuacion-programa",
     motivo:
-      "Las actuaciones operativas, los programas y los objetivos estratégicos pertenecen al Plan de Acción (Art. 3, CONTRACT-LHPM v1.5).",
+      "Los objetivos estratégicos pertenecen al Plan de Acción; las actuaciones operativas y los programas, a las agendas anuales de implantación (Art. 3, CONTRACT-LHPM v2.3.1).",
     pattern:
       /programa de intervención|actuaciones previstas|objetivo estratégico|línea estratégica|objetivo operativo|cartera de servicios propuesta/i,
   },

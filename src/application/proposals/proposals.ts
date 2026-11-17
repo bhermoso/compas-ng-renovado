@@ -77,7 +77,7 @@ export function stableProposalId(kind: ProposalKind, ...parts: string[]): string
   return [kind, ...parts.map(slug)].join(":");
 }
 
-// Responsable, plazo, recurso o indicador de ejecución: pertenecen al Plan de Acción.
+// Responsable, plazo, recurso o indicador de ejecución: no pertenecen al Perfil (agendas anuales de implantación).
 const OPERATIONAL_PATTERNS: Array<{ id: string; pattern: RegExp }> = [
   { id: "responsable", pattern: /\b(responsable|a cargo de|corresponde a la concejal[ií]a)\b/i },
   { id: "plazo", pattern: /\b(en un plazo|antes de(l)? (\d{4}|fin de)|en \d+ (días|semanas|meses|años)|durante el (primer|segundo) (trimestre|semestre))\b/i },

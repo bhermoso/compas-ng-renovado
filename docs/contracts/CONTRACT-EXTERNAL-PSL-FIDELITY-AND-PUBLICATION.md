@@ -4,7 +4,7 @@
 >
 > Alcance: perfiles de salud local redactados fuera de COMPÁS NG, importados en `MunicipalityWorkspace.externalProfileLibrary`, sus originales, revisiones y representaciones.
 >
-> **Prelación:** subordinado a `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md` v2.3.0 (02-11-2026), vigente. En caso de contradicción, prevalece el contrato metodológico. `docs/architecture/EXTERNAL-PROFILE.md` describe la decisión operativa de importación (29-10-2026); los contratos del antiguo compilador y de escritura automática no reactivan la generación en la pestaña Perfil.
+> **Prelación:** subordinado a `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md` v2.3.1 (17-11-2026), vigente. En caso de contradicción, prevalece el contrato metodológico. `docs/architecture/EXTERNAL-PROFILE.md` describe la decisión operativa de importación (29-10-2026); los contratos del antiguo compilador y de escritura automática no reactivan la generación en la pestaña Perfil.
 
 ## 1. Naturaleza del producto y responsabilidades
 
@@ -22,7 +22,7 @@ El documento externo deberá identificar, como mínimo, los siete apartados del 
 3. Convergencias y divergencias entre fuentes, cuando existan.
 4. Lo que no sabemos y la fuente o actuación de conocimiento que cerraría cada laguna.
 5. Recomendaciones **del Perfil**, de tipo Conocer, Contrastar o Abordar, derivadas de conclusiones o lagunas y sin fijar responsabilidades, plazos, recursos ni líneas del futuro Plan.
-6. Paso al Plan de Acción como frontera de decisión, no como plan anticipado.
+6. Paso al Plan de Acción como frontera de decisión, no como plan anticipado: no atribuye al Plan de Acción actuaciones, responsables, recursos ni plazos, que pertenecen a las agendas anuales de implantación (Art. 16 quater, apartado 6).
 7. Autoría, versión y validación.
 
 La información exhaustiva, referencias, tablas, limitaciones metodológicas, fuentes y trazabilidad detallada figuran en anexos. El art. 17 ter dispone cuatro páginas de datos comparables al inicio del documento canónico. **Para un perfil externo antiguo o de transición que no las contenga, COMPÁS deberá señalar la carencia: no las atribuirá retrospectivamente al original ni las rellenará con cifras inventadas.** Incorporarlas editorialmente exige evidencias declaradas, registro de versión y verificación de equivalencia con el documento canónico.
