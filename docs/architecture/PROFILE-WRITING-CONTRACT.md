@@ -4,7 +4,8 @@
 > lo redacte COMPÁS NG, una persona o un asistente fuera de la aplicación.
 > Versión inicial: 2026-07-09. Versión 2: 2026-10-25 (§0, lector y voz;
 > §1 y §4 alineados con el contrato metodológico v2.1.0); §0.2, §0.4 y §0.5
-> revisados el 2026-10-26 (estructura en siete apartados y citas). Implementación
+> revisados el 2026-10-26 (estructura en siete apartados y citas); §0.4 (apartado 6)
+> y §5 bis alineados con el contrato metodológico v2.3.1 el 2026-11-17. Implementación
 > testeable: `src/application/health-profile/profileWritingContract.ts` y
 > `tests/profile-writing-contract.test.ts`.
 
@@ -101,7 +102,7 @@ territoriales previas.
    una con la conclusión de la que deriva, para que el equipo técnico elija,
    corrija o descarte (Art. 8 quater). «Abordar» solo con relación de grado 1
    o 2.
-6. **Paso al Plan de Acción.** Breve transición que no incorpora actuaciones ni sustituye la decisión del Grupo Motor.
+6. **Paso al Plan de Acción.** Breve transición que no incorpora actuaciones ni sustituye la decisión del Grupo Motor. Dice que el Plan de Acción fija las líneas estratégicas, los objetivos y los indicadores, y que las actuaciones, con sus responsables, recursos y plazos, se concretan en las agendas anuales de implantación (contrato metodológico v2.3.1, Art. 16 quater, apartado 6).
 7. **Autoría y validación.** Registro administrativo posterior al cierre de conclusiones y recomendaciones, que podrá trasladarse a metadatos o anexos para preservar ese cierre.
 
 **Anexos.**
@@ -285,8 +286,9 @@ histórica sobre recomendaciones corresponde a una narrativa anterior y no
 autoriza rechazar recomendaciones elegibles del apartado previsto. Las pruebas
 de regresión del generador antiguo describen su salida actual, no una prohibición
 metodológica universal. La prohibición de recomendaciones se considera obsoleta:
-el Perfil RELAS debe culminar con conclusiones y recomendaciones; las actuaciones,
-responsables, plazos e indicadores corresponden al Plan de Acción. Antes de activar generación nueva deben actualizarse
+el Perfil RELAS debe culminar con conclusiones y recomendaciones; las líneas
+estratégicas, los objetivos y los indicadores corresponden al Plan de Acción, y las
+actuaciones, con sus responsables, recursos y plazos, a las agendas anuales de implantación. Antes de activar generación nueva deben actualizarse
 verificador, pruebas, compilador y consumidores de exportación de forma conjunta,
 con pruebas sobre perfiles históricos; no se altera la salida actual mediante
 esta PR exclusivamente documental.
