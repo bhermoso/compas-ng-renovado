@@ -1,7 +1,7 @@
 # CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY
 
 > Contrato metodológico canónico del Perfil de Salud Local (PSL) en COMPÁS NG.
-> Versión 2.3.0 — 2026-11-02 (historial en el registro de revisiones)
+> Versión 2.3.1 — 2026-11-17 (historial en el registro de revisiones)
 > Estado: VIGENTE
 >
 > Este contrato define qué debe ser metodológicamente un Perfil de Salud Local,
@@ -56,12 +56,13 @@ El Perfil pertenece a la etapa de síntesis diagnóstica. Las etapas de prioriza
 |---|---|---|
 | **Diagnóstico (Perfil)** | ¿Qué dice la evidencia sobre el territorio? | PSL |
 | **Priorización** | ¿Qué necesidades merecen atención preferente? | Deliberación del Grupo Motor |
-| **Planificación** | ¿Qué se va a hacer, cómo, quién y cuándo? | Plan de Acción / PLS |
+| **Planificación** | ¿Qué se quiere conseguir y cómo se medirá? | Plan de Acción: líneas estratégicas, objetivos e indicadores |
+| **Implantación** | ¿Qué se hace, quién, con qué recursos y cuándo? | Actuaciones y agendas anuales de implantación del PLS |
 | **Decisión** | ¿La corporación asume el plan como compromiso institucional? | PLS aprobado |
 
 El Perfil concluye y orienta. No decide. Formula recomendaciones del Perfil derivadas de sus conclusiones y lagunas (Art. 8 quater): qué conocer, qué contrastar, qué abordar. No selecciona prioridades, no asigna líneas estratégicas, no fija actuaciones operativas (responsable, plazo, recurso, indicador de ejecución), no asume compromisos y no sustituye la deliberación del Grupo Motor.
 
-La recomendación del Perfil propone, la priorización elige, el Plan de Acción concreta y la decisión compromete.
+La recomendación del Perfil propone, la priorización elige, el Plan de Acción fija líneas, objetivos e indicadores, las agendas anuales concretan las actuaciones y la decisión compromete.
 
 La mezcla de estas etapas en el contenido del Perfil es un defecto metodológico grave que invalida el diagnóstico como base de planificación.
 
@@ -190,7 +191,7 @@ El cierre interpretativo establece:
 
 Cada recomendación cita las conclusiones o lagunas de las que deriva y, si se apoya en una relación, su grado de sustento (Art. 8 bis). Una recomendación de tipo «Abordar» solo puede apoyarse en relaciones de grado 1 o 2.
 
-El Capítulo VI no establece compromisos, no selecciona prioridades y no asigna líneas estratégicas, no ordena las recomendaciones entre sí y no fija actuaciones operativas (responsable, plazo, recurso, indicador de ejecución). Esa concreción pertenece al Plan de Acción / Plan Local de Salud, que es un producto distinto del Perfil. El Perfil termina cuando el territorio queda comprendido y las recomendaciones están formuladas.
+El Capítulo VI no establece compromisos, no selecciona prioridades y no asigna líneas estratégicas, no ordena las recomendaciones entre sí y no fija actuaciones operativas (responsable, plazo, recurso, indicador de ejecución). Las líneas, los objetivos y los indicadores pertenecen al Plan de Acción; las actuaciones, con su responsable, plazo y recurso, a las agendas anuales de implantación del Plan Local de Salud (CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT §3.1 bis; CONTRACT-AGENDA-ACTUATIONS). Ambos son productos distintos del Perfil. El Perfil termina cuando el territorio queda comprendido y las recomendaciones están formuladas.
 
 ### Art. 8. Tipos de afirmación
 
@@ -269,11 +270,11 @@ La recomendación del Perfil es el último paso de la cadena de lectura (Art. 8 
 Reglas:
 
 1. **Forma.** Verbo en infinitivo y objeto. Declara la conclusión o la laguna de la que deriva y la decisión del Grupo Motor que habilita.
-2. **Lo que no es.** No incluye responsable, plazo, recurso, indicador de ejecución, prioridad ni línea estratégica. No ordena las recomendaciones entre sí y no compromete a nadie. Esas determinaciones pertenecen a la priorización y al Plan de Acción.
+2. **Lo que no es.** No incluye responsable, plazo, recurso, indicador de ejecución, prioridad ni línea estratégica. No ordena las recomendaciones entre sí y no compromete a nadie. Esas determinaciones pertenecen a la priorización, al Plan de Acción (líneas, objetivos e indicadores) y a las agendas anuales de implantación (actuaciones con responsable, plazo y recurso).
 3. **Una laguna no es un área de intervención** (Art. 7 ter). Sobre una laguna solo caben recomendaciones de tipo «Conocer» o «Contrastar».
 4. **Autoría y elección.** La recomendación es de autoría humana (Art. 8) y pasa por el menú elegible (Art. 16 ter).
-5. **Derivación desde el Plan.** Toda actuación del Plan de Acción debe poder derivarse de una recomendación o de una conclusión del Perfil. La actuación que no pueda derivarse declara en el Plan la fuente en que se apoya.
-6. **Diferencia con la actuación.** La recomendación responde a qué hay que conocer, contrastar o abordar. La actuación del Plan responde a quién, cuándo, con qué recursos y cómo se mide.
+5. **Derivación desde el Plan.** Toda línea, objetivo e indicador del Plan de Acción, y toda actuación de las agendas, debe poder derivarse de una recomendación o de una conclusión del Perfil. El elemento que no pueda derivarse declara la fuente en que se apoya.
+6. **Diferencia con el Plan y con la actuación.** La recomendación responde a qué hay que conocer, contrastar o abordar. El Plan de Acción responde a qué se quiere conseguir y cómo se medirá. La actuación de la agenda responde a quién hace qué, cuándo y con qué recursos.
 
 *Consecuencia si se viola:* el Perfil prescribe o prioriza sin deliberación, o recomienda abordar un problema que ninguna fuente sostiene.
 
@@ -455,9 +456,9 @@ Los capítulos de conclusiones y cierre interpretativo del Perfil son siempre de
 
 La cadena metodológica del Perfil es:
 
-`evidencia → lectura integrada → conclusiones → recomendaciones del Perfil → | frontera de decisión | → priorización → Plan de Acción`
+`evidencia → lectura integrada → conclusiones → recomendaciones del Perfil → | frontera de decisión | → priorización → Plan de Acción → actuaciones y agendas anuales`
 
-El Perfil llega hasta las recomendaciones. La priorización corresponde al Grupo Motor y las actuaciones operativas al Plan de Acción y al Plan Local de Salud. La frontera entre Perfil y Plan no es un muro: toda actuación posterior debe poder derivarse de las recomendaciones y conclusiones del Perfil, y toda recomendación y conclusión debe poder trazarse hasta la evidencia que la sostiene.
+El Perfil llega hasta las recomendaciones. La priorización corresponde al Grupo Motor; las líneas estratégicas, los objetivos y los indicadores, al Plan de Acción; y las actuaciones, con sus responsables, recursos y plazos, a las agendas anuales de implantación del Plan Local de Salud, que son un instrumento separado del Plan de Acción (CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT §3.1 bis). La frontera entre Perfil y Plan no es un muro: todo elemento posterior debe poder derivarse de las recomendaciones y conclusiones del Perfil, y toda recomendación y conclusión debe poder trazarse hasta la evidencia que la sostiene.
 
 ### Art. 16 ter. Conclusiones y recomendaciones como menú elegible
 
@@ -486,7 +487,7 @@ El Perfil es un argumento: su unidad es la conclusión, y se lee como un texto d
 3. **Convergencias y divergencias.** Las cuestiones que aparecen en dos o más fuentes, según el Art. 14. Si no hay ninguna cuestión compartida, el apartado se omite y el punto de partida lo declara.
 4. **Lo que no sabemos.** Las lagunas que condicionan una conclusión, cada una con el dato que la cerraría.
 5. **Recomendaciones del Perfil.** En el formato del Art. 8 quater.
-6. **Paso al Plan de Acción.** Texto fijo de la frontera de decisión (Art. 16 bis): qué recibe el Plan (las conclusiones, las recomendaciones y las lagunas elegidas) y que la priorización corresponde al Grupo Motor.
+6. **Paso al Plan de Acción.** Texto fijo de la frontera de decisión (Art. 16 bis): qué recibe el Plan (las conclusiones, las recomendaciones y las lagunas elegidas), que la priorización corresponde al Grupo Motor, que el Plan de Acción fija las líneas estratégicas, los objetivos y los indicadores, y que las actuaciones, con sus responsables, recursos y plazos, se concretan en las agendas anuales de implantación, fuera del Plan de Acción. El apartado no atribuye al Plan de Acción actuaciones, responsables, recursos ni plazos. Redacción de referencia: «El Grupo Motor recibe las conclusiones y las recomendaciones que el equipo técnico elija y las preguntas abiertas. A partir de aquí decide qué priorizar; el Plan de Acción fija las líneas estratégicas, los objetivos y los indicadores, y las actuaciones, con sus responsables, recursos y plazos, se concretan después en las agendas anuales de implantación.»
 7. **Autoría y validación.** Responsable técnico, fechas y registro de lo compilado por el sistema, lo declarado por el equipo y lo redactado por el equipo (Art. 17).
 
 **Anexo compilado.** Evidencia por fuente, cifras con procedencia, relaciones declaradas y unidades de lectura (Art. 4 bis). Lo genera el sistema y no admite edición manual. Es parte del mismo documento (Art. 17 bis) y es el único lugar donde figura la evidencia completa.
@@ -733,11 +734,11 @@ Pantalla, visor, impresión, DOCX y PDF son representaciones del mismo documento
 
 **I-LHPM-9 — Frontera entre recomendaciones y decisión**
 
-El Perfil concluye y recomienda; no decide. Sus recomendaciones no llevan responsable, plazo, recurso, indicador, prioridad ni línea estratégica. La priorización es del Grupo Motor y las actuaciones operativas del Plan de Acción, que deben derivarse de las conclusiones y recomendaciones del Perfil, y estas de la evidencia.
+El Perfil concluye y recomienda; no decide. Sus recomendaciones no llevan responsable, plazo, recurso, indicador, prioridad ni línea estratégica. La priorización es del Grupo Motor; las líneas, los objetivos y los indicadores, del Plan de Acción; y las actuaciones, de las agendas anuales de implantación. Todo ello debe derivarse de las conclusiones y recomendaciones del Perfil, y estas de la evidencia.
 
-*Consecuencia si se viola:* el Perfil selecciona prioridades o fija actuaciones, o el Plan formula actuaciones sin base diagnóstica trazable.
+*Consecuencia si se viola:* el Perfil selecciona prioridades o fija actuaciones, el Plan o la agenda formulan objetivos o actuaciones sin base diagnóstica trazable, o el Perfil atribuye al Plan de Acción las actuaciones que corresponden a las agendas.
 
-*Fuente:* Art. 16 bis; CONTRACT-ACTION-PLAN.
+*Fuente:* Art. 16 bis; CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT §3.1 bis; CONTRACT-AGENDA-ACTUATIONS.
 
 ---
 
@@ -783,7 +784,7 @@ La conexión entre un activo y un determinante la declara una persona del equipo
 
 Toda recomendación del Perfil tiene autoría humana validada, cita las conclusiones o lagunas de las que deriva, es de un tipo del Art. 8 quater y no fija responsable, plazo ni recurso (Art. 8, 16).
 
-*Consecuencia si se viola:* el sistema emite como recomendación del Perfil un texto que nadie ha validado, o el Perfil invade el Plan de Acción.
+*Consecuencia si se viola:* el sistema emite como recomendación del Perfil un texto que nadie ha validado, o el Perfil invade el Plan de Acción o las agendas de implantación.
 
 **I-LHPM-16 — Menú elegible, sin elección por defecto**
 
@@ -876,3 +877,4 @@ El panel de salud usa el núcleo común de indicadores, declara sus comparadores
 | 2026-11-02 | 2.3.0 | Reforma del Art. 17 ter («Una sola salida, con páginas de datos comparables»): el único Perfil se abre con cuatro páginas de plantilla común (portada, población, panel de salud y desigualdad), sin salida aparte. Nuevo Art. 17 quater: núcleo cerrado de unos treinta indicadores en siete dominios, comparadores (Distrito, provincia y Andalucía cuando la fuente los publica), colores solo con intervalos o significación de la fuente, renta por sección censal del INE como eje de desigualdad interna y tendencia entre ciclos comparables. I-LHPM-10 ajustado y nuevo I-LHPM-22. Decisiones del autor del 2026-11-02, a partir de los Local Authority Health Profiles de Public Health England | COMPÁS NG |
 | 2026-11-01 | 2.2.0 | Conclusiones narradas y lectura de conjunto (Art. 16 quater, apartado 2): el apartado se abre con una lectura que relaciona las conclusiones; cada conclusión se escribe en prosa con las cifras citadas dentro del texto, y el tipo, las evidencias, el grado, el límite y las recomendaciones pasan a una tabla de trazabilidad del anexo. Nuevo Art. 13 bis e invariante I-LHPM-21: los datos epidemiológicos oficiales se reproducen como los publica su fuente, sin cautelas añadidas, conservando año, escala y ausencia de datos posteriores. Criterios del Art. 19 «Incertidumbre visible» (ajustado) y «Lectura de conjunto» (nuevo). Decisiones del autor del 2026-11-01, a partir del Perfil de Zagra v0.1 | COMPÁS NG |
 | 2026-10-24 | 2.1.0 | Distinción entre recurso y activo (Art. 9 bis, I-LHPM-12): un registro de Localiza Salud es un recurso; es activo para la salud cuando consta su validación con los criterios de registro y validación de activos para la salud en Andalucía, que incluyen la identificación comunitaria. Los patrones de cruce se nombran con «recurso registrado». Decisión del autor del 2026-10-24, contrastada con Loja (162 recursos, 5 activos identificados comunitariamente) | COMPÁS NG |
+| 2026-11-17 | 2.3.1 | Coherencia con CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT §3.1 bis (2026-10-19): el Plan de Acción comprende líneas estratégicas, objetivos e indicadores; las actuaciones, con responsables, recursos y plazos, pertenecen a las agendas anuales de implantación, instrumento separado. Se ajustan Art. 3, 7 quater, 8 quater (reglas 2, 5 y 6), 16 bis, 16 quater (apartado 6, con redacción de referencia), I-LHPM-9 e I-LHPM-15. Motivo: las revisiones externas del 16/11/2026 de Alfacar, Atarfe, Loja y Zagra atribuían al Plan de Acción actuaciones, responsables, recursos y plazos. Decisión del autor | COMPÁS NG |

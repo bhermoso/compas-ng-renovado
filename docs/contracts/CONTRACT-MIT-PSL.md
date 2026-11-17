@@ -578,8 +578,10 @@ lectura interpretativa documentando alcance y limitaciones y recoge las
 orientaciones técnicas que el equipo elige del menú de propuestas
 (CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY v1.5, Art. 16 ter). Ningún capítulo
 del PSL selecciona prioridades ni formula actuaciones operativas (responsable,
-plazo, recurso). Las actuaciones pertenecen al Motor de Traducción Estratégica
-(Producto 5) y al Plan de Acción (Producto 6).
+plazo, recurso). Las líneas, los objetivos y los indicadores pertenecen al
+Plan de Acción (Producto 6), con el apoyo del Motor de Traducción Estratégica
+(Producto 5); las actuaciones, a las agendas anuales de implantación
+(CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT §3.1 bis).
 
 **I-PSL-4 — La deliberación del capítulo VII nunca es generada por el sistema**
 

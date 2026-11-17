@@ -9,6 +9,12 @@
 > Estado operativo: **LEGACY** desde PA-RELAS-01. Sus motores permanecen en
 > código por compatibilidad, pero ya no constituyen la ruta visible del Plan de
 > Acción. La cadena vigente se define en `CONTRACT-DELIBERATIVE-PRIORITISATION.md`.
+>
+> Doctrina vigente sobre actuaciones (2026-10-19, CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT
+> §3.1 bis): el Plan de Acción comprende líneas estratégicas, objetivos e
+> indicadores; las actuaciones y las agendas anuales son un instrumento separado
+> (CONTRACT-AGENDA-ACTUATIONS). Lo que este contrato dice de `ActionPlanAction`
+> describe el motor legado y no define qué contiene el Plan de Acción.
 
 ---
 
