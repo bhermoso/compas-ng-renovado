@@ -25,8 +25,8 @@ interface Props {
   onRun: (ids: string[], kinds: ProfileUpdateKind[], apply: boolean, onProgress: (message: string) => void, textPackage?: ProfileTextPackage) => Promise<ProfileUpdateOutcome[]>;
 }
 
-const KINDS: ProfileUpdateKind[] = ['rotulos', 'paginas-datos', 'indicadores', 'cifras-conclusiones', 'paquete-texto'];
-const DEFAULT_KINDS: ProfileUpdateKind[] = ['rotulos', 'paginas-datos', 'indicadores', 'cifras-conclusiones'];
+const KINDS = Object.keys(PROFILE_UPDATE_LABEL) as ProfileUpdateKind[];
+const DEFAULT_KINDS: ProfileUpdateKind[] = ['rotulos', 'paginas-datos', 'indicadores', 'cifras-conclusiones', 'campos-derivados'];
 const slug = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 function downloadPackage(o: ProfileUpdateOutcome) {
