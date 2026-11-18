@@ -10,7 +10,7 @@ import { EMPTY_PROFILE_LIBRARY, isExternalProfileLibrary } from "./application/h
 import type { ExternalProfileLibrary } from "./domain/health-profile/ExternalHealthProfile";
 import { InitialLocalHealthPlanPanel } from "./ui/components/InitialLocalHealthPlanPanel";
 import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
-import { InstitutionalLogoBand } from "./ui/components/InstitutionalLogoBand";
+import { HomePortada } from "./ui/components/HomePortada";
 import { DocumentReviewInbox } from "./ui/components/DocumentReviewInbox";
 import { DiagnosisControlRoom, DiagnosisModuleSection } from "./ui/components/DiagnosisControlRoom";
 import { DuplicateDocumentsPanel } from "./ui/components/DuplicateDocumentsPanel";
@@ -3887,7 +3887,7 @@ export default function App() {
         />
       )}
 
-      <main className="app-shell">
+      <main className={view === "inicio" ? "app-shell app-shell--home" : "app-shell"}>
         {/* Selector de municipio (se muestra sobre cualquier vista) */}
         {showMunicipalitySelector && (
           <section className="municipality-selector">
@@ -4001,214 +4001,8 @@ export default function App() {
           </section>
         )}
 
-        {/* ── ① Inicio — Portada institucional de COMPÁS */}
-        {view === "inicio" && (
-          <>
-            {/* ═══ CUBIERTA — identidad COMPÁS NG ═══ */}
-            <div className="home-cover">
-              <div className="home-cover__stripe" />
-              <div className="home-cover__inner">
-                {/* Marco de referencia — sin atribución oficial */}
-                <div className="home-cover__chain">
-                  <span className="home-cover__chain-level">Marco de referencia</span>
-                  <span className="home-cover__chain-sep">·</span>
-                  <span className="home-cover__chain-level">RELAS</span>
-                  <span className="home-cover__chain-sep">·</span>
-                  <span className="home-cover__chain-level">Planificación Local de Salud</span>
-                  <span className="home-cover__chain-sep">·</span>
-                  <span className="home-cover__chain-level">Salud pública municipal</span>
-                  <span className="home-cover__chain-sep">·</span>
-                  <span className="home-cover__chain-level">Andalucía</span>
-                </div>
-
-                {/* Marca — el único foco visual */}
-                <div className="home-cover__brand">
-                  <h1 className="home-cover__wordmark">COMPÁS</h1>
-                </div>
-
-                {/* Regla de identidad — franja canónica bajo la marca */}
-                <hr className="home-cover__rule" />
-
-                {/* Subtítulo */}
-                <p className="home-cover__subtitle">
-                  Herramienta en desarrollo para la planificación local en salud
-                </p>
-
-                {/* Franja de logos institucionales */}
-                <InstitutionalLogoBand
-                  variant="cover"
-                  ids={["consejeria", "distrito-sanitario", "relas", "violencia-genero", "rasselh"]}
-                />
-              </div>
-            </div>
-
-            {/* ═══ MISIÓN — qué es y para qué sirve ═══ */}
-            <section className="home-mission">
-              <div className="home-mission__inner">
-                <p className="home-mission__statement">
-                  Prototipo metodológico orientado a apoyar la elaboración de Planes Locales
-                  de Salud municipales, tomando como referencia el marco RELAS y la experiencia
-                  acumulada de <strong>COMPÁS</strong>.
-                </p>
-                <div className="home-mission__context">
-                  <p className="home-mission__context-label">Marco de referencia</p>
-                  <ul className="home-mission__context-list">
-                    <li className="home-mission__context-item">Marco RELAS · Planificación Local de Salud</li>
-                    <li className="home-mission__context-item">Salud pública municipal · Andalucía</li>
-                    <li className="home-mission__context-item">Experiencia histórica de COMPÁS</li>
-                    <li className="home-mission__context-item">Herramienta en desarrollo — no desplegada oficialmente</li>
-                  </ul>
-                </div>
-              </div>
-            </section>
-
-            {/* ═══ PROCESO — cómo trabaja ═══ */}
-            <section className="home-process">
-              <div className="home-process__inner">
-                <p className="home-section-eyebrow">Proceso</p>
-                <h2 className="home-process__heading">El ciclo de planificación local en salud</h2>
-                <div className="home-process__cycle">
-                  <div className="home-process__phase home-process__phase--1">
-                    <span className="home-process__ordinal">01</span>
-                    <span className="home-process__verb">Diagnosticar</span>
-                    <p className="home-process__desc">
-                      Informe de salud, estudios complementarios y activos comunitarios
-                      organizados y analizados.
-                    </p>
-                  </div>
-                  <div className="home-process__phase home-process__phase--2">
-                    <span className="home-process__ordinal">02</span>
-                    <span className="home-process__verb">Perfilar</span>
-                    <p className="home-process__desc">
-                      Perfil de Salud Local elaborado fuera de COMPÁS, incorporado
-                      y revisado por el equipo.
-                    </p>
-                  </div>
-                  <div className="home-process__phase home-process__phase--3">
-                    <span className="home-process__ordinal">03</span>
-                    <span className="home-process__verb">Priorizar</span>
-                    <p className="home-process__desc">
-                      Selección técnica y participativa de las áreas de actuación
-                      prioritarias.
-                    </p>
-                  </div>
-                  <div className="home-process__phase home-process__phase--4">
-                    <span className="home-process__ordinal">04</span>
-                    <span className="home-process__verb">Planificar</span>
-                    <p className="home-process__desc">
-                      Plan de Acción: líneas de actuación, objetivos e indicadores
-                      trazados al diagnóstico.
-                    </p>
-                  </div>
-                  <div className="home-process__phase home-process__phase--5">
-                    <span className="home-process__ordinal">05</span>
-                    <span className="home-process__verb">Implantar</span>
-                    <p className="home-process__desc">
-                      Agenda de actuaciones del plan, organizadas por entorno
-                      y con ficha propia.
-                    </p>
-                    <button
-                      type="button"
-                      className="home-process__open"
-                      onClick={() => setView("agenda")}
-                    >
-                      Abrir la agenda
-                    </button>
-                  </div>
-                  <div className="home-process__phase home-process__phase--6">
-                    <span className="home-process__ordinal">06</span>
-                    <span className="home-process__verb">Evaluar</span>
-                    <p className="home-process__desc">
-                      Grado de cumplimiento del plan, resultados alcanzados y
-                      recomendaciones para el ciclo siguiente.
-                    </p>
-                  </div>
-                </div>
-                <p className="home-process__note">
-                  Las decisiones sobre el diagnóstico, la priorización y el plan corresponden
-                  al equipo técnico, a la ciudadanía y a la autoridad competente.
-                  COMPÁS organiza la información y apoya el proceso; no sustituye la deliberación
-                  institucional.
-                </p>
-              </div>
-            </section>
-
-            {/* ═══ FLUJO — entradas y salidas de COMPÁS ═══ */}
-            <section className="home-products">
-              <div className="home-products__inner">
-
-                {/* Zona 1: Fuentes — entran en COMPÁS, no las genera */}
-                <div className="home-sources">
-                  <p className="home-section-eyebrow">Documentos que se incorporan a COMPÁS</p>
-                  <p className="home-sources__note">
-                    Informes, estudios y perfiles elaborados fuera de COMPÁS que sirven de referencia para la planificación.
-                  </p>
-                  <div className="home-sources__list">
-                    <div className="home-source">
-                      <p className="home-source__name">Perfil de Salud Local</p>
-                      <p className="home-source__desc">
-                        Documento elaborado fuera de COMPÁS. Se incorpora con sus resultados,
-                        se consulta, se descarga y se revisa conservando sus versiones en Firebase.
-                      </p>
-                      <button type="button" className="home-process__open" onClick={() => setView("psl")}>
-                        Abrir el Perfil de Salud Local
-                      </button>
-                    </div>
-                    <div className="home-source">
-                      <p className="home-source__name">Informe de Salud</p>
-                      <p className="home-source__desc">
-                        Documento fuente elaborado fuera de COMPÁS e incorporado
-                        al proceso diagnóstico.
-                      </p>
-                    </div>
-                    <div className="home-source">
-                      <p className="home-source__name">Estudios complementarios</p>
-                      <p className="home-source__desc">
-                        Información recogida mediante estudios específicos que
-                        complementa el diagnóstico territorial.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Conector — organización de documentos y apoyo a la planificación */}
-                <div className="home-transform">
-                  <span className="home-transform__arrow">↓</span>
-                  <span className="home-transform__label">COMPÁS organiza y apoya la planificación</span>
-                </div>
-
-                {/* Zona 2: Salidas — documentos que genera COMPÁS */}
-                <div className="home-outputs">
-                  <p className="home-section-eyebrow">Documentos de planificación y evaluación</p>
-                  <div className="home-products__list">
-                    <div className="home-product home-product--3">
-                      <p className="home-product__name">Plan de Acción Local en Salud</p>
-                      <p className="home-product__desc">
-                        Líneas estratégicas, objetivos, indicadores, programas y actuaciones
-                        construidos a partir del diagnóstico y la priorización.
-                      </p>
-                    </div>
-                    <div className="home-product home-product--4">
-                      <p className="home-product__name">Plan Local de Salud</p>
-                      <p className="home-product__desc">
-                        Documento institucional que integra diagnóstico, priorización,
-                        plan de acción, seguimiento y evaluación.
-                      </p>
-                    </div>
-                    <div className="home-product home-product--5">
-                      <p className="home-product__name">Informe de Evaluación</p>
-                      <p className="home-product__desc">
-                        Documento de evaluación anual, bianual, trianual o final
-                        del Plan Local de Salud.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </section>
-          </>
-        )}
+        {/* ── ① Inicio — Portada institucional de COMPÁS, en una sola pantalla */}
+        {view === "inicio" && <HomePortada onNavigate={(v) => setView(v)} />}
 
         {/* ── ② Repositorio documental ─────────────────────── */}
         {view === "repositorio" && (
