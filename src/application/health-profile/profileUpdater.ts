@@ -229,7 +229,15 @@ export function buildProfileUpdate(input: ProfileUpdateInput): ProfileUpdateResu
     const touched = [!same(next.summary, base.summary) ? "resumen (lectura de conjunto)" : "", !same(next.findings, base.findings) ? `conclusiones (${next.findings.length})` : "", !same(next.areas, base.areas) ? `recomendaciones (${next.areas.length})` : ""].filter(Boolean);
     if (touched.length) { derived = next; changes.push(`Campos del paquete derivados del texto: ${touched.join(", ")}.`); }
   }
-  const derivedChanged = derived.summary !== base.summary || derived.findings !== base.findings || derived.areas !== base.areas;
+  // Las notas de revisiones anteriores nombraban el PDF por número de revisión, que no es el de los
+  // archivos adjuntos cuando la revisión de partida también salió del actualizador. Se nombran los archivos.
+  const attachmentNames = base.attachmentIds.map(id => library.attachments.find(a => a.id === id)?.name).filter((n): n is string => !!n);
+  const filesSentence = attachmentNames.length ? `Los archivos originales adjuntos (${attachmentNames.join(", ")}) no contienen estos cambios.` : "Esta revisión no tiene archivos originales adjuntos.";
+  const OLD_PDF_SENTENCE = /El PDF original adjunto corresponde a la revisión [\d.]+ y no contiene estos cambios\./;
+  const limitations = base.limitations.filter(Boolean).map(l => OLD_PDF_SENTENCE.test(l) ? l.replace(OLD_PDF_SENTENCE, filesSentence) : l);
+  const limitationsFixed = limitations.some((l, i) => l !== base.limitations.filter(Boolean)[i]);
+  if (limitationsFixed && kinds.includes("campos-derivados")) changes.push("Notas de limitaciones: los archivos originales adjuntos se nombran por su nombre.");
+  const derivedChanged = derived.summary !== base.summary || derived.findings !== base.findings || derived.areas !== base.areas || (limitationsFixed && kinds.includes("campos-derivados"));
   const linksChanged = bindings !== base.bindings || conditions !== base.conditions;
   if (!changes.length || (text === base.text && results === base.results && !linksChanged && !flags.length && !derivedChanged)) return { base, changes: [], blocked: "Los cambios elegidos no modifican este Perfil." };
 
@@ -237,7 +245,10 @@ export function buildProfileUpdate(input: ProfileUpdateInput): ProfileUpdateResu
   const title = to ? base.title.replace(/revisión\s+\d+\.\d+(?:\.\d+)?\s*·\s*\d{2}\/\d{2}\/\d{4}/i, `revisión ${to} · ${date}`) : `${base.title} · actualización ${date}`;
   text = bumpCoverRevision(text, from, to, date);
   text = appendAuthorship(text, `Revisión ${to ?? "actualizada"}, ${date}, generada con el Actualizador de perfiles de COMPÁS a partir de la revisión ${from ?? "anterior"}: ${changes.join(" ")} El resto del texto no cambia. Pendiente de revisión técnica.`);
-  const note = snapshot ? `Revisión ${to ?? ""} generada por el Actualizador de perfiles el ${date} con la estadística territorial descargada el ${snapshot.retrievedAt.slice(0, 10)}. El PDF original adjunto corresponde a la revisión ${from ?? "anterior"} y no contiene estos cambios.`.replace(/\s+/g, " ") : `Revisión generada por el Actualizador de perfiles el ${date}.`;
+  const usesStatistics = kinds.some(k => k === "paginas-datos" || k === "indicadores" || k === "cifras-conclusiones");
+  const note = (snapshot && usesStatistics
+    ? `Revisión ${to ?? ""} generada por el Actualizador de perfiles el ${date} con la estadística territorial descargada el ${snapshot.retrievedAt.slice(0, 10)}. ${filesSentence}`
+    : `Revisión ${to ?? ""} generada por el Actualizador de perfiles el ${date}. ${filesSentence}`).replace(/\s+/g, " ");
   if (pending.length) changes.push(`Atención: ya hay ${pending.length} revisión en curso sobre la vigente; esta se añade aparte.`);
   const profile: ExternalHealthProfile = {
     ...structuredClone(base),
@@ -253,7 +264,7 @@ export function buildProfileUpdate(input: ProfileUpdateInput): ProfileUpdateResu
     summary: derived.summary,
     findings: derived.findings,
     areas: derived.areas,
-    limitations: [...base.limitations.filter(Boolean), note],
+    limitations: [...limitations, note],
     ...(bindings ? { bindings } : {}),
     ...(conditions ? { conditions } : {}),
     reviewFlags: flags,

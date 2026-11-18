@@ -1,7 +1,7 @@
 # CONTRACT-PROFILE-UPDATER
 
 > Actualizador de perfiles: aplicar un cambio declarado a cualquier expediente
-> Versión 1.2.0 — 2026-11-18
+> Versión 1.2.1 — 2026-11-18
 > Estado: VIGENTE
 >
 > Implementación: `src/application/health-profile/profileUpdater.ts`,
@@ -100,11 +100,18 @@ expediente de forma reproducible.
 3. El cambio «Resumen, conclusiones y recomendaciones del paquete a partir del texto»
    corrige un Perfil cuyos campos no siguen a su texto. Como el texto no cambia,
    produce una revisión de corrección: sube solo el último número («0.9.0» → «0.9.1»).
+4. La nota de limitaciones de cada revisión generada nombra los archivos originales
+   adjuntos por su nombre de archivo, no por un número de revisión: una revisión
+   generada hereda los originales de la última que se incorporó con PDF, que no es
+   necesariamente la inmediatamente anterior. Solo menciona la estadística territorial
+   cuando el cambio la usa. La corrección del punto 3 reescribe en ese sentido las
+   notas anteriores que nombraban el PDF por número de revisión.
 
 ## Registro de revisiones
 
 | Fecha | Versión | Cambio | Responsable |
 |---|---|---|---|
+| 2026-11-18 | 1.2.1 | §8.4 la nota de limitaciones nombra los archivos adjuntos. Origen: las correcciones 0.9.1, 0.8.1, 0.6.1 y 0.4.1 decían que el PDF adjunto correspondía a 0.9.0, 0.8.0, 0.6.0 y 0.4.0, que no tienen PDF propio | COMPÁS NG |
 | 2026-11-18 | 1.2.0 | §8 campos del paquete derivados del texto y revisión de corrección. Origen: las revisiones de Atarfe, Loja y Zagra del 18/11/2026 conservaban el resumen, las conclusiones y las recomendaciones de la revisión anterior | COMPÁS NG |
 | 2026-11-18 | 1.1.0 | §6 cifras enlazadas y condiciones de las conclusiones (capa 2); §7 paquete de texto redactado fuera de COMPÁS (capa 3). Decisión del autor: «de momento capas 2 y 3» | COMPÁS NG |
 | 2026-11-18 | 1.0.0 | Creación. Encargo del autor: «necesito poder aplicar cualquier cambio a cualquier expediente»; actualizador dentro de COMPÁS | COMPÁS NG |
