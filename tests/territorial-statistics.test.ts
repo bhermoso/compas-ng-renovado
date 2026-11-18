@@ -298,4 +298,15 @@ describe("revisión del Perfil con los datos descargados", () => {
     expect(changes.filter(c => c.kind === "conservado").map(c => c.indicatorId)).toEqual(["adrh-renta-neta-persona"]);
     expect(changes.find(c => c.kind === "actualizado")?.previous).toMatchObject({ value: "33.000", reason: "actualizable" });
   });
+
+  it("no duplica los resultados que ya vinieron de la estadística territorial", async () => {
+    const s = await snapshotAlfacar();
+    const first = mergeTerritorialResults(s, []).results;
+    // Retitulados o retemados por el actualizador: se reconocen por su identificador.
+    const renamed = first.map(r => ({ ...r, title: `${r.title} (revisado)`, topic: "Condiciones de vida" }));
+    const second = mergeTerritorialResults(s, renamed).results;
+    const ids = second.map(r => r.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(second.length).toBe(first.length);
+  });
 });

@@ -201,10 +201,14 @@ export function mergeTerritorialResults(snapshot: TerritorialStatisticsSnapshot,
       (o.level === "municipio" || (o.level === "seccion" && sectionCount > 1 && SECTION_REVISION_INDICATORS.includes(ficha.id))));
     const matches = profileMatches(ficha, results, snapshot.ineCode);
     for (const o of obs) {
-      const found = matches.find(m => (o.level === "municipio" ? !m.section : m.section === o.territoryCode))?.result;
+      // Un resultado que ya vino de la estadística territorial conserva su identificador: se reconoce
+      // por él aunque su título no responda al patrón del catálogo (evita duplicarlo en cada revisión).
+      const canonicalId = `ts-${ficha.id}${o.level === "seccion" ? `-${o.territoryCode}` : ""}`;
+      const found = matches.find(m => (o.level === "municipio" ? !m.section : m.section === o.territoryCode))?.result
+        ?? results.find(r => r.id === canonicalId);
       const scale = o.level === "municipio" ? "Municipio" : `Sección censal ${o.territoryCode}`;
       if (!found) {
-        next.push(resultFrom(snapshot, ficha, o, `ts-${ficha.id}${o.level === "seccion" ? `-${o.territoryCode}` : ""}`));
+        next.push(resultFrom(snapshot, ficha, o, canonicalId));
         changes.push({ kind: "añadido", indicatorId: ficha.id, title: ficha.title, scale, value: o.literal, period: o.period });
         continue;
       }
