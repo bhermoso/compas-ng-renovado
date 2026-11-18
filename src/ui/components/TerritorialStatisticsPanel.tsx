@@ -4,11 +4,11 @@
  * el paquete para la próxima revisión del Perfil. No modifica el Perfil vigente.
  */
 import { useMemo, useState } from 'react';
-import type { ExternalHealthProfile } from '../../domain/health-profile/ExternalHealthProfile';
+import type { ExternalHealthProfile, ProfileResult } from '../../domain/health-profile/ExternalHealthProfile';
 import type { TerritorialStatisticsSnapshot } from '../../domain/territorial-statistics/TerritorialStatistics';
 import {
   DOMAIN_LABEL, TERRITORIAL_INDICATORS, appendSnapshot, findAndalusianIneCodes, latestSnapshot, profileCoverage, provenanceCsv,
-  retrieveTerritorialStatistics, revisionPackage, revisionResults, sectionCsv, sectionTable, type CoverageStatus,
+  mergeTerritorialResults, retrieveTerritorialStatistics, revisionPackage, revisionResults, sectionCsv, sectionTable, type CoverageStatus,
 } from '../../application/territorial-statistics';
 import './TerritorialStatisticsPanel.css';
 
@@ -21,6 +21,8 @@ interface Props {
   activeProfile?: ExternalHealthProfile;
   authorName?: string;
   onSave?: (snapshots: TerritorialStatisticsSnapshot[], onProgress?: (message: string) => void) => Promise<void>;
+  /** Abre una nueva revisión del Perfil vigente con estos resultados, para revisarla y guardarla. */
+  onPrepareRevision?: (results: ProfileResult[], note: string) => void;
 }
 
 const STATUS_LABEL: Record<CoverageStatus, string> = {
@@ -48,7 +50,7 @@ function download(content: string, name: string, type: string) {
 const when = (iso: string) => new Date(iso).toLocaleString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 const slug = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
-export function TerritorialStatisticsPanel({ municipalityId, municipalityName, ineCode, province, snapshots, activeProfile, authorName, onSave }: Props) {
+export function TerritorialStatisticsPanel({ municipalityId, municipalityName, ineCode, province, snapshots, activeProfile, authorName, onSave, onPrepareRevision }: Props) {
   const [code, setCode] = useState(ineCode ?? '');
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState<{ label: string; done: number; total: number }>();
@@ -63,6 +65,8 @@ export function TerritorialStatisticsPanel({ municipalityId, municipalityName, i
   const coverage = useMemo(() => shown ? profileCoverage(shown, activeProfile) : [], [shown, activeProfile]);
   const results = useMemo(() => shown ? revisionResults(shown) : [], [shown]);
   const sections = useMemo(() => shown ? sectionTable(shown) : undefined, [shown]);
+  const merge = useMemo(() => shown && activeProfile ? mergeTerritorialResults(shown, activeProfile.results) : undefined, [shown, activeProfile]);
+  const count = (k: string) => merge?.changes.filter(c => c.kind === k).length ?? 0;
 
   async function run() {
     setError(''); setMessage(''); setBusy(true);
@@ -136,6 +140,25 @@ export function TerritorialStatisticsPanel({ municipalityId, municipalityName, i
         {sections && sections.rows.length > 0 && <button type="button" onClick={() => download(sectionCsv(shown), `${base}-secciones.csv`, 'text/csv;charset=utf-8')}>↓ Secciones censales (CSV)</button>}
         {shown.grid && <button type="button" onClick={() => download(shown.grid!.geojson, `${base}-malla-250m.geojson`, 'application/geo+json')}>↓ Malla de 250 m (GeoJSON)</button>}
       </div>
+
+      {activeProfile && merge && <section className="tsp-block tsp-revision">
+        <h3>Llevar estos datos al Perfil</h3>
+        <p>Se prepara una nueva revisión de «{activeProfile.title}» con los indicadores de esta descarga: <strong>{count('añadido')} añadidos</strong> y <strong>{count('actualizado')} actualizados</strong> (dato más reciente o valor distinto del publicado por la fuente); {count('conservado')} se conservan como están. Los añadidos se muestran en las páginas de datos del Perfil: población en «Quién vive aquí», renta y desigualdad por sección en «Desigualdad», y empleo, pensiones y hogares en el panel, bajo «Determinantes sociales».</p>
+        <p className="ep-help">El texto del Perfil no cambia, y la revisión vigente tampoco: la nueva queda en revisión hasta que la valides. El PDF original adjunto no contiene estos datos; la revisión lo declara entre sus limitaciones.</p>
+        <details><summary>Ver los cambios uno a uno ({merge.changes.length})</summary>
+          <div className="tsp-scroll"><table className="tsp-table">
+            <thead><tr><th>Cambio</th><th>Indicador</th><th>Escala</th><th>Valor</th><th>En el Perfil vigente</th></tr></thead>
+            <tbody>{merge.changes.map((c, i) => <tr key={i}><td>{c.kind}</td><td>{c.title}</td><td>{c.scale}</td><td className="tsp-num">{c.value} <span>({c.period})</span></td><td>{c.previous ? `${c.previous.value} (${c.previous.period || '—'}) · ${STATUS_LABEL[c.previous.reason]}` : '—'}</td></tr>)}</tbody>
+          </table></div>
+        </details>
+        {onPrepareRevision && <div className="tsp-run">
+          <button type="button" className="ep-primary" disabled={busy || !!fresh || count('añadido') + count('actualizado') === 0}
+            onClick={() => onPrepareRevision(merge.results, `Esta revisión incorpora ${count('añadido')} indicadores y actualiza ${count('actualizado')} con estadística territorial oficial (INE, IECA) descargada en COMPÁS el ${when(shown.retrievedAt)} (catálogo ${shown.catalogVersion}). El PDF original adjunto no contiene estos datos.`)}>
+            Preparar la nueva revisión del Perfil
+          </button>
+          {fresh && <span className="ep-help">Guarda antes la descarga en el expediente, para que la revisión remita a ella.</span>}
+        </div>}
+      </section>}
 
       <section className="tsp-block">
         <h3>Cobertura frente al Perfil vigente</h3>

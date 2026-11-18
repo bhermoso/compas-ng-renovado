@@ -75,7 +75,15 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
  const fullProfileRef=useRef<HTMLDivElement>(null);
  const selected=library.profiles.find(p=>p.id===(selectedId ?? library.activeId)) ?? library.profiles.find(p=>p.id===library.activeId);
  const activeProfile=library.profiles.find(p=>p.id===library.activeId);
- const statisticsPanel=<TerritorialStatisticsPanel municipalityId={municipalityId} municipalityName={municipalityName} ineCode={ineCode} province={province} snapshots={territorialStatistics} activeProfile={activeProfile} authorName={authorName} onSave={onSaveTerritorialStatistics}/>;
+ const prepareTerritorialRevision=(results:ProfileResult[],note:string)=>{
+  if(!activeProfile)return;
+  if(draft&&!window.confirm('Ya hay un borrador sin guardar. ¿Sustituirlo por la revisión con los datos territoriales?'))return;
+  setDraft({...structuredClone(activeProfile),id:crypto.randomUUID(),revisionOf:activeProfile.id,createdAt:new Date().toISOString(),status:'review',validatedBy:undefined,validatedAt:undefined,archivedAt:undefined,archivedBy:undefined,results:structuredClone(results),limitations:[...activeProfile.limitations.filter(Boolean),note]});
+  setNewFiles([]);setResultDraft(undefined);setError('');setSelectedId(activeProfile.id);
+  setMessage('Nueva revisión preparada con los datos territoriales. Revisa los indicadores y pulsa «Guardar» al final; la versión vigente no cambia hasta que valides esta.');
+  window.scrollTo({top:0,behavior:'smooth'});
+ };
+ const statisticsPanel=<TerritorialStatisticsPanel key={municipalityId} onPrepareRevision={prepareTerritorialRevision} municipalityId={municipalityId} municipalityName={municipalityName} ineCode={ineCode} province={province} snapshots={territorialStatistics} activeProfile={activeProfile} authorName={authorName} onSave={onSaveTerritorialStatistics}/>;
  useEffect(()=>{onDirtyChange?.(!!draft);return()=>onDirtyChange?.(false);},[draft,onDirtyChange]);
  useEffect(()=>{
   if(!draft)return;
