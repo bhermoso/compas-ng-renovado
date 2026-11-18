@@ -149,3 +149,11 @@ describe("campos del paquete derivados del texto (CONTRACT-PROFILE-UPDATER §8)"
     expect(r.blocked).toBe("Los cambios elegidos no modifican este Perfil.");
   });
 });
+
+describe("panel del actualizador", () => {
+  it("ofrece todos los cambios del contrato, también la corrección de campos derivados", async () => {
+    const src = (await import("node:fs")).readFileSync("src/ui/components/ProfileUpdaterPanel.tsx", "utf8");
+    expect(src).toContain("Object.keys(PROFILE_UPDATE_LABEL)");
+    expect(src).toMatch(/DEFAULT_KINDS[^\n]*'campos-derivados'/);
+  });
+});
