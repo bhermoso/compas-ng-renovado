@@ -1,5 +1,6 @@
 import { readLocalizaAssets } from "./application/localiza-assets";
 import { buildProfileUpdate, type ProfileUpdateKind } from "./application/health-profile/profileUpdater";
+import type { ProfileTextPackage } from "./application/health-profile/profileTextOperations";
 import type { ProfileUpdateOutcome } from "./ui/components/ProfileUpdaterPanel";
 import { appendExternalProfile } from "./application/health-profile/externalProfiles";
 import { isTerritorialStatisticsSnapshot } from "./application/territorial-statistics/snapshots";
@@ -1518,7 +1519,7 @@ export default function App() {
    * a los expedientes indicados. En modo de vista previa no guarda nada; al aplicar,
    * añade a cada expediente una revisión «en revisión» y la confirma en Firebase.
    */
-  const handleProfileUpdates = useCallback(async (ids: string[], kinds: ProfileUpdateKind[], apply: boolean, onProgress: (message: string) => void): Promise<ProfileUpdateOutcome[]> => {
+  const handleProfileUpdates = useCallback(async (ids: string[], kinds: ProfileUpdateKind[], apply: boolean, onProgress: (message: string) => void, textPackage?: ProfileTextPackage): Promise<ProfileUpdateOutcome[]> => {
     if (!remoteClient.auth.currentUser) throw new Error("Inicia sesión para leer y guardar los expedientes compartidos.");
     const out: ProfileUpdateOutcome[] = [];
     const currentId = workspace.municipality.identity.id;
@@ -1529,7 +1530,7 @@ export default function App() {
         const ws = id === currentId ? workspace : await readRemoteWorkspace(remoteClient, id);
         if (!ws) { out.push({ id, name, changes: [], blocked: "No hay expediente compartido en Firebase." }); continue; }
         const library = ws.externalProfileLibrary ?? { profiles: [], attachments: [] };
-        const r = buildProfileUpdate({ library, snapshots: ws.territorialStatistics, kinds, author: remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || "", now: new Date(), newId: () => crypto.randomUUID() });
+        const r = buildProfileUpdate({ library, snapshots: ws.territorialStatistics, kinds, textPackage, author: remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || "", now: new Date(), newId: () => crypto.randomUUID() });
         if (!r.profile) { out.push({ id, name, changes: r.changes, blocked: r.blocked }); continue; }
         const outcome: ProfileUpdateOutcome = { id, name, changes: r.changes, from: r.base?.title, title: r.profile.title, profile: r.profile };
         if (apply) {

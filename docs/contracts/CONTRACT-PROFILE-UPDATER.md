@@ -1,7 +1,7 @@
 # CONTRACT-PROFILE-UPDATER
 
 > Actualizador de perfiles: aplicar un cambio declarado a cualquier expediente
-> Versión 1.0.0 — 2026-11-18
+> Versión 1.1.0 — 2026-11-18
 > Estado: VIGENTE
 >
 > Implementación: `src/application/health-profile/profileUpdater.ts`,
@@ -57,8 +57,39 @@ expediente de forma reproducible.
 4. El PDF de la revisión se exporta desde el propio Perfil una vez validada; el PDF
    original adjunto corresponde a la revisión anterior y así se declara.
 
+## 6. Capa 2 · Cifras enlazadas de las conclusiones
+
+1. Una revisión puede declarar **vínculos**: cada uno une una cifra o un año de una
+   conclusión («C14») o de la lectura de conjunto («LECTURA») con un indicador del
+   catálogo y un ámbito. Con cada descarga, el cambio «Cifras enlazadas de las
+   conclusiones» sustituye esa cifra por la publicada, solo como número completo y
+   solo en su párrafo.
+2. Una revisión puede declarar **condiciones**: el enunciado que sostiene una
+   conclusión, expresado como comparación entre dos valores («el Gini municipal es
+   inferior al provincial»). Si una condición deja de cumplirse, o falta un valor, o
+   la cifra enlazada ya no está en el texto, la conclusión se **marca para revisar**,
+   y con ella las recomendaciones cuyo «Fundamento» la cita.
+3. COMPÁS no reescribe el razonamiento de una conclusión marcada. Las marcas se
+   muestran con la revisión y no forman parte del texto publicado.
+
+## 7. Capa 3 · Paquete de texto redactado fuera de COMPÁS
+
+1. La redacción nueva (conclusiones, lectura de conjunto, fundamentos, referencias,
+   vínculos y condiciones) llega en un paquete `compas-profile-text-package/v1` con
+   una entrada por expediente: municipio, título exacto de la revisión sobre la que
+   se redactó y operaciones.
+2. Operaciones: `replace-section` (cuerpo de una sección por su rótulo),
+   `upsert-conclusion` (sustituye o añade «Cn.»), `set-fundamento` (de «Rn.»),
+   `replace-paragraph` (por su comienzo, si es único), `add-references` (sin
+   duplicar etiquetas) y `set-links` (vínculos y condiciones).
+3. Si la revisión vigente no es aquella sobre la que se redactó el paquete, o una
+   operación no encuentra su sitio, el paquete no se aplica a ese expediente.
+4. El paquete se aplica con el actualizador, como cualquier otro cambio, y produce
+   una revisión en revisión.
+
 ## Registro de revisiones
 
 | Fecha | Versión | Cambio | Responsable |
 |---|---|---|---|
+| 2026-11-18 | 1.1.0 | §6 cifras enlazadas y condiciones de las conclusiones (capa 2); §7 paquete de texto redactado fuera de COMPÁS (capa 3). Decisión del autor: «de momento capas 2 y 3» | COMPÁS NG |
 | 2026-11-18 | 1.0.0 | Creación. Encargo del autor: «necesito poder aplicar cualquier cambio a cualquier expediente»; actualizador dentro de COMPÁS | COMPÁS NG |

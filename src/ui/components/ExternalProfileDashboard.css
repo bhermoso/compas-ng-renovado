@@ -342,3 +342,6 @@
 /* El lector no se ensancha por una tabla: la tabla se desplaza dentro de su marco. */
 .epr>*,.epr-layout>*{min-width:0}
 @media (max-width:640px){.epr-text{padding:20px 12px}}
+.ep-review-flags{border:1px solid var(--ep-line);border-left:4px solid var(--ep-blue);padding:12px 16px;margin:10px 0;font-size:13.5px}
+.ep-review-flags ul{margin:6px 0;padding-left:18px}
+.ep-review-flags small{color:var(--ep-muted)}

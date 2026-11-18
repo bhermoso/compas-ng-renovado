@@ -55,7 +55,36 @@ export interface ExternalHealthProfile {
  areas: Array<{ id: string; title: string; rationale: string }>;
  attachmentIds: string[];
  evidenceVersion?: string;
+ /** Cifras de las conclusiones enlazadas a indicadores de la estadística territorial (CONTRACT-PROFILE-UPDATER §6). */
+ bindings?: ProfileBinding[];
+ /** Condiciones que sostienen cada conclusión; si dejan de cumplirse, la conclusión se marca para revisar. */
+ conditions?: ProfileCondition[];
+ /** Conclusiones y recomendaciones marcadas para revisar en esta revisión. No forman parte del texto publicado. */
+ reviewFlags?: ProfileReviewFlag[];
 }
+
+/** Referencia a un valor de la estadística territorial: indicador del catálogo y ámbito. */
+export interface ProfileValueRef { indicatorId: string; level: 'municipio' | 'seccion' | 'provincia' | 'andalucia' | 'espana'; territoryCode?: string }
+export interface ProfileBinding {
+ /** «C14», o «LECTURA» para la lectura de conjunto. */
+ target: string;
+ ref: ProfileValueRef;
+ /** «value» enlaza la cifra; «period», el año. */
+ field: 'value' | 'period';
+ /** Texto exacto con el que aparece ahora en el párrafo («28,3», «2024»). */
+ literal: string;
+ /** Si el mismo texto aparece varias veces en el párrafo, cuál es (1 = el primero). */
+ occurrence?: number;
+}
+export interface ProfileCondition {
+ target: string;
+ /** Enunciado legible: «el Gini municipal es inferior al provincial». */
+ statement: string;
+ left: ProfileValueRef;
+ op: '<' | '>' | '<=' | '>=';
+ right: ProfileValueRef | { value: number };
+}
+export interface ProfileReviewFlag { target: string; reason: string }
 export interface ExternalProfileLibrary {
  profiles: ExternalHealthProfile[];
  attachments: ProfileAttachment[];
