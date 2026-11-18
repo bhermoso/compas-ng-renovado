@@ -1,6 +1,7 @@
 import zaidin from '../../../docs/source-material/health-reports/informe-salud-zaidin-abril-2023.pdf?url';
 import epvsa from '../../../docs/source-material/strategic-frameworks/08_Lineas_EPVSA_02abril24.pdf?url';
 import esca from '../../../docs/source-material/strategic-frameworks/Estrategia de Salud Comunitaria de Andalucia 2026-2030-ESCA.pdf?url';
+import esa from '../../../docs/source-material/strategic-frameworks/Estrategia de Salud de Andalucia 2030-ESA.pdf?url';
 import plizdFv from '../../../docs/source-material/territorial-documentation/PLIZD_FUENTE_VAQUEROS_2024.pdf?url';
 import mayores from '../../../docs/source-material/strategic-frameworks/Plan de mayores 2020-23.pdf?url';
 
@@ -9,6 +10,7 @@ export const bundledDocuments: Record<string, string> = {
   'docs/source-material/health-reports/informe-salud-zaidin-abril-2023.pdf': zaidin,
   'docs/source-material/strategic-frameworks/08_Lineas_EPVSA_02abril24.pdf': epvsa,
   'docs/source-material/strategic-frameworks/Estrategia de Salud Comunitaria de Andalucia 2026-2030-ESCA.pdf': esca,
+  'docs/source-material/strategic-frameworks/Estrategia de Salud de Andalucia 2030-ESA.pdf': esa,
   'docs/source-material/strategic-frameworks/Plan de mayores 2020-23.pdf': mayores,
   'docs/source-material/territorial-documentation/PLIZD_FUENTE_VAQUEROS_2024.pdf': plizdFv,
 };

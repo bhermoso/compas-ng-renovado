@@ -2,6 +2,7 @@ import { documentAccessUrl, documentDownloadFileName, isPdfDocumentAccess } from
 const frameworks = {
  epvsa: ['EPVSA', 'docs/source-material/strategic-frameworks/08_Lineas_EPVSA_02abril24.pdf'],
  esca: ['ESCA', 'docs/source-material/strategic-frameworks/Estrategia de Salud Comunitaria de Andalucia 2026-2030-ESCA.pdf'],
+ esa: ['ESA 2030', 'docs/source-material/strategic-frameworks/Estrategia de Salud de Andalucia 2030-ESA.pdf'],
  mayores: ['Plan Estratégico Integral para Personas Mayores en Andalucía 2020–2023', 'docs/source-material/strategic-frameworks/Plan de mayores 2020-23.pdf'],
 } as const;
 export function FrameworkReference({ name }: { name: keyof typeof frameworks }) {

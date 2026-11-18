@@ -48,6 +48,15 @@ export const SUPPORT_DOCUMENTS: readonly SupportDocument[] = Object.freeze([
     note: "Incluye el programa P04 de identificación y dinamización de activos para la salud.",
   },
   {
+    id: "esa-2030",
+    shortName: "ESA 2030",
+    title: "Estrategia de Salud de Andalucía 2030",
+    issuer: "Consejería de Sanidad, Presidencia y Emergencias, Junta de Andalucía",
+    period: "2026–2030 · aprobada por el Consejo de Gobierno el 11/02/2026",
+    location: { kind: "compas", path: "docs/source-material/strategic-frameworks/Estrategia de Salud de Andalucia 2030-ESA.pdf" },
+    note: "Cuatro líneas estratégicas, 14 objetivos y 164 acciones (apartado 11). Su línea 2 se dedica a la equidad, la reducción de desigualdades y la participación; la línea 3, a los determinantes e inequidades en salud.",
+  },
+  {
     id: "esca",
     shortName: "ESCA",
     title: "Estrategia de Salud Comunitaria de Andalucía 2026–2030",
@@ -106,6 +115,7 @@ export function supportDocumentIdsCitedIn(source: string): string[] {
   cite("epvsa", /EPVSA/);
   cite("epvsa-indicadores", /P04/);
   cite("esca", /ESCA/);
+  cite("esa-2030", /ESA ?2030/);
   cite("mayores", /Plan de mayores/);
   cite("sns-salud-mental", /\bSNS\b/);
   cite("ena-2017-2024", /\bENA\b/);
