@@ -25,3 +25,7 @@
 .tsp-failures li{font-size:13px}
 .tsp-sources{font-size:13px;padding-left:18px}
 .tsp-sources small{display:block;color:var(--ep-muted);white-space:pre-line;margin:4px 0 8px}
+.pu-fieldset{border:1px solid var(--ep-line);padding:10px 14px;margin:12px 0;display:flex;flex-wrap:wrap;gap:8px 18px}
+.pu-fieldset legend{font-size:12px;font-weight:600;padding:0 4px}
+.pu-fieldset label{display:flex;gap:6px;align-items:center;font-size:13.5px}
+.pu-changes{margin:0;padding-left:16px;font-size:12.5px}

@@ -1,4 +1,7 @@
 import { readLocalizaAssets } from "./application/localiza-assets";
+import { buildProfileUpdate, type ProfileUpdateKind } from "./application/health-profile/profileUpdater";
+import type { ProfileUpdateOutcome } from "./ui/components/ProfileUpdaterPanel";
+import { appendExternalProfile } from "./application/health-profile/externalProfiles";
 import { isTerritorialStatisticsSnapshot } from "./application/territorial-statistics/snapshots";
 import type { TerritorialStatisticsSnapshot } from "./domain/territorial-statistics/TerritorialStatistics";
 import { ExternalProfileDashboard } from "./ui/components/ExternalProfileDashboard";
@@ -1509,6 +1512,44 @@ export default function App() {
       .filter((municipality) => !readDeletedMunicipalityIds().includes(municipality.id)),
     [customMunicipalities]
   );
+
+  /**
+   * Actualizador de perfiles (CONTRACT-PROFILE-UPDATER): aplica los cambios elegidos
+   * a los expedientes indicados. En modo de vista previa no guarda nada; al aplicar,
+   * añade a cada expediente una revisión «en revisión» y la confirma en Firebase.
+   */
+  const handleProfileUpdates = useCallback(async (ids: string[], kinds: ProfileUpdateKind[], apply: boolean, onProgress: (message: string) => void): Promise<ProfileUpdateOutcome[]> => {
+    if (!remoteClient.auth.currentUser) throw new Error("Inicia sesión para leer y guardar los expedientes compartidos.");
+    const out: ProfileUpdateOutcome[] = [];
+    const currentId = workspace.municipality.identity.id;
+    for (const id of ids) {
+      const name = allMunicipalities.find(m => m.id === id)?.name ?? id;
+      try {
+        onProgress(`${name}: leyendo el expediente compartido…`);
+        const ws = id === currentId ? workspace : await readRemoteWorkspace(remoteClient, id);
+        if (!ws) { out.push({ id, name, changes: [], blocked: "No hay expediente compartido en Firebase." }); continue; }
+        const library = ws.externalProfileLibrary ?? { profiles: [], attachments: [] };
+        const r = buildProfileUpdate({ library, snapshots: ws.territorialStatistics, kinds, author: remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || "", now: new Date(), newId: () => crypto.randomUUID() });
+        if (!r.profile) { out.push({ id, name, changes: r.changes, blocked: r.blocked }); continue; }
+        const outcome: ProfileUpdateOutcome = { id, name, changes: r.changes, from: r.base?.title, title: r.profile.title, profile: r.profile };
+        if (apply) {
+          onProgress(`${name}: guardando la revisión…`);
+          const nextLibrary = appendExternalProfile(library, r.profile, [], id);
+          const now = new Date().toISOString();
+          const next = { ...ws, externalProfileLibrary: nextLibrary, updatedAt: now };
+          await saveRemoteWorkspace(remoteClient, next, progress => onProgress(`${name}: ${profileSaveProgressMessage(progress)}`), ws.updatedAt);
+          if (id === currentId) setWorkspace(prev => { if (prev.municipality.identity.id !== id) return prev; const saved = { ...prev, externalProfileLibrary: nextLibrary, updatedAt: now }; lastExplicitProfileWorkspaceRef.current = saved; return saved; });
+          outcome.saved = true;
+        }
+        out.push(outcome);
+      } catch (error) {
+        out.push({ id, name, changes: [], blocked: error instanceof Error ? error.message : String(error) });
+      }
+    }
+    onProgress(apply ? "Actualización terminada." : "Vista previa terminada.");
+    return out;
+  }, [workspace, remoteClient, allMunicipalities, setWorkspace]);
+
   catalogIdsRef.current = new Set(allMunicipalities.map((m) => m.id));
   activeIdRef.current = municipality.id;
   const compasDocumentLibrary = useMemo(
@@ -4459,6 +4500,8 @@ export default function App() {
               province={workspace.municipality.identity.province}
               territorialStatistics={workspace.territorialStatistics}
               onSaveTerritorialStatistics={handleSaveTerritorialStatistics}
+              updaterMunicipalities={allMunicipalities.filter(m => m.territorialType === undefined || m.territorialType === "municipio").map(m => ({ id: m.id, name: m.name }))}
+              onRunProfileUpdates={handleProfileUpdates}
               onDirtyChange={onProfileDirtyChange}
             />
           </>

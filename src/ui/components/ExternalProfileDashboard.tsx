@@ -11,6 +11,8 @@ import { ProfileResultsDashboard } from './ProfileResultsDashboard';
 import { ProfileEditorialLab } from './ProfileEditorialLab';
 import { ProfileOriginalVerifier } from './ProfileOriginalVerifier';
 import { TerritorialStatisticsPanel } from './TerritorialStatisticsPanel';
+import { ProfileUpdaterPanel, type ProfileUpdateOutcome } from './ProfileUpdaterPanel';
+import type { ProfileUpdateKind } from '../../application/health-profile/profileUpdater';
 import type { TerritorialStatisticsSnapshot } from '../../domain/territorial-statistics/TerritorialStatistics';
 import './ExternalProfileDashboard.css';
 
@@ -27,6 +29,8 @@ interface Props {
  province?: string;
  territorialStatistics?: TerritorialStatisticsSnapshot[];
  onSaveTerritorialStatistics?: (snapshots: TerritorialStatisticsSnapshot[], onProgress?: (message: string) => void) => Promise<void>;
+ updaterMunicipalities?: Array<{ id: string; name: string }>;
+ onRunProfileUpdates?: (ids: string[], kinds: ProfileUpdateKind[], apply: boolean, onProgress: (message: string) => void) => Promise<ProfileUpdateOutcome[]>;
 }
 const date = (s: string) => new Date(s).toLocaleDateString('es-ES', {day:'numeric',month:'short',year:'numeric'});
 const lines = (s: string) => s.split('\n').map(v => v.trim()).filter(Boolean);
@@ -61,9 +65,9 @@ function emptyProfile(municipalityId: string): ExternalHealthProfile {
  return {schema:'compas-external-profile/v1',id:crypto.randomUUID(),municipalityId,title:'',period:'',author:'',createdAt:new Date().toISOString(),
   status:'review',summary:'',text:'',results:[],findings:[],limitations:[],areas:[],attachmentIds:[]};
 }
-export function ExternalProfileDashboard({municipalityId,municipalityName,library,legacyProfiles=[],legacyText,authorName,onSave,onDirtyChange,ineCode,province,territorialStatistics,onSaveTerritorialStatistics}: Props) {
+export function ExternalProfileDashboard({municipalityId,municipalityName,library,legacyProfiles=[],legacyText,authorName,onSave,onDirtyChange,ineCode,province,territorialStatistics,onSaveTerritorialStatistics,updaterMunicipalities,onRunProfileUpdates}: Props) {
  const [selectedId,setSelectedId]=useState(library.activeId);
- const [tab,setTab]=useState<'results'|'document'|'versions'|'laboratory'|'statistics'>('results');
+ const [tab,setTab]=useState<'results'|'document'|'versions'|'laboratory'|'statistics'|'updater'>('results');
  const [draft,setDraft]=useState<ExternalHealthProfile>();
  const [newFiles,setNewFiles]=useState<ProfileAttachment[]>([]);
  const [busy,setBusy]=useState(false); const [message,setMessage]=useState(''); const [error,setError]=useState('');
@@ -319,7 +323,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
        {files.length===0&&<small>No hay archivos adjuntos a esta versión.</small>}
      </div>
    </div>
-   <nav className="ep-tabs ep-tabs--primary" aria-label="Espacios del perfil">{([['results','Perfil'],['document','Documento completo'],['versions','Gestión y versiones'],['statistics','Estadística territorial'],['laboratory','Laboratorio experimental']] as const).map(([key,label])=><button key={key} type="button" aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>
+   <nav className="ep-tabs ep-tabs--primary" aria-label="Espacios del perfil">{([['results','Perfil'],['document','Documento completo'],['versions','Gestión y versiones'],['statistics','Estadística territorial'],...(onRunProfileUpdates?[['updater','Actualizador de perfiles'] as const]:[]),['laboratory','Laboratorio experimental']] as const).map(([key,label])=><button key={key} type="button" aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>
    {tab==='results'&&<main className="ep-main ep-main--profile">
     <p className="ep-review-status" role="status">
       {selected.id!==library.activeId ? 'Revisión no vigente. ' : ''}
@@ -337,6 +341,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
      : pdf&&fileUrls[pdf.id] ? <><p><a href={fileUrls[pdf.id]} target="_blank" rel="noopener noreferrer">Abrir PDF original en otra pestaña</a></p><iframe title="PDF original del Perfil de Salud Local" src={fileUrls[pdf.id]}/></>
      : <p>No hay texto extraíble. Consulta el archivo original o incorpora una transcripción.</p>}
    </section></main>}
+   {tab==='updater'&&onRunProfileUpdates&&<main className="ep-main ep-main--statistics"><ProfileUpdaterPanel municipalities={updaterMunicipalities??[]} currentId={municipalityId} onRun={onRunProfileUpdates}/></main>}
    {tab==='statistics'&&<main className="ep-main ep-main--statistics">{statisticsPanel}</main>}
    {tab==='laboratory'&&<main className="ep-main ep-main--laboratory"><ProfileEditorialLab key={selected.id} profile={selected}/></main>}
    {tab==='versions'&&<main className="ep-main ep-main--management">
