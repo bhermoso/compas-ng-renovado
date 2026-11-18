@@ -52,10 +52,27 @@ export interface ProfileDataBlock {
  */
 export interface ProfileDataPages {
   cover: ProfileDataBlock[];
+  /** «Contexto y población» (antes «Quién vive aquí»). */
   whoLivesHere: string[];
+  /** «Salud y bienestar» (antes «Panel de salud»). */
   healthPanel: string[];
+  /** «Ejes de desigualdad» (antes «Desigualdad»). */
   inequality: { intro: string[]; blocks: ProfileDataBlock[] };
+  /** «Condiciones de vida» (v2.5.0). */
+  livingConditions: string[];
+  /** «Servicios» (v2.5.0). */
+  services: string[];
 }
+
+/** Rótulos de las páginas de datos (Art. 17 ter, v2.5.0) y sus equivalentes anteriores. */
+export const DATA_PAGE_HEADINGS = {
+  whoLivesHere: /^(quién vive aquí|contexto y población)$/i,
+  inequality: /^(ejes de )?desigualdad$/i,
+  livingConditions: /^condiciones de vida$/i,
+  services: /^servicios( sanitarios y sociales| de salud y sociales)?$/i,
+  healthPanel: /^(panel de salud|salud y bienestar)$/i,
+} as const;
+const isDataPageHeading = (line: string) => Object.values(DATA_PAGE_HEADINGS).some(re => re.test(line));
 
 export interface ProfileStructure {
   sections: ProfileSection[];
@@ -86,8 +103,9 @@ function headingOf(block: string): { title: string; level: 1 | 2 } | null {
   const line = block.replace(/\s+/g, " ").trim();
   if (line.length > 80 || /[.,;:]$/.test(line)) return null;
   if (/^(Resumen|Anexos|Portada y créditos|Referencias|Índice)$/i.test(line)) return { title: line, level: 1 };
-  // Páginas de datos del Art. 17 ter: «Loja en datos», «Quién vive aquí», «Panel de salud», «Desigualdad».
-  if (/^(Quién vive aquí|Panel de salud|Desigualdad)$/i.test(line) || /^[A-ZÁÉÍÓÚÑ][^.]{1,40} en datos$/.test(line)) return { title: line, level: 1 };
+  // Páginas de datos del Art. 17 ter: «Loja en datos», «Contexto y población», «Ejes de desigualdad»,
+  // «Condiciones de vida», «Servicios», «Salud y bienestar» (y los rótulos anteriores a la v2.5.0).
+  if (isDataPageHeading(line) || /^[A-ZÁÉÍÓÚÑ][^.]{1,40} en datos$/.test(line)) return { title: line, level: 1 };
   const numbered = /^(\d{1,2})\.?\s+([A-ZÁÉÍÓÚÑ¿][^.]{2,76})$/.exec(line);
   if (numbered && !/^\d+\.º/.test(line) && !/\d{4}/.test(numbered[2])) return { title: `${numbered[1]}. ${numbered[2].trim()}`, level: 1 };
   const annex = /^([A-K])\.\s+([A-ZÁÉÍÓÚÑ][^.]{2,76})$/.exec(line);
@@ -301,15 +319,19 @@ function labelledBlocks(paragraphs: string[]): { intro: string[]; blocks: Profil
 
 function dataPagesOf(find: (re: RegExp) => ProfileSection | undefined): ProfileDataPages | undefined {
   const cover = find(/^.+ en datos$/i);
-  const who = find(/^quién vive aquí$/i);
-  const panel = find(/^panel de salud$/i);
-  const inequality = find(/^desigualdad$/i);
-  if (!cover && [who, panel, inequality].filter(Boolean).length < 2) return undefined;
+  const who = find(DATA_PAGE_HEADINGS.whoLivesHere);
+  const panel = find(DATA_PAGE_HEADINGS.healthPanel);
+  const inequality = find(DATA_PAGE_HEADINGS.inequality);
+  const living = find(DATA_PAGE_HEADINGS.livingConditions);
+  const services = find(DATA_PAGE_HEADINGS.services);
+  if (!cover && [who, panel, inequality, living, services].filter(Boolean).length < 2) return undefined;
   return {
     cover: cover ? labelledBlocks(cover.paragraphs).blocks : [],
     whoLivesHere: who?.paragraphs ?? [],
     healthPanel: panel?.paragraphs ?? [],
     inequality: labelledBlocks(inequality?.paragraphs ?? []),
+    livingConditions: living?.paragraphs ?? [],
+    services: services?.paragraphs ?? [],
   };
 }
 

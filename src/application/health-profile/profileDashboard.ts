@@ -75,6 +75,8 @@ export function groupRecommendations(areas: ExternalHealthProfile["areas"]): Das
 export interface DataPageResults {
   whoLivesHere: ProfileResult[];
   inequality: ProfileResult[];
+  livingConditions: ProfileResult[];
+  services: ProfileResult[];
   healthPanel: ProfileResult[];
   /** Resultados por sección censal que no son de «Desigualdad»: se leen en la matriz de la página 4, no en el panel. */
   bySection: ProfileResult[];
@@ -86,18 +88,22 @@ const norm = (s: string | undefined) => (s ?? "").normalize("NFD").replace(/[\u0
 
 /**
  * Reparte los resultados entre las páginas de datos (Art. 17 ter) según el
- * tema que declara el perfil: «Quién vive aquí», «Desigualdad» y, el resto,
- * el panel de salud, en el orden en que el perfil los entrega. Los resultados
+ * tema que declara el perfil, en el orden del marco de determinantes sociales
+ * (Art. 4 quater): «Contexto y población» («Quién vive aquí»), «Ejes de
+ * desigualdad» («Desigualdad»), «Condiciones de vida» («Determinantes
+ * sociales»), «Servicios» y, el resto, «Salud y bienestar», en el orden en que el perfil los entrega. Los resultados
  * cuyo ámbito declarado es una sección censal y tienen valor numérico no
  * describen el municipio: van a la matriz por sección de la página 4
  * (desigualdad interna, Art. 17 quater), no al panel.
  */
 export function splitDataPageResults(results: ProfileResult[]): DataPageResults {
-  const out: DataPageResults = { whoLivesHere: [], inequality: [], healthPanel: [], bySection: [] };
+  const out: DataPageResults = { whoLivesHere: [], inequality: [], livingConditions: [], services: [], healthPanel: [], bySection: [] };
   for (const r of results) {
     const topic = norm(r.topic);
-    if (topic === "quien vive aqui") out.whoLivesHere.push(r);
-    else if (topic === "desigualdad") out.inequality.push(r);
+    if (topic === "quien vive aqui" || topic === "contexto y poblacion") out.whoLivesHere.push(r);
+    else if (topic === "desigualdad" || topic === "ejes de desigualdad") out.inequality.push(r);
+    else if (topic === "condiciones de vida" || topic === "determinantes sociales") out.livingConditions.push(r);
+    else if (topic === "servicios") out.services.push(r);
     else if (isSectionScale(r) && r.chartValue !== undefined) out.bySection.push(r);
     else out.healthPanel.push(r);
   }

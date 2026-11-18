@@ -18,8 +18,10 @@ import "./ProfileDataPages.css";
 
 /**
  * Páginas de datos comparables del Perfil (contrato, Art. 17 ter), con una
- * presentación inspirada en los Local Authority Health Profiles: portada,
- * quién vive aquí, panel de salud y desigualdad. Todo procede del Perfil
+ * presentación inspirada en los Local Authority Health Profiles y ordenada
+ * según el marco de determinantes sociales (Art. 4 quater): portada, contexto
+ * y población, ejes de desigualdad, condiciones de vida, servicios, y salud y
+ * bienestar. Todo procede del Perfil
  * guardado (texto y paquete de resultados): no hay cifras en el código.
  * Las comparaciones no llevan colores de juicio (Art. 17 quater, 3): cada
  * ámbito se distingue por su forma, no por «mejor» o «peor».
@@ -319,14 +321,14 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
   const panelTablesCovered = split.healthPanel.length > 0 && panelTables.length > 0 && profileTablesCovered(panelTables, split.healthPanel);
   const comparedCount = split.healthPanel.filter((r) => comparatorsOf(r).some((c) => geo.includes(c.label))).length;
   const pageHead = (n: number, heading: string) => (
-    <header className="pdp-page__head"><span>{municipalityName} en datos · {n} de 4</span><h2>{heading}</h2></header>
+    <header className="pdp-page__head"><span>{municipalityName} en datos · {n} de 6</span><h2>{heading}</h2></header>
   );
 
   return (
     <div className="pdp-wrap">
       <div className="pdp-toolbar pdp-noprint">
         <nav aria-label="Páginas de datos">
-          {["Portada", "Quién vive aquí", "Panel de salud", "Desigualdad"].map((label, i) => <a key={label} href={`#pdp-${i + 1}`}><span>{i + 1}</span>{label}</a>)}
+          {["Portada", "Contexto y población", "Ejes de desigualdad", "Condiciones de vida", "Servicios", "Salud y bienestar"].map((label, i) => <a key={label} href={`#pdp-${i + 1}`}><span>{i + 1}</span>{label}</a>)}
         </nav>
         <div className="pdp-downloads">
           <button type="button" onClick={() => printPages(root.current, `${title} · páginas de datos`)}>↓ Guardar páginas en PDF</button>
@@ -362,8 +364,8 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
           {metrics.length > 0 && <p className="pdp-metrics">{metrics.join(" · ")}</p>}
         </section>
 
-        <section id="pdp-2" className="pdp-page" aria-label="Quién vive aquí">
-          {pageHead(2, "Quién vive aquí")}
+        <section id="pdp-2" className="pdp-page" aria-label="Contexto y población">
+          {pageHead(2, "Contexto y población")}
           <ProfileText paragraphs={pages.whoLivesHere} className="pdp-text" />
           {split.whoLivesHere.length > 0 && (
             <>
@@ -371,10 +373,45 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
               <IndicatorTable results={split.whoLivesHere} municipalityName={municipalityName} geo={geo} caption="Población, hogares y origen" grouped={false} id="pdp-t2" />
             </>
           )}
+          {pages.whoLivesHere.length === 0 && split.whoLivesHere.length === 0 && <p className="pdp-text">El Perfil no trae datos de contexto y población.</p>}
         </section>
 
-        <section id="pdp-3" className="pdp-page" aria-label="Panel de salud">
-          {pageHead(3, "Panel de salud")}
+        <section id="pdp-3" className="pdp-page" aria-label="Ejes de desigualdad">
+          {pageHead(3, "Ejes de desigualdad")}
+          <ProfileText paragraphs={pages.inequality.intro} className="pdp-text" />
+          <SectionExplorer results={sectionResults} municipalityName={municipalityName} />
+          <SectionMatrixTable results={split.bySection} id="pdp-t4s" />
+          {inequalityOther.length > 0 && <IndicatorTable results={inequalityOther} municipalityName={municipalityName} geo={geo} caption="Renta, educación y ocupación" grouped={false} id="pdp-t4" />}
+          {pages.inequality.blocks.length > 0 && (
+            <div className="pdp-blocks pdp-blocks--plain">
+              {pages.inequality.blocks.map((b) => <div key={b.title} className="pdp-block"><h3>{b.title}</h3><ProfileText paragraphs={[b.text]} /></div>)}
+            </div>
+          )}
+        </section>
+        <section id="pdp-4" className="pdp-page" aria-label="Condiciones de vida">
+          {pageHead(4, "Condiciones de vida")}
+          <ProfileText paragraphs={pages.livingConditions ?? []} className="pdp-text" />
+          {split.livingConditions.length > 0 ? (
+            <>
+              <Legend municipalityName={municipalityName} geo={geo} />
+              <IndicatorTable results={split.livingConditions} municipalityName={municipalityName} geo={geo} caption="Empleo, ingresos, hogares y vivienda" grouped={false} id="pdp-t4c" />
+            </>
+          ) : (pages.livingConditions ?? []).length === 0 && <p className="pdp-text">El Perfil no trae datos de condiciones de vida.</p>}
+        </section>
+
+        <section id="pdp-5" className="pdp-page" aria-label="Servicios">
+          {pageHead(5, "Servicios")}
+          <ProfileText paragraphs={pages.services ?? []} className="pdp-text" />
+          {split.services.length > 0 ? (
+            <>
+              <Legend municipalityName={municipalityName} geo={geo} />
+              <IndicatorTable results={split.services} municipalityName={municipalityName} geo={geo} caption="Servicios sanitarios y sociales" grouped={false} id="pdp-t5" />
+            </>
+          ) : (pages.services ?? []).length === 0 && <p className="pdp-text">El Perfil no trae datos de servicios sanitarios ni sociales del municipio.</p>}
+        </section>
+
+        <section id="pdp-6" className="pdp-page" aria-label="Salud y bienestar">
+          {pageHead(6, "Salud y bienestar")}
           <ProfileText paragraphs={pages.healthPanel} className="pdp-text" withTables={!panelTablesCovered} />
           {split.healthPanel.length > 0 ? (
             <>
@@ -417,18 +454,6 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
           <p className="pdp-note">Valores tal como los publica cada fuente. Los ámbitos se distinguen por la forma del marcador; el panel no marca mejor o peor, porque solo podría hacerlo cuando la fuente publica intervalos o significación. Cada fila tiene su propia escala.</p>
         </section>
 
-        <section id="pdp-4" className="pdp-page" aria-label="Desigualdad">
-          {pageHead(4, "Desigualdad")}
-          <ProfileText paragraphs={pages.inequality.intro} className="pdp-text" />
-          <SectionExplorer results={sectionResults} municipalityName={municipalityName} />
-          <SectionMatrixTable results={split.bySection} id="pdp-t4s" />
-          {inequalityOther.length > 0 && <IndicatorTable results={inequalityOther} municipalityName={municipalityName} geo={geo} caption="Otros indicadores de desigualdad" grouped={false} id="pdp-t4" />}
-          {pages.inequality.blocks.length > 0 && (
-            <div className="pdp-blocks pdp-blocks--plain">
-              {pages.inequality.blocks.map((b) => <div key={b.title} className="pdp-block"><h3>{b.title}</h3><ProfileText paragraphs={[b.text]} /></div>)}
-            </div>
-          )}
-        </section>
       </div>
     </div>
   );

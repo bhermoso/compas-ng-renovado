@@ -172,6 +172,21 @@ describe("descarga de Alfacar", () => {
     expect(s.observations.some(o => o.indicatorId === "adrh-renta-neta-persona")).toBe(true);
   });
 
+  it("IECA: si la dirección nueva falla, consulta la anterior y registra la que respondió", async () => {
+    const calls: string[] = [];
+    const s = await retrieveTerritorialStatistics({
+      municipalityId: "alfacar", municipalityName: "Alfacar", ineCode: "18011", includeGrid: false,
+      fetchJson: async url => { calls.push(url); if (url.startsWith("https://www.ieca.junta-andalucia.es/")) throw new Error("Failed to fetch"); return fakeFetch([])(url); },
+      indicators: pick("ieca-tasa-desempleo-registrado"),
+    });
+    expect(calls).toEqual([
+      "https://www.ieca.junta-andalucia.es/intranet/admin/rest/v1.0/consulta/120971",
+      "https://www.juntadeandalucia.es/institutodeestadisticaycartografia/intranet/admin/rest/v1.0/consulta/120971",
+    ]);
+    expect(s.failures).toEqual([]);
+    expect(s.sources[0].url).toMatch(/^https:\/\/www\.juntadeandalucia\.es\//);
+  });
+
   it("rechaza códigos que no son municipios andaluces", async () => {
     await expect(retrieveTerritorialStatistics({ municipalityId: "x", municipalityName: "x", ineCode: "28079", fetchJson: async () => [] })).rejects.toThrow(/andaluza/);
     await expect(retrieveTerritorialStatistics({ municipalityId: "x", municipalityName: "x", ineCode: "180", fetchJson: async () => [] })).rejects.toThrow(/cinco cifras/);
@@ -182,7 +197,7 @@ describe("paquete para la revisión", () => {
   it("resultados con la forma del paquete del Perfil y comparadores publicados", async () => {
     const s = await snapshotAlfacar();
     const r = revisionResults(s).find(x => x.id === "ts-adrh-renta-neta-persona")!;
-    expect(r).toMatchObject({ value: "12.924", unit: "euros", period: "2024", scale: "Municipal", topic: "Desigualdad", chartValue: 12924 });
+    expect(r).toMatchObject({ value: "12.924", unit: "euros", period: "2024", scale: "Municipal", topic: "Ejes de desigualdad", chartValue: 12924 });
     expect(r.comparisons).toEqual([{ label: "Provincia de Granada", value: 13509 }, { label: "Andalucía", value: 13342 }]);
     expect(r.page).toMatch(/tabla 31025 · consultado 2026-11-17/);
     const der = revisionResults(s).find(x => x.id === "ts-censo-estudios-superiores")!;
@@ -271,15 +286,15 @@ describe("revisión del Perfil con los datos descargados", () => {
     const { results, changes } = mergeTerritorialResults(s, vigentes);
     expect(results.find(r => r.id === "r1")).toBe(vigentes[0]);
     const r2 = results.find(r => r.id === "r2")!;
-    expect(r2).toMatchObject({ period: "2024", supportsConclusions: ["C2"], topic: "Desigualdad" });
+    expect(r2).toMatchObject({ period: "2024", supportsConclusions: ["C2"], topic: "Ejes de desigualdad" });
     expect(r2.caution).toMatch(/Sustituye en esta revisión el valor 33\.000 \(2023\)/);
     expect(results.find(r => r.id === "r3")).toBe(vigentes[2]);
     const tasa = results.find(r => r.id === "ts-ieca-tasa-desempleo-registrado")!;
-    expect(tasa).toMatchObject({ value: "15,8", unit: "%", topic: "Determinantes sociales", scale: "Municipio" });
+    expect(tasa).toMatchObject({ value: "15,8", unit: "%", topic: "Condiciones de vida", scale: "Municipio" });
     expect(tasa.comparisons).toEqual([{ label: "Andalucía", value: 15.7 }]);
     // Indicadores por sección: van a la página de desigualdad con su código.
     const secc = results.filter(r => r.id.startsWith("ts-ieca-seccion-tasa-desempleo-"));
-    expect(secc.map(r => [r.scale, r.value, r.topic])).toEqual([["Sección censal 1801101001", "18,8", "Desigualdad"], ["Sección censal 1801101002", "18,2", "Desigualdad"]]);
+    expect(secc.map(r => [r.scale, r.value, r.topic])).toEqual([["Sección censal 1801101001", "18,8", "Ejes de desigualdad"], ["Sección censal 1801101002", "18,2", "Ejes de desigualdad"]]);
     expect(changes.filter(c => c.kind === "conservado").map(c => c.indicatorId)).toEqual(["adrh-renta-neta-persona"]);
     expect(changes.find(c => c.kind === "actualizado")?.previous).toMatchObject({ value: "33.000", reason: "actualizable" });
   });

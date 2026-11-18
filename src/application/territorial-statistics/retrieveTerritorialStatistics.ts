@@ -9,7 +9,7 @@ import type {
   TerritorialSource, TerritorialStatisticsSnapshot,
 } from "../../domain/territorial-statistics/TerritorialStatistics";
 import {
-  BADEA_BASE, IECA_GRID, INE_BASE, INE_TABLES, TERRITORIAL_CATALOG_VERSION, TERRITORIAL_INDICATORS,
+  BADEA_BASE, IECA_GRID, IECA_HOSTS, INE_BASE, INE_TABLES, TERRITORIAL_CATALOG_VERSION, TERRITORIAL_INDICATORS,
   provinceOf, type AndalusianProvince, type BadeaSource, type IndicatorFicha, type IneTableKey,
 } from "./catalog";
 import {
@@ -47,6 +47,17 @@ export function seriesKey(series: string): string {
 
 export function seriesMatches(row: IneRow, series: string): boolean {
   return seriesKey(row.suffix) === seriesKey(series);
+}
+
+/** Consulta del IECA con la dirección actual y, si falla, con la anterior. */
+async function fetchIeca(fetchJson: FetchJson, url: string): Promise<{ data: unknown; url: string }> {
+  const [current, previous] = IECA_HOSTS;
+  try { return { data: await fetchJson(url), url }; }
+  catch (error) {
+    if (!url.startsWith(current)) throw error;
+    const fallback = previous + url.slice(current.length);
+    return { data: await fetchJson(fallback), url: fallback };
+  }
 }
 
 export async function retrieveTerritorialStatistics(opts: RetrieveOptions): Promise<TerritorialStatisticsSnapshot> {
@@ -110,8 +121,8 @@ export async function retrieveTerritorialStatistics(opts: RetrieveOptions): Prom
     steps.push({
       label: `IECA · consulta ${consulta}`,
       run: async () => {
-        const url = badeaUrl(BADEA_BASE, consulta);
-        const parsed = parseBadea(await fetchJson(url), ineCode, province);
+        const { data, url } = await fetchIeca(fetchJson, badeaUrl(BADEA_BASE, consulta));
+        const parsed = parseBadea(data, ineCode, province);
         const sourceId = `badea-${consulta}`;
         sources.push({ id: sourceId, provider: "IECA", product: parsed.activity || "BADEA", table: String(consulta), title: parsed.title, url, notes: parsed.notes });
         if (!parsed.rows.some(r => r.level === "municipio" || r.level === "seccion")) failures.push({ scope: `BADEA ${consulta}`, message: "La consulta no publica el municipio ni sus secciones." });
@@ -128,8 +139,9 @@ export async function retrieveTerritorialStatistics(opts: RetrieveOptions): Prom
     steps.push({
       label: "IECA · malla de 250 m",
       run: async () => {
-        const url = gridUrl(IECA_GRID.endpoint, IECA_GRID.typeName, ineCode);
-        const fc = (await fetchJson(url)) as GridFeatureCollection;
+        const got = await fetchIeca(fetchJson, gridUrl(IECA_GRID.endpoint, IECA_GRID.typeName, ineCode));
+        const url = got.url;
+        const fc = got.data as GridFeatureCollection;
         if (!fc || !Array.isArray(fc.features)) throw new Error("Respuesta de la malla no válida.");
         const sourceId = `ieca-grid-${IECA_GRID.year}`;
         sources.push({ id: sourceId, provider: "IECA", product: "Distribución espacial de la población", table: IECA_GRID.typeName, title: IECA_GRID.title, url, notes: "Valor -1: secreto estadístico (celda no sumada)." });
