@@ -6,7 +6,7 @@
  */
 import { describe, expect, it } from "vitest";
 import {
-  INE_TABLES, TERRITORIAL_INDICATORS, appendSnapshot, findAndalusianIneCodes, ineSuffix, isTerritorialStatisticsSnapshot, literalEs,
+  INE_TABLES, TERRITORIAL_INDICATORS, appendSnapshot, findAndalusianIneCodes, ineSuffix, mergeTerritorialResults, sectionCodeOf, isTerritorialStatisticsSnapshot, literalEs,
   parseBadea, profileCoverage, provenanceCsv, repairText, retrieveTerritorialStatistics, revisionResults, sectionCsv,
 } from "../src/application/territorial-statistics";
 
@@ -250,5 +250,37 @@ describe("búsqueda del código INE por nombre", () => {
     expect(await findAndalusianIneCodes("ALFACAR", "Granada", fetchJson)).toEqual([{ code: "18011", name: "Alfacar" }]);
     expect(await findAndalusianIneCodes("La Zubia", "Granada", fetchJson)).toEqual([{ code: "18193", name: "Zubia, La" }]);
     expect(await findAndalusianIneCodes("Granada-Zaidín", "Granada", fetchJson)).toEqual([]);
+  });
+});
+
+describe("revisión del Perfil con los datos descargados", () => {
+  const base = { source: "INE", page: "", caution: "" };
+  it("reconoce la sección por su código completo o por distrito y sección", () => {
+    expect(sectionCodeOf({ title: "Renta neta media por persona, sección censal 01004", scale: "Sección censal" }, "18022")).toBe("1802201004");
+    expect(sectionCodeOf({ title: "Renta", scale: "Sección censal 1801101001" }, "18011")).toBe("1801101001");
+    expect(sectionCodeOf({ title: "Renta neta media por persona", scale: "Municipio" }, "18011")).toBeUndefined();
+  });
+
+  it("añade lo ausente, actualiza lo desactualizado conservando su vínculo y conserva lo demás", async () => {
+    const s = await snapshotAlfacar();
+    const vigentes = [
+      { ...base, id: "r1", title: "Renta neta media por persona", value: "12.924", unit: "euros", period: "2024", scale: "Municipio" },
+      { ...base, id: "r2", title: "Renta neta media por hogar", value: "33.000", unit: "euros", period: "2023", scale: "Municipio", supportsConclusions: ["C2"] },
+      { ...base, id: "r3", title: "Glucemia", value: "1", unit: "%", period: "2024" },
+    ];
+    const { results, changes } = mergeTerritorialResults(s, vigentes);
+    expect(results.find(r => r.id === "r1")).toBe(vigentes[0]);
+    const r2 = results.find(r => r.id === "r2")!;
+    expect(r2).toMatchObject({ period: "2024", supportsConclusions: ["C2"], topic: "Desigualdad" });
+    expect(r2.caution).toMatch(/Sustituye en esta revisión el valor 33\.000 \(2023\)/);
+    expect(results.find(r => r.id === "r3")).toBe(vigentes[2]);
+    const tasa = results.find(r => r.id === "ts-ieca-tasa-desempleo-registrado")!;
+    expect(tasa).toMatchObject({ value: "15,8", unit: "%", topic: "Determinantes sociales", scale: "Municipio" });
+    expect(tasa.comparisons).toEqual([{ label: "Andalucía", value: 15.7 }]);
+    // Indicadores por sección: van a la página de desigualdad con su código.
+    const secc = results.filter(r => r.id.startsWith("ts-ieca-seccion-tasa-desempleo-"));
+    expect(secc.map(r => [r.scale, r.value, r.topic])).toEqual([["Sección censal 1801101001", "18,8", "Desigualdad"], ["Sección censal 1801101002", "18,2", "Desigualdad"]]);
+    expect(changes.filter(c => c.kind === "conservado").map(c => c.indicatorId)).toEqual(["adrh-renta-neta-persona"]);
+    expect(changes.find(c => c.kind === "actualizado")?.previous).toMatchObject({ value: "33.000", reason: "actualizable" });
   });
 });

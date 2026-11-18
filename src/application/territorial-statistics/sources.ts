@@ -155,7 +155,10 @@ export function parseBadea(raw: unknown, ineCode: string, province: string): { r
     const periodDim = dims.find(d => /^\d{4}$/.test(d.cod));
     const values = row.slice(nDims).map(v => {
       const literal = (v.format ?? v.val ?? "").toString().trim();
-      const n = v.val === null || v.val === undefined || v.val === "" ? NaN : Number(v.val);
+      // El valor publicado es la representación de la fuente («15,7%»); `val` puede
+      // llevar decimales de cálculo que la fuente no publica (15.70077473).
+      const shown = /\d/.test(literal) ? Number(literal.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".")) : NaN;
+      const n = Number.isFinite(shown) ? shown : v.val === null || v.val === undefined || v.val === "" ? NaN : Number(v.val);
       const secret = literal === "-" || literal === "(-)";
       return { value: Number.isFinite(n) && !secret ? n : null, literal: secret ? "Secreto estadístico" : literal, secret };
     });

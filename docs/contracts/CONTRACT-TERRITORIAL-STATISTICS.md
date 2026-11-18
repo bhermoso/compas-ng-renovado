@@ -2,7 +2,7 @@
 
 > Estadística territorial oficial para el Perfil de Salud Local: búsqueda, descarga,
 > conservación e integración en la revisión.
-> Versión 1.0.0 — 2026-11-17
+> Versión 1.1.0 — 2026-11-18
 > Estado: VIGENTE
 >
 > Desarrolla el dominio «determinantes sociales» y el eje de desigualdad del
@@ -146,9 +146,27 @@ El panel genera, a partir de una descarga:
    (CSV).
 4. **Malla de 250 m** en GeoJSON, tal como la devuelve el servicio.
 
-El paquete no modifica la revisión vigente ni constituye validación. El equipo
-redactor decide qué incorpora y dónde: las páginas de datos (Art. 17 ter), la
-página de desigualdad (Art. 17 quater, 4) o el anexo.
+El paquete no modifica la revisión vigente ni constituye validación.
+
+### 10 bis. Nueva revisión del Perfil con los datos descargados (v1.1.0)
+
+1. Desde una descarga guardada, el usuario puede preparar una **nueva revisión** del
+   Perfil vigente. La vigente no cambia; la nueva queda «en revisión» hasta que el
+   usuario la guarda y la valida (`CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION`).
+2. Reglas de incorporación, por indicador y escala (municipio o sección):
+   - **Ausente en el Perfil:** se añade.
+   - **Dato más reciente** o **mismo periodo con valor distinto del publicado por la
+     fuente:** se sustituye. Conserva el identificador del resultado y sus vínculos
+     con las conclusiones, y la cautela declara el valor sustituido.
+   - **Al día, periodo posterior en el Perfil u otra medida:** se conserva el del Perfil.
+3. Destino en las páginas de datos (Art. 17 ter): los indicadores de población
+   van a «Quién vive aquí»; los de desigualdad a «Desigualdad», y además por
+   sección censal un conjunto fijo de ocho indicadores cuando el municipio tiene
+   más de una sección. Los de determinantes sociales van al panel, bajo ese dominio.
+4. El texto del Perfil no se modifica. La revisión añade a sus limitaciones la fecha
+   de la descarga y la advertencia de que el PDF original adjunto no contiene estos
+   datos. Para que el documento publicado los recoja, hay que regenerar el PDF.
+5. Antes de guardar, el usuario ve cada cambio con el valor anterior y su motivo.
 
 ## 11. Invariantes
 
@@ -211,4 +229,5 @@ Las tablas por provincia de las otras siete provincias andaluzas figuran en `cat
 
 | Fecha | Versión | Cambio | Responsable |
 |---|---|---|---|
+| 2026-11-18 | 1.1.0 | §10 bis: nueva revisión del Perfil con los datos descargados (añadir, sustituir o conservar por indicador y escala; destino en las páginas de datos; el texto no cambia). Cobertura comparada en la escala del resultado del Perfil. Valor numérico tomado de la representación publicada por el IECA. Motivo: el autor pidió que los datos se reflejen en el Perfil | COMPÁS NG |
 | 2026-11-17 | 1.0.0 | Creación: fuentes, catálogo de 37 indicadores, descarga, valor literal, comparadores, conservación y paquete para la revisión. Comprobado contra las API del INE y del IECA con Alfacar (18011). Encargo del autor: «todo el circuito», integración como paquete para la revisión, cuatro fuentes | COMPÁS NG |
