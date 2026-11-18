@@ -9,10 +9,12 @@ import type { ExternalHealthProfile, ProfileResult } from "../../domain/health-p
 import type { TerritorialObservation, TerritorialStatisticsSnapshot } from "../../domain/territorial-statistics/TerritorialStatistics";
 import { TERRITORIAL_INDICATORS, type IndicatorDomain, type IndicatorFicha } from "./catalog";
 
+/** Rótulo de cada bloque del marco: coincide con el tema y la página de datos (Art. 17 ter). */
 export const DOMAIN_LABEL: Record<IndicatorDomain, string> = {
-  "determinantes-sociales": "Determinantes sociales",
-  desigualdad: "Desigualdad",
-  poblacion: "Población",
+  "contexto-poblacion": "Contexto y población",
+  "ejes-desigualdad": "Ejes de desigualdad",
+  "condiciones-vida": "Condiciones de vida",
+  servicios: "Servicios",
 };
 
 const COMPARATOR_ORDER = ["provincia", "andalucia", "espana"] as const;
@@ -142,17 +144,14 @@ export function profileCoverage(snapshot: TerritorialStatisticsSnapshot, profile
 
 // ── Revisión del Perfil con los datos descargados ───────────────────────────
 
-/** Página de datos a la que va cada dominio (Art. 17 ter): población a «Quién vive aquí». */
-export const REVISION_TOPIC: Record<IndicatorDomain, string> = {
-  poblacion: "Quién vive aquí",
-  desigualdad: "Desigualdad",
-  "determinantes-sociales": "Determinantes sociales",
-};
+/** Página de datos a la que va cada bloque del marco (Art. 17 ter, v2.5.0). */
+export const REVISION_TOPIC: Record<IndicatorDomain, string> = DOMAIN_LABEL;
 
 /** Indicadores que se llevan al Perfil también por sección censal (página de desigualdad). */
 export const SECTION_REVISION_INDICATORS = [
   "adrh-renta-neta-persona", "adrh-bajo-60-mediana", "adrh-gini", "censo-estudios-superiores",
   "censo-extranjera", "ieca-seccion-tasa-desempleo", "ieca-seccion-indice-soledad", "ieca-seccion-pension-mediana",
+  "ieca-seccion-alquiler-colectiva",
 ];
 
 export interface RevisionChange {
@@ -181,7 +180,7 @@ function resultFrom(snapshot: TerritorialStatisticsSnapshot, ficha: IndicatorFic
   return {
     id, title: section ? ficha.title.replace(/ por sección$/, "") : ficha.title,
     value: withoutPercent(o.literal, ficha.unit), unit: ficha.unit, source: text, page: locator, period: o.period,
-    caution: cautions.join(" "), topic: section ? "Desigualdad" : REVISION_TOPIC[ficha.domain],
+    caution: cautions.join(" "), topic: section ? "Ejes de desigualdad" : REVISION_TOPIC[ficha.domain],
     scale: section ? `Sección censal ${o.territoryCode}` : "Municipio", temporalContext: "current",
     ...(o.value !== null ? { chartValue: o.value } : {}), ...(comparisons.length ? { comparisons } : {}),
   };

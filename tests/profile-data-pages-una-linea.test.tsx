@@ -16,8 +16,9 @@ const results: ProfileResult[] = [
 ];
 const pages = { cover: [], whoLivesHere: [], healthPanel: ["Resultados del Informe.", "| Indicador | Alfacar |\n|---|---|\n| Asma | 1.589,56 |\n| Diabetes | 745,21 |"], inequality: { intro: [], blocks: [] } };
 const html = renderToStaticMarkup(<ProfileDataPages pages={pages} results={results} municipalityName="Alfacar" title="Perfil" period="0.8.1" metrics={[]} />);
-const panel = html.slice(html.indexOf('id="pdp-3"'), html.indexOf('id="pdp-4"'));
-const page4 = html.slice(html.indexOf('id="pdp-4"'));
+// v2.5.0: el panel de salud es la página 6 («Salud y bienestar»); la desigualdad, la 3.
+const panel = html.slice(html.indexOf('id="pdp-6"'));
+const page4 = html.slice(html.indexOf('id="pdp-3"'), html.indexOf('id="pdp-4"'));
 const rows = [...panel.matchAll(/<tr><th scope="row">([\s\S]*?)<\/tr>/g)].map((m) => m[1]);
 
 describe("Panel de salud · una línea por indicador", () => {

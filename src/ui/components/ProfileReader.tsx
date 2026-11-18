@@ -1,5 +1,6 @@
 import { Fragment, useMemo, useState, type ReactNode } from "react";
 import type { ProfileStructure, ProfileSection } from "../../application/health-profile/profileStructure";
+import { DATA_PAGE_HEADINGS } from "../../application/health-profile/profileStructure";
 
 import { ProfileText } from "./ProfileText";
 
@@ -76,7 +77,7 @@ export function ProfileReader({ structure, pdfUrl, title }: { structure: Profile
     /^(?:\d+[.\s]+)?Punto de partida\b/i.test(section.title.trim())
   );
   // Las páginas de datos (Art. 17 ter) son parte del Perfil y abren la lectura; no van con los preliminares.
-  const isDataPage = (s: ProfileSection) => /^(.+ en datos|Quién vive aquí|Panel de salud|Desigualdad)$/i.test(s.title.trim());
+  const isDataPage = (s: ProfileSection) => /^.+ en datos$/i.test(s.title.trim()) || Object.values(DATA_PAGE_HEADINGS).some(re => re.test(s.title.trim()));
   const before = firstChapterIndex > 0 ? sections.slice(0, firstChapterIndex) : [];
   // Solo el material introductorio no numerado queda plegado. Los capítulos
   // 01–05, si existen, son parte del Perfil y deben figurar en el índice.

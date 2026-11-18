@@ -104,7 +104,7 @@ export function TerritorialStatisticsPanel({ municipalityId, municipalityName, i
   }
 
   const base = shown ? `${slug(municipalityName)}-estadistica-territorial-${shown.retrievedAt.slice(0, 10)}` : '';
-  const domains = (['determinantes-sociales', 'desigualdad', 'poblacion'] as const);
+  const domains = (['contexto-poblacion', 'ejes-desigualdad', 'condiciones-vida', 'servicios'] as const);
 
   return <section className="tsp" aria-labelledby="tsp-title">
     <header className="tsp-head">
@@ -143,7 +143,7 @@ export function TerritorialStatisticsPanel({ municipalityId, municipalityName, i
 
       {activeProfile && merge && <section className="tsp-block tsp-revision">
         <h3>Llevar estos datos al Perfil</h3>
-        <p>Se prepara una nueva revisión de «{activeProfile.title}» con los indicadores de esta descarga: <strong>{count('añadido')} añadidos</strong> y <strong>{count('actualizado')} actualizados</strong> (dato más reciente o valor distinto del publicado por la fuente); {count('conservado')} se conservan como están. Los añadidos se muestran en las páginas de datos del Perfil: población en «Quién vive aquí», renta y desigualdad por sección en «Desigualdad», y empleo, pensiones y hogares en el panel, bajo «Determinantes sociales».</p>
+        <p>Se prepara una nueva revisión de «{activeProfile.title}» con los indicadores de esta descarga: <strong>{count('añadido')} añadidos</strong> y <strong>{count('actualizado')} actualizados</strong> (dato más reciente o valor distinto del publicado por la fuente); {count('conservado')} se conservan como están. Los añadidos se muestran en las páginas de datos del Perfil, en el orden del marco de determinantes sociales: «Contexto y población», «Ejes de desigualdad» (con la desigualdad por sección), «Condiciones de vida» y «Servicios».</p>
         <p className="ep-help">El texto del Perfil no cambia, y la revisión vigente tampoco: la nueva queda en revisión hasta que la valides. El PDF original adjunto no contiene estos datos; la revisión lo declara entre sus limitaciones.</p>
         <details><summary>Ver los cambios uno a uno ({merge.changes.length})</summary>
           <div className="tsp-scroll"><table className="tsp-table">

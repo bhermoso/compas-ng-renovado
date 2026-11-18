@@ -90,8 +90,8 @@ describe("ProfileResultsDashboard · páginas de datos (Art. 17 ter)", () => {
     expect(metrics[0].rows.map((x) => x.section)).toEqual(["03002 (Alfaguara)", "05002"]);
     expect(metrics[0].references.map((x) => x.label)).toEqual(["Loja", "Provincia de Granada"]);
   });
-  it("abre con las cuatro páginas en orden y después la lectura de conjunto", () => {
-    const order = ["Perfil de Salud Local</p>", "<h2>Quién vive aquí</h2>", "<h2>Panel de salud</h2>", "<h2>Desigualdad</h2>", "Qué concluye el perfil", "Lo que concluye el perfil"].map((t) => html.indexOf(t));
+  it("abre con las seis páginas en el orden del marco y después la lectura de conjunto", () => {
+    const order = ["Perfil de Salud Local</p>", "<h2>Contexto y población</h2>", "<h2>Ejes de desigualdad</h2>", "<h2>Condiciones de vida</h2>", "<h2>Servicios</h2>", "<h2>Salud y bienestar</h2>", "Qué concluye el perfil", "Lo que concluye el perfil"].map((t) => html.indexOf(t));
     expect(order.every((i) => i >= 0)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
   });

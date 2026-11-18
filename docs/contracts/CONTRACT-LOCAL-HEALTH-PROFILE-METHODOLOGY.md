@@ -1,7 +1,7 @@
 # CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY
 
 > Contrato metodológico canónico del Perfil de Salud Local (PSL) en COMPÁS NG.
-> Versión 2.4.0 — 2026-11-17 (historial en el registro de revisiones)
+> Versión 2.5.0 — 2026-11-18 (historial en el registro de revisiones)
 > Estado: VIGENTE
 >
 > Este contrato define qué debe ser metodológicamente un Perfil de Salud Local,
@@ -102,6 +102,17 @@ Un tema que el Informe de Salud trata y que la priorización temática no recoge
 1. **Declaración.** El eje se declara con su definición, las dimensiones del Informe que agrupa y la autoría y la fecha de quien lo declara. Sin declaración, el tema no genera unidad ni conclusión compilada.
 2. **Estatuto.** Un eje es una agrupación de evidencia, no un hallazgo. Declararlo no lo prioriza: priorizar corresponde al Grupo Motor (Art. 3).
 3. **Versión.** Cada cambio del eje es una versión nueva, con autoría y fecha.
+
+### Art. 4 quater. Marco de los determinantes sociales de la salud
+
+El Perfil es un informe de salud basado en los determinantes sociales. Su marco de lectura común, igual en todos los municipios, es el de la Comisión sobre Determinantes Sociales de la Salud de la OMS (Solar e Irwin, *A conceptual framework for action on the social determinants of health*, OMS, 2010), en la adaptación de la Comisión para Reducir las Desigualdades Sociales en Salud en España (*Avanzando hacia la equidad*, Ministerio de Sanidad y Política Social, 2010; Gac Sanit. 2012;26(2):182-189).
+
+1. **Orden de lectura.** El Perfil recorre el marco en este orden: contexto y población; ejes de desigualdad o determinantes estructurales (renta y su distribución, nivel educativo, ocupación, sexo, edad, origen y territorio); condiciones de vida o determinantes intermedios (empleo y paro, ingresos y prestaciones, hogares, convivencia y soledad, vivienda); servicios sanitarios y sociales; y salud y bienestar.
+2. **Estatuto.** El marco organiza la evidencia y la lectura; no es un hallazgo ni prioriza. No sustituye a los ejes de lectura que declare el equipo (Art. 4 ter), que se sitúan dentro de él.
+3. **Relación con la salud.** Situar un resultado de salud junto a un determinante no demuestra que el determinante lo cause. La lectura de conjunto puede señalar coincidencias territoriales o por grupo de población que la evidencia muestre, con el grado de sustento que permita (Art. 8 bis); no afirma causalidad.
+4. **Desigualdad, no solo media.** Cada eje se lee, cuando la fuente lo permite, por sexo, por edad, por origen y por sección censal. Si la fuente solo publica la media municipal, el Perfil lo declara: la ausencia de desagregación no equivale a ausencia de desigualdad.
+
+*Consecuencia si se viola:* el Perfil vuelve a ser un inventario de indicadores sanitarios con un apartado social al margen, y no puede explicar por qué la salud se distribuye como se distribuye.
 
 ### Art. 5. Perfil como explicación territorial
 
@@ -529,18 +540,22 @@ Las diferencias de formato solo pueden afectar a soporte, paginación, densidad 
 
 El Perfil de Salud Local tiene una única salida: el documento canónico del Art. 17 bis. No existe una salida comparativa breve ni otra representación con estatuto propio, sea por audiencia, por formato o por densidad de lectura.
 
-Ese único documento se abre con cuatro páginas de plantilla común, iguales en todos los municipios y en todos los ciclos, que preceden al cuerpo del Art. 16 quater:
+Ese único documento se abre con seis páginas de plantilla común, iguales en todos los municipios y en todos los ciclos, que preceden al cuerpo del Art. 16 quater y siguen el orden del marco de los determinantes sociales (Art. 4 quater):
 
 1. **Portada.** Identidad del municipio, mapa del término municipal, cifras clave y una lectura breve en cuatro bloques: resumen, desigualdades, comunidad y salud.
-2. **Quién vive aquí.** Pirámide de población frente a Andalucía, con su proyección cuando exista, y ficha comparada de hogares, origen, renta y empleo.
-3. **Panel de salud.** Los indicadores del núcleo común (Art. 17 quater), con su valor local, recuento, periodo, comparadores y cambio desde el ciclo anterior.
-4. **Desigualdad.** Lo que la media del municipio no muestra: diferencias internas por sección censal (Art. 17 quater, 4), por sexo, edad y origen, y series en el tiempo.
+2. **Contexto y población.** Pirámide de población frente a Andalucía, con su proyección cuando exista; edad, origen, hogares y grado de urbanización.
+3. **Ejes de desigualdad.** Los determinantes estructurales: renta y su distribución (renta media y mediana, índice de Gini, P80/P20, población por debajo del 60 % de la mediana), nivel educativo y ocupación, con su desagregación por sexo, edad, origen y sección censal (Art. 17 quater, 4).
+4. **Condiciones de vida.** Los determinantes intermedios: empleo y paro registrado, por sexo; ingresos por fuente, pensiones y prestaciones; hogares unipersonales y soledad; vivienda.
+5. **Servicios.** Recursos de atención primaria y de servicios sociales del municipio, cuando la fuente los publica.
+6. **Salud y bienestar.** Los indicadores del núcleo común (Art. 17 quater), con su valor local, recuento, periodo, comparadores y cambio desde el ciclo anterior.
 
-Estas páginas son parte del Perfil, no un producto distinto: se ven igual en pantalla, visor, DOCX, PDF e impresión, y su contenido procede del mismo expediente. El panel de la aplicación muestra estas cuatro páginas; el lector, el documento entero. Las páginas de datos muestran y comparan: no concluyen, no priorizan y no sustituyen a las conclusiones ni a las recomendaciones del cuerpo.
+Una página sin datos publicados para el municipio se mantiene y lo declara. Estas páginas son parte del Perfil, no un producto distinto: se ven igual en pantalla, visor, DOCX, PDF e impresión, y su contenido procede del mismo expediente. El panel de la aplicación muestra estas seis páginas; el lector, el documento entero.
+
+*Compatibilidad.* Los Perfiles anteriores a la versión 2.5.0 rotulan sus páginas «Quién vive aquí», «Panel de salud» y «Desigualdad», y sus indicadores con esos temas o con «Determinantes sociales». Se muestran en las páginas equivalentes (2, 6, 3 y 4) sin reescribirse; la siguiente revisión adopta los rótulos nuevos. Las páginas de datos muestran y comparan: no concluyen, no priorizan y no sustituyen a las conclusiones ni a las recomendaciones del cuerpo.
 
 Una representación nueva con estatuto propio solo puede añadirse por reforma expresa de este contrato.
 
-*Nota de revisión.* La versión 1.8.0 derogó la salida comparativa breve tipo OHID/Fingertips (2026-10-23). La versión 2.3.0 (2026-11-02) no la restaura como salida aparte: incorpora al único Perfil las páginas de datos comparables, a partir del estudio de los Local Authority Health Profiles de Public Health England (Barking and Dagenham y Kensington and Chelsea, 2018 y 2019). La numeración de los artículos y de los invariantes no se altera.
+*Nota de revisión.* La versión 2.5.0 (2026-11-18) sustituye las cuatro páginas por seis, ordenadas según el marco de los determinantes sociales (Art. 4 quater). La versión 1.8.0 derogó la salida comparativa breve tipo OHID/Fingertips (2026-10-23). La versión 2.3.0 (2026-11-02) no la restaura como salida aparte: incorpora al único Perfil las páginas de datos comparables, a partir del estudio de los Local Authority Health Profiles de Public Health England (Barking and Dagenham y Kensington and Chelsea, 2018 y 2019). La numeración de los artículos y de los invariantes no se altera.
 
 ### Art. 17 quater. Núcleo de indicadores y comparación
 
@@ -889,3 +904,4 @@ El panel de salud usa el núcleo común de indicadores, declara sus comparadores
 | 2026-11-17 | 2.3.1 | Coherencia con CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT §3.1 bis (2026-10-19): el Plan de Acción comprende líneas estratégicas, objetivos e indicadores; las actuaciones, con responsables, recursos y plazos, pertenecen a las agendas anuales de implantación, instrumento separado. Se ajustan Art. 3, 7 quater, 8 quater (reglas 2, 5 y 6), 16 bis, 16 quater (apartado 6, con redacción de referencia), I-LHPM-9 e I-LHPM-15. Motivo: las revisiones externas del 16/11/2026 de Alfacar, Atarfe, Loja y Zagra atribuían al Plan de Acción actuaciones, responsables, recursos y plazos. Decisión del autor | COMPÁS NG |
 | 2026-11-17 | 2.3.1 (aclaración) | Se incorpora la aclaración de aplicación a producción externa redactada el 12-11-2026 (procedente de la PR #120, no fusionada): contenido, cautelas, estructura y modelo canónico rigen también para el Perfil elaborado fuera de COMPÁS; la importación conserva y representa, no produce diagnóstico nuevo | COMPÁS NG |
 | 2026-11-17 | 2.4.0 | Art. 17 quater: desarrollo del dominio de determinantes sociales y del eje de desigualdad mediante `CONTRACT-TERRITORIAL-STATISTICS` (catálogo de 37 indicadores con ficha y tabla por provincia; descarga del INE y del IECA conservada como material para la revisión, sin modificar la vigente). Motivo: los cuatro Perfiles vigentes usan una parte pequeña de la estadística oficial disponible (sin Gini, P80/P20 ni fuentes de ingreso). Encargo del autor del 2026-11-17 | COMPÁS NG |
+| 2026-11-18 | 2.5.0 | Nuevo Art. 4 quater: el Perfil es un informe de salud basado en los determinantes sociales, con el marco de la Comisión sobre Determinantes Sociales de la Salud de la OMS (Solar e Irwin, 2010) adaptado por la Comisión para Reducir las Desigualdades Sociales en Salud en España (2010). Art. 17 ter: seis páginas de datos en el orden del marco (portada; contexto y población; ejes de desigualdad; condiciones de vida; servicios; salud y bienestar), con compatibilidad para los Perfiles anteriores. Decisión del autor del 2026-11-18: «que el perfil de salud local sea verdaderamente un informe de salud basado en los determinantes sociales de la salud» | COMPÁS NG |

@@ -2,7 +2,7 @@
 
 > Estadística territorial oficial para el Perfil de Salud Local: búsqueda, descarga,
 > conservación e integración en la revisión.
-> Versión 1.1.0 — 2026-11-18
+> Versión 1.2.0 — 2026-11-18
 > Estado: VIGENTE
 >
 > Desarrolla el dominio «determinantes sociales» y el eje de desigualdad del
@@ -46,15 +46,18 @@ sin alterar la revisión vigente.
 |---|---|---|---|
 | Atlas de Distribución de Renta de los Hogares (ADRH) | INE | API wstempus, tablas por provincia y tablas nacionales | Municipio, distrito censal, sección; provincia, Andalucía y España como comparadores |
 | Censo anual de población | INE | API wstempus, tablas por provincia | Municipio, distrito censal, sección; provincia como comparador |
-| Banco de Datos Estadísticos de Andalucía (BADEA, SIMA) | IECA | API REST de consultas | Municipio, sección; provincia y Andalucía cuando la consulta los publica |
+| Banco de Datos Estadísticos de Andalucía (BADEA, SIMA) | IECA | API REST de consultas en www.ieca.junta-andalucia.es (antes en www.juntadeandalucia.es/institutodeestadisticaycartografia, que redirige y se usa como respaldo) | Municipio, sección; provincia y Andalucía cuando la consulta los publica |
 | Distribución espacial de la población (malla de 250 m) | IECA | Servicio WFS | Celda de 250 m dentro del término municipal |
 
 Una fuente nueva entra por reforma de este contrato y nueva versión del catálogo.
 
 ## 4. Catálogo de indicadores
 
-1. El catálogo (`catalog.ts`, versión `2026-11-17`) contiene 37 indicadores en tres
-   dominios: determinantes sociales, desigualdad y población. El anexo A los lista.
+1. El catálogo (`catalog.ts`, versión `2026-11-18`) contiene 46 indicadores, ordenados
+   en los bloques del marco de determinantes sociales (Art. 4 quater del contrato
+   metodológico): contexto y población, ejes de desigualdad, condiciones de vida y
+   servicios. Cada bloque corresponde a una página de datos del Perfil. El anexo A
+   los lista.
 2. Cada indicador tiene una **ficha** con: identificador estable, título,
    definición, unidad, productor, periodicidad, escalas, comparadores, si la
    fuente publica intervalos, cautelas, tabla o consulta exacta y denominación de
@@ -97,15 +100,17 @@ Una fuente nueva entra por reforma de este contrato y nueva versión del catálo
 
 ## 7. Comparadores
 
-1. Se descargan los ámbitos superiores que la fuente publica en tablas o consultas
+1. Un recuento (personas, centros, viviendas) no se compara con ámbitos superiores:
+   depende del tamaño del ámbito. Se comparan tasas, porcentajes, medias y medianas.
+2. Se descargan los ámbitos superiores que la fuente publica en tablas o consultas
    del mismo producto: provincia, Andalucía y España para el ADRH; provincia para el
    Censo anual; provincia y Andalucía para las consultas BADEA que los incluyen.
-2. Un comparador que la fuente no publica se omite y no se estima. Las tablas
+3. Un comparador que la fuente no publica se omite y no se estima. Las tablas
    municipales del Censo anual no publican Andalucía; ninguna de estas fuentes
    publica el Distrito sanitario.
-3. En la tasa municipal de desempleo registrado, el IECA publica la provincia y
+4. En la tasa municipal de desempleo registrado, el IECA publica la provincia y
    Andalucía por grado de urbanización. Se usa el del propio municipio y se nombra.
-4. Ninguna de estas fuentes publica intervalos ni significación: el panel no marca
+5. Ninguna de estas fuentes publica intervalos ni significación: el panel no marca
    «mejor», «similar» ni «peor» (Art. 17 quater, 3).
 
 ## 8. Escala
@@ -195,7 +200,9 @@ El paquete no modifica la revisión vigente ni constituye validación.
 
 ---
 
-## Anexo A. Indicadores del catálogo 2026-11-17
+## Anexo A. Indicadores del catálogo 2026-11-18
+
+La columna «Dominio» refleja la versión 2026-11-17. Desde la 2026-11-18 cada indicador pertenece a un bloque del marco: contexto y población (población, edad, origen, tamaño del hogar, grado de urbanización); ejes de desigualdad (renta y su distribución, IRPF, estudios, ocupación); condiciones de vida (fuentes de ingreso, paro y desempleo, pensiones, hogares unipersonales y soledad, vivienda); servicios.
 
 | Dominio | Indicador | Fuente | Tabla o consulta | Escalas | Comparadores |
 |---|---|---|---|---|---|
@@ -221,6 +228,13 @@ El paquete no modifica la revisión vigente ni constituye validación.
 | Desigualdad | Tasa de desempleo registrado y de larga duración por sección | IECA · BADEA | 119350 | Sección | — |
 | Determinantes sociales | Índice de soledad por sección | IECA · BADEA | 119351 | Sección | — |
 | Desigualdad | Mediana de las pensiones contributivas por sección | IECA · BADEA | 119349 | Sección | — |
+| Condiciones de vida | Paro registrado de mujeres y de hombres | IECA · BADEA | 37015 | Municipio | — |
+| Condiciones de vida | Paro registrado de más de un año (% del paro) | IECA · BADEA | 117866 | Municipio | Provincia, Andalucía |
+| Condiciones de vida | Pensión contributiva media de mujeres y de hombres | IECA · BADEA | 46121 | Municipio | Provincia, Andalucía |
+| Condiciones de vida | Viviendas familiares no principales (Censo 2021) | IECA · BADEA | 108129 | Municipio | — |
+| Condiciones de vida | Cuantía media del alquiler de vivienda colectiva por sección | IECA · BADEA | 121064 | Sección | — |
+| Servicios | Centros de atención primaria | IECA · BADEA | 40161 | Municipio | — |
+| Servicios | Centros de servicios sociales | IECA · BADEA | 58270 | Municipio | — |
 | Población y contexto | Población, 65 y más años, afiliaciones, pensiones y demandantes de empleo por celda | IECA · malla de 250 m | `grid:gridp_250` (2024) | Celda | — |
 
 Las tablas por provincia de las otras siete provincias andaluzas figuran en `catalog.ts`.
@@ -229,5 +243,6 @@ Las tablas por provincia de las otras siete provincias andaluzas figuran en `cat
 
 | Fecha | Versión | Cambio | Responsable |
 |---|---|---|---|
+| 2026-11-18 | 1.2.0 | Catálogo 2026-11-18: 46 indicadores en los bloques del marco de determinantes sociales (contrato metodológico v2.5.0); nueve nuevos (paro y pensión media por sexo, paro de larga duración, viviendas no principales, alquiler por sección, centros de atención primaria y de servicios sociales); los recuentos dejan de compararse con ámbitos superiores. El IECA sirve sus API desde www.ieca.junta-andalucia.es: la dirección anterior redirige y esa redirección bloquea la consulta desde el navegador; se usa como respaldo | COMPÁS NG |
 | 2026-11-18 | 1.1.0 | §10 bis: nueva revisión del Perfil con los datos descargados (añadir, sustituir o conservar por indicador y escala; destino en las páginas de datos; el texto no cambia). Cobertura comparada en la escala del resultado del Perfil. Valor numérico tomado de la representación publicada por el IECA. Motivo: el autor pidió que los datos se reflejen en el Perfil | COMPÁS NG |
 | 2026-11-17 | 1.0.0 | Creación: fuentes, catálogo de 37 indicadores, descarga, valor literal, comparadores, conservación y paquete para la revisión. Comprobado contra las API del INE y del IECA con Alfacar (18011). Encargo del autor: «todo el circuito», integración como paquete para la revisión, cuatro fuentes | COMPÁS NG |
