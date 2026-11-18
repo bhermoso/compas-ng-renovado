@@ -209,3 +209,33 @@ export function applyTextPackage(base: Pick<ExternalHealthProfile, "text" | "bin
   }
   return { text: paras.join("\n\n"), bindings, conditions, changes, problems };
 }
+
+// ── Campos derivados del texto ──────────────────────────────────────────────
+
+/**
+ * Resumen, conclusiones y recomendaciones del paquete se derivan del texto:
+ * el resumen es la lectura de conjunto, las conclusiones son los párrafos
+ * «Cn.» y las recomendaciones, los bloques «Rn.» con su tipo y su fundamento.
+ * Si el texto cambia y estos campos no, el paquete describe otra revisión.
+ * Se conserva la forma del título de las recomendaciones del Perfil de partida
+ * (con o sin el rótulo de la recomendación).
+ */
+export interface DerivedProfileFields { summary?: string; findings: string[]; areas: Array<{ id: string; title: string; rationale: string }> }
+
+export function deriveProfileFields(text: string, baseAreas: Array<{ id: string; title: string }> = []): DerivedProfileFields {
+  const paras = text.split("\n\n").map(p => p.trim());
+  const findings = paras.filter(p => /^C\d+\.\s/.test(p));
+  const r = sectionRange(paras, "Una lectura de conjunto");
+  const summary = r && r[1] > r[0] ? paras.slice(r[0], r[1]).join("\n\n") : undefined;
+  const withHeading = !baseAreas.length || baseAreas.some(a => { const h = paras.find(p => p.startsWith(`${a.id}. `)); return !!h && a.title.startsWith(`${h}. `); });
+  const areas: DerivedProfileFields["areas"] = [];
+  paras.forEach((p, i) => {
+    const m = /^(R\d+)\.\s+(.+)$/.exec(p);
+    if (!m || !paras[i + 2]?.startsWith("Fundamento:")) return;
+    const t = /^(Conocer|Contrastar|Abordar)\.\s+([\s\S]+)$/.exec(paras[i + 1] ?? "");
+    if (!t) return;
+    const fundamento = paras[i + 2].slice("Fundamento:".length).trim().replace(/\.$/, "");
+    areas.push({ id: m[1], title: withHeading ? `${m[1]}. ${m[2]}. ${t[2]}` : `${m[1]}. ${t[2]}`, rationale: `${t[1]} · Deriva de ${fundamento}` });
+  });
+  return { ...(summary ? { summary } : {}), findings, areas };
+}

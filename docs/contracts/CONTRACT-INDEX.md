@@ -46,9 +46,9 @@ Contrato de persistencia y rehidratación del workspace municipal en localStorag
 ---
 
 ### CONTRACT-PROFILE-UPDATER
-**Estado:** VIGENTE — 1.0.0, 2026-11-18
+**Estado:** VIGENTE — 1.2.0, 2026-11-18
 
-Actualizador de perfiles: aplica cambios declarados (rótulos del modelo, páginas de datos compiladas desde la estadística territorial, indicadores de la descarga) al Perfil vigente de cualquier expediente y crea en cada uno una revisión en revisión. No redacta conclusiones ni toca el texto de autoría del equipo.
+Actualizador de perfiles: aplica cambios declarados (rótulos del modelo, páginas de datos compiladas desde la estadística territorial, indicadores de la descarga, cifras enlazadas y condiciones, paquetes de texto redactados fuera de COMPÁS) al Perfil vigente de cualquier expediente y crea en cada uno una revisión en revisión. Mantiene el resumen, las conclusiones y las recomendaciones del paquete derivados del texto; una corrección sin cambio de texto sube solo el número de corrección. No redacta conclusiones.
 
 **Relacionado con:** CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY (Art. 4 quater, 17 ter), CONTRACT-TERRITORIAL-STATISTICS, CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION.
 

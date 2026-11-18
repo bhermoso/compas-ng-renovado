@@ -178,6 +178,8 @@ const DEMO_MUNICIPALITIES: CreateMunicipalityContextInput[] = [
   { id: "zagra",          name: "Zagra",               province: "Granada", ineCode: "18913", createdBy: "COMPÁS" },
 ];
 const DEMO_MUNICIPALITY_IDS = DEMO_MUNICIPALITIES.map((municipality) => municipality.id);
+/** Caso de referencia con estudios sintéticos; el único ámbito que se rotula como demostración. */
+const SYNTHETIC_DEMO_MUNICIPALITY_ID = "granada-zaidin";
 
 const CUSTOM_MUNICIPALITIES_KEY = "compas-ng:custom-municipalities";
 const DELETED_MUNICIPALITIES_KEY = "compas-ng:deleted-municipalities";
@@ -3841,7 +3843,9 @@ export default function App() {
                 <span>INE {municipality.ineCode}</span>
               </>
             )}
-            {DEMO_MUNICIPALITIES.some((m) => m.id === municipality.id) && (
+            {/* Solo Granada-Zaidín es un caso de demostración (estudios sintéticos). Los demás
+                ámbitos iniciales son expedientes reales con datos en Firebase. */}
+            {municipality.id === SYNTHETIC_DEMO_MUNICIPALITY_ID && (
               <span className="app-nav__municipality-badge">Demostración</span>
             )}
             <button
