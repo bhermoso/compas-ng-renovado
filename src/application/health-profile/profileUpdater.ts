@@ -13,19 +13,25 @@ import { latestSnapshot } from "../territorial-statistics/snapshots";
 import { mergeTerritorialResults, REVISION_TOPIC } from "../territorial-statistics/revisionPackage";
 import { COMPILED_CONTEXT_MARK, compileDataPages } from "../territorial-statistics/compiledDataPages";
 import { DATA_PAGE_HEADINGS } from "./profileStructure";
+import { applyTextPackage, dependentRecommendations, evaluateConditions, refreshBindings, type ProfileTextPackage } from "./profileTextOperations";
+import type { ProfileBinding, ProfileCondition, ProfileReviewFlag } from "../../domain/health-profile/ExternalHealthProfile";
 
-export type ProfileUpdateKind = "paginas-datos" | "indicadores" | "rotulos";
+export type ProfileUpdateKind = "paginas-datos" | "indicadores" | "rotulos" | "cifras-conclusiones" | "paquete-texto";
 
 export const PROFILE_UPDATE_LABEL: Record<ProfileUpdateKind, string> = {
   rotulos: "Rótulos y temas del modelo de determinantes sociales (contrato 2.5.0)",
   "paginas-datos": "Páginas de datos compiladas desde la última descarga",
   indicadores: "Indicadores de la descarga en los resultados del Perfil",
+  "cifras-conclusiones": "Cifras enlazadas de las conclusiones y comprobación de sus condiciones",
+  "paquete-texto": "Texto del cuerpo desde un paquete redactado fuera de COMPÁS",
 };
 
 export interface ProfileUpdateInput {
   library: ExternalProfileLibrary;
   snapshots?: TerritorialStatisticsSnapshot[];
   kinds: ProfileUpdateKind[];
+  /** Paquete de texto (capa 3), necesario si se elige «paquete-texto». */
+  textPackage?: ProfileTextPackage;
   author: string;
   now: Date;
   newId: () => string;
@@ -131,7 +137,7 @@ function addReferences(text: string, refs: string[]): { text: string; added: num
   if (!missing.length) return { text, added: 0 };
   // Tras la última referencia contigua al rótulo.
   let end = at + 1;
-  while (end < paras.length && !/^(Anexo [A-Z]\.|\d{1,2}\.\s)/.test(paras[end].trim())) end++;
+  while (end < paras.length && !/^Anexo [A-Z]\./.test(paras[end].trim())) end++;
   paras.splice(end, 0, ...missing);
   return { text: paras.join("\n\n"), added: missing.length };
 }
@@ -159,11 +165,24 @@ export function buildProfileUpdate(input: ProfileUpdateInput): ProfileUpdateResu
   if (!base) return { changes: [], blocked: "El expediente no tiene Perfil vigente." };
   const pending = library.profiles.filter(p => p.revisionOf === base.id && p.status === "review" && !p.archivedAt);
   const snapshot = latestSnapshot(input.snapshots);
-  if ((kinds.includes("paginas-datos") || kinds.includes("indicadores")) && !snapshot) return { base, changes: [], blocked: "El expediente no tiene ninguna descarga de estadística territorial guardada." };
+  if ((kinds.includes("paginas-datos") || kinds.includes("indicadores") || kinds.includes("cifras-conclusiones")) && !snapshot) return { base, changes: [], blocked: "El expediente no tiene ninguna descarga de estadística territorial guardada." };
   const changes: string[] = [];
   let text = base.text;
   let results = base.results;
+  let bindings: ProfileBinding[] | undefined = base.bindings;
+  let conditions: ProfileCondition[] | undefined = base.conditions;
+  const flags: ProfileReviewFlag[] = [];
   const date = dmy(input.now);
+
+  if (kinds.includes("paquete-texto")) {
+    const entry = input.textPackage?.entries.find(e => e.municipalityId === base.municipalityId);
+    if (!entry) return { base, changes: [], blocked: "El paquete de texto no trae operaciones para este expediente." };
+    if (entry.baseTitle.trim() !== base.title.trim()) return { base, changes: [], blocked: `El paquete se redactó sobre «${entry.baseTitle}» y la revisión vigente es «${base.title}».` };
+    const r = applyTextPackage({ text, bindings, conditions }, entry);
+    if (r.problems.length) return { base, changes: r.changes, blocked: `El paquete no se puede aplicar: ${r.problems.join(" ")}` };
+    text = r.text; bindings = r.bindings; conditions = r.conditions;
+    changes.push(`Paquete de texto (${input.textPackage!.createdAt.slice(0, 10)}): ${r.changes.join(" ")}`);
+  }
 
   if (kinds.includes("paginas-datos") || kinds.includes("rotulos")) {
     const r = rebuildDataPages(text, snapshot, kinds.includes("paginas-datos"), kinds.includes("rotulos"));
@@ -184,7 +203,20 @@ export function buildProfileUpdate(input: ProfileUpdateInput): ProfileUpdateResu
     results = results.map(r => { const t = LEGACY_TOPIC[norm(r.topic)]; if (t && t !== r.topic) { retopic++; return { ...r, topic: t }; } return r; });
     if (retopic) changes.push(`${retopic} indicadores reasignados a las páginas del modelo nuevo.`);
   }
-  if (!changes.length || (text === base.text && results === base.results)) return { base, changes: [], blocked: "Los cambios elegidos no modifican este Perfil." };
+  if (kinds.includes("cifras-conclusiones") && snapshot) {
+    if (bindings?.length) {
+      const r = refreshBindings(text, bindings, snapshot);
+      text = r.text; bindings = r.bindings; flags.push(...r.flags);
+      if (r.changes.length) changes.push(`Cifras de las conclusiones actualizadas: ${r.changes.join(" ")}`);
+    }
+    if (conditions?.length) flags.push(...evaluateConditions(conditions, snapshot));
+    const marked = [...new Set(flags.map(f => f.target).filter(t => /^C\d+$/.test(t)))];
+    flags.push(...dependentRecommendations(text, marked));
+    if (flags.length) changes.push(`Para revisar: ${[...new Set(flags.map(f => f.target))].join(", ")}.`);
+    else if (bindings?.length || conditions?.length) changes.push("Las condiciones de las conclusiones se siguen cumpliendo.");
+  }
+  const linksChanged = bindings !== base.bindings || conditions !== base.conditions;
+  if (!changes.length || (text === base.text && results === base.results && !linksChanged && !flags.length)) return { base, changes: [], blocked: "Los cambios elegidos no modifican este Perfil." };
 
   const { from, to } = nextRevisionNumber(base.title);
   const title = to ? base.title.replace(/revisión\s+\d+\.\d+(?:\.\d+)?\s*·\s*\d{2}\/\d{2}\/\d{4}/i, `revisión ${to} · ${date}`) : `${base.title} · actualización ${date}`;
@@ -204,6 +236,9 @@ export function buildProfileUpdate(input: ProfileUpdateInput): ProfileUpdateResu
     text,
     results,
     limitations: [...base.limitations.filter(Boolean), note],
+    ...(bindings ? { bindings } : {}),
+    ...(conditions ? { conditions } : {}),
+    reviewFlags: flags,
   };
   return { base, profile, changes };
 }

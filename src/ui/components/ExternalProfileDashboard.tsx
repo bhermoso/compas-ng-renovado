@@ -13,6 +13,7 @@ import { ProfileOriginalVerifier } from './ProfileOriginalVerifier';
 import { TerritorialStatisticsPanel } from './TerritorialStatisticsPanel';
 import { ProfileUpdaterPanel, type ProfileUpdateOutcome } from './ProfileUpdaterPanel';
 import type { ProfileUpdateKind } from '../../application/health-profile/profileUpdater';
+import type { ProfileTextPackage } from '../../application/health-profile/profileTextOperations';
 import type { TerritorialStatisticsSnapshot } from '../../domain/territorial-statistics/TerritorialStatistics';
 import './ExternalProfileDashboard.css';
 
@@ -30,7 +31,7 @@ interface Props {
  territorialStatistics?: TerritorialStatisticsSnapshot[];
  onSaveTerritorialStatistics?: (snapshots: TerritorialStatisticsSnapshot[], onProgress?: (message: string) => void) => Promise<void>;
  updaterMunicipalities?: Array<{ id: string; name: string }>;
- onRunProfileUpdates?: (ids: string[], kinds: ProfileUpdateKind[], apply: boolean, onProgress: (message: string) => void) => Promise<ProfileUpdateOutcome[]>;
+ onRunProfileUpdates?: (ids: string[], kinds: ProfileUpdateKind[], apply: boolean, onProgress: (message: string) => void, textPackage?: ProfileTextPackage) => Promise<ProfileUpdateOutcome[]>;
 }
 const date = (s: string) => new Date(s).toLocaleDateString('es-ES', {day:'numeric',month:'short',year:'numeric'});
 const lines = (s: string) => s.split('\n').map(v => v.trim()).filter(Boolean);
@@ -307,6 +308,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
    <button className="ep-primary" type="button" disabled={busy} onClick={()=>fileInput.current?.click()}>Seleccionar el perfil</button>
    <p className="ep-help">Hasta 20 MB por archivo. Originales, texto, resultados y versiones se guardan en Firebase. El navegador es una caché.</p></div>
   </div>{statisticsPanel}</> : <>
+   {selected.reviewFlags && selected.reviewFlags.length > 0 && <div className="ep-review-flags" role="note"><strong>Para revisar en esta revisión</strong><ul>{selected.reviewFlags.map((f,i)=><li key={i}><b>{f.target}</b>: {f.reason}</li>)}</ul><small>Marcas del Actualizador de perfiles. No forman parte del texto publicado.</small></div>}
    <div className="ep-document-toolbar" aria-label="Acceso a archivos y versiones">
      <div className="ep-document-toolbar__top">
        <span><strong>Archivos y versiones</strong> · {selected.status==='validated'?'Validada':'En revisión'}{selected.archivedAt?' · Archivada':''}</span>

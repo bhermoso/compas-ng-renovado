@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import type { ExternalHealthProfile } from '../../domain/health-profile/ExternalHealthProfile';
 import { PROFILE_UPDATE_LABEL, type ProfileUpdateKind } from '../../application/health-profile/profileUpdater';
+import { parseTextPackage, type ProfileTextPackage } from '../../application/health-profile/profileTextOperations';
 
 export interface ProfileUpdateOutcome {
   id: string;
@@ -21,10 +22,11 @@ export interface ProfileUpdateOutcome {
 interface Props {
   municipalities: Array<{ id: string; name: string }>;
   currentId: string;
-  onRun: (ids: string[], kinds: ProfileUpdateKind[], apply: boolean, onProgress: (message: string) => void) => Promise<ProfileUpdateOutcome[]>;
+  onRun: (ids: string[], kinds: ProfileUpdateKind[], apply: boolean, onProgress: (message: string) => void, textPackage?: ProfileTextPackage) => Promise<ProfileUpdateOutcome[]>;
 }
 
-const KINDS: ProfileUpdateKind[] = ['rotulos', 'paginas-datos', 'indicadores'];
+const KINDS: ProfileUpdateKind[] = ['rotulos', 'paginas-datos', 'indicadores', 'cifras-conclusiones', 'paquete-texto'];
+const DEFAULT_KINDS: ProfileUpdateKind[] = ['rotulos', 'paginas-datos', 'indicadores', 'cifras-conclusiones'];
 const slug = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 function downloadPackage(o: ProfileUpdateOutcome) {
@@ -37,7 +39,9 @@ function downloadPackage(o: ProfileUpdateOutcome) {
 }
 
 export function ProfileUpdaterPanel({ municipalities, currentId, onRun }: Props) {
-  const [kinds, setKinds] = useState<ProfileUpdateKind[]>(KINDS);
+  const [kinds, setKinds] = useState<ProfileUpdateKind[]>(DEFAULT_KINDS);
+  const [pkg, setPkg] = useState<ProfileTextPackage>();
+  const [pkgName, setPkgName] = useState('');
   const [ids, setIds] = useState<string[]>([currentId]);
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState('');
@@ -49,7 +53,8 @@ export function ProfileUpdaterPanel({ municipalities, currentId, onRun }: Props)
   async function run(apply: boolean) {
     setBusy(true); setError(''); setApplied(false);
     try {
-      const out = await onRun(ids, kinds, apply, setProgress);
+      if (kinds.includes('paquete-texto') && !pkg) throw new Error('Elige el archivo del paquete de texto.');
+      const out = await onRun(ids, kinds, apply, setProgress, kinds.includes('paquete-texto') ? pkg : undefined);
       setPreview(out); setApplied(apply);
     } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
     finally { setBusy(false); }
@@ -64,6 +69,12 @@ export function ProfileUpdaterPanel({ municipalities, currentId, onRun }: Props)
       <fieldset className="pu-fieldset"><legend>Cambios</legend>
         {KINDS.map(k => <label key={k}><input type="checkbox" checked={kinds.includes(k)} disabled={busy} onChange={() => { setKinds(toggle(kinds, k)); setPreview(undefined); }}/> {PROFILE_UPDATE_LABEL[k]}</label>)}
       </fieldset>
+      {kinds.includes('paquete-texto') && <p className="ep-help"><label>Paquete de texto (compas-profile-text-package/v1): <input type="file" accept="application/json,.json" disabled={busy} onChange={async e => {
+        const f = e.target.files?.[0]; setPkg(undefined); setPkgName(''); setPreview(undefined);
+        if (!f) return;
+        try { const p = parseTextPackage(JSON.parse(await f.text())); setPkg(p); setPkgName(`${f.name} · ${p.entries.length} expedientes · ${p.note}`); }
+        catch (err) { setError(err instanceof Error ? err.message : String(err)); }
+      }}/></label>{pkgName && <small> {pkgName}</small>}</p>}
       <fieldset className="pu-fieldset"><legend>Expedientes</legend>
         <label><input type="checkbox" checked={ids.length === municipalities.length} disabled={busy} onChange={() => { setIds(ids.length === municipalities.length ? [currentId] : municipalities.map(m => m.id)); setPreview(undefined); }}/> Todos</label>
         {municipalities.map(m => <label key={m.id}><input type="checkbox" checked={ids.includes(m.id)} disabled={busy} onChange={() => { setIds(toggle(ids, m.id)); setPreview(undefined); }}/> {m.name}</label>)}
@@ -84,7 +95,7 @@ export function ProfileUpdaterPanel({ municipalities, currentId, onRun }: Props)
         <tbody>{preview.map(o => <tr key={o.id}>
           <td>{o.name}</td>
           <td>{o.blocked ? <em>{o.blocked}</em> : <>{o.title}<small>a partir de «{o.from}»{o.saved ? ' · guardada' : ''}</small></>}</td>
-          <td>{o.changes.length ? <ul className="pu-changes">{o.changes.map((c, i) => <li key={i}>{c}</li>)}</ul> : '—'}</td>
+          <td>{o.changes.length ? <ul className="pu-changes">{o.changes.map((c, i) => <li key={i}>{c}</li>)}</ul> : '—'}{o.profile?.reviewFlags?.length ? <ul className="pu-changes pu-flags">{o.profile.reviewFlags.map((f, i) => <li key={i}><strong>{f.target}</strong>: {f.reason}</li>)}</ul> : null}</td>
           <td>{o.profile ? <button type="button" onClick={() => downloadPackage(o)}>↓ JSON</button> : '—'}</td>
         </tr>)}</tbody>
       </table></div>
