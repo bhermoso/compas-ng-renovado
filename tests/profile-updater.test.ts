@@ -63,7 +63,7 @@ describe("actualizador de perfiles", () => {
     expect(r.profile).toMatchObject({ id: "nueva", revisionOf: "v082", status: "review", title: "Perfil de Salud Local de Alfacar · revisión 0.9.0 · 18/11/2026" });
     expect(r.profile!.validatedBy).toBeUndefined();
     expect(base.text).toBe(text);
-    expect(r.profile!.limitations.at(-1)).toMatch(/PDF original adjunto corresponde a la revisión 0\.8\.2/);
+    expect(r.profile!.limitations.at(-1)).toMatch(/con la estadística territorial descargada el 2026-11-18\. Esta revisión no tiene archivos originales adjuntos\./);
   });
 
   it("ordena las seis páginas, compila las de datos y conserva el texto del equipo y los anexos", () => {
@@ -155,5 +155,19 @@ describe("panel del actualizador", () => {
     const src = (await import("node:fs")).readFileSync("src/ui/components/ProfileUpdaterPanel.tsx", "utf8");
     expect(src).toContain("Object.keys(PROFILE_UPDATE_LABEL)");
     expect(src).toMatch(/DEFAULT_KINDS[^\n]*'campos-derivados'/);
+  });
+});
+
+describe("notas de limitaciones y archivos adjuntos", () => {
+  const att = { id: "a1", name: "Atarfe_PSL_v0_7_1_2026-11-17.pdf", size: 1, type: "application/pdf", uploadedAt: "", storagePath: "" } as never;
+  const p: ExternalHealthProfile = { ...base, id: "v081", title: "Perfil de Salud Local de Atarfe · revisión 0.8.1 · 18/11/2026", text: "2. Conclusiones\n\nC1. Una.\n\nReferencias\n\n1. Informe.", findings: ["C1. Una."],
+    attachmentIds: ["a1"], limitations: ["Revisión 0.8.1 generada por el Actualizador de perfiles el 18/11/2026 con la estadística territorial descargada el 2026-11-18. El PDF original adjunto corresponde a la revisión 0.8.0 y no contiene estos cambios."] };
+  it("la corrección nombra los archivos adjuntos en lugar de un número de revisión", () => {
+    const r = buildProfileUpdate({ library: { profiles: [p], attachments: [att], activeId: "v081" }, kinds: ["campos-derivados"], author: "B", now: new Date("2026-11-18T17:00:00Z"), newId: () => "c" });
+    expect(r.blocked).toBeUndefined();
+    expect(r.profile!.title).toContain("revisión 0.8.2");
+    expect(r.profile!.limitations[0]).toContain("Los archivos originales adjuntos (Atarfe_PSL_v0_7_1_2026-11-17.pdf) no contienen estos cambios.");
+    expect(r.profile!.limitations.join(" ")).not.toMatch(/corresponde a la revisión/);
+    expect(r.profile!.limitations.at(-1)).toBe("Revisión 0.8.2 generada por el Actualizador de perfiles el 18/11/2026. Los archivos originales adjuntos (Atarfe_PSL_v0_7_1_2026-11-17.pdf) no contienen estos cambios.");
   });
 });
