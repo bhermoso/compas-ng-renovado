@@ -65,38 +65,54 @@ export function revisionResults(snapshot: TerritorialStatisticsSnapshot, catalog
 
 // ── Cobertura frente al Perfil vigente ───────────────────────────────────────
 
-export type CoverageStatus = "ausente" | "actualizable" | "al-dia" | "revisar-valor" | "sin-dato";
+export type CoverageStatus = "ausente" | "actualizable" | "al-dia" | "revisar-valor" | "otro-periodo" | "otra-medida" | "sin-dato";
 
 export interface CoverageRow {
   indicatorId: string;
   title: string;
   domain: IndicatorDomain;
   status: CoverageStatus;
-  downloaded?: { literal: string; period: string };
-  inProfile?: { title: string; value: string; period: string };
+  /** Valor descargado en la misma escala que el resultado del Perfil (municipio o sección). */
+  downloaded?: { literal: string; period: string; territory: string };
+  inProfile?: { title: string; value: string; unit: string; period: string; scale?: string };
 }
 
-function parseEs(value: string): number | null {
+function parseEs(value: string): { n: number; decimals: number } | null {
   const m = value.replace(/\s/g, "").match(/-?[\d.]*\d(,\d+)?/);
   if (!m) return null;
   const n = Number(m[0].replace(/\./g, "").replace(",", "."));
-  return Number.isFinite(n) ? n : null;
+  return Number.isFinite(n) ? { n, decimals: m[1] ? m[1].length - 1 : 0 } : null;
 }
 const yearOf = (s: string) => Number((s.match(/(19|20)\d{2}(?!.*(19|20)\d{2})/) ?? [""])[0]) || 0;
+const decimalsOf = (literal: string) => { const m = literal.match(/,(\d+)/); return m ? m[1].length : 0; };
 
+/**
+ * Compara cada indicador del catálogo con el resultado del Perfil vigente que lo
+ * recoge, en la misma escala: si el Perfil da el dato de una sección censal, se
+ * compara con esa sección. Dos valores que coinciden al redondearlos a la menor
+ * precisión de ambos se consideran iguales.
+ */
 export function profileCoverage(snapshot: TerritorialStatisticsSnapshot, profile?: Pick<ExternalHealthProfile, "results">, catalog: IndicatorFicha[] = TERRITORIAL_INDICATORS): CoverageRow[] {
   return catalog.map(ficha => {
-    const local = municipalObservation(snapshot, ficha.id) ?? snapshot.observations.find(o => o.indicatorId === ficha.id);
     const re = new RegExp(ficha.profileMatch, "i");
     const found = profile?.results.find(r => re.test(r.title));
+    const section = found?.scale?.match(/\b(\d{10})\b/)?.[1];
+    const all = snapshot.observations.filter(o => o.indicatorId === ficha.id);
+    const local = section ? all.find(o => o.territoryCode === section) : all.find(o => o.level === "municipio") ?? all.find(o => o.level === "seccion");
     const row: CoverageRow = { indicatorId: ficha.id, title: ficha.title, domain: ficha.domain, status: "sin-dato" };
-    if (local) row.downloaded = { literal: local.level === "municipio" ? local.literal : "Por sección censal", period: local.period };
-    if (found) row.inProfile = { title: found.title, value: found.value, period: found.period };
-    if (!local) row.status = "sin-dato";
-    else if (!found) row.status = "ausente";
-    else if (yearOf(found.period) && yearOf(local.period) > yearOf(found.period)) row.status = "actualizable";
-    else if (local.level === "municipio" && local.value !== null && parseEs(found.value) !== null && Math.abs(parseEs(found.value)! - local.value) > 1e-9) row.status = "revisar-valor";
-    else row.status = "al-dia";
+    if (local) row.downloaded = { literal: local.level === "municipio" || section ? local.literal : "Por sección censal", period: local.period, territory: local.level === "seccion" ? `sección ${local.territoryCode}` : local.territoryName };
+    if (found) row.inProfile = { title: found.title, value: found.value, unit: found.unit, period: found.period, scale: found.scale };
+    if (!local) return row;
+    if (!found) { row.status = "ausente"; return row; }
+    const py = yearOf(found.period), dy = yearOf(local.period);
+    if (py && dy > py) { row.status = "actualizable"; return row; }
+    if (py && py > dy) { row.status = "otro-periodo"; return row; }
+    if ((ficha.unit === "%") !== /%/.test(`${found.unit} ${found.value}`)) { row.status = "otra-medida"; return row; }
+    const p = parseEs(found.value);
+    if (local.value === null || !p) { row.status = "al-dia"; return row; }
+    const d = Math.min(p.decimals, decimalsOf(local.literal));
+    const round = (x: number) => Math.round(x * 10 ** d) / 10 ** d;
+    row.status = round(p.n) === round(local.value) ? "al-dia" : "revisar-valor";
     return row;
   });
 }
