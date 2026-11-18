@@ -204,6 +204,20 @@ describe("paquete para la revisión", () => {
     expect(c["adrh-gini"]).toBe("sin-dato");
   });
 
+  it("cobertura en la misma escala que el Perfil: sección, periodo posterior y otra medida", async () => {
+    const s = await snapshotAlfacar();
+    const profile = { results: [
+      { id: "1", title: "Educación superior", value: "6,0", unit: "%", source: "INE", page: "", period: "2024", caution: "", scale: "Sección censal 1801101001" },
+      { id: "2", title: "Renta neta media por persona", value: "13.000", unit: "€", source: "INE", page: "", period: "2025", caution: "" },
+      { id: "3", title: "Tasa municipal de desempleo registrado", value: "415", unit: "personas", source: "IECA", page: "", period: "2025", caution: "" },
+    ] };
+    const c = Object.fromEntries(profileCoverage(s, profile).map(x => [x.indicatorId, x]));
+    // Sección 1801101001 en la descarga: secreto en el denominador, sin valor numérico.
+    expect(c["censo-estudios-superiores"].downloaded?.territory).toBe("sección 1801101001");
+    expect(c["adrh-renta-neta-persona"].status).toBe("otro-periodo");
+    expect(c["ieca-tasa-desempleo-registrado"].status).toBe("otra-medida");
+  });
+
   it("CSV de procedencia y de secciones con separador «;»", async () => {
     const s = await snapshotAlfacar();
     const prov = provenanceCsv(s);

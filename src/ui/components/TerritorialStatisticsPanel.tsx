@@ -28,6 +28,8 @@ const STATUS_LABEL: Record<CoverageStatus, string> = {
   actualizable: 'Hay un dato más reciente',
   'al-dia': 'Al día',
   'revisar-valor': 'Mismo periodo, valor distinto',
+  'otro-periodo': 'El Perfil usa un periodo posterior',
+  'otra-medida': 'El Perfil usa otra medida',
   'sin-dato': 'Sin dato descargado',
 };
 
@@ -137,13 +139,13 @@ export function TerritorialStatisticsPanel({ municipalityId, municipalityName, i
 
       <section className="tsp-block">
         <h3>Cobertura frente al Perfil vigente</h3>
-        <p className="ep-help">{activeProfile ? `Comparado con «${activeProfile.title}». La coincidencia se busca por el nombre del indicador; conviene comprobarla.` : 'El expediente no tiene Perfil vigente: todos los indicadores figuran como ausentes.'}</p>
+        <p className="ep-help">{activeProfile ? `Comparado con «${activeProfile.title}». La coincidencia se busca por el nombre del indicador y se compara en la misma escala: si el Perfil da el dato de una sección, con esa sección. Conviene comprobarla.` : 'El expediente no tiene Perfil vigente: todos los indicadores figuran como ausentes.'}</p>
         <div className="tsp-scroll"><table className="tsp-table">
           <thead><tr><th>Indicador</th><th>Descargado</th><th>En el Perfil vigente</th><th>Estado</th></tr></thead>
           <tbody>{coverage.map(c => <tr key={c.indicatorId} data-status={c.status}>
             <td>{c.title}</td>
-            <td>{c.downloaded ? `${c.downloaded.literal} (${c.downloaded.period})` : '—'}</td>
-            <td>{c.inProfile ? `${c.inProfile.value} (${c.inProfile.period || 'periodo no declarado'})` : '—'}</td>
+            <td>{c.downloaded ? `${c.downloaded.literal} (${c.downloaded.period})` : '—'}{c.downloaded && c.inProfile ? <small>{c.downloaded.territory}</small> : null}</td>
+            <td>{c.inProfile ? <>{`${c.inProfile.value} ${c.inProfile.unit} (${c.inProfile.period || 'periodo no declarado'})`}<small>«{c.inProfile.title}»{c.inProfile.scale ? ` · ${c.inProfile.scale}` : ''}</small></> : '—'}</td>
             <td>{STATUS_LABEL[c.status]}</td>
           </tr>)}</tbody>
         </table></div>
