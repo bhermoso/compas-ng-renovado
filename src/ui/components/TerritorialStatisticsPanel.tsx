@@ -184,7 +184,7 @@ export function TerritorialStatisticsPanel({ municipalityId, municipalityName, i
             <tbody>{rows.map(r => <tr key={r.id}>
               <td>{r.title}<small>{r.caution}</small></td>
               <td className="tsp-num">{r.value} <span>{r.unit}</span></td>
-              <td>{r.comparisons?.map(c => `${c.label}: ${c.value.toLocaleString('es-ES', { maximumFractionDigits: 10 })}`).join(' · ') || 'No publicados'}</td>
+              <td>{r.comparisons?.map(c => `${c.label}: ${c.value.toLocaleString('es-ES', { maximumFractionDigits: 10 })}`).join(' · ') || (TERRITORIAL_INDICATORS.find(f => `ts-${f.id}` === r.id)?.comparators.length ? 'No publicados' : 'No se compara')}</td>
               <td>{r.period}</td>
               <td><small>{r.source} · {r.page}</small></td>
             </tr>)}</tbody>
