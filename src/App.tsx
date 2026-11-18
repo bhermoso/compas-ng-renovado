@@ -451,6 +451,19 @@ export default function App() {
   const [remotePersistenceMessage, setRemotePersistenceMessage] =
     useState<string | null>(null);
   const [showMunicipalitySelector, setShowMunicipalitySelector] = useState(false);
+  // La barra de navegación es fija, pero el selector de ámbito se abre al principio
+  // de la vista: si la página está desplazada, se lleva el selector a la vista,
+  // justo debajo de la barra.
+  useEffect(() => {
+    if (!showMunicipalitySelector) return;
+    const frame = requestAnimationFrame(() => {
+      const selector = document.querySelector<HTMLElement>(".municipality-selector");
+      if (!selector) return;
+      const navBottom = document.querySelector(".app-nav")?.getBoundingClientRect().bottom ?? 0;
+      window.scrollTo({ top: Math.max(0, window.scrollY + selector.getBoundingClientRect().top - navBottom - 8) });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [showMunicipalitySelector]);
   const [municipalityToDelete, setMunicipalityToDelete] = useState<CreateMunicipalityContextInput | null>(null);
   const [isThematicModalOpen, setIsThematicModalOpen] = useState(false);
   const [initialCustomMunicipalities] = useState<CreateMunicipalityContextInput[]>(
