@@ -1,7 +1,7 @@
 # CONTRACT-PROFILE-UPDATER
 
 > Actualizador de perfiles: aplicar un cambio declarado a cualquier expediente
-> Versión 1.1.0 — 2026-11-18
+> Versión 1.2.0 — 2026-11-18
 > Estado: VIGENTE
 >
 > Implementación: `src/application/health-profile/profileUpdater.ts`,
@@ -87,9 +87,24 @@ expediente de forma reproducible.
 4. El paquete se aplica con el actualizador, como cualquier otro cambio, y produce
    una revisión en revisión.
 
+## 8. Campos del paquete derivados del texto
+
+1. El resumen, las conclusiones y las recomendaciones del paquete del Perfil
+   (`summary`, `findings`, `areas`) se derivan del texto: el resumen es la lectura de
+   conjunto; las conclusiones, los párrafos «Cn.»; las recomendaciones, los bloques
+   «Rn.» con su tipo y su «Fundamento». Se conserva la forma del título de las
+   recomendaciones del Perfil de partida.
+2. Cada vez que un cambio modifica el texto, el actualizador rehace esos campos en la
+   misma revisión. Un paquete cuyo texto y cuyos campos describen revisiones
+   distintas no es un estado válido.
+3. El cambio «Resumen, conclusiones y recomendaciones del paquete a partir del texto»
+   corrige un Perfil cuyos campos no siguen a su texto. Como el texto no cambia,
+   produce una revisión de corrección: sube solo el último número («0.9.0» → «0.9.1»).
+
 ## Registro de revisiones
 
 | Fecha | Versión | Cambio | Responsable |
 |---|---|---|---|
+| 2026-11-18 | 1.2.0 | §8 campos del paquete derivados del texto y revisión de corrección. Origen: las revisiones de Atarfe, Loja y Zagra del 18/11/2026 conservaban el resumen, las conclusiones y las recomendaciones de la revisión anterior | COMPÁS NG |
 | 2026-11-18 | 1.1.0 | §6 cifras enlazadas y condiciones de las conclusiones (capa 2); §7 paquete de texto redactado fuera de COMPÁS (capa 3). Decisión del autor: «de momento capas 2 y 3» | COMPÁS NG |
 | 2026-11-18 | 1.0.0 | Creación. Encargo del autor: «necesito poder aplicar cualquier cambio a cualquier expediente»; actualizador dentro de COMPÁS | COMPÁS NG |

@@ -108,3 +108,44 @@ describe("actualizador de perfiles", () => {
     expect(buildProfileUpdate({ library, snapshots: [], kinds: ["paginas-datos"], author: "", now: new Date(), newId: () => "x" }).blocked).toMatch(/descarga/);
   });
 });
+
+describe("campos del paquete derivados del texto (CONTRACT-PROFILE-UPDATER §8)", () => {
+  const body = [
+    "2. Conclusiones", "Una lectura de conjunto", "Primera lectura.", "Segunda lectura.",
+    "C1. Conclusión uno.", "C2. Conclusión dos.",
+    "5. Recomendaciones", "R1. Cuidados", "Abordar. Valorar apoyos.", "Fundamento: C1, C2.",
+    "7. Autoría y revisión", "Perfil elaborado por el equipo.", "Referencias", "1. Informe.",
+  ].join("\n\n");
+  const stale: ExternalHealthProfile = { ...base, id: "v040", title: "Perfil de Salud Local de Zagra · revisión 0.4.0 · 18/11/2026", period: "Revisión 0.4.0 · 18/11/2026",
+    text: body, summary: "Lectura anterior que ya no está en el texto.", findings: ["C1. Conclusión uno."],
+    areas: [{ id: "R1", title: "R1. Cuidados. Valorar apoyos.", rationale: "Abordar · Deriva de C1" }] };
+  const fix = () => buildProfileUpdate({ library: { profiles: [stale], attachments: [], activeId: "v040" }, kinds: ["campos-derivados"], author: "B", now: new Date("2026-11-18T15:00:00Z"), newId: () => "corr" });
+
+  it("una corrección sin cambio de texto sube solo el número de corrección", () => {
+    expect(nextRevisionNumber("Perfil · revisión 0.9.0 · 18/11/2026", true)).toEqual({ from: "0.9.0", to: "0.9.1" });
+    const r = fix();
+    expect(r.blocked).toBeUndefined();
+    expect(r.profile!.title).toBe("Perfil de Salud Local de Zagra · revisión 0.4.1 · 18/11/2026");
+    expect(r.profile!.text).toContain("Revisión 0.4.1, 18/11/2026");
+  });
+
+  it("rehace resumen, conclusiones y recomendaciones desde el texto", () => {
+    const p = fix().profile!;
+    expect(p.summary).toBe("Primera lectura.\n\nSegunda lectura.");
+    expect(p.findings).toEqual(["C1. Conclusión uno.", "C2. Conclusión dos."]);
+    expect(p.areas).toEqual([{ id: "R1", title: "R1. Cuidados. Valorar apoyos.", rationale: "Abordar · Deriva de C1, C2" }]);
+    expect(stale.findings).toEqual(["C1. Conclusión uno."]);
+  });
+
+  it("conserva el título breve de las recomendaciones si el Perfil lo usaba", () => {
+    const short = { ...stale, areas: [{ id: "R1", title: "R1. Valorar apoyos.", rationale: "Abordar · Deriva de C1" }] };
+    const r = buildProfileUpdate({ library: { profiles: [short], attachments: [], activeId: "v040" }, kinds: ["campos-derivados"], author: "B", now: new Date("2026-11-18T15:00:00Z"), newId: () => "corr" });
+    expect(r.profile!.areas[0].title).toBe("R1. Valorar apoyos.");
+  });
+
+  it("no crea revisión si los campos ya siguen al texto", () => {
+    const p = fix().profile!;
+    const r = buildProfileUpdate({ library: { profiles: [p], attachments: [], activeId: p.id }, kinds: ["campos-derivados"], author: "B", now: new Date("2026-11-18T16:00:00Z"), newId: () => "otra" });
+    expect(r.blocked).toBe("Los cambios elegidos no modifican este Perfil.");
+  });
+});

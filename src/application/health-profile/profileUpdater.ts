@@ -13,10 +13,10 @@ import { latestSnapshot } from "../territorial-statistics/snapshots";
 import { mergeTerritorialResults, REVISION_TOPIC } from "../territorial-statistics/revisionPackage";
 import { COMPILED_CONTEXT_MARK, compileDataPages } from "../territorial-statistics/compiledDataPages";
 import { DATA_PAGE_HEADINGS } from "./profileStructure";
-import { applyTextPackage, dependentRecommendations, evaluateConditions, refreshBindings, type ProfileTextPackage } from "./profileTextOperations";
+import { applyTextPackage, dependentRecommendations, deriveProfileFields, evaluateConditions, refreshBindings, type ProfileTextPackage } from "./profileTextOperations";
 import type { ProfileBinding, ProfileCondition, ProfileReviewFlag } from "../../domain/health-profile/ExternalHealthProfile";
 
-export type ProfileUpdateKind = "paginas-datos" | "indicadores" | "rotulos" | "cifras-conclusiones" | "paquete-texto";
+export type ProfileUpdateKind = "paginas-datos" | "indicadores" | "rotulos" | "cifras-conclusiones" | "paquete-texto" | "campos-derivados";
 
 export const PROFILE_UPDATE_LABEL: Record<ProfileUpdateKind, string> = {
   rotulos: "Rótulos y temas del modelo de determinantes sociales (contrato 2.5.0)",
@@ -24,6 +24,7 @@ export const PROFILE_UPDATE_LABEL: Record<ProfileUpdateKind, string> = {
   indicadores: "Indicadores de la descarga en los resultados del Perfil",
   "cifras-conclusiones": "Cifras enlazadas de las conclusiones y comprobación de sus condiciones",
   "paquete-texto": "Texto del cuerpo desde un paquete redactado fuera de COMPÁS",
+  "campos-derivados": "Resumen, conclusiones y recomendaciones del paquete a partir del texto",
 };
 
 export interface ProfileUpdateInput {
@@ -53,11 +54,15 @@ const LEGACY_TOPIC: Record<string, string> = {
 const norm = (s: string | undefined) => (s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
 const dmy = (d: Date) => `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
 
-/** Siguiente número de revisión: sube la versión menor («0.8.2» → «0.9.0»). */
-export function nextRevisionNumber(title: string): { from?: string; to?: string } {
+/**
+ * Siguiente número de revisión: sube la versión menor («0.8.2» → «0.9.0»); una
+ * corrección que no cambia el texto sube solo la de corrección («0.9.0» → «0.9.1»).
+ */
+export function nextRevisionNumber(title: string, correction = false): { from?: string; to?: string } {
   const m = /revisión\s+(\d+)\.(\d+)(?:\.(\d+))?/i.exec(title);
   if (!m) return {};
-  return { from: m[0].replace(/^revisión\s+/i, ""), to: `${m[1]}.${Number(m[2]) + 1}.0` };
+  const from = m[0].replace(/^revisión\s+/i, "");
+  return { from, to: correction ? `${m[1]}.${m[2]}.${Number(m[3] ?? 0) + 1}` : `${m[1]}.${Number(m[2]) + 1}.0` };
 }
 
 type Page = "cover" | "contexto" | "ejes" | "condiciones" | "servicios" | "salud";
@@ -215,10 +220,20 @@ export function buildProfileUpdate(input: ProfileUpdateInput): ProfileUpdateResu
     if (flags.length) changes.push(`Para revisar: ${[...new Set(flags.map(f => f.target))].join(", ")}.`);
     else if (bindings?.length || conditions?.length) changes.push("Las condiciones de las conclusiones se siguen cumpliendo.");
   }
+  // Resumen, conclusiones y recomendaciones del paquete siguen al texto (CONTRACT-PROFILE-UPDATER §8).
+  let derived: { summary: string; findings: string[]; areas: ExternalHealthProfile["areas"] } = { summary: base.summary, findings: base.findings, areas: base.areas };
+  if (text !== base.text || kinds.includes("campos-derivados")) {
+    const d = deriveProfileFields(text, base.areas);
+    const next = { summary: d.summary ?? base.summary, findings: d.findings.length ? d.findings : base.findings, areas: d.areas.length ? d.areas : base.areas };
+    const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+    const touched = [!same(next.summary, base.summary) ? "resumen (lectura de conjunto)" : "", !same(next.findings, base.findings) ? `conclusiones (${next.findings.length})` : "", !same(next.areas, base.areas) ? `recomendaciones (${next.areas.length})` : ""].filter(Boolean);
+    if (touched.length) { derived = next; changes.push(`Campos del paquete derivados del texto: ${touched.join(", ")}.`); }
+  }
+  const derivedChanged = derived.summary !== base.summary || derived.findings !== base.findings || derived.areas !== base.areas;
   const linksChanged = bindings !== base.bindings || conditions !== base.conditions;
-  if (!changes.length || (text === base.text && results === base.results && !linksChanged && !flags.length)) return { base, changes: [], blocked: "Los cambios elegidos no modifican este Perfil." };
+  if (!changes.length || (text === base.text && results === base.results && !linksChanged && !flags.length && !derivedChanged)) return { base, changes: [], blocked: "Los cambios elegidos no modifican este Perfil." };
 
-  const { from, to } = nextRevisionNumber(base.title);
+  const { from, to } = nextRevisionNumber(base.title, text === base.text && results === base.results && !linksChanged);
   const title = to ? base.title.replace(/revisión\s+\d+\.\d+(?:\.\d+)?\s*·\s*\d{2}\/\d{2}\/\d{4}/i, `revisión ${to} · ${date}`) : `${base.title} · actualización ${date}`;
   text = bumpCoverRevision(text, from, to, date);
   text = appendAuthorship(text, `Revisión ${to ?? "actualizada"}, ${date}, generada con el Actualizador de perfiles de COMPÁS a partir de la revisión ${from ?? "anterior"}: ${changes.join(" ")} El resto del texto no cambia. Pendiente de revisión técnica.`);
@@ -235,6 +250,9 @@ export function buildProfileUpdate(input: ProfileUpdateInput): ProfileUpdateResu
     period: base.period.replace(/Revisión\s+\d+\.\d+(?:\.\d+)?\s*·\s*\d{2}\/\d{2}\/\d{4}/i, `Revisión ${to ?? ""} · ${date}`),
     text,
     results,
+    summary: derived.summary,
+    findings: derived.findings,
+    areas: derived.areas,
     limitations: [...base.limitations.filter(Boolean), note],
     ...(bindings ? { bindings } : {}),
     ...(conditions ? { conditions } : {}),
