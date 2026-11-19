@@ -4085,6 +4085,7 @@ export default function App() {
               canWrite={documentWriteAllowed}
               persistence={remotePersistenceMessage ?? ""}
               onOpenUploader={() => document.getElementById("document-review-title")?.scrollIntoView({behavior:"smooth",block:"start"})}
+              onOpenAssetValidations={() => { toggleDiagnosisModule("documents", true); requestAnimationFrame(() => document.getElementById("diag-mod-documents")?.scrollIntoView({behavior:"smooth",block:"start"})); }}
             />
 
             {/* ── Originales en el expediente compartido ── */}
