@@ -18,13 +18,15 @@ export interface ProfileUpdateOutcome {
   title?: string;
   profile?: ExternalHealthProfile;
   delta?: ProfileUpdateDelta;
+  /** Snapshot exacto de la revisión de partida, para rechazar cambios entre vista previa y guardado. */
+  baseline?: string;
   saved?: boolean;
 }
 
 interface Props {
   municipalities: Array<{ id: string; name: string }>;
   currentId: string;
-  onRun: (ids: string[], kinds: ProfileUpdateKind[], apply: boolean, onProgress: (message: string) => void, textPackage?: ProfileTextPackage) => Promise<ProfileUpdateOutcome[]>;
+  onRun: (ids: string[], kinds: ProfileUpdateKind[], apply: boolean, onProgress: (message: string) => void, textPackage?: ProfileTextPackage, expectedBaselines?: Record<string,string>) => Promise<ProfileUpdateOutcome[]>;
 }
 
 const KINDS = Object.keys(PROFILE_UPDATE_LABEL) as ProfileUpdateKind[];
@@ -56,7 +58,8 @@ export function ProfileUpdaterPanel({ municipalities, currentId, onRun }: Props)
     setBusy(true); setError(''); setApplied(false);
     try {
       if (kinds.includes('paquete-texto') && !pkg) throw new Error('Elige el archivo del paquete de texto.');
-      const out = await onRun(ids, kinds, apply, setProgress, kinds.includes('paquete-texto') ? pkg : undefined);
+      const expectedBaselines = apply ? Object.fromEntries((preview ?? []).filter(o=>o.profile&&o.baseline).map(o=>[o.id,o.baseline!])) : undefined;
+      const out = await onRun(ids, kinds, apply, setProgress, kinds.includes('paquete-texto') ? pkg : undefined, expectedBaselines);
       setPreview(out); setApplied(apply);
     } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
     finally { setBusy(false); }
