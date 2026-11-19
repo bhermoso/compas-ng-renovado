@@ -3396,7 +3396,6 @@ export default function App() {
       const doc = prev.repository.documents.find((d) => d.id === documentId);
       const municipalityId = prev.municipality.identity.id;
       const deletesHealthReport = doc?.kind === "health-report" && prev.healthReport?.linkedDocumentId === documentId;
-      const deletesCommunityAssets = doc?.kind === "community-asset";
       const deletesIBSE = isIBSEDocument(doc);
       const deletesDUKE = isDUKEDocument(doc);
       const deletesPREDIMED = isPREDIMEDDocument(doc);
@@ -3427,7 +3426,6 @@ export default function App() {
               if (atom.municipalityId !== municipalityId) return true;
               if (atom.provenance.documentId === documentId) return false;
               if (deletesHealthReport && atom.provenance.origin === "health-report") return false;
-              if (deletesCommunityAssets && atom.provenance.origin === "community-assets") return false;
               if (deletesIBSE && atom.provenance.origin === "ibse") return false;
               if (
                 deletesDUKE &&
