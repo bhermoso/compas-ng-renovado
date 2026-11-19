@@ -59,7 +59,7 @@ export function DocumentationProvider({ workspace, children, canWrite = false, o
       ? workspace.healthReport
       : workspace.previousHealthReports?.find(r => r.linkedDocumentId === selected.id)
   );
-  return <DocumentOriginalManagementContext.Provider value={canWrite && onStoreOriginal && onCreateRevision && onArchiveDocument && onDeleteDocument ? { municipalityId: workspace.municipality.identity.id, originals: workspace.documentOriginals ?? [], derivatives: workspace.documentDerivedFiles ?? [], storeDerivative: onStoreDerivative, storeOriginal: onStoreOriginal, createRevision: onCreateRevision, archiveDocument: onArchiveDocument, deleteDocument: onDeleteDocument } : null}><DocumentationContext.Provider value={open}>
+  return <DocumentOriginalManagementContext.Provider value={{ municipalityId: workspace.municipality.identity.id, originals: workspace.documentOriginals ?? [], derivatives: workspace.documentDerivedFiles ?? [], storeDerivative: canWrite ? onStoreDerivative : undefined, storeOriginal: canWrite ? onStoreOriginal : undefined, createRevision: canWrite ? onCreateRevision : undefined, archiveDocument: canWrite ? onArchiveDocument : undefined, deleteDocument: canWrite ? onDeleteDocument : undefined }}><DocumentationContext.Provider value={open}>
     {children}
     <button type="button" className="documentation-launcher" onClick={() => open(null)}>Consultar documentación ({documents.length})</button>
     <dialog ref={dialog} className="documentation-dialog" aria-labelledby="documentation-title">
