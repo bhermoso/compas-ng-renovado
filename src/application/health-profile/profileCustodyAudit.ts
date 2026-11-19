@@ -5,7 +5,7 @@
 import type { ExternalHealthProfile, ExternalProfileLibrary } from "../../domain/health-profile/ExternalHealthProfile";
 
 const revision = (s: string) => /\brevisi[oó]n\s+(\d+\.\d+(?:\.\d+)?)/i.exec(s)?.[1];
-const fileRevision = (s: string) => /\bv(\d+)[._-](\d+)(?:[._-](\d+))?/i.exec(s)?.slice(1).filter(Boolean).join(".");
+const fileRevision = (s: string) => /(?:^|[_\s-])v(\d+)[._-](\d+)(?:[._-](\d+))?/i.exec(s)?.slice(1).filter(Boolean).join(".");
 
 export interface ProfileCustodyAudit {
   declaredRevisions: string[];
