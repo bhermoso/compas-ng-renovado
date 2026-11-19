@@ -43,7 +43,8 @@
   align-items: end;
   gap: 0 40px;
 }
-.hp-cover__chain { grid-area: chain; }
+.hp-cover__context { grid-area: chain; display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:4px 16px; margin-bottom:clamp(4px,1vh,14px); }
+.hp-cover__chain { grid-area: auto; }
 .hp-cover__brand { grid-area: brand; }
 .hp-cover__side { grid-area: side; }
 
@@ -252,4 +253,39 @@
 
 @media (prefers-reduced-motion: reduce) {
   .hp * { transition: none; }
+}
+
+/* El ámbito cargado no debe quedar oculto mientras la portada muestra su expediente. */
+.hp-cover__context .hp-cover__chain { margin:0; }
+.hp-cover__municipality {
+  display:flex;
+  align-items:baseline;
+  gap:5px;
+  flex-wrap:wrap;
+  color:var(--texto-secundario);
+  font-size:12px;
+}
+.hp-cover__municipality-label {
+  font-size:10px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--texto-terciario);
+  margin-right:4px;
+}
+.hp-cover__municipality strong { color:var(--texto-principal);font-size:14px; }
+.hp-cover__municipality button {
+  border:0;
+  border-bottom:1px solid var(--azul);
+  border-radius:0;
+  background:transparent;
+  color:var(--azul);
+  font:inherit;
+  font-weight:600;
+  cursor:pointer;
+  padding:4px;
+  margin-left:4px;
+}
+.hp-cover__municipality button:focus-visible {outline:2px solid var(--azul);outline-offset:2px}
+@media (max-width:760px) {
+ .hp-cover__context {align-items:flex-start;flex-direction:column}
 }

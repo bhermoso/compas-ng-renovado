@@ -1,0 +1,44 @@
+import { describe, expect, it } from "vitest";
+import { renderToStaticMarkup } from "react-dom/server";
+import { HomePortada } from "../src/ui/components/HomePortada";
+import { ProfileResultsDashboard } from "../src/ui/components/ProfileResultsDashboard";
+import type { ExternalHealthProfile } from "../src/domain/health-profile/ExternalHealthProfile";
+import { readFileSync } from "node:fs";
+
+describe("Portada municipal e indicadores compactos", () => {
+  it("identifica con nombre y código el expediente activo, con selector funcional enlazable", () => {
+    const html = renderToStaticMarkup(<HomePortada onNavigate={()=>{}} municipality={{name:"Loja",province:"Granada",ineCode:"18122"}} onChangeMunicipality={()=>{}}/>);
+    expect(html).toContain("Expediente cargado");
+    expect(html).toContain("Loja");
+    expect(html).toContain("Granada");
+    expect(html).toContain("INE 18122");
+    expect(html).toContain("Cambiar ámbito");
+  });
+  it("muestra indicadores como filas con título, valor, periodo, fuente y detalle completo", () => {
+    const profile = {
+      id:"loja", municipalityId:"loja", status:"review", title:"Perfil Loja", summary:"",
+      findings:[],areas:[],limitations:[],text:"",
+      results:[{
+        id:"renta", title:"Mediana de renta por unidad de consumo",
+        value:"15.750",unit:"€/unidad de consumo/año",period:"2024",
+        source:"INE",page:"tabla 31025; referentes provincial y autonómico: tabla 53689 · CUMUN 18122; https://www.ine.es/jaxiT3/Tabla.htm?t=31025",
+        topic:"Determinantes sociales",caution:"Sexo total salvo hombres y mujeres"
+      }],
+    } as ExternalHealthProfile;
+    const html=renderToStaticMarkup(<ProfileResultsDashboard profile={profile} municipalityName="Loja"/>);
+    expect(html).toContain("epd-row__single");
+    expect(html).toContain("Mediana de renta por unidad de consumo");
+    expect(html).toContain("15.750");
+    expect(html).toContain("2024");
+    expect(html).toContain("INE");
+    expect(html).toContain("tabla 53689");
+    expect(html).toContain("Consultar fuente oficial");
+    expect(html).toContain("https://www.ine.es/jaxiT3/Tabla.htm?t=31025");
+  });
+  it("conserva la fila única en escritorio y el reflujo sin perder detalles en móvil", () => {
+    const css=readFileSync(new URL("../src/ui/components/ExternalProfileDashboard.css",import.meta.url),"utf8");
+    expect(css).toContain("grid-template-columns: minmax(180px, 2fr)");
+    expect(css).toContain(".epd-row__details[open]");
+    expect(css).toContain("@media (max-width: 760px)");
+  });
+});

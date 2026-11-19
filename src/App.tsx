@@ -4024,7 +4024,7 @@ export default function App() {
         )}
 
         {/* ── ① Inicio — Portada institucional de COMPÁS, en una sola pantalla */}
-        {view === "inicio" && <HomePortada onNavigate={(v) => setView(v)} />}
+        {view === "inicio" && <HomePortada onNavigate={(v) => setView(v)} municipality={{name:municipality.name, province:municipality.province, ineCode:municipality.ineCode}} onChangeMunicipality={() => setShowMunicipalitySelector(v => !v)} />}
 
         {/* ── ② Repositorio documental ─────────────────────── */}
         {view === "repositorio" && (
