@@ -3896,6 +3896,8 @@ export default function App() {
             };
           })()}
           agendaCount={workspace.agendaActuations?.length ?? 0}
+          validatedPlanPresent={(workspace.validatedActionPlans ?? []).some((plan) => plan.municipalityId === municipality.id && plan.status === "validated")}
+          planWorkInProgress={(workspace.actionPlanModuleReviews?.length ?? 0) > 0 || (workspace.planPreparationDrafts?.length ?? 0) > 0}
           currentView={view}
           onNavigate={(v) => { setAgendaFocusId(undefined); setView(v as AppView); window.scrollTo({ top: 0, behavior: "auto" }); }}
         />

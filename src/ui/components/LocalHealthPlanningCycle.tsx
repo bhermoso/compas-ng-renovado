@@ -48,6 +48,10 @@ export interface LocalHealthPlanningCycleProps {
   prioritySelectionWithoutParticipation?: boolean;
   /** Actuaciones registradas en la agenda (instrumento de la fase Implantación). */
   agendaCount?: number;
+  /** Plan de Acción validado en el expediente municipal. */
+  validatedPlanPresent?: boolean;
+  /** Existen borradores o revisiones de planificación aún no validados. */
+  planWorkInProgress?: boolean;
   onNavigate?: (view: AppViewId) => void;
   /** Vista seleccionada: solo presentación, no altera los estados del expediente. */
   currentView?: AppViewId;
@@ -78,6 +82,8 @@ function derivePhases({
   externalProfileStatus,
   prioritySelectionWithoutParticipation = false,
   agendaCount = 0,
+  validatedPlanPresent = false,
+  planWorkInProgress = false,
 }: LocalHealthPlanningCycleProps): CyclePhase[] {
   const external = externalProfileStatus !== undefined;
   const pslReady = external
@@ -137,16 +143,16 @@ function derivePhases({
     prioPhase = "pending";
   }
 
-  // 4 - Plan de accion
-  // «Perfil validado» es criterio de calidad, no requisito: la fase no se bloquea por él.
-  let planPhase: PhaseStatus;
-  if (!pslHasEvidence && !prioritySelectionDone) {
-    planPhase = "blocked";
-  } else if (prioritySelectionDone) {
-    planPhase = "current";
-  } else {
-    planPhase = "pending";
-  }
+  // 4 - Plan de acción: una selección de prioridades NO equivale a un plan.
+  // Solo un documento validado permite acreditar la fase como terminada.
+  const planPhase: PhaseStatus = validatedPlanPresent
+    ? "completed"
+    : planWorkInProgress || prioritySelectionDone ? "current" : "pending";
+  const planNote = validatedPlanPresent
+    ? "Plan de Acción validado en el expediente"
+    : planWorkInProgress ? "Existe trabajo de planificación sin validar"
+    : prioritySelectionDone ? "Prioridades seleccionadas; pendiente de elaborar el Plan"
+    : "Pendiente de elaborar y validar el Plan";
 
   // 5 - Implantacion
   // La agenda es el instrumento de la fase y es un registro de trabajo: no se condiciona a la priorización.
@@ -155,19 +161,18 @@ function derivePhases({
     ? `${agendaCount} ${agendaCount === 1 ? "actuación registrada" : "actuaciones registradas"} en la agenda`
     : "Registra actuaciones en la agenda";
 
-  // 6 - Evaluacion
-  const evaluationPhase: PhaseStatus = prioritySelectionDone ? "pending" : "blocked";
-  const evaluationNote = prioritySelectionDone
-    ? "Pendiente de implantación"
-    : "Requiere plan implantable";
+  // 6 - Evaluación: la pantalla actual es informativa y no guarda una
+  // evaluación. No anunciarla como disponible por existir prioridades.
+  const evaluationPhase: PhaseStatus = "blocked";
+  const evaluationNote = "Módulo de evaluación aún no implementado";
 
   return [
     {
       id:          "informe",
       num:         1,
       label:       "Informe sobre la situación de salud",
-      status:      healthReportLoaded ? "completed" : "current",
-      statusLabel: healthReportLoaded ? "Disponible" : undefined,
+      status:      healthReportLoaded ? "completed" : "pending",
+      statusLabel: healthReportLoaded ? "Informe incorporado" : "Sin informe incorporado",
       navigateTo:  "repositorio",
     },
     {
@@ -192,7 +197,8 @@ function derivePhases({
       num:         4,
       label:       "Plan de acción",
       status:      planPhase,
-      navigateTo:  planPhase !== "blocked" ? "plan" : undefined,
+      note:        planNote,
+      navigateTo:  "plan",
     },
     {
       id:            "implantacion",
@@ -209,7 +215,7 @@ function derivePhases({
       label:       "Evaluación",
       status:      evaluationPhase,
       note:        evaluationNote,
-      navigateTo:  evaluationPhase !== "blocked" ? "evaluacion" : undefined,
+      navigateTo:  "evaluacion",
     },
   ];
 }
