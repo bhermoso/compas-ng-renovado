@@ -9,6 +9,11 @@ let batchWaiting = false;
 let holdNextDeleteBatch: Promise<void> | undefined;
 let deleteBatchWaiting = false;
 const ref = (path: string[]) => ({ path: path.join("/"), __ref: true });
+const listDocs = (path: string) => ({
+  docs: [...store.entries()]
+    .filter(([k]) => k.startsWith(`${path}/`))
+    .map(([k, v]) => ({ id: k.split("/").pop(), data: () => v })),
+});
 vi.mock("firebase/firestore", () => ({
   doc: (_db: unknown, ...path: string[]) => ref(path),
   collection: (_db: unknown, ...path: string[]) => ref(path),
@@ -29,11 +34,9 @@ vi.mock("firebase/firestore", () => ({
     exists: () => store.has(r.path),
     data: () => store.get(r.path),
   }),
-  getDocs: async (r: { path: string }) => ({
-    docs: [...store.entries()]
-      .filter(([k]) => k.startsWith(`${r.path}/`))
-      .map(([k, v]) => ({ id: k.split("/").pop(), data: () => v })),
-  }),
+  getDocs: async (r: { path: string }) => listDocs(r.path),
+  // El código lee los fragmentos del servidor, sin caché (RemoteWorkspace, 5/11/2026).
+  getDocsFromServer: async (r: { path: string }) => listDocs(r.path),
   setDoc: async (r: { path: string }, data: Record<string, unknown>) => { store.set(r.path, data); },
   deleteDoc: async (r: { path: string }) => { store.delete(r.path); },
   writeBatch: () => {
