@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import type { MunicipalDocumentRepository, MunicipalDocument } from "../../domain/repository";
 import type { EvidenceAtom } from "../../domain/evidence";
 import { DocumentReference } from "./Documentation";
-import { getCategory, KIND_LABEL } from "./documentRepositoryCategorization";
+import { KIND_LABEL } from "./documentRepositoryCategorization";
 import "./DocumentArchiveManager.css";
 
 interface Props {
@@ -12,13 +12,14 @@ interface Props {
   canWrite: boolean;
   persistence: string;
   onOpenUploader: () => void;
+  onOpenAssetValidations: () => void;
 }
 
 type Scope = "all" | "active" | "archived" | "assets" | "studies";
 const isActive = (d: MunicipalDocument) => d.status !== "archived" && d.status !== "rejected";
 
 /** Un punto de acceso a TODA la documentación, no solamente a las fuentes 'otras'. */
-export function DocumentArchiveManager({ repository, evidence, originalIds, canWrite, persistence, onOpenUploader }: Props) {
+export function DocumentArchiveManager({ repository, evidence, originalIds, canWrite, persistence, onOpenUploader, onOpenAssetValidations }: Props) {
   const [query, setQuery] = useState("");
   const [scope, setScope] = useState<Scope>("all");
   const [open, setOpen] = useState(false);
@@ -49,6 +50,7 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
       </div>
       <div className="dam__controls">
         <button type="button" onClick={onOpenUploader}>Cargar otro documento</button>
+        <button type="button" onClick={onOpenAssetValidations}>Revisar validaciones de activos</button>
         <button type="button" aria-expanded={open} onClick={() => setOpen(v => !v)}>{open ? "Ocultar archivo" : "Buscar, sustituir o retirar documentos"}</button>
       </div>
       <p className="dam__persistence" role="status">Persistencia: {persistence || "sin confirmación reciente"}. {canWrite ? "Las operaciones documentales se confirman en Firebase desde cada ficha." : "Las operaciones de escritura no están disponibles en esta sesión."}</p>
