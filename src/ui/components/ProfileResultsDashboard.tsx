@@ -11,6 +11,7 @@ import {
 } from "../../application/health-profile/profileDashboard";
 
 const sourceLine = (r: ProfileResult) => [r.source, r.page].filter(Boolean).join(", ");
+const sourceUrl = (r: ProfileResult) => (r.page.match(/https?:\/\/[^\s;,<>]+/i) ?? r.source.match(/https?:\/\/[^\s;,<>]+/i))?.[0];
 /** Unidad para mostrar junto a la cifra: «% de papeletas» se abrevia a «%» (la base figura aparte). */
 const displayUnit = (unit: string) => (unit.startsWith("%") ? " %" : unit ? ` ${unit}` : "");
 
@@ -28,26 +29,32 @@ function ResultRow({ result, scale }: { result: ProfileResult; scale?: number })
   const width = (v: number) => `${scale && scale > 0 ? Math.max(0.5, (v / scale) * 100) : 0}%`;
   const hasBar = result.chartValue !== undefined && result.chartValue >= 0 && !!scale;
   const unit = displayUnit(result.unit);
+  const url = sourceUrl(result);
   return (
-    <li className="epd-row">
-      <div className="epd-row__head">
-        <span className="epd-row__title">{result.title}</span>
+    <li className="epd-row epd-row--compact">
+      <div className="epd-row__single" aria-label={result.title}>
+        <strong className="epd-row__title">{result.title}</strong>
         <span className="epd-row__value">{result.value}{unit}</span>
+        <span className="epd-row__period">{result.period || "Periodo no declarado"}</span>
+        <span className="epd-row__source" title={sourceLine(result)}>{result.source || "Fuente no declarada"}</span>
+        <details className="epd-row__details">
+          <summary>Detalle</summary>
+          <div className="epd-row__details-content">
+            <p><strong>Indicador:</strong> {result.title} · <strong>Valor:</strong> {result.value}{unit} · <strong>Periodo:</strong> {result.period || "no declarado"}</p>
+            <p><strong>Procedencia:</strong> {sourceLine(result) || "No declarada"}{result.denominator && ` · Base: ${result.denominator}`}</p>
+            {url && <p><a href={url} target="_blank" rel="noopener noreferrer">Consultar fuente oficial ↗</a></p>}
+            {result.caution && <p><strong>Cautela:</strong> {result.caution}</p>}
+            {hasBar && (
+              <div className="epd-row__bars" title={`${result.title}: ${result.value}${unit}${result.comparison ? ` · ${result.comparison.label}: ${formatComparisonValue(result.comparison.value)}${unit}` : ""}`}>
+                <div className="epd-bar"><span>{result.scale || "Municipio"}</span><div className="epd-bar__track"><i style={{ width: width(result.chartValue!) }} /></div></div>
+                {result.comparison && result.comparison.value >= 0 && (
+                  <div className="epd-bar epd-bar--ref"><span>{result.comparison.label} · {formatComparisonValue(result.comparison.value)}{unit}</span><div className="epd-bar__track"><i style={{ width: width(result.comparison.value) }} /></div></div>
+                )}
+              </div>
+            )}
+          </div>
+        </details>
       </div>
-      {hasBar && (
-        <div className="epd-row__bars" title={`${result.title}: ${result.value}${unit}${result.comparison ? ` · ${result.comparison.label}: ${formatComparisonValue(result.comparison.value)}${unit}` : ""}`}>
-          <div className="epd-bar"><span>{result.scale || "Municipio"}</span><div className="epd-bar__track"><i style={{ width: width(result.chartValue!) }} /></div></div>
-          {result.comparison && result.comparison.value >= 0 && (
-            <div className="epd-bar epd-bar--ref"><span>{result.comparison.label} · {formatComparisonValue(result.comparison.value)}{unit}</span><div className="epd-bar__track"><i style={{ width: width(result.comparison.value) }} /></div></div>
-          )}
-        </div>
-      )}
-      <p className="epd-row__meta">
-        <span>{result.period}</span>
-        {sourceLine(result) && <span>{sourceLine(result)}</span>}
-        {result.denominator && <span>Base: {result.denominator}</span>}
-      </p>
-      {result.caution && <p className="epd-row__note">{result.caution}</p>}
     </li>
   );
 }
