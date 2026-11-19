@@ -3551,9 +3551,29 @@ export default function App() {
     profileSaveInFlightRef.current = true;
     setRemotePersistenceMessage("Eliminando documento y evidencias en Firebase…");
     try {
-      await saveRemoteWorkspace(remoteClient, nextWorkspace);
+      // Retirar siempre desde la revisión exacta consultada, sin sobrescribir
+      // cambios de otra sesión o equipo.
+      await saveRemoteWorkspace(remoteClient, nextWorkspace, undefined, workspace.updatedAt);
       setWorkspace(current => current.municipality.identity.id === municipalityId ? nextWorkspace : current);
-      setRemotePersistenceMessage("Documento y evidencias eliminados del expediente compartido.");
+      // Un commit de Firebase no basta para declarar cerrado el ciclo:
+      // leer de nuevo desde el servidor y comprobar ficha, originales y validaciones.
+      let verified = false;
+      try {
+        const remote = await readRemoteWorkspace(remoteClient, municipalityId);
+        verified = Boolean(remote &&
+          !remote.repository.documents.some(d => d.id === documentId) &&
+          !(remote.documentOriginals ?? []).some(o => o.documentId === documentId) &&
+          !(remote.repository.assetValidations ?? []).some(v => v.documentId === documentId) &&
+          !(remote.repository.conciliations ?? []).some(c => c.current.documentId === documentId || c.historical.documentId === documentId) &&
+          !remote.evidenceStore.atoms.some(atom => atom.provenance.documentId === documentId));
+      } catch (verificationError) {
+        console.warn("[document-delete-remote-verification]", verificationError);
+      }
+      if (!verified) {
+        setRemotePersistenceMessage("Eliminación escrita en Firebase, pero la lectura posterior no la ha verificado. Recupera el expediente antes de operar de nuevo.");
+        return false;
+      }
+      setRemotePersistenceMessage("Eliminación comprobada mediante lectura de Firebase: ficha, original, evidencias y validaciones.");
       await deleteOriginalFile(municipalityId, documentId).catch(error => {
         console.warn("[original-cache-delete-error]", error);
         setRemotePersistenceMessage("Documento eliminado en Firebase; no se pudo limpiar su caché local.");
