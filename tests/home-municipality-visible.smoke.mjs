@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 
 const HOST="127.0.0.1",PORT="5173";
-const APP_URL=`http://${HOST}:${PORT}/COMPAS_NG/`;
+const APP_URL=`http://${HOST}:${PORT}/compas-ng-renovado/`;
 const ROOT=fileURLToPath(new URL("..",import.meta.url));
 const VITE=fileURLToPath(new URL("../node_modules/vite/bin/vite.js",import.meta.url));
 const assert=(condition,message)=>{if(!condition)throw new Error(message);};
@@ -21,7 +21,7 @@ async function ready(processRef){
     if(await responds())return;
     await new Promise(resolve=>setTimeout(resolve,250));
   }
-  throw new Error("Vite did not become ready");
+  throw new Error("Vite did not become ready at "+APP_URL);
 }
 
 let proc,browser;
