@@ -23,7 +23,7 @@ const isActive = (d: MunicipalDocument) => d.status !== "archived" && d.status !
 export function DocumentArchiveManager({ repository, evidence, originalIds, canWrite, persistence, originalCapacity, onOpenUploader, onOpenAssetValidations }: Props) {
   const [query, setQuery] = useState("");
   const [scope, setScope] = useState<Scope>("all");
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const originals = useMemo(() => new Set(originalIds), [originalIds]);
   const archive = repository.documents;
   const filtered = useMemo(() => archive.filter((d) => {
@@ -40,8 +40,8 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
   return (
     <section className="workspace-panel dam" aria-labelledby="dam-title">
       <div className="panel-header dam__head">
-        <div><p className="eyebrow">Archivo documental · Control de cargas</p><h2 id="dam-title">Gestionar el archivo del expediente</h2></div>
-        <p className="panel-note">Localiza cualquier documento o fuente de activos, consulta sus dependencias y accede desde una sola ficha a su original, versiones, archivo y retirada.</p>
+        <div><p className="eyebrow">Diagnóstico · Fuente documental única</p><h2 id="dam-title">Gestor documental del expediente</h2></div>
+        <p className="panel-note">Un único índice para informes, PDF, DOCX, estudios CSV y activos. Cada ficha muestra su procedencia, el texto conservado y la disponibilidad del archivo; los paneles metodológicos presentan resultados, no nuevos originales.</p>
       </div>
       <div className="dam__summary">
         <span><strong>{archive.length}</strong> fichas</span>
@@ -50,11 +50,11 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
         <span><strong>{(repository.assetValidations ?? []).length}</strong> declaraciones de validación de activos</span>
       </div>
       <div className="dam__controls">
-        <button type="button" onClick={onOpenUploader}>Cargar otro documento</button>
+        <button type="button" onClick={onOpenUploader}>Incorporar PDF, DOCX o CSV (revisión previa)</button>
         <button type="button" onClick={onOpenAssetValidations}>Revisar validaciones de activos</button>
-        <button type="button" aria-expanded={open} onClick={() => setOpen(v => !v)}>{open ? "Ocultar archivo" : "Buscar, sustituir o retirar documentos"}</button>
+        <button type="button" aria-expanded={open} onClick={() => setOpen(v => !v)}>{open ? "Contraer catálogo" : "Mostrar catálogo y buscar"}</button>
       </div>
-      <p className="dam__foot">La cantidad de fichas no tiene un máximo fijo, pero los archivos originales tienen límites de capacidad: 20 MB por archivo y 40 MB compartidos con los originales del Perfil. Un registro sin original no equivale a un fichero conservado.</p>
+      <p className="dam__foot">La cantidad de fichas no tiene un máximo fijo, pero los archivos originales tienen límites de capacidad: 20 MB por archivo y 40 MB compartidos con los originales del Perfil. La transcripción conservada no acredita el DOCX o PDF original. Las reconstrucciones deben conservar su procedencia y no sustituir el original.</p>
       <p className="dam__persistence" role="status">Persistencia: {persistence || "sin confirmación reciente"}. {canWrite ? "Las operaciones documentales se confirman en Firebase desde cada ficha." : "Las operaciones de escritura no están disponibles en esta sesión."}</p>
       {open && <>
         <div className="dam__filters">
@@ -64,12 +64,12 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
           </select></label>
         </div>
         <p className="dam__count">{filtered.length} documentos encontrados. Una ficha archivada conserva la documentación; eliminar retira su registro y evidencias, con confirmación.</p>
-        <div className="dam__table-scroll"><table className="dam__table"><thead><tr><th>Documento</th><th>Tipo</th><th>Estado</th><th>Original</th><th>Dependencias</th><th>Gestión</th></tr></thead>
+        <div className="dam__table-scroll"><table className="dam__table"><thead><tr><th>Documento</th><th>Tipo</th><th>Estado</th><th>Archivo y texto</th><th>Dependencias</th><th>Gestión</th></tr></thead>
           <tbody>{filtered.map(d => <tr key={d.id}>
             <th scope="row"><strong>{d.title}</strong><small>{d.sourceFileName || "Sin nombre de archivo"}</small></th>
             <td>{KIND_LABEL[d.kind] ?? d.kind}</td>
             <td>{d.status === "archived" ? "Archivado" : d.status === "validated" ? "Validado" : d.status === "rejected" ? "Rechazado" : "Registrado"}</td>
-            <td>{originals.has(d.id) ? "Guardado en expediente" : "No consta original compartido"}</td>
+            <td>{originals.has(d.id) ? "Archivo compartido" : "Archivo no compartido"}{d.sourceText?.trim() ? " · Texto conservado" : ""}</td>
             <td>{countOf(d.id)} evidencias{validationCount(d.id) ? ` · ${validationCount(d.id)} validaciones de activos` : ""}{d.revisionOf ? " · revisión" : ""}</td>
             <td><DocumentReference documentId={d.id}>Abrir ficha y operaciones</DocumentReference></td>
           </tr>)}</tbody>
