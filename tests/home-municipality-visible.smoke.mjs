@@ -7,13 +7,13 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 
 const HOST="127.0.0.1",PORT="5173";
-const URL=`http://${HOST}:${PORT}/COMPAS_NG/`;
+const APP_URL=`http://${HOST}:${PORT}/COMPAS_NG/`;
 const ROOT=fileURLToPath(new URL("..",import.meta.url));
 const VITE=fileURLToPath(new URL("../node_modules/vite/bin/vite.js",import.meta.url));
 const assert=(condition,message)=>{if(!condition)throw new Error(message);};
 
 async function responds(){
-  try{const a=AbortSignal.timeout(1000);return (await fetch(URL,{signal:a})).ok}catch{return false}
+  try{const a=AbortSignal.timeout(1000);return (await fetch(APP_URL,{signal:a})).ok}catch{return false}
 }
 async function ready(processRef){
   for(let n=0;n<80;n++){
@@ -32,7 +32,7 @@ try{
   }
   browser=await chromium.launch({headless:true});
   const page=await browser.newPage({viewport:{width:1280,height:720}});
-  await page.goto(URL,{waitUntil:"domcontentloaded"});
+  await page.goto(APP_URL,{waitUntil:"domcontentloaded"});
   const nav=page.locator("nav.app-nav");
   const municipality=nav.locator(".app-nav__municipality");
   await municipality.waitFor({state:"visible",timeout:15000});
