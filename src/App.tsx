@@ -12,6 +12,7 @@ import type { ExternalProfileLibrary } from "./domain/health-profile/ExternalHea
 import { InitialLocalHealthPlanPanel } from "./ui/components/InitialLocalHealthPlanPanel";
 import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
 import { HomePortada } from "./ui/components/HomePortada";
+import { DocumentArchiveManager } from "./ui/components/DocumentArchiveManager";
 import { DocumentReviewInbox } from "./ui/components/DocumentReviewInbox";
 import { DiagnosisControlRoom, DiagnosisModuleSection } from "./ui/components/DiagnosisControlRoom";
 import { DuplicateDocumentsPanel } from "./ui/components/DuplicateDocumentsPanel";
@@ -4075,6 +4076,16 @@ export default function App() {
                 />
               );
             })()}
+
+            {/* Punto único de control de todo el archivo documental, incluidos activos y CSV. */}
+            <DocumentArchiveManager
+              repository={runtime.workspace.repository}
+              evidence={runtime.workspace.evidenceStore.atoms}
+              originalIds={(runtime.workspace.documentOriginals ?? []).map(o => o.documentId)}
+              canWrite={documentWriteAllowed}
+              persistence={remotePersistenceMessage ?? ""}
+              onOpenUploader={() => document.getElementById("document-review-title")?.scrollIntoView({behavior:"smooth",block:"start"})}
+            />
 
             {/* ── Originales en el expediente compartido ── */}
             {(() => {
