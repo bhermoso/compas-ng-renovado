@@ -44,9 +44,11 @@ export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable
   {file && <p><button type="button" onClick={openOriginal}>Abrir original</button> <button type="button" onClick={download}>Descargar original · {file.name}</button> <small>{remoteOriginal ? 'Original guardado en el expediente compartido.' : 'Original solo en este navegador; pendiente de sincronizar.'}</small></p>}
   {!loading && !file && !url && <p><strong>Archivo original no disponible.</strong> {retainedTextAvailable ? 'Existe una transcripción sanitaria vinculada; no equivale al DOCX original.' : doc.sourceText?.trim() ? 'Puedes consultar el texto conservado.' : 'Solo se conserva la referencia o los datos derivados.'}</p>}
   {doc.sourceText?.trim() && <details><summary>Consultar texto conservado</summary><p style={{whiteSpace:'pre-wrap'}}>{doc.sourceText}</p></details>}
-  {management && <label className="document-access__attach">{file ? 'Verificar o reponer original' : 'Adjuntar el archivo original'}
-   <input type="file" aria-label={`Adjuntar original: ${doc.title}`} onChange={async e=>{
+  {management && <label className="document-access__attach">{file ? 'Verificar o reponer original (PDF o DOCX)' : 'Adjuntar el archivo original (PDF o DOCX)'}
+   <input type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label={`Adjuntar original PDF o DOCX: ${doc.title}`} onChange={async e=>{
     const input=e.currentTarget;const next=input.files?.[0];if(!next)return;
+    if(!/\.(pdf|docx)$/i.test(next.name)) { setMessage('Solo se admiten archivos PDF o DOCX.'); input.value=''; return; }
+    if(/(?:reconstruid[oa]|reconstrucci[oó]n)/i.test(next.name)) { setMessage('Este fichero indica que es una reconstrucción. No lo adjuntes como original verificado: conserva el texto y regístralo como copia reconstruida.'); input.value=''; return; }
     if(!window.confirm(`¿Vincular «${next.name}» a «${doc.title}»? Comprueba que corresponde a este documento. Si el contenido difiere del original existente debes importar una versión nueva; no se alterarán en silencio las evidencias.`)){input.value='';return;}
     try {
       if (!management) throw new Error('El expediente compartido no permite guardar originales desde esta vista.');
@@ -62,7 +64,7 @@ export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable
   </label>}
   {management && showManagementActions && <div className="document-access__manage" aria-label={`Gestión documental de ${doc.title}`}>
     <label>Crear nueva versión
-      <input type="file" aria-label={`Sustituir mediante nueva versión: ${doc.title}`} onChange={async e=>{
+      <input type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label={`Sustituir mediante nueva versión PDF o DOCX: ${doc.title}`} onChange={async e=>{
         const input=e.currentTarget, replacement=input.files?.[0];if(!replacement)return;
         input.value='';
         if(!window.confirm(`¿Crear una nueva versión de «${doc.title}» con «${replacement.name}»? El documento anterior y todas sus evidencias seguirán conservados.`))return;
