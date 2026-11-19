@@ -13,6 +13,7 @@ interface Props {
   canWrite: boolean;
   persistence: string;
   originalCapacity: string;
+  archiveVersion: string;
   onVerifyRemote: () => Promise<ArchiveComparison>;
   onOpenUploader: () => void;
   onOpenAssetValidations: () => void;
@@ -22,7 +23,7 @@ type Scope = "all" | "active" | "archived" | "assets" | "studies";
 const isActive = (d: MunicipalDocument) => d.status !== "archived" && d.status !== "rejected";
 
 /** Un punto de acceso a TODA la documentación, no solamente a las fuentes 'otras'. */
-export function DocumentArchiveManager({ repository, evidence, originalIds, canWrite, persistence, originalCapacity, onVerifyRemote, onOpenUploader, onOpenAssetValidations }: Props) {
+export function DocumentArchiveManager({ repository, evidence, originalIds, canWrite, persistence, originalCapacity, archiveVersion, onVerifyRemote, onOpenUploader, onOpenAssetValidations }: Props) {
   const [query, setQuery] = useState("");
   const [scope, setScope] = useState<Scope>("all");
   const [open, setOpen] = useState(false);
@@ -30,7 +31,7 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
   const [verification, setVerification] = useState<{ key: string; report?: ArchiveComparison; error?: string }>();
   const originals = useMemo(() => new Set(originalIds), [originalIds]);
   const archive = repository.documents;
-  const archiveKey = [repository.updatedAt, ...archive.map(d=>`${d.id}:${d.updatedAt}:${d.status}`),...originalIds].join("|");
+  const archiveKey = [archiveVersion, repository.updatedAt, ...archive.map(d=>`${d.id}:${d.updatedAt}:${d.status}`),...originalIds].join("|");
   const filtered = useMemo(() => archive.filter((d) => {
     if (scope === "active" && !isActive(d)) return false;
     if (scope === "archived" && isActive(d)) return false;
