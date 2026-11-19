@@ -3,6 +3,7 @@ import type { MunicipalityWorkspace } from '../../domain/workspace/MunicipalityW
 import type { DocumentKind, MunicipalDocument } from '../../domain/repository';
 import { DocumentAccess } from './DocumentAccess.tsx';
 import { documentCustodyMetadata } from './documentCustody';
+import type { StoredDocumentDerivative } from '../../application/document-files/documentOriginals';
 import { DocumentOriginalManagementContext } from './DocumentOriginalManagement';
 import { resolveDocumentReference, type DocumentReferenceTarget } from './documentReferenceResolver';
 
@@ -21,7 +22,7 @@ export function DocumentReference({ children, documentId, fileName }: Reference 
   return <button type="button" className="document-reference" onClick={() => open({ documentId, fileName })}>{children}</button>;
 }
 
-export function DocumentationProvider({ workspace, children, canWrite = false, onStoreOriginal, onCreateRevision, onArchiveDocument, onDeleteDocument }: { workspace: MunicipalityWorkspace; children: ReactNode; canWrite?: boolean; onStoreOriginal?: (documentId: string, file: File) => Promise<void>; onCreateRevision?: (documentId: string, file: File) => Promise<void>; onArchiveDocument?: (documentId: string) => Promise<void>; onDeleteDocument?: (documentId: string) => Promise<boolean> }) {
+export function DocumentationProvider({ workspace, children, canWrite = false, onStoreOriginal, onStoreDerivative, onCreateRevision, onArchiveDocument, onDeleteDocument }: { workspace: MunicipalityWorkspace; children: ReactNode; canWrite?: boolean; onStoreOriginal?: (documentId: string, file: File) => Promise<void>; onStoreDerivative?: (documentId: string, file: File, provenance: StoredDocumentDerivative['provenance']) => Promise<void>; onCreateRevision?: (documentId: string, file: File) => Promise<void>; onArchiveDocument?: (documentId: string) => Promise<void>; onDeleteDocument?: (documentId: string) => Promise<boolean> }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [reference, setReference] = useState<Reference | null>(null);
   const [query, setQuery] = useState('');
@@ -58,7 +59,7 @@ export function DocumentationProvider({ workspace, children, canWrite = false, o
       ? workspace.healthReport
       : workspace.previousHealthReports?.find(r => r.linkedDocumentId === selected.id)
   );
-  return <DocumentOriginalManagementContext.Provider value={canWrite && onStoreOriginal && onCreateRevision && onArchiveDocument && onDeleteDocument ? { municipalityId: workspace.municipality.identity.id, originals: workspace.documentOriginals ?? [], storeOriginal: onStoreOriginal, createRevision: onCreateRevision, archiveDocument: onArchiveDocument, deleteDocument: onDeleteDocument } : null}><DocumentationContext.Provider value={open}>
+  return <DocumentOriginalManagementContext.Provider value={canWrite && onStoreOriginal && onCreateRevision && onArchiveDocument && onDeleteDocument ? { municipalityId: workspace.municipality.identity.id, originals: workspace.documentOriginals ?? [], derivatives: workspace.documentDerivedFiles ?? [], storeDerivative: onStoreDerivative, storeOriginal: onStoreOriginal, createRevision: onCreateRevision, archiveDocument: onArchiveDocument, deleteDocument: onDeleteDocument } : null}><DocumentationContext.Provider value={open}>
     {children}
     <button type="button" className="documentation-launcher" onClick={() => open(null)}>Consultar documentación ({documents.length})</button>
     <dialog ref={dialog} className="documentation-dialog" aria-labelledby="documentation-title">
@@ -78,7 +79,7 @@ export function DocumentationProvider({ workspace, children, canWrite = false, o
         {revisionFamily.length > 1 && <section aria-label="Versiones del documento"><h3>Versiones · {revisionFamily.length}</h3><ul>{revisionFamily.map(d=><li key={d.id}><DocumentReference documentId={d.id}>{d.title} · versión {d.revisionNumber ?? 1}</DocumentReference><small>{d.sourceFileName ?? 'Sin original'} · {d.status}</small></li>)}</ul></section>}
         {canWrite && <div className="documentation-operations">
           <label>Incorporar nueva versión (sin modificar los indicadores anteriores)
-            <input type="file" aria-label="Crear nueva versión documental" onChange={async e => {
+            <input type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Crear nueva versión documental PDF o DOCX" onChange={async e => {
               const file=e.currentTarget.files?.[0];e.currentTarget.value='';
               if(!file || !onCreateRevision) return;
               if(!window.confirm('Se creará otra ficha y se conservarán las evidencias anteriores. La nueva versión requerirá revisión técnica. ¿Continuar?')) return;
