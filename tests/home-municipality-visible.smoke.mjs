@@ -32,7 +32,12 @@ try{
   }
   browser=await chromium.launch({headless:true});
   const page=await browser.newPage({viewport:{width:1280,height:720}});
-  await page.goto(APP_URL,{waitUntil:"domcontentloaded"});
+  const errors=[];
+  page.on("pageerror",error=>errors.push(error.message));
+  page.on("console",msg=>{if(msg.type()==="error")errors.push(msg.text())});
+  const response=await page.goto(APP_URL,{waitUntil:"domcontentloaded"});
+  await page.waitForTimeout(2000);
+  console.log("E2E diagnostic",JSON.stringify({url:page.url(),httpStatus:response?.status(),title:await page.title(),body:(await page.locator("body").innerText()).slice(0,1200),errors}));
   const nav=page.locator("nav.app-nav");
   const municipality=nav.locator(".app-nav__municipality");
   await municipality.waitFor({state:"visible",timeout:15000});
