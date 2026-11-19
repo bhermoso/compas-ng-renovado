@@ -13,6 +13,7 @@ on:
       - 'tests/profile-update-preview-integrity.test.ts'
       - 'tests/compact-platform-layout.test.ts'
       - 'tests/home-context-indicator-compact.test.tsx'
+      - 'tests/home-municipality-visible.smoke.mjs'
       - 'tests/visual-identity-guardrails.test.tsx'
       - 'tests/visual-historical-guardrails.test.ts'
       - 'docs/visual/**'
@@ -48,6 +49,7 @@ jobs:
       - run: npm run build
       - run: npx vitest run tests/healthy-ageing-notation.test.tsx tests/indicator-worksheet.test.ts tests/planning-instruments.test.ts tests/relas-draft-migration.test.ts tests/action-plan-compatibility.test.tsx tests/universal-four-block-action-plan.test.tsx tests/zagra-four-blocks.test.tsx tests/external-profiles.test.tsx tests/profile-structure.test.ts tests/remote-workspace-lifecycle.test.ts tests/document-originals.test.ts tests/document-access.test.tsx tests/visual-identity-guardrails.test.tsx tests/visual-historical-guardrails.test.ts tests/document-duplicates.test.ts tests/document-revisions.test.ts tests/initial-local-health-plan.test.tsx tests/local-health-plan-outline.test.tsx tests/psl-c-canonical-projector.test.ts tests/zaidin-final-replacement.test.ts tests/plan-document.test.ts tests/plan-editor-whitespace.test.tsx tests/definitive-action-plan-preview.test.tsx tests/municipality-seed-hydration.test.ts tests/planning-cycle-progress.test.tsx tests/planning-cycle-real-status.test.tsx tests/planning-cycle-layout.test.ts tests/profile-prioritization-fidelity.test.tsx tests/profile-custody-audit.test.ts tests/profile-update-preview-integrity.test.ts tests/compact-platform-layout.test.ts tests/home-context-indicator-compact.test.tsx
       - run: npx playwright install --with-deps chromium
+      - run: node tests/home-municipality-visible.smoke.mjs
       - run: node tests/fuente-vaqueros-hydration.smoke.mjs
       - run: node tests/action-plan-compatibility.smoke.mjs
       - run: node tests/common-action-plan-workspace.smoke.mjs
