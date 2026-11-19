@@ -334,4 +334,17 @@ describe("revisión del Perfil con los datos descargados", () => {
     expect(changes.some(c => c.kind === "actualizado" && c.previous?.title === "Tasa de desempleo registrado por sección")).toBe(true);
     expect(results.filter(r => r.id.startsWith("s")).map(r => r.title)).toEqual([T, T, T]);
   });
+
+  it("conserva las filas propias del Perfil que repiten una sección (mínimo y máximo)", async () => {
+    const s = await snapshotAlfacar();
+    const T = "Tasa de desempleo registrado por sección censal";
+    const vigentes = [
+      { ...base, id: "s1", title: T, value: "18,8", unit: "%", period: "2024", scale: "Sección censal 1801101001", topic: "Condiciones de vida" },
+      { ...base, id: "s2", title: T, value: "18,2", unit: "%", period: "2024", scale: "Sección censal 1801101002", topic: "Condiciones de vida" },
+      { ...base, id: "s3", title: T, value: "15,1", unit: "%", period: "2024", scale: "Sección censal 1801101003", topic: "Condiciones de vida" },
+      { ...base, id: "max", title: "Tasa de desempleo registrado, sección 01001 (máximo)", value: "18,8", unit: "%", period: "2024", scale: "Sección censal 1801101001", topic: "Desigualdad" },
+    ];
+    const { results } = mergeTerritorialResults(s, vigentes);
+    expect(results.find(r => r.id === "max")).toMatchObject({ title: "Tasa de desempleo registrado, sección 01001 (máximo)", topic: "Desigualdad" });
+  });
 });

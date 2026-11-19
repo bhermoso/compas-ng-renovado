@@ -248,7 +248,12 @@ export function mergeTerritorialResults(snapshot: TerritorialStatisticsSnapshot,
         changes.push({ kind: "conservado", indicatorId: ficha.id, title: ficha.title, scale, value: found.value, period: found.period, previous });
       }
     }
-    alignSectionLabels(ficha, matches.filter(m => m.section).map(m => m.result.id), next, changes);
+    // Solo se alinea la sección que no tiene otro resultado del mismo indicador: la que dejó un
+    // hueco en su fila. Las filas propias del Perfil (mínimo y máximo entre secciones, por ejemplo)
+    // repiten una sección que ya está en la fila y se conservan.
+    const perSection = new Map<string, number>();
+    for (const m of matches) if (m.section) perSection.set(m.section, (perSection.get(m.section) ?? 0) + 1);
+    alignSectionLabels(ficha, matches.filter(m => m.section && perSection.get(m.section) === 1).map(m => m.result.id), next, changes);
   }
   return { results: next, changes };
 }
