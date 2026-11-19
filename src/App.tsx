@@ -1,5 +1,6 @@
 import { readLocalizaAssets } from "./application/localiza-assets";
 import { buildProfileUpdate, type ProfileUpdateKind } from "./application/health-profile/profileUpdater";
+import { compareProfileUpdate } from "./application/health-profile/profileUpdateDelta";
 import type { ProfileTextPackage } from "./application/health-profile/profileTextOperations";
 import type { ProfileUpdateOutcome } from "./ui/components/ProfileUpdaterPanel";
 import { appendExternalProfile } from "./application/health-profile/externalProfiles";
@@ -1547,7 +1548,7 @@ export default function App() {
         const library = ws.externalProfileLibrary ?? { profiles: [], attachments: [] };
         const r = buildProfileUpdate({ library, snapshots: ws.territorialStatistics, kinds, textPackage, author: remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || "", now: new Date(), newId: () => crypto.randomUUID() });
         if (!r.profile) { out.push({ id, name, changes: r.changes, blocked: r.blocked }); continue; }
-        const outcome: ProfileUpdateOutcome = { id, name, changes: r.changes, from: r.base?.title, title: r.profile.title, profile: r.profile };
+        const outcome: ProfileUpdateOutcome = { id, name, changes: r.changes, from: r.base?.title, title: r.profile.title, profile: r.profile, delta: r.base ? compareProfileUpdate(r.base,r.profile) : undefined };
         if (apply) {
           onProgress(`${name}: guardando la revisión…`);
           const nextLibrary = appendExternalProfile(library, r.profile, [], id);
