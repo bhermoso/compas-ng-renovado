@@ -65,8 +65,9 @@ export function DocumentationProvider({ workspace, children, canWrite = false, o
     <dialog ref={dialog} className="documentation-dialog" aria-labelledby="documentation-title">
       <header><h2 id="documentation-title">{selected ? selected.title : categoryLabel || 'Documentación del expediente'}</h2><button type="button" autoFocus onClick={() => dialog.current?.close()}>Cerrar</button></header>
       {selected ? <>
-        <p><strong>Archivo de referencia:</strong> {selected.sourceFileName ?? 'Nombre no registrado'}</p>
+        <p><strong>Archivo de referencia:</strong> {selected.sourceFileName ?? 'Nombre no registrado'} · {original ? "Original conservado" : "Original pendiente"} · {workspace.documentDerivedFiles?.filter(d=>d.derivedFromDocumentId===selected.id).length ?? 0} copias derivadas</p>
         <p>{selected.source.system}</p>
+        <details className="documentation-technical"><summary>Metadatos técnicos y trazabilidad</summary>
         <dl className="documentation-metadata">
           <div><dt>Estado</dt><dd>{custody?.status}</dd></div>
           <div><dt>Incorporación</dt><dd>{selected.createdAt}</dd></div>
@@ -76,6 +77,7 @@ export function DocumentationProvider({ workspace, children, canWrite = false, o
           <div><dt>Original compartido</dt><dd>{original ? 'Disponible en expediente Firebase' : 'No incorporado al expediente compartido'}</dd></div>
           {historical?.body.originalText && <div><dt>Texto sanitario</dt><dd>Conservado como transcripción; no sustituye el DOCX original.</dd></div>}
         </dl>
+        </details>
         {revisionFamily.length > 1 && <section aria-label="Versiones del documento"><h3>Versiones · {revisionFamily.length}</h3><ul>{revisionFamily.map(d=><li key={d.id}><DocumentReference documentId={d.id}>{d.title} · versión {d.revisionNumber ?? 1}</DocumentReference><small>{d.sourceFileName ?? 'Sin original'} · {d.status}</small></li>)}</ul></section>}
         {canWrite && <div className="documentation-operations">
           <label>Incorporar nueva versión (sin modificar los indicadores anteriores)
