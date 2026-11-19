@@ -11,6 +11,7 @@ interface Props {
   originalIds: readonly string[];
   canWrite: boolean;
   persistence: string;
+  originalCapacity: string;
   onOpenUploader: () => void;
   onOpenAssetValidations: () => void;
 }
@@ -19,7 +20,7 @@ type Scope = "all" | "active" | "archived" | "assets" | "studies";
 const isActive = (d: MunicipalDocument) => d.status !== "archived" && d.status !== "rejected";
 
 /** Un punto de acceso a TODA la documentación, no solamente a las fuentes 'otras'. */
-export function DocumentArchiveManager({ repository, evidence, originalIds, canWrite, persistence, onOpenUploader, onOpenAssetValidations }: Props) {
+export function DocumentArchiveManager({ repository, evidence, originalIds, canWrite, persistence, originalCapacity, onOpenUploader, onOpenAssetValidations }: Props) {
   const [query, setQuery] = useState("");
   const [scope, setScope] = useState<Scope>("all");
   const [open, setOpen] = useState(false);
@@ -45,7 +46,7 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
       <div className="dam__summary">
         <span><strong>{archive.length}</strong> fichas</span>
         <span><strong>{archive.filter(isActive).length}</strong> activas</span>
-        <span><strong>{originalCount}</strong> originales compartidos</span>
+        <span><strong>{originalCount}</strong> originales compartidos · {originalCapacity}</span>
         <span><strong>{(repository.assetValidations ?? []).length}</strong> declaraciones de validación de activos</span>
       </div>
       <div className="dam__controls">
@@ -53,6 +54,7 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
         <button type="button" onClick={onOpenAssetValidations}>Revisar validaciones de activos</button>
         <button type="button" aria-expanded={open} onClick={() => setOpen(v => !v)}>{open ? "Ocultar archivo" : "Buscar, sustituir o retirar documentos"}</button>
       </div>
+      <p className="dam__foot">La cantidad de fichas no tiene un máximo fijo, pero los archivos originales tienen límites de capacidad: 20 MB por archivo y 40 MB compartidos con los originales del Perfil. Un registro sin original no equivale a un fichero conservado.</p>
       <p className="dam__persistence" role="status">Persistencia: {persistence || "sin confirmación reciente"}. {canWrite ? "Las operaciones documentales se confirman en Firebase desde cada ficha." : "Las operaciones de escritura no están disponibles en esta sesión."}</p>
       {open && <>
         <div className="dam__filters">
