@@ -1,6 +1,6 @@
 import { readLocalizaAssets } from "./application/localiza-assets";
 import { buildProfileUpdate, type ProfileUpdateKind } from "./application/health-profile/profileUpdater";
-import { compareProfileUpdate } from "./application/health-profile/profileUpdateDelta";
+import { compareProfileUpdate, profileUpdateBaseline, canApplyProfilePreview } from "./application/health-profile/profileUpdateDelta";
 import type { ProfileTextPackage } from "./application/health-profile/profileTextOperations";
 import type { ProfileUpdateOutcome } from "./ui/components/ProfileUpdaterPanel";
 import { appendExternalProfile } from "./application/health-profile/externalProfiles";
@@ -1548,8 +1548,8 @@ export default function App() {
         const library = ws.externalProfileLibrary ?? { profiles: [], attachments: [] };
         const r = buildProfileUpdate({ library, snapshots: ws.territorialStatistics, kinds, textPackage, author: remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || "", now: new Date(), newId: () => crypto.randomUUID() });
         if (!r.profile) { out.push({ id, name, changes: r.changes, blocked: r.blocked }); continue; }
-        const baseline = r.base ? JSON.stringify({profile:r.base,territorialStatistics:ws.territorialStatistics}) : undefined;
-        if (apply && (!baseline || !expectedBaselines?.[id] || expectedBaselines[id] !== baseline)) {
+        const baseline = r.base ? profileUpdateBaseline(r.base,ws.territorialStatistics) : undefined;
+        if (apply && (!baseline || !canApplyProfilePreview(expectedBaselines?.[id],baseline))) {
           out.push({id,name,changes:[],blocked:"El Perfil cambió desde la vista previa o no existe una comparación previa válida. Vuelve a consultar la vista previa antes de guardar."});
           continue;
         }
