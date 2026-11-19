@@ -1,0 +1,1562 @@
+{
+ "schema": "compas-profile-text-package/v1",
+ "createdAt": "2026-11-19T14:30:00.000Z",
+ "author": "Revisión documental asistida; solicitud de Blas Ramón Hermoso Rico",
+ "note": "Alfacar: cifras enlazadas y condiciones de C11, C13-C17 y la lectura de conjunto",
+ "entries": [
+  {
+   "municipalityId": "alfacar",
+   "baseTitle": "Perfil de Salud Local de Alfacar · revisión 0.9.2 · 18/11/2026",
+   "operations": [
+    {
+     "op": "set-links",
+     "bindings": [
+      {
+       "target": "C11",
+       "ref": {
+        "indicatorId": "censo-estudios-primaria",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       },
+       "field": "value",
+       "literal": "18,1"
+      },
+      {
+       "target": "C11",
+       "ref": {
+        "indicatorId": "censo-estudios-primaria",
+        "level": "municipio"
+       },
+       "field": "value",
+       "literal": "12,5"
+      },
+      {
+       "target": "C11",
+       "ref": {
+        "indicatorId": "censo-estudios-superiores",
+        "level": "municipio"
+       },
+       "field": "value",
+       "literal": "30,7"
+      },
+      {
+       "target": "C13",
+       "ref": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "field": "value",
+       "literal": "11.847"
+      },
+      {
+       "target": "C13",
+       "ref": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       },
+       "field": "value",
+       "literal": "13.866"
+      },
+      {
+       "target": "C13",
+       "ref": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "field": "period",
+       "literal": "2024"
+      },
+      {
+       "target": "C13",
+       "ref": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "municipio"
+       },
+       "field": "value",
+       "literal": "12.924"
+      },
+      {
+       "target": "C13",
+       "ref": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "municipio"
+       },
+       "field": "value",
+       "literal": "23,4"
+      },
+      {
+       "target": "C13",
+       "ref": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "provincia"
+       },
+       "field": "value",
+       "literal": "27,8"
+      },
+      {
+       "target": "C13",
+       "ref": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "andalucia"
+       },
+       "field": "value",
+       "literal": "26,2"
+      },
+      {
+       "target": "C14",
+       "ref": {
+        "indicatorId": "adrh-gini",
+        "level": "municipio"
+       },
+       "field": "period",
+       "literal": "2024"
+      },
+      {
+       "target": "C14",
+       "ref": {
+        "indicatorId": "adrh-gini",
+        "level": "municipio"
+       },
+       "field": "value",
+       "literal": "28,3"
+      },
+      {
+       "target": "C14",
+       "ref": {
+        "indicatorId": "adrh-gini",
+        "level": "espana"
+       },
+       "field": "value",
+       "literal": "31,9"
+      },
+      {
+       "target": "C14",
+       "ref": {
+        "indicatorId": "adrh-p80-p20",
+        "level": "municipio"
+       },
+       "field": "value",
+       "literal": "2,4"
+      },
+      {
+       "target": "C14",
+       "ref": {
+        "indicatorId": "adrh-p80-p20",
+        "level": "provincia"
+       },
+       "field": "value",
+       "literal": "2,7"
+      },
+      {
+       "target": "C14",
+       "ref": {
+        "indicatorId": "adrh-p80-p20",
+        "level": "andalucia"
+       },
+       "field": "value",
+       "literal": "2,5"
+      },
+      {
+       "target": "C14",
+       "ref": {
+        "indicatorId": "adrh-p80-p20",
+        "level": "espana"
+       },
+       "field": "value",
+       "literal": "2,6"
+      },
+      {
+       "target": "C14",
+       "ref": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "municipio"
+       },
+       "field": "value",
+       "literal": "23,4"
+      },
+      {
+       "target": "C14",
+       "ref": {
+        "indicatorId": "adrh-fuente-salario",
+        "level": "municipio"
+       },
+       "field": "value",
+       "literal": "61,3"
+      },
+      {
+       "target": "C14",
+       "ref": {
+        "indicatorId": "adrh-fuente-pensiones",
+        "level": "municipio"
+       },
+       "field": "value",
+       "literal": "19,7"
+      },
+      {
+       "target": "C14",
+       "ref": {
+        "indicatorId": "adrh-gini",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       },
+       "field": "value",
+       "literal": "30,6"
+      },
+      {
+       "target": "C15",
+       "ref": {
+        "indicatorId": "ieca-tasa-desempleo-registrado-mujeres",
+        "level": "municipio"
+       },
+       "field": "period",
+       "literal": "2025"
+      },
+      {
+       "target": "C15",
+       "ref": {
+        "indicatorId": "ieca-tasa-desempleo-registrado-mujeres",
+        "level": "municipio"
+       },
+       "field": "value",
+       "literal": "19,3"
+      },
+      {
+       "target": "C15",
+       "ref": {
+        "indicatorId": "ieca-tasa-desempleo-registrado-hombres",
+        "level": "municipio"
+       },
+       "field": "value",
+       "literal": "12,4"
+      },
+      {
+       "target": "C15",
+       "ref": {
+        "indicatorId": "ieca-pension-media-mujeres",
+        "level": "municipio"
+       },
+       "field": "value",
+       "literal": "1.152,7"
+      },
+      {
+       "target": "C15",
+       "ref": {
+        "indicatorId": "ieca-pension-media-hombres",
+        "level": "municipio"
+       },
+       "field": "value",
+       "literal": "1.395,7"
+      },
+      {
+       "target": "C15",
+       "ref": {
+        "indicatorId": "adrh-bajo-60-mediana-mujeres",
+        "level": "municipio"
+       },
+       "field": "value",
+       "literal": "24,1"
+      },
+      {
+       "target": "C15",
+       "ref": {
+        "indicatorId": "adrh-bajo-60-mediana-hombres",
+        "level": "municipio"
+       },
+       "field": "value",
+       "literal": "22,8"
+      },
+      {
+       "target": "C16",
+       "ref": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "field": "period",
+       "literal": "2024"
+      },
+      {
+       "target": "C16",
+       "ref": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "field": "value",
+       "literal": "45,9"
+      },
+      {
+       "target": "C16",
+       "ref": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101001"
+       },
+       "field": "value",
+       "literal": "44,2"
+      },
+      {
+       "target": "C17",
+       "ref": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "field": "value",
+       "literal": "11.847"
+      },
+      {
+       "target": "C17",
+       "ref": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "field": "value",
+       "literal": "26,1"
+      },
+      {
+       "target": "C17",
+       "ref": {
+        "indicatorId": "ieca-seccion-pension-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "field": "value",
+       "literal": "852,7"
+      },
+      {
+       "target": "C17",
+       "ref": {
+        "indicatorId": "adrh-pob-menor-18",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "field": "value",
+       "literal": "22,1"
+      },
+      {
+       "target": "C17",
+       "ref": {
+        "indicatorId": "ieca-seccion-tasa-desempleo",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "field": "value",
+       "literal": "18,2"
+      },
+      {
+       "target": "C17",
+       "ref": {
+        "indicatorId": "ieca-seccion-tasa-desempleo",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       },
+       "field": "value",
+       "literal": "15,1"
+      }
+     ],
+     "conditions": [
+      {
+       "target": "LECTURA",
+       "statement": "la renta por persona de Alfacar es inferior a la provincial",
+       "left": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "provincia"
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "la renta por persona de Alfacar es inferior a la andaluza",
+       "left": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "andalucia"
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "el índice de Gini de Alfacar es inferior al de la provincia",
+       "left": {
+        "indicatorId": "adrh-gini",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-gini",
+        "level": "provincia"
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "el índice de Gini de Alfacar es inferior al de Andalucía",
+       "left": {
+        "indicatorId": "adrh-gini",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-gini",
+        "level": "andalucia"
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "la razón P80/P20 de Alfacar es inferior al de la provincia",
+       "left": {
+        "indicatorId": "adrh-p80-p20",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-p80-p20",
+        "level": "provincia"
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "la razón P80/P20 de Alfacar es inferior al de Andalucía",
+       "left": {
+        "indicatorId": "adrh-p80-p20",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-p80-p20",
+        "level": "andalucia"
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "la población bajo el 60 % de la mediana de Alfacar es inferior al de la provincia",
+       "left": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "provincia"
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "la población bajo el 60 % de la mediana de Alfacar es inferior al de Andalucía",
+       "left": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "andalucia"
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "el desempleo registrado de las mujeres supera al de los hombres",
+       "left": {
+        "indicatorId": "ieca-tasa-desempleo-registrado-mujeres",
+        "level": "municipio"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "ieca-tasa-desempleo-registrado-hombres",
+        "level": "municipio"
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "la pensión media de las mujeres es inferior a la de los hombres",
+       "left": {
+        "indicatorId": "ieca-pension-media-mujeres",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "ieca-pension-media-hombres",
+        "level": "municipio"
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "la renta por persona de la 01002 es inferior a la de la 01001",
+       "left": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101001"
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "la pensión mediana de la 01002 es inferior a la de la 01001",
+       "left": {
+        "indicatorId": "ieca-seccion-pension-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "ieca-seccion-pension-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101001"
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "la proporción de menores de 18 de la 01002 es mayor que la de la 01001",
+       "left": {
+        "indicatorId": "adrh-pob-menor-18",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "adrh-pob-menor-18",
+        "level": "seccion",
+        "territoryCode": "1801101001"
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "la renta por persona de la 01002 es inferior a la de la 01003",
+       "left": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "la pensión mediana de la 01002 es inferior a la de la 01003",
+       "left": {
+        "indicatorId": "ieca-seccion-pension-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "ieca-seccion-pension-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "la proporción de menores de 18 de la 01002 es mayor que la de la 01003",
+       "left": {
+        "indicatorId": "adrh-pob-menor-18",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "adrh-pob-menor-18",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "la renta por persona de la 01002 es inferior a la de la 01004",
+       "left": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "la pensión mediana de la 01002 es inferior a la de la 01004",
+       "left": {
+        "indicatorId": "ieca-seccion-pension-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "ieca-seccion-pension-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "la proporción de menores de 18 de la 01002 es mayor que la de la 01004",
+       "left": {
+        "indicatorId": "adrh-pob-menor-18",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "adrh-pob-menor-18",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "el índice de soledad de la 01001 está entre 39 y 46",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101001"
+       },
+       "op": ">=",
+       "right": {
+        "value": 38.5
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "el índice de soledad de la 01001 está entre 39 y 46",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101001"
+       },
+       "op": "<",
+       "right": {
+        "value": 46.5
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "el índice de soledad de la 01002 está entre 39 y 46",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": ">=",
+       "right": {
+        "value": 38.5
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "el índice de soledad de la 01002 está entre 39 y 46",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": "<",
+       "right": {
+        "value": 46.5
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "el índice de soledad de la 01003 está entre 39 y 46",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       },
+       "op": ">=",
+       "right": {
+        "value": 38.5
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "el índice de soledad de la 01003 está entre 39 y 46",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       },
+       "op": "<",
+       "right": {
+        "value": 46.5
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "el índice de soledad de la 01004 está entre 39 y 46",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       },
+       "op": ">=",
+       "right": {
+        "value": 38.5
+       }
+      },
+      {
+       "target": "LECTURA",
+       "statement": "el índice de soledad de la 01004 está entre 39 y 46",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       },
+       "op": "<",
+       "right": {
+        "value": 46.5
+       }
+      },
+      {
+       "target": "C11",
+       "statement": "la primaria o inferior de Alfacar es menor que en la provincia",
+       "left": {
+        "indicatorId": "censo-estudios-primaria",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "censo-estudios-primaria",
+        "level": "provincia"
+       }
+      },
+      {
+       "target": "C13",
+       "statement": "la 01002 tiene la menor renta por persona (frente a la 01001)",
+       "left": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101001"
+       }
+      },
+      {
+       "target": "C13",
+       "statement": "la 01002 tiene la menor renta por persona (frente a la 01003)",
+       "left": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       }
+      },
+      {
+       "target": "C13",
+       "statement": "la 01002 tiene la menor renta por persona (frente a la 01004)",
+       "left": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       }
+      },
+      {
+       "target": "C13",
+       "statement": "la 01004 tiene la mayor renta por persona (frente a la 01001)",
+       "left": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101001"
+       }
+      },
+      {
+       "target": "C13",
+       "statement": "la 01004 tiene la mayor renta por persona (frente a la 01002)",
+       "left": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       }
+      },
+      {
+       "target": "C13",
+       "statement": "la 01004 tiene la mayor renta por persona (frente a la 01003)",
+       "left": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       }
+      },
+      {
+       "target": "C13",
+       "statement": "la renta media municipal es inferior a la provincial",
+       "left": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "provincia"
+       }
+      },
+      {
+       "target": "C13",
+       "statement": "la renta media municipal es inferior a la andaluza",
+       "left": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "andalucia"
+       }
+      },
+      {
+       "target": "C13",
+       "statement": "la población bajo el umbral es menor que en la provincia",
+       "left": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "provincia"
+       }
+      },
+      {
+       "target": "C13",
+       "statement": "la población bajo el umbral es menor que en Andalucía",
+       "left": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "andalucia"
+       }
+      },
+      {
+       "target": "C14",
+       "statement": "el índice de Gini municipal es inferior al provincial",
+       "left": {
+        "indicatorId": "adrh-gini",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-gini",
+        "level": "provincia"
+       }
+      },
+      {
+       "target": "C14",
+       "statement": "la razón P80/P20 municipal es inferior a la del ámbito provincial",
+       "left": {
+        "indicatorId": "adrh-p80-p20",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-p80-p20",
+        "level": "provincia"
+       }
+      },
+      {
+       "target": "C14",
+       "statement": "el índice de Gini municipal es inferior al andaluz",
+       "left": {
+        "indicatorId": "adrh-gini",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-gini",
+        "level": "andalucia"
+       }
+      },
+      {
+       "target": "C14",
+       "statement": "la razón P80/P20 municipal es inferior a la del ámbito andaluz",
+       "left": {
+        "indicatorId": "adrh-p80-p20",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-p80-p20",
+        "level": "andalucia"
+       }
+      },
+      {
+       "target": "C14",
+       "statement": "el índice de Gini municipal es inferior al español",
+       "left": {
+        "indicatorId": "adrh-gini",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-gini",
+        "level": "espana"
+       }
+      },
+      {
+       "target": "C14",
+       "statement": "la razón P80/P20 municipal es inferior a la del ámbito español",
+       "left": {
+        "indicatorId": "adrh-p80-p20",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-p80-p20",
+        "level": "espana"
+       }
+      },
+      {
+       "target": "C14",
+       "statement": "la población bajo el umbral es menor que en la provincia",
+       "left": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "provincia"
+       }
+      },
+      {
+       "target": "C14",
+       "statement": "la población bajo el umbral es menor que en Andalucía",
+       "left": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "andalucia"
+       }
+      },
+      {
+       "target": "C14",
+       "statement": "la 01004 tiene el Gini más alto (frente a la 01001)",
+       "left": {
+        "indicatorId": "adrh-gini",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "adrh-gini",
+        "level": "seccion",
+        "territoryCode": "1801101001"
+       }
+      },
+      {
+       "target": "C14",
+       "statement": "la 01004 tiene el Gini más alto (frente a la 01002)",
+       "left": {
+        "indicatorId": "adrh-gini",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "adrh-gini",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       }
+      },
+      {
+       "target": "C14",
+       "statement": "la 01004 tiene el Gini más alto (frente a la 01003)",
+       "left": {
+        "indicatorId": "adrh-gini",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "adrh-gini",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       }
+      },
+      {
+       "target": "C15",
+       "statement": "en Alfacar el desempleo registrado de las mujeres supera al de los hombres",
+       "left": {
+        "indicatorId": "ieca-tasa-desempleo-registrado-mujeres",
+        "level": "municipio"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "ieca-tasa-desempleo-registrado-hombres",
+        "level": "municipio"
+       }
+      },
+      {
+       "target": "C15",
+       "statement": "en Alfacar la pensión media de las mujeres es inferior a la de los hombres",
+       "left": {
+        "indicatorId": "ieca-pension-media-mujeres",
+        "level": "municipio"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "ieca-pension-media-hombres",
+        "level": "municipio"
+       }
+      },
+      {
+       "target": "C15",
+       "statement": "en Alfacar la proporción bajo el umbral es mayor en las mujeres",
+       "left": {
+        "indicatorId": "adrh-bajo-60-mediana-mujeres",
+        "level": "municipio"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "adrh-bajo-60-mediana-hombres",
+        "level": "municipio"
+       }
+      },
+      {
+       "target": "C15",
+       "statement": "en la provincia el desempleo registrado de las mujeres supera al de los hombres",
+       "left": {
+        "indicatorId": "ieca-tasa-desempleo-registrado-mujeres",
+        "level": "provincia"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "ieca-tasa-desempleo-registrado-hombres",
+        "level": "provincia"
+       }
+      },
+      {
+       "target": "C15",
+       "statement": "en la provincia la pensión media de las mujeres es inferior a la de los hombres",
+       "left": {
+        "indicatorId": "ieca-pension-media-mujeres",
+        "level": "provincia"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "ieca-pension-media-hombres",
+        "level": "provincia"
+       }
+      },
+      {
+       "target": "C15",
+       "statement": "en la provincia la proporción bajo el umbral es mayor en las mujeres",
+       "left": {
+        "indicatorId": "adrh-bajo-60-mediana-mujeres",
+        "level": "provincia"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "adrh-bajo-60-mediana-hombres",
+        "level": "provincia"
+       }
+      },
+      {
+       "target": "C15",
+       "statement": "en Andalucía el desempleo registrado de las mujeres supera al de los hombres",
+       "left": {
+        "indicatorId": "ieca-tasa-desempleo-registrado-mujeres",
+        "level": "andalucia"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "ieca-tasa-desempleo-registrado-hombres",
+        "level": "andalucia"
+       }
+      },
+      {
+       "target": "C15",
+       "statement": "en Andalucía la pensión media de las mujeres es inferior a la de los hombres",
+       "left": {
+        "indicatorId": "ieca-pension-media-mujeres",
+        "level": "andalucia"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "ieca-pension-media-hombres",
+        "level": "andalucia"
+       }
+      },
+      {
+       "target": "C15",
+       "statement": "en Andalucía la proporción bajo el umbral es mayor en las mujeres",
+       "left": {
+        "indicatorId": "adrh-bajo-60-mediana-mujeres",
+        "level": "andalucia"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "adrh-bajo-60-mediana-hombres",
+        "level": "andalucia"
+       }
+      },
+      {
+       "target": "C16",
+       "statement": "el índice de soledad de la 01001 está entre 39 y 46",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101001"
+       },
+       "op": ">=",
+       "right": {
+        "value": 38.5
+       }
+      },
+      {
+       "target": "C16",
+       "statement": "el índice de soledad de la 01001 está entre 39 y 46",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101001"
+       },
+       "op": "<",
+       "right": {
+        "value": 46.5
+       }
+      },
+      {
+       "target": "C16",
+       "statement": "el índice de soledad de la 01002 está entre 39 y 46",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": ">=",
+       "right": {
+        "value": 38.5
+       }
+      },
+      {
+       "target": "C16",
+       "statement": "el índice de soledad de la 01002 está entre 39 y 46",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": "<",
+       "right": {
+        "value": 46.5
+       }
+      },
+      {
+       "target": "C16",
+       "statement": "el índice de soledad de la 01003 está entre 39 y 46",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       },
+       "op": ">=",
+       "right": {
+        "value": 38.5
+       }
+      },
+      {
+       "target": "C16",
+       "statement": "el índice de soledad de la 01003 está entre 39 y 46",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       },
+       "op": "<",
+       "right": {
+        "value": 46.5
+       }
+      },
+      {
+       "target": "C16",
+       "statement": "el índice de soledad de la 01004 está entre 39 y 46",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       },
+       "op": ">=",
+       "right": {
+        "value": 38.5
+       }
+      },
+      {
+       "target": "C16",
+       "statement": "el índice de soledad de la 01004 está entre 39 y 46",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       },
+       "op": "<",
+       "right": {
+        "value": 46.5
+       }
+      },
+      {
+       "target": "C16",
+       "statement": "la 01002 tiene el índice de soledad más alto (frente a la 01001)",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101001"
+       }
+      },
+      {
+       "target": "C16",
+       "statement": "la 01002 tiene el índice de soledad más alto (frente a la 01003)",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       }
+      },
+      {
+       "target": "C16",
+       "statement": "la 01002 tiene el índice de soledad más alto (frente a la 01004)",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       }
+      },
+      {
+       "target": "C16",
+       "statement": "la 01001 tiene el segundo índice más alto (frente a la 01003)",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101001"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       }
+      },
+      {
+       "target": "C16",
+       "statement": "la 01001 tiene el segundo índice más alto (frente a la 01004)",
+       "left": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101001"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "ieca-seccion-indice-soledad",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       }
+      },
+      {
+       "target": "C17",
+       "statement": "la 01002 tiene la menor renta por persona (frente a la 01001)",
+       "left": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101001"
+       }
+      },
+      {
+       "target": "C17",
+       "statement": "la 01002 tiene la mayor proporción bajo el umbral (frente a la 01001)",
+       "left": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101001"
+       }
+      },
+      {
+       "target": "C17",
+       "statement": "la 01002 tiene la menor pensión mediana (frente a la 01001)",
+       "left": {
+        "indicatorId": "ieca-seccion-pension-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "ieca-seccion-pension-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101001"
+       }
+      },
+      {
+       "target": "C17",
+       "statement": "la 01002 tiene la mayor proporción de menores de 18 (frente a la 01001)",
+       "left": {
+        "indicatorId": "adrh-pob-menor-18",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "adrh-pob-menor-18",
+        "level": "seccion",
+        "territoryCode": "1801101001"
+       }
+      },
+      {
+       "target": "C17",
+       "statement": "la 01002 tiene la menor renta por persona (frente a la 01003)",
+       "left": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       }
+      },
+      {
+       "target": "C17",
+       "statement": "la 01002 tiene la mayor proporción bajo el umbral (frente a la 01003)",
+       "left": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       }
+      },
+      {
+       "target": "C17",
+       "statement": "la 01002 tiene la menor pensión mediana (frente a la 01003)",
+       "left": {
+        "indicatorId": "ieca-seccion-pension-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "ieca-seccion-pension-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       }
+      },
+      {
+       "target": "C17",
+       "statement": "la 01002 tiene la mayor proporción de menores de 18 (frente a la 01003)",
+       "left": {
+        "indicatorId": "adrh-pob-menor-18",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "adrh-pob-menor-18",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       }
+      },
+      {
+       "target": "C17",
+       "statement": "la 01002 tiene la menor renta por persona (frente a la 01004)",
+       "left": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "adrh-renta-neta-persona",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       }
+      },
+      {
+       "target": "C17",
+       "statement": "la 01002 tiene la mayor proporción bajo el umbral (frente a la 01004)",
+       "left": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "adrh-bajo-60-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       }
+      },
+      {
+       "target": "C17",
+       "statement": "la 01002 tiene la menor pensión mediana (frente a la 01004)",
+       "left": {
+        "indicatorId": "ieca-seccion-pension-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "ieca-seccion-pension-mediana",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       }
+      },
+      {
+       "target": "C17",
+       "statement": "la 01002 tiene la mayor proporción de menores de 18 (frente a la 01004)",
+       "left": {
+        "indicatorId": "adrh-pob-menor-18",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       },
+       "op": ">",
+       "right": {
+        "indicatorId": "adrh-pob-menor-18",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       }
+      },
+      {
+       "target": "C17",
+       "statement": "la 01003 tiene el desempleo registrado más bajo (frente a la 01001)",
+       "left": {
+        "indicatorId": "ieca-seccion-tasa-desempleo",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "ieca-seccion-tasa-desempleo",
+        "level": "seccion",
+        "territoryCode": "1801101001"
+       }
+      },
+      {
+       "target": "C17",
+       "statement": "la 01003 tiene el desempleo registrado más bajo (frente a la 01002)",
+       "left": {
+        "indicatorId": "ieca-seccion-tasa-desempleo",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "ieca-seccion-tasa-desempleo",
+        "level": "seccion",
+        "territoryCode": "1801101002"
+       }
+      },
+      {
+       "target": "C17",
+       "statement": "la 01003 tiene el desempleo registrado más bajo (frente a la 01004)",
+       "left": {
+        "indicatorId": "ieca-seccion-tasa-desempleo",
+        "level": "seccion",
+        "territoryCode": "1801101003"
+       },
+       "op": "<",
+       "right": {
+        "indicatorId": "ieca-seccion-tasa-desempleo",
+        "level": "seccion",
+        "territoryCode": "1801101004"
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

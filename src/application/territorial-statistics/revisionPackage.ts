@@ -187,6 +187,27 @@ function resultFrom(snapshot: TerritorialStatisticsSnapshot, ficha: IndicatorFic
 }
 
 /**
+ * Las secciones de un mismo indicador comparten rótulo y página. Una revisión anterior
+ * pudo sustituir una sola sección con el rótulo del catálogo y dejarla fuera de su
+ * fila; se alinea con el rótulo y la página que tiene la mayoría de sus secciones.
+ */
+function alignSectionLabels(ficha: IndicatorFicha, ids: string[], next: ProfileResult[], changes: RevisionChange[]) {
+  const items = ids.map(id => next.findIndex(r => r.id === id)).filter(i => i >= 0);
+  if (items.length < 2) return;
+  const count = new Map<string, number>();
+  for (const i of items) { const k = JSON.stringify([next[i].title, next[i].topic ?? ""]); count.set(k, (count.get(k) ?? 0) + 1); }
+  const [best, n] = [...count.entries()].sort((a, b) => b[1] - a[1])[0];
+  if (n * 2 <= items.length) return; // sin mayoría clara no se decide
+  const [title, topic] = JSON.parse(best) as [string, string];
+  for (const i of items) {
+    const r = next[i];
+    if (r.title === title && (r.topic ?? "") === topic) continue;
+    next[i] = { ...r, title, topic: topic || undefined };
+    changes.push({ kind: "actualizado", indicatorId: ficha.id, title: ficha.title, scale: r.scale ?? "", value: r.value, period: r.period, previous: { title: r.title, value: r.value, period: r.period, reason: "al-dia" } });
+  }
+}
+
+/**
  * Resultados de una nueva revisión: los del Perfil vigente más los descargados.
  * Un indicador ausente se añade; uno con dato más reciente o con valor distinto
  * al publicado se sustituye conservando su identificador (y sus vínculos con las
@@ -216,6 +237,9 @@ export function mergeTerritorialResults(snapshot: TerritorialStatisticsSnapshot,
       const previous = { title: found.title, value: found.value, period: found.period, reason: status };
       if (status === "actualizable" || status === "revisar-valor") {
         const replacement = resultFrom(snapshot, ficha, o, found.id);
+        // Se sustituye el dato, no el rótulo ni la página: así el resultado sigue en la misma
+        // fila que las demás secciones del indicador (matriz por sección).
+        replacement.title = found.title; replacement.topic = found.topic ?? replacement.topic; replacement.scale = found.scale ?? replacement.scale;
         if (found.supportsConclusions) replacement.supportsConclusions = found.supportsConclusions;
         replacement.caution = `${replacement.caution} Sustituye en esta revisión el valor ${found.value} (${found.period || "periodo no declarado"}) del Perfil anterior.`.trim();
         next[next.findIndex(r => r.id === found.id)] = replacement;
@@ -224,6 +248,7 @@ export function mergeTerritorialResults(snapshot: TerritorialStatisticsSnapshot,
         changes.push({ kind: "conservado", indicatorId: ficha.id, title: ficha.title, scale, value: found.value, period: found.period, previous });
       }
     }
+    alignSectionLabels(ficha, matches.filter(m => m.section).map(m => m.result.id), next, changes);
   }
   return { results: next, changes };
 }

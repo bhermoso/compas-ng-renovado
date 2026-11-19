@@ -309,4 +309,29 @@ describe("revisión del Perfil con los datos descargados", () => {
     expect(new Set(ids).size).toBe(ids.length);
     expect(second.length).toBe(first.length);
   });
+
+  it("al sustituir el dato de una sección conserva su rótulo y su página", async () => {
+    const s = await snapshotAlfacar();
+    const T = "Tasa de desempleo registrado por sección censal";
+    const vigentes = [
+      { ...base, id: "s1", title: T, value: "18,8", unit: "%", period: "2024", scale: "Sección censal 1801101001", topic: "Condiciones de vida" },
+      { ...base, id: "s2", title: T, value: "18,25", unit: "%", period: "2024", scale: "Sección censal 1801101002", topic: "Condiciones de vida" },
+    ];
+    const { results } = mergeTerritorialResults(s, vigentes);
+    expect(results.find(r => r.id === "s2")).toMatchObject({ value: "18,2", title: T, topic: "Condiciones de vida", scale: "Sección censal 1801101002" });
+  });
+
+  it("devuelve a su fila la sección que una revisión anterior sacó con el rótulo del catálogo", async () => {
+    const s = await snapshotAlfacar();
+    const T = "Tasa de desempleo registrado por sección censal";
+    const vigentes = [
+      { ...base, id: "s1", title: T, value: "18,8", unit: "%", period: "2024", scale: "Sección censal 1801101001", topic: "Condiciones de vida" },
+      { ...base, id: "s2", title: "Tasa de desempleo registrado por sección", value: "18,2", unit: "%", period: "2024", scale: "Sección censal 1801101002", topic: "Ejes de desigualdad" },
+      { ...base, id: "s3", title: T, value: "15,1", unit: "%", period: "2024", scale: "Sección censal 1801101003", topic: "Condiciones de vida" },
+    ];
+    const { results, changes } = mergeTerritorialResults(s, vigentes);
+    expect(results.find(r => r.id === "s2")).toMatchObject({ title: T, topic: "Condiciones de vida", value: "18,2" });
+    expect(changes.some(c => c.kind === "actualizado" && c.previous?.title === "Tasa de desempleo registrado por sección")).toBe(true);
+    expect(results.filter(r => r.id.startsWith("s")).map(r => r.title)).toEqual([T, T, T]);
+  });
 });
