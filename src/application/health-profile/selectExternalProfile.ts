@@ -6,7 +6,10 @@ export function selectExternalProfile(workspace: MunicipalityWorkspace): LocalHe
  const library = workspace.externalProfileLibrary;
  const profile = library?.profiles.find(p => p.id === library.activeId && p.municipalityId === workspace.municipality.identity.id);
  if (!profile && workspace.validatedPSL?.municipalityId === workspace.municipality.identity.id) return workspace.validatedPSL;
- const areas = profile?.areas.map(a => ({...a,relatedEvidenceIds:[],cautions:profile.limitations})) ?? [];
+ // La recomendación externa solo conserva su identidad y texto. El paquete
+ // no contiene enlaces a EvidenceAtom: no fabricar un recuento cero ni
+ // convertir las limitaciones generales en cautelas de cada recomendación.
+ const areas = profile?.areas.map(a => ({...a,relatedEvidenceIds:[],cautions:[]})) ?? [];
  return {
   id:profile?.id ?? `no-profile:${workspace.municipality.identity.id}`,municipalityId:workspace.municipality.identity.id,
   status:profile?.status ?? 'archived',version:profile?.id ?? 'none',evidenceStoreVersion:profile?.evidenceVersion ?? '',strategicFrameworkSectionIds:[],

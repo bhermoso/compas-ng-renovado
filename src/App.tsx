@@ -4339,6 +4339,11 @@ export default function App() {
             {/* Candidaturas técnicas — derivadas del PSL */}
             <PrioritizationPanel
               prioritization={runtime.prioritization}
+              externalSource={(() => {
+                const library = workspace.externalProfileLibrary;
+                const active = library?.profiles.find(p => p.id === library.activeId && p.municipalityId === municipality.id);
+                return active ? { id: active.id, title: active.title, status: active.status, limitations: active.limitations } : undefined;
+              })()}
               pslStatus={runtime.psl.status}
               pslIsStale={runtime.pslIsStale}
               hasInsufficientEvidence={pipelineIsEmpty}
