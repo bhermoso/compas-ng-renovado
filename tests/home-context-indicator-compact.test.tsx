@@ -6,6 +6,14 @@ import type { ExternalHealthProfile } from "../src/domain/health-profile/Externa
 import { readFileSync } from "node:fs";
 
 describe("Portada municipal e indicadores compactos", () => {
+  it("la navegación no oculta el municipio en Inicio", () => {
+    const app=readFileSync(new URL("../src/App.tsx",import.meta.url),"utf8");
+    expect(app).toContain('<div className="app-nav__municipality" aria-label="Expediente municipal seleccionado">');
+    expect(app).not.toContain('{view !== "inicio" && <div className="app-nav__municipality">');
+    expect(app).toContain("Expediente cargado:");
+  });
+
+
   it("identifica con nombre y código el expediente activo, con selector funcional enlazable", () => {
     const html = renderToStaticMarkup(<HomePortada onNavigate={()=>{}} municipality={{name:"Loja",province:"Granada",ineCode:"18122"}} onChangeMunicipality={()=>{}}/>);
     expect(html).toContain("Expediente cargado");
