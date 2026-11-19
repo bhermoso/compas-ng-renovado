@@ -65,6 +65,8 @@ describe('Gestión documental contextual en todas las fichas',()=>{
    </DocumentOriginalManagementContext.Provider>
   );
   expect(html).toContain('Adjuntar el archivo original');
+  expect(html).toContain('accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"');
+  expect(html).toContain('Adjuntar original PDF o DOCX');
   expect(html).toContain('Crear nueva versión');
   expect(html).toContain('Archivar documento');
   expect(html).toContain('Eliminar documento');
