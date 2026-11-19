@@ -23,7 +23,7 @@ const repository = {
 
 describe("Gestión documental completa", () => {
   it("enumera incluso fuentes de activos y el Informe y permite abrir su ficha", () => {
-    const html = renderToStaticMarkup(<DocumentArchiveManager repository={repository} evidence={[] as EvidenceAtom[]} originalIds={["assets-1"]} canWrite persistence="Firebase · copia confirmada" originalCapacity="6 MB / 40 MB" onVerifyRemote={async()=>({matches:true,problems:[],remoteUpdatedAt:"2026-11-19",remoteDocuments:2,remoteOriginals:1})} onOpenUploader={()=>{}} onOpenAssetValidations={()=>{}}/>);
+    const html = renderToStaticMarkup(<DocumentArchiveManager repository={repository} evidence={[] as EvidenceAtom[]} originalIds={["assets-1"]} canWrite persistence="Firebase · copia confirmada" originalCapacity="6 MB / 40 MB" archiveVersion={time} onVerifyRemote={async()=>({matches:true,problems:[],remoteUpdatedAt:"2026-11-19",remoteDocuments:2,remoteOriginals:1})} onOpenUploader={()=>{}} onOpenAssetValidations={()=>{}}/>);
     expect(html).toContain("Gestionar el archivo del expediente");
     expect(html).toContain("2</strong> fichas");
     expect(html).toContain("1</strong> originales compartidos");
