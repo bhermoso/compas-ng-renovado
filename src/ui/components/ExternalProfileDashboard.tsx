@@ -12,6 +12,7 @@ import { ProfileEditorialLab } from './ProfileEditorialLab';
 import { ProfileOriginalVerifier } from './ProfileOriginalVerifier';
 import { TerritorialStatisticsPanel } from './TerritorialStatisticsPanel';
 import { ProfileUpdaterPanel, type ProfileUpdateOutcome } from './ProfileUpdaterPanel';
+import { printCompleteProfile } from './printCompleteProfile';
 import type { ProfileUpdateKind } from '../../application/health-profile/profileUpdater';
 import type { ProfileTextPackage } from '../../application/health-profile/profileTextOperations';
 import type { TerritorialStatisticsSnapshot } from '../../domain/territorial-statistics/TerritorialStatistics';
@@ -40,28 +41,6 @@ function download(blob: Blob, name: string) {
  window.setTimeout(() => URL.revokeObjectURL(url),1000);
 }
 /** Imprime la lectura completa del perfil, no solo las cuatro páginas de datos. */
-function printCompleteProfile(node: HTMLElement | null, title: string) {
- if (!node) return;
- const frame=document.createElement('iframe');
- frame.title='Exportación del Perfil de Salud Local';
- frame.style.cssText='position:fixed;width:0;height:0;border:0;right:0;bottom:0';
- document.body.appendChild(frame);
- const doc=frame.contentDocument;
- if(!doc){frame.remove();return;}
- const styles=Array.from(document.querySelectorAll('style,link[rel="stylesheet"]')).map(el=>el.outerHTML).join('');
- const safeTitle=title.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
- doc.open();
- doc.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>${safeTitle}</title>${styles}
- <style>@page{size:A4;margin:12mm} body{background:white!important;margin:0!important}
- .epd-trace__item,.epd-findings li,.epd-recos__group{break-inside:avoid}
- .epd{max-width:none!important} .pdp-page{break-after:auto!important;page-break-after:auto!important}
- .pdp-print-body .pdp-page{break-after:auto!important}
- </style></head><body class="pdp-print-body"><main class="external-profile"><div class="ep-main ep-main--profile">${node.outerHTML}</div></main></body></html>`);
- doc.close();
- let printed=false;
- const go=()=>{if(printed)return;printed=true;frame.contentWindow?.focus();frame.contentWindow?.print();window.setTimeout(()=>frame.remove(),1500)};
- if(doc.readyState==='complete')window.setTimeout(go,400);else frame.addEventListener('load',()=>window.setTimeout(go,400),{once:true});
-}
 function emptyProfile(municipalityId: string): ExternalHealthProfile {
  return {schema:'compas-external-profile/v1',id:crypto.randomUUID(),municipalityId,title:'',period:'',author:'',createdAt:new Date().toISOString(),
   status:'review',summary:'',text:'',results:[],findings:[],limitations:[],areas:[],attachmentIds:[]};
