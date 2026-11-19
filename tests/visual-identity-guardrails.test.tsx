@@ -78,7 +78,7 @@ describe("Contrato visual institucional COMPÁS · regresiones", () => {
     expect(html).toContain('role="alert"');
     expect(html).toContain('data-tone="error"');
     expect(html).toContain("No se pudo guardar el perfil en Firebase.");
-    expect(html).toContain("Copias y detalles");
+    expect(html).toContain("Conservación y copias");
     expect(html).toContain("Exportar copia");
     expect(html).not.toContain("app-persistence-warning");
   });
