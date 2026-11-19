@@ -3843,6 +3843,7 @@ export default function App() {
         {/* El ámbito del expediente permanece visible también en Inicio: la portada utiliza datos municipales. */}
         <div className="app-nav__municipality" aria-label="Expediente municipal seleccionado">
           <div className="app-nav__municipality-row">
+            <span className="app-nav__context-label">Expediente cargado:</span>
             <span className="app-nav__municipality-name">
               {municipality.name}
             </span>
