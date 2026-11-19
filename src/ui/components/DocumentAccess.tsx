@@ -10,7 +10,7 @@ export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable
  const context=useDocumentOriginalManagement();
  // Never present active-municipality write operations on a document from the
  // cross-municipality read-only library.
- const management=context?.municipalityId===doc.municipalityId ? context : null;
+ const management=context?.municipalityId===doc.municipalityId && context.storeOriginal && context.createRevision && context.archiveDocument && context.deleteDocument ? context : null;
  const remoteOriginal=management?.originals.find(o=>o.documentId===doc.id);
  const [file,setFile]=useState<File>();const [message,setMessage]=useState('');
  const [derivedKind,setDerivedKind]=useState<'transcription-reconstruction'|'format-conversion'>('transcription-reconstruction');
@@ -79,7 +79,7 @@ export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable
     try {
       if (!management) throw new Error('El expediente compartido no permite guardar originales desde esta vista.');
       setMessage('Comprobando archivo y guardando en Firebase…');
-      await management.storeOriginal(doc.id,next);
+      await management.storeOriginal?.(doc.id,next);
       setFile(next);
       setMessage('Original verificado y guardado en Firebase. La copia del navegador es una caché.');
     } catch(error) {
@@ -94,18 +94,18 @@ export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable
         const input=e.currentTarget, replacement=input.files?.[0];if(!replacement)return;
         input.value='';
         if(!window.confirm(`¿Crear una nueva versión de «${doc.title}» con «${replacement.name}»? El documento anterior y todas sus evidencias seguirán conservados.`))return;
-        try{setMessage('Guardando nueva versión en Firebase…');await management.createRevision(doc.id,replacement);setMessage('Nueva versión guardada; el documento original permanece conservado.');}
+        try{setMessage('Guardando nueva versión en Firebase…');await management.createRevision?.(doc.id,replacement);setMessage('Nueva versión guardada; el documento original permanece conservado.');}
         catch(error){setMessage('No se ha guardado la nueva versión: '+(error as Error).message);}
       }}/>
     </label>
     {doc.status!=='archived'&&<button type="button" onClick={async()=>{
       if(!window.confirm(`¿Archivar «${doc.title}» sin eliminar su archivo ni sus evidencias?`))return;
-      try{setMessage('Archivando en Firebase…');await management.archiveDocument(doc.id);setMessage('Documento archivado y conservado en Firebase.');}
+      try{setMessage('Archivando en Firebase…');await management.archiveDocument?.(doc.id);setMessage('Documento archivado y conservado en Firebase.');}
       catch(error){setMessage('No se ha podido archivar: '+(error as Error).message);}
     }}>Archivar documento</button>}
     <button type="button" onClick={async()=>{
       if(!window.confirm(`¿Eliminar definitivamente «${doc.title}» de Firebase y retirar sus evidencias derivadas? Esta acción no equivale a archivar y no se puede deshacer.`))return;
-      try{setMessage('Eliminando en Firebase…');const deleted=await management.deleteDocument(doc.id);setMessage(deleted?'Eliminación confirmada por Firebase.':'Firebase no ha confirmado la eliminación.');}
+      try{setMessage('Eliminando en Firebase…');const deleted=await management.deleteDocument?.(doc.id);setMessage(deleted?'Eliminación confirmada por Firebase.':'Firebase no ha confirmado la eliminación.');}
       catch(error){setMessage('No se ha podido eliminar: '+(error as Error).message);}
     }}>Eliminar documento</button>
   </div>}
