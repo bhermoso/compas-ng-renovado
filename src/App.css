@@ -11660,3 +11660,25 @@ h3 {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
   }
 }
+
+/* El ámbito activo se identifica también en Inicio; la barra no oculta
+   su etiqueta ni el selector por tratarse de la portada. */
+.app-nav__context-label {
+  font-weight: 600;
+  font-size: .71rem;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  color: var(--texto-terciario);
+}
+.app-nav--home .app-nav__municipality-row {
+  min-height: 32px;
+  height: auto;
+  padding-block: 4px;
+  overflow-x: auto;
+}
+.app-nav--home .app-nav__municipality-row > * { flex-shrink: 0; }
+.app-nav--home .app-nav__municipality-name { font-size: .84rem; }
+@media (max-width: 600px) {
+  .app-nav__municipality-row { gap: 7px; }
+  .app-nav__context-label { font-size: .67rem; }
+}
