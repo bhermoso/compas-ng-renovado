@@ -488,6 +488,15 @@ export function removeMunicipalDocument(
   return {
     ...repository,
     documents: repository.documents.filter((d) => d.id !== documentId),
+    // Una carga retirada no puede conservar validaciones ni conciliaciones
+    // que la señalen como fuente disponible. Las demás declaraciones perduran.
+    ...(repository.assetValidations !== undefined
+      ? { assetValidations: repository.assetValidations.filter(v => v.documentId !== documentId) }
+      : {}),
+    ...(repository.conciliations !== undefined
+      ? { conciliations: repository.conciliations.filter(c =>
+          c.historical.documentId !== documentId && c.current.documentId !== documentId) }
+      : {}),
     updatedAt: now,
   };
 }
