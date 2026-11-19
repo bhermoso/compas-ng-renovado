@@ -2157,12 +2157,12 @@ export default function App() {
   /**
    * Dónde queda lo incorporado, sin prometer más de lo que ocurre: con sesión,
    * la ficha, el texto y las evidencias viajan en el expediente compartido de
-   * Firebase (autoguardado); el archivo original del Diagnóstico solo se
-   * conserva en IndexedDB de este navegador (originalFiles.ts).
+   * Firebase para sesiones autenticadas; IndexedDB mantiene una copia local.
+   * Sin autenticación, los archivos no se comparten con otros navegadores.
    */
   function storageSummary(): string {
     return remoteClient.auth.currentUser
-      ? `La ficha, el texto, las evidencias y el archivo original se guardan en el expediente compartido de Firebase. Los originales del Diagnóstico y del Perfil comparten un límite de ${formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)} por expediente; el que no quepa se conserva solo en este navegador y se avisa.`
+      ? `La ficha, el texto, las evidencias, los originales y las copias derivadas se guardan en el expediente compartido de Firebase. Los archivos del Diagnóstico y del Perfil comparten un límite de ${formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)} por expediente; el que no quepa se conserva solo en este navegador y se avisa.`
       : "Sin sesión iniciada: todo se guarda solo en este navegador. Inicia sesión para guardar el expediente en Firebase.";
   }
 
