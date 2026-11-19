@@ -1,4 +1,5 @@
 import { externalProfileDocument } from '../../application/health-profile/externalProfileDocument';
+import { auditProfileCustody, findUnpublishedValueConflicts } from '../../application/health-profile/profileCustodyAudit';
 import { prepareZagraHistoricalRevision, ZAGRA_HISTORICAL_RESULTS } from '../../application/health-profile/zagraHistoricalEvidence';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { parseProfileStructure, prefillFromStructure } from '../../application/health-profile/profileStructure';
@@ -59,6 +60,8 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
  const fullProfileRef=useRef<HTMLDivElement>(null);
  const selected=library.profiles.find(p=>p.id===(selectedId ?? library.activeId)) ?? library.profiles.find(p=>p.id===library.activeId);
  const activeProfile=library.profiles.find(p=>p.id===library.activeId);
+ const custody=selected ? auditProfileCustody(selected,library) : undefined;
+ const numericConflicts=selected ? findUnpublishedValueConflicts(selected.text) : [];
  const prepareTerritorialRevision=(results:ProfileResult[],note:string)=>{
   if(!activeProfile)return;
   if(draft&&!window.confirm('Ya hay un borrador sin guardar. ¿Sustituirlo por la revisión con los datos territoriales?'))return;
@@ -306,7 +309,9 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
    </div>
    <nav className="ep-tabs ep-tabs--primary" aria-label="Espacios del perfil">{([['results','Perfil'],['document','Documento completo'],['versions','Gestión y versiones'],['statistics','Estadística territorial'],...(onRunProfileUpdates?[['updater','Actualizador de perfiles'] as const]:[]),['laboratory','Laboratorio experimental']] as const).map(([key,label])=><button key={key} type="button" aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>
    {tab==='results'&&<main className="ep-main ep-main--profile">
-    <p className="ep-review-status" role="status">
+    {custody?.distinctOriginal&&<p className="ep-review-flags" role="note"><strong>Original anterior a esta revisión.</strong> Los archivos adjuntos identifican la versión {custody.attachmentVersions.join(", ")}; la lectura actual corresponde a la revisión {custody.currentVersion}. El original no incorpora las transformaciones posteriores.</p>}
+     {numericConflicts.map(c=><p className="ep-review-flags" role="alert" key={c.section}><strong>Incoherencia documental por cotejar.</strong> La tabla de la sección censal {c.section} presenta {c.displayed} como porcentaje exacto, mientras otro pasaje del Perfil dice que ese porcentaje no está publicado. No se modifica ninguna cifra automáticamente.</p>)}
+     <p className="ep-review-status" role="status">
       {selected.id!==library.activeId ? 'Revisión no vigente. ' : ''}
       {selected.status==='review' ? 'Borrador técnico: pendiente de validación.' : 'Versión validada técnicamente.'}
     </p>
@@ -331,11 +336,12 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
     <div className="ep-cover"><span>COMPÁS</span><div><small>{municipalityName}</small><h2>{selected.title}</h2><p>{selected.period||'Periodo no declarado'}</p></div><small>PERFIL DE SALUD LOCAL</small></div>
     <p className="ep-status">{selected.id===library.activeId?'Versión de referencia':'Revisión no vigente'} · {selected.status==='validated'?'Validada técnicamente':'En revisión'}</p>
     <dl className="ep-metadata"><div><dt>Autoría</dt><dd>{selected.author||'No declarada'}</dd></div><div><dt>Incorporación</dt><dd>{date(selected.createdAt)}</dd></div>{selected.validatedBy&&<div><dt>Validación</dt><dd>{selected.validatedBy} · {date(selected.validatedAt!)}</dd></div>}</dl>
-    <div className="ep-file-actions"><button type="button" disabled={busy} onClick={()=>void exportRevision()}>↓ Descargar esta revisión · Word</button>{files.map(file=><a key={file.id} aria-disabled={!fileUrls[file.id]} href={fileUrls[file.id]} download={file.name}>↓ Descargar original · {file.name}</a>)}
+    {custody&&<section className="ep-review-flags" aria-label="Control documental de esta revisión"><strong>Origen y cadena de revisiones</strong><p>Revisión actual: {custody.currentVersion??"sin número identificable"}. {custody.distinctOriginal?"Los archivos originales adjuntos son de una revisión anterior y no contienen los cambios posteriores.":"La coincidencia de nombres no certifica la equivalencia del original y esta lectura."}</p><p>Revisiones conservadas como registros en esta biblioteca: {library.profiles.length}. {custody.declaredRevisions.length>0?`Revisiones mencionadas en las notas: ${custody.declaredRevisions.join(", ")}.`:"No constan revisiones anteriores citadas en las notas estructuradas."}</p>{custody.missingRevisions.length>0&&<p><strong>No constan como registros independientes:</strong> {custody.missingRevisions.join(", ")}. Su mención textual no permite recuperar ni comparar sus contenidos exactos.</p>}{numericConflicts.map(c=><p key={c.section}><strong>Cifra pendiente de cotejo:</strong> sección {c.section}, porcentaje {c.displayed}; otra parte del documento declara que ese valor exacto no está publicado.</p>)}</section>}
+     <div className="ep-file-actions"><button type="button" disabled={busy} onClick={()=>void exportRevision()}>↓ Descargar esta revisión · Word</button>{files.map(file=><a key={file.id} aria-disabled={!fileUrls[file.id]} href={fileUrls[file.id]} download={file.name}>↓ Descargar original · {file.name}</a>)}
      {selected.text&&<button type="button" onClick={()=>download(new Blob([selected.text],{type:'text/plain;charset=utf-8'}),`${selected.title}.txt`)}>↓ Descargar texto de esta revisión</button>}
      <button type="button" onClick={()=>download(new Blob([JSON.stringify({schema:'compas-profile-package/v1',municipalityId,title:selected.title,period:selected.period,author:selected.author,summary:selected.summary,text:selected.text,results:selected.results,findings:selected.findings,limitations:selected.limitations,areas:selected.areas},null,2)],{type:'application/json'}),`${selected.title}-resultados.json`)}>↓ Descargar paquete de resultados</button>
     </div><button className="ep-primary" disabled={busy} onClick={edit}>Editar una nueva revisión</button>
-    <p className="ep-help">Los originales no se modifican. Cada edición conserva la versión anterior.</p>
+    <p className="ep-help">Los archivos originales adjuntos no se modifican. Las ediciones nuevas se registran aparte; una revisión anterior solo puede recuperarse si continúa conservada en esta biblioteca. No se reconstruye a partir de sus menciones textuales.</p>
    </aside>
     <section className="ep-versions"><p className="ep-eyebrow">HISTORIAL CONSERVADO EN FIREBASE</p><h2>Versiones del perfil</h2><p className="ep-version-summary" role="status">{library.profiles.length} versiones · {library.activeId?1:0} vigente{library.activeId?'':'s'} · {library.profiles.length} eliminables. <strong>Eliminar</strong> está disponible incluso en la versión vigente; <strong>Archivar</strong> solo en las no vigentes. Ninguna acción se realiza sin confirmación y guardado remoto.</p>{[...library.profiles].reverse().map(p=><article key={p.id}><div><h3>{p.title}</h3><p>{date(p.createdAt)} · {p.author||'Autoría no declarada'} · {p.status==='validated'?'Validada':'En revisión'}{p.id===library.activeId?' · Vigente':''}{p.archivedAt?' · Archivada':''}</p></div><div className="ep-actions"><button onClick={()=>{setSelectedId(p.id);setTab('document');}}>Consultar versión</button>{p.id!==library.activeId&&!p.archivedAt&&<button disabled={busy} onClick={()=>void commit({...library,activeId:p.id},'Versión vigente actualizada en Firebase.')}>Establecer como vigente</button>}
       {p.id!==library.activeId&&!p.archivedAt&&<button disabled={busy} onClick={()=>void archiveVersion(p)}>Archivar versión</button>}
