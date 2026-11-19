@@ -52,6 +52,14 @@ describe("Auditoría documental del Perfil de Salud Local", () => {
     expect(findUnpublishedValueConflicts(text)).toEqual([{section:"03002",displayed:"58,8"}]);
     expect(text).toContain("58,8");
   });
+  it("detecta cuando el texto indica primero que no se publica el valor y después nombra la sección", () => {
+    const text = [
+      "Sección | Renta (€) | Bajo el 60 % | Gini",
+      "03002 | 7.107 | 58,8 | 34,7",
+      "La tabla territorial del INE no publica un porcentaje exacto bajo umbral para la sección 03002.",
+    ].join("\n");
+    expect(findUnpublishedValueConflicts(text)).toEqual([{section:"03002",displayed:"58,8"}]);
+  });
   it("no acusa contradicción si la tabla declara el valor como no disponible", () => {
     const text = "Sección | Renta | Bajo el 60 %\n03002 | 7.107 | —\nLa tabla de renta de la sección 03002 no publica un porcentaje exacto.";
     expect(findUnpublishedValueConflicts(text)).toEqual([]);
