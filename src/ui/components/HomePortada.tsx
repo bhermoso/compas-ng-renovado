@@ -31,13 +31,27 @@ const PHASES: Phase[] = [
   { n: "06", verb: "Evaluar", desc: "Cumplimiento, resultados y recomendaciones para el ciclo siguiente.", docLabel: "Sale", doc: "Informe de evaluación", target: "evaluacion" },
 ];
 
-export function HomePortada({ onNavigate }: { onNavigate: (view: HomeTarget) => void }) {
+interface HomePortadaProps {
+  onNavigate: (view: HomeTarget) => void;
+  municipality: { name: string; province?: string; ineCode?: string };
+  onChangeMunicipality: () => void;
+}
+export function HomePortada({ onNavigate, municipality, onChangeMunicipality }: HomePortadaProps) {
   return (
     <div className="hp" aria-label="Portada de COMPÁS">
       <header className="hp-cover">
-        <p className="hp-cover__chain">
-          Marco RELAS · Planificación Local de Salud · Salud pública municipal · Andalucía
-        </p>
+        <div className="hp-cover__context">
+          <p className="hp-cover__chain">
+            Marco RELAS · Planificación Local de Salud · Salud pública municipal · Andalucía
+          </p>
+          <div className="hp-cover__municipality" aria-label="Expediente municipal cargado">
+            <span className="hp-cover__municipality-label">Expediente cargado</span>
+            <strong>{municipality.name}</strong>
+            {municipality.province && <span>· {municipality.province}</span>}
+            {municipality.ineCode && <span>· INE {municipality.ineCode}</span>}
+            <button type="button" onClick={onChangeMunicipality}>Cambiar ámbito</button>
+          </div>
+        </div>
         <div className="hp-cover__brand">
           <h1 className="home-cover__wordmark hp-cover__wordmark">COMPÁS</h1>
           <hr className="home-cover__rule hp-cover__rule" />
