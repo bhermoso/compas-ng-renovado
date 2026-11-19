@@ -20,3 +20,77 @@
   .lhpc__phase { min-width: 145px; }
 }
 @media (prefers-reduced-motion: reduce) { .lhpc__progress-fill { transition: none; } }
+
+/*
+ * Las fases contienen textos de longitud variable. El diseño original heredaba
+ * white-space:nowrap y dejaba que etiquetas, estados y notas compartieran una
+ * sola línea. Cada fase es ahora una tarjeta de anchura estable dentro de un
+ * carril horizontal desplazable, con filas separadas y envoltura real.
+ */
+.lhpc .lhpc__phases {
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--borde) transparent;
+  padding-bottom: 5px;
+  align-items: stretch;
+  scroll-snap-type: x proximity;
+}
+.lhpc .lhpc__phases::-webkit-scrollbar { display: block; height: 6px; }
+.lhpc .lhpc__phases::-webkit-scrollbar-thumb { background: var(--borde); border-radius: 999px; }
+.lhpc .lhpc__phase {
+  flex: 0 0 225px;
+  width: 225px;
+  min-width: 0;
+  box-sizing: border-box;
+  white-space: normal;
+  align-items: stretch;
+  padding: 10px 12px;
+  scroll-snap-align: start;
+}
+.lhpc .lhpc__phase-btn {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  grid-template-rows: auto auto auto;
+  align-content: start;
+  align-items: start;
+  gap: 5px 9px;
+  min-width: 0;
+  width: 100%;
+  white-space: normal;
+}
+.lhpc .lhpc__phase-num { grid-column: 1; grid-row: 1; }
+.lhpc .lhpc__phase-label {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  line-height: 1.3;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.lhpc .lhpc__phase-status {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  line-height: 1.35;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  display: block;
+}
+.lhpc .lhpc__phase-note {
+  display: block;
+  margin-top: 4px;
+  line-height: 1.35;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.lhpc .lhpc__phase-action {
+  grid-column: 2;
+  grid-row: 3;
+  margin: 2px 0 0;
+  justify-self: start;
+}
+@media (max-width: 760px) {
+  .lhpc .lhpc__phase { flex-basis: 210px; width: 210px; }
+}
