@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { MunicipalDocumentRepository, MunicipalDocument } from "../../domain/repository";
 import type { EvidenceAtom } from "../../domain/evidence";
 import { DocumentReference } from "./Documentation";
+import type { ArchiveComparison } from "../../application/document-files/compareDocumentArchive";
 import { KIND_LABEL } from "./documentRepositoryCategorization";
 import "./DocumentArchiveManager.css";
 
@@ -12,6 +13,7 @@ interface Props {
   canWrite: boolean;
   persistence: string;
   originalCapacity: string;
+  onVerifyRemote: () => Promise<ArchiveComparison>;
   onOpenUploader: () => void;
   onOpenAssetValidations: () => void;
 }
@@ -20,12 +22,15 @@ type Scope = "all" | "active" | "archived" | "assets" | "studies";
 const isActive = (d: MunicipalDocument) => d.status !== "archived" && d.status !== "rejected";
 
 /** Un punto de acceso a TODA la documentación, no solamente a las fuentes 'otras'. */
-export function DocumentArchiveManager({ repository, evidence, originalIds, canWrite, persistence, originalCapacity, onOpenUploader, onOpenAssetValidations }: Props) {
+export function DocumentArchiveManager({ repository, evidence, originalIds, canWrite, persistence, originalCapacity, onVerifyRemote, onOpenUploader, onOpenAssetValidations }: Props) {
   const [query, setQuery] = useState("");
   const [scope, setScope] = useState<Scope>("all");
   const [open, setOpen] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [verification, setVerification] = useState<{ key: string; report?: ArchiveComparison; error?: string }>();
   const originals = useMemo(() => new Set(originalIds), [originalIds]);
   const archive = repository.documents;
+  const archiveKey = [repository.updatedAt, ...archive.map(d=>`${d.id}:${d.updatedAt}:${d.status}`),...originalIds].join("|");
   const filtered = useMemo(() => archive.filter((d) => {
     if (scope === "active" && !isActive(d)) return false;
     if (scope === "archived" && isActive(d)) return false;
@@ -52,9 +57,20 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
       <div className="dam__controls">
         <button type="button" onClick={onOpenUploader}>Cargar otro documento</button>
         <button type="button" onClick={onOpenAssetValidations}>Revisar validaciones de activos</button>
+        <button type="button" disabled={verifying} onClick={async()=>{
+          setVerifying(true);
+          try{const report=await onVerifyRemote();setVerification({key:archiveKey,report});}
+          catch(error){setVerification({key:archiveKey,error:(error as Error).message});}
+          finally{setVerifying(false);}
+        }}>{verifying?"Leyendo Firebase…":"Verificar archivo en Firebase"}</button>
         <button type="button" aria-expanded={open} onClick={() => setOpen(v => !v)}>{open ? "Ocultar archivo" : "Buscar, sustituir o retirar documentos"}</button>
       </div>
       <p className="dam__foot">La cantidad de fichas no tiene un máximo fijo, pero los archivos originales tienen límites de capacidad: 20 MB por archivo y 40 MB compartidos con los originales del Perfil. Un registro sin original no equivale a un fichero conservado.</p>
+      {verification?.key===archiveKey && <div className="dam__verification" role="status">
+        {verification.error ? <strong>No verificado: {verification.error}</strong>
+          : verification.report?.matches ? <strong>Comprobado en Firebase: {verification.report.remoteDocuments} fichas y {verification.report.remoteOriginals} originales coinciden, incluidas las validaciones y las relaciones documentales. Lectura: {verification.report.remoteUpdatedAt}.</strong>
+          : <><strong>Hay diferencias con Firebase; no se puede cerrar la operación como sincronizada.</strong><ul>{verification.report?.problems.map((problem,i)=><li key={i}>{problem}</li>)}</ul></>}
+      </div>}
       <p className="dam__persistence" role="status">Persistencia: {persistence || "sin confirmación reciente"}. {canWrite ? "Las operaciones documentales se confirman en Firebase desde cada ficha." : "Las operaciones de escritura no están disponibles en esta sesión."}</p>
       {open && <>
         <div className="dam__filters">
