@@ -12,6 +12,7 @@ import type { ExternalProfileLibrary } from "./domain/health-profile/ExternalHea
 import { InitialLocalHealthPlanPanel } from "./ui/components/InitialLocalHealthPlanPanel";
 import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
 import { HomePortada } from "./ui/components/HomePortada";
+import { DocumentArchiveManager } from "./ui/components/DocumentArchiveManager";
 import { DocumentReviewInbox } from "./ui/components/DocumentReviewInbox";
 import { DiagnosisControlRoom, DiagnosisModuleSection } from "./ui/components/DiagnosisControlRoom";
 import { DuplicateDocumentsPanel } from "./ui/components/DuplicateDocumentsPanel";
@@ -1719,9 +1720,16 @@ export default function App() {
     }));
   }
 
-  function handleRemoveAssetValidation(validationId: string) {
+  async function handleRemoveAssetValidation(validationId: string) {
     const record = workspace.repository.assetValidations?.find(v => v.id === validationId);
     if (!record) return;
+    const municipalityId = workspace.municipality.identity.id;
+    if (!documentWriteAllowed || !remoteClient.auth.currentUser ||
+      remoteHydratedMunicipalityId !== municipalityId ||
+      pendingSeedId || pendingIndexedDbHydrationId || profileSaveInFlightRef.current) {
+      setRemotePersistenceMessage("No se puede retirar la validación: inicia sesión con permiso de edición y recupera el expediente de Firebase.");
+      return;
+    }
     if (!window.confirm(
       "Vas a retirar una declaración de validación de activos.\n" +
       "Documento: " + (workspace.repository.documents.find(d => d.id === record.documentId)?.title ?? record.documentId) + "\n" +
@@ -1729,11 +1737,31 @@ export default function App() {
       "Se conservarán las fichas y sus evidencias; cambiará la constancia formal de validación.\n" +
       "Aceptar: retirar la declaración · Cancelar: mantenerla."
     )) return;
-    setWorkspace((prev) => ({
-      ...prev,
-      repository: removeAssetValidation(prev.repository, validationId),
+    const next: MunicipalityWorkspace = {
+      ...workspace,
+      repository: removeAssetValidation(workspace.repository, validationId),
       updatedAt: new Date().toISOString(),
-    }));
+    };
+    profileSaveInFlightRef.current = true;
+    setRemotePersistenceMessage("Retirando declaración de validación en Firebase…");
+    try {
+      await saveRemoteWorkspace(remoteClient, next, undefined, workspace.updatedAt);
+      setWorkspace(prev => prev.municipality.identity.id === municipalityId ? next : prev);
+      let verified = false;
+      try {
+        const recovered = await readRemoteWorkspace(remoteClient, municipalityId);
+        verified = Boolean(recovered && !(recovered.repository.assetValidations ?? []).some(v => v.id === validationId));
+      } catch (verificationError) {
+        console.warn("[asset-validation-remote-verification]", verificationError);
+      }
+      setRemotePersistenceMessage(verified
+        ? "Declaración retirada y ausencia comprobada mediante lectura de Firebase."
+        : "La retirada se escribió en Firebase, pero no se pudo comprobar mediante una nueva lectura. Recupera el expediente antes de seguir.");
+    } catch (error) {
+      setRemotePersistenceMessage("No se ha retirado la declaración de Firebase: " + (error as Error).message);
+    } finally {
+      profileSaveInFlightRef.current = false;
+    }
   }
 
   async function handleLoadHealthReport(file: File, options: LoaderOptions = {}): Promise<boolean> {
@@ -3395,7 +3423,6 @@ export default function App() {
       const doc = prev.repository.documents.find((d) => d.id === documentId);
       const municipalityId = prev.municipality.identity.id;
       const deletesHealthReport = doc?.kind === "health-report" && prev.healthReport?.linkedDocumentId === documentId;
-      const deletesCommunityAssets = doc?.kind === "community-asset";
       const deletesIBSE = isIBSEDocument(doc);
       const deletesDUKE = isDUKEDocument(doc);
       const deletesPREDIMED = isPREDIMEDDocument(doc);
@@ -3426,7 +3453,6 @@ export default function App() {
               if (atom.municipalityId !== municipalityId) return true;
               if (atom.provenance.documentId === documentId) return false;
               if (deletesHealthReport && atom.provenance.origin === "health-report") return false;
-              if (deletesCommunityAssets && atom.provenance.origin === "community-assets") return false;
               if (deletesIBSE && atom.provenance.origin === "ibse") return false;
               if (
                 deletesDUKE &&
@@ -3550,9 +3576,29 @@ export default function App() {
     profileSaveInFlightRef.current = true;
     setRemotePersistenceMessage("Eliminando documento y evidencias en Firebase…");
     try {
-      await saveRemoteWorkspace(remoteClient, nextWorkspace);
+      // Retirar siempre desde la revisión exacta consultada, sin sobrescribir
+      // cambios de otra sesión o equipo.
+      await saveRemoteWorkspace(remoteClient, nextWorkspace, undefined, workspace.updatedAt);
       setWorkspace(current => current.municipality.identity.id === municipalityId ? nextWorkspace : current);
-      setRemotePersistenceMessage("Documento y evidencias eliminados del expediente compartido.");
+      // Un commit de Firebase no basta para declarar cerrado el ciclo:
+      // leer de nuevo desde el servidor y comprobar ficha, originales y validaciones.
+      let verified = false;
+      try {
+        const remote = await readRemoteWorkspace(remoteClient, municipalityId);
+        verified = Boolean(remote &&
+          !remote.repository.documents.some(d => d.id === documentId) &&
+          !(remote.documentOriginals ?? []).some(o => o.documentId === documentId) &&
+          !(remote.repository.assetValidations ?? []).some(v => v.documentId === documentId) &&
+          !(remote.repository.conciliations ?? []).some(c => c.current.documentId === documentId || c.historical.documentId === documentId) &&
+          !remote.evidenceStore.atoms.some(atom => atom.provenance.documentId === documentId));
+      } catch (verificationError) {
+        console.warn("[document-delete-remote-verification]", verificationError);
+      }
+      if (!verified) {
+        setRemotePersistenceMessage("Eliminación escrita en Firebase, pero la lectura posterior no la ha verificado. Recupera el expediente antes de operar de nuevo.");
+        return false;
+      }
+      setRemotePersistenceMessage("Eliminación comprobada mediante lectura de Firebase: ficha, original, evidencias y validaciones.");
       await deleteOriginalFile(municipalityId, documentId).catch(error => {
         console.warn("[original-cache-delete-error]", error);
         setRemotePersistenceMessage("Documento eliminado en Firebase; no se pudo limpiar su caché local.");
@@ -4075,6 +4121,18 @@ export default function App() {
                 />
               );
             })()}
+
+            {/* Punto único de control de todo el archivo documental, incluidos activos y CSV. */}
+            <DocumentArchiveManager
+              repository={runtime.workspace.repository}
+              evidence={runtime.workspace.evidenceStore.atoms}
+              originalIds={(runtime.workspace.documentOriginals ?? []).map(o => o.documentId)}
+              originalCapacity={`${formatMegabytes(documentOriginalsBytes(runtime.workspace.documentOriginals) + profileOriginalsBytes(runtime.workspace.externalProfileLibrary))} / ${formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)}`}
+              canWrite={documentWriteAllowed}
+              persistence={remotePersistenceMessage ?? ""}
+              onOpenUploader={() => document.getElementById("document-review-title")?.scrollIntoView({behavior:"smooth",block:"start"})}
+              onOpenAssetValidations={() => { toggleDiagnosisModule("documents", true); requestAnimationFrame(() => document.getElementById("diag-mod-documents")?.scrollIntoView({behavior:"smooth",block:"start"})); }}
+            />
 
             {/* ── Originales en el expediente compartido ── */}
             {(() => {
