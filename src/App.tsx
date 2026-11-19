@@ -3886,9 +3886,10 @@ export default function App() {
           </div>
         </div>
 
-        {/* Franja de contexto municipal — oculta en inicio, visible en vistas operativas */}
-        {view !== "inicio" && <div className="app-nav__municipality">
+        {/* Referencia del expediente cargado también en Inicio. */}
+        <div className="app-nav__municipality" aria-label="Expediente municipal seleccionado">
           <div className="app-nav__municipality-row">
+            <span className="app-nav__context-label">Expediente cargado:</span>
             <span className="app-nav__municipality-name">
               {municipality.name}
             </span>
@@ -3921,7 +3922,7 @@ export default function App() {
               {showMunicipalitySelector ? "Cerrar ▲" : "Cambiar ámbito ▾"}
             </button>
           </div>
-        </div>}
+        </div>
       </nav>
 
       {/* Ciclo de Planificación Local — visible en todas las vistas: Implantación (agenda) no exige datos previos */}
