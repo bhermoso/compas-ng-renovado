@@ -3897,7 +3897,7 @@ export default function App() {
           })()}
           agendaCount={workspace.agendaActuations?.length ?? 0}
           currentView={view}
-          onNavigate={(v) => { setAgendaFocusId(undefined); setView(v as AppView); }}
+          onNavigate={(v) => { setAgendaFocusId(undefined); setView(v as AppView); window.scrollTo({ top: 0, behavior: "auto" }); }}
         />
       )}
 
