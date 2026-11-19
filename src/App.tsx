@@ -4127,6 +4127,7 @@ export default function App() {
               repository={runtime.workspace.repository}
               evidence={runtime.workspace.evidenceStore.atoms}
               originalIds={(runtime.workspace.documentOriginals ?? []).map(o => o.documentId)}
+              originalCapacity={`${formatMegabytes(documentOriginalsBytes(runtime.workspace.documentOriginals) + profileOriginalsBytes(runtime.workspace.externalProfileLibrary))} / ${formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)}`}
               canWrite={documentWriteAllowed}
               persistence={remotePersistenceMessage ?? ""}
               onOpenUploader={() => document.getElementById("document-review-title")?.scrollIntoView({behavior:"smooth",block:"start"})}
