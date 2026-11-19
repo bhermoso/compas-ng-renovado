@@ -1720,9 +1720,16 @@ export default function App() {
     }));
   }
 
-  function handleRemoveAssetValidation(validationId: string) {
+  async function handleRemoveAssetValidation(validationId: string) {
     const record = workspace.repository.assetValidations?.find(v => v.id === validationId);
     if (!record) return;
+    const municipalityId = workspace.municipality.identity.id;
+    if (!documentWriteAllowed || !remoteClient.auth.currentUser ||
+      remoteHydratedMunicipalityId !== municipalityId ||
+      pendingSeedId || pendingIndexedDbHydrationId || profileSaveInFlightRef.current) {
+      setRemotePersistenceMessage("No se puede retirar la validación: inicia sesión con permiso de edición y recupera el expediente de Firebase.");
+      return;
+    }
     if (!window.confirm(
       "Vas a retirar una declaración de validación de activos.\n" +
       "Documento: " + (workspace.repository.documents.find(d => d.id === record.documentId)?.title ?? record.documentId) + "\n" +
@@ -1730,11 +1737,31 @@ export default function App() {
       "Se conservarán las fichas y sus evidencias; cambiará la constancia formal de validación.\n" +
       "Aceptar: retirar la declaración · Cancelar: mantenerla."
     )) return;
-    setWorkspace((prev) => ({
-      ...prev,
-      repository: removeAssetValidation(prev.repository, validationId),
+    const next: MunicipalityWorkspace = {
+      ...workspace,
+      repository: removeAssetValidation(workspace.repository, validationId),
       updatedAt: new Date().toISOString(),
-    }));
+    };
+    profileSaveInFlightRef.current = true;
+    setRemotePersistenceMessage("Retirando declaración de validación en Firebase…");
+    try {
+      await saveRemoteWorkspace(remoteClient, next, undefined, workspace.updatedAt);
+      setWorkspace(prev => prev.municipality.identity.id === municipalityId ? next : prev);
+      let verified = false;
+      try {
+        const recovered = await readRemoteWorkspace(remoteClient, municipalityId);
+        verified = Boolean(recovered && !(recovered.repository.assetValidations ?? []).some(v => v.id === validationId));
+      } catch (verificationError) {
+        console.warn("[asset-validation-remote-verification]", verificationError);
+      }
+      setRemotePersistenceMessage(verified
+        ? "Declaración retirada y ausencia comprobada mediante lectura de Firebase."
+        : "La retirada se escribió en Firebase, pero no se pudo comprobar mediante una nueva lectura. Recupera el expediente antes de seguir.");
+    } catch (error) {
+      setRemotePersistenceMessage("No se ha retirado la declaración de Firebase: " + (error as Error).message);
+    } finally {
+      profileSaveInFlightRef.current = false;
+    }
   }
 
   async function handleLoadHealthReport(file: File, options: LoaderOptions = {}): Promise<boolean> {
