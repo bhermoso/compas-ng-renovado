@@ -50,8 +50,10 @@ export interface UnpublishedValueConflict {
  * No adjudica cuál de las dos afirmaciones es correcta ni altera el documento.
  */
 export function findUnpublishedValueConflicts(text: string): UnpublishedValueConflict[] {
-  const mentioned = [...text.matchAll(/secci[oó]n\s+(\d{5})[^\n.]{0,180}no publica un porcentaje exacto/gi)]
-    .map(m => m[1]);
+  const mentioned = [
+    ...[...text.matchAll(/secci[oó]n\s+(\d{5})[^\n.]{0,180}no publica un porcentaje exacto/gi)].map(m => m[1]),
+    ...[...text.matchAll(/no publica un porcentaje exacto[^\n.]{0,180}secci[oó]n\s+(\d{5})/gi)].map(m => m[1]),
+  ];
   const sections = [...new Set(mentioned)];
   const lines = text.split("\n");
   const conflicts: UnpublishedValueConflict[] = [];
