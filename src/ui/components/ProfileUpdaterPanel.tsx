@@ -60,7 +60,7 @@ export function ProfileUpdaterPanel({ municipalities, currentId, onRun }: Props)
       if (kinds.includes('paquete-texto') && !pkg) throw new Error('Elige el archivo del paquete de texto.');
       const expectedBaselines = apply ? Object.fromEntries((preview ?? []).filter(o=>o.profile&&o.baseline).map(o=>[o.id,o.baseline!])) : undefined;
       const out = await onRun(ids, kinds, apply, setProgress, kinds.includes('paquete-texto') ? pkg : undefined, expectedBaselines);
-      setPreview(out); setApplied(apply);
+      setPreview(out); setApplied(apply && out.some(o=>o.saved));
     } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
     finally { setBusy(false); }
   }
