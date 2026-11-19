@@ -4130,6 +4130,7 @@ export default function App() {
               evidence={runtime.workspace.evidenceStore.atoms}
               originalIds={(runtime.workspace.documentOriginals ?? []).map(o => o.documentId)}
               originalCapacity={`${formatMegabytes(documentOriginalsBytes(runtime.workspace.documentOriginals) + profileOriginalsBytes(runtime.workspace.externalProfileLibrary))} / ${formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)}`}
+              archiveVersion={runtime.workspace.updatedAt}
               onVerifyRemote={async () => {
                 const scope = runtime.workspace.municipality.identity.id;
                 if (!remoteClient.auth.currentUser) throw new Error("Inicia sesión para consultar Firebase.");
