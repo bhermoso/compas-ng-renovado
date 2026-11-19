@@ -13,6 +13,7 @@ import { InitialLocalHealthPlanPanel } from "./ui/components/InitialLocalHealthP
 import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
 import { HomePortada } from "./ui/components/HomePortada";
 import { DocumentArchiveManager } from "./ui/components/DocumentArchiveManager";
+import { compareDocumentArchive } from "./application/document-files/compareDocumentArchive";
 import { DocumentReviewInbox } from "./ui/components/DocumentReviewInbox";
 import { DiagnosisControlRoom, DiagnosisModuleSection } from "./ui/components/DiagnosisControlRoom";
 import { DuplicateDocumentsPanel } from "./ui/components/DuplicateDocumentsPanel";
@@ -4129,6 +4130,13 @@ export default function App() {
               evidence={runtime.workspace.evidenceStore.atoms}
               originalIds={(runtime.workspace.documentOriginals ?? []).map(o => o.documentId)}
               originalCapacity={`${formatMegabytes(documentOriginalsBytes(runtime.workspace.documentOriginals) + profileOriginalsBytes(runtime.workspace.externalProfileLibrary))} / ${formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)}`}
+              onVerifyRemote={async () => {
+                const scope = runtime.workspace.municipality.identity.id;
+                if (!remoteClient.auth.currentUser) throw new Error("Inicia sesión para consultar Firebase.");
+                const recovered = await readRemoteWorkspace(remoteClient, scope);
+                if (!recovered) throw new Error("No se ha encontrado un expediente remoto para este municipio.");
+                return compareDocumentArchive(runtime.workspace, recovered);
+              }}
               canWrite={documentWriteAllowed}
               persistence={remotePersistenceMessage ?? ""}
               onOpenUploader={() => document.getElementById("document-review-title")?.scrollIntoView({behavior:"smooth",block:"start"})}
