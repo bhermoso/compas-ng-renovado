@@ -13,6 +13,7 @@ export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable
  const management=context?.municipalityId===doc.municipalityId ? context : null;
  const remoteOriginal=management?.originals.find(o=>o.documentId===doc.id);
  const [file,setFile]=useState<File>();const [message,setMessage]=useState('');
+ const [derivedKind,setDerivedKind]=useState<'transcription-reconstruction'|'format-conversion'>('transcription-reconstruction');
  const [loading,setLoading]=useState(true);
  // La consulta IndexedDB depende del documento; el reset evita mostrar un original anterior.
  // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -44,6 +45,31 @@ export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable
   {file && <p><button type="button" onClick={openOriginal}>Abrir original</button> <button type="button" onClick={download}>Descargar original · {file.name}</button> <small>{remoteOriginal ? 'Original guardado en el expediente compartido.' : 'Original solo en este navegador; pendiente de sincronizar.'}</small></p>}
   {!loading && !file && !url && <p><strong>Archivo original no disponible.</strong> {retainedTextAvailable ? 'Existe una transcripción sanitaria vinculada; no equivale al DOCX original.' : doc.sourceText?.trim() ? 'Puedes consultar el texto conservado.' : 'Solo se conserva la referencia o los datos derivados.'}</p>}
   {doc.sourceText?.trim() && <details><summary>Consultar texto conservado</summary><p style={{whiteSpace:'pre-wrap'}}>{doc.sourceText}</p></details>}
+  {(context?.derivatives ?? []).filter(d=>d.derivedFromDocumentId===doc.id).length>0 && <div className="document-access__derivatives">
+    <strong>Copias derivadas (no originales)</strong>
+    <ul>{(context?.derivatives ?? []).filter(d=>d.derivedFromDocumentId===doc.id).map(d=><li key={d.id}>
+      {d.name} · {d.provenance==='transcription-reconstruction'?'Reconstrucción desde transcripción':'Conversión de formato'} · SHA-256: {d.sha256.slice(0,12)}…
+      {' '}<button type="button" onClick={async()=>{try{const derived=await decodeDocumentOriginal(d);const href=URL.createObjectURL(derived);const a=window.document.createElement('a');a.href=href;a.download=d.name;a.click();setTimeout(()=>URL.revokeObjectURL(href),1000);}catch(error){setMessage((error as Error).message);}}}>Descargar copia</button>
+    </li>)}</ul>
+  </div>}
+  {management?.storeDerivative && <div className="document-access__derivatives">
+    <label>Tipo de copia
+      <select value={derivedKind} onChange={e=>setDerivedKind(e.target.value as typeof derivedKind)}>
+        <option value="transcription-reconstruction">Reconstrucción a partir del texto conservado</option>
+        <option value="format-conversion">Conversión de formato</option>
+      </select>
+    </label>
+    <label>Vincular PDF o DOCX como copia derivada (sin cambiar el original ni las evidencias)
+      <input type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label={`Adjuntar copia derivada PDF o DOCX: ${doc.title}`} onChange={async e=>{
+        const input=e.currentTarget;const next=input.files?.[0];input.value='';if(!next)return;
+        if(!/\\.(pdf|docx)$/i.test(next.name)){setMessage('Formato no admitido: utiliza PDF o DOCX.');return;}
+        if(!window.confirm(`¿Guardar «${next.name}» como copia derivada de «${doc.title}», sin atribuirle carácter de original?`))return;
+        try{setMessage('Guardando la copia derivada en Firebase…');await management.storeDerivative?.(doc.id,next,derivedKind);setMessage('Copia derivada registrada en el expediente compartido.');}
+        catch(error){setMessage('No se ha guardado la copia derivada: '+(error as Error).message);}
+      }}/>
+    </label>
+  </div>}
+
   {management && <label className="document-access__attach">{file ? 'Verificar o reponer original (PDF o DOCX)' : 'Adjuntar el archivo original (PDF o DOCX)'}
    <input type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label={`Adjuntar original PDF o DOCX: ${doc.title}`} onChange={async e=>{
     const input=e.currentTarget;const next=input.files?.[0];if(!next)return;
