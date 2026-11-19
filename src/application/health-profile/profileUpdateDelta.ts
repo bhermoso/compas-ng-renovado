@@ -38,3 +38,12 @@ export function compareProfileUpdate(
     after,
   };
 }
+
+/** Compara el contenido exacto que alimenta el Actualizador, no el título de la vista previa. */
+export function profileUpdateBaseline(profile: ExternalHealthProfile, territorialStatistics: unknown): string {
+  return JSON.stringify({profile,territorialStatistics});
+}
+
+export function canApplyProfilePreview(expected: string | undefined, actual: string): boolean {
+  return expected !== undefined && expected === actual;
+}
