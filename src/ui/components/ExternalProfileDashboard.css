@@ -345,3 +345,45 @@
 .ep-review-flags{border:1px solid var(--ep-line);border-left:4px solid var(--ep-blue);padding:12px 16px;margin:10px 0;font-size:13.5px}
 .ep-review-flags ul{margin:6px 0;padding-left:18px}
 .ep-review-flags small{color:var(--ep-muted)}
+
+/* Densidad coherente con HomePortada: cabeceras, navegación y gestión.
+   No altera la tipografía del texto íntegro, las tablas clínicas ni gráficos. */
+.external-profile { margin-bottom: 22px; }
+.external-profile .ep-header { margin-bottom: 14px; }
+.external-profile .ep-header__body {
+  padding: clamp(14px,2vw,24px) clamp(15px,2.4vw,28px);
+  gap: 20px;
+}
+.external-profile .ep-tabs {
+  margin-bottom: 14px;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.external-profile .ep-tabs button {
+  padding: 8px 12px;
+  min-height: 40px;
+}
+.external-profile .ep-document-toolbar {
+  margin-bottom: 12px;
+  padding: 7px 0;
+}
+.external-profile .ep-document-card {
+  padding: clamp(12px,1.8vw,20px);
+}
+.external-profile .ep-management-grid {
+  gap: clamp(12px,2vw,20px);
+}
+.external-profile .ep-management-upload {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+.external-profile .ep-section-heading { margin: 14px 0 10px; }
+.external-profile .ep-section-heading h2 { font-size: clamp(18px,2.1vw,23px); }
+.external-profile .ep-results { gap: 12px; }
+.external-profile .ep-result { padding: clamp(12px,1.8vw,18px); }
+.external-profile .ep-result__value { margin-bottom: 12px !important; }
+@media (max-width: 760px) {
+  .external-profile .ep-tabs { overflow: visible; }
+  .external-profile .ep-tabs button { padding: 8px 10px; }
+  .external-profile .ep-result { min-width: 0; }
+}
