@@ -1,5 +1,6 @@
 import { readLocalizaAssets } from "./application/localiza-assets";
 import { buildProfileUpdate, type ProfileUpdateKind } from "./application/health-profile/profileUpdater";
+import { compareProfileUpdate, profileUpdateBaseline, canApplyProfilePreview } from "./application/health-profile/profileUpdateDelta";
 import type { ProfileTextPackage } from "./application/health-profile/profileTextOperations";
 import type { ProfileUpdateOutcome } from "./ui/components/ProfileUpdaterPanel";
 import { appendExternalProfile } from "./application/health-profile/externalProfiles";
@@ -1534,7 +1535,7 @@ export default function App() {
    * a los expedientes indicados. En modo de vista previa no guarda nada; al aplicar,
    * añade a cada expediente una revisión «en revisión» y la confirma en Firebase.
    */
-  const handleProfileUpdates = useCallback(async (ids: string[], kinds: ProfileUpdateKind[], apply: boolean, onProgress: (message: string) => void, textPackage?: ProfileTextPackage): Promise<ProfileUpdateOutcome[]> => {
+  const handleProfileUpdates = useCallback(async (ids: string[], kinds: ProfileUpdateKind[], apply: boolean, onProgress: (message: string) => void, textPackage?: ProfileTextPackage, expectedBaselines?: Record<string,string>): Promise<ProfileUpdateOutcome[]> => {
     if (!remoteClient.auth.currentUser) throw new Error("Inicia sesión para leer y guardar los expedientes compartidos.");
     const out: ProfileUpdateOutcome[] = [];
     const currentId = workspace.municipality.identity.id;
@@ -1547,7 +1548,12 @@ export default function App() {
         const library = ws.externalProfileLibrary ?? { profiles: [], attachments: [] };
         const r = buildProfileUpdate({ library, snapshots: ws.territorialStatistics, kinds, textPackage, author: remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || "", now: new Date(), newId: () => crypto.randomUUID() });
         if (!r.profile) { out.push({ id, name, changes: r.changes, blocked: r.blocked }); continue; }
-        const outcome: ProfileUpdateOutcome = { id, name, changes: r.changes, from: r.base?.title, title: r.profile.title, profile: r.profile };
+        const baseline = r.base ? profileUpdateBaseline(r.base,ws.territorialStatistics) : undefined;
+        if (apply && (!baseline || !canApplyProfilePreview(expectedBaselines?.[id],baseline))) {
+          out.push({id,name,changes:[],blocked:"El Perfil cambió desde la vista previa o no existe una comparación previa válida. Vuelve a consultar la vista previa antes de guardar."});
+          continue;
+        }
+        const outcome: ProfileUpdateOutcome = { id, name, changes: r.changes, from: r.base?.title, title: r.profile.title, profile: r.profile, delta: r.base ? compareProfileUpdate(r.base,r.profile) : undefined, baseline };
         if (apply) {
           onProgress(`${name}: guardando la revisión…`);
           const nextLibrary = appendExternalProfile(library, r.profile, [], id);
