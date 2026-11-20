@@ -120,7 +120,7 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
         <button type="button" onClick={onOpenAssetValidations}>Revisar validaciones de activos</button>
         <button type="button" aria-expanded={open} onClick={() => setOpen(v => !v)}>{open ? "Contraer catálogo" : "Mostrar catálogo y buscar"}</button>
       </div>
-      <details className="dam__limits"><summary>Capacidad y custodia documental</summary><p>20 MB por archivo y 40 MB compartidos con el Perfil. Una transcripción o reconstrucción no acredita el original.</p></details>
+      <details className="dam__limits"><summary>Capacidad y custodia documental</summary><p>En esta implementación, los originales completos y las copias derivadas se guardan en el expediente compartido de Cloud Firestore, codificados en base64. IndexedDB conserva una caché local del navegador; al recuperar el expediente se compara y actualiza desde Firebase. No se guardan en Firebase Storage.</p><p>Cada guardado confirmado crea un snapshot nuevo del expediente. Después, el sistema intenta retirar los fragmentos del snapshot anterior; esos fragmentos no son un historial documental consultable. Las revisiones que deban conservarse se registran como fichas y originales propios.</p><p>Máximo de 20 MB por archivo y 40 MB compartidos con el Perfil. Una transcripción o reconstrucción no acredita el original.</p></details>
       <p className="dam__persistence" role="status">Persistencia: {persistence || "sin confirmación reciente"}. {canWrite ? "Las operaciones documentales se confirman en Firebase desde cada ficha." : "Las operaciones de escritura no están disponibles en esta sesión."}</p>
       {open && <>
         <div className="dam__filters">
