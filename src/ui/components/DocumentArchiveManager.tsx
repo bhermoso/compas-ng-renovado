@@ -4,7 +4,7 @@ import type { EvidenceAtom } from "../../domain/evidence";
 import { DocumentReference } from "./Documentation";
 import { DocumentCycleControl } from "./DocumentCycleControl";
 import { KIND_LABEL } from "./documentRepositoryCategorization";
-import { organizeMunicipalDocuments } from "../../application/municipal-document-organization";
+import { organizeMunicipalDocuments, municipalDocumentSection } from "../../application/municipal-document-organization";
 import "./DocumentArchiveManager.css";
 
 interface Props {
@@ -82,7 +82,7 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
         <div className="dam__table-scroll"><table className="dam__table"><thead><tr><th>Documento</th><th>Tipo</th><th>Estado</th><th>Original y texto</th><th>Versión y procedencia</th><th>Dependencias</th><th>Gestión</th></tr></thead>
           <tbody>{visibleSections.flatMap(section => [<tr key={`section-${section.id}`} className="dam__section-row"><th colSpan={7} scope="colgroup">{section.label}<small>{section.detail} · {section.documents.length} documentos</small></th></tr>, ...section.documents.map(d => <tr key={d.id}>
             <th scope="row"><strong>{d.title}</strong><small>{d.sourceFileName || "Sin nombre de archivo"}</small></th>
-            <td>{KIND_LABEL[d.kind] ?? d.kind}</td>
+            <td>{municipalDocumentSection(d) === "plans" ? "Plan de Acción municipal" : municipalDocumentSection(d) === "prioritization" ? "Priorización municipal" : KIND_LABEL[d.kind] ?? d.kind}</td>
             <td>{d.status === "archived" ? "Archivado" : d.status === "validated" ? "Validado" : d.status === "rejected" ? "Rechazado" : "Registrado"}</td>
             <td>{originals.has(d.id) ? "Original registrado en el expediente (pendiente de cotejo remoto)" : "Original no acreditado en el expediente"}{d.sourceText?.trim() ? " · Texto conservado (no es el original)" : " · Sin texto conservado"}</td>
             <td className="dam__provenance"><strong>{d.revisionNumber ? `v${d.revisionNumber}` : "Sin número de versión"}</strong><small>{d.revisionOf ? `Revisión de ${d.revisionOf}` : "Sin predecesora declarada"}</small><small>{d.contentSha256 ? `Huella declarada SHA-256: ${d.contentSha256.slice(0, 12)}…` : "Sin huella registrada"}</small><small>{d.source.organization || d.source.system || "Origen no declarado"}</small></td>
