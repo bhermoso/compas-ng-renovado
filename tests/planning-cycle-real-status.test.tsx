@@ -42,7 +42,8 @@ describe("Estados trazables del ciclo de planificación", () => {
   it("la evaluación no se anuncia como disponible mientras su módulo sea informativo", () => {
     const html = render({ prioritySelectionDone: true, validatedPlanPresent: true });
     expect(html).toContain("Módulo de evaluación aún no implementado");
-    expect(html).toContain('title="Ir a: Evaluación"');
+    expect(html).toContain("Evaluación");
+    expect(html).not.toContain('title="Ir a: Evaluación"');
     expect(html).toContain('aria-valuenow="1"');
   });
 });
