@@ -7,6 +7,8 @@ import { appendExternalProfile } from "./application/health-profile/externalProf
 import { isTerritorialStatisticsSnapshot } from "./application/territorial-statistics/snapshots";
 import type { TerritorialStatisticsSnapshot } from "./domain/territorial-statistics/TerritorialStatistics";
 import { ExternalProfileDashboard } from "./ui/components/ExternalProfileDashboard";
+import { TerritorialStatisticsPanel } from "./ui/components/TerritorialStatisticsPanel";
+import type { ProfileResult } from "./domain/health-profile/ExternalHealthProfile";
 import { EMPTY_PROFILE_LIBRARY, isExternalProfileLibrary } from "./application/health-profile/externalProfiles";
 import type { ExternalProfileLibrary } from "./domain/health-profile/ExternalHealthProfile";
 import { InitialLocalHealthPlanPanel } from "./ui/components/InitialLocalHealthPlanPanel";
@@ -578,6 +580,7 @@ export default function App() {
   const [plainText, setPlainText] = useState("");
   const [kind, setKind] = useState<DocumentKind>("territorial-documentation");
   // Sala de control del diagnóstico: secciones de detalle abiertas.
+  const [pendingStatisticsRevision, setPendingStatisticsRevision] = useState<{ municipalityId: string; results: ProfileResult[]; note: string } | null>(null);
   const [openDiagModules, setOpenDiagModules] = useState<ReadonlySet<DiagnosisSectionId>>(() => new Set(["studies"]));
   const toggleDiagnosisModule = useCallback((id: DiagnosisSectionId, open: boolean) => {
     setOpenDiagModules((previous) => {
@@ -4212,6 +4215,28 @@ export default function App() {
               );
             })()}
 
+            {/* La estadística territorial es una fuente del diagnóstico.
+                Su incorporación al Perfil genera siempre una revisión separada. */}
+            <details className="workspace-panel diagnosis-territorial-statistics" data-testid="diagnosis-territorial-statistics">
+              <summary><strong>Estadística territorial oficial · INE e IECA</strong><span>Descargar, conservar y comparar datos del ámbito</span></summary>
+              <TerritorialStatisticsPanel
+                key={workspace.municipality.identity.id}
+                municipalityId={workspace.municipality.identity.id}
+                municipalityName={municipality.name}
+                ineCode={workspace.municipality.identity.ineCode}
+                province={workspace.municipality.identity.province}
+                snapshots={workspace.territorialStatistics}
+                activeProfile={workspace.externalProfileLibrary?.profiles.find(p => p.id === workspace.externalProfileLibrary?.activeId)}
+                authorName={remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || ""}
+                onSave={handleSaveTerritorialStatistics}
+                onPrepareRevision={(results, note) => {
+                  setPendingStatisticsRevision({municipalityId: municipality.id, results, note});
+                  setView("psl");
+                  window.scrollTo({top: 0, behavior: "auto"});
+                }}
+              />
+            </details>
+
             {/* Acceso al IBSE y SAM consolidado en la navegación de cuatro áreas.
                 No repetir una segunda tarjeta IBSE ni otra cifra fuera de Estudios. */}
             {/* Punto único de control de todo el archivo documental, incluidos activos y CSV. */}
@@ -4471,8 +4496,8 @@ export default function App() {
               onSave={handleSaveExternalProfiles}
               ineCode={workspace.municipality.identity.ineCode}
               province={workspace.municipality.identity.province}
-              territorialStatistics={workspace.territorialStatistics}
-              onSaveTerritorialStatistics={handleSaveTerritorialStatistics}
+              incomingTerritorialRevision={pendingStatisticsRevision?.municipalityId === municipality.id ? pendingStatisticsRevision : undefined}
+              onIncomingTerritorialRevisionConsumed={() => setPendingStatisticsRevision(null)}
               updaterMunicipalities={allMunicipalities.filter(m => m.territorialType === undefined || m.territorialType === "municipio").map(m => ({ id: m.id, name: m.name }))}
               onRunProfileUpdates={handleProfileUpdates}
               onDirtyChange={onProfileDirtyChange}
