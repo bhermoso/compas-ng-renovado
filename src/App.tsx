@@ -4228,7 +4228,7 @@ export default function App() {
                       save: (updated,expected) => saveRemoteWorkspace(remoteClient,updated,undefined,expected),
                     },expectedWorkspace);
                     if (result.status === "updated") {
-                      setWorkspace(current => current.municipality.identity.id === "loja" ? result.workspace : current);
+                      setWorkspace(current => current.municipality.identity.id === "loja" && JSON.stringify(current) === JSON.stringify(expectedWorkspace) ? result.workspace : current);
                       setRemotePersistenceMessage("Corrección documental de Loja guardada y comprobada en Firebase.");
                     }
                     return result.status;
