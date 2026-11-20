@@ -2,6 +2,7 @@ import fuenteVaquerosSeed from "./fuenteVaquerosSeed";
 import lojaSeed from "./lojaSeed";
 import type { MunicipalityWorkspace } from "../../domain/workspace";
 import { parseWorkspaceJSON } from "../persistence/local-storage";
+import { normalizeKnownMunicipalDocumentKinds } from "../../application/workspace/normalizeKnownMunicipalDocuments";
 
 /**
  * municipalitySeeds
@@ -116,7 +117,11 @@ export async function loadMunicipalitySeed(
     const identity = workspace.municipality.identity;
     if (identity.id !== seed.municipalityId) return null;
     if (identity.name !== seed.expectedName) return null;
-    return workspace;
+    // Sólo al hidratar el seed de Loja: normalización explícita de un tipo
+    // documental mal rotulado. No alcanza expedientes existentes en Firebase.
+    return municipalityId === "loja"
+      ? normalizeKnownMunicipalDocumentKinds(workspace).workspace
+      : workspace;
   } catch {
     return null;
   }
