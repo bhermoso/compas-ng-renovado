@@ -56,6 +56,8 @@ export interface DiagnosisControlSummary {
   overall: DiagnosisOverallState;
   metrics: {
     activeDocuments: number;
+    /** Debe existir un solo registro vigente Localiza Salud por municipio. */
+    activeLocalizaDocuments: number;
     studiesLoaded: number;
     totalStudies: number;
     assets: number;
@@ -221,6 +223,7 @@ export function buildDiagnosisControlSummary(input: DiagnosisControlInput): Diag
     overall,
     metrics: {
       activeDocuments: active.length,
+      activeLocalizaDocuments: active.filter(d => d.kind === "localiza-salud").length,
       studiesLoaded,
       totalStudies,
       assets: input.assetCount,
