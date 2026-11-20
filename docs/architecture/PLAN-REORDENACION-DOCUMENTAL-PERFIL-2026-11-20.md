@@ -51,6 +51,18 @@ La relación aportada por el usuario contiene **19 filas enlazadas a identificad
 
 Inventario único significa un solo archivo/inventario vigente del municipio, **no** un solo registro de recurso, y **no** eliminación del historial.
 
+## 5 bis. Conciliación concreta de la relación aportada por el usuario
+
+Cotejo de 2026-11-20 entre la relación de 20 recursos aportada en la conversación y el `sourceText` del seed público de Atarfe (20 líneas):
+
+- **Coinciden los 20 títulos de la relación** en el inventario del seed, incluidas las dos entradas tituladas Centro de Participación Activa y los talleres de coro y senderismo; las filas no deben convertirse en 20 originales.
+- La relación aportada permite completar dos referencias externas que **faltan en el seed**: **Centro Cultural Medina Elvira — 61583** y **Club de senderismo Castillejo — 61924**. La unidad de salud mental comunitaria permanece sin ID externo en ambos conjuntos.
+- El seed presenta un único `doc-localiza-atarfe` y **26 átomos derivados**: **20 `asset`**, **5 `indicator`** y **1 `qualitative-observation`**. No son 26 archivos originales. La exposición prominente de «Evidencias» como cuarto bloque confunde niveles.
+- CPA **61419** y **61585** comparten título e institución pero describen talleres y destinatarios de manera diferente; **61425** (coro) y **61429** (senderismo) son actividades con entradas diferenciadas. Decisión propuesta: entidad institucional CPA + subrecursos/actividades vinculados cuando lo acrediten los datos, sin fusionar automáticamente los IDs externos.
+- **Acción necesaria**: matriz de correspondencias por ID externo, título, ámbito, destinatarios, temática, tipo propuesto y relación jerárquica; reconciliación sin sobrescribir ni añadir un segundo Localiza.
+
+Los dos identificadores recuperables son una propuesta de completado **pendiente de confirmar contra fuente externa y Firebase real**; esta auditoría no ha cambiado el seed ni el expediente remoto.
+
 ## 6. Vista de Diagnóstico territorial: pantalla inicial y herramientas
 
 Estado inicial al entrar, **sin expansión del IBSE**: portada institucional con el gradiente COMPÁS, banda de cinco logos ya utilizada por Inicio, municipio y 3–4 accesos centrados en documentos RELAS. Sin renderizar la lista masiva de fuentes, el catálogo global, la bandeja de carga ni el EvidenceStore. El contenido inicial debe caber a 1280 × 720 salvo restricciones de accesibilidad; móvil puede desplazar.
