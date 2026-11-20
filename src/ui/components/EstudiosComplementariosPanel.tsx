@@ -355,11 +355,11 @@ export function EstudiosComplementariosPanel({
   ) => ({ label, municipalityValue, granadaValue, andaluciaValue, unit, direction });
 
   const comparisons = {
-    ibse: ibseStudy && ibseStudy.aggregates.nValid > 0 && buildComparison(
+    ibse: ibseStudy && ibseStudy.aggregates.nValid > 0 ? buildComparison(
       [metric("Índice IBSE", ibseStudy.aggregates.meanTotal, granadaReferences?.ibse.meanTotal ?? null, "/100", "higher-is-favourable")],
       "monitor IBSE provincial de Granada, agregado con el parser canónico",
       "Referencia contextual provincial; no procede de la EAS ni constituye una estimación poblacional. Sin equivalente autonómico EAS.",
-    ),
+    ) : undefined,
     duke: dukeStudy && buildComparison(
       [metric("Apoyo social global", dukeStudy.aggregates.meanGlobal, granadaReferences?.duke.meanGlobal ?? null, "/55", "higher-is-favourable", anda["duke-apoyo-global"] ?? null)],
       easSource,
