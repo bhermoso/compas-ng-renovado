@@ -21,6 +21,7 @@ interface Props {
 
 type Scope = "all" | "active" | "archived" | "assets" | "studies";
 const isActive = (d: MunicipalDocument) => d.status !== "archived" && d.status !== "rejected";
+const normalizeSearch = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
 const TEMPORAL_SCOPE_LABEL: Record<string, string> = {
   current: "Actual",
@@ -76,8 +77,16 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
     if (scope === "archived" && isActive(d)) return false;
     if (scope === "assets" && d.kind !== "community-asset" && d.kind !== "localiza-salud") return false;
     if (scope === "studies" && d.kind !== "complementary-study" && d.kind !== "redcap-export") return false;
-    return (d.title + " " + (d.sourceFileName ?? "") + " " + (KIND_LABEL[d.kind] ?? "")).normalize("NFD")
-      .replace(/[\u0300-\u036f]/g,"").toLowerCase().includes(query.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim());
+    const searchableValues = [
+      d.title, d.sourceFileName, KIND_LABEL[d.kind], d.kind, d.tags.join(" "),
+      d.source.organization, d.source.system, d.source.url, d.source.collectedAt,
+      d.revisionNumber?.toString(), d.revisionOf, d.contentSha256,
+      d.temporal?.documentDate?.value, d.temporal?.observedPeriod?.literal,
+      d.temporal?.observedPeriod?.from?.value, d.temporal?.observedPeriod?.to?.value,
+      d.temporal?.sourceCollectedAt?.value, d.temporal?.validity, d.temporal?.temporalScope,
+      d.cycle?.status, d.cycle?.referenceYear?.toString(),
+    ].filter(Boolean).join(" ");
+    return normalizeSearch(searchableValues).includes(normalizeSearch(query).trim());
   }), [archive, query, scope]);
   const countOf = (id: string) => evidence.filter(a => a.provenance.documentId === id).length;
   const validationCount = (id: string) => (repository.assetValidations ?? []).filter(v => v.documentId === id).length;
@@ -115,7 +124,7 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
       <p className="dam__persistence" role="status">Persistencia: {persistence || "sin confirmación reciente"}. {canWrite ? "Las operaciones documentales se confirman en Firebase desde cada ficha." : "Las operaciones de escritura no están disponibles en esta sesión."}</p>
       {open && <>
         <div className="dam__filters">
-          <label>Buscar por título, original o categoría<input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Informe, CSV, Localiza, activos…" /></label>
+          <label>Buscar por título, archivo, período o procedencia<input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Informe, 2017, IBSE, fuente…" /></label>
           <label>Mostrar<select value={scope} onChange={e => setScope(e.target.value as Scope)}>
             <option value="all">Todos</option><option value="active">Activos</option><option value="archived">Archivados o rechazados</option><option value="assets">Activos para la salud</option><option value="studies">Estudios y CSV</option>
           </select></label>
@@ -127,7 +136,7 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
             <td>{municipalDocumentSection(d) === "plans" ? "Plan de Acción municipal" : municipalDocumentSection(d) === "prioritization" ? "Priorización municipal" : KIND_LABEL[d.kind] ?? d.kind}</td>
             <td>{d.status === "archived" ? "Archivado" : d.status === "validated" ? "Validado" : d.status === "rejected" ? "Rechazado" : "Registrado"}</td>
             <td>{originals.has(d.id) ? "Original registrado en el expediente (pendiente de cotejo remoto)" : "Original no acreditado en el expediente"}{d.sourceText?.trim() ? " · Texto conservado (no es el original)" : " · Sin texto conservado"}</td>
-            <td className="dam__provenance"><strong>{d.revisionNumber ? `v${d.revisionNumber}` : "Sin número de versión"}</strong><small>{d.revisionOf ? `Revisión de ${d.revisionOf}` : "Sin predecesora declarada"}</small><small>{d.contentSha256 ? `Huella declarada SHA-256: ${d.contentSha256.slice(0, 12)}…` : "Sin huella registrada"}</small><small>{d.source.organization || d.source.system || "Origen no declarado"}</small>{documentTemporalDetails(d).map((detail, index) => <small key={`${d.id}-temporal-${index}`}>{detail}</small>)}</td>
+            <td className="dam__provenance"><strong>{d.revisionNumber ? `v${d.revisionNumber}` : "Sin número de versión"}</strong>{d.revisionOf ? archive.some(candidate => candidate.id === d.revisionOf) ? <small>Revisión de <DocumentReference documentId={d.revisionOf}>{archive.find(candidate => candidate.id === d.revisionOf)?.title ?? d.revisionOf}</DocumentReference></small> : <small>Predecesora no localizada: {d.revisionOf}</small> : <small>Sin predecesora declarada</small>}<small>{d.contentSha256 ? `Huella declarada SHA-256: ${d.contentSha256.slice(0, 12)}…` : "Sin huella registrada"}</small><small>{d.source.organization || d.source.system || "Origen no declarado"}</small>{documentTemporalDetails(d).map((detail, index) => <small key={`${d.id}-temporal-${index}`}>{detail}</small>)}</td>
             <td>{countOf(d.id)} evidencias{validationCount(d.id) ? ` · ${validationCount(d.id)} validaciones de activos` : ""}{d.revisionOf ? " · revisión" : ""}</td>
             <td><DocumentReference documentId={d.id}>Abrir ficha</DocumentReference>{onSetDocumentCycle && canWrite && <details className="dam__cycle"><summary>Declarar ciclo</summary><DocumentCycleControl cycle={d.cycle} onChange={cycle=>onSetDocumentCycle(d.id,cycle)}/></details>}</td>
           </tr>)] )}</tbody>
