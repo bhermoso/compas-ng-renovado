@@ -26,8 +26,6 @@ interface Props {
  authorName: string;
  onSave: (library: ExternalProfileLibrary, onProgress?: (message: string) => void) => Promise<void>;
  onDirtyChange?: (dirty: boolean) => void;
- ineCode?: string;
- province?: string;
  incomingTerritorialRevision?: { municipalityId: string; results: ProfileResult[]; note: string };
  onIncomingTerritorialRevisionConsumed?: () => void;
  updaterMunicipalities?: Array<{ id: string; name: string }>;
@@ -44,7 +42,7 @@ function emptyProfile(municipalityId: string): ExternalHealthProfile {
  return {schema:'compas-external-profile/v1',id:crypto.randomUUID(),municipalityId,title:'',period:'',author:'',createdAt:new Date().toISOString(),
   status:'review',summary:'',text:'',results:[],findings:[],limitations:[],areas:[],attachmentIds:[]};
 }
-export function ExternalProfileDashboard({municipalityId,municipalityName,library,legacyProfiles=[],legacyText,authorName,onSave,onDirtyChange,ineCode,province,incomingTerritorialRevision,onIncomingTerritorialRevisionConsumed,updaterMunicipalities,onRunProfileUpdates}: Props) {
+export function ExternalProfileDashboard({municipalityId,municipalityName,library,legacyProfiles=[],legacyText,authorName,onSave,onDirtyChange,incomingTerritorialRevision,onIncomingTerritorialRevisionConsumed,updaterMunicipalities,onRunProfileUpdates}: Props) {
  const [selectedId,setSelectedId]=useState(library.activeId);
  const [tab,setTab]=useState<'results'|'document'|'versions'|'laboratory'|'updater'>('results');
  const [draft,setDraft]=useState<ExternalHealthProfile>();
@@ -57,7 +55,6 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
  const replaceAttachmentId=useRef<string|undefined>(undefined);
  const fullProfileRef=useRef<HTMLDivElement>(null);
  const selected=library.profiles.find(p=>p.id===(selectedId ?? library.activeId)) ?? library.profiles.find(p=>p.id===library.activeId);
- const activeProfile=library.profiles.find(p=>p.id===library.activeId);
  const custody=selected ? auditProfileCustody(selected,library) : undefined;
  const numericConflicts=selected ? findUnpublishedValueConflicts(selected.text) : [];
  // La descarga nace en Diagnóstico; aquí se prepara una nueva revisión sin alterar la vigente.
