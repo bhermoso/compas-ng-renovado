@@ -5,13 +5,13 @@ import { decodeDocumentOriginal } from '../../application/document-files/documen
 import { useDocumentOriginalManagement } from './DocumentOriginalManagement';
 import { documentAccessUrl, documentDownloadFileName, isPdfDocumentAccess } from './documentAccessUtils';
 
-export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable=false,showManagementActions=true}:{document:MunicipalDocument;documentLabel?:string;retainedTextAvailable?:boolean;showManagementActions?:boolean}){
+export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable=false,showManagementActions=true,showText=true}:{document:MunicipalDocument;documentLabel?:string;retainedTextAvailable?:boolean;showManagementActions?:boolean;showText?:boolean}){
  const contextualLabel=documentLabel?.trim();
  const context=useDocumentOriginalManagement();
  // Never present active-municipality write operations on a document from the
  // cross-municipality read-only library.
  const management=context?.municipalityId===doc.municipalityId && context.storeOriginal && context.createRevision && context.archiveDocument && context.deleteDocument ? context : null;
- const remoteOriginal=management?.originals.find(o=>o.documentId===doc.id);
+ const remoteOriginal=context?.municipalityId===doc.municipalityId ? context.originals.find(o=>o.documentId===doc.id) : undefined;
  const [file,setFile]=useState<File>();const [message,setMessage]=useState('');
  const [derivedKind,setDerivedKind]=useState<'transcription-reconstruction'|'format-conversion'>('transcription-reconstruction');
  const [loading,setLoading]=useState(true);
@@ -43,8 +43,8 @@ export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable
   </div>}
   {url && !isPdfDocumentAccess(doc.source.url) && <a className="doc-repo__open" href={url} target="_blank" rel="noopener noreferrer" aria-label={`Abrir documento: ${doc.title} (nueva pestaña)`}>Abrir documento ↗</a>}
   {file && <p><button type="button" onClick={openOriginal}>Abrir original</button> <button type="button" onClick={download}>Descargar original · {file.name}</button> <small>{remoteOriginal ? 'Original guardado en el expediente compartido.' : 'Original solo en este navegador; pendiente de sincronizar.'}</small></p>}
-  {!loading && !file && !url && <p><strong>Archivo original no disponible.</strong> {retainedTextAvailable ? 'Existe una transcripción sanitaria vinculada; no equivale al DOCX original.' : doc.sourceText?.trim() ? 'Puedes consultar el texto conservado.' : 'Solo se conserva la referencia o los datos derivados.'}</p>}
-  {doc.sourceText?.trim() && <details><summary>Consultar texto conservado</summary><p style={{whiteSpace:'pre-wrap'}}>{doc.sourceText}</p></details>}
+  {!loading && !file && !url && !retainedTextAvailable && !doc.sourceText?.trim() && <p className="document-access__notice">No hay archivo ni transcripción incorporados.</p>}
+  {showText && doc.sourceText?.trim() && <details><summary>Consultar texto conservado</summary><p style={{whiteSpace:'pre-wrap'}}>{doc.sourceText}</p></details>}
   {(context?.derivatives ?? []).filter(d=>d.derivedFromDocumentId===doc.id).length>0 && <div className="document-access__derivatives">
     <strong>Copias derivadas (no originales)</strong>
     <ul>{(context?.derivatives ?? []).filter(d=>d.derivedFromDocumentId===doc.id).map(d=><li key={d.id}>
@@ -52,7 +52,7 @@ export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable
       {' '}<button type="button" onClick={async()=>{try{const derived=await decodeDocumentOriginal(d);const href=URL.createObjectURL(derived);const a=window.document.createElement('a');a.href=href;a.download=d.name;a.click();setTimeout(()=>URL.revokeObjectURL(href),1000);}catch(error){setMessage((error as Error).message);}}}>Descargar copia</button>
     </li>)}</ul>
   </div>}
-  {management?.storeDerivative && <div className="document-access__derivatives">
+  {management?.storeDerivative && <details className="document-access__actions"><summary>Vincular PDF o DOCX como copia reconstruida o convertida</summary><div className="document-access__derivatives">
     <label>Tipo de copia
       <select value={derivedKind} onChange={e=>setDerivedKind(e.target.value as typeof derivedKind)}>
         <option value="transcription-reconstruction">Reconstrucción a partir del texto conservado</option>
@@ -68,9 +68,9 @@ export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable
         catch(error){setMessage('No se ha guardado la copia derivada: '+(error as Error).message);}
       }}/>
     </label>
-  </div>}
+  </div></details>}
 
-  {management && <label className="document-access__attach">{file ? 'Verificar o reponer original (PDF o DOCX)' : 'Adjuntar el archivo original (PDF o DOCX)'}
+  {management && <details className="document-access__actions"><summary>Adjuntar original auténtico</summary><label className="document-access__attach">{file ? 'Verificar o reponer original (PDF o DOCX)' : 'Adjuntar el archivo original (PDF o DOCX)'}
    <input type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label={`Adjuntar original PDF o DOCX: ${doc.title}`} onChange={async e=>{
     const input=e.currentTarget;const next=input.files?.[0];if(!next)return;
     if(!/\.(pdf|docx)$/i.test(next.name)) { setMessage('Solo se admiten archivos PDF o DOCX.'); input.value=''; return; }
@@ -87,7 +87,7 @@ export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable
     }
     input.value='';
    }}/>
-  </label>}
+  </label></details>}
   {management && showManagementActions && <div className="document-access__manage" aria-label={`Gestión documental de ${doc.title}`}>
     <label>Crear nueva versión
       <input type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label={`Sustituir mediante nueva versión PDF o DOCX: ${doc.title}`} onChange={async e=>{
