@@ -6,11 +6,12 @@ import { createEvidenceStore } from "../src/domain/evidence";
 import { STRATEGIC_REFERENCES } from "../src/application/strategic-reference-library";
 import { createCleanWorkspaceExample, inspectWorkspaceSeparation } from "../src/application/clean-workspace-example";
 import { StrategicReferenceLibrary } from "../src/ui/components/StrategicReferenceLibrary";
-import type { MunicipalityContext } from "../src/domain/municipality";
+import { createMunicipalityContext } from "../src/domain/municipality";
+import { parseWorkspaceJSON } from "../src/infrastructure/persistence/local-storage";
 
-const municipality = {
-  identity: {id:"atarfe",name:"Atarfe",ineCode:"18022",province:"Granada"},
-} as MunicipalityContext;
+const municipality = createMunicipalityContext({
+  id:"atarfe",name:"Atarfe",ineCode:"18022",province:"Granada",createdBy:"Prueba",
+});
 
 function sourceWorkspace() {
   const repo=createMunicipalDocumentRepository({municipalityId:"atarfe"});
@@ -51,6 +52,11 @@ describe("Biblioteca común y expediente de ensayo limpio",()=>{
     expect(JSON.stringify(source)).toBe(before);
     expect(clean).not.toBe(source);
     expect(clean.municipality).not.toBe(source.municipality);
+    const reimported = parseWorkspaceJSON(JSON.stringify(clean));
+    expect(reimported).not.toBeNull();
+    expect(reimported?.municipality.identity.id).toBe("ensayo-atarfe");
+    expect(reimported?.repository.documents).toEqual([]);
+
   });
   it("muestra biblioteca transversal sin convertirla en evidencia territorial",()=>{
     const html=renderToStaticMarkup(<StrategicReferenceLibrary workspace={sourceWorkspace()}/>);
