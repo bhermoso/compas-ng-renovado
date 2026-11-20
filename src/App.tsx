@@ -4181,6 +4181,7 @@ export default function App() {
             {/* Punto único de control de todo el archivo documental, incluidos activos y CSV. */}
             <DocumentArchiveManager
               repository={runtime.workspace.repository}
+              onSetDocumentCycle={documentWriteAllowed ? handleSetDocumentCycle : undefined}
               evidence={runtime.workspace.evidenceStore.atoms}
               originalIds={(runtime.workspace.documentOriginals ?? []).map(o => o.documentId)}
               originalCapacity={`${formatMegabytes(documentOriginalsBytes(runtime.workspace.documentOriginals) + documentDerivativesBytes(runtime.workspace.documentDerivedFiles) + profileOriginalsBytes(runtime.workspace.externalProfileLibrary))} / ${formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)}`}
