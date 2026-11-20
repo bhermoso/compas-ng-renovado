@@ -4,16 +4,9 @@ import type { DocumentKind, TemporalScope } from "../../domain/repository";
 import type {
   DiagnosisControlSummary,
   DiagnosisModuleId,
-  DiagnosisOverallState,
 } from "../../application/diagnosis/diagnosisControlSummary";
 
-const OVERALL_MESSAGE: Record<DiagnosisOverallState, string> = {
-  ready: "Diagnóstico con Informe de Salud y evidencia disponible para revisar el Perfil de Salud Local.",
-  partial: "Diagnóstico en elaboración. Faltan fuentes por incorporar o declarar.",
-  empty: "Diagnóstico vacío. Empieza por el Informe de Salud del ámbito territorial.",
-};
-
-const STATE_LABEL = { ok: "Disponible", partial: "Parcial", empty: "Sin datos" } as const;
+const STATE_LABEL = { ok: "Con registros", partial: "Carga parcial", empty: "Sin registros" } as const;
 
 const SCOPE_FILTERS: Array<{ value: TemporalScope | "all"; label: string }> = [
   { value: "all", label: "Todas" },
@@ -75,13 +68,13 @@ export function DiagnosisControlRoom({ municipalityName, summary, kindLabels = [
         <div>
           <p className="eyebrow">01 · Diagnóstico territorial · Sala de control</p>
           <h2 id="diagnosis-control-title" className="diagnosis-control__municipality">{municipalityName}</h2>
-          <p className={`diagnosis-control__state diagnosis-control__state--${summary.overall}`}>{OVERALL_MESSAGE[summary.overall]}</p>
+          <p className="diagnosis-control__state">Resumen de las fuentes, los documentos y las evidencias asociados a este ámbito.</p>
         </div>
       </div>
 
       <dl className="diagnosis-control__metrics" aria-label="Resumen navegable del expediente">
         <div><dt>Documentos activos</dt><dd>{metricValue(metrics.activeDocuments, "documentos", "documents")}</dd></div>
-        <div><dt>Estudios</dt><dd>{metricValue(`${metrics.studiesLoaded}/${metrics.totalStudies}`, "estudios", "studies")}</dd></div>
+        <div><dt>Instrumentos cargados</dt><dd>{metricValue(`${metrics.studiesLoaded}/${metrics.totalStudies}`, "instrumentos", "studies")}</dd></div>
         {metrics.validatedAssets !== undefined
           ? <div><dt>Activos validados</dt><dd>{metricValue(`${metrics.validatedAssets} de ${metrics.assets}`, "activos validados", "assets")}</dd></div>
           : <div><dt>Recursos de activos</dt><dd>{metricValue(metrics.assets, "recursos de activos", "assets")}</dd></div>}

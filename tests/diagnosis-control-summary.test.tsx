@@ -12,9 +12,8 @@ const declaration = { declaredBy: "tecnica@sas.es", declaredAt: "2026-10-31T00:0
 const base = { evidenceCount: 0, healthReportLoaded: false, studiesLoaded: Array(13).fill(false), studyEvidenceCount: 0, assetCount: 0 };
 
 describe("buildDiagnosisControlSummary", () => {
-  it("expediente vacío: todo a cero y estado vacío", () => {
+  it("expediente vacío: todo a cero y módulos sin registros", () => {
     const s = buildDiagnosisControlSummary({ ...base, repository: empty });
-    expect(s.overall).toBe("empty");
     expect(s.metrics).toMatchObject({ activeDocuments: 0, studiesLoaded: 0, totalStudies: 13, withoutTemporalDeclaration: 0 });
     expect(s.modules.map(m => m.state)).toEqual(["empty", "empty", "empty", "empty", "empty", "empty"]);
   });
@@ -28,7 +27,6 @@ describe("buildDiagnosisControlSummary", () => {
     repo = { ...repo, documents: repo.documents.map(d => d.id === "old" ? { ...d, status: "archived" as const } : d) };
     const studies = Array(13).fill(false); studies[0] = true;
     const s = buildDiagnosisControlSummary({ ...base, repository: repo, healthReportLoaded: true, evidenceCount: 6, studiesLoaded: studies, studyEvidenceCount: 6 });
-    expect(s.overall).toBe("ready");
     expect(s.metrics.activeDocuments).toBe(4);
     const byId = Object.fromEntries(s.modules.map(m => [m.id, m]));
     expect(byId["studies"]).toMatchObject({ value: "1 de 13", state: "partial" });
@@ -62,6 +60,9 @@ describe("DiagnosisControlRoom", () => {
     const html = renderToStaticMarkup(<DiagnosisControlRoom municipalityName="Zagra" summary={summary} kindLabels={[{ value: "health-report", label: "Informe de Salud" }]} onOpenModule={() => {}} />);
     expect(html).toContain("Zagra");
     expect(html).toContain("Sala de control");
+    expect(html).toContain("Resumen de las fuentes, los documentos y las evidencias asociados a este ámbito.");
+    expect(html).not.toContain("Diagnóstico en elaboración");
+    expect(html).not.toContain("Diagnóstico vacío");
     expect(html).toContain("Sin alcance temporal declarado");
     expect(html).toContain("Estudios complementarios");
     expect(html).toContain("Ver detalle");

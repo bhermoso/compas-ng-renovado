@@ -37,8 +37,6 @@ export interface DiagnosisModuleSummary {
   detail: string;
 }
 
-export type DiagnosisOverallState = "ready" | "partial" | "empty";
-
 export interface DiagnosisTimelineEntry {
   documentId: string;
   title: string;
@@ -53,7 +51,6 @@ export interface DiagnosisTimelineEntry {
 }
 
 export interface DiagnosisControlSummary {
-  overall: DiagnosisOverallState;
   metrics: {
     activeDocuments: number;
     studiesLoaded: number;
@@ -151,11 +148,6 @@ export function buildDiagnosisControlSummary(input: DiagnosisControlInput): Diag
   const scopeCounts: Record<TemporalScope, number> = { current: 0, historical: 0, mixed: 0, undetermined: 0 };
   for (const entry of timeline) scopeCounts[entry.scope] += 1;
 
-  const overall: DiagnosisOverallState =
-    input.healthReportLoaded && input.evidenceCount > 0 ? "ready"
-    : input.healthReportLoaded || input.evidenceCount > 0 || input.repository.documents.length > 0 ? "partial"
-    : "empty";
-
   const reportCardMissing =
     input.healthReportLoaded && !active.some((d) => d.kind === "health-report");
   const modules: DiagnosisModuleSummary[] = [
@@ -218,7 +210,6 @@ export function buildDiagnosisControlSummary(input: DiagnosisControlInput): Diag
   ];
 
   return {
-    overall,
     metrics: {
       activeDocuments: active.length,
       studiesLoaded,
