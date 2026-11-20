@@ -4494,8 +4494,6 @@ export default function App() {
               legacyProfiles={workspace.compiledProfiles}
               legacyText={workspace.validatedPSL?.conclusiones.content}
               onSave={handleSaveExternalProfiles}
-              ineCode={workspace.municipality.identity.ineCode}
-              province={workspace.municipality.identity.province}
               incomingTerritorialRevision={pendingStatisticsRevision?.municipalityId === municipality.id ? pendingStatisticsRevision : undefined}
               onIncomingTerritorialRevisionConsumed={() => setPendingStatisticsRevision(null)}
               updaterMunicipalities={allMunicipalities.filter(m => m.territorialType === undefined || m.territorialType === "municipio").map(m => ({ id: m.id, name: m.name }))}
