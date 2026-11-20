@@ -16,6 +16,7 @@ import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
 import { HomePortada } from "./ui/components/HomePortada";
 import { DocumentArchiveManager } from "./ui/components/DocumentArchiveManager";
 import { StrategicReferenceLibrary } from "./ui/components/StrategicReferenceLibrary";
+import { normalizeLojaMetadataRemotely } from "./application/workspace/normalizeLojaMetadataRemotely";
 import { DocumentReviewInbox } from "./ui/components/DocumentReviewInbox";
 import { DiagnosisControlRoom, DiagnosisModuleSection } from "./ui/components/DiagnosisControlRoom";
 import { DuplicateDocumentsPanel } from "./ui/components/DuplicateDocumentsPanel";
@@ -4218,7 +4219,22 @@ export default function App() {
 
             {/* Biblioteca de referencia institucional: no pertenece al expediente
                 municipal y no alimenta el diagnóstico ni las evidencias. */}
-            <StrategicReferenceLibrary workspace={runtime.workspace} />
+            <StrategicReferenceLibrary
+              workspace={workspace}
+              onNormalizeLojaRemote={documentWriteAllowed && remoteHydratedMunicipalityId === "loja" && remoteClient.auth.currentUser
+                ? async expectedWorkspace => {
+                    const result = await normalizeLojaMetadataRemotely({
+                      read: id => readRemoteWorkspace(remoteClient,id),
+                      save: (updated,expected) => saveRemoteWorkspace(remoteClient,updated,undefined,expected),
+                    },expectedWorkspace);
+                    if (result.status === "updated") {
+                      setWorkspace(current => current.municipality.identity.id === "loja" && JSON.stringify(current) === JSON.stringify(expectedWorkspace) ? result.workspace : current);
+                      setRemotePersistenceMessage("Corrección documental de Loja guardada y comprobada en Firebase.");
+                    }
+                    return result.status;
+                  }
+                : undefined}
+            />
 
             {/* La estadística territorial es una fuente del diagnóstico.
                 Su incorporación al Perfil genera siempre una revisión separada. */}

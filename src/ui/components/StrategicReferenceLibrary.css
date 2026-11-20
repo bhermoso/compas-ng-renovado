@@ -24,3 +24,11 @@
 .srl__audit-table small {display:block;margin-top:5px;font-weight:400;color:var(--texto-secundario);overflow-wrap:anywhere}
 .srl__migration>button {cursor:pointer;padding:8px 12px;margin:10px 0}
 @media(max-width:700px){.srl__totals{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.srl__repair {border-top:1px solid var(--borde);margin-top:12px;padding-top:12px}
+.srl__repair p {line-height:1.55;margin:10px 0}
+.srl__repair button {display:inline-block;max-width:100%;padding:8px 12px;margin:5px 0 10px;cursor:pointer}
+.srl__repair button:disabled {opacity:.5;cursor:not-allowed}
+.srl__ack {display:flex;align-items:baseline;gap:10px;margin:10px 0;font-size:.86rem}
+.srl__ack input {flex:none}
+.srl__repair details ul {max-height:180px;overflow:auto;padding-left:22px}
