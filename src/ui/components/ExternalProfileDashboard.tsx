@@ -11,12 +11,10 @@ import { PSLCArtifactViewer } from './PSLCArtifactViewer';
 import { ProfileResultsDashboard } from './ProfileResultsDashboard';
 import { ProfileEditorialLab } from './ProfileEditorialLab';
 import { ProfileOriginalVerifier } from './ProfileOriginalVerifier';
-import { TerritorialStatisticsPanel } from './TerritorialStatisticsPanel';
 import { ProfileUpdaterPanel, type ProfileUpdateOutcome } from './ProfileUpdaterPanel';
 import { printCompleteProfile } from './printCompleteProfile';
 import type { ProfileUpdateKind } from '../../application/health-profile/profileUpdater';
 import type { ProfileTextPackage } from '../../application/health-profile/profileTextOperations';
-import type { TerritorialStatisticsSnapshot } from '../../domain/territorial-statistics/TerritorialStatistics';
 import './ExternalProfileDashboard.css';
 
 interface Props {
@@ -30,8 +28,8 @@ interface Props {
  onDirtyChange?: (dirty: boolean) => void;
  ineCode?: string;
  province?: string;
- territorialStatistics?: TerritorialStatisticsSnapshot[];
- onSaveTerritorialStatistics?: (snapshots: TerritorialStatisticsSnapshot[], onProgress?: (message: string) => void) => Promise<void>;
+ incomingTerritorialRevision?: { municipalityId: string; results: ProfileResult[]; note: string };
+ onIncomingTerritorialRevisionConsumed?: () => void;
  updaterMunicipalities?: Array<{ id: string; name: string }>;
  onRunProfileUpdates?: (ids: string[], kinds: ProfileUpdateKind[], apply: boolean, onProgress: (message: string) => void, textPackage?: ProfileTextPackage) => Promise<ProfileUpdateOutcome[]>;
 }
@@ -46,9 +44,9 @@ function emptyProfile(municipalityId: string): ExternalHealthProfile {
  return {schema:'compas-external-profile/v1',id:crypto.randomUUID(),municipalityId,title:'',period:'',author:'',createdAt:new Date().toISOString(),
   status:'review',summary:'',text:'',results:[],findings:[],limitations:[],areas:[],attachmentIds:[]};
 }
-export function ExternalProfileDashboard({municipalityId,municipalityName,library,legacyProfiles=[],legacyText,authorName,onSave,onDirtyChange,ineCode,province,territorialStatistics,onSaveTerritorialStatistics,updaterMunicipalities,onRunProfileUpdates}: Props) {
+export function ExternalProfileDashboard({municipalityId,municipalityName,library,legacyProfiles=[],legacyText,authorName,onSave,onDirtyChange,ineCode,province,incomingTerritorialRevision,onIncomingTerritorialRevisionConsumed,updaterMunicipalities,onRunProfileUpdates}: Props) {
  const [selectedId,setSelectedId]=useState(library.activeId);
- const [tab,setTab]=useState<'results'|'document'|'versions'|'laboratory'|'statistics'|'updater'>('results');
+ const [tab,setTab]=useState<'results'|'document'|'versions'|'laboratory'|'updater'>('results');
  const [draft,setDraft]=useState<ExternalHealthProfile>();
  const [newFiles,setNewFiles]=useState<ProfileAttachment[]>([]);
  const [busy,setBusy]=useState(false); const [message,setMessage]=useState(''); const [error,setError]=useState('');
@@ -62,15 +60,31 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
  const activeProfile=library.profiles.find(p=>p.id===library.activeId);
  const custody=selected ? auditProfileCustody(selected,library) : undefined;
  const numericConflicts=selected ? findUnpublishedValueConflicts(selected.text) : [];
- const prepareTerritorialRevision=(results:ProfileResult[],note:string)=>{
-  if(!activeProfile)return;
-  if(draft&&!window.confirm('Ya hay un borrador sin guardar. ¿Sustituirlo por la revisión con los datos territoriales?'))return;
-  setDraft({...structuredClone(activeProfile),id:crypto.randomUUID(),revisionOf:activeProfile.id,createdAt:new Date().toISOString(),status:'review',validatedBy:undefined,validatedAt:undefined,archivedAt:undefined,archivedBy:undefined,results:structuredClone(results),limitations:[...activeProfile.limitations.filter(Boolean),note]});
-  setNewFiles([]);setResultDraft(undefined);setError('');setSelectedId(activeProfile.id);
-  setMessage('Nueva revisión preparada con los datos territoriales. Revisa los indicadores y pulsa «Guardar» al final; la versión vigente no cambia hasta que valides esta.');
-  window.scrollTo({top:0,behavior:'smooth'});
- };
- const statisticsPanel=<TerritorialStatisticsPanel key={municipalityId} onPrepareRevision={prepareTerritorialRevision} municipalityId={municipalityId} municipalityName={municipalityName} ineCode={ineCode} province={province} snapshots={territorialStatistics} activeProfile={activeProfile} authorName={authorName} onSave={onSaveTerritorialStatistics}/>;
+ // La descarga nace en Diagnóstico; aquí se prepara una nueva revisión sin alterar la vigente.
+ useEffect(() => {
+   if (!incomingTerritorialRevision || incomingTerritorialRevision.municipalityId !== municipalityId) return;
+   const current = library.profiles.find(p => p.id === library.activeId);
+   if (!current) { onIncomingTerritorialRevisionConsumed?.(); return; }
+   setDraft({
+     ...structuredClone(current),
+     id: crypto.randomUUID(),
+     revisionOf: current.id,
+     createdAt: new Date().toISOString(),
+     status: 'review',
+     validatedBy: undefined,
+     validatedAt: undefined,
+     archivedAt: undefined,
+     archivedBy: undefined,
+     results: structuredClone(incomingTerritorialRevision.results),
+     limitations: [...current.limitations.filter(Boolean), incomingTerritorialRevision.note],
+   });
+   setNewFiles([]);
+   setResultDraft(undefined);
+   setError('');
+   setSelectedId(current.id);
+   setMessage('Revisión preparada con datos del diagnóstico. Comprueba los indicadores antes de guardar; el Perfil vigente no se modifica.');
+   onIncomingTerritorialRevisionConsumed?.();
+ }, [incomingTerritorialRevision, municipalityId, library, onIncomingTerritorialRevisionConsumed]);
  useEffect(()=>{onDirtyChange?.(!!draft);return()=>onDirtyChange?.(false);},[draft,onDirtyChange]);
  useEffect(()=>{
   if(!draft)return;
@@ -289,7 +303,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
    <p className="ep-formats">PDF · Word DOCX · texto · Markdown · paquete de resultados JSON</p>
    <button className="ep-primary" type="button" disabled={busy} onClick={()=>fileInput.current?.click()}>Seleccionar el perfil</button>
    <p className="ep-help">Hasta 20 MB por archivo. Originales, texto, resultados y versiones se guardan en Firebase. El navegador es una caché.</p></div>
-  </div>{statisticsPanel}</> : <>
+  </div></> : <>
    {selected.reviewFlags && selected.reviewFlags.length > 0 && <div className="ep-review-flags" role="note"><strong>Para revisar en esta revisión</strong><ul>{selected.reviewFlags.map((f,i)=><li key={i}><b>{f.target}</b>: {f.reason}</li>)}</ul><small>Marcas del Actualizador de perfiles. No forman parte del texto publicado.</small></div>}
    <div className="ep-document-toolbar" aria-label="Acceso a archivos y versiones">
      <div className="ep-document-toolbar__top">
@@ -307,7 +321,7 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
        {files.length===0&&<small>No hay archivos adjuntos a esta versión.</small>}
      </div>
    </div>
-   <nav className="ep-tabs ep-tabs--primary" aria-label="Espacios del perfil">{([['results','Perfil'],['document','Documento completo'],['versions','Gestión y versiones'],['statistics','Estadística territorial'],...(onRunProfileUpdates?[['updater','Actualizador de perfiles'] as const]:[]),['laboratory','Laboratorio experimental']] as const).map(([key,label])=><button key={key} type="button" aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>
+   <nav className="ep-tabs ep-tabs--primary" aria-label="Espacios del perfil">{([['results','Perfil'],['document','Documento completo'],['versions','Gestión y versiones'],...(onRunProfileUpdates?[['updater','Actualizador de perfiles'] as const]:[]),['laboratory','Laboratorio experimental']] as const).map(([key,label])=><button key={key} type="button" aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>
    {tab==='results'&&<main className="ep-main ep-main--profile">
     {custody?.distinctOriginal&&<p className="ep-review-flags" role="note"><strong>Original anterior a esta revisión.</strong> Los archivos adjuntos identifican la versión {custody.attachmentVersions.join(", ")}; la lectura actual corresponde a la revisión {custody.currentVersion}. El original no incorpora las transformaciones posteriores.</p>}
      {numericConflicts.map(c=><p className="ep-review-flags" role="alert" key={c.section}><strong>Incoherencia documental por cotejar.</strong> La tabla de la sección censal {c.section} presenta {c.displayed} como porcentaje exacto, mientras otro pasaje del Perfil dice que ese porcentaje no está publicado. No se modifica ninguna cifra automáticamente.</p>)}
@@ -328,7 +342,6 @@ export function ExternalProfileDashboard({municipalityId,municipalityName,librar
      : <p>No hay texto extraíble. Consulta el archivo original o incorpora una transcripción.</p>}
    </section></main>}
    {tab==='updater'&&onRunProfileUpdates&&<main className="ep-main ep-main--statistics"><ProfileUpdaterPanel municipalities={updaterMunicipalities??[]} currentId={municipalityId} onRun={onRunProfileUpdates}/></main>}
-   {tab==='statistics'&&<main className="ep-main ep-main--statistics">{statisticsPanel}</main>}
    {tab==='laboratory'&&<main className="ep-main ep-main--laboratory"><ProfileEditorialLab key={selected.id} profile={selected}/></main>}
    {tab==='versions'&&<main className="ep-main ep-main--management">
     <section className="ep-management-upload"><div><p className="ep-eyebrow">ADMINISTRACIÓN DOCUMENTAL</p><h2>Gestionar el perfil de {municipalityName}</h2><p>Para incorporar una revisión, selecciona conjuntamente su PDF original y su paquete JSON de resultados. Se conservará la versión anterior y la nueva quedará en revisión, sin validación automática.</p></div><button type="button" className="ep-primary" disabled={busy} onClick={()=>fileInput.current?.click()}>↑ Incorporar nueva revisión</button></section>
