@@ -20,7 +20,8 @@ describe("Diagnóstico territorial consolidado", () => {
     const html = renderToStaticMarkup(
       <DiagnosisControlRoom municipalityName="Atarfe" summary={summary} onOpenModule={() => {}} />
     );
-    expect(html).toContain("Explorar el diagnóstico");
+    expect(html).toContain("Áreas de trabajo");
+    expect(html).toContain("Consultar cronología de fuentes");
     expect(html).toContain("Estudios e indicadores");
     expect(html).toContain("Fuentes documentales");
     expect(html).toContain("Activos para la salud");
