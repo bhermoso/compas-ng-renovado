@@ -4217,6 +4217,21 @@ export default function App() {
               );
             })()}
 
+            {/* Acceso al IBSE y SAM consolidado en la navegación de cuatro áreas.
+                No repetir una segunda tarjeta IBSE ni otra cifra fuera de Estudios. */}
+            {/* Punto único de control de todo el archivo documental, incluidos activos y CSV. */}
+            <DocumentArchiveManager
+              repository={runtime.workspace.repository}
+              onSetDocumentCycle={documentWriteAllowed ? handleSetDocumentCycle : undefined}
+              evidence={runtime.workspace.evidenceStore.atoms}
+              originalIds={(runtime.workspace.documentOriginals ?? []).map(o => o.documentId)}
+              originalCapacity={`${formatMegabytes(documentOriginalsBytes(runtime.workspace.documentOriginals) + documentDerivativesBytes(runtime.workspace.documentDerivedFiles) + profileOriginalsBytes(runtime.workspace.externalProfileLibrary))} / ${formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)}`}
+              canWrite={documentWriteAllowed}
+              persistence={remotePersistenceMessage ?? ""}
+              onOpenUploader={() => document.getElementById("document-review-title")?.scrollIntoView({behavior:"smooth",block:"start"})}
+              onOpenAssetValidations={() => { toggleDiagnosisModule("documents", true); requestAnimationFrame(() => document.getElementById("diag-mod-documents")?.scrollIntoView({behavior:"smooth",block:"start"})); }}
+            />
+
             {/* Biblioteca de referencia institucional: no pertenece al expediente
                 municipal y no alimenta el diagnóstico ni las evidencias. */}
             <StrategicReferenceLibrary
@@ -4257,21 +4272,6 @@ export default function App() {
                 }}
               />
             </details>
-
-            {/* Acceso al IBSE y SAM consolidado en la navegación de cuatro áreas.
-                No repetir una segunda tarjeta IBSE ni otra cifra fuera de Estudios. */}
-            {/* Punto único de control de todo el archivo documental, incluidos activos y CSV. */}
-            <DocumentArchiveManager
-              repository={runtime.workspace.repository}
-              onSetDocumentCycle={documentWriteAllowed ? handleSetDocumentCycle : undefined}
-              evidence={runtime.workspace.evidenceStore.atoms}
-              originalIds={(runtime.workspace.documentOriginals ?? []).map(o => o.documentId)}
-              originalCapacity={`${formatMegabytes(documentOriginalsBytes(runtime.workspace.documentOriginals) + documentDerivativesBytes(runtime.workspace.documentDerivedFiles) + profileOriginalsBytes(runtime.workspace.externalProfileLibrary))} / ${formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)}`}
-              canWrite={documentWriteAllowed}
-              persistence={remotePersistenceMessage ?? ""}
-              onOpenUploader={() => document.getElementById("document-review-title")?.scrollIntoView({behavior:"smooth",block:"start"})}
-              onOpenAssetValidations={() => { toggleDiagnosisModule("documents", true); requestAnimationFrame(() => document.getElementById("diag-mod-documents")?.scrollIntoView({behavior:"smooth",block:"start"})); }}
-            />
 
             {/* ── Originales en el expediente compartido ── */}
             {(() => {
