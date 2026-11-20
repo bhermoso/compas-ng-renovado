@@ -61,6 +61,17 @@ try{
   await page.getByRole("button",{name:/Diagnóstico territorial/i}).first().click();
   await municipality.waitFor({state:"visible",timeout:5000});
   assert((await municipality.innerText()).includes(name),"El ámbito desapareció al navegar");
+  // La estadística es una fuente de Diagnóstico, no una pestaña de Perfil.
+  const statistics=page.locator('[data-testid="diagnosis-territorial-statistics"]');
+  await statistics.waitFor({state:"visible",timeout:5000});
+  await statistics.locator("summary").click();
+  assert(await statistics.locator(".tsp").isVisible(),"No se abre la estadística territorial en Diagnóstico");
+  await page.getByRole("button",{name:/Perfil de Salud Local/i}).first().click();
+  const tabs=page.locator(".ep-tabs--primary");
+  if (await tabs.count() > 0) {
+    assert(!(await tabs.innerText()).includes("Estadística territorial"),"El Perfil conserva la pestaña territorial duplicada");
+  }
+
   console.log(`PASS: expediente ${name} visible en Inicio, selector abierto y navegación comprobada.`);
   }
 }finally{
