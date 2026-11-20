@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { removeMunicipalDocument } from "../src/domain/repository";
-import { DocumentArchiveManager } from "../src/ui/components/DocumentArchiveManager";
+import { DocumentArchiveManager, documentCoincidences } from "../src/ui/components/DocumentArchiveManager";
 import type { MunicipalDocumentRepository } from "../src/domain/repository";
 import type { EvidenceAtom } from "../src/domain/evidence";
 
@@ -22,6 +22,26 @@ const repository = {
 } as unknown as MunicipalDocumentRepository;
 
 describe("Gestión documental completa", () => {
+  it("identifica huellas idénticas como mismo contenido, sin confundir versiones con distintos bytes", () => {
+    const shared = "a".repeat(64);
+    const documents = [
+      {...repository.documents[1], id:"ibse-1", title:"IBSE Atarfe", contentSha256:shared},
+      {...repository.documents[1], id:"ibse-2", title:"IBSE Atarfe", contentSha256:shared, revisionNumber:2},
+      {...repository.documents[1], id:"ibse-3", title:"IBSE Atarfe", contentSha256:"b".repeat(64), revisionNumber:3},
+    ];
+    const groups = documentCoincidences(documents);
+    expect(groups.find(g=>g.reason==="hash")?.documents.map(d=>d.id)).toEqual(["ibse-1","ibse-2"]);
+    expect(groups.find(g=>g.reason==="title")?.documents).toHaveLength(3);
+  });
+  it("los títulos iguales sin hash son candidatos, no duplicados confirmados", () => {
+    const documents = [
+      {...repository.documents[1], id:"ibse-1", title:"Índice IBSE"},
+      {...repository.documents[1], id:"ibse-2", title:"Indice  IBSE", revisionOf:"ibse-1"},
+    ];
+    const groups = documentCoincidences(documents);
+    expect(groups).toHaveLength(1);
+    expect(groups[0].reason).toBe("title");
+  });
   it("enumera incluso fuentes de activos y el Informe y permite abrir su ficha", () => {
     const html = renderToStaticMarkup(<DocumentArchiveManager repository={repository} evidence={[] as EvidenceAtom[]} originalIds={["assets-1"]} canWrite persistence="Firebase · copia confirmada" originalCapacity="6 MB / 40 MB" onOpenUploader={()=>{}} onOpenAssetValidations={()=>{}}/>);
     expect(html).toContain("Gestor documental del expediente");
