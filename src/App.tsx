@@ -4340,9 +4340,10 @@ export default function App() {
                 onRenameDocument={handleRenameDocument}
               />
             </DiagnosisModuleSection>
-            <DiagnosisModuleSection id="diag-mod-documents" title="Repositorio documental y bibliotecas" description="Documentos del expediente, ciclos, conciliaciones y biblioteca COMPÁS" open={openDiagModules.has("documents")} onToggle={(open) => toggleDiagnosisModule("documents", open)}>
+            <DiagnosisModuleSection id="diag-mod-documents" title="Validaciones documentales y biblioteca" description="Conciliaciones, validación de activos y referencias transversales; el catálogo de archivos se consulta arriba" open={openDiagModules.has("documents")} onToggle={(open) => toggleDiagnosisModule("documents", open)}>
               <DocumentRepositoryPanel
                 repository={runtime.workspace.repository}
+                hideRepeatedListings
                 onDelete={documentWriteAllowed ? handleDeleteDocument : undefined}
                 libraryDocuments={compasDocumentLibrary}
                 libraryMessage={documentLibraryMessage}
