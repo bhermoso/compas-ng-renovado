@@ -6,13 +6,18 @@ import { createMunicipalityWorkspace, type MunicipalityWorkspace } from "../doma
 /**
  * Preparación de un expediente de ensayo en memoria.
  * No guarda, no borra, no modifica la fuente ni reutiliza sus originales.
- * El mismo municipio y código INE permiten comparar el escenario limpio.
- * No exportar como fuente canónica ni importar en una sesión con datos reales.
+ * Conserva el código INE para comparación, pero cambia el ID y el nombre
+ * del ámbito para que una importación no sobrescriba el municipio original.
+ * Es un escenario de ENSAYO, no una fuente municipal canónica.
  */
 export function createCleanWorkspaceExample(source: MunicipalityWorkspace): MunicipalityWorkspace {
-  const id = source.municipality.identity.id;
+  const originalId = source.municipality.identity.id;
+  const id = `ensayo-${originalId}`;
+  const municipality = structuredClone(source.municipality);
+  municipality.identity.id = id;
+  municipality.identity.name = `${source.municipality.identity.name} · ensayo limpio`;
   return createMunicipalityWorkspace(
-    structuredClone(source.municipality),
+    municipality,
     createMunicipalDocumentRepository({ municipalityId: id }),
     createEvidenceStore(id),
   );
