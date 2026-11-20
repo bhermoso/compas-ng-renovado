@@ -50,6 +50,9 @@ jobs:
           python3 - <<'PY'
           import os
           from pathlib import Path
+          import json
+          from datetime import datetime, timezone
+          Path("dist/version.json").write_text(json.dumps({"commit": os.environ["COMPAS_COMMIT"], "published_build_utc": datetime.now(timezone.utc).isoformat()}), encoding="utf-8")
           path = Path("dist/index.html")
           html = path.read_text(encoding="utf-8")
           marker = f'<meta name="compas-build-sha" content="{os.environ["COMPAS_COMMIT"]}">'
