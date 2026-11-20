@@ -7,8 +7,8 @@ import "./HomePortada.css";
  * Todo el contenido de la portada (identidad, logos, finalidad, ciclo de
  * planificación con los documentos que entran y salen en cada fase, y nota
  * sobre las decisiones) cabe en el alto de la ventana sin desplazamiento,
- * desde 1280 × 720. Las fases son accesos directos a cada módulo; el estado
- * de cada fase lo muestra el ciclo de planificación permanente de la cabecera.
+ * desde 1280 × 720. Las fases explican el proceso sin duplicar la navegación principal; el estado
+ * del expediente se consulta en el resumen desplegable de la cabecera.
  */
 
 type HomeTarget = "repositorio" | "psl" | "priorizacion" | "plan" | "plan-local" | "agenda" | "evaluacion";
@@ -36,7 +36,7 @@ interface HomePortadaProps {
   municipality: { name: string; province?: string; ineCode?: string };
   onChangeMunicipality: () => void;
 }
-export function HomePortada({ onNavigate, municipality, onChangeMunicipality }: HomePortadaProps) {
+export function HomePortada(_props: HomePortadaProps) {
   return (
     <div className="hp" aria-label="Portada de COMPÁS">
       <header className="hp-cover">
@@ -44,13 +44,7 @@ export function HomePortada({ onNavigate, municipality, onChangeMunicipality }: 
           <p className="hp-cover__chain">
             Marco RELAS · Planificación Local de Salud · Salud pública municipal · Andalucía
           </p>
-          <div className="hp-cover__municipality" aria-label="Expediente municipal cargado">
-            <span className="hp-cover__municipality-label">Expediente cargado</span>
-            <strong>{municipality.name}</strong>
-            {municipality.province && <span>· {municipality.province}</span>}
-            {municipality.ineCode && <span>· INE {municipality.ineCode}</span>}
-            <button type="button" onClick={onChangeMunicipality}>Cambiar ámbito</button>
-          </div>
+
         </div>
         <div className="hp-cover__brand">
           <h1 className="home-cover__wordmark hp-cover__wordmark">COMPÁS</h1>
@@ -74,7 +68,7 @@ export function HomePortada({ onNavigate, municipality, onChangeMunicipality }: 
         <ol className="hp-cycle__phases">
           {PHASES.map((p, i) => (
             <li key={p.n} className={`hp-phase hp-phase--${i + 1}`}>
-              <button type="button" className="hp-phase__btn" onClick={() => onNavigate(p.target)}>
+              <div className="hp-phase__btn">
                 <span className="hp-phase__head">
                   <span className="hp-phase__n">{p.n}</span>
                   <span className="hp-phase__verb">{p.verb}</span>
@@ -83,15 +77,15 @@ export function HomePortada({ onNavigate, municipality, onChangeMunicipality }: 
                 <span className="hp-phase__doc">
                   <span className="hp-phase__doc-label">{p.docLabel}</span> {p.doc}
                 </span>
-              </button>
+              </div>
             </li>
           ))}
         </ol>
         <div className="hp-cycle__plan">
-          <button type="button" className="hp-cycle__plan-btn" onClick={() => onNavigate("plan-local")}>
+          <div className="hp-cycle__plan-btn">
             <strong>Plan Local de Salud</strong>
             <span>compila el Perfil, el Plan de Acción y las agendas anuales</span>
-          </button>
+          </div>
         </div>
       </section>
 
