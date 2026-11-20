@@ -1,0 +1,50 @@
+/* Diagnóstico: misma economía visual y paleta institucional que HomePortada.
+   La vista inicial muestra orientación; los datos extensos quedan bajo demanda. */
+.diagnosis-control.workspace-panel { padding: clamp(16px,2vw,28px); margin-bottom: 12px; }
+.diagnosis-control__head { margin-bottom: 12px; }
+.diagnosis-control__municipality { font-size: clamp(1.35rem,2.5vw,2rem); letter-spacing: -.035em; }
+.diagnosis-control__state { max-width: 72ch; margin: 4px 0 0; font-size: .84rem; line-height:1.35; }
+.diagnosis-control__metrics { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:10px; margin:12px 0; padding:0; }
+.diagnosis-control__metrics > div { min-width:0; padding:9px 10px; border-top:3px solid var(--azul); background:var(--fondo-principal); }
+.diagnosis-control__metrics > div:nth-child(2) { border-color:var(--cyan); }
+.diagnosis-control__metrics > div:nth-child(3) { border-color:var(--verde); }
+.diagnosis-control__metrics > div:nth-child(4) { border-color:var(--amarillo); }
+.diagnosis-control__metrics > div:nth-child(5) { border-color:var(--naranja); }
+.diagnosis-control__metrics > div:nth-child(6) { border-color:var(--rojo); }
+.diagnosis-control__metrics dt { font-size:.7rem; line-height:1.2; color:var(--texto-secundario); }
+.diagnosis-control__metrics dd { margin:4px 0 0; font-size:1.3rem; font-weight:700; line-height:1.1; }
+.diagnosis-control__metrics .diagnosis-control__metric-link { font-size:inherit; font-weight:inherit; }
+.diagnosis-control > .panel-note { font-size:.75rem; margin:4px 0 12px; }
+.diagnosis-area-navigation { margin:12px 0; }
+.diagnosis-control__subtitle { font-size:.78rem; text-transform:uppercase; letter-spacing:.09em; color:var(--azul); margin-bottom:8px; }
+.diagnosis-area-navigation__grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+.diagnosis-area-navigation__grid button { display:flex; flex-direction:column; text-align:left; gap:6px; min-width:0; padding:12px; background:white; border:1px solid var(--borde); border-top:3px solid var(--azul); border-radius:4px; cursor:pointer; }
+.diagnosis-area-navigation__grid button:nth-child(2) { border-top-color:var(--cyan); }
+.diagnosis-area-navigation__grid button:nth-child(3) { border-top-color:var(--verde); }
+.diagnosis-area-navigation__grid button:nth-child(4) { border-top-color:var(--amarillo); }
+.diagnosis-area-navigation__grid strong { font-size:.84rem; color:var(--texto-principal); }
+.diagnosis-area-navigation__grid span { font-size:.76rem; line-height:1.35; color:var(--texto-secundario); }
+.diagnosis-area-navigation__grid button:hover strong { text-decoration:underline; text-underline-offset:3px; color:var(--azul); }
+.diagnosis-control__module-audit,.diagnosis-control__timeline-details { border-top:1px solid var(--borde); padding:9px 0; margin:0; }
+.diagnosis-control__module-audit > summary,.diagnosis-control__timeline-details > summary { cursor:pointer; font-size:.83rem; font-weight:650; color:var(--azul); }
+.diagnosis-control__module-audit[open],.diagnosis-control__timeline-details[open] { padding-bottom:15px; }
+.duplicate-documents.workspace-panel { padding:12px 22px; margin-bottom:12px; border-left:3px solid var(--naranja); }
+.duplicate-documents__fold > summary { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; cursor:pointer; font-size:.86rem; color:var(--texto-principal); }
+.duplicate-documents__fold > summary span { color:var(--texto-secundario); font-size:.8rem; }
+.duplicate-documents__fold[open] > summary { margin-bottom:18px; }
+.dam.workspace-panel { padding:16px 24px; margin-bottom:12px; }
+.dam .dam__head .panel-note { font-size:.82rem; }
+.dam .dam__head h2 { font-size:1.2rem; }
+.dam__summary { margin:6px 0; }
+.dam__controls { margin:8px 0; }
+.dam__controls button { min-height:34px; font-size:.83rem; }
+@media(max-width:950px) {
+ .diagnosis-control__metrics { grid-template-columns:repeat(3,minmax(0,1fr)); }
+ .diagnosis-area-navigation__grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media(max-width:550px) {
+ .diagnosis-control__metrics { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .diagnosis-area-navigation__grid { grid-template-columns:1fr; }
+ .duplicate-documents.workspace-panel,.dam.workspace-panel { padding:12px; }
+}
+@media(prefers-reduced-motion:reduce) { .diagnosis-control * { scroll-behavior:auto; } }
