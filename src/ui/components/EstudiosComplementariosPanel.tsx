@@ -355,11 +355,10 @@ export function EstudiosComplementariosPanel({
   ) => ({ label, municipalityValue, granadaValue, andaluciaValue, unit, direction });
 
   const comparisons = {
-    ibse: ibseStudy && ibseStudy.aggregates.nValid > 0 ? buildComparison(
-      [metric("Índice IBSE", ibseStudy.aggregates.meanTotal, granadaReferences?.ibse.meanTotal ?? null, "/100", "higher-is-favourable")],
-      "monitor IBSE provincial de Granada, agregado con el parser canónico",
-      "Referencia contextual provincial; no procede de la EAS ni constituye una estimación poblacional. Sin equivalente autonómico EAS.",
-    ) : undefined,
+    // No cotejar el total municipal MIXTO (incluye menores) con una muestra EAS
+    // adulta, ni con una referencia provincial EAS 2023 sin ponderación.
+    // El contraste IBSE permanece suspendido hasta validar universo, fórmula y pesos.
+    ibse: undefined,
     duke: dukeStudy && buildComparison(
       [metric("Apoyo social global", dukeStudy.aggregates.meanGlobal, granadaReferences?.duke.meanGlobal ?? null, "/55", "higher-is-favourable", anda["duke-apoyo-global"] ?? null)],
       easSource,
@@ -465,6 +464,21 @@ export function EstudiosComplementariosPanel({
           onLoadCSV={(file) => onLoadIBSECSV?.(file, ibseAdjustmentTarget)}
           onDelete={makeDeleteHandler("ibse")}
         >
+          {!invalidIbse && ibseStudy && (
+            <section className="study-report__section" aria-label="Referencias IBSE: pendientes de homologación">
+              <h3 className="study-report__section-title">Referencias territoriales · pendiente de validación</h3>
+              <p>El índice de la muestra municipal de Atarfe incluye menores de 16 años. No se comparará automáticamente su media global con el IBSE adulto de la EAS 2023.</p>
+              <table className="study-strata-table">
+                <thead><tr><th scope="col">Ámbito</th><th scope="col">Valor</th><th scope="col">Procedencia y limitación</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">Atarfe, muestra municipal</th><td>{ibseStudy.aggregates.meanTotal}/100</td><td>{ibseStudy.aggregates.nValid} respuestas válidas; incluye menores y adultos, sin ponderación poblacional</td></tr>
+                  <tr><th scope="row">Granada, EAS 2023</th><td>{granadaReferences ? `${granadaReferences.ibse.meanTotal}/100` : "Cargando…"}</td><td>Recalculado por COMPÁS sobre 814 casos válidos; media sin ponderación, no estimación oficial provincial</td></tr>
+                  <tr><th scope="row">Andalucía, EAS 2023</th><td>75,94/100</td><td>Valor autonómico publicado para población adulta; pendiente de reproducir con microdatos, variable y ponderación oficiales</td></tr>
+                </tbody>
+              </table>
+              <p>No se emiten valoraciones automáticas favorables/desfavorables hasta verificar comparabilidad y la referencia provincial ponderada. El 81,78 histórico de Granada no está contrastado.</p>
+            </section>
+          )}
           {invalidIbse ? (
             <section className="workspace-panel" role="alert">
               <h3>Importación IBSE inválida: no hay respuestas puntuables</h3>
