@@ -78,6 +78,7 @@ import { ibseStudyToEvidenceAtoms } from "./application/ibse";
 import { prepareIBSEImport, type IBSEAdjustmentTarget } from "./application/ibse/prepareIBSEImport";
 import { ageBandsForMunicipality } from "./application/sam";
 import { createIBSEStudy } from "./domain/ibse";
+import { validateIBSESourceCSV } from "./application/ibse/validateIBSESourceCSV";
 import { parseDUKECSV, dukeStudyToEvidenceAtoms } from "./application/duke";
 import { createDUKEStudy } from "./domain/duke";
 import { parsePREDIMEDCSV, predimedStudyToEvidenceAtoms } from "./application/predimed";
@@ -2287,17 +2288,8 @@ export default function App() {
     setIsLoadingIBSE(true);
     try {
       const text = await file.text();
-      // La exportación de respuestas REDCap no es su DataDictionary.
-      // Una cabecera de diccionario y una muestra sin puntuaciones válidas no pueden
-      // sustituir un IBSE previo ni sus evidencias: abortar ANTES de escribir fichero.
-      const header = text.replace(/^\\uFEFF/, "").split(/\\r?\\n/, 1)[0]?.toLowerCase() ?? "";
-      if (/\\bfield_name\\b/.test(header) && /\\b(field_type|field_label)\\b/.test(header)) {
-        throw new Error("Este CSV es un diccionario de variables REDCap, no un archivo con respuestas IBSE. No se ha sustituido el estudio existente.");
-      }
       const { aggregates, methodologicalCautions, warnings, ageSexObserved, strataCounts, demographicAdjustment } = await prepareIBSEImport(text, workspace.municipality.identity.id, target);
-      if (aggregates.nValid === 0) {
-        throw new Error("El CSV no contiene respuestas IBSE válidas. Importación cancelada: el estudio y sus indicadores anteriores se han conservado.");
-      }
+      validateIBSESourceCSV(text, aggregates.nValid);
       const documentId = crypto.randomUUID();
       await saveOriginalFile(workspace.municipality.identity.id, documentId, file);
       const study = createIBSEStudy({
