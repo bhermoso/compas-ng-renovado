@@ -11682,3 +11682,30 @@ h3 {
   .app-nav__municipality-row { gap: 7px; }
   .app-nav__context-label { font-size: .67rem; }
 }
+
+/* Ficha única y progresiva de la documentación territorial. */
+.documentation-dialog{width:min(860px,calc(100vw - 24px));padding:clamp(15px,2.5vw,26px);border:1px solid #b9c9d0;border-radius:14px;box-shadow:0 18px 55px #10263735}
+.documentation-dialog header{position:sticky;top:-26px;z-index:2;background:#fff;padding:10px 0 15px;border-bottom:1px solid #dae2e5;margin-bottom:15px;align-items:center}
+.documentation-dialog header h2{font-size:clamp(1.15rem,2.6vw,1.55rem);line-height:1.25}
+.documentation-overview{padding:16px 18px;margin:0 0 15px;background:#f5f9f7;border:1px solid #d7e5df;border-radius:12px}
+.documentation-overview__type{font-size:.75rem!important;text-transform:uppercase;letter-spacing:.06em;font-weight:750;color:#275d4f;margin:0 0 3px!important}
+.documentation-overview__source{font-size:.85rem!important;color:#47635a;margin:0 0 12px!important}
+.documentation-overview__statuses{display:flex;flex-wrap:wrap;gap:7px}
+.documentation-status{font-size:.78rem;border:1px solid #c8d5db;background:white;color:#3b5260;padding:5px 9px;border-radius:100px}
+.documentation-status--ok{background:#e8f4ed;border-color:#b9d8c5;color:#1d603c}
+.documentation-status--pending{background:#fff5df;border-color:#e7d49e;color:#795418}
+.documentation-overview__file{font-size:.83rem!important;overflow-wrap:anywhere;color:#385669;margin:12px 0 0!important}
+.documentation-overview__notice{font-size:.86rem!important;line-height:1.5!important;margin:12px 0 0!important}
+.documentation-dialog .documentation-technical,.documentation-dialog .documentation-management,.documentation-dialog .documentation-transcript,.documentation-dialog .document-access__actions{border:1px solid #d9e2e5;border-radius:9px;margin:10px 0;background:white}
+.documentation-dialog .documentation-technical>summary,.documentation-dialog .documentation-management>summary,.documentation-dialog .documentation-transcript>summary,.documentation-dialog .document-access__actions>summary{padding:13px 16px;cursor:pointer;font-weight:650;color:#1c566d}
+.documentation-dialog .documentation-technical[open],.documentation-dialog .documentation-management[open],.documentation-dialog .documentation-transcript[open],.documentation-dialog .document-access__actions[open]{background:#fbfdfc}
+.documentation-dialog .documentation-metadata,.documentation-dialog .documentation-operations,.documentation-dialog .documentation-text,.documentation-dialog .document-access__derivatives{padding:12px 16px;margin:0}
+.documentation-dialog .documentation-metadata{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px}
+.documentation-dialog .documentation-metadata div{min-width:0;border-bottom:1px solid #eef2f3;padding-bottom:7px}
+.documentation-dialog .documentation-metadata dt{font-size:.75rem;color:#62717a}
+.documentation-dialog .documentation-metadata dd{font-size:.85rem;margin:4px 0;overflow-wrap:anywhere}
+.documentation-dialog .documentation-text{max-height:45vh;overflow:auto;font-size:.9rem;line-height:1.65}
+.documentation-dialog .document-access{margin:0}
+.documentation-dialog .documentation-management .documentation-operations{display:flex;gap:12px;flex-wrap:wrap}
+.documentation-dialog .documentation-management .documentation-operations>*{max-width:100%}
+@media(max-width:600px){.documentation-dialog .documentation-metadata{grid-template-columns:1fr}.documentation-overview{padding:12px}.documentation-dialog header{top:-15px}}
