@@ -79,6 +79,7 @@ import { prepareIBSEImport, type IBSEAdjustmentTarget } from "./application/ibse
 import { ageBandsForMunicipality } from "./application/sam";
 import { createIBSEStudy } from "./domain/ibse";
 import { validateIBSESourceCSV } from "./application/ibse/validateIBSESourceCSV";
+import { inferIBSESampleScope } from "./application/ibse/inferIBSESampleScope";
 import { parseDUKECSV, dukeStudyToEvidenceAtoms } from "./application/duke";
 import { createDUKEStudy } from "./domain/duke";
 import { parsePREDIMEDCSV, predimedStudyToEvidenceAtoms } from "./application/predimed";
@@ -2290,7 +2291,23 @@ export default function App() {
       const text = await file.text();
       const { aggregates, methodologicalCautions, warnings, ageSexObserved, strataCounts, demographicAdjustment } = await prepareIBSEImport(text, workspace.municipality.identity.id, target);
       validateIBSESourceCSV(text, aggregates.nValid);
+      const existingStudy = workspace.ibseStudy;
+      if (existingStudy && !window.confirm(
+        `Se sustituirá el IBSE activo de ${workspace.municipality.identity.name} (${existingStudy.aggregates.nValid} válidos; ${existingStudy.aggregates.meanTotal}/100) por «${file.name}» (${aggregates.nValid} válidos; ${aggregates.meanTotal}/100). El estudio y las evidencias anteriores se guardarán en el historial y su ficha quedará archivada. Confirma solo si el CSV contiene respuestas individuales, no un diccionario.`
+      )) {
+        setIbseMessage("Importación cancelada. El IBSE anterior permanece intacto.");
+        return false;
+      }
+      const existingBytes = documentOriginalsBytes(workspace.documentOriginals)
+        + documentDerivativesBytes(workspace.documentDerivedFiles)
+        + profileOriginalsBytes(workspace.externalProfileLibrary);
+      const fits = decideOriginalUpload(file.size, existingBytes);
+      if (fits !== "fits") throw new Error(fits === "too-large"
+        ? "El CSV supera el límite de 20 MB por archivo."
+        : "El expediente supera la capacidad documental de 40 MB. No se ha sustituido el IBSE.");
       const documentId = crypto.randomUUID();
+      // Original verificable y compartible, además de copia de seguridad en IndexedDB.
+      const original = await encodeDocumentOriginal(documentId, file);
       await saveOriginalFile(workspace.municipality.identity.id, documentId, file);
       const study = createIBSEStudy({
         municipalityId: workspace.municipality.identity.id,
@@ -2298,6 +2315,7 @@ export default function App() {
         aggregates,
         demographicAdjustment,
         strataCounts,
+        sampleScope: inferIBSESampleScope(strataCounts),
         ageSexObserved:
           ageSexObserved === undefined
             ? undefined
@@ -2314,10 +2332,20 @@ export default function App() {
       );
       setWorkspace((prev) => {
         const now = new Date().toISOString();
-        const repositoryWithoutPrior = removeDocumentsByTag(
-          prev.repository,
-          IBSE_DOCUMENT_TAG
+        const priorDocuments = prev.repository.documents.filter(d => d.tags.includes(IBSE_DOCUMENT_TAG));
+        const oldEvidence = prev.evidenceStore.atoms.filter(
+          atom => atom.municipalityId === prev.municipality.identity.id && atom.provenance.origin === "ibse"
         );
+        // No destruir fichas ni originales antiguos: archivar su asociación activa.
+        const repositoryWithoutPrior = {
+          ...prev.repository,
+          updatedAt: now,
+          documents: prev.repository.documents.map(d =>
+            d.tags.includes(IBSE_DOCUMENT_TAG)
+              ? { ...d, status: "archived" as const, tags: [...d.tags.filter(tag => tag !== IBSE_DOCUMENT_TAG), "ibse-history"] }
+              : d
+          ),
+        };
         const nextRepository = addMunicipalDocument(repositoryWithoutPrior, {
           id: documentId,
           kind: "redcap-export",
@@ -2346,6 +2374,10 @@ export default function App() {
           ...prev,
           repository: nextRepository,
           ibseStudy: study,
+          ibseStudyHistory: prev.ibseStudy
+            ? [...(prev.ibseStudyHistory ?? []), { replacedAt: now, previousStudy: prev.ibseStudy, documents: priorDocuments, evidence: oldEvidence }]
+            : prev.ibseStudyHistory,
+          documentOriginals: mergeDocumentOriginals(prev.documentOriginals ?? [], [original]),
           evidenceStore: nextStore,
           updatedAt: now,
         };
@@ -2353,7 +2385,7 @@ export default function App() {
       const warn = warnings.length > 0 ? ` Avisos: ${warnings.join(" ")}` : "";
       setIbseMessage(
         aggregates.nValid > 0
-          ? `IBSE cargado: ${aggregates.nValid} registros válidos · Media total: ${aggregates.meanTotal} · ${ibseAtoms.length} indicadores incorporados al análisis territorial.${warn}`
+          ? `IBSE preparado: ${aggregates.nValid} registros válidos · Media total: ${aggregates.meanTotal} · ${ibseAtoms.length} indicadores. Estudio anterior archivado; confirma la sincronización del expediente en Firebase.${warn}`
           : `CSV procesado sin registros válidos.${warn}`
       );
       return true;
