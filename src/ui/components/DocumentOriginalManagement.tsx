@@ -1,15 +1,17 @@
 import { createContext, useContext } from "react";
-import type { StoredDocumentOriginal } from "../../application/document-files/documentOriginals";
+import type { StoredDocumentOriginal, StoredDocumentDerivative } from "../../application/document-files/documentOriginals";
 
 export interface DocumentOriginalManagement {
   /** Only operations on the currently authenticated municipality are authorised. */
   municipalityId: string;
   originals: readonly StoredDocumentOriginal[];
+  derivatives?: readonly StoredDocumentDerivative[];
+  storeDerivative?: (documentId: string, file: File, provenance: StoredDocumentDerivative['provenance']) => Promise<void>;
   /** Only resolves after the shared expediente has been saved in Firebase. */
-  storeOriginal: (documentId: string, file: File) => Promise<void>;
-  createRevision: (documentId: string, file: File) => Promise<void>;
-  archiveDocument: (documentId: string) => Promise<void>;
-  deleteDocument: (documentId: string) => Promise<boolean>;
+  storeOriginal?: (documentId: string, file: File) => Promise<void>;
+  createRevision?: (documentId: string, file: File) => Promise<void>;
+  archiveDocument?: (documentId: string) => Promise<void>;
+  deleteDocument?: (documentId: string) => Promise<boolean>;
 }
 
 export const DocumentOriginalManagementContext = createContext<DocumentOriginalManagement | null>(null);

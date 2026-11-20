@@ -461,7 +461,7 @@ export function shouldRestoreIndexedDbWorkspace(
   // posterior los eliminaría también de Firebase.
   return (
     stored.updatedAt === current.updatedAt &&
-    (stored.documentOriginals?.length ?? 0) > (current.documentOriginals?.length ?? 0)
+    ((stored.documentOriginals?.length ?? 0) + (stored.documentDerivedFiles?.length ?? 0)) > ((current.documentOriginals?.length ?? 0) + (current.documentDerivedFiles?.length ?? 0))
   );
 }
 
@@ -481,8 +481,14 @@ export function withCarriedDocumentOriginals(
   const documentIds = new Set(current.repository.documents.map((d) => d.id));
   const removed = new Set((current.deletedDocuments ?? []).map(o => o.documentId));
   const carried = (other.documentOriginals ?? []).filter((o) => !have.has(o.documentId) && documentIds.has(o.documentId) && !removed.has(o.documentId));
-  if (carried.length === 0) return current;
-  return { ...current, documentOriginals: [...(current.documentOriginals ?? []), ...carried] };
+  const derivedHave = new Set((current.documentDerivedFiles ?? []).map(d => d.id));
+  const derivedCarried = (other.documentDerivedFiles ?? []).filter(d => !derivedHave.has(d.id) && documentIds.has(d.derivedFromDocumentId) && !removed.has(d.derivedFromDocumentId));
+  if (carried.length === 0 && derivedCarried.length === 0) return current;
+  return {
+    ...current,
+    documentOriginals: [...(current.documentOriginals ?? []), ...carried],
+    documentDerivedFiles: [...(current.documentDerivedFiles ?? []), ...derivedCarried],
+  };
 }
 
 export function shouldReplaceWithSeed(

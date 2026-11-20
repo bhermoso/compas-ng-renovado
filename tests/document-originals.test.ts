@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { documentCustodyMetadata } from "../src/ui/components/documentCustody";
 import {
   MAX_ORIGINAL_FILE_BYTES, MAX_WORKSPACE_ORIGINALS_BYTES, decideOriginalUpload, decodeDocumentOriginal,
-  documentOriginalsBytes, encodeDocumentOriginal, mergeDocumentOriginals, profileOriginalsBytes, pruneDocumentOriginals,
+  documentOriginalsBytes, documentDerivativesBytes, encodeDocumentOriginal, mergeDocumentOriginals, mergeDocumentDerivatives, profileOriginalsBytes, pruneDocumentOriginals, pruneDocumentDerivatives,
 } from "../src/application/document-files/documentOriginals";
 import { isEmptyWorkspaceForPersistenceGuard } from "../src/application/workspace/isEmptyWorkspaceForPersistenceGuard";
 import { createCompleteMunicipalityWorkspace } from "../src/application/workspace";
@@ -44,6 +44,19 @@ describe("originales del Diagnóstico en el expediente", () => {
     ws.documentOriginals = [await encodeDocumentOriginal("a", file("a"))];
     expect(isEmptyWorkspaceForPersistenceGuard(ws)).toBe(false);
   });
+  it('registra derivados PDF y DOCX separados del original sin duplicarlos', async () => {
+    const pdf = { ...(await encodeDocumentOriginal('a', file('%PDF', 'copia.pdf'))), id:'copia-pdf', derivedFromDocumentId:'a', provenance:'transcription-reconstruction' as const, createdAt:'2026-11-20T00:00:00Z' };
+    const docx = { ...(await encodeDocumentOriginal('a', file('docx', 'copia.docx'))), id:'copia-docx', derivedFromDocumentId:'a', provenance:'format-conversion' as const, createdAt:'2026-11-20T00:00:00Z' };
+    const merged = mergeDocumentDerivatives([pdf], [docx]);
+    expect(merged.map(d=>d.name)).toEqual(['copia.pdf','copia.docx']);
+    expect(mergeDocumentDerivatives(merged, [pdf])).toHaveLength(2);
+    expect(documentDerivativesBytes(merged)).toBe(8);
+    expect(pruneDocumentDerivatives(merged,[{id:'a'}] as never)).toHaveLength(2);
+    expect(pruneDocumentDerivatives(merged,[{id:'b'}] as never)).toHaveLength(0);
+    const ws = createCompleteMunicipalityWorkspace({id:'zagra',name:'Zagra'});
+    ws.documentDerivedFiles=[pdf];
+    expect(isEmptyWorkspaceForPersistenceGuard(ws)).toBe(false);
+  });
 });
 
 import { serializeWorkspaceForLocalStorage, serializeWorkspaceForStorage } from "../src/infrastructure/persistence/local-storage/LocalStorageWorkspacePersistence";
@@ -56,6 +69,10 @@ describe("copia ligera de localStorage", () => {
     // La copia ampliada (IndexedDB) sí los conserva.
     expect(JSON.parse(serializeWorkspaceForStorage(ws)).documentOriginals).toHaveLength(1);
     expect(ws.documentOriginals).toHaveLength(1);
+    ws.documentDerivedFiles=[{...(await encodeDocumentOriginal('a',file('derivado','derivado.pdf'))),id:'derived-1',derivedFromDocumentId:'a',provenance:'transcription-reconstruction',createdAt:'2026-11-20T00:00:00Z'}];
+    const light=JSON.parse(serializeWorkspaceForLocalStorage(ws));
+    expect(light.documentDerivedFiles).toBeUndefined();
+    expect(JSON.parse(serializeWorkspaceForStorage(ws)).documentDerivedFiles).toHaveLength(1);
   });
 });
 

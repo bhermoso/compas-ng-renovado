@@ -17,6 +17,34 @@ export interface StoredDocumentOriginal extends ProfileAttachment {
   documentId: string;
 }
 
+/** Copias reconstruidas o conversiones: nunca se catalogan como originales primarios. */
+export interface StoredDocumentDerivative extends StoredDocumentOriginal {
+  /** Identificador de la ficha primaria que conserva texto, evidencias y versiones. */
+  derivedFromDocumentId: string;
+  provenance: "transcription-reconstruction" | "format-conversion";
+  createdAt: string;
+}
+
+export function documentDerivativesBytes(files: readonly StoredDocumentDerivative[] | undefined): number {
+  return (files ?? []).reduce((sum, item) => sum + item.size, 0);
+}
+
+export function mergeDocumentDerivatives(
+  current: readonly StoredDocumentDerivative[],
+  additions: readonly StoredDocumentDerivative[],
+): StoredDocumentDerivative[] {
+  const incoming = new Set(additions.map(d => d.id));
+  return [...current.filter(d => !incoming.has(d.id)), ...additions];
+}
+
+export function pruneDocumentDerivatives(
+  files: readonly StoredDocumentDerivative[],
+  documents: readonly MunicipalDocument[],
+): StoredDocumentDerivative[] {
+  const ids = new Set(documents.map(d => d.id));
+  return files.filter(d => ids.has(d.derivedFromDocumentId));
+}
+
 export const MAX_ORIGINAL_FILE_BYTES = MAX_PROFILE_FILE_BYTES;
 export const MAX_WORKSPACE_ORIGINALS_BYTES = MAX_PROFILE_LIBRARY_BYTES;
 

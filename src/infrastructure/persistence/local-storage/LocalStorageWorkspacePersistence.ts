@@ -121,8 +121,9 @@ export function serializeWorkspaceForStorage(
 export function serializeWorkspaceForLocalStorage(
   workspace: MunicipalityWorkspace
 ): string {
-  const { documentOriginals: _originals, ...light } = stripHtmlFields(workspace);
+  const { documentOriginals: _originals, documentDerivedFiles: _derived, ...light } = stripHtmlFields(workspace);
   void _originals;
+  void _derived;
   return JSON.stringify(light);
 }
 

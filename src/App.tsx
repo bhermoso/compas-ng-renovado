@@ -19,7 +19,7 @@ import { DuplicateDocumentsPanel } from "./ui/components/DuplicateDocumentsPanel
 import { findDuplicateGroups, findExistingCopy, retireDuplicateDocument } from "./application/document-ingestion/documentDuplicates";
 import { sha256Hex } from "./application/document-ingestion/sha256";
 import { canDeleteDocumentVersion, createDocumentRevision } from "./application/document-files/documentRevisions";
-import { MAX_WORKSPACE_ORIGINALS_BYTES, decideOriginalUpload, decodeDocumentOriginal, documentOriginalsBytes, encodeDocumentOriginal, formatMegabytes, mergeDocumentOriginals, profileOriginalsBytes, pruneDocumentOriginals, type StoredDocumentOriginal } from "./application/document-files/documentOriginals";
+import { MAX_WORKSPACE_ORIGINALS_BYTES, decideOriginalUpload, decodeDocumentOriginal, documentOriginalsBytes, documentDerivativesBytes, encodeDocumentOriginal, formatMegabytes, mergeDocumentOriginals, mergeDocumentDerivatives, profileOriginalsBytes, pruneDocumentOriginals, type StoredDocumentOriginal, type StoredDocumentDerivative } from "./application/document-files/documentOriginals";
 import { buildDiagnosisControlSummary, type DiagnosisModuleId } from "./application/diagnosis/diagnosisControlSummary";
 import { replaceZaidinFinalDraft } from "./application/workspace/replaceZaidinFinalDraft";
 import { regroupZagraActionPlan } from "./application/workspace/regroupZagraActionPlan";
@@ -671,7 +671,7 @@ export default function App() {
         originalSyncSkip.current.add(key);
       }
       const storedIds = new Set(stored.map((o) => o.documentId));
-      let used = documentOriginalsBytes(stored) + profileOriginalsBytes(workspace.externalProfileLibrary);
+      let used = documentOriginalsBytes(stored) + documentDerivativesBytes(workspace.documentDerivedFiles) + profileOriginalsBytes(workspace.externalProfileLibrary);
       const additions: StoredDocumentOriginal[] = [];
       const localOnly: Array<{ documentId: string; reason: "too-large" | "over-budget" }> = [];
       for (const d of documents) {
@@ -1230,7 +1230,7 @@ export default function App() {
       await saveOriginalFile(municipalityId, documentId, file);
       return;
     }
-    const used = documentOriginalsBytes(workspace.documentOriginals) + profileOriginalsBytes(workspace.externalProfileLibrary);
+    const used = documentOriginalsBytes(workspace.documentOriginals) + documentDerivativesBytes(workspace.documentDerivedFiles) + profileOriginalsBytes(workspace.externalProfileLibrary);
     const decision = decideOriginalUpload(file.size, used);
     if (decision !== "fits") {
       throw new Error(decision === "too-large" ? "El original supera el límite de 20 MB por archivo." : "Se supera el límite compartido de 40 MB de originales y perfiles.");
@@ -1258,6 +1258,60 @@ export default function App() {
       });
     } catch (error) {
       setRemotePersistenceMessage("El original no se ha guardado en Firebase.");
+      throw error;
+    } finally {
+      profileSaveInFlightRef.current = false;
+    }
+  }, [workspace, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+
+  /** Los derivados son copias vinculadas: nunca se hacen pasar por el original. */
+  const handleStoreDocumentDerivative = useCallback(async (
+    documentId: string,
+    file: File,
+    provenance: StoredDocumentDerivative["provenance"],
+  ): Promise<void> => {
+    const municipalityId = workspace.municipality.identity.id;
+    if (!remoteClient.auth.currentUser || remoteHydratedMunicipalityId !== municipalityId || pendingSeedId || pendingIndexedDbHydrationId) {
+      throw new Error("Inicia sesión y recupera el expediente compartido antes de añadir la copia.");
+    }
+    if (profileSaveInFlightRef.current) throw new Error("Ya hay otra operación documental en curso.");
+    if (!workspace.repository.documents.some(d => d.id === documentId)) throw new Error("La ficha documental no existe en este municipio.");
+    if (!/\\.(pdf|docx)$/i.test(file.name)) throw new Error("Solo se admiten derivados PDF o DOCX.");
+    if (provenance !== "transcription-reconstruction" && provenance !== "format-conversion") throw new Error("Indica la procedencia de la copia.");
+    const original = await encodeDocumentOriginal(documentId, file);
+    const existing = (workspace.documentDerivedFiles ?? []).filter(d => d.derivedFromDocumentId === documentId);
+    if (existing.some(d => d.sha256 === original.sha256)) return;
+    const extension = file.name.toLowerCase().endsWith(".pdf") ? ".pdf" : ".docx";
+    if (existing.some(d => d.name.toLowerCase().endsWith(extension))) {
+      throw new Error("Ya existe un derivado de este formato. Conserva la copia anterior: cualquier sustitución necesita una revisión documental.");
+    }
+    const used = documentOriginalsBytes(workspace.documentOriginals) + documentDerivativesBytes(workspace.documentDerivedFiles) + profileOriginalsBytes(workspace.externalProfileLibrary);
+    const decision = decideOriginalUpload(file.size, used);
+    if (decision !== "fits") throw new Error(decision === "too-large" ? "El fichero supera 20 MB." : "El expediente superaría el límite conjunto de 40 MB.");
+    const derivative: StoredDocumentDerivative = {
+      ...original,
+      id: crypto.randomUUID(),
+      derivedFromDocumentId: documentId,
+      provenance,
+      createdAt: new Date().toISOString(),
+    };
+    const next = {
+      ...workspace,
+      documentDerivedFiles: mergeDocumentDerivatives(workspace.documentDerivedFiles ?? [], [derivative]),
+      updatedAt: new Date().toISOString(),
+    };
+    profileSaveInFlightRef.current = true;
+    setRemotePersistenceMessage("Guardando copia derivada en Firebase…");
+    try {
+      await saveRemoteWorkspace(remoteClient, next);
+      setWorkspace(current => current.municipality.identity.id === municipalityId ? ({
+        ...current,
+        documentDerivedFiles: mergeDocumentDerivatives(current.documentDerivedFiles ?? [], [derivative]),
+        updatedAt: next.updatedAt,
+      }) : current);
+      setRemotePersistenceMessage("Copia derivada guardada en el expediente compartido.");
+    } catch (error) {
+      setRemotePersistenceMessage("No se ha confirmado el guardado de la copia derivada.");
       throw error;
     } finally {
       profileSaveInFlightRef.current = false;
@@ -2103,12 +2157,12 @@ export default function App() {
   /**
    * Dónde queda lo incorporado, sin prometer más de lo que ocurre: con sesión,
    * la ficha, el texto y las evidencias viajan en el expediente compartido de
-   * Firebase (autoguardado); el archivo original del Diagnóstico solo se
-   * conserva en IndexedDB de este navegador (originalFiles.ts).
+   * Firebase para sesiones autenticadas; IndexedDB mantiene una copia local.
+   * Sin autenticación, los archivos no se comparten con otros navegadores.
    */
   function storageSummary(): string {
     return remoteClient.auth.currentUser
-      ? `La ficha, el texto, las evidencias y el archivo original se guardan en el expediente compartido de Firebase. Los originales del Diagnóstico y del Perfil comparten un límite de ${formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)} por expediente; el que no quepa se conserva solo en este navegador y se avisa.`
+      ? `La ficha, el texto, las evidencias, los originales y las copias derivadas se guardan en el expediente compartido de Firebase. Los archivos del Diagnóstico y del Perfil comparten un límite de ${formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)} por expediente; el que no quepa se conserva solo en este navegador y se avisa.`
       : "Sin sesión iniciada: todo se guarda solo en este navegador. Inicia sesión para guardar el expediente en Firebase.";
   }
 
@@ -3445,6 +3499,7 @@ export default function App() {
           { documentId, title: doc?.title ?? documentId, deletedAt: new Date().toISOString() },
         ],
         documentOriginals: (prev.documentOriginals ?? []).filter(o => o.documentId !== documentId),
+        documentDerivedFiles: (prev.documentDerivedFiles ?? []).filter(o => o.derivedFromDocumentId !== documentId),
         repository: removeMunicipalDocument(prev.repository, documentId),
         evidenceStore: {
           ...prev.evidenceStore,
@@ -3852,7 +3907,7 @@ export default function App() {
   // ── Render ──────────────────────────────────────────────────
 
   return (
-    <DocumentationProvider key={municipality.id} workspace={workspace} canWrite={documentWriteAllowed} onStoreOriginal={handleStoreDocumentOriginal} onCreateRevision={handleCreateDocumentRevision} onArchiveDocument={handleArchiveDocument} onDeleteDocument={documentWriteAllowed ? handleDeleteDocument : undefined}>
+    <DocumentationProvider key={municipality.id} workspace={workspace} canWrite={documentWriteAllowed} onStoreOriginal={handleStoreDocumentOriginal} onStoreDerivative={handleStoreDocumentDerivative} onCreateRevision={handleCreateDocumentRevision} onArchiveDocument={handleArchiveDocument} onDeleteDocument={documentWriteAllowed ? handleDeleteDocument : undefined}>
       {municipalityToDelete && <DeleteWorkspaceDialog
         name={municipalityToDelete.name}
         discardDraft={preparationDirtyRef.current && municipalityToDelete.id === municipality.id}
@@ -4128,7 +4183,7 @@ export default function App() {
               repository={runtime.workspace.repository}
               evidence={runtime.workspace.evidenceStore.atoms}
               originalIds={(runtime.workspace.documentOriginals ?? []).map(o => o.documentId)}
-              originalCapacity={`${formatMegabytes(documentOriginalsBytes(runtime.workspace.documentOriginals) + profileOriginalsBytes(runtime.workspace.externalProfileLibrary))} / ${formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)}`}
+              originalCapacity={`${formatMegabytes(documentOriginalsBytes(runtime.workspace.documentOriginals) + documentDerivativesBytes(runtime.workspace.documentDerivedFiles) + profileOriginalsBytes(runtime.workspace.externalProfileLibrary))} / ${formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)}`}
               canWrite={documentWriteAllowed}
               persistence={remotePersistenceMessage ?? ""}
               onOpenUploader={() => document.getElementById("document-review-title")?.scrollIntoView({behavior:"smooth",block:"start"})}
@@ -4143,7 +4198,7 @@ export default function App() {
               return (
                 <section className="workspace-panel originals-status" aria-label="Originales en el expediente compartido">
                   <p className="originals-status__line">
-                    <strong>Originales en el expediente compartido:</strong> {stored.length === 1 ? "1 documento" : `${stored.length} documentos`} · {formatMegabytes(used)} de {formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)}, contando los del Perfil.
+                    <strong>Archivos en el expediente compartido:</strong> {stored.length} originales · {(runtime.workspace.documentDerivedFiles ?? []).length} derivados · {formatMegabytes(used)} de {formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)}, contando los del Perfil.
                     {remoteClient.auth.currentUser ? " Se guardan en Firebase con el expediente." : " Sin sesión iniciada, se guardan solo en este navegador."}
                   </p>
                   {localOnlyOriginals.length > 0 && (
