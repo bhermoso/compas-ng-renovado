@@ -17,7 +17,7 @@ export function StrategicReferenceLibrary({workspace}: {workspace: MunicipalityW
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `COMPAS-${summary.municipalityId}-ENSAYO-LIMPIO-NO-IMPORTAR-EN-EXPEDIENTE-ACTIVO.json`;
+    link.download = `COMPAS-ensayo-${summary.municipalityId}-limpio.json`;
     link.click();
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
@@ -51,9 +51,9 @@ export function StrategicReferenceLibrary({workspace}: {workspace: MunicipalityW
         <p><strong>{summary.municipalDocuments}</strong> fichas municipales: {summary.strategicCopies} marcos estratégicos y {summary.diagnosticDocuments} documentos de otros tipos.</p>
         <p><strong>{summary.evidenceAtoms}</strong> evidencias · <strong>{summary.originals}</strong> originales registrados · <strong>{summary.profiles}</strong> versiones de Perfil · <strong>{summary.validatedPlans}</strong> planes validados.</p>
         {summary.strategicTitles.length>0 && <details><summary>Marcos estratégicos registrados en este municipio ({summary.strategicCopies})</summary><ul>{summary.strategicTitles.map((title,i)=><li key={i}>{title}</li>)}</ul></details>}
-        <p>El ejemplo limpio contiene únicamente la identidad del municipio y las colecciones vacías de documentos y evidencias. No sustituye al expediente real, no elimina sus datos y no modifica Firebase.</p>
-        <button type="button" onClick={downloadClean}>Descargar ejemplo limpio en JSON (uso aislado)</button>
-        <p className="srl__warning">No importes este JSON sobre el expediente activo: úsalo solo en un entorno de ensayo separado. Antes de una migración real, descarga y verifica una copia de recuperación con los originales.</p>
+        <p>El ejemplo crea un ámbito independiente («ensayo-» + identificador municipal), con el mismo código INE y sin documentos, evidencias, versiones ni planes. El expediente real permanece intacto; no se escribe en Firebase.</p>
+        <button type="button" onClick={downloadClean}>Descargar expediente de ensayo limpio</button>
+        <p className="srl__warning">El JSON puede importarse desde «Conservar y recuperar el trabajo» como otro ámbito, sin sustituir Atarfe o Loja. Es una simulación, no un expediente observado. Antes de limpiar documentos reales, descarga una copia de recuperación con originales y compruébala.</p>
       </div>}
     </details>
   </section>;
