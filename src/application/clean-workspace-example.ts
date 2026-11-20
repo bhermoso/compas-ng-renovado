@@ -1,6 +1,7 @@
 import type { MunicipalDocumentRepository } from "../domain/repository";
 import { createMunicipalDocumentRepository } from "../domain/repository";
 import { createEvidenceStore } from "../domain/evidence";
+import { createMunicipalityContext } from "../domain/municipality";
 import { createMunicipalityWorkspace, type MunicipalityWorkspace } from "../domain/workspace";
 
 /**
@@ -13,9 +14,14 @@ import { createMunicipalityWorkspace, type MunicipalityWorkspace } from "../doma
 export function createCleanWorkspaceExample(source: MunicipalityWorkspace): MunicipalityWorkspace {
   const originalId = source.municipality.identity.id;
   const id = `ensayo-${originalId}`;
-  const municipality = structuredClone(source.municipality);
-  municipality.identity.id = id;
-  municipality.identity.name = `${source.municipality.identity.name} · ensayo limpio`;
+  const municipality = createMunicipalityContext({
+    id,
+    name: `${source.municipality.identity.name} · ensayo limpio`,
+    province: source.municipality.identity.province,
+    ineCode: source.municipality.identity.ineCode,
+    territorialType: source.municipality.identity.territorialType,
+    createdBy: "COMPÁS · ensayo no institucional",
+  });
   return createMunicipalityWorkspace(
     municipality,
     createMunicipalDocumentRepository({ municipalityId: id }),
