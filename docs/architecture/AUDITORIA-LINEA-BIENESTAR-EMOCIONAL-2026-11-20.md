@@ -44,6 +44,70 @@ El Plan Local de Salud debe seleccionar preferentemente **objetivos y nombres de
 5. **Revisión funcional**: ninguna migración silenciosa de BEM 0.2; la eventual 0.3 debe versionarse y preservar borradores, fichas de indicadores, decisiones y validaciones 0.2.
 6. **Validación técnica**: colaboración entre equipo local, salud pública y agentes responsables de fuentes. La redacción oficial no debe confundirse con promesa de resultado o competencia local.
 
+
+## Concordancia completa de la versión 0.2 con la propuesta 0.3-candidate
+
+**No se declara que los 17 objetivos específicos de COMPÁS existan literalmente en PESMA-A o EPVSA.** PESMA-A clasifica objetivos estratégicos, objetivos de programas y sus indicadores; EPVSA diferencia indicadores de contexto e impacto. Es metodológicamente incorrecto renumerar cualquiera de esos elementos como un objetivo específico municipal idéntico.
+
+La correspondencia verificable, con descripción, ruta de medición, fuente y disposición de cada unidad se conserva de forma ejecutable en `BemOfficialRevisionCandidate.ts`, **no importado por el catálogo operativo**.
+
+| Código actual | Jerarquía oficial a la que contribuye | Indicador oficial vinculable | Dictamen |
+|---|---|---|---|
+| BEM-OE1.1 | PESMA OE01, bienestar emocional | PESMA OE01: IBSE 16+ | Misma familia instrumental; comparabilidad pendiente |
+| BEM-OE1.2 | PESMA OE01 | Ninguno idéntico | Brechas municipales: análisis complementario |
+| BEM-OE1.3 | PESMA OE01 | Ninguno idéntico | Ítem local de tranquilidad: análisis complementario |
+| BEM-OE2.1 | EPVSA OE1.4 | Ninguno idéntico | Ítem de soledad percibida ≠ medición oficial de soledad no deseada |
+| BEM-OE2.2 | EPVSA OE1.4 | EPVSA 1.4.5.a: apoyo social y afectivo | DUKE; revisar punto de corte y muestra |
+| BEM-OE3.1 | PESMA OE01, P.01.02 | Nº de centros con GEA/GRUBEA | Cambiar el porcentaje genérico si se adopta indicador oficial |
+| BEM-OE3.2 | PESMA OE01, P.01.02 | Ninguno idéntico | Colaboración familiar: posible actuación local |
+| BEM-OE3.3 | EPVSA OE1.6 | EPVSA 1.6.3.a: pantallas 8–15 | Igualar preguntas, población y periodicidad |
+| BEM-OE4.1 | EPVSA OE1.7 / P04 | No equivale al indicador 1.7.1 | Inventario temático Localiza: medida propia |
+| BEM-OE4.2 | EPVSA OE1.7 | EPVSA 1.7.1.a: recomendaciones desde SSPA | Separar SSPA del conjunto de agentes locales |
+| BEM-OE4.3 | EPVSA OE1.7 | Ninguno idéntico | Brecha de oferta: diagnóstico participativo |
+| BEM-OE5.1 | PESMA OE02 | Ninguno idéntico | Formación de agentes: actuación |
+| BEM-OE5.2 | PESMA OE05, línea comunitaria | Ninguno idéntico | GRAFA/GRUSE y coordinación: acuerdo sanitario |
+| BEM-OE6.1 | PESMA OE04, P.04.01 | Ninguno idéntico al recuento local | Formación de agentes: actuación; preservar competencia asistencial |
+| BEM-OE6.2 | PESMA OE04, P.04.01 | Ninguno idéntico | Difusión de recursos 024: actuación |
+| BEM-OE7.1 | PESMA OE10, inclusión y estigma | Ninguno idéntico | Escala de actitudes: evaluación local |
+| BEM-OE7.2 | PESMA OE10, participación social | Ninguno idéntico | Registro de participación: evaluación local |
+
+### Verificación nueva contra los textos definitivos
+
+- PESMA-A p. 129, tabla de líneas: OE01, OE02, OE04 y OE05, y p. 131, OE10. Es importante que **estigma y participación** correspondan a OE10 y **modelo comunitario/coordinación de AP** a OE05: la versión 0.2 no distinguía bien esas referencias.
+- PESMA-A p. 138, P.01.02: nombre de programa y recuentos propios de GEA/GRUBEA. No sustituir por «cualquier programa» ni medirlo con porcentaje sin denominarlo distinto.
+- PESMA-A p. 333, evaluación: **IBSE de Bericat en población mayor de 16 años** y KIDSCREEN en población de 8 a 16. **75,94 es el valor de referencia de Andalucía.**
+- PESMA-A p. 169–170, P.04.01: objetivos específicos del programa de prevención del suicidio y sus indicadores sanitarios; el «número de agentes comunitarios formados» y la «difusión del 024» de COMPÁS son actividades municipales, no indicadores de impacto oficiales del PESMA.
+- EPVSA 2024–2030, fichero oficial de indicadores: 1.4.3.a (SF-12 componente mental), 1.4.5.a (apoyo social), 1.6.3.a (pantallas 8–15), 1.7.1.a (recomendaciones SSPA); las versiones «.b» son formulaciones de impacto.
+
+Fuente primaria PESMA-A: https://www.sspa.juntadeandalucia.es/servicioandaluzdesalud/sites/default/files/sincfiles/wsas-media-mediafile_sasdocumento/2026/pesmaa.pdf
+
+Fuente primaria EPVSA: https://cdn.juntadeandalucia.es/sites/default/files/inline-files/2024/04/INDICADORES_EstrategiaVidaSaludable_02abril2024.pdf
+
+### Arquitectura y activación
+
+- `OfficialMentalHealthReferences.ts`: catálogo de fuentes y códigos oficiales contrastados.
+- `BemOfficialRevisionCandidate.ts`: los 17 códigos anteriores, con propuestas de encaje, responsables de recogida, requisitos y tratamientos. Versión **0.3-candidate**.
+- `ActionPlanCatalog.ts`: sigue utilizando **BEM 0.2** como versión operativa; no se han alterado sus textos, IDs ni indicadores.
+- `tests/bem-official-references.test.ts`: comprueba cobertura completa, relaciones válidas y que la nueva candidata no esté activada.
+
+**No declarar BEM 0.3 implementado/operativo.** Antes de activarlo hay que preservar explícitamente decisiones municipales, borradores y fichas; revisar qué programas de PESMA-A son competencia local y qué indicadores requieren acuerdos de suministro sanitario. La revisión técnica debe decidir si usa pocos objetivos estratégicos oficiales y sus indicadores, en lugar de forzar siete grupos y diecisiete objetivos por inercia.
+
+### Herramientas de producción de información que requiere COMPÁS
+
+| Herramienta | Medida y límites |
+|---|---|
+| IBSE municipal | Recogida y limpieza, edad 16+, cálculo explícito, SAM, población y comparabilidad |
+| DUKE-UNC-11 | Datos de apoyo social, corte oficial, adultos 16+, EAS y limitaciones de muestra |
+| SF-12 | Componente mental; usar solo cálculo compatible y metodología de EAS |
+| Encuestas de 8–15 años | Preguntas sobre pantallas y periodo diario; evitar mezclar edades |
+| Registro escolar | Centros únicos que imparten GEA/GRUBEA por año, con fuente de Educación |
+| Registro de recomendación de activos | Emisor sanitario SSPA identificable separadamente de otros sectores; no confundir recomendación con inventario |
+| Localiza Salud | Inventario vigente con recursos y actividades, estado de validación, control de coincidencias |
+| Registro formativo y comunitario | Actuaciones locales y cobertura; no presentar como indicador de impacto PESMA |
+| Datos sanitarios asistenciales | Solo mediante fuente institucional agregada y convenio; nunca reconstruir de fichas comunitarias |
+
+La regla fundamental es conservar **la metodología y el denominador del indicador oficial** o declarar explícitamente una medida local distinta.
+
 ## Tabla de prioridades de normalización
 
 | Código BEM existente | Referente verificable | Qué conservar o cambiar |
