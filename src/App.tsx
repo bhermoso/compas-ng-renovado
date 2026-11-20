@@ -576,7 +576,7 @@ export default function App() {
   const [plainText, setPlainText] = useState("");
   const [kind, setKind] = useState<DocumentKind>("territorial-documentation");
   // Sala de control del diagnóstico: secciones de detalle abiertas.
-  const [openDiagModules, setOpenDiagModules] = useState<ReadonlySet<DiagnosisSectionId>>(() => new Set());
+  const [openDiagModules, setOpenDiagModules] = useState<ReadonlySet<DiagnosisSectionId>>(() => new Set(["studies"]));
   const toggleDiagnosisModule = useCallback((id: DiagnosisSectionId, open: boolean) => {
     setOpenDiagModules((previous) => {
       const next = new Set(previous);
@@ -4178,6 +4178,20 @@ export default function App() {
               );
             })()}
 
+            {runtime.workspace.ibseStudy && (
+              <section className="workspace-panel" aria-label="Acceso directo a resultados IBSE">
+                <div className="panel-header">
+                  <div>
+                    <p className="eyebrow">Estudio cargado · Índice de bienestar socioemocional</p>
+                    <h2>IBSE de {municipality.name}</h2>
+                    <p>{runtime.workspace.ibseStudy.aggregates.nValid} respuestas válidas · Índice observado: {runtime.workspace.ibseStudy.aggregates.meanTotal}/100</p>
+                  </div>
+                  <button type="button" onClick={() => openDiagnosisModule("studies")}>
+                    Ver resultados y tripirámide SAM
+                  </button>
+                </div>
+              </section>
+            )}
             {/* Punto único de control de todo el archivo documental, incluidos activos y CSV. */}
             <DocumentArchiveManager
               repository={runtime.workspace.repository}
