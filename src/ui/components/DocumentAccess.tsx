@@ -37,13 +37,15 @@ export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable
  }
  return <div className="document-access">
   {url && isPdfDocumentAccess(doc.source.url) && <div className="document-access__links">
-   <a className="doc-repo__open" href={url} download={doc.sourceFileName ?? documentDownloadFileName(doc.source.url, doc.title)} aria-label={`${contextualLabel ? `Descargar ${contextualLabel}` : "Descargar PDF original"}: ${doc.title}`}>{contextualLabel ? `Descargar ${contextualLabel}` : "Descargar PDF original"}</a>
-   <a className="doc-repo__open doc-repo__open--secondary" href={url} target="_blank" rel="noopener noreferrer" aria-label={`${contextualLabel ? `Abrir ${contextualLabel} en nueva pestaña` : "Abrir PDF en nueva pestaña"}: ${doc.title}`}>{contextualLabel ? `Abrir ${contextualLabel} en nueva pestaña` : "Abrir en nueva pestaña"}</a>
+   <a className="doc-repo__open" href={url} download={doc.sourceFileName ?? documentDownloadFileName(doc.source.url, doc.title)} aria-label={`${contextualLabel ? `Descargar ${contextualLabel}` : "Descargar PDF desde fuente externa"}: ${doc.title}`}>{contextualLabel ? `Descargar ${contextualLabel}` : "Descargar PDF desde fuente externa"}</a>
+   <a className="doc-repo__open doc-repo__open--secondary" href={url} target="_blank" rel="noopener noreferrer" aria-label={`${contextualLabel ? `Abrir ${contextualLabel} en nueva pestaña` : "Abrir PDF de la fuente externa en nueva pestaña"}: ${doc.title}`}>{contextualLabel ? `Abrir ${contextualLabel} en nueva pestaña` : "Abrir fuente externa en nueva pestaña"}</a>
    <p className="document-access__notice">Si el visor integrado muestra una pestaña vacía, usa la descarga {contextualLabel ? `del ${contextualLabel}` : "del PDF original"}.</p>
   </div>}
   {url && !isPdfDocumentAccess(doc.source.url) && <a className="doc-repo__open" href={url} target="_blank" rel="noopener noreferrer" aria-label={`Abrir documento: ${doc.title} (nueva pestaña)`}>Abrir documento ↗</a>}
-  {file && <p><button type="button" onClick={openOriginal}>Abrir original</button> <button type="button" onClick={download}>Descargar original · {file.name}</button> <small>{remoteOriginal ? 'Original guardado en el expediente compartido.' : 'Original solo en este navegador; pendiente de sincronizar.'}</small></p>}
-  {!loading && !file && !url && !retainedTextAvailable && !doc.sourceText?.trim() && <p className="document-access__notice">No hay archivo ni transcripción incorporados.</p>}
+  {loading && <p role="status">Comprobando disponibilidad del archivo…</p>}
+  {url && <p className="document-access__notice">Enlace a la fuente externa: no acredita que el PDF esté cargado en COMPÁS ni que corresponda a la versión registrada.</p>}
+  {file && <p><button type="button" onClick={openOriginal}>Abrir original</button> <button type="button" onClick={download}>Descargar original · {file.name}</button> <small>{remoteOriginal ? 'Original registrado en el expediente compartido.' : 'Copia encontrada en este navegador; no acredita sincronización con Firebase.'}</small></p>}
+  {!loading && !file && <p className="document-access__notice">No hay archivo original recuperable desde el expediente o este navegador. {url ? "Solo consta un enlace externo." : retainedTextAvailable || doc.sourceText?.trim() ? "Existe texto conservado, que no sustituye al original." : "Tampoco consta una transcripción."}</p>}
   {showText && doc.sourceText?.trim() && <details><summary>Consultar texto conservado</summary><p style={{whiteSpace:'pre-wrap'}}>{doc.sourceText}</p></details>}
   {(context?.derivatives ?? []).filter(d=>d.derivedFromDocumentId===doc.id).length>0 && <div className="document-access__derivatives">
     <strong>Copias derivadas (no originales)</strong>
