@@ -91,8 +91,30 @@ export function DiagnosisControlRoom({ municipalityName, summary, kindLabels = [
       </dl>
       <p className="panel-note">Las cifras cuentan registros y declaraciones del expediente; no certifican calidad, vigencia ni suficiencia metodológica.</p>
 
-      <h3 className="diagnosis-control__subtitle">Módulos del diagnóstico</h3>
-      <ul className="diagnosis-matrix" aria-label="Módulos del diagnóstico">
+      <nav aria-label="Áreas del diagnóstico territorial" className="diagnosis-area-navigation">
+        <h3 className="diagnosis-control__subtitle">Explorar el diagnóstico</h3>
+        <div className="diagnosis-area-navigation__grid">
+          <button type="button" onClick={() => onOpenModule?.("studies")} disabled={!onOpenModule}>
+            <strong>01 · Estudios e indicadores</strong>
+            <span>IBSE, SAM, resultados y referencias</span>
+          </button>
+          <button type="button" onClick={() => onOpenModule?.("health-report")} disabled={!onOpenModule}>
+            <strong>02 · Fuentes documentales</strong>
+            <span>Informe de Salud y expediente</span>
+          </button>
+          <button type="button" onClick={() => onOpenModule?.("assets")} disabled={!onOpenModule}>
+            <strong>03 · Activos para la salud</strong>
+            <span>Inventario, procedencia y validación</span>
+          </button>
+          <button type="button" onClick={() => onOpenModule?.("evidence")} disabled={!onOpenModule}>
+            <strong>04 · Evidencias y diagnóstico</strong>
+            <span>Hallazgos trazables por fuente</span>
+          </button>
+        </div>
+      </nav>
+      <details className="diagnosis-control__module-audit">
+        <summary>Estado detallado de módulos y fuentes</summary>
+        <ul className="diagnosis-matrix" aria-label="Módulos del diagnóstico">
         {summary.modules.map((module) => (
           <li key={module.id} className={`diagnosis-matrix__card diagnosis-matrix__card--${module.state}`}>
             {(() => {
@@ -117,7 +139,8 @@ export function DiagnosisControlRoom({ municipalityName, summary, kindLabels = [
             })()}
           </li>
         ))}
-      </ul>
+        </ul>
+      </details>
 
       <DiagnosisTimeline summary={summary} kindLabels={kindLabels} filter={timelineFilter} setFilter={setTimelineFilter} />
     </section>
