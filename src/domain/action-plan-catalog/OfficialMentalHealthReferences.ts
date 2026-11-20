@@ -28,7 +28,7 @@ export interface OfficialIndicatorReference {
   municipalComparability: "requires-methodological-review";
 }
 
-const PESMA = "https://www.sspa.juntadeandalucia.es/servicioandaluzdesalud/sites/default/files/sincfiles/wsas-media-mediafile_sasdocumento/2026/pesmaa.pdf";
+const PESMA = "https://www.juntadeandalucia.es/sites/default/files/inline-files/2026/05/PESMAA.pdf";
 const EPVSA = "https://www.juntadeandalucia.es/organismos/presidenciasanidadyemergencias/areas/sanidad/planificacion/estrategia-promocion-vida-saludable-andalucia.html";
 const EPVSA_INDICATORS = "https://cdn.juntadeandalucia.es/sites/default/files/inline-files/2024/04/INDICADORES_EstrategiaVidaSaludable_02abril2024.pdf";
 
