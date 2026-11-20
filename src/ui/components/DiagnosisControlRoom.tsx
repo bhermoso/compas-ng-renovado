@@ -61,19 +61,6 @@ interface DiagnosisControlRoomProps {
 export function DiagnosisControlRoom({ municipalityName, summary, kindLabels = [], onOpenModule, onOpenWorkspace }: DiagnosisControlRoomProps) {
   const { metrics } = summary;
   const [timelineFilter, setTimelineFilter] = useState<TemporalScope | "all">("all");
-  const allDocumentKinds = Object.keys(FALLBACK_KIND_LABELS) as DocumentKind[];
-  const openTimelineWithoutScope = () => {
-    setTimelineFilter("undetermined");
-    const timeline = document.getElementById("diagnosis-timeline-details") as HTMLDetailsElement | null;
-    if (timeline) timeline.open = true;
-    timeline?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-  const metricValue = (value: number | string, label: string, target: "documents" | "studies" | "assets" | "evidence" | "temporal") => {
-    if (target === "documents") return <DocumentCollectionReference kinds={allDocumentKinds} className="diagnosis-control__metric-link" >{value}<span aria-hidden="true"> ↗</span><span className="sr-only"> · Consultar documentación: {label}</span></DocumentCollectionReference>;
-    if (target === "temporal") return <button type="button" className="diagnosis-control__metric-link" onClick={openTimelineWithoutScope}>{value}<span aria-hidden="true"> ↘</span><span className="sr-only"> · Filtrar la cronología por documentos sin alcance temporal</span></button>;
-    if (!onOpenModule) return <span>{value}</span>;
-    return <button type="button" className="diagnosis-control__metric-link" onClick={() => onOpenModule(target === "studies" ? "studies" : target === "assets" ? "assets" : "evidence")}>{value}<span aria-hidden="true"> ↘</span><span className="sr-only"> · Abrir detalle de {label}</span></button>;
-  };
   return (
     <section className="workspace-panel diagnosis-control" aria-labelledby="diagnosis-control-title">
       <header className="diagnosis-cover">
