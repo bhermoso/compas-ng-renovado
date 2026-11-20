@@ -97,3 +97,8 @@
 .diagnosis-workspace__toolbar button { border:0; border-bottom:1px solid var(--azul); border-radius:0; padding:5px 0; background:transparent; color:var(--azul); font:inherit; font-weight:650; cursor:pointer; }
 @media(max-width:960px) { .diagnosis-cover__identity { grid-template-columns:1fr; } .diagnosis-cover__logos .ilogo-band--cover { justify-content:flex-start; flex-wrap:wrap; } .diagnosis-control .diagnosis-area-navigation__grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; } #root:has(.app-shell--diagnosis-cover) .documentation-launcher { margin:6px auto 10px; } }
 @media(max-width:600px) { .diagnosis-control.workspace-panel { padding:14px 18px; } .diagnosis-control .diagnosis-area-navigation__grid { grid-template-columns:1fr; gap:6px; } }
+
+/* La portada inicial no muestra auditorías ni cronologías. Ambas se conservan
+   en la vista de trabajo, tras entrar a cualquiera de las áreas. */
+.app-shell--diagnosis-cover .diagnosis-control__module-audit,
+.app-shell--diagnosis-cover .diagnosis-control__timeline-details { display:none; }
