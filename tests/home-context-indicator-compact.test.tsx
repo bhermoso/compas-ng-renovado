@@ -14,13 +14,12 @@ describe("Portada municipal e indicadores compactos", () => {
   });
 
 
-  it("identifica con nombre y código el expediente activo, con selector funcional enlazable", () => {
+  it("no duplica el expediente ni el selector municipal dentro de la portada", () => {
     const html = renderToStaticMarkup(<HomePortada onNavigate={()=>{}} municipality={{name:"Loja",province:"Granada",ineCode:"18122"}} onChangeMunicipality={()=>{}}/>);
-    expect(html).toContain("Expediente cargado");
-    expect(html).toContain("Loja");
-    expect(html).toContain("Granada");
-    expect(html).toContain("INE 18122");
-    expect(html).toContain("Cambiar ámbito");
+    expect(html).toContain("El ciclo de planificación local en salud");
+    expect(html).not.toContain("Expediente cargado");
+    expect(html).not.toContain("Cambiar ámbito");
+    expect(html).not.toContain("INE 18122");
   });
   it("muestra indicadores como filas con título, valor, periodo, fuente y detalle completo", () => {
     const profile = {

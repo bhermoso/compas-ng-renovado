@@ -223,64 +223,35 @@ function derivePhases({
 // ── Componente ────────────────────────────────────────────────────────────────
 
 export function LocalHealthPlanningCycle(props: LocalHealthPlanningCycleProps) {
-  const { onNavigate, currentView } = props;
   const phases = derivePhases(props);
   const completed = phases.filter((phase) => phase.status === "completed").length;
   const total = phases.length;
 
+  // Los estados del expediente son información, no una segunda navegación.
+  // La navegación operativa permanece exclusivamente en las pestañas de App.
   return (
-    <div className="lhpc" role="navigation" aria-label="Proceso de planificación local de salud">
-      <div className="lhpc__inner">
-        <div className="lhpc__progress-head">
-          <p className="lhpc__heading">Expediente local de salud</p>
-          <span className="lhpc__progress-label">{completed} de {total} fases completadas</span>
-          <div className="lhpc__progress-track" role="progressbar" aria-label="Fases completadas del expediente" aria-valuemin={0} aria-valuemax={total} aria-valuenow={completed}>
-            <span className="lhpc__progress-fill" style={{ width: `${(completed / total) * 100}%` }} />
-          </div>
-        </div>
-        <ol className="lhpc__phases" role="list">
-          {phases.map((phase) => {
-            const isClickable = onNavigate !== undefined && phase.navigateTo !== undefined;
-            const selected = phase.navigateTo !== undefined && currentView === phase.navigateTo;
-            const content = (
-              <>
-                <span className="lhpc__phase-num" aria-hidden="true">
-                  {phase.num}
-                </span>
-                <span className="lhpc__phase-label">{phase.label}</span>
-                <span className="lhpc__phase-status" aria-label={`Estado: ${phase.statusLabel ?? STATUS_LABEL[phase.status]}`}>
-                  {phase.statusLabel ?? STATUS_LABEL[phase.status]}
-                  {phase.note && (
-                    <span className="lhpc__phase-note">{phase.note}</span>
-                  )}
-                </span>
-                {isClickable && <span className="lhpc__phase-action" aria-hidden="true">Abrir ↗</span>}
-              </>
-            );
-
-            return (
-              <li
-                key={phase.id}
-                className={`lhpc__phase lhpc__phase--${phase.status}${isClickable ? " lhpc__phase--nav" : ""}${selected ? " lhpc__phase--selected" : ""}${phase.scopeBoundary ? " lhpc__phase--scope-start" : ""}`}
-              >
-                {isClickable ? (
-                  <button
-                    type="button"
-                    className="lhpc__phase-btn"
-                    onClick={() => onNavigate!(phase.navigateTo!)}
-                    title={`Ir a: ${phase.label}`}
-                    aria-current={selected ? "step" : undefined}
-                  >
-                    {content}
-                  </button>
-                ) : (
-                  content
-                )}
-              </li>
-            );
-          })}
+    <details className="lhpc lhpc--compact" aria-label="Estado del expediente local de salud">
+      <summary className="lhpc__compact-summary">
+        <span className="lhpc__compact-title">Expediente local de salud</span>
+        <span className="lhpc__progress-label">{completed} de {total} fases completadas</span>
+        <span className="lhpc__compact-track" role="progressbar"
+          aria-label="Fases completadas del expediente"
+          aria-valuemin={0} aria-valuemax={total} aria-valuenow={completed}>
+          <span className="lhpc__progress-fill" style={{ width: `${(completed / total) * 100}%` }} />
+        </span>
+        <span className="lhpc__compact-toggle">Ver estados</span>
+      </summary>
+      <div className="lhpc__compact-detail">
+        <ol className="lhpc__compact-phases">
+          {phases.map((phase) => (
+            <li key={phase.id} className={`lhpc__compact-phase lhpc__compact-phase--${phase.status}`}>
+              <span className="lhpc__compact-phase-name">{phase.num}. {phase.label}</span>
+              <span className="lhpc__compact-phase-status">{phase.statusLabel ?? STATUS_LABEL[phase.status]}</span>
+              {phase.note && <span className="lhpc__compact-phase-note">{phase.note}</span>}
+            </li>
+          ))}
         </ol>
       </div>
-    </div>
+    </details>
   );
 }

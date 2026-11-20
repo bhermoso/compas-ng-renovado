@@ -94,3 +94,40 @@
 @media (max-width: 760px) {
   .lhpc .lhpc__phase { flex-basis: 210px; width: 210px; }
 }
+
+/* Variante compacta: la segunda banda deja de actuar como navegación. */
+.lhpc--compact {
+  display: block;
+  width: 100%;
+  border-bottom: 1px solid var(--borde);
+  background: var(--blanco);
+}
+.lhpc--compact .lhpc__compact-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  padding: 8px clamp(16px, 3vw, 40px);
+  cursor: pointer;
+  list-style: none;
+}
+.lhpc--compact .lhpc__compact-summary::-webkit-details-marker { display: none; }
+.lhpc--compact .lhpc__compact-summary:focus-visible { outline: 3px solid var(--azul); outline-offset: -3px; }
+.lhpc__compact-title { font-size: .82rem; font-weight: 700; }
+.lhpc__compact-track { display: block; flex: 1 1 110px; max-width: 180px; min-width: 75px; height: 6px; overflow: hidden; border-radius: 999px; background: var(--borde); }
+.lhpc__compact-track .lhpc__progress-fill { height: 100%; display: block; }
+.lhpc__compact-toggle { margin-left: auto; font-size: .76rem; color: var(--azul); font-weight: 700; }
+.lhpc--compact[open] .lhpc__compact-toggle::after { content: " ▲"; }
+.lhpc--compact:not([open]) .lhpc__compact-toggle::after { content: " ▼"; }
+.lhpc__compact-detail { padding: 4px clamp(16px, 3vw, 40px) 12px; }
+.lhpc__compact-phases { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.lhpc__compact-phase { display: grid; align-content: start; gap: 3px; padding: 9px 12px; border: 1px solid var(--borde); border-radius: 5px; min-width: 0; }
+.lhpc__compact-phase-name { font-size: .8rem; font-weight: 700; }
+.lhpc__compact-phase-status { font-size: .76rem; color: var(--texto-secundario); }
+.lhpc__compact-phase-note { font-size: .72rem; color: var(--texto-terciario); overflow-wrap: anywhere; }
+@media (max-width: 900px) { .lhpc__compact-phases { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 600px) {
+  .lhpc__compact-phases { grid-template-columns: 1fr; }
+  .lhpc__compact-title { flex-basis: 100%; }
+  .lhpc__compact-toggle { margin-left: 0; }
+}

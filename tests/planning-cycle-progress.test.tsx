@@ -32,11 +32,13 @@ describe("expediente: navegación y progreso", () => {
     expect(html).toContain('aria-valuenow="2"');
   });
 
-  it("presenta accesos explícitos y marca la vista activa", () => {
+  it("presenta detalle de fases sin duplicar los enlaces de navegación", () => {
     const html = renderToStaticMarkup(<LocalHealthPlanningCycle {...base} onNavigate={() => {}} currentView="psl" />);
-    expect(html).toContain('title="Ir a: Perfil de salud local"');
-    expect(html).toContain('aria-current="step"');
-    expect(html).toContain("Abrir ↗");
-    expect(html).toContain("lhpc__phase--selected");
+    expect(html).toContain("<details");
+    expect(html).toContain("<summary");
+    expect(html).toContain("Ver estados");
+    expect(html).toContain("Perfil de salud local");
+    expect(html).not.toContain("Ir a: Perfil de salud local");
+    expect(html).not.toContain("Abrir ↗");
   });
 });
