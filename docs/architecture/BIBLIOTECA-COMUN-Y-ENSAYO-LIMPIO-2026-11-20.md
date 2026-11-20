@@ -13,8 +13,8 @@ Fecha: 2026-11-20. Estado: primera fase, **sin borrados ni migraciones remotas**
 - `src/application/strategic-reference-library.ts`: catálogo común de los cuatro PDF ya incluidos en el build. No reescribe los datos de los municipios; cada ficha conserva una ruta de origen y un ámbito de referencia.
 - `StrategicReferenceLibrary`: biblioteca consultable en Diagnóstico territorial, diferenciada de la documentación municipal.
 - `inspectWorkspaceSeparation`: inventario de fuentes estratégicas repetidas por municipio, fuentes restantes, evidencias, originales, versiones y planes.
-- `createCleanWorkspaceExample`: **copia nueva en memoria**, con identidad del municipio y colecciones de documentos y evidencias vacías. No opera en Firebase, almacenamiento del navegador ni seeds.
-- Un JSON de ensayo puede descargarse manualmente. **No debe importarse sobre el expediente activo**.
+- `createCleanWorkspaceExample`: **copia nueva en memoria**, con ID independiente `ensayo-<municipio>`, nombre de ensayo y colecciones de documentos y evidencias vacías. No opera en Firebase, almacenamiento del navegador ni seeds.
+- Un JSON de ensayo puede descargarse e importarse en COMPÁS como **ámbito distinto** usando «Conservar y recuperar el trabajo». Su identificador `ensayo-<municipio>` evita sobrescribir Atarfe o Loja. No se convierte en dato municipal observado.
 
 ## Lo que NO debe automatizarse todavía
 
@@ -31,7 +31,7 @@ Fecha: 2026-11-20. Estado: primera fase, **sin borrados ni migraciones remotas**
 2. Inventario documentado de posibles referencias comunes por **ámbito real**, emisor, versión y SHA-256. Identificar planes **locales** que deben permanecer municipales.
 3. Crear persistencia propia de biblioteca compartida con permisos de administrador y control de versiones, independiente de los workspaces.
 4. Reemplazar duplicaciones municipales por **vínculos de referencia**, conservando las relaciones de procedencia; nunca recalcular evidencia por el mero cambio de ubicación.
-5. Activar un **entorno de ensayo aislado** de Atarfe o Loja, con ID y almacenamiento diferentes, sin reemplazar el municipio real.
+5. Validar la importación y uso del **entorno de ensayo aislado** de Atarfe o Loja, con ID y almacenamiento diferentes, sin reemplazar el municipio real.
 6. Realizar comparación documental antes/después y pruebas de importación, recuperación, accesos y actualización remota; solo entonces considerar retirar duplicados mediante confirmación explícita.
 
 La fase actual es una separación **de consulta e inventario**. Todavía no constituye una migración global ni una limpieza de Firebase.
