@@ -38,7 +38,11 @@ describe("Biblioteca común y expediente de ensayo limpio",()=>{
     const source=sourceWorkspace();
     const before=JSON.stringify(source);
     const clean=createCleanWorkspaceExample(source);
-    expect(clean.municipality.identity).toEqual(source.municipality.identity);
+    expect(clean.municipality.identity.id).toBe("ensayo-atarfe");
+    expect(clean.municipality.identity.name).toBe("Atarfe · ensayo limpio");
+    expect(clean.municipality.identity.ineCode).toBe("18022");
+    expect(clean.repository.municipalityId).toBe("ensayo-atarfe");
+    expect(clean.evidenceStore.municipalityId).toBe("ensayo-atarfe");
     expect(clean.repository.documents).toEqual([]);
     expect(clean.evidenceStore.atoms).toEqual([]);
     expect(clean.externalProfileLibrary).toBeUndefined();
