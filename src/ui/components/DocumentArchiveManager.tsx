@@ -4,6 +4,7 @@ import type { EvidenceAtom } from "../../domain/evidence";
 import { DocumentReference } from "./Documentation";
 import { DocumentCycleControl } from "./DocumentCycleControl";
 import { KIND_LABEL } from "./documentRepositoryCategorization";
+import { organizeMunicipalDocuments } from "../../application/municipal-document-organization";
 import "./DocumentArchiveManager.css";
 
 interface Props {
@@ -39,6 +40,8 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
   const countOf = (id: string) => evidence.filter(a => a.provenance.documentId === id).length;
   const validationCount = (id: string) => (repository.assetValidations ?? []).filter(v => v.documentId === id).length;
   const originalCount = archive.filter(d => originals.has(d.id)).length;
+  const sections = useMemo(() => organizeMunicipalDocuments(archive), [archive]);
+  const visibleSections = useMemo(() => organizeMunicipalDocuments(filtered).filter(section => section.documents.length > 0), [filtered]);
   return (
     <section className="workspace-panel dam" aria-labelledby="dam-title">
       <div className="panel-header dam__head">
@@ -51,6 +54,16 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
         <span><strong>{originalCount}</strong> originales registrados · {originalCapacity}</span>
         <span><strong>{(repository.assetValidations ?? []).length}</strong> declaraciones de validación de activos</span>
       </div>
+      <div className="dam__municipal-map" aria-label="Organización documental del expediente">
+        {sections.filter(section => section.documents.length > 0).map(section =>
+          <div className="dam__municipal-item" key={section.id}>
+            <strong>{section.documents.length}</strong>
+            <span>{section.label}</span>
+          </div>
+        )}
+      </div>
+      {sections.some(section => section.id === "strategic" && section.documents.length > 0) && 
+        <p className="dam__strategic-note">Los marcos estratégicos registrados aquí están pendientes de clasificación. Los planes municipales, aunque antes figuren como marcos, permanecen en «Planes de Acción municipales». La biblioteca común es independiente del expediente.</p>}
       <div className="dam__controls">
         <button type="button" onClick={onOpenUploader}>Incorporar PDF, DOCX o CSV (revisión previa)</button>
         <button type="button" onClick={onOpenAssetValidations}>Revisar validaciones de activos</button>
@@ -67,7 +80,7 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
         </div>
         <p className="dam__count">{filtered.length} documentos encontrados. Una ficha archivada conserva la documentación; eliminar retira su registro y evidencias, con confirmación.</p>
         <div className="dam__table-scroll"><table className="dam__table"><thead><tr><th>Documento</th><th>Tipo</th><th>Estado</th><th>Original y texto</th><th>Versión y procedencia</th><th>Dependencias</th><th>Gestión</th></tr></thead>
-          <tbody>{filtered.map(d => <tr key={d.id}>
+          <tbody>{visibleSections.flatMap(section => [<tr key={`section-${section.id}`} className="dam__section-row"><th colSpan={7} scope="colgroup">{section.label}<small>{section.detail} · {section.documents.length} documentos</small></th></tr>, ...section.documents.map(d => <tr key={d.id}>
             <th scope="row"><strong>{d.title}</strong><small>{d.sourceFileName || "Sin nombre de archivo"}</small></th>
             <td>{KIND_LABEL[d.kind] ?? d.kind}</td>
             <td>{d.status === "archived" ? "Archivado" : d.status === "validated" ? "Validado" : d.status === "rejected" ? "Rechazado" : "Registrado"}</td>
@@ -75,7 +88,7 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
             <td className="dam__provenance"><strong>{d.revisionNumber ? `v${d.revisionNumber}` : "Sin número de versión"}</strong><small>{d.revisionOf ? `Revisión de ${d.revisionOf}` : "Sin predecesora declarada"}</small><small>{d.contentSha256 ? `Huella declarada SHA-256: ${d.contentSha256.slice(0, 12)}…` : "Sin huella registrada"}</small><small>{d.source.organization || d.source.system || "Origen no declarado"}</small></td>
             <td>{countOf(d.id)} evidencias{validationCount(d.id) ? ` · ${validationCount(d.id)} validaciones de activos` : ""}{d.revisionOf ? " · revisión" : ""}</td>
             <td><DocumentReference documentId={d.id}>Abrir ficha</DocumentReference>{onSetDocumentCycle && canWrite && <details className="dam__cycle"><summary>Declarar ciclo</summary><DocumentCycleControl cycle={d.cycle} onChange={cycle=>onSetDocumentCycle(d.id,cycle)}/></details>}</td>
-          </tr>)}</tbody>
+          </tr>)] )}</tbody>
         </table></div>
         {!filtered.length && <p>No hay documentos con ese criterio.</p>}
         
