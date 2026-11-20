@@ -4220,7 +4220,7 @@ export default function App() {
             {/* Biblioteca de referencia institucional: no pertenece al expediente
                 municipal y no alimenta el diagnóstico ni las evidencias. */}
             <StrategicReferenceLibrary
-              workspace={runtime.workspace}
+              workspace={workspace}
               onNormalizeLojaRemote={documentWriteAllowed && remoteHydratedMunicipalityId === "loja" && remoteClient.auth.currentUser
                 ? async expectedWorkspace => {
                     const result = await normalizeLojaMetadataRemotely({
