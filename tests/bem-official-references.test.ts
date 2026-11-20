@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { EMOTIONAL_WELLBEING_MODULE } from "../src/domain/action-plan-catalog/ActionPlanCatalog";
 import { BEM_LEGACY_ALIGNMENT, BEM_OFFICIAL_OBJECTIVES, BEM_OFFICIAL_INDICATORS } from "../src/domain/action-plan-catalog/OfficialMentalHealthReferences";
-import { BEM_OBJECTIVE_REVIEW, BEM_OFFICIAL_GROUPING, auditBemCandidateCompleteness } from "../src/domain/action-plan-catalog/BemOfficialRevisionCandidate";
+import { BEM_OBJECTIVE_REVIEW, BEM_OFFICIAL_GROUPING, BEM_PROGRAM_CORRESPONDENCE, auditBemCandidateCompleteness } from "../src/domain/action-plan-catalog/BemOfficialRevisionCandidate";
 
 describe("Auditoría normativa de Bienestar emocional", () => {
   const legacy = EMOTIONAL_WELLBEING_MODULE;
@@ -64,5 +64,16 @@ describe("Auditoría normativa de Bienestar emocional", () => {
     expect(primary.disposition).toBe("requiere-decision-institucional");
     expect(primary.officialObjectiveId).toBe("PESMA-OE05");
     expect(BEM_OBJECTIVE_REVIEW.find(x => x.legacySpecificCode === "BEM-OE7.1")!.officialObjectiveId).toBe("PESMA-OE10");
+  });
+  it("identifica el nivel de programa, incluidos los objetivos específicos oficiales de prevención del suicidio", () => {
+    expect(BEM_PROGRAM_CORRESPONDENCE.map(x => x.legacySpecificCode).length).toBe(8);
+    const originalSpecificCodes = new Set(legacy.generalObjectives.flatMap(g => g.specificObjectives.map(s => s.code)));
+    expect(BEM_PROGRAM_CORRESPONDENCE.every(x => originalSpecificCodes.has(x.legacySpecificCode))).toBe(true);
+    const suicide = BEM_PROGRAM_CORRESPONDENCE.filter(x => x.officialProgramCode === "P.04.01");
+    expect(suicide.map(x => x.officialPosition)).toEqual([
+      "objetivo específico 10: formación e investigación",
+      "objetivo específico 6: sensibilización pública",
+    ]);
+    expect(suicide.every(x => x.equivalence === "contribución-local")).toBe(true);
   });
 });
