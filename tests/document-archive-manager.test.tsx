@@ -26,9 +26,12 @@ describe("Gestión documental completa", () => {
     const html = renderToStaticMarkup(<DocumentArchiveManager repository={repository} evidence={[] as EvidenceAtom[]} originalIds={["assets-1"]} canWrite persistence="Firebase · copia confirmada" originalCapacity="6 MB / 40 MB" onOpenUploader={()=>{}} onOpenAssetValidations={()=>{}}/>);
     expect(html).toContain("Gestor documental del expediente");
     expect(html).toContain("Incorporar PDF, DOCX o CSV (revisión previa)");
-    expect(html).toContain("Archivo y texto");
+    expect(html).toContain("Original y texto");
+    expect(html).toContain("Versión y procedencia");
+    expect(html).toContain("Versión sin numerar");
+    expect(html).toContain("Origen institucional no declarado");
     expect(html).toContain("Informe de Salud Loja");
-    expect(html).toContain("Archivo no compartido");
+    expect(html).toContain("Original no acreditado en expediente");
     expect(html).toContain("Contraer catálogo");
     expect(html).toContain("2</strong> fichas");
     expect(html).toContain("1</strong> originales compartidos");
