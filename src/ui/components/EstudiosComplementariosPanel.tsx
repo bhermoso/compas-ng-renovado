@@ -72,7 +72,10 @@ function StudyRow({
   children,
   comparison,
 }: StudyRowProps) {
-  const [showDetail, setShowDetail] = useState(false);
+  // El IBSE es el único estudio con expediente semilla completo en Atarfe:
+  // mostrar sus resultados y SAM sin exigir un segundo clic oculto.
+  const [detailOverride, setDetailOverride] = useState<boolean | null>(null);
+  const showDetail = detailOverride ?? (loaded && inputId === 'ibse-csv-input');
 
   return (
     <div
@@ -150,10 +153,10 @@ function StudyRow({
           <button
             type="button"
             className="ec-study-row__detail-toggle"
-            onClick={() => setShowDetail((v) => !v)}
+            onClick={() => setDetailOverride(!showDetail)}
             aria-expanded={showDetail}
           >
-            {showDetail ? "Ocultar detalle ▲" : "Ver detalle ▾"}
+            {showDetail ? "Ocultar resultados ▲" : inputId === "ibse-csv-input" ? "Ver resultados IBSE y SAM ▾" : "Ver detalle ▾"}
           </button>
           {showDetail && (
             <div className="ec-study-row__detail">
@@ -431,6 +434,12 @@ export function EstudiosComplementariosPanel({
             <option value="15-plus">Población municipal de 15 años y más</option>
           </select>
         </label>
+        {!ibseStudy && repository?.documents.some(d=>d.tags.includes('ibse')) && (
+          <p className="ec-study-row__message" role="status">
+            La fuente IBSE figura en el catálogo documental, pero los resultados del estudio no están cargados en este expediente.
+            El registro de un CSV no equivale a disponer de sus resultados. Revisa la recuperación del expediente compartido antes de sustituir o importar el archivo.
+          </p>
+        )}
         <StudyRow
           name="IBSE"
           subtitle="Índice de bienestar socioemocional"
