@@ -27,11 +27,13 @@ const tagged = (document: MunicipalDocument, fragment: string) =>
 
 export function municipalDocumentSection(document: MunicipalDocument): MunicipalDocumentSection {
   const title = norm(document.title);
+  // Una priorización que propone líneas de acción no es por ello un Plan aprobado
+  // ni un borrador autónomo de Plan de Acción.
+  if (tagged(document,"prioriti") || tagged(document,"prioriz") ||
+    (document.kind === "qualitative-material" && /prioriz/.test(title))) return "prioritization";
   const localPlan = tagged(document,"action-plan") || tagged(document,"plan-local") ||
     (document.territorialScale === "municipio" && /plan de accion|plan local de salud/.test(title));
   if (localPlan) return "plans";
-  if (tagged(document,"prioriti") || tagged(document,"prioriz") ||
-    (document.kind === "qualitative-material" && /prioriz/.test(title))) return "prioritization";
   if (document.kind === "health-report") return "health";
   if (document.kind === "localiza-salud" || document.kind === "community-asset") return "assets";
   if (document.kind === "complementary-study" || document.kind === "redcap-export" ||
