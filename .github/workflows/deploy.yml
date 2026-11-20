@@ -43,6 +43,24 @@ jobs:
           test -s dist/verificar-perfiles.html
           grep -q 'type="module"' dist/verificar-perfiles.html
 
+      - name: Incorporar versión verificable al HTML publicado
+        env:
+          COMPAS_COMMIT: ${{ github.sha }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          import json
+          from datetime import datetime, timezone
+          Path("dist/version.json").write_text(json.dumps({"commit": os.environ["COMPAS_COMMIT"], "published_build_utc": datetime.now(timezone.utc).isoformat()}), encoding="utf-8")
+          path = Path("dist/index.html")
+          html = path.read_text(encoding="utf-8")
+          marker = f'<meta name="compas-build-sha" content="{os.environ["COMPAS_COMMIT"]}">'
+          if "</head>" not in html:
+              raise SystemExit("Falta </head> en dist/index.html")
+          path.write_text(html.replace("</head>", f"    {marker}\n  </head>", 1), encoding="utf-8")
+          PY
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
@@ -63,3 +81,21 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Comprobar commit servido por GitHub Pages
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+          COMPAS_COMMIT: ${{ github.sha }}
+        run: |
+          test -n "$PAGE_URL"
+          for attempt in $(seq 1 18); do
+            html=$(curl --fail --silent --show-error --location --max-time 20 --header 'Cache-Control: no-cache' "${PAGE_URL}?compas_verify=${COMPAS_COMMIT}" || true)
+            if printf '%s' "$html" | grep -Fq "name=\"compas-build-sha\" content=\"${COMPAS_COMMIT}\""; then
+              echo "Pages sirve el commit ${COMPAS_COMMIT}"
+              exit 0
+            fi
+            echo "Esperando propagación de Pages (${attempt}/18)"
+            sleep 10
+          done
+          echo "::error::El despliegue terminó, pero Pages no acredita el commit publicado."
+          exit 1
