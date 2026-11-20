@@ -25,7 +25,7 @@ const isActive = (d: MunicipalDocument) => d.status !== "archived" && d.status !
 export function DocumentArchiveManager({ repository, evidence, originalIds, canWrite, persistence, originalCapacity, onOpenUploader, onOpenAssetValidations, onSetDocumentCycle }: Props) {
   const [query, setQuery] = useState("");
   const [scope, setScope] = useState<Scope>("all");
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const originals = useMemo(() => new Set(originalIds), [originalIds]);
   const archive = repository.documents;
   const filtered = useMemo(() => archive.filter((d) => {
@@ -48,7 +48,7 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
       <div className="dam__summary">
         <span><strong>{archive.length}</strong> fichas</span>
         <span><strong>{archive.filter(isActive).length}</strong> activas</span>
-        <span><strong>{originalCount}</strong> originales compartidos · {originalCapacity}</span>
+        <span><strong>{originalCount}</strong> originales registrados · {originalCapacity}</span>
         <span><strong>{(repository.assetValidations ?? []).length}</strong> declaraciones de validación de activos</span>
       </div>
       <div className="dam__controls">
@@ -66,12 +66,13 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
           </select></label>
         </div>
         <p className="dam__count">{filtered.length} documentos encontrados. Una ficha archivada conserva la documentación; eliminar retira su registro y evidencias, con confirmación.</p>
-        <div className="dam__table-scroll"><table className="dam__table"><thead><tr><th>Documento</th><th>Tipo</th><th>Estado</th><th>Archivo y texto</th><th>Dependencias</th><th>Gestión</th></tr></thead>
+        <div className="dam__table-scroll"><table className="dam__table"><thead><tr><th>Documento</th><th>Tipo</th><th>Estado</th><th>Original y texto</th><th>Versión y procedencia</th><th>Dependencias</th><th>Gestión</th></tr></thead>
           <tbody>{filtered.map(d => <tr key={d.id}>
             <th scope="row"><strong>{d.title}</strong><small>{d.sourceFileName || "Sin nombre de archivo"}</small></th>
             <td>{KIND_LABEL[d.kind] ?? d.kind}</td>
             <td>{d.status === "archived" ? "Archivado" : d.status === "validated" ? "Validado" : d.status === "rejected" ? "Rechazado" : "Registrado"}</td>
-            <td>{originals.has(d.id) ? "Archivo compartido" : "Archivo no compartido"}{d.sourceText?.trim() ? " · Texto conservado" : ""}</td>
+            <td>{originals.has(d.id) ? "Original registrado en el expediente (pendiente de cotejo remoto)" : "Original no acreditado en el expediente"}{d.sourceText?.trim() ? " · Texto conservado (no es el original)" : " · Sin texto conservado"}</td>
+            <td className="dam__provenance"><strong>{d.revisionNumber ? `v${d.revisionNumber}` : "Sin número de versión"}</strong><small>{d.revisionOf ? `Revisión de ${d.revisionOf}` : "Sin predecesora declarada"}</small><small>{d.contentSha256 ? `Huella declarada SHA-256: ${d.contentSha256.slice(0, 12)}…` : "Sin huella registrada"}</small><small>{d.source.organization || d.source.system || "Origen no declarado"}</small></td>
             <td>{countOf(d.id)} evidencias{validationCount(d.id) ? ` · ${validationCount(d.id)} validaciones de activos` : ""}{d.revisionOf ? " · revisión" : ""}</td>
             <td><DocumentReference documentId={d.id}>Abrir ficha</DocumentReference>{onSetDocumentCycle && canWrite && <details className="dam__cycle"><summary>Declarar ciclo</summary><DocumentCycleControl cycle={d.cycle} onChange={cycle=>onSetDocumentCycle(d.id,cycle)}/></details>}</td>
           </tr>)}</tbody>
