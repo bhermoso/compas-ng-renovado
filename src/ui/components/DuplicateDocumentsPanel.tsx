@@ -24,6 +24,8 @@ export function DuplicateDocumentsPanel({ groups, kindLabels = [], atomCountByDo
   const labelOf = (kind: DocumentKind) => kindLabels.find((k) => k.value === kind)?.label ?? kind;
   return (
     <section className="workspace-panel duplicate-documents" aria-labelledby="duplicate-documents-title">
+      <details className="duplicate-documents__fold">
+        <summary><strong>Revisar documentos repetidos</strong><span>{groups.length} grupos · {copies} posibles copias · abrir revisión</span></summary>
       <div className="panel-header">
         <div>
           <p className="eyebrow">Documentos repetidos</p>
@@ -67,6 +69,7 @@ export function DuplicateDocumentsPanel({ groups, kindLabels = [], atomCountByDo
           );
         })}
       </ol>
+      </details>
     </section>
   );
 }
