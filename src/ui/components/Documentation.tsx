@@ -65,21 +65,30 @@ export function DocumentationProvider({ workspace, children, canWrite = false, o
     <dialog ref={dialog} className="documentation-dialog" aria-labelledby="documentation-title">
       <header><h2 id="documentation-title">{selected ? selected.title : categoryLabel || 'Documentación del expediente'}</h2><button type="button" autoFocus onClick={() => dialog.current?.close()}>Cerrar</button></header>
       {selected ? <>
-        <p><strong>Archivo de referencia:</strong> {selected.sourceFileName ?? 'Nombre no registrado'} · {original ? "Original conservado" : "Original pendiente"} · {workspace.documentDerivedFiles?.filter(d=>d.derivedFromDocumentId===selected.id).length ?? 0} copias derivadas</p>
-        <p>{selected.source.system}</p>
-        <details className="documentation-technical"><summary>Metadatos técnicos y trazabilidad</summary>
-        <dl className="documentation-metadata">
-          <div><dt>Estado</dt><dd>{custody?.status}</dd></div>
-          <div><dt>Incorporación</dt><dd>{selected.createdAt}</dd></div>
-          <div><dt>SHA-256 de la carga inicial</dt><dd>{custody?.registeredSha256}</dd></div>
-          <div><dt>SHA-256 del original compartido</dt><dd>{custody?.originalSha256}</dd></div>
-          <div><dt>Evidencias atomizadas vinculadas</dt><dd>{dependencyCount}</dd></div>
-          <div><dt>Original compartido</dt><dd>{original ? 'Disponible en expediente Firebase' : 'No incorporado al expediente compartido'}</dd></div>
-          {historical?.body.originalText && <div><dt>Texto sanitario</dt><dd>Conservado como transcripción; no sustituye el DOCX original.</dd></div>}
-        </dl>
+        <section className="documentation-overview" aria-label="Resumen documental">
+          <div className="documentation-overview__identity">
+            <p className="documentation-overview__type">{selected.kind === 'health-report' ? 'Informe de Salud' : selected.kind === 'redcap-export' || selected.kind === 'complementary-study' ? 'Estudio o datos' : 'Fuente documental'}</p>
+            <p className="documentation-overview__source">{selected.source.system ?? 'Procedencia no indicada'}</p>
+          </div>
+          <div className="documentation-overview__statuses">
+            <span className={original ? "documentation-status documentation-status--ok" : "documentation-status documentation-status--pending"}>{original ? 'Original disponible' : 'Original pendiente'}</span>
+            <span className="documentation-status">{selected.sourceText?.trim() || historical?.body.originalText ? 'Texto disponible' : 'Sin transcripción'}</span>
+            {(workspace.documentDerivedFiles?.filter(d=>d.derivedFromDocumentId===selected.id).length ?? 0) > 0 && <span className="documentation-status">{workspace.documentDerivedFiles?.filter(d=>d.derivedFromDocumentId===selected.id).length} copias derivadas</span>}
+          </div>
+          <p className="documentation-overview__file">{selected.sourceFileName ?? 'Sin nombre de archivo registrado'}</p>
+          {!original && (selected.sourceText?.trim() || historical?.body.originalText) && <p className="documentation-overview__notice">Se conserva el contenido textual. El documento de origen no está incorporado; las reconstrucciones se identifican como copias, no como originales.</p>}
+        </section>
+        <details className="documentation-technical"><summary>Ficha técnica y trazabilidad</summary>
+          <dl className="documentation-metadata">
+            <div><dt>Estado de custodia</dt><dd>{custody?.status}</dd></div>
+            <div><dt>Fecha de incorporación</dt><dd>{selected.createdAt}</dd></div>
+            <div><dt>SHA-256 registrado</dt><dd>{custody?.registeredSha256}</dd></div>
+            <div><dt>SHA-256 del original compartido</dt><dd>{custody?.originalSha256}</dd></div>
+            <div><dt>Evidencias vinculadas</dt><dd>{dependencyCount}</dd></div>
+          </dl>
         </details>
         {revisionFamily.length > 1 && <section aria-label="Versiones del documento"><h3>Versiones · {revisionFamily.length}</h3><ul>{revisionFamily.map(d=><li key={d.id}><DocumentReference documentId={d.id}>{d.title} · versión {d.revisionNumber ?? 1}</DocumentReference><small>{d.sourceFileName ?? 'Sin original'} · {d.status}</small></li>)}</ul></section>}
-        {canWrite && <div className="documentation-operations">
+        {canWrite && <details className="documentation-management"><summary>Gestionar versiones, archivo y eliminación</summary><div className="documentation-operations">
           <label>Incorporar nueva versión (sin modificar los indicadores anteriores)
             <input type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label="Crear nueva versión documental PDF o DOCX" onChange={async e => {
               const file=e.currentTarget.files?.[0];e.currentTarget.value='';
@@ -99,11 +108,11 @@ export function DocumentationProvider({ workspace, children, canWrite = false, o
             try {setOperationMessage('Eliminando en Firebase…'); const deleted=await onDeleteDocument(selected.id); if(deleted) {setReference(null); setOperationMessage('Documento eliminado.');} else setOperationMessage('No se ha confirmado la eliminación en Firebase.');}
             catch(error) {setOperationMessage((error as Error).message);}
           }}>Eliminar documento</button>
-        </div>}
+        </div></details>}
         {operationMessage && <p role="status">{operationMessage}</p>}
 
-        <DocumentAccess key={selected.id} document={selected} retainedTextAvailable={!!historical?.body.originalText} showManagementActions={false} />
-        {historical?.body.originalText && !selected.sourceText && <details><summary>Consultar texto sanitario conservado (no es el DOCX original)</summary><p className="documentation-text">{historical.body.originalText}</p></details>}
+        <DocumentAccess key={selected.id} document={selected} retainedTextAvailable={!!historical?.body.originalText} showManagementActions={false} showText={false} />
+        {(selected.sourceText?.trim() || historical?.body.originalText) && <details className="documentation-transcript"><summary>Leer transcripción conservada</summary><p className="documentation-text">{selected.sourceText?.trim() || historical?.body.originalText}</p></details>}
         <p><button type="button" onClick={() => setReference(null)}>Ver toda la documentación</button></p>
       </> : <>
         {reference && !reference.kinds?.length && <p role="status"><strong>{matches.length ? 'Hay varias referencias con ese nombre.' : 'No se ha localizado el documento en este expediente.'}</strong> {reference.fileName ?? reference.documentId}. {matches.length ? 'Selecciona el documento correspondiente.' : 'Puedes buscarlo en el catálogo. Una mención no acredita que el archivo esté disponible.'}</p>}
