@@ -131,3 +131,28 @@
   .lhpc__compact-title { flex-basis: 100%; }
   .lhpc__compact-toggle { margin-left: 0; }
 }
+
+/* Legibilidad independiente de las reglas históricas de tarjetas y listas. */
+.lhpc--compact .lhpc__compact-phases {
+  list-style: none;
+  counter-reset: none;
+}
+.lhpc--compact .lhpc__compact-phase {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  color: var(--texto-principal);
+}
+.lhpc--compact .lhpc__compact-phase-name,
+.lhpc--compact .lhpc__compact-phase-status,
+.lhpc--compact .lhpc__compact-phase-note {
+  display: block;
+  position: static;
+  width: 100%;
+  height: auto;
+  visibility: visible;
+  opacity: 1;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
