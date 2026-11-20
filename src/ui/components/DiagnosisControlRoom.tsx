@@ -1,3 +1,4 @@
+import "./DiagnosisCompact.css";
 import { useState, type ReactNode } from "react";
 import { DocumentCollectionReference, DocumentReference } from "./Documentation";
 import type { DocumentKind, TemporalScope } from "../../domain/repository";
@@ -61,7 +62,9 @@ export function DiagnosisControlRoom({ municipalityName, summary, kindLabels = [
   const allDocumentKinds = Object.keys(FALLBACK_KIND_LABELS) as DocumentKind[];
   const openTimelineWithoutScope = () => {
     setTimelineFilter("undetermined");
-    document.getElementById("diagnosis-timeline")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const timeline = document.getElementById("diagnosis-timeline-details") as HTMLDetailsElement | null;
+    if (timeline) timeline.open = true;
+    timeline?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
   const metricValue = (value: number | string, label: string, target: "documents" | "studies" | "assets" | "evidence" | "temporal") => {
     if (target === "documents") return <DocumentCollectionReference kinds={allDocumentKinds} className="diagnosis-control__metric-link" >{value}<span aria-hidden="true"> ↗</span><span className="sr-only"> · Consultar documentación: {label}</span></DocumentCollectionReference>;
@@ -73,7 +76,7 @@ export function DiagnosisControlRoom({ municipalityName, summary, kindLabels = [
     <section className="workspace-panel diagnosis-control" aria-labelledby="diagnosis-control-title">
       <div className="diagnosis-control__head">
         <div>
-          <p className="eyebrow">01 · Diagnóstico territorial · Sala de control</p>
+          <p className="eyebrow">01 · Diagnóstico territorial</p>
           <h2 id="diagnosis-control-title" className="diagnosis-control__municipality">{municipalityName}</h2>
           <p className={`diagnosis-control__state diagnosis-control__state--${summary.overall}`}>{OVERALL_MESSAGE[summary.overall]}</p>
         </div>
@@ -92,7 +95,7 @@ export function DiagnosisControlRoom({ municipalityName, summary, kindLabels = [
       <p className="panel-note">Las cifras cuentan registros y declaraciones del expediente; no certifican calidad, vigencia ni suficiencia metodológica.</p>
 
       <nav aria-label="Áreas del diagnóstico territorial" className="diagnosis-area-navigation">
-        <h3 className="diagnosis-control__subtitle">Explorar el diagnóstico</h3>
+        <h3 className="diagnosis-control__subtitle">Áreas de trabajo</h3>
         <div className="diagnosis-area-navigation__grid">
           <button type="button" onClick={() => onOpenModule?.("studies")} disabled={!onOpenModule}>
             <strong>01 · Estudios e indicadores</strong>
@@ -142,7 +145,10 @@ export function DiagnosisControlRoom({ municipalityName, summary, kindLabels = [
         </ul>
       </details>
 
-      <DiagnosisTimeline summary={summary} kindLabels={kindLabels} filter={timelineFilter} setFilter={setTimelineFilter} />
+      <details className="diagnosis-control__timeline-details" id="diagnosis-timeline-details">
+        <summary>Consultar cronología de fuentes · {summary.timeline.length} registros</summary>
+        <DiagnosisTimeline summary={summary} kindLabels={kindLabels} filter={timelineFilter} setFilter={setTimelineFilter} />
+      </details>
     </section>
   );
 }
