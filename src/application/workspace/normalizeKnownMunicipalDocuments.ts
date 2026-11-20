@@ -1,5 +1,5 @@
-import type { MunicipalityWorkspace } from "../domain/workspace";
-import type { MunicipalDocument } from "../domain/repository";
+import type { MunicipalityWorkspace } from "../../domain/workspace";
+import type { MunicipalDocument } from "../../domain/repository";
 
 /**
  * Corrección de metadatos históricamente comprobados en el seed de Loja.
