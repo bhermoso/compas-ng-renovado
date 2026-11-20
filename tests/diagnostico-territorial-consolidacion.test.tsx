@@ -22,10 +22,10 @@ describe("Diagnóstico territorial consolidado", () => {
     );
     expect(html).toContain("Áreas de trabajo");
     expect(html).toContain("Consultar cronología de fuentes");
-    expect(html).toContain("Estudios e indicadores");
-    expect(html).toContain("Fuentes documentales");
-    expect(html).toContain("Activos para la salud");
-    expect(html).toContain("Evidencias y diagnóstico");
+    expect(html).toContain("Estudios complementarios");
+    expect(html).toContain("Informe sobre la situación de salud de ");
+    expect(html).toContain("Localiza Salud de ");
+    expect(html).toContain("Evidencias del diagnóstico");
     expect(html).toContain("Estado detallado de módulos y fuentes");
     expect(html).toContain("<details");
   });
