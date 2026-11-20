@@ -83,6 +83,16 @@ export interface MunicipalityWorkspace {
   healthReport?: HealthReportDocument;
   previousHealthReports?: HealthReportDocument[];
   ibseStudy?: IBSEStudy;
+  /** Revisiones del estudio IBSE anteriores a una nueva importación confirmada.
+   * Contiene agregados, ficha y evidencias previas, nunca microdatos individuales.
+   * No participan en el diagnóstico activo hasta una restauración revisada.
+   */
+  ibseStudyHistory?: Array<{
+    replacedAt: string;
+    previousStudy: IBSEStudy;
+    documents: import("../repository").MunicipalDocument[];
+    evidence: import("../evidence").EvidenceAtom[];
+  }>;
   dukeStudy?: DUKEStudy;
   predimedStudy?: PREDIMEDStudy;
   sf12Study?: SF12Study;
