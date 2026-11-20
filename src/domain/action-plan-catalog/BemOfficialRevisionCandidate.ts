@@ -140,6 +140,22 @@ export const BEM_OBJECTIVE_REVIEW: readonly BemObjectiveReview[] = [
   },
 ] as const;
 
+/** Correspondencias de nivel programa: no son nuevos objetivos BEM.
+ * Los códigos PESMA conservan su nivel original y la localización de página.
+ * 'P.04.01-6' se refiere al sexto objetivo específico enumerado dentro
+ * del programa P.04.01, NO al sexto objetivo estratégico del PESMA.
+ */
+export const BEM_PROGRAM_CORRESPONDENCE = [
+  { legacySpecificCode: "BEM-OE3.1", officialProgramCode: "P.01.02", officialPosition: "objetivos del programa e indicadores escolares", officialLocation: "PESMA-A pp. 137–138", equivalence: "parcial" },
+  { legacySpecificCode: "BEM-OE3.2", officialProgramCode: "P.01.02", officialPosition: "colaboración de las familias y comunidad educativa", officialLocation: "PESMA-A pp. 137–138", equivalence: "contribución-local" },
+  { legacySpecificCode: "BEM-OE5.1", officialProgramCode: "P.02.CT02", officialPosition: "formación básica de personal técnico de juventud", officialLocation: "PESMA-A línea 1, OE02", equivalence: "contribución-local" },
+  { legacySpecificCode: "BEM-OE5.2", officialProgramCode: "P.05.02", officialPosition: "modelo comunitario de salud mental y adicciones", officialLocation: "PESMA-A línea 2, OE05", equivalence: "requiere-acuerdo-sanitario" },
+  { legacySpecificCode: "BEM-OE6.1", officialProgramCode: "P.04.01", officialPosition: "objetivo específico 10: formación e investigación", officialLocation: "PESMA-A p. 170, objetivo específico 10", equivalence: "contribución-local" },
+  { legacySpecificCode: "BEM-OE6.2", officialProgramCode: "P.04.01", officialPosition: "objetivo específico 6: sensibilización pública", officialLocation: "PESMA-A p. 170, objetivo específico 6", equivalence: "contribución-local" },
+  { legacySpecificCode: "BEM-OE7.1", officialProgramCode: "P.10.01", officialPosition: "sensibilización y reducción del estigma", officialLocation: "PESMA-A línea 5, OE10", equivalence: "contribución-local" },
+  { legacySpecificCode: "BEM-OE7.2", officialProgramCode: "P.10.05", officialPosition: "agentes de apoyo mutuo", officialLocation: "PESMA-A línea 5, OE10", equivalence: "contribución-local" },
+] as const;
+
 export const BEM_OFFICIAL_GROUPING = [
   { id: "salud-emocional", officialObjectiveIds: ["PESMA-OE01", "EPVSA-OE1.4"], description: "Bienestar emocional y calidad de vida" },
   { id: "comunidad-activos", officialObjectiveIds: ["EPVSA-OE1.7", "PESMA-OE05"], description: "Promoción comunitaria y activos" },
