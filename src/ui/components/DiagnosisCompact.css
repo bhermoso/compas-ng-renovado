@@ -48,3 +48,11 @@
  .duplicate-documents.workspace-panel,.dam.workspace-panel { padding:12px; }
 }
 @media(prefers-reduced-motion:reduce) { .diagnosis-control * { scroll-behavior:auto; } }
+
+/* Subida y revisión: solo se despliega al solicitarla. */
+.diagnosis-progressive { max-width:1210px; margin:0 auto 12px; border:1px solid var(--borde); border-left:3px solid var(--cyan); background:var(--blanco); border-radius:6px; padding:12px 20px; }
+.diagnosis-progressive > summary { cursor:pointer; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px 16px; color:var(--texto-principal); font-size:.87rem; }
+.diagnosis-progressive > summary span { color:var(--texto-secundario); font-size:.8rem; }
+.diagnosis-progressive[open] > summary { margin-bottom:14px; }
+.diagnosis-progressive > .workspace-panel { margin-bottom:0; }
+.diagnosis-module { scroll-margin-top:145px; }
