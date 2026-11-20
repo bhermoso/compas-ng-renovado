@@ -15,7 +15,7 @@ describe("recuperación IBSE con muestra mixta y trazabilidad", () => {
   });
   it("Atarfe: interpreta 1993 como año de nacimiento de 2026 y conserva la fila en SAM", async () => {
     const header = "record_id,monitor_ibse_complete,ibse_total,ibse_factor_vinculo,ibse_factor_situacion,ibse_factor_control,ibse_factor_persona,sexo,edad";
-    const csv = [header, "170,2,62.5,62.5,62.5,62.5,62.5,2,1993", "171,2,50,50,50,50,50,1,14"].join("\\n");
+    const csv = [header, "170,2,62.5,62.5,62.5,62.5,62.5,2,1993", "171,2,50,50,50,50,50,1,14"].join("\n");
     const result = await prepareIBSEImport(csv, "atarfe", "none");
     expect(result.aggregates.nValid).toBe(2);
     expect(result.ageSexObserved?.assignedCount).toBe(2);
