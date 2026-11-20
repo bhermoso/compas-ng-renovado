@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, it, expect } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { removeMunicipalDocument } from "../src/domain/repository";
@@ -26,12 +27,14 @@ describe("Gestión documental completa", () => {
     const html = renderToStaticMarkup(<DocumentArchiveManager repository={repository} evidence={[] as EvidenceAtom[]} originalIds={["assets-1"]} canWrite persistence="Firebase · copia confirmada" originalCapacity="6 MB / 40 MB" onOpenUploader={()=>{}} onOpenAssetValidations={()=>{}}/>);
     expect(html).toContain("Gestor documental del expediente");
     expect(html).toContain("Incorporar PDF, DOCX o CSV (revisión previa)");
-    expect(html).toContain("Archivo y texto");
-    expect(html).toContain("Informe de Salud Loja");
-    expect(html).toContain("Archivo no compartido");
-    expect(html).toContain("Contraer catálogo");
+    const source = readFileSync(new URL("../src/ui/components/DocumentArchiveManager.tsx", import.meta.url), "utf8");
+    expect(source).toContain("<th>Original y texto</th><th>Versión y procedencia</th>");
+    expect(source).toContain("Texto conservado (no es el original)");
+    expect(source).toContain("Sin huella registrada");
+    expect(html).not.toContain("Informe de Salud Loja");
+    expect(html).toContain("Mostrar catálogo y buscar");
     expect(html).toContain("2</strong> fichas");
-    expect(html).toContain("1</strong> originales compartidos");
+    expect(html).toContain("1</strong> originales registrados");
     expect(html).toContain("Revisar validaciones de activos");
     expect(html).toContain("Firebase · copia confirmada");
   });
