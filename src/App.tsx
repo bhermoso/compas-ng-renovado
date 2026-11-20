@@ -2287,7 +2287,17 @@ export default function App() {
     setIsLoadingIBSE(true);
     try {
       const text = await file.text();
+      // La exportación de respuestas REDCap no es su DataDictionary.
+      // Una cabecera de diccionario y una muestra sin puntuaciones válidas no pueden
+      // sustituir un IBSE previo ni sus evidencias: abortar ANTES de escribir fichero.
+      const header = text.replace(/^\\uFEFF/, "").split(/\\r?\\n/, 1)[0]?.toLowerCase() ?? "";
+      if (/\\bfield_name\\b/.test(header) && /\\b(field_type|field_label)\\b/.test(header)) {
+        throw new Error("Este CSV es un diccionario de variables REDCap, no un archivo con respuestas IBSE. No se ha sustituido el estudio existente.");
+      }
       const { aggregates, methodologicalCautions, warnings, ageSexObserved, strataCounts, demographicAdjustment } = await prepareIBSEImport(text, workspace.municipality.identity.id, target);
+      if (aggregates.nValid === 0) {
+        throw new Error("El CSV no contiene respuestas IBSE válidas. Importación cancelada: el estudio y sus indicadores anteriores se han conservado.");
+      }
       const documentId = crypto.randomUUID();
       await saveOriginalFile(workspace.municipality.identity.id, documentId, file);
       const study = createIBSEStudy({
@@ -2355,8 +2365,8 @@ export default function App() {
           : `CSV procesado sin registros válidos.${warn}`
       );
       return true;
-    } catch {
-      setIbseMessage("Error al procesar el CSV. Verifica que sea una exportación REDCap válida.");
+    } catch (error) {
+      setIbseMessage((error as Error).message || "Error al procesar el CSV. Verifica que sea una exportación REDCap con respuestas válidas.");
       return false;
     } finally {
       setIsLoadingIBSE(false);
@@ -4184,7 +4194,7 @@ export default function App() {
                   <div>
                     <p className="eyebrow">Estudio cargado · Índice de bienestar socioemocional</p>
                     <h2>IBSE de {municipality.name}</h2>
-                    <p>{runtime.workspace.ibseStudy.aggregates.nValid} respuestas válidas · Índice observado: {runtime.workspace.ibseStudy.aggregates.meanTotal}/100</p>
+                    <p>{runtime.workspace.ibseStudy.aggregates.nValid > 0 ? `${runtime.workspace.ibseStudy.aggregates.nValid} respuestas válidas · Índice observado: ${runtime.workspace.ibseStudy.aggregates.meanTotal}/100` : "Estudio inconsistente: 0 respuestas válidas. No interpretar el índice 0 como resultado de bienestar."}</p>
                   </div>
                   <button type="button" onClick={() => openDiagnosisModule("studies")}>
                     Ver resultados y tripirámide SAM
