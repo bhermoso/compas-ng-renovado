@@ -21,7 +21,7 @@ interface Props {
 
 type Scope = "all" | "active" | "archived" | "assets" | "studies";
 const isActive = (d: MunicipalDocument) => d.status !== "archived" && d.status !== "rejected";
-const normalizeSearch = (value: string) => value.normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").toLowerCase();
+const normalizeSearch = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
 const TEMPORAL_SCOPE_LABEL: Record<string, string> = {
   current: "Actual",
