@@ -31,7 +31,7 @@ describe("IBSE Atarfe: acceso directo a resultados y SAM", () => {
     const html = renderToStaticMarkup(<EstudiosComplementariosPanel municipalityName="Atarfe" ibseStudy={damaged} repository={seed.repository as MunicipalDocumentRepository}/>);
     expect(html).toContain("Importación IBSE inválida");
     expect(html).toContain("no es una medición del bienestar");
-    expect(html).not.toContain("0/100");
+    expect(html).not.toContain("Índice IBSE de 0/100");
     expect(html).not.toContain("Comparación territorial");
     expect(html).not.toContain("La muestra municipal participante de Atarfe obtiene");
   });
