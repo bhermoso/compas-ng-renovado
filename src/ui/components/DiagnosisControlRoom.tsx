@@ -92,6 +92,9 @@ export function DiagnosisControlRoom({ municipalityName, summary, kindLabels = [
         <div className={metrics.withoutTemporalDeclaration ? "diagnosis-control__metric--attention" : undefined}><dt>Sin alcance temporal</dt><dd>{metricValue(metrics.withoutTemporalDeclaration, "sin alcance temporal", "temporal")}</dd></div>
         <div className={metrics.pendingValidation ? "diagnosis-control__metric--attention" : undefined}><dt>Pendientes de validación</dt><dd>{metricValue(metrics.pendingValidation, "pendientes de validación", "documents")}</dd></div>
       </dl>
+      {metrics.activeLocalizaDocuments > 1 && <p className="diagnosis-control__localiza-warning" role="status">
+        Localiza Salud de {municipalityName}: constan {metrics.activeLocalizaDocuments} registros activos. Debe mantenerse uno solo vigente; revisa las cargas y sus versiones antes de archivar copias. No se ha eliminado ningún registro.
+      </p>}
       <p className="panel-note">Las cifras cuentan registros y declaraciones del expediente; no certifican calidad, vigencia ni suficiencia metodológica.</p>
 
       <nav aria-label="Áreas del diagnóstico territorial" className="diagnosis-area-navigation">
