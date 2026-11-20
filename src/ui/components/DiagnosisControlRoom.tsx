@@ -9,9 +9,9 @@ import type {
 } from "../../application/diagnosis/diagnosisControlSummary";
 
 const OVERALL_MESSAGE: Record<DiagnosisOverallState, string> = {
-  ready: "Diagnóstico con Informe de Salud y evidencia disponible para revisar el Perfil de Salud Local.",
+  ready: "Informe sobre la situación de salud incorporado y evidencias disponibles para revisar el Perfil de Salud Local.",
   partial: "Diagnóstico en elaboración. Faltan fuentes por incorporar o declarar.",
-  empty: "Diagnóstico vacío. Empieza por el Informe de Salud del ámbito territorial.",
+  empty: "Diagnóstico vacío. Empieza por el Informe sobre la situación de salud del municipio.",
 };
 
 const STATE_LABEL = { ok: "Disponible", partial: "Parcial", empty: "Sin datos" } as const;
@@ -26,7 +26,7 @@ const SCOPE_FILTERS: Array<{ value: TemporalScope | "all"; label: string }> = [
 
 /** Nombres de respaldo para tipos que no figuran en el selector de carga. */
 const FALLBACK_KIND_LABELS: Record<DocumentKind, string> = {
-  "health-report": "Informe de Salud",
+  "health-report": "Informe sobre la situación de salud",
   "complementary-study": "Estudio complementario",
   "eas-variable": "Variable EAS",
   "cmi-indicator": "Indicador CMI",
@@ -98,19 +98,19 @@ export function DiagnosisControlRoom({ municipalityName, summary, kindLabels = [
         <h3 className="diagnosis-control__subtitle">Áreas de trabajo</h3>
         <div className="diagnosis-area-navigation__grid">
           <button type="button" onClick={() => onOpenModule?.("studies")} disabled={!onOpenModule}>
-            <strong>01 · Estudios e indicadores</strong>
+            <strong>01 · Estudios complementarios</strong>
             <span>IBSE, SAM, resultados y referencias</span>
           </button>
           <button type="button" onClick={() => onOpenModule?.("health-report")} disabled={!onOpenModule}>
-            <strong>02 · Fuentes documentales</strong>
-            <span>Informe de Salud y expediente</span>
+            <strong>02 · Informe sobre la situación de salud</strong>
+            <span>Informe sobre la situación de salud de {municipalityName}</span>
           </button>
           <button type="button" onClick={() => onOpenModule?.("assets")} disabled={!onOpenModule}>
-            <strong>03 · Activos para la salud</strong>
-            <span>Inventario, procedencia y validación</span>
+            <strong>03 · Localiza Salud</strong>
+            <span>Localiza Salud de {municipalityName} · inventario y validación</span>
           </button>
           <button type="button" onClick={() => onOpenModule?.("evidence")} disabled={!onOpenModule}>
-            <strong>04 · Evidencias y diagnóstico</strong>
+            <strong>04 · Evidencias del diagnóstico</strong>
             <span>Hallazgos trazables por fuente</span>
           </button>
         </div>
