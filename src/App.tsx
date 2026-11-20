@@ -4217,8 +4217,6 @@ export default function App() {
               );
             })()}
 
-            {/* Acceso al IBSE y SAM consolidado en la navegación de cuatro áreas.
-                No repetir una segunda tarjeta IBSE ni otra cifra fuera de Estudios. */}
             {/* Punto único de control de todo el archivo documental, incluidos activos y CSV. */}
             <DocumentArchiveManager
               repository={runtime.workspace.repository}
