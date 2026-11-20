@@ -3,3 +3,13 @@
 .dam__provenance { min-width: 170px; max-width: 270px; overflow-wrap: anywhere; }
 .dam__provenance strong, .dam__provenance small { display: block; line-height: 1.4; }
 .dam__provenance small { margin-top: 3px; color: var(--texto-secundario); }
+
+/* Lectura funcional del archivo por secciones, sin modificar los registros. */
+.dam__municipal-map {display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin:12px 0}
+.dam__municipal-item {display:flex;align-items:baseline;gap:9px;min-width:0;padding:8px 10px;border:1px solid var(--borde);border-radius:6px}
+.dam__municipal-item strong {font-variant-numeric:tabular-nums}
+.dam__municipal-item span {font-size:.8rem;overflow-wrap:anywhere}
+.dam__strategic-note {font-size:.8rem;line-height:1.5;color:var(--texto-secundario)}
+.dam__section-row {background:var(--fondo-secundario)}
+.dam__section-row th {text-align:left;font-size:.83rem;padding:10px 12px;white-space:normal}
+.dam__section-row small {display:block;margin-top:3px;font-weight:400;color:var(--texto-secundario)}
