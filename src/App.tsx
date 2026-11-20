@@ -4223,7 +4223,7 @@ export default function App() {
               originalCapacity={`${formatMegabytes(documentOriginalsBytes(runtime.workspace.documentOriginals) + documentDerivativesBytes(runtime.workspace.documentDerivedFiles) + profileOriginalsBytes(runtime.workspace.externalProfileLibrary))} / ${formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)}`}
               canWrite={documentWriteAllowed}
               persistence={remotePersistenceMessage ?? ""}
-              onOpenUploader={() => document.getElementById("document-review-title")?.scrollIntoView({behavior:"smooth",block:"start"})}
+              onOpenUploader={() => { const details = document.getElementById("diagnosis-upload") as HTMLDetailsElement | null; if (details) details.open = true; requestAnimationFrame(() => document.getElementById("document-review-title")?.scrollIntoView({behavior:"smooth",block:"start"})); }}
               onOpenAssetValidations={() => { toggleDiagnosisModule("documents", true); requestAnimationFrame(() => document.getElementById("diag-mod-documents")?.scrollIntoView({behavior:"smooth",block:"start"})); }}
             />
 
@@ -4278,7 +4278,9 @@ export default function App() {
             })()}
 
             {/* ── Entrada universal: análisis, revisión e incorporación ── */}
-            <DocumentReviewInbox
+            <details className="diagnosis-progressive" id="diagnosis-upload">
+              <summary><strong>Incorporar nueva documentación</strong><span>PDF, DOCX, CSV · revisión antes de registrar</span></summary>
+              <DocumentReviewInbox
               key={runtime.workspace.municipality.identity.id}
               municipality={runtime.workspace.municipality.identity.name}
               repository={runtime.workspace.repository}
@@ -4301,7 +4303,8 @@ export default function App() {
                     ? handleInboxStudyCsv(file, request.studyId, request.temporal, request.contentSha256)
                     : handleLoadDocumentFile(file, { kind: request.kind, declaresOpenAnswers: false, temporal: request.temporal, contentSha256: request.contentSha256 })
               }
-            />
+              />
+            </details>
 
             {/* ── Detalle por módulo: paneles existentes, plegados ── */}
             <DiagnosisModuleSection id="diag-mod-health-report" title="Informe de Salud" description="Visor del Informe incorporado" open={openDiagModules.has("health-report")} onToggle={(open) => toggleDiagnosisModule("health-report", open)}>
