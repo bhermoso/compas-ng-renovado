@@ -41,6 +41,28 @@ try{
   if ((await page.locator("body").innerText()).includes("COMPAS · Acceso")) {
     console.warn("SKIP autenticación requerida: la prueba no certifica visibilidad del municipio en una sesión real.");
   } else {
+  // Regresión visual de la banda compacta: no basta con tener el texto en DOM.
+  const cycle=page.locator("details.lhpc--compact");
+  await cycle.waitFor({state:"visible",timeout:15000});
+  await cycle.locator("summary").click();
+  assert(await cycle.evaluate(el=>el.open),"El detalle de estados no se despliega");
+  const phaseRows=cycle.locator(".lhpc__compact-phase");
+  assert(await phaseRows.count()===6,"El expediente no muestra las seis fases");
+  for(const row of await phaseRows.all()){
+    const name=row.locator(".lhpc__compact-phase-name");
+    const status=row.locator(".lhpc__compact-phase-status");
+    assert((await name.innerText()).trim().length>4,"Una fase carece de nombre");
+    assert((await status.innerText()).trim().length>0,"Una fase carece de estado");
+    assert(await name.isVisible(),"El nombre de una fase existe pero no es visible");
+    assert(await status.isVisible(),"El estado de una fase existe pero no es visible");
+    const geometry=await name.evaluate(el=>{
+      const r=el.getBoundingClientRect(),style=getComputedStyle(el);
+      return {width:r.width,height:r.height,visibility:style.visibility,opacity:parseFloat(style.opacity),color:style.color};
+    });
+    assert(geometry.width>0 && geometry.height>0 && geometry.visibility!=="hidden" && geometry.opacity>0,
+      `El nombre de una fase queda colapsado: ${JSON.stringify(geometry)}`);
+  }
+  await cycle.locator("summary").click();
   const nav=page.locator("nav.app-nav");
   const municipality=nav.locator(".app-nav__municipality");
   await municipality.waitFor({state:"visible",timeout:15000});
