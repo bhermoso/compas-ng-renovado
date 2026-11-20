@@ -9,7 +9,7 @@ export type IBSEAdjustmentTarget = "none" | "15-plus";
 
 export async function prepareIBSEImport(text: string, municipalityId: string, target: IBSEAdjustmentTarget = "none") {
   const bands = ageBandsForMunicipality(municipalityId);
-  const { adjustmentRows = [], ...parsed } = parseIBSECSV(text, { ageBands: bands, collectAdjustmentRows: true });
+  const { adjustmentRows = [], ...parsed } = parseIBSECSV(text, { ageBands: bands, collectAdjustmentRows: true, ...(municipalityId === "atarfe" ? { surveyYear: 2026 } : {}) });
   const blocked = (reason: string) => ({ ...parsed, demographicAdjustment: { status: "blocked", reasons: [reason] } as IBSEAdjustment });
   if (target === "none") return blocked("No se ha solicitado ajuste demográfico. Se conservan las medias participantes.");
   if (parsed.warnings.length) return blocked("El archivo no contiene todas las columnas requeridas para verificar el ajuste.");
