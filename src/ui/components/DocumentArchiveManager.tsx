@@ -20,7 +20,7 @@ interface Props {
 
 type Scope = "all" | "active" | "archived" | "assets" | "studies";
 const isActive = (d: MunicipalDocument) => d.status !== "archived" && d.status !== "rejected";
-const normalized = (value: string) => value.normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").toLowerCase().replace(/\\s+/g, " ").trim();
+const normalized = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
 type Coincidence = { documents: MunicipalDocument[]; reason: "hash" | "title" };
 /** Hash identical => same bytes; identical title/type => review candidate, never an automatic deletion. */
 export function documentCoincidences(documents: readonly MunicipalDocument[]): Coincidence[] {
