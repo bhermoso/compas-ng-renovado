@@ -56,6 +56,8 @@ export interface DiagnosisControlSummary {
   overall: DiagnosisOverallState;
   metrics: {
     activeDocuments: number;
+    /** Debe existir un solo registro vigente Localiza Salud por municipio. */
+    activeLocalizaDocuments: number;
     studiesLoaded: number;
     totalStudies: number;
     assets: number;
@@ -161,7 +163,7 @@ export function buildDiagnosisControlSummary(input: DiagnosisControlInput): Diag
   const modules: DiagnosisModuleSummary[] = [
     {
       id: "health-report",
-      label: "Informe de Salud",
+      label: "Informe sobre la situación de salud",
       count: input.healthReportLoaded ? 1 : 0,
       value: input.healthReportLoaded ? "Incorporado" : "Sin incorporar",
       state: input.healthReportLoaded ? (reportCardMissing ? "partial" : "ok") : "empty",
@@ -181,7 +183,7 @@ export function buildDiagnosisControlSummary(input: DiagnosisControlInput): Diag
     },
     {
       id: "assets",
-      label: "Activos para la salud",
+      label: "Localiza Salud y activos para la salud",
       count: input.assetCount,
       value: input.validatedAssetCount !== undefined ? `${input.validatedAssetCount} de ${input.assetCount}` : String(input.assetCount),
       state: input.assetCount === 0 ? "empty" : input.validatedAssetCount === undefined || input.validatedAssetCount === input.assetCount ? "ok" : "partial",
@@ -221,6 +223,7 @@ export function buildDiagnosisControlSummary(input: DiagnosisControlInput): Diag
     overall,
     metrics: {
       activeDocuments: active.length,
+      activeLocalizaDocuments: active.filter(d => d.kind === "localiza-salud").length,
       studiesLoaded,
       totalStudies,
       assets: input.assetCount,

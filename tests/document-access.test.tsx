@@ -17,8 +17,8 @@ describe('Acceso a documentos del repositorio', () => {
    expect(isPdfDocumentAccess(document.source.url)).toBe(true);
   }
   const html = renderToStaticMarkup(<DocumentRepositoryPanel repository={repository}/>);
-  expect(html.match(/Descargar PDF original/g)?.length).toBeGreaterThanOrEqual(4);
-  expect(html).toContain('Abrir en nueva pestaña');
+  expect(html.match(/Descargar PDF desde fuente externa/g)?.length).toBeGreaterThanOrEqual(4);
+  expect(html).toContain('Abrir fuente externa en nueva pestaña');
   expect(html).not.toContain('Todos los documentos del expediente');
   expect(html).toContain('Otras fuentes documentales');
  });
@@ -39,7 +39,7 @@ describe('Acceso a documentos del repositorio', () => {
   expect(html).toContain('Descargar Informe de Salud original');
   expect(html).toContain('Abrir Informe de Salud original en nueva pestaña');
   expect(html).toContain('descarga del Informe de Salud original');
-  expect(html).not.toContain('>Descargar PDF original<');
+  expect(html).not.toContain('>Descargar PDF desde fuente externa<');
  });
  it('no convierte rutas desconocidas o esquemas ejecutables en enlaces', () => {
   for(const url of ['javascript:alert(1)', 'data:text/html,test', 'file:///tmp/a.pdf', 'docs/desconocido.pdf', '__proto__', undefined]) expect(documentAccessUrl(url)).toBeUndefined();
@@ -77,7 +77,7 @@ describe('Gestión documental contextual en todas las fichas',()=>{
   expect(html).toContain('Crear nueva versión');
   expect(html).toContain('Archivar documento');
   expect(html).toContain('Eliminar documento');
-  expect(html).toContain('Descargar PDF original');
+  expect(html).toContain('Descargar PDF desde fuente externa');
  });
  it('no permite alterar un documento de otro municipio desde la biblioteca transversal',()=>{
   const document=seed.repository.documents.find(d=>d.kind==='health-report')!;

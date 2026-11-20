@@ -289,7 +289,7 @@ export const BEM_PROVENANCE: Readonly<Record<string, CatalogElementProvenance>> 
   "bem-2027-2030": ada("PESMA-A, OE01 «Aumentar el bienestar emocional de la población andaluza»; SNS, objetivos 2.1 y 2.2. La enumeración de factores protectores es de COMPÁS."),
   "BEM-OG1": ada("PESMA-A, OE01; EPVSA, OE 1.4 «Incrementar la percepción de calidad de vida y de bienestar emocional». La reducción de desigualdades es añadido de COMPÁS."),
   "BEM-OE1.1": ada("PESMA-A, OE01; EPVSA, OE 1.4."),
-  "BEM-I1.1": pro("Monitor municipal de bienestar socioemocional (IBSE, Bericat 2014). La EPVSA mide el OE 1.4 con SF-12, Kidscreen y felicidad declarada, no con el IBSE."),
+  "BEM-I1.1": pro("Operacionalización propia del monitor municipal IBSE (Bericat 2014), diferente de la Encuesta Andaluza de Salud. El instrumento IBSE figura oficialmente en PESMA-A 2026–2029, OE01, indicador de población mayor de 16 años (p. 333, referencia autonómica 75,94). No acreditar comparabilidad local sin revisar muestra, edad, fórmula y recogida; la EPVSA OE1.4 utiliza otros indicadores."),
   "BEM-OE1.2": pro("Hallazgos del Perfil de Salud Local de Atarfe (C3 y C4); sin objetivo equivalente en las estrategias de referencia."),
   "BEM-I1.2": pro("Monitor municipal de bienestar socioemocional (IBSE)."),
   "BEM-OE1.3": pro("Hallazgo del Monitor de Atarfe 2026: Control (energía y tranquilidad) es el factor más bajo."),

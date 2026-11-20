@@ -17,7 +17,7 @@ export const STUDY_LABEL_BY_TAG: Record<string, string> = {
 };
 
 export const KIND_LABEL: Record<DocumentKind, string> = {
-  "health-report": "Informe de Salud",
+  "health-report": "Informe sobre la situación de salud",
   "localiza-salud": "Localiza Salud",
   "strategic-framework": "Marco estratégico y normativo",
   "complementary-study": "Estudio complementario",

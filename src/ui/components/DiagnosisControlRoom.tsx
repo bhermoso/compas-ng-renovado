@@ -1,3 +1,5 @@
+import "./DiagnosisCompact.css";
+import { InstitutionalLogoBand } from "./InstitutionalLogoBand";
 import { useState, type ReactNode } from "react";
 import { DocumentCollectionReference, DocumentReference } from "./Documentation";
 import type { DocumentKind, TemporalScope } from "../../domain/repository";
@@ -8,9 +10,9 @@ import type {
 } from "../../application/diagnosis/diagnosisControlSummary";
 
 const OVERALL_MESSAGE: Record<DiagnosisOverallState, string> = {
-  ready: "Diagnóstico con Informe de Salud y evidencia disponible para revisar el Perfil de Salud Local.",
+  ready: "Informe sobre la situación de salud incorporado y evidencias disponibles para revisar el Perfil de Salud Local.",
   partial: "Diagnóstico en elaboración. Faltan fuentes por incorporar o declarar.",
-  empty: "Diagnóstico vacío. Empieza por el Informe de Salud del ámbito territorial.",
+  empty: "Diagnóstico vacío. Empieza por el Informe sobre la situación de salud del municipio.",
 };
 
 const STATE_LABEL = { ok: "Disponible", partial: "Parcial", empty: "Sin datos" } as const;
@@ -25,7 +27,7 @@ const SCOPE_FILTERS: Array<{ value: TemporalScope | "all"; label: string }> = [
 
 /** Nombres de respaldo para tipos que no figuran en el selector de carga. */
 const FALLBACK_KIND_LABELS: Record<DocumentKind, string> = {
-  "health-report": "Informe de Salud",
+  "health-report": "Informe sobre la situación de salud",
   "complementary-study": "Estudio complementario",
   "eas-variable": "Variable EAS",
   "cmi-indicator": "Indicador CMI",
@@ -52,66 +54,55 @@ interface DiagnosisControlRoomProps {
   kindLabels?: ReadonlyArray<{ value: DocumentKind; label: string }>;
   /** Abre el detalle del módulo en la parte inferior de la pestaña. */
   onOpenModule?: (id: DiagnosisModuleId) => void;
+  onOpenWorkspace?: () => void;
 }
 
 /** Cabecera, resumen factual y matriz de módulos del Diagnóstico territorial. */
-export function DiagnosisControlRoom({ municipalityName, summary, kindLabels = [], onOpenModule }: DiagnosisControlRoomProps) {
+export function DiagnosisControlRoom({ municipalityName, summary, kindLabels = [], onOpenModule, onOpenWorkspace }: DiagnosisControlRoomProps) {
   const { metrics } = summary;
   const [timelineFilter, setTimelineFilter] = useState<TemporalScope | "all">("all");
-  const allDocumentKinds = Object.keys(FALLBACK_KIND_LABELS) as DocumentKind[];
-  const openTimelineWithoutScope = () => {
-    setTimelineFilter("undetermined");
-    document.getElementById("diagnosis-timeline")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-  const metricValue = (value: number | string, label: string, target: "documents" | "studies" | "assets" | "evidence" | "temporal") => {
-    if (target === "documents") return <DocumentCollectionReference kinds={allDocumentKinds} className="diagnosis-control__metric-link" >{value}<span aria-hidden="true"> ↗</span><span className="sr-only"> · Consultar documentación: {label}</span></DocumentCollectionReference>;
-    if (target === "temporal") return <button type="button" className="diagnosis-control__metric-link" onClick={openTimelineWithoutScope}>{value}<span aria-hidden="true"> ↘</span><span className="sr-only"> · Filtrar la cronología por documentos sin alcance temporal</span></button>;
-    if (!onOpenModule) return <span>{value}</span>;
-    return <button type="button" className="diagnosis-control__metric-link" onClick={() => onOpenModule(target === "studies" ? "studies" : target === "assets" ? "assets" : "evidence")}>{value}<span aria-hidden="true"> ↘</span><span className="sr-only"> · Abrir detalle de {label}</span></button>;
-  };
   return (
     <section className="workspace-panel diagnosis-control" aria-labelledby="diagnosis-control-title">
-      <div className="diagnosis-control__head">
-        <div>
-          <p className="eyebrow">01 · Diagnóstico territorial · Sala de control</p>
-          <h2 id="diagnosis-control-title" className="diagnosis-control__municipality">{municipalityName}</h2>
-          <p className={`diagnosis-control__state diagnosis-control__state--${summary.overall}`}>{OVERALL_MESSAGE[summary.overall]}</p>
+      <header className="diagnosis-cover">
+        <div className="diagnosis-cover__eyebrow">Marco RELAS · Planificación Local de Salud · Andalucía</div>
+        <div className="diagnosis-cover__identity">
+          <div className="diagnosis-cover__brand">
+            <h2 id="diagnosis-control-title" className="diagnosis-cover__title">Diagnóstico territorial</h2>
+            <div className="diagnosis-cover__rule" aria-hidden="true" />
+            <p className="diagnosis-cover__municipality">{municipalityName}</p>
+            <p className="diagnosis-cover__state">{OVERALL_MESSAGE[summary.overall]}</p>
+          </div>
+          <div className="diagnosis-cover__logos">
+            <InstitutionalLogoBand variant="cover" ids={["consejeria", "distrito-sanitario", "relas", "violencia-genero", "rasselh"]} />
+          </div>
         </div>
-      </div>
+      </header>
 
-      <dl className="diagnosis-control__metrics" aria-label="Resumen navegable del expediente">
-        <div><dt>Documentos activos</dt><dd>{metricValue(metrics.activeDocuments, "documentos", "documents")}</dd></div>
-        <div><dt>Estudios</dt><dd>{metricValue(`${metrics.studiesLoaded}/${metrics.totalStudies}`, "estudios", "studies")}</dd></div>
-        {metrics.validatedAssets !== undefined
-          ? <div><dt>Activos validados</dt><dd>{metricValue(`${metrics.validatedAssets} de ${metrics.assets}`, "activos validados", "assets")}</dd></div>
-          : <div><dt>Recursos de activos</dt><dd>{metricValue(metrics.assets, "recursos de activos", "assets")}</dd></div>}
-        <div><dt>Evidencias</dt><dd>{metricValue(metrics.evidence, "evidencias", "evidence")}</dd></div>
-        <div className={metrics.withoutTemporalDeclaration ? "diagnosis-control__metric--attention" : undefined}><dt>Sin alcance temporal</dt><dd>{metricValue(metrics.withoutTemporalDeclaration, "sin alcance temporal", "temporal")}</dd></div>
-        <div className={metrics.pendingValidation ? "diagnosis-control__metric--attention" : undefined}><dt>Pendientes de validación</dt><dd>{metricValue(metrics.pendingValidation, "pendientes de validación", "documents")}</dd></div>
-      </dl>
-      <p className="panel-note">Las cifras cuentan registros y declaraciones del expediente; no certifican calidad, vigencia ni suficiencia metodológica.</p>
-
-      <nav aria-label="Áreas del diagnóstico territorial" className="diagnosis-area-navigation">
-        <h3 className="diagnosis-control__subtitle">Explorar el diagnóstico</h3>
+      <nav aria-label="Documentación del diagnóstico territorial" className="diagnosis-area-navigation">
+        <h3 className="diagnosis-control__subtitle">Documentación COMPÁS–RELAS</h3>
         <div className="diagnosis-area-navigation__grid">
-          <button type="button" onClick={() => onOpenModule?.("studies")} disabled={!onOpenModule}>
-            <strong>01 · Estudios e indicadores</strong>
-            <span>IBSE, SAM, resultados y referencias</span>
-          </button>
           <button type="button" onClick={() => onOpenModule?.("health-report")} disabled={!onOpenModule}>
-            <strong>02 · Fuentes documentales</strong>
-            <span>Informe de Salud y expediente</span>
+            <strong>01 · Informe sobre la situación de salud de {municipalityName}</strong>
+            <span>{summary.modules.find(m => m.id === "health-report")?.value ?? "Sin incorporar"} · consultar el informe y sus versiones</span>
+          </button>
+          <button type="button" onClick={() => onOpenModule?.("studies")} disabled={!onOpenModule}>
+            <strong>02 · Estudios complementarios</strong>
+            <span>IBSE y demás instrumentos · {metrics.studiesLoaded} de {metrics.totalStudies} incorporados</span>
           </button>
           <button type="button" onClick={() => onOpenModule?.("assets")} disabled={!onOpenModule}>
-            <strong>03 · Activos para la salud</strong>
-            <span>Inventario, procedencia y validación</span>
+            <strong>03 · Localiza Salud de {municipalityName}</strong>
+            <span>{metrics.assets} recursos registrados · {metrics.activeLocalizaDocuments} fichas vigentes</span>
           </button>
-          <button type="button" onClick={() => onOpenModule?.("evidence")} disabled={!onOpenModule}>
-            <strong>04 · Evidencias y diagnóstico</strong>
-            <span>Hallazgos trazables por fuente</span>
+          <button type="button" onClick={onOpenWorkspace} disabled={!onOpenWorkspace}>
+            <strong>04 · Gestionar documentación</strong>
+            <span>Consultar, incorporar, reemplazar o retirar versiones con confirmación</span>
           </button>
         </div>
       </nav>
+      {metrics.activeLocalizaDocuments > 1 && <p className="diagnosis-control__localiza-warning" role="status">
+        Localiza Salud: {metrics.activeLocalizaDocuments} fichas activas. Revisar para mantener un único inventario vigente; no se ha retirado ninguna.
+      </p>}
+      <p className="diagnosis-control__footnote">El detalle de los estudios y los registros técnicos se despliega solo al seleccionar un área.</p>
       <details className="diagnosis-control__module-audit">
         <summary>Estado detallado de módulos y fuentes</summary>
         <ul className="diagnosis-matrix" aria-label="Módulos del diagnóstico">
@@ -142,7 +133,10 @@ export function DiagnosisControlRoom({ municipalityName, summary, kindLabels = [
         </ul>
       </details>
 
-      <DiagnosisTimeline summary={summary} kindLabels={kindLabels} filter={timelineFilter} setFilter={setTimelineFilter} />
+      <details className="diagnosis-control__timeline-details" id="diagnosis-timeline-details">
+        <summary>Consultar cronología de fuentes · {summary.timeline.length} registros</summary>
+        <DiagnosisTimeline summary={summary} kindLabels={kindLabels} filter={timelineFilter} setFilter={setTimelineFilter} />
+      </details>
     </section>
   );
 }

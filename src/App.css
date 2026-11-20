@@ -11636,67 +11636,67 @@ h3 {
    Los módulos extensos siguen teniendo scroll natural; no se fija el alto de
    tablas, documentos, lectores, formularios ni paneles de contenido.
    Clases acotadas al shell de trabajo para no afectar a la portada. */
-#root .app-shell:not(.app-shell--home) {
+#root .app-shell:not(.app-shell--home):not(.app-shell--diagnosis-cover) {
   padding: clamp(14px, 2.5vw, 30px) clamp(16px, 3vw, 36px) 32px;
 }
-#root .app-shell:not(.app-shell--home) .hero,
-#root .app-shell:not(.app-shell--home) .workspace-panel {
+#root .app-shell:not(.app-shell--home):not(.app-shell--diagnosis-cover) .hero,
+#root .app-shell:not(.app-shell--home):not(.app-shell--diagnosis-cover) .workspace-panel {
   padding: clamp(15px, 2vw, 26px) clamp(16px, 2.8vw, 30px);
   margin-bottom: 16px;
   border-radius: 0;
   box-shadow: none;
   min-width: 0;
 }
-#root .app-shell:not(.app-shell--home) .panel-header {
+#root .app-shell:not(.app-shell--home):not(.app-shell--diagnosis-cover) .panel-header {
   gap: 12px 22px;
   margin-bottom: 16px;
 }
-#root .app-shell:not(.app-shell--home) .panel-header h2 {
+#root .app-shell:not(.app-shell--home):not(.app-shell--diagnosis-cover) .panel-header h2 {
   font-size: clamp(1.2rem, 2.3vw, 1.55rem);
   line-height: 1.22;
   letter-spacing: -.025em;
 }
-#root .app-shell:not(.app-shell--home) .eyebrow {
+#root .app-shell:not(.app-shell--home):not(.app-shell--diagnosis-cover) .eyebrow {
   font-size: .7rem;
   letter-spacing: .11em;
   margin-bottom: 7px;
 }
-#root .app-shell:not(.app-shell--home) .panel-note {
+#root .app-shell:not(.app-shell--home):not(.app-shell--diagnosis-cover) .panel-note {
   font-size: .87rem;
   line-height: 1.45;
 }
-#root .app-shell:not(.app-shell--home) .grid {
+#root .app-shell:not(.app-shell--home):not(.app-shell--diagnosis-cover) .grid {
   gap: 12px;
   margin-bottom: 18px;
 }
-#root .app-shell:not(.app-shell--home) .card {
+#root .app-shell:not(.app-shell--home):not(.app-shell--diagnosis-cover) .card {
   padding: clamp(12px, 1.5vw, 18px);
   border-radius: 0;
   min-width: 0;
 }
-#root .app-shell:not(.app-shell--home) .card h2 {
+#root .app-shell:not(.app-shell--home):not(.app-shell--diagnosis-cover) .card h2 {
   margin-bottom: 8px;
 }
-#root .app-shell:not(.app-shell--home) .document-row {
+#root .app-shell:not(.app-shell--home):not(.app-shell--diagnosis-cover) .document-row {
   min-width: 0;
   overflow-wrap: anywhere;
 }
-#root .app-shell:not(.app-shell--home) .repo-section-divider {
+#root .app-shell:not(.app-shell--home):not(.app-shell--diagnosis-cover) .repo-section-divider {
   margin-top: 18px;
   margin-bottom: 14px;
 }
-#root .app-shell:not(.app-shell--home) .gradient-bar {
+#root .app-shell:not(.app-shell--home):not(.app-shell--diagnosis-cover) .gradient-bar {
   margin: calc(-1 * clamp(15px, 2vw, 26px)) calc(-1 * clamp(16px, 2.8vw, 30px)) 20px;
 }
 /* La lectura y la operabilidad prevalecen sobre la densidad. */
 @media (max-width: 760px) {
-  #root .app-shell:not(.app-shell--home) {
+  #root .app-shell:not(.app-shell--home):not(.app-shell--diagnosis-cover) {
     padding: 12px 12px 24px;
   }
-  #root .app-shell:not(.app-shell--home) .panel-header {
+  #root .app-shell:not(.app-shell--home):not(.app-shell--diagnosis-cover) .panel-header {
     grid-template-columns: minmax(0, 1fr);
   }
-  #root .app-shell:not(.app-shell--home) .grid {
+  #root .app-shell:not(.app-shell--home):not(.app-shell--diagnosis-cover) .grid {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
   }
 }

@@ -71,12 +71,17 @@ export function DocumentationProvider({ workspace, children, canWrite = false, o
             <p className="documentation-overview__source">{selected.source.system ?? 'Procedencia no indicada'}</p>
           </div>
           <div className="documentation-overview__statuses">
-            <span className={original ? "documentation-status documentation-status--ok" : "documentation-status documentation-status--pending"}>{original ? 'Original disponible' : 'Original pendiente'}</span>
+            <span className="documentation-status documentation-status--pending">{original ? 'Original registrado · recuperación por comprobar' : 'Sin original compartido registrado'}</span>
             <span className="documentation-status">{selected.sourceText?.trim() || historical?.body.originalText ? 'Texto disponible' : 'Sin transcripción'}</span>
             {(workspace.documentDerivedFiles?.filter(d=>d.derivedFromDocumentId===selected.id).length ?? 0) > 0 && <span className="documentation-status">{workspace.documentDerivedFiles?.filter(d=>d.derivedFromDocumentId===selected.id).length} copias derivadas</span>}
           </div>
           <p className="documentation-overview__file">{selected.sourceFileName ?? 'Sin nombre de archivo registrado'}</p>
           {!original && (selected.sourceText?.trim() || historical?.body.originalText) && <p className="documentation-overview__notice">Se conserva el contenido textual. El documento de origen no está incorporado; las reconstrucciones se identifican como copias, no como originales.</p>}
+        </section>
+        <section aria-label="Acceso al archivo original" className="documentation-original-primary">
+          <h3>Archivo original</h3>
+          <p>{original ? 'Archivo registrado en el expediente compartido. Abre o descarga el original; el texto conservado no lo sustituye.' : 'No consta un original compartido en este expediente. Comprueba la disponibilidad local o el enlace externo antes de utilizarlo como fuente.'}</p>
+          <DocumentAccess key={selected.id} document={selected} retainedTextAvailable={!!historical?.body.originalText} showManagementActions={false} showText={false} />
         </section>
         <details className="documentation-technical"><summary>Ficha técnica y trazabilidad</summary>
           <dl className="documentation-metadata">
@@ -111,7 +116,6 @@ export function DocumentationProvider({ workspace, children, canWrite = false, o
         </div></details>}
         {operationMessage && <p role="status">{operationMessage}</p>}
 
-        <DocumentAccess key={selected.id} document={selected} retainedTextAvailable={!!historical?.body.originalText} showManagementActions={false} showText={false} />
         {(selected.sourceText?.trim() || historical?.body.originalText) && <details className="documentation-transcript"><summary>Leer transcripción conservada</summary><p className="documentation-text">{selected.sourceText?.trim() || historical?.body.originalText}</p></details>}
         <p><button type="button" onClick={() => setReference(null)}>Ver toda la documentación</button></p>
       </> : <>
