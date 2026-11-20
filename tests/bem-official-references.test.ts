@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { EMOTIONAL_WELLBEING_MODULE } from "../src/domain/action-plan-catalog/ActionPlanCatalog";
 import { BEM_LEGACY_ALIGNMENT, BEM_OFFICIAL_OBJECTIVES, BEM_OFFICIAL_INDICATORS } from "../src/domain/action-plan-catalog/OfficialMentalHealthReferences";
 import { BEM_OBJECTIVE_REVIEW, BEM_OFFICIAL_GROUPING, BEM_PROGRAM_CORRESPONDENCE, auditBemCandidateCompleteness } from "../src/domain/action-plan-catalog/BemOfficialRevisionCandidate";
+import { BEM_OFFICIAL_AXES, BEM_OFFICIAL_REVIEW_RULES, auditBemOfficialArchitecture, listBemOfficialArchitecture } from "../src/domain/action-plan-catalog/BemOfficialArchitecture";
 
 describe("Auditoría normativa de Bienestar emocional", () => {
   const legacy = EMOTIONAL_WELLBEING_MODULE;
@@ -75,5 +76,35 @@ describe("Auditoría normativa de Bienestar emocional", () => {
       "objetivo específico 6: sensibilización pública",
     ]);
     expect(suicide.every(x => x.equivalence === "contribución-local")).toBe(true);
+  });
+  it("distingue 5 objetivos PESMA y 3 EPVSA sin crear siete generales municipales nuevos", () => {
+    const report = auditBemOfficialArchitecture();
+    expect(report).toEqual({
+      version: "0.3-candidate",
+      primaryObjectives: 5,
+      complementaryObjectives: 3,
+      unique: true,
+      allMapped: true,
+      automaticActivationAllowed: false,
+    });
+    expect(BEM_OFFICIAL_AXES.filter(x => x.scope === "eje-pesma").map(x => x.officialObjectiveId))
+      .toEqual(["PESMA-OE01","PESMA-OE02","PESMA-OE04","PESMA-OE05","PESMA-OE10"]);
+    expect(listBemOfficialArchitecture().every(x => x.objective.title.length > 20)).toBe(true);
+  });
+  it("protege los planes municipales y no convierte un indicador de Localiza en recomendaciones del SSPA", () => {
+    expect(BEM_OFFICIAL_REVIEW_RULES).toMatchObject({
+      previousModuleVersion: "0.2",
+      retainPreviousDrafts: true,
+      retainIndicatorWorksheets: true,
+      requireExplicitSelection: true,
+      requireHumanValidation: true,
+      preserveOfficialCodes: true,
+      autoPromote: false,
+      inheritMunicipalDecisions: false,
+    });
+    const assets = BEM_OFFICIAL_AXES.find(x => x.officialObjectiveId === "EPVSA-OE1.7")!;
+    expect(assets.officialIndicatorIds).toEqual(["EPVSA-1.7.1"]);
+    expect(assets.note).toMatch(/Localiza Salud/);
+    expect(BEM_OFFICIAL_AXES.filter(x => x.officialObjectiveId === "PESMA-OE04")[0].officialIndicatorIds).toEqual([]);
   });
 });
