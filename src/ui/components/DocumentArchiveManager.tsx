@@ -22,6 +22,48 @@ interface Props {
 type Scope = "all" | "active" | "archived" | "assets" | "studies";
 const isActive = (d: MunicipalDocument) => d.status !== "archived" && d.status !== "rejected";
 
+const TEMPORAL_SCOPE_LABEL: Record<string, string> = {
+  current: "Actual",
+  historical: "Histórico",
+  mixed: "Mixto",
+  undetermined: "Por determinar",
+};
+
+const DOCUMENT_VALIDITY_LABEL: Record<string, string> = {
+  valid: "Vigente",
+  superseded: "Sustituido",
+  repealed: "Derogado",
+  expired: "Caducado",
+  unknown: "Desconocida",
+  "not-applicable": "No aplicable",
+};
+
+function documentTemporalDetails(document: MunicipalDocument): string[] {
+  const temporal = document.temporal;
+  const details: string[] = [];
+  const documentDate = temporal?.documentDate?.value;
+  if (documentDate) details.push(`Fecha del documento: ${documentDate}`);
+
+  const period = temporal?.observedPeriod;
+  const periodLabel = period?.literal ?? [period?.from?.value, period?.to?.value].filter(Boolean).join("–");
+  if (periodLabel) details.push(`Período observado: ${periodLabel}`);
+
+  const declaredScope = temporal?.declaration
+    ? TEMPORAL_SCOPE_LABEL[temporal.temporalScope ?? "undetermined"]
+    : "sin declaración";
+  details.push(`Alcance temporal: ${declaredScope}`);
+
+  const cycle = document.cycle
+    ? `${document.cycle.status === "current" ? "actual" : "histórico"}${document.cycle.referenceYear !== undefined ? ` · ${document.cycle.referenceYear}` : ""}`
+    : "sin declarar";
+  details.push(`Ciclo diagnóstico: ${cycle}`);
+
+  if (temporal?.validity) {
+    details.push(`Vigencia documental: ${DOCUMENT_VALIDITY_LABEL[temporal.validity] ?? temporal.validity}`);
+  }
+  return details;
+}
+
 /** Un punto de acceso a TODA la documentación, no solamente a las fuentes 'otras'. */
 export function DocumentArchiveManager({ repository, evidence, originalIds, canWrite, persistence, originalCapacity, onOpenUploader, onOpenAssetValidations, onSetDocumentCycle }: Props) {
   const [query, setQuery] = useState("");
@@ -85,7 +127,7 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
             <td>{municipalDocumentSection(d) === "plans" ? "Plan de Acción municipal" : municipalDocumentSection(d) === "prioritization" ? "Priorización municipal" : KIND_LABEL[d.kind] ?? d.kind}</td>
             <td>{d.status === "archived" ? "Archivado" : d.status === "validated" ? "Validado" : d.status === "rejected" ? "Rechazado" : "Registrado"}</td>
             <td>{originals.has(d.id) ? "Original registrado en el expediente (pendiente de cotejo remoto)" : "Original no acreditado en el expediente"}{d.sourceText?.trim() ? " · Texto conservado (no es el original)" : " · Sin texto conservado"}</td>
-            <td className="dam__provenance"><strong>{d.revisionNumber ? `v${d.revisionNumber}` : "Sin número de versión"}</strong><small>{d.revisionOf ? `Revisión de ${d.revisionOf}` : "Sin predecesora declarada"}</small><small>{d.contentSha256 ? `Huella declarada SHA-256: ${d.contentSha256.slice(0, 12)}…` : "Sin huella registrada"}</small><small>{d.source.organization || d.source.system || "Origen no declarado"}</small></td>
+            <td className="dam__provenance"><strong>{d.revisionNumber ? `v${d.revisionNumber}` : "Sin número de versión"}</strong><small>{d.revisionOf ? `Revisión de ${d.revisionOf}` : "Sin predecesora declarada"}</small><small>{d.contentSha256 ? `Huella declarada SHA-256: ${d.contentSha256.slice(0, 12)}…` : "Sin huella registrada"}</small><small>{d.source.organization || d.source.system || "Origen no declarado"}</small>{documentTemporalDetails(d).map((detail, index) => <small key={`${d.id}-temporal-${index}`}>{detail}</small>)}</td>
             <td>{countOf(d.id)} evidencias{validationCount(d.id) ? ` · ${validationCount(d.id)} validaciones de activos` : ""}{d.revisionOf ? " · revisión" : ""}</td>
             <td><DocumentReference documentId={d.id}>Abrir ficha</DocumentReference>{onSetDocumentCycle && canWrite && <details className="dam__cycle"><summary>Declarar ciclo</summary><DocumentCycleControl cycle={d.cycle} onChange={cycle=>onSetDocumentCycle(d.id,cycle)}/></details>}</td>
           </tr>)] )}</tbody>
