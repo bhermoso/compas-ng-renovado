@@ -15,6 +15,7 @@ import { InitialLocalHealthPlanPanel } from "./ui/components/InitialLocalHealthP
 import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
 import { HomePortada } from "./ui/components/HomePortada";
 import { DocumentArchiveManager } from "./ui/components/DocumentArchiveManager";
+import { StrategicReferenceLibrary } from "./ui/components/StrategicReferenceLibrary";
 import { DocumentReviewInbox } from "./ui/components/DocumentReviewInbox";
 import { DiagnosisControlRoom, DiagnosisModuleSection } from "./ui/components/DiagnosisControlRoom";
 import { DuplicateDocumentsPanel } from "./ui/components/DuplicateDocumentsPanel";
@@ -4214,6 +4215,10 @@ export default function App() {
                 />
               );
             })()}
+
+            {/* Biblioteca de referencia institucional: no pertenece al expediente
+                municipal y no alimenta el diagnóstico ni las evidencias. */}
+            <StrategicReferenceLibrary workspace={runtime.workspace} />
 
             {/* La estadística territorial es una fuente del diagnóstico.
                 Su incorporación al Perfil genera siempre una revisión separada. */}
