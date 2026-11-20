@@ -71,7 +71,7 @@ export function DocumentationProvider({ workspace, children, canWrite = false, o
             <p className="documentation-overview__source">{selected.source.system ?? 'Procedencia no indicada'}</p>
           </div>
           <div className="documentation-overview__statuses">
-            <span className={original ? "documentation-status documentation-status--ok" : "documentation-status documentation-status--pending"}>{original ? 'Original disponible' : 'Original pendiente'}</span>
+            <span className="documentation-status documentation-status--pending">{original ? 'Original registrado · recuperación por comprobar' : 'Sin original compartido registrado'}</span>
             <span className="documentation-status">{selected.sourceText?.trim() || historical?.body.originalText ? 'Texto disponible' : 'Sin transcripción'}</span>
             {(workspace.documentDerivedFiles?.filter(d=>d.derivedFromDocumentId===selected.id).length ?? 0) > 0 && <span className="documentation-status">{workspace.documentDerivedFiles?.filter(d=>d.derivedFromDocumentId===selected.id).length} copias derivadas</span>}
           </div>
