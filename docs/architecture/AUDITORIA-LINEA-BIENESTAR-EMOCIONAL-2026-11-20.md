@@ -124,3 +124,55 @@ La regla fundamental es conservar **la metodología y el denominador del indicad
 **Resultado entregado ahora:** referencia normativa estructurada, correspondencia completa con los 17 indicadores legados, pruebas de identidad y documentación. El catálogo operativo sigue en 0.2, deliberadamente: **no se han alterado planes municipales**.
 
 **Pendiente para activar 0.3:** completar contraste literal objetivo específico–indicador (PESMA-A y EPVSA); decidir qué objetivos regionales son asumibles como contribución de un Plan Local; migración explícita con historia conservada; pruebas E2E de versiones y revisión humana.
+
+
+## Arquitectura propuesta 0.3: cinco ejes oficiales y tres referencias complementarias
+
+**Contrato de revisión propuesto; no sustituye todavía los contratos ni el módulo 0.2 vigentes.** Especificación ejecutable en `src/domain/action-plan-catalog/BemOfficialArchitecture.ts`, pruebas en `tests/bem-official-references.test.ts`.
+
+### Objetivos PESMA-A que vertebrarían la línea
+
+| Código original | Objetivo oficial | Rol de la planificación local | Indicadores oficiales |
+|---|---|---|---|
+| PESMA-A OE01 | Aumentar el bienestar emocional de la población andaluza. | Promoción comunitaria, educación y medición | IBSE (>16 años), KIDSCREEN infantil (8–16), indicadores de P.01.02 |
+| PESMA-A OE02 | Mejorar la detección y atención precoz de las personas con problemas de adicciones y/o salud mental. | Formación y orientación comunitaria, sin diagnóstico clínico | No se hereda automáticamente un indicador asistencial autonómico |
+| PESMA-A OE04 | Disminuir las conductas suicidas y su impacto social. | Sensibilización y coordinación para prevención | Indicadores clínicos del PESMA requieren fuente sanitaria institucional |
+| PESMA-A OE05 | Fomentar un modelo comunitario y mejorar la coordinación Salud Mental, Adicciones y Atención Primaria (proceso asistencial de ansiedad, depresión y somatizaciones). | Coordinación interinstitucional bajo acuerdos | No presentar las derivaciones a GRAFA/GRUSE como indicador PESMA sin acuerdo |
+| PESMA-A OE10 | Mejorar la inclusión social de las personas con problemas de salud mental y/o adicciones en colaboración con el tejido asociativo, mediante la reducción del estigma y la discriminación y fomentando la participación social. | Colaboración con asociaciones, participación y reducción del estigma | No equiparar recuentos de actividades a indicadores oficiales de inclusión |
+
+Se preservan **sus códigos OE01/OE02/OE04/OE05/OE10**, en lugar de crear cinco títulos COMPÁS y declararlos oficiales. **PESMA-A OE03** (salud física de personas con problemas de salud mental) se conserva como referencia transversal o de colaboración sanitaria, pero no se activa como obligación clínica municipal. Lo mismo ocurre con líneas asistenciales especializadas del Plan. La selección no supone adopción automática de las ocho referencias por un municipio.
+
+### Referencias de la EPVSA que acompañarían a los ejes PESMA-A
+
+| Código original | Objetivo oficial | Indicadores y fuente |
+|---|---|---|
+| EPVSA OE1.4 | Incrementar la percepción de calidad de vida y de bienestar emocional | 1.4.3.a, componente mental SF-12; 1.4.5.a, bajo apoyo social y afectivo; Encuesta Andaluza de Salud |
+| EPVSA OE1.6 | Disminuir el tiempo dedicado al uso de aparatos electrónicos, en detrimento del tiempo dedicado a familiares y amistades | 1.6.3.a, menores de 8–15 años, por EAS; transversal, no objetivo específico de salud mental |
+| EPVSA OE1.7 | Incrementar las recomendaciones a la ciudadanía sobre activos comunitarios que facilitan una vida saludable | 1.7.1.a, recomendaciones desde el SSPA; no es número de fichas Localiza |
+
+### Jerarquía y competencias
+
+1. **Objetivo oficial:** texto/código invariable enlazado a fuente, página y versión.
+2. **Programa oficial:** por ejemplo P.01.02, P.04.01, P.05.02, P.10.01; conservar código y nivel de cada objetivo programático.
+3. **Contribución del Plan Local:** acuerdo de colaboración, actuación municipal, agente responsable y plazo. Es una actuación territorial, **no** otro objetivo oficial renombrado.
+4. **Indicador oficial:** fuente primaria, unidad, población, método, línea base y grado de disponibilidad. La misma herramienta (IBSE, Duke) no basta para afirmar comparabilidad.
+5. **Indicador local complementario:** registro separado, con denominación propia y sin equivalencia falsa.
+6. **Validación y vigencia:** decisiones humanas separadas, no heredadas automáticamente de BEM 0.2.
+
+El plan contiene otra línea de **Prevención y abordaje de las adicciones**. Los programas compartidos del PESMA-A se referencian desde ambas líneas con **una sola identidad programática oficial**; no deben duplicarse los indicadores nacionales/autonómicos bajo nuevos códigos.
+
+### Condiciones pendientes para activar 0.3
+
+- Selección deliberativa de ejes pertinentes y responsables territoriales; no asumir los cinco en todos los municipios.
+- Contraste oficial de texto específico e indicadores de programas seleccionados.
+- Especificación de fuente, periodicidad, disponibilidad y comparabilidad para cada indicador.
+- Migración explícita, reversible y auditada de los borradores/fichas 0.2; ninguna validación transferida silenciosamente.
+- Ensayo E2E con municipio no productivo y verificación de lectura tras guardar en Firebase.
+- Aprobación humana de la estructura y sus competencias.
+
+**Estado:** la arquitectura candidata y las pruebas están versionadas, pero **no se ha modificado el módulo operativo ni desplegado la nueva clasificación**.
+
+### Fuentes contrastadas con las páginas originales
+
+- PESMA-A versión aprobada, objetivos OE01–OE05, página impresa 129; OE10, página 131; programas P.01.02, páginas 137–138; indicadores OE01, página 333. [PDF oficial](https://www.juntadeandalucia.es/sites/default/files/inline-files/2026/05/PESMAA.pdf).
+- EPVSA, cuadro de indicadores páginas 2–3, códigos OE1.4, OE1.6, OE1.7 y 1.4.3.a/1.4.5.a/1.6.3.a/1.7.1.a. [PDF oficial](https://cdn.juntadeandalucia.es/sites/default/files/inline-files/2024/04/INDICADORES_EstrategiaVidaSaludable_02abril2024.pdf).
