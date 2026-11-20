@@ -284,7 +284,7 @@ type LoaderOptions = {
 };
 
 const DOCUMENT_KINDS: { value: DocumentKind; label: string }[] = [
-  { value: "health-report",             label: "Informe de Salud" },
+  { value: "health-report",             label: "Informe sobre la situación de salud" },
   { value: "complementary-study",       label: "Estudio complementario" },
   { value: "localiza-salud",            label: "Localiza Salud" },
   { value: "strategic-framework",       label: "Marco estratégico y normativo" },
@@ -578,7 +578,8 @@ export default function App() {
   const [plainText, setPlainText] = useState("");
   const [kind, setKind] = useState<DocumentKind>("territorial-documentation");
   // Sala de control del diagnóstico: secciones de detalle abiertas.
-  const [openDiagModules, setOpenDiagModules] = useState<ReadonlySet<DiagnosisSectionId>>(() => new Set(["studies"]));
+  const [openDiagModules, setOpenDiagModules] = useState<ReadonlySet<DiagnosisSectionId>>(() => new Set());
+  const [diagnosisWorkspaceOpen, setDiagnosisWorkspaceOpen] = useState(false);
   const toggleDiagnosisModule = useCallback((id: DiagnosisSectionId, open: boolean) => {
     setOpenDiagModules((previous) => {
       const next = new Set(previous);
@@ -703,6 +704,7 @@ export default function App() {
 
   const openDiagnosisModule = useCallback((module: DiagnosisModuleId) => {
     const section = DIAGNOSIS_SECTION_OF_MODULE[module];
+    setDiagnosisWorkspaceOpen(true);
     toggleDiagnosisModule(section, true);
     requestAnimationFrame(() => document.getElementById(`diag-mod-${section}`)?.scrollIntoView({ behavior: "smooth", block: "start" }));
   }, [toggleDiagnosisModule]);
@@ -4045,7 +4047,7 @@ export default function App() {
         />
       )}
 
-      <main className={view === "inicio" ? "app-shell app-shell--home" : "app-shell"}>
+      <main className={view === "inicio" ? "app-shell app-shell--home" : view === "repositorio" && !diagnosisWorkspaceOpen ? "app-shell app-shell--diagnosis-cover" : "app-shell"}>
         {/* Selector de municipio (se muestra sobre cualquier vista) */}
         {showMunicipalitySelector && (
           <section className="municipality-selector">
@@ -4208,10 +4210,16 @@ export default function App() {
                   summary={summary}
                   kindLabels={DOCUMENT_KINDS}
                   onOpenModule={openDiagnosisModule}
+                  onOpenWorkspace={() => { setDiagnosisWorkspaceOpen(true); toggleDiagnosisModule("documents", true); requestAnimationFrame(() => document.getElementById("diagnosis-workspace")?.scrollIntoView({behavior:"smooth",block:"start"})); }}
                 />
               );
             })()}
 
+            {diagnosisWorkspaceOpen && <section className="diagnosis-workspace" id="diagnosis-workspace" aria-label="Documentación y herramientas del diagnóstico">
+              <div className="diagnosis-workspace__toolbar">
+                <strong>Documentación y herramientas de {municipality.name}</strong>
+                <button type="button" onClick={() => { setDiagnosisWorkspaceOpen(false); setOpenDiagModules(new Set()); window.scrollTo({top:0,behavior:"auto"}); }}>Cerrar detalle y volver a la portada</button>
+              </div>
             {/* Acceso al IBSE y SAM consolidado en la navegación de cuatro áreas.
                 No repetir una segunda tarjeta IBSE ni otra cifra fuera de Estudios. */}
             {/* Punto único de control de todo el archivo documental, incluidos activos y CSV. */}
@@ -4307,7 +4315,7 @@ export default function App() {
             </details>
 
             {/* ── Detalle por módulo: paneles existentes, plegados ── */}
-            <DiagnosisModuleSection id="diag-mod-health-report" title="Informe de Salud" description="Visor del Informe incorporado" open={openDiagModules.has("health-report")} onToggle={(open) => toggleDiagnosisModule("health-report", open)}>
+            <DiagnosisModuleSection id="diag-mod-health-report" title={`Informe sobre la situación de salud de ${municipality.name}`} description="Visor del Informe incorporado" open={openDiagModules.has("health-report")} onToggle={(open) => toggleDiagnosisModule("health-report", open)}>
               <HealthReportViewer
                 healthReport={runtime.workspace.healthReport}
                 repository={runtime.workspace.repository}
@@ -4446,6 +4454,7 @@ export default function App() {
                 </button>
               </div>
             </section>
+            </section>}
           </>
         )}
 
