@@ -52,6 +52,7 @@ const IBSE_FACTORS: Array<{
 
 export function IBSEPanel({ ibseStudy, municipalityName }: IBSEPanelProps) {
   if (ibseStudy === undefined) return null;
+  if (ibseStudy.aggregates.nValid === 0) return <section className="study-report" role="alert"><h3>IBSE no evaluable</h3><p>El CSV registrado no contiene respuestas puntuables. El 0/100 no es un indicador de bienestar y no se presentarán factores, comparaciones ni SAM calculados a partir de él.</p><p>Fuente: {ibseStudy.sourceFileName}</p></section>;
 
   const module = IBSE_MODULE;
   const note = module.institutionalNote;
