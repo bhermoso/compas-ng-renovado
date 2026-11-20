@@ -11723,3 +11723,24 @@ h3 {
   .app-nav__context-label { font-size: .67rem; }
 }
 
+
+/* La estadística territorial es una fuente de Diagnóstico, no una pestaña del Perfil. */
+.diagnosis-territorial-statistics > summary {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  cursor: pointer;
+  color: var(--texto-principal);
+}
+.diagnosis-territorial-statistics > summary span {
+  font-size: .84rem;
+  color: var(--texto-secundario);
+}
+.diagnosis-territorial-statistics > summary:focus-visible {
+  outline: 3px solid var(--azul);
+  outline-offset: 3px;
+}
+.diagnosis-territorial-statistics[open] > summary {
+  margin-bottom: 18px;
+}
