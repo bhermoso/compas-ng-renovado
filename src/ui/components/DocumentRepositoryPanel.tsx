@@ -60,6 +60,8 @@ function sortWithinCategory(docs: MunicipalDocument[]): MunicipalDocument[] {
 
 interface DocumentRepositoryPanelProps {
   repository: MunicipalDocumentRepository;
+  /** El catálogo principal del diagnóstico ya muestra todos los documentos. */
+  hideRepeatedListings?: boolean;
   onDelete?: (documentId: string) => void;
   libraryDocuments?: CompasLibraryDocument[];
   libraryMessage?: string | null;
@@ -200,6 +202,7 @@ function LibraryDocumentRow({
 
 export function DocumentRepositoryPanel({
   repository,
+  hideRepeatedListings = false,
   onDelete,
   libraryDocuments,
   libraryMessage,
@@ -236,7 +239,7 @@ export function DocumentRepositoryPanel({
 
   return (
     <>
-      {catalogDocs.length > 0 && (
+      {!hideRepeatedListings && catalogDocs.length > 0 && (
         <section className="workspace-panel">
           <h2>Informe, estudios y activos del expediente</h2>
           <p>Consulta los originales, el texto conservado y las referencias del informe de salud, los estudios y los activos. Las demás fuentes y los marcos estratégicos se listan en sus apartados, más abajo. <strong>Registrar un documento no implica conservar su archivo ni aprobarlo.</strong></p>
@@ -314,7 +317,7 @@ export function DocumentRepositoryPanel({
         </section>
       )}
 
-      <section className="workspace-panel">
+      {!hideRepeatedListings && <section className="workspace-panel">
         <div className="panel-header">
           <div>
             <p className="eyebrow">Diagnóstico territorial</p>
@@ -344,9 +347,9 @@ export function DocumentRepositoryPanel({
             ))}
           </div>
         )}
-      </section>
+      </section>}
 
-      {strategicDocs.length > 0 && (
+      {!hideRepeatedListings && strategicDocs.length > 0 && (
         <section className="workspace-panel">
           <div className="panel-header">
             <div>

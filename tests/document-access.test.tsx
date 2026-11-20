@@ -22,6 +22,13 @@ describe('Acceso a documentos del repositorio', () => {
   expect(html).not.toContain('Todos los documentos del expediente');
   expect(html).toContain('Otras fuentes documentales');
  });
+ it('en Diagnóstico evita repetir los documentos ya presentes en el catálogo principal',()=>{
+  const html = renderToStaticMarkup(<DocumentRepositoryPanel repository={repository} hideRepeatedListings/>);
+  expect(html).not.toContain('Informe, estudios y activos del expediente');
+  expect(html).not.toContain('Otras fuentes documentales');
+  expect(html).not.toContain('Marcos estratégicos para Plan de Acción');
+  expect(html).not.toContain('Abrir catálogo');
+ });
  it('lista cada documento en un solo lugar',()=>{
   const html = renderToStaticMarkup(<DocumentRepositoryPanel repository={repository}/>);
   for (const document of repository.documents) expect(html.split(`>${document.title}</h3>`).length - 1).toBe(1);

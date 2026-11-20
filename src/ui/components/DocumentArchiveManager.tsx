@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
-import type { MunicipalDocumentRepository, MunicipalDocument } from "../../domain/repository";
+import type { MunicipalDocumentRepository, MunicipalDocument, DocumentCycle } from "../../domain/repository";
 import type { EvidenceAtom } from "../../domain/evidence";
 import { DocumentReference } from "./Documentation";
+import { DocumentCycleControl } from "./DocumentCycleControl";
 import { KIND_LABEL } from "./documentRepositoryCategorization";
 import "./DocumentArchiveManager.css";
 
@@ -12,6 +13,7 @@ interface Props {
   canWrite: boolean;
   persistence: string;
   originalCapacity: string;
+  onSetDocumentCycle?: (documentId: string, cycle: DocumentCycle | undefined) => void;
   onOpenUploader: () => void;
   onOpenAssetValidations: () => void;
 }
@@ -20,7 +22,7 @@ type Scope = "all" | "active" | "archived" | "assets" | "studies";
 const isActive = (d: MunicipalDocument) => d.status !== "archived" && d.status !== "rejected";
 
 /** Un punto de acceso a TODA la documentación, no solamente a las fuentes 'otras'. */
-export function DocumentArchiveManager({ repository, evidence, originalIds, canWrite, persistence, originalCapacity, onOpenUploader, onOpenAssetValidations }: Props) {
+export function DocumentArchiveManager({ repository, evidence, originalIds, canWrite, persistence, originalCapacity, onOpenUploader, onOpenAssetValidations, onSetDocumentCycle }: Props) {
   const [query, setQuery] = useState("");
   const [scope, setScope] = useState<Scope>("all");
   const [open, setOpen] = useState(true);
@@ -54,7 +56,7 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
         <button type="button" onClick={onOpenAssetValidations}>Revisar validaciones de activos</button>
         <button type="button" aria-expanded={open} onClick={() => setOpen(v => !v)}>{open ? "Contraer catálogo" : "Mostrar catálogo y buscar"}</button>
       </div>
-      <p className="dam__foot">La cantidad de fichas no tiene un máximo fijo, pero los archivos originales tienen límites de capacidad: 20 MB por archivo y 40 MB compartidos con los originales del Perfil. La transcripción conservada no acredita el DOCX o PDF original. Las reconstrucciones deben conservar su procedencia y no sustituir el original.</p>
+      <details className="dam__limits"><summary>Capacidad y custodia documental</summary><p>20 MB por archivo y 40 MB compartidos con el Perfil. Una transcripción o reconstrucción no acredita el original.</p></details>
       <p className="dam__persistence" role="status">Persistencia: {persistence || "sin confirmación reciente"}. {canWrite ? "Las operaciones documentales se confirman en Firebase desde cada ficha." : "Las operaciones de escritura no están disponibles en esta sesión."}</p>
       {open && <>
         <div className="dam__filters">
@@ -71,11 +73,11 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
             <td>{d.status === "archived" ? "Archivado" : d.status === "validated" ? "Validado" : d.status === "rejected" ? "Rechazado" : "Registrado"}</td>
             <td>{originals.has(d.id) ? "Archivo compartido" : "Archivo no compartido"}{d.sourceText?.trim() ? " · Texto conservado" : ""}</td>
             <td>{countOf(d.id)} evidencias{validationCount(d.id) ? ` · ${validationCount(d.id)} validaciones de activos` : ""}{d.revisionOf ? " · revisión" : ""}</td>
-            <td><DocumentReference documentId={d.id}>Abrir ficha y operaciones</DocumentReference></td>
+            <td><DocumentReference documentId={d.id}>Abrir ficha</DocumentReference>{onSetDocumentCycle && canWrite && <details className="dam__cycle"><summary>Declarar ciclo</summary><DocumentCycleControl cycle={d.cycle} onChange={cycle=>onSetDocumentCycle(d.id,cycle)}/></details>}</td>
           </tr>)}</tbody>
         </table></div>
         {!filtered.length && <p>No hay documentos con ese criterio.</p>}
-        <p className="dam__foot">Desde «Abrir ficha y operaciones» puedes descargar o reponer el original, incorporar una versión nueva, archivar o eliminar con confirmación, según permisos. Para cargas nuevas utiliza «Cargar otro documento».</p>
+        
       </>}
     </section>
   );
