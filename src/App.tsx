@@ -4212,20 +4212,8 @@ export default function App() {
               );
             })()}
 
-            {runtime.workspace.ibseStudy && (
-              <section className="workspace-panel" aria-label="Acceso directo a resultados IBSE">
-                <div className="panel-header">
-                  <div>
-                    <p className="eyebrow">Estudio cargado · Índice de bienestar socioemocional</p>
-                    <h2>IBSE de {municipality.name}</h2>
-                    <p>{runtime.workspace.ibseStudy.aggregates.nValid > 0 ? `${runtime.workspace.ibseStudy.aggregates.nValid} respuestas válidas · Índice observado: ${runtime.workspace.ibseStudy.aggregates.meanTotal}/100` : "Estudio inconsistente: 0 respuestas válidas. No interpretar el índice 0 como resultado de bienestar."}</p>
-                  </div>
-                  <button type="button" onClick={() => openDiagnosisModule("studies")}>
-                    Ver resultados y tripirámide SAM
-                  </button>
-                </div>
-              </section>
-            )}
+            {/* Acceso al IBSE y SAM consolidado en la navegación de cuatro áreas.
+                No repetir una segunda tarjeta IBSE ni otra cifra fuera de Estudios. */}
             {/* Punto único de control de todo el archivo documental, incluidos activos y CSV. */}
             <DocumentArchiveManager
               repository={runtime.workspace.repository}
