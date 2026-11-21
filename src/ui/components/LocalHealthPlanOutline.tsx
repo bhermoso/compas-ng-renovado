@@ -93,7 +93,7 @@ export function LocalHealthPlanOutline({
       <section className="pie-doc-section">
         <h3>1. Identidad y alcance</h3>
         <p>
-          Documento de trabajo para ordenar el ciclo de planificación local en salud del
+          Documento de trabajo para ordenar el ciclo de planificación local en salud de{" "}
           {territorialName} durante 2027–2030.
         </p>
       </section>
