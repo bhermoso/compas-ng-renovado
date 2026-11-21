@@ -87,9 +87,8 @@ function UnaddressedNeedsEditor({
 
   return (
     <section
-      className="card"
+      className="card pcm-unaddressed-needs"
       aria-label="Necesidades no priorizadas (G-PLS-7)"
-      style={{ marginTop: "1.5rem" }}
     >
       <h3 style={{ marginTop: 0 }}>Necesidades no priorizadas · G-PLS-7</h3>
       <p className="panel-note">
@@ -142,6 +141,9 @@ function UnaddressedNeedsEditor({
         </p>
       ) : null}
 
+      {/* El formulario se pliega: el estado de G-PLS-7 queda visible arriba. */}
+      <details className="pcm-unaddressed-form">
+      <summary>Documentar necesidades no priorizadas</summary>
       <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem", flexWrap: "wrap" }}>
         <button type="button" onClick={handleNoneLeft}>
           Ninguna necesidad quedó fuera
@@ -186,6 +188,7 @@ function UnaddressedNeedsEditor({
           </button>
         </div>
       </fieldset>
+      </details>
 
       {message && (
         <p role="status" style={{ marginTop: "0.5rem", fontSize: "0.875rem" }}>
@@ -218,17 +221,18 @@ function groupTraceabilityByBlock(links: ActionPlanTraceabilityLink[]): Array<{
   return Array.from(byBlock.values());
 }
 
-export function DefinitiveActionPlanPreview({municipalityId, modules, drafts, worksheets = [], validatedActionPlans, onValidatePlan, onDeletePlanVersion, onDraftChange}: {
+export function DefinitiveActionPlanPreview({municipalityId, municipalityName: visibleName, modules, drafts, worksheets = [], validatedActionPlans, onValidatePlan, onDeletePlanVersion, onDraftChange}: {
   validatedActionPlans?: import("../../domain/action-plan-catalog/PlanDocument").PlanDocument[];
   onValidatePlan?: (document: import("../../domain/action-plan-catalog/PlanDocument").PlanDocument) => boolean;
   onDeletePlanVersion?: (document: import("../../domain/action-plan-catalog/PlanDocument").PlanDocument) => Promise<boolean>;
   onDraftChange?: (draft: PlanPreparationDraft) => void;
   municipalityId: string;
+  municipalityName?: string;
   modules: ActionPlanCatalogModule[];
   drafts?: PlanPreparationDraft[];
   worksheets?: IndicatorWorksheet[];
 }) {
-  const municipalityName = municipalityId === "granada-zaidin" ? "El Zaidín" : municipalityId;
+  const municipalityName = municipalityId === "granada-zaidin" ? "El Zaidín" : visibleName ?? municipalityId;
   const active = useMemo(() => buildDefinitiveActionPlanProjection(municipalityId, modules, drafts), [municipalityId, modules, drafts]);
   const traceability = useMemo(() => buildActionPlanTraceability(municipalityId, active, worksheets), [municipalityId, active, worksheets]);
 

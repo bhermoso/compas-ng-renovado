@@ -11303,6 +11303,152 @@ h3 {
   .diagnosis-page.hp { grid-template-columns: minmax(0, 1fr); }
 }
 
+/* Plan de Acción comparte la portada de Inicio y el ritmo de columnas de
+   Diagnóstico: una columna de color por sección; la sección abierta ocupa el
+   ancho completo y su contenido solo se monta al abrirla. */
+.plan-page.hp {
+  display: grid;
+  grid-template-columns: repeat(var(--plan-cols, 4), minmax(0, 1fr));
+  align-content: start;
+  align-items: start;
+  gap: clamp(12px, 2vh, 24px) 16px;
+  padding: clamp(18px, 4vh, 48px) clamp(16px, 4vw, 40px);
+}
+.plan-page > .hp-cover,
+.plan-page > details[open] { grid-column: 1 / -1; }
+.plan-page > .hp-phase { min-width: 0; }
+.plan-page > details > summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  align-content: start;
+  min-height: 68px;
+  padding: 10px 0 8px;
+  list-style: none;
+  cursor: pointer;
+}
+.plan-page > details > summary::-webkit-details-marker { display: none; }
+.plan-page > details > summary strong { font-size: .94rem; line-height: 1.25; }
+.plan-page > details > summary span {
+  grid-row: 2;
+  font-size: .8rem;
+  line-height: 1.35;
+  color: var(--texto-secundario);
+}
+.plan-page > details > summary::after {
+  content: "▼" / "";
+  grid-column: 2;
+  grid-row: 1;
+  color: var(--azul-profundo);
+  font-size: .72rem;
+}
+.plan-page > details[open] > summary::after { content: "▲" / ""; }
+.plan-page > details > summary:focus-visible { outline: 2px solid var(--azul); outline-offset: 3px; }
+.plan-page__body { padding: 14px 0; border-top: 1px solid var(--borde); }
+@media (max-width: 960px) {
+  .plan-page.hp { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .plan-page.hp { gap: 8px 12px; }
+  .plan-page.workspace-page.hp { padding-block: 12px; }
+  .plan-page > details > summary { min-height: 0; }
+}
+@media (max-width: 350px) {
+  .plan-page.hp { grid-template-columns: minmax(0, 1fr); }
+}
+/* Interior de las secciones del Plan: la jerarquía de la portada, sin cajas
+   anidadas ni controles con el estilo por defecto del navegador. */
+/* Prefijo con #root para prevalecer sobre «#root .app-shell:not(.app-shell--home) .workspace-panel». */
+#root .hp.plan-page .plan-page__body .workspace-panel {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.plan-page__body .pcm-catalog-header { display: grid; gap: 6px; padding-bottom: 8px; }
+.plan-page__body .pcm-catalog-header .hp-cover__section-title { font-size: 1.2rem; line-height: 1.25; margin: 0; }
+.plan-page__body .pcm-catalog-header .hp-cover__rule { margin: 2px 0 4px; }
+.plan-page__body .pcm-catalog-header .pcm-help-fold { margin: 0; }
+.plan-page__body .pcm-catalog-header .pcm-help-fold > summary { font-size: .86rem; }
+#root .hp.plan-page .plan-page__body .pcm-preparation {
+  border-top: 1px solid var(--borde);
+  padding: 2px 0;
+}
+.plan-page__body .pcm-line-fold > summary { padding: 6px 0; }
+.plan-page__body .pcm-definitive-plan { display: grid; gap: 12px; }
+.plan-page__body .plan-document-actions {
+  display: grid;
+  gap: 8px;
+  padding: 0 0 12px;
+  border-bottom: 1px solid var(--borde);
+}
+.plan-page__body .plan-document-actions h3 { font-size: 1rem; margin: 0; }
+.plan-page__body .plan-document-actions p { margin: 0; font-size: .86rem; color: var(--texto-secundario); }
+.plan-page__body .plan-document-actions label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-size: .86rem;
+  color: var(--texto-secundario);
+}
+.plan-page__body .plan-document-actions input {
+  flex: 1 1 220px;
+  min-height: 36px;
+  padding: 4px 8px;
+  border: 1px solid var(--borde);
+  background: var(--blanco);
+  color: var(--texto-principal);
+  font: inherit;
+}
+.plan-page__body .plan-document-actions button,
+.plan-page__body .pcm-definitive-plan > div > button {
+  justify-self: start;
+  padding: 6px 10px;
+  min-height: 36px;
+  border: 1px solid var(--borde);
+  background: var(--blanco);
+  color: var(--azul-profundo);
+  font: inherit;
+  font-size: .86rem;
+  cursor: pointer;
+}
+.plan-page__body .pcm-definitive-plan .plan-document-actions > button,
+.plan-page__body .plan-document-actions > button {
+  border-color: var(--azul-profundo);
+  background: var(--azul-profundo);
+  color: var(--blanco);
+}
+.plan-page__body .plan-document-actions button:disabled { opacity: .55; cursor: default; }
+.plan-page__body .plan-document-actions button:focus-visible,
+.plan-page__body .plan-document-actions input:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+.plan-page__body .plan-document-actions .backup-panel__actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.pcm-unaddressed-needs { margin-top: 1.5rem; }
+#root .hp.plan-page .plan-page__body .pcm-unaddressed-needs {
+  margin: 0;
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 1px solid var(--borde);
+  border-radius: 0;
+  box-shadow: none;
+}
+.plan-page__body .pcm-unaddressed-form > summary { cursor: pointer; color: var(--azul-profundo); font-size: .86rem; font-weight: 650; padding: 4px 0; }
+.plan-page__body .pcm-unaddressed-form[open] > summary { margin-bottom: 8px; }
+.plan-page__body .pcm-unaddressed-form button,
+.plan-page__body .pcm-definitive-plan button {
+  padding: 6px 10px;
+  min-height: 36px;
+  border: 1px solid var(--borde);
+  border-radius: 0;
+  background: var(--blanco);
+  color: var(--azul-profundo);
+  font: inherit;
+  font-size: .86rem;
+  cursor: pointer;
+}
+
 
 /* Diagnóstico editorial: franja de datos y navegación sin tarjetas KPI sobredimensionadas. */
 .diagnosis-control .diagnosis-control__metrics {

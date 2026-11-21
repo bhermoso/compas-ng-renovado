@@ -18,13 +18,15 @@ try {
   await page.locator(".app-nav__tab", { hasText: "Plan de Acción" }).first().click({ timeout: 20000 });
   await page.waitForTimeout(800);
   const h = () => page.evaluate(() => document.documentElement.scrollHeight);
-  const tabs = await page.locator(".plan-tabs__tab").allTextContents();
-  console.log("pestañas:", tabs.join(" | "), "| altura inicial:", await h());
+  const sections = page.locator(".plan-page > details > summary");
+  const tabs = (await sections.allTextContents()).map(t => t.trim());
+  console.log("secciones:", tabs.join(" | "), "| altura inicial:", await h());
+  await sections.first().click(); await page.waitForTimeout(500);
   await page.screenshot({ path: "/tmp/plan-lineas.png", fullPage: true });
   const folds = page.locator(".pcm-line-fold");
   console.log("líneas plegadas:", await folds.count(), "| abiertas:", await page.locator(".pcm-line-fold[open]").count());
   if (await folds.count()) { await folds.first().locator("> summary").click(); console.log("tras abrir una línea, altura:", await h()); }
-  for (const t of tabs.slice(1)) { await page.locator(".plan-tabs__tab", { hasText: t }).click(); await page.waitForTimeout(300); console.log(t, "→ altura", await h()); }
+  for (let i = 1; i < tabs.length; i++) { await sections.nth(i).click(); await page.waitForTimeout(300); console.log(tabs[i], "→ altura", await h(), "| abiertas:", await page.locator(".plan-page > details[open]").count()); }
   await page.screenshot({ path: "/tmp/plan-tabs.png" });
   if (!tabs.length) code = 1;
 } catch (e) { console.log("FALLO", String(e.message).split("\n")[0]); await page.screenshot({ path: "/tmp/plan-tabs-fail.png" }); code = 1; }
