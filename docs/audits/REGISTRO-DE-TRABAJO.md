@@ -22,6 +22,56 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-21 · Dependencias entre líneas del Plan de Acción: instrumentos de recogida
+
+**Publicado al empezar:** `92d9f1bb70508390f94fd28987a6d7693f756774` (#196).
+
+### Hechos observados
+
+- **El responsable detectó el problema** en «Gestionar actuaciones · BEM-I1.1»:
+  se podían elegir los ejes de Envejecimiento.
+- **Reproducido en el navegador** con Atarfe de `public/seeds`. En las fichas
+  de BEM-I1.1 y de ADI-I1.1, «Instrumentos para preparar la recogida»
+  ofrecía los ejes de Envejecimiento saludable (Edadismo, Soledad no deseada,
+  Autonomía, Participación) y la nota «No se han registrado mediciones del
+  Zaidín», con 0 instrumentos.
+- **Causa.** `PlanningInstrumentCatalog` estaba escrito para Envejecimiento:
+  - ejes fijos en el código;
+  - objetivo deducido sustituyendo `ENV-I` por `ENV-OE`.
+  - Todos los instrumentos de `PlanningInstruments.ts` pertenecen a objetivos
+    `ENV-`.
+- **El contenido de Bienestar emocional y salud mental es propio.** Su objetivo
+  sobre soledad no deseada (BEM-OG2) procede de la EPVSA (indicador 1.4.5) y
+  de la Estrategia de Salud Mental del SNS, no del módulo de Envejecimiento.
+- **Las demás referencias a Envejecimiento** en el código del Plan
+  (`ZAIDIN_AGING_PROPOSAL`, `HEALTHY_AGING_MODULE`) se aplican solo a su propio
+  módulo, y a Granada-Zaidín y Zagra.
+- **Las propuestas de actuación** (`ActionWorksheetProposal.ts`) solo existen
+  para indicadores `ENV-` y no aparecen en otras líneas.
+
+### Cambio
+
+- **Cada línea muestra solo los instrumentos de sus propios objetivos.** Los
+  ejes se obtienen de esos instrumentos y no de una lista fija.
+- **Bienestar emocional y Adicciones** muestran ahora que la línea no tiene
+  todavía instrumentos de recogida preparados en COMPÁS, y que el catálogo
+  existente corresponde a Envejecimiento y no se les aplica.
+- **Envejecimiento saludable** conserva su catálogo y sus ejes.
+- Prueba: `tests/planning-instruments-by-line.test.tsx`.
+
+### Pendiente
+
+- Decidir los instrumentos de recogida de Bienestar emocional, por ejemplo
+  el IBSE, que COMPÁS ya explota como estudio complementario, y los de
+  Adicciones. Deben documentarse con versión, población, permisos,
+  preguntas y puntuación.
+- `tests/collection-preparation.smoke.mjs` y
+  `tests/plan-preparation.smoke.mjs` fallan también en `master`: no llegan a
+  la pestaña porque la entrada exige sesión. No están en la integración
+  continua.
+
+---
+
 ## 2026-11-21 · Perfil de Salud Local con el diseño de Inicio
 
 **Publicado al empezar:** `35799144ae8ca68a6235beaee4706c7f3a03a088` (#195).
