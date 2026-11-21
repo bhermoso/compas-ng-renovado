@@ -22,6 +22,8 @@
   --tinta-azul:        #172033;
   --azul-profundo:     #1e3a5f;
   --blanco:            #ffffff;
+  /* Procedencia «propia de COMPÁS» en el catálogo del Plan (texto sobre fondo claro). */
+  --procedencia-propia: #8a5a12;
 
   /* Gramática visual única. Los seis colores del ciclo no se reutilizan
      como fondos de avisos, controles ni tarjetas. */
@@ -11422,7 +11424,7 @@ h3 {
 .profile-page .ep-space.hp-phase--4 { border-top-color: var(--amarillo); }
 .profile-page .ep-space.hp-phase--5 { border-top-color: var(--naranja); }
 .profile-page .ep-space.hp-phase--6 { border-top-color: var(--rojo); }
-.profile-page .ep-space[aria-expanded="true"] { background: var(--fondo-secundario, #f6f8fa); }
+.profile-page .ep-space[aria-expanded="true"] { background: var(--fondo-secundario); }
 .profile-page .ep-space strong,
 .profile-page .external-profile--compact > details.hp-phase > summary strong { font-size: .94rem; line-height: 1.25; }
 .profile-page .ep-space span,
@@ -11730,7 +11732,7 @@ h3 {
 .tp-saved-note {background:transparent;border:0;border-top:1px solid var(--borde);border-radius:0;padding:10px 0}
 .tp-modal {border-radius:2px;box-shadow:0 2px 12px rgba(15,23,42,.09)}
 .tp-modal__header {padding:22px 26px 17px}
-.tp-modal__close {border-radius:2px;background:#fff}
+.tp-modal__close {border-radius:2px;background:var(--blanco)}
 .tp-ranking {gap:0;border-top:1px solid var(--borde)}
 .tp-ranking__row,
 .tp-ranking__row--top5 {
@@ -11760,7 +11762,7 @@ h3 {
 .plan-psl-provenance--stale {border-left-color:var(--naranja)}
 .pcm-line-decision,.pcm-tree-module,.pcm-indicator,
 .pcm-traceability-card,.pcm-general,.pcm-specific {
-  background:#fff;border:0;border-bottom:1px solid var(--borde);
+  background:var(--blanco);border:0;border-bottom:1px solid var(--borde);
   border-radius:0;box-shadow:none;
 }
 .pcm-general > summary {background:transparent;border-bottom:1px solid var(--borde)}
@@ -11768,7 +11770,7 @@ h3 {
 .pcm-line-decision {padding:12px 0}
 .pcm-specific {padding:12px 0}
 .pcm-save-row button {
-  background:#fff;color:var(--azul);
+  background:var(--blanco);color:var(--azul);
   border:1px solid var(--borde);border-left:3px solid var(--azul);
   border-radius:0;font-weight:600;
 }
@@ -11799,7 +11801,7 @@ h3 {
 .status-pill--partial {border-bottom-color:var(--amarillo)}
 .pipeline-empty-notice {border:0;border-top:1px solid var(--borde);border-radius:0;background:transparent;padding:14px 0}
 .exp-card__goto,.exp-card__goto:hover {
-  background:#fff;border:1px solid var(--borde);
+  background:var(--blanco);border:1px solid var(--borde);
   border-left:3px solid var(--azul);border-radius:0;color:var(--azul);
 }
 
@@ -11812,7 +11814,7 @@ h3 {
   border-bottom:2px solid var(--azul);box-shadow:none;
 }
 .document-review-inbox__editor,.document-review-inbox__import {
-  border:1px solid var(--borde);border-radius:0;background:#fff;
+  border:1px solid var(--borde);border-radius:0;background:var(--blanco);
 }
 .document-review-inbox__editor input,
 .document-review-inbox__editor select{border-radius:0}
@@ -11893,11 +11895,11 @@ h3 {
   border-radius:0;padding:12px 0;color:var(--texto-principal);
 }
 .ges-btn--danger,.ges-btn--danger:hover {
-  background:#fff;border:1px solid var(--borde);border-left:3px solid var(--rojo);
+  background:var(--blanco);border:1px solid var(--borde);border-left:3px solid var(--rojo);
   border-radius:0;color:var(--rojo);
 }
 .pai-objetivo--sin-cobertura,.pai-tension {
-  background:#fff;border:0;border-left:2px solid var(--amarillo);
+  background:var(--blanco);border:0;border-left:2px solid var(--amarillo);
   border-bottom:1px solid var(--borde);border-radius:0;
 }
 
@@ -11946,7 +11948,7 @@ h3 {
 .plan-document-versions__row button{
   border:1px solid var(--borde);
   border-radius:0;
-  background:#fff;
+  background:var(--blanco);
   color:var(--azul);
   min-height:31px;
   font-size:12px;
@@ -11978,9 +11980,9 @@ h3 {
 .study-strata-table th:first-child, .study-strata-table thead th:first-child { text-align: left; }
 
 /* Procedencia declarada de cada elemento del catálogo de Plan de Acción */
-.pcm-element-provenance { font-size: 0.8rem; color: var(--texto-secundario, #4b5563); margin: 2px 0 8px; }
+.pcm-element-provenance { font-size: 0.8rem; color: var(--texto-secundario); margin: 2px 0 8px; }
 .pcm-element-provenance span { font-weight: 600; margin-right: 4px; }
-.pcm-element-provenance[data-provenance="propio"] span { color: #8a5a12; }
+.pcm-element-provenance[data-provenance="propio"] span { color: var(--procedencia-propia); }
 
 /* COMPÁS — densidad editorial compartida (portada como referencia).
    Los módulos extensos siguen teniendo scroll natural; no se fija el alto de

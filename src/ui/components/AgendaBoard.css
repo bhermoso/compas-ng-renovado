@@ -110,10 +110,10 @@
 /* COMPÁS · Agenda operativa: tablero funcional, no colección de tarjetas. */
 .agenda-toolbar{padding-bottom:10px;border-bottom:1px solid var(--borde)}
 .agenda-board{gap:0;border:1px solid var(--borde)}
-.agenda-column{background:#fff;border:0;border-right:1px solid var(--borde);border-radius:0}
+.agenda-column{background:var(--blanco);border:0;border-right:1px solid var(--borde);border-radius:0}
 .agenda-column:last-child{border-right:0}
 .agenda-column header{
-  min-height:0;background:#fff;border:0;border-bottom:1px solid var(--borde);
+  min-height:0;background:var(--blanco);border:0;border-bottom:1px solid var(--borde);
   padding:13px 12px 10px;
 }
 .agenda-column--sanitario header,
@@ -122,7 +122,7 @@
 .agenda-column--laboral header {border-bottom:1px solid var(--borde)}
 .agenda-column__body{padding:8px 10px 14px;gap:0}
 .agenda-card{
-  background:#fff;border:0;border-bottom:1px solid var(--borde);
+  background:var(--blanco);border:0;border-bottom:1px solid var(--borde);
   border-radius:0;padding:12px 4px;box-shadow:none;
 }
 .agenda-card:hover{border-color:var(--azul)}
@@ -141,7 +141,7 @@
 .agenda-badge--line {border-bottom-color:var(--azul);color:var(--azul)}
 .agenda-badge--prio-alta {color:var(--texto-principal)}
 .agenda-templates,.agenda-notice,.agenda-timeline,.agenda-catalog__line,.agenda-catalog__program{
-  background:#fff;border:0;border-top:1px solid var(--borde);
+  background:var(--blanco);border:0;border-top:1px solid var(--borde);
   border-radius:0;box-shadow:none;
 }
 .agenda-templates__item {

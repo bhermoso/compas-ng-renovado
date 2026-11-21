@@ -22,6 +22,54 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-21 · Fallos de la suite completa: paso 1
+
+**Publicado al empezar:** `7b47c58a53c89a50bd942f93d35a3632a251dbe0` (#198).
+
+### Clasificación de los 15 fallos (hechos observados)
+
+| Grupo | Fallos | Causa | Resolución |
+|---|---|---|---|
+| Colores literales | 5 | `#fff` y similares en CSS sujeto al contrato de paleta | Sustituidos por variables. `#fff` pasa a `var(--blanco)`, con el mismo valor. El marrón de procedencia «propia» pasa a la variable `--procedencia-propia: #8a5a12`, con el mismo valor. No hay cambio visual. |
+| Pruebas desfasadas tras el rediseño | 6 | Buscaban textos que cambiaron: «Sala de control», «Líneas estratégicas disponibles», «Descargar estas páginas · PDF» y «Objetivo general:»; contaban 30 fichas cuando, con Bienestar emocional, hay 47; esperaban el modo y los rótulos antiguos de edición | Pruebas actualizadas a la función vigente, sin rebajar lo que comprueban; los recuentos se calculan ahora a partir del catálogo |
+| IBSE «se pierde al rehidratar» | 1 | La prueba creaba un estudio sin su documento y el saneamiento lo retira, por diseño | La prueba incluye ahora el documento de origen |
+| Numeración visible del Plan | 1 | El indicador lleva `displayCode` | La prueba compara el contenido sin la numeración visible |
+| **Pendientes** | 3 | Ver abajo | — |
+
+### Comprobado
+
+- Las funciones afectadas existen y responden. Por ejemplo, la descarga de
+  las páginas de datos del Perfil se llama ahora «Guardar páginas en PDF», y
+  la edición directa del Plan funciona (prueba de humo
+  `action-plan-compatibility`).
+- La suite completa pasa de 15 a 3 fallos.
+- Integración continua:
+  - incorpora los 9 ficheros corregidos y 8 pruebas creadas hoy que no
+    estaban;
+  - el bloque pasa a 55 ficheros y 402 pruebas, todas en verde;
+  - se activa también con cualquier cambio en `tests/**`.
+
+### Pendientes
+
+1. **Impresión** (`psl-c-impresion-regimen`): hay dos bloques
+   `@media print` y el contrato exige uno. Paso 2: fusionarlos comparando el
+   PDF antes y después.
+2. **Localiza duplicado** (`document-ingestion-origins`): cargar dos veces el
+   mismo texto duplica los activos.
+   - Decisión del responsable (21/11/2026): es una repetición y se ignora.
+     Paso 2.
+3. **Borrador de versión anterior** (`plan-preparation`, «conserva el
+   borrador anterior y avisa de la revisión editorial»):
+   - el panel muestra solo el aviso «Se conserva sin modificar y no se puede
+     editar» y no enseña la redacción del territorio;
+   - los datos se conservan;
+   - en la aplicación, Granada-Zaidín migra su borrador antes de llegar ahí.
+
+   Decisión pendiente: mostrar esa redacción en solo lectura, o mantener
+   solo el aviso.
+
+---
+
 ## 2026-11-21 · Instrumentos de medición que traen las estrategias
 
 **Publicado al empezar:** `09b92603c21358a89a156772421d2eba8c2d0833` (#197).

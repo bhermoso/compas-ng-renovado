@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { HEALTHY_AGING_MODULE } from "../src/domain/action-plan-catalog/ActionPlanCatalog";
 import { ZAIDIN_AGING_PROPOSAL, createZaidinFinalActionPlanDraft, excludedByAncestor, type PlanPreparationDraft } from "../src/domain/action-plan-catalog/PlanPreparationDraft";
 import { PlanPreparationPanel } from "../src/ui/components/PlanPreparationPanel";
+import { actionPlanElementCode } from "../src/domain/action-plan-catalog/ActionPlanNotation";
 import { createCompleteMunicipalityWorkspace } from "../src/application/workspace";
 import { parseWorkspaceJSON } from "../src/infrastructure/persistence/local-storage";
 import { isEmptyWorkspaceForPersistenceGuard } from "../src/application/workspace/isEmptyWorkspaceForPersistenceGuard";
@@ -32,8 +33,9 @@ describe("Preparación independiente del Plan", () => {
  const panel = PlanPreparationPanel({module: ZAIDIN_AGING_PROPOSAL, municipalityId: finalDraft.municipalityId, draft: finalDraft, onChange: () => {}, renderWorksheet: () => null});
  const html = renderToStaticMarkup(panel);
  expect(html).toContain("Redacción final del Plan de Acción del Distrito Zaidín");
- expect(html).toContain("Objetivo general:");
- expect(html).toContain("Objetivo específico · OE1.1 (ENV-OE5.1)");
+ expect(html).toContain("Objetivo general · ");
+ // La numeración visible del Plan sustituye al código de catálogo en el encabezado.
+ expect(html).toContain(`Objetivo específico · ${actionPlanElementCode(ZAIDIN_AGING_PROPOSAL, "ENV-OE5.1")}`);
  expect(html).not.toContain("Propuesta inicial de objetivo general");
  expect(html).not.toContain("Usar propuesta inicial");
  expect(finalDraft.decisions[ZAIDIN_AGING_PROPOSAL.id].status).toBe("included");
@@ -46,7 +48,11 @@ describe("Preparación independiente del Plan", () => {
  const next = ZAIDIN_AGING_PROPOSAL.generalObjectives.flatMap(g => g.specificObjectives);
  expect(ZAIDIN_AGING_PROPOSAL.generalObjectives.map(g => g.specificObjectives.length)).toEqual([2,7,4,5]);
  expect(next.map(o => o.code).sort()).toEqual(original.map(o => o.code).sort());
- for (const o of next) expect(o.indicator).toEqual(original.find(x => x.code === o.code)!.indicator);
+ // El contenido del indicador no cambia; solo se añade la numeración visible del Plan (displayCode).
+ for (const o of next) {
+  const { displayCode: _visible, ...indicator } = o.indicator;
+  expect(indicator).toEqual(original.find(x => x.code === o.code)!.indicator);
+ }
  expect(HEALTHY_AGING_MODULE.generalObjectives).toHaveLength(9);
  expect(ZAIDIN_AGING_PROPOSAL.generalObjectives[2].specificObjectives.map(o => o.code)).toContain("ENV-OE9.1");
  });
@@ -98,18 +104,20 @@ describe("Preparación independiente del Plan", () => {
  it("guarda inmediatamente la redacción modificada sin crear revisión administrativa", () => {
  const changes: PlanPreparationDraft[] = [];
  const source = ZAIDIN_AGING_PROPOSAL.generalObjectives[0].specificObjectives[1].title;
- const first = PlanPreparationPanel({module: ZAIDIN_AGING_PROPOSAL, municipalityId: draft.municipalityId, onChange: next => changes.push(next), renderWorksheet: () => null});
- const select = findElement(first, element => element.type === "select" && element.props["aria-label"] === "Estado del Plan ENV-OE5.2");
+ // Edición territorial directa (canEditProposal sin canReview), como en la pestaña Plan de Acción.
+ const code = actionPlanElementCode(ZAIDIN_AGING_PROPOSAL, "ENV-OE5.2");
+ const first = PlanPreparationPanel({module: ZAIDIN_AGING_PROPOSAL, municipalityId: draft.municipalityId, canEditProposal: true, onChange: next => changes.push(next), renderWorksheet: () => null});
+ const select = findElement(first, element => element.type === "select" && element.props["aria-label"] === `Estado del Plan ${code}`);
  expect(select).toBeDefined();
  (select!.props.onChange as (event: {target: {value: string}}) => void)({target: {value: "modified"}});
  expect(changes).toHaveLength(1);
  expect(changes[0].decisions["ENV-OE5.2"]).toMatchObject({status: "modified", sourceText: source, text: source});
  expect(changes[0].decisions[ZAIDIN_AGING_PROPOSAL.id]).toMatchObject({status: "included"});
  expect(changes[0].decisions[ZAIDIN_AGING_PROPOSAL.generalObjectives[0].code]).toMatchObject({status: "included"});
- const second = PlanPreparationPanel({module: ZAIDIN_AGING_PROPOSAL, municipalityId: draft.municipalityId, draft: changes[0], onChange: next => changes.push(next), renderWorksheet: () => null});
- const textarea = findElement(second, element => element.type === "textarea" && element.props["aria-label"] === "Redacción vigente · ENV-OE5.2");
+ const second = PlanPreparationPanel({module: ZAIDIN_AGING_PROPOSAL, municipalityId: draft.municipalityId, draft: changes[0], canEditProposal: true, onChange: next => changes.push(next), renderWorksheet: () => null});
+ const textarea = findElement(second, element => element.type === "textarea" && element.props["aria-label"] === `Redacción vigente · ${code}`);
  expect(textarea).toBeDefined();
- const saveButton = findElement(second, element => element.type === "button" && element.props["aria-label"] === "Guardar redacción vigente · ENV-OE5.2");
+ const saveButton = findElement(second, element => element.type === "button" && String(element.props["aria-label"] ?? "").includes(code));
  expect(saveButton).toBeDefined();
  (textarea!.props.onChange as (event: {target: {value: string}}) => void)({target: {value: "Texto definitivo de prueba"}});
  expect(changes).toHaveLength(2);
