@@ -40,7 +40,7 @@ import { BackupPanel } from './ui/components/BackupPanel';
 import { DocumentationProvider } from "./ui/components/Documentation";
 import type { PlanPreparationDraft } from "./domain/action-plan-catalog/PlanPreparationDraft";
 import { worksheetKey, type IndicatorWorksheet } from "./domain/action-plan-catalog/IndicatorWorksheet";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { type CycleConciliation, type AssetValidationDeclaration, type DocumentCycle, type DocumentKind, type DocumentTemporalMetadata, type MunicipalDocument, type MunicipalDocumentRepository, addMunicipalDocument, setMunicipalDocumentCycle, addCycleConciliation, addAssetValidation, removeAssetValidation, renameMunicipalDocument, removeCycleConciliation, replaceMunicipalDocumentByKind, removeMunicipalDocument, setMunicipalDocumentTemporalMetadata } from "./domain/repository";
 import { type MunicipalityWorkspace } from "./domain/workspace";
 import { type QuestionnaireProject } from "./domain/questionnaire";
@@ -258,6 +258,8 @@ const NAV_ITEMS: { id: AppView; label: string; phase?: string }[] = [
   { id: "evaluacion",    label: "Evaluación", phase: "06" },
   { id: "ges",           label: "Gestor de Encuestas" },
 ];
+type PlanSection = "lineas" | "resultante" | "lectura" | "prioridades" | "borrador";
+
 /** En escritorio una etiqueta larga se parte en dos líneas por un punto fijo
  * («Perfil de / Salud Local»), nunca en tres; el texto accesible no cambia. */
 const NAV_LABEL_BREAKS: Record<string, [string, string]> = {
@@ -443,7 +445,7 @@ export default function App() {
       : "inicio";
   });
   const [agendaFocusId, setAgendaFocusId] = useState<string | undefined>(undefined);
-  const [planTab, setPlanTab] = useState<"lineas" | "resultante" | "lectura" | "prioridades" | "borrador">("lineas");
+  const [planTab, setPlanTab] = useState<PlanSection | null>(null);
   const profileSaveInFlightRef = useRef(false);
   // Evita volver a escribir automáticamente el mismo expediente ya confirmado
   // por el guardado manual (incluidos todos los originales en base64).
@@ -4493,7 +4495,98 @@ export default function App() {
           </section>
         )}
 
-        {view !== "inicio" && view !== "repositorio" && (
+        {/* ── ⑦ Plan de Acción: portada común y una columna por sección, como Diagnóstico ── */}
+        {view === "plan" && (() => {
+          const catalog = (section: "lineas" | "resultante") => (
+            <ActionPlanCatalogPanel
+              section={section}
+              municipalityId={workspace.municipality.identity.id}
+              municipalityName={municipality.name}
+              lectura={runtime.lectura ?? undefined}
+              selection={runtime.lectura ? workspace.deliberativePrioritySelection : undefined}
+              eligibleModules={runtime.lectura ? runtime.eligibleActionPlanModules : []}
+              reviews={workspace.actionPlanModuleReviews ?? []}
+              validatedActionPlans={workspace.validatedActionPlans ?? []}
+              onDeletePlanVersion={documentWriteAllowed ? handleDeleteValidatedPlanVersion : undefined}
+              onValidatePlan={(document) => {
+                if (document.municipalityId !== workspace.municipality.identity.id) return false;
+                const next = {...workspace, validatedActionPlans: [...(workspace.validatedActionPlans ?? []), document], updatedAt: new Date().toISOString()};
+                if (!saveWorkspaceToLocalStorage(next)) return false;
+                setWorkspace(next);
+                return true;
+              }}
+              drafts={workspace.planPreparationDrafts ?? []}
+              onDraftChange={handlePlanPreparationChange}
+              worksheets={workspace.indicatorWorksheets ?? []}
+              onWorksheetChange={handleIndicatorWorksheetChange}
+              onSave={handleSaveActionPlanModuleReview}
+            />
+          );
+          const validated = (workspace.validatedActionPlans ?? []).length;
+          const sections: { id: PlanSection; title: string; summary: string; body: () => ReactNode }[] = [
+            { id: "lineas", title: "Líneas e indicadores", summary: "Catálogo RELAS · selección y redacción del territorio", body: () => catalog("lineas") },
+            { id: "resultante", title: "Plan resultante", summary: validated === 0 ? "Ninguna versión validada" : validated === 1 ? "1 versión validada" : `${validated} versiones validadas`, body: () => catalog("resultante") },
+          ];
+          if (runtime.lectura) {
+            const lectura = runtime.lectura;
+            sections.push(
+              { id: "lectura", title: "Lectura estratégica", summary: "Lectura Estratégica Local del Perfil vigente", body: () => <LecturaEstrategicaView lectura={lectura} /> },
+              { id: "prioridades", title: "Participación y prioridades", summary: "Encuesta ciudadana y selección del Grupo Motor", body: () => (
+                <>
+                  <ThematicPrioritisationPanel
+                    savedIds={runtime.workspace.thematicPrioritisation?.selectedTopicIds ?? []}
+                    onOpen={handleOpenThematicModal}
+                  />
+                  <CitizenParticipationSummary
+                    study={runtime.workspace.thematicPrioritisationStudy}
+                    municipalityId={runtime.workspace.municipality.identity.id}
+                    municipalityName={runtime.workspace.municipality.identity.name}
+                  />
+                  <DeliberativePrioritySelectionPanel
+                    key={`${lectura.id}-${workspace.deliberativePrioritySelection?.id ?? "pending"}`}
+                    lectura={lectura}
+                    citizenPrioritisation={workspace.thematicPrioritisation}
+                    selection={workspace.deliberativePrioritySelection}
+                    isStale={runtime.prioritySelectionIsStale}
+                    onSave={handleSaveDeliberativePrioritySelection}
+                  />
+                </>
+              ) },
+              { id: "borrador", title: "Borrador de actuaciones", summary: runtime.pai ? "Borrador automático disponible" : "Requiere una selección vigente del Grupo Motor", body: () => runtime.pai
+                ? <PAIView pai={runtime.pai} />
+                : <p className="panel-note">El borrador automático de actuaciones se genera cuando el Grupo Motor registra una selección vigente. La edición directa de objetivos e indicadores se guarda en «Líneas e indicadores».</p> },
+            );
+          }
+          return (
+            <section key="plan" className="hp plan-page workspace-page" aria-labelledby="workspace-cover-title" style={{"--plan-cols": sections.length} as CSSProperties}>
+              <CompasCover
+                title="Plan de Acción"
+                context="04 · Planificar"
+                subtitle={<><strong>{municipality.name}</strong>{municipality.province && ` · ${municipality.province}`}{municipality.ineCode && ` · INE ${municipality.ineCode}`}</>}
+                side={<p className="hp-cover__mission">{runtime.lectura
+                  ? "COMPÁS aporta candidaturas desde la Lectura Estratégica Local y la selección del Grupo Motor; no selecciona prioridades ni adopta compromisos municipales."
+                  : "Edición territorial directa: al elegir Modificar, la redacción queda guardada en este expediente sin revisión administrativa intermedia."}</p>}
+              />
+              {sections.map((section, index) => (
+                <details
+                  key={section.id}
+                  className={`plan-page__section hp-phase hp-phase--${index + 1}`}
+                  data-plan-section={section.id}
+                  open={planTab === section.id}
+                  onToggle={event => {
+                    const isOpen = event.currentTarget.open;
+                    setPlanTab(current => isOpen ? section.id : current === section.id ? null : current);
+                  }}
+                >
+                  <summary><strong>{section.title}</strong><span>{section.summary}</span></summary>
+                  {planTab === section.id && <div className="plan-page__body">{section.body()}</div>}
+                </details>
+              ))}
+            </section>
+          );
+        })()}
+
+        {view !== "inicio" && view !== "repositorio" && view !== "plan" && (
           <section key={view} className="hp workspace-page" aria-labelledby="workspace-cover-title">
             <CompasCover
               title={NAV_ITEMS.find(item => item.id === view)?.label ?? (view === "analisis" ? "Análisis territorial" : "Lectura Estratégica Local")}
@@ -4585,181 +4678,6 @@ export default function App() {
                 {runtime.profileValidation.detail}
               </p>
             </section>
-          )}
-          </WorkspaceDisclosure>
-        )}
-
-        {/* ── ⑦ Plan de Acción — MTE + selección deliberativa + PAI ── */}
-        {view === "plan" && (
-          <WorkspaceDisclosure title="Secciones del Plan de Acción">
-          {runtime.lectura ? (
-            <>
-            <section className="workspace-panel">
-              <p className="eyebrow">Plan Local de Salud 2027–2030</p>
-              <h2>Plan de Acción</h2>
-              <details className="pcm-help-fold"><summary>Cadena canónica</summary>
-              <p className="panel-note">
-                Lectura Estratégica Local, selección deliberativa del
-                Grupo Motor y propuesta técnica del Plan de Acción. El sistema aporta candidaturas;
-                no selecciona prioridades ni adopta compromisos municipales.
-              </p>
-              </details>
-            </section>
-            <div className="plan-tabs" role="tablist" aria-label="Secciones del Plan de Acción">
-              {([
-                ["lineas", "Líneas e indicadores"],
-                ["resultante", "Plan resultante"],
-                ["lectura", "Lectura estratégica"],
-                ["prioridades", "Participación y prioridades"],
-                ["borrador", "Borrador de actuaciones"],
-              ] as const).map(([id, label]) => (
-                <button key={id} type="button" role="tab" aria-selected={planTab === id}
-                  className={`plan-tabs__tab${planTab === id ? " plan-tabs__tab--active" : ""}`}
-                  onClick={() => setPlanTab(id)}>{label}</button>
-              ))}
-            </div>
-            {planTab === "lineas" && (
-            <>
-            <ActionPlanCatalogPanel
-              section="lineas"
-              municipalityId={workspace.municipality.identity.id}
-              lectura={runtime.lectura}
-              selection={workspace.deliberativePrioritySelection}
-              eligibleModules={runtime.eligibleActionPlanModules}
-              reviews={workspace.actionPlanModuleReviews ?? []}
-              validatedActionPlans={workspace.validatedActionPlans ?? []}
-              onDeletePlanVersion={documentWriteAllowed ? handleDeleteValidatedPlanVersion : undefined}
-              onValidatePlan={(document) => {
-                if (document.municipalityId !== workspace.municipality.identity.id) return false;
-                const next = {...workspace, validatedActionPlans: [...(workspace.validatedActionPlans ?? []), document], updatedAt: new Date().toISOString()};
-                if (!saveWorkspaceToLocalStorage(next)) return false;
-                setWorkspace(next);
-                return true;
-              }}
-              drafts={workspace.planPreparationDrafts ?? []}
-              onDraftChange={handlePlanPreparationChange}
-              worksheets={workspace.indicatorWorksheets ?? []}
-              onWorksheetChange={handleIndicatorWorksheetChange}
-              onSave={handleSaveActionPlanModuleReview}
-            />
-            </>
-            )}
-            {planTab === "resultante" && (
-            <>
-            <ActionPlanCatalogPanel
-              section="resultante"
-              municipalityId={workspace.municipality.identity.id}
-              lectura={runtime.lectura}
-              selection={workspace.deliberativePrioritySelection}
-              eligibleModules={runtime.eligibleActionPlanModules}
-              reviews={workspace.actionPlanModuleReviews ?? []}
-              validatedActionPlans={workspace.validatedActionPlans ?? []}
-              onDeletePlanVersion={documentWriteAllowed ? handleDeleteValidatedPlanVersion : undefined}
-              onValidatePlan={(document) => {
-                if (document.municipalityId !== workspace.municipality.identity.id) return false;
-                const next = {...workspace, validatedActionPlans: [...(workspace.validatedActionPlans ?? []), document], updatedAt: new Date().toISOString()};
-                if (!saveWorkspaceToLocalStorage(next)) return false;
-                setWorkspace(next);
-                return true;
-              }}
-              drafts={workspace.planPreparationDrafts ?? []}
-              onDraftChange={handlePlanPreparationChange}
-              worksheets={workspace.indicatorWorksheets ?? []}
-              onWorksheetChange={handleIndicatorWorksheetChange}
-              onSave={handleSaveActionPlanModuleReview}
-            />
-            </>
-            )}
-            {planTab === "lectura" && (
-            <>
-            <LecturaEstrategicaView lectura={runtime.lectura} />
-            </>
-            )}
-            {planTab === "prioridades" && (
-            <>
-            <div className="repo-section-divider">
-              <span className="repo-section-divider__text">Participación ciudadana</span>
-            </div>
-            <ThematicPrioritisationPanel
-              savedIds={
-                runtime.workspace.thematicPrioritisation?.selectedTopicIds ?? []
-              }
-              onOpen={handleOpenThematicModal}
-            />
-            <CitizenParticipationSummary
-              study={runtime.workspace.thematicPrioritisationStudy}
-              municipalityId={runtime.workspace.municipality.identity.id}
-              municipalityName={runtime.workspace.municipality.identity.name}
-            />
-            <DeliberativePrioritySelectionPanel
-              key={`${runtime.lectura.id}-${workspace.deliberativePrioritySelection?.id ?? "pending"}`}
-              lectura={runtime.lectura}
-              citizenPrioritisation={workspace.thematicPrioritisation}
-              selection={workspace.deliberativePrioritySelection}
-              isStale={runtime.prioritySelectionIsStale}
-              onSave={handleSaveDeliberativePrioritySelection}
-            />
-            </>
-            )}
-            {planTab === "borrador" && (
-            <>
-            {runtime.pai ? (
-              <PAIView pai={runtime.pai} />
-            ) : (
-              <section className="workspace-panel">
-                <div className="phase-blocked-notice">
-                  <strong>Borrador automático de actuaciones no disponible</strong>
-                  <p>
-                    La edición directa de objetivos e indicadores se guarda arriba en el expediente territorial.
-                    Para generar automáticamente actuaciones, el Grupo Motor debe registrar una selección vigente.
-                  </p>
-                </div>
-              </section>
-            )}
-            </>
-            )}
-            </>
-          ) : (
-            <>
-              <section className="workspace-panel">
-                <p className="eyebrow">Plan Local de Salud 2027–2030</p>
-                <h2>Plan de Acción · edición directa</h2>
-                <div className="phase-blocked-notice">
-                  <strong>Edición territorial disponible</strong>
-                  <p>
-                    Puedes seleccionar, excluir y modificar líneas, objetivos e indicadores. Al elegir Modificar,
-                    la nueva redacción se guarda en este expediente territorial sin revisión administrativa intermedia.
-                  </p>
-                </div>
-              </section>
-              <div className="plan-tabs" role="tablist" aria-label="Secciones del Plan de Acción">
-                {([["lineas", "Líneas e indicadores"], ["resultante", "Plan resultante"]] as const).map(([id, label]) => (
-                  <button key={id} type="button" role="tab" aria-selected={(planTab === "resultante" ? "resultante" : "lineas") === id}
-                    className={`plan-tabs__tab${(planTab === "resultante" ? "resultante" : "lineas") === id ? " plan-tabs__tab--active" : ""}`}
-                    onClick={() => setPlanTab(id)}>{label}</button>
-                ))}
-              </div>
-              <ActionPlanCatalogPanel
-                section={planTab === "resultante" ? "resultante" : "lineas"}
-                municipalityId={workspace.municipality.identity.id}
-                eligibleModules={[]}
-                reviews={workspace.actionPlanModuleReviews ?? []}
-              validatedActionPlans={workspace.validatedActionPlans ?? []}
-              onDeletePlanVersion={documentWriteAllowed ? handleDeleteValidatedPlanVersion : undefined}
-              onValidatePlan={(document) => {
-                if (document.municipalityId !== workspace.municipality.identity.id) return false;
-                const next = {...workspace, validatedActionPlans: [...(workspace.validatedActionPlans ?? []), document], updatedAt: new Date().toISOString()};
-                if (!saveWorkspaceToLocalStorage(next)) return false;
-                setWorkspace(next);
-                return true;
-              }}
-              drafts={workspace.planPreparationDrafts ?? []}
-              onDraftChange={handlePlanPreparationChange}
-              worksheets={workspace.indicatorWorksheets ?? []}
-              onWorksheetChange={handleIndicatorWorksheetChange}
-                onSave={handleSaveActionPlanModuleReview}
-              />
-            </>
           )}
           </WorkspaceDisclosure>
         )}

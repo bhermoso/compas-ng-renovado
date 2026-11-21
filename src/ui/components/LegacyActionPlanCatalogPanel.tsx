@@ -22,6 +22,8 @@ import type { LecturaEstrategicaLocal } from "../../domain/strategic-scenario";
 export interface LegacyActionPlanCatalogPanelProps {
   /** Qué parte del panel se muestra: "lineas" (edición), "resultante" (Plan resultante) o "todo". */
   section?: "lineas" | "resultante" | "todo";
+  /** Nombre visible del ámbito; si falta, se muestra su identificador. */
+  municipalityName?: string;
   validatedActionPlans?: import("../../domain/action-plan-catalog/PlanDocument").PlanDocument[];
   onValidatePlan?: (document: import("../../domain/action-plan-catalog/PlanDocument").PlanDocument) => boolean;
   onDeletePlanVersion?: (document: import("../../domain/action-plan-catalog/PlanDocument").PlanDocument) => Promise<boolean>;
@@ -311,15 +313,16 @@ export function LegacyActionPlanCatalogPanel(props: LegacyActionPlanCatalogPanel
   return (
     <div className="pcm-root">
       <section className="workspace-panel pcm-catalog-header">
-        <p className="eyebrow">Catálogo RELAS de Plan de Acción</p>
-        <h2>Tres líneas reutilizables de Plan de Acción · envejecimiento saludable, adicciones y bienestar emocional y salud mental</h2>
-        <p className="panel-note">Consulta en cualquier expediente las propuestas documentadas de Granada-Zaidín y los demás módulos del catálogo: objetivos estratégicos, objetivos generales y específicos, indicadores y fichas técnicas. Selecciona y adapta los elementos en el borrador propio del territorio; nunca se importan como acuerdos aprobados.</p>
-        <p className="pcm-source">Cada módulo indica fuente y versión. Las fichas de indicador y de actuación permiten preparar instrumentos de medición y recogida de datos. Los planes de acción, programas y compromisos operativos deben concretarse localmente, sin copiarlos automáticamente de otro expediente.</p>
+        <p className="eyebrow hp-cover__chain">Catálogo RELAS de Plan de Acción</p>
+        <h2 className="hp-cover__section-title">Tres líneas reutilizables de Plan de Acción · envejecimiento saludable, adicciones y bienestar emocional y salud mental</h2>
+        <hr className="home-cover__rule hp-cover__rule" />
         <details className="pcm-help-fold pcm-support-docs" data-support-documents="true"><summary>Documentación de apoyo</summary>
           <p className="panel-note">Estrategias y planes de los que proceden los objetivos e indicadores del catálogo. Cada elemento indica su procedencia: literal, adaptada o propia de COMPÁS.</p>
           <ul>{SUPPORT_DOCUMENTS.map(doc => <li key={doc.id}><SupportDocumentLink doc={doc}/> · {doc.title}. {doc.issuer}. {doc.period}.{doc.location.kind === "compas" ? " Original conservado en COMPÁS." : " Consulta en la dirección pública."}{doc.note ? ` ${doc.note}` : ""}</li>)}</ul>
         </details>
         <details className="pcm-help-fold"><summary>Cómo funciona</summary>
+        <p className="panel-note">Consulta en cualquier expediente las propuestas documentadas de Granada-Zaidín y los demás módulos del catálogo: objetivos estratégicos, objetivos generales y específicos, indicadores y fichas técnicas. Selecciona y adapta los elementos en el borrador propio del territorio; nunca se importan como acuerdos aprobados.</p>
+        <p className="pcm-source">Cada módulo indica fuente y versión. Las fichas de indicador y de actuación permiten preparar instrumentos de medición y recogida de datos. Los planes de acción, programas y compromisos operativos deben concretarse localmente, sin copiarlos automáticamente de otro expediente.</p>
         <p className="panel-note">
           {directTerritorialEdit
             ? "Selecciona, excluye o modifica líneas, objetivos e indicadores. Al marcar Modificar, la nueva redacción queda guardada como texto vigente de este expediente territorial; la aprobación del Grupo Motor es una fase institucional distinta."
