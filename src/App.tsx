@@ -4221,28 +4221,6 @@ export default function App() {
               onOpenAssetValidations={() => { openDiagnosisToolbox(); toggleDiagnosisModule("documents", true); requestAnimationFrame(() => document.getElementById("diag-mod-documents")?.scrollIntoView({behavior:"smooth",block:"start"})); }}
             />
 
-            <details id="diagnosis-tools-drawer" className="diagnosis-tools-drawer">
-              <summary><strong>Otras herramientas del diagnóstico</strong><span>Bibliotecas, estadística, custodia, incorporación y módulos de análisis</span></summary>
-              <div className="diagnosis-tools-drawer__body">
-            {/* Biblioteca de referencia institucional: no pertenece al expediente
-                municipal y no alimenta el diagnóstico ni las evidencias. */}
-            <StrategicReferenceLibrary
-              workspace={workspace}
-              onNormalizeLojaRemote={documentWriteAllowed && remoteHydratedMunicipalityId === "loja" && remoteClient.auth.currentUser
-                ? async expectedWorkspace => {
-                    const result = await normalizeLojaMetadataRemotely({
-                      read: id => readRemoteWorkspace(remoteClient,id),
-                      save: (updated,expected) => saveRemoteWorkspace(remoteClient,updated,undefined,expected),
-                    },expectedWorkspace);
-                    if (result.status === "updated") {
-                      setWorkspace(current => current.municipality.identity.id === "loja" && JSON.stringify(current) === JSON.stringify(expectedWorkspace) ? result.workspace : current);
-                      setRemotePersistenceMessage("Corrección documental de Loja guardada y comprobada en Firebase.");
-                    }
-                    return result.status;
-                  }
-                : undefined}
-            />
-
             {/* La estadística territorial es una fuente del diagnóstico.
                 Su incorporación al Perfil genera siempre una revisión separada. */}
             <details className="workspace-panel diagnosis-territorial-statistics" data-testid="diagnosis-territorial-statistics">
@@ -4264,6 +4242,28 @@ export default function App() {
                 }}
               />
             </details>
+
+            <details id="diagnosis-tools-drawer" className="diagnosis-tools-drawer">
+              <summary><strong>Otras herramientas del diagnóstico</strong><span>Bibliotecas, custodia, incorporación y módulos de análisis</span></summary>
+              <div className="diagnosis-tools-drawer__body">
+            {/* Biblioteca de referencia institucional: no pertenece al expediente
+                municipal y no alimenta el diagnóstico ni las evidencias. */}
+            <StrategicReferenceLibrary
+              workspace={workspace}
+              onNormalizeLojaRemote={documentWriteAllowed && remoteHydratedMunicipalityId === "loja" && remoteClient.auth.currentUser
+                ? async expectedWorkspace => {
+                    const result = await normalizeLojaMetadataRemotely({
+                      read: id => readRemoteWorkspace(remoteClient,id),
+                      save: (updated,expected) => saveRemoteWorkspace(remoteClient,updated,undefined,expected),
+                    },expectedWorkspace);
+                    if (result.status === "updated") {
+                      setWorkspace(current => current.municipality.identity.id === "loja" && JSON.stringify(current) === JSON.stringify(expectedWorkspace) ? result.workspace : current);
+                      setRemotePersistenceMessage("Corrección documental de Loja guardada y comprobada en Firebase.");
+                    }
+                    return result.status;
+                  }
+                : undefined}
+            />
 
             {/* ── Originales en el expediente compartido ── */}
             {(() => {
