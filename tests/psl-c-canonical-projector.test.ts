@@ -6,7 +6,7 @@
  * contenido; cada elemento una vez), aísla la ruta B histórica para artefactos
  * legacy, y no reconstruye desde `provenance`/`conclusiones.content`.
  *
- * Cobertura: Atarfe y Granada-Zaidín.
+ * Cobertura: Atarfe y Municipio de ensayo.
  */
 
 import { describe, it, expect, beforeAll } from "vitest";
@@ -50,8 +50,8 @@ const store = new Map<string, string>();
 
 const DIR = dirname(fileURLToPath(import.meta.url));
 const exportPath = (muni: string, file: string) =>
-  muni === "granada-zaidin"
-    ? resolve(DIR, "..", "fixtures", "workspaces", "granada-zaidin-synthetic-test.json")
+  muni === "municipio-ensayo"
+    ? resolve(DIR, "..", "fixtures", "workspaces", "municipio-ensayo-synthetic-test.json")
     : resolve(DIR, "..", "municipalities", muni, "exports", file);
 
 function validatedPSL(base: LocalHealthProfile): LocalHealthProfile {
@@ -115,12 +115,12 @@ let zaidin: Caso;
 let atarfe: Caso;
 
 beforeAll(() => {
-  zaidin = cargar("granada-zaidin", "compas-ng-workspace-granada-zaidin.json");
+  zaidin = cargar("municipio-ensayo", "compas-ng-workspace-municipio-ensayo.json");
   atarfe = cargar("atarfe", "compas-ng-workspace-atarfe.json");
 });
 
 const CASOS = (): Array<[string, () => Caso]> => [
-  ["Granada-Zaidín", () => zaidin],
+  ["Municipio de ensayo", () => zaidin],
   ["Atarfe", () => atarfe],
 ];
 

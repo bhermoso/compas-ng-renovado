@@ -2,11 +2,11 @@
  * Lote A — verdad epistemológica del Perfil (F4, F5, F6).
  *
  * Corrige tres incoherencias de la lectura del Perfil de Atarfe, con guardias de
- * regresión sobre el caso canónico Granada-Zaidín (que NO debe cambiar):
+ * regresión sobre el caso canónico Municipio de ensayo (que NO debe cambiar):
  *
  *   F4 — El IBSE municipal de Atarfe (documento territorialScale "municipio") es
  *        muestra local del ámbito: esLocal, sin demoProxy ni referencia provincial
- *        fabricada. El IBSE provincial de Granada-Zaidín conserva su tratamiento proxy.
+ *        fabricada. El IBSE provincial de Municipio de ensayo conserva su tratamiento proxy.
  *   F5 — El conflicto multiescala solo se activa con indicadores de procedencia
  *        distinta del IBSE; los 5 indicadores del propio IBSE de Atarfe no cuentan
  *        como una segunda escala poblacional.
@@ -27,8 +27,8 @@ import type { MunicipalityWorkspace } from "../src/domain/workspace";
 
 const _dir = dirname(fileURLToPath(import.meta.url));
 function loadSeed(id: string): MunicipalityWorkspace {
-  const path = id === "granada-zaidin"
-    ? resolve(_dir, "../fixtures/workspaces/granada-zaidin-synthetic-test.json")
+  const path = id === "municipio-ensayo"
+    ? resolve(_dir, "../fixtures/workspaces/municipio-ensayo-synthetic-test.json")
     : resolve(_dir, `../public/seeds/compas-ng-workspace-${id}.json`);
   const raw = readFileSync(
     path,
@@ -40,7 +40,7 @@ function loadSeed(id: string): MunicipalityWorkspace {
 }
 
 const atarfe = loadSeed("atarfe");
-const zaidin = loadSeed("granada-zaidin");
+const zaidin = loadSeed("municipio-ensayo");
 
 const CONFLICTO_ESCALA = "conflicto-escala-individual-poblacional";
 const CONFLICTO_TEMPORAL = "conflicto-temporal-cambio-volumen";
@@ -57,7 +57,7 @@ describe("Lote A · F4 — escala real del IBSE cargado", () => {
     }
   });
 
-  it("F4.2 REGRESIÓN Granada-Zaidín: el IBSE provincial conserva su tratamiento proxy", () => {
+  it("F4.2 REGRESIÓN Municipio de ensayo: el IBSE provincial conserva su tratamiento proxy", () => {
     const refs = buildIndicatorComparisonReferences({ workspace: zaidin }).references;
     const ibse = refs.filter((r) => r.instrument === "IBSE");
     expect(ibse.length).toBeGreaterThan(0);
@@ -68,10 +68,10 @@ describe("Lote A · F4 — escala real del IBSE cargado", () => {
     }
   });
 
-  it("F4.3 REGRESIÓN Granada-Zaidín: el nuevo criterio de escala no reclasifica ninguna fuente provincial", () => {
+  it("F4.3 REGRESIÓN Municipio de ensayo: el nuevo criterio de escala no reclasifica ninguna fuente provincial", () => {
     // Invariante que garantiza la regresión: el cambio F4 solo marca local un
     // estudio cuyo DOCUMENTO declara territorialScale "municipio". Como ningún
-    // documento de Granada-Zaidín lo declara, ninguna fuente provincial (IBSE ni
+    // documento de Municipio de ensayo lo declara, ninguna fuente provincial (IBSE ni
     // EAS) puede volverse local por este cambio.
     expect(
       zaidin.repository.documents.every((d) => d.territorialScale !== "municipio")
@@ -90,7 +90,7 @@ describe("Lote A · F5 — conflicto multiescala solo con indicadores no-IBSE", 
     expect(indicadores.every((a) => a.provenance.origin === "ibse")).toBe(true);
   });
 
-  it("F5.2 REGRESIÓN Granada-Zaidín: conserva el conflicto de escala legítimo (IBSE + indicadores EAS)", () => {
+  it("F5.2 REGRESIÓN Municipio de ensayo: conserva el conflicto de escala legítimo (IBSE + indicadores EAS)", () => {
     const runtime = createMunicipalityRuntime({ workspace: zaidin });
     const indicadoresNoIbse = runtime.mit.dimensionDiagnostica.indicators.filter(
       (a) => a.provenance.origin !== "ibse"

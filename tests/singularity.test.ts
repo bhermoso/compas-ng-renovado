@@ -1,9 +1,9 @@
 /**
  * Prueba de singularidad (F18, prueba de aceptación 6): expedientes distintos no dan
- * el mismo conjunto de unidades ni las mismas propuestas, y Granada-Zaidín no cambia
+ * el mismo conjunto de unidades ni las mismas propuestas, y Municipio de ensayo no cambia
  * sin justificación.
  *
- * Alcance: Granada-Zaidín entra con el fixture sintético del repositorio. Los expedientes
+ * Alcance: Municipio de ensayo entra con el fixture sintético del repositorio. Los expedientes
  * reales de Zagra y Atarfe no están en el repositorio y no se copian a él (fixtures/workspaces/README.md):
  * aquí se representan con dos expedientes de la misma forma (Zagra: Informe + priorización
  * ciudadana, sin activos; Atarfe: Informe + activos, sin priorización). La comprobación sobre
@@ -22,7 +22,7 @@ import {
 import { buildReadingUnitProposals } from "../src/application/proposals";
 import { THEMATIC_TOPICS, type ThematicPrioritisationStudy } from "../src/domain/thematic-prioritisation";
 
-const FIXTURE = resolve(dirname(fileURLToPath(import.meta.url)), "../fixtures/workspaces/granada-zaidin-synthetic-test.json");
+const FIXTURE = resolve(dirname(fileURLToPath(import.meta.url)), "../fixtures/workspaces/municipio-ensayo-synthetic-test.json");
 
 function collect(node: unknown, out: Array<{ id: string; kind: string; title: string; content: string }> = []) {
   if (Array.isArray(node)) node.forEach((n) => collect(n, out));
@@ -87,8 +87,8 @@ describe("singularidad de los expedientes", () => {
     expect(shape(again)).toEqual(shape(cases.zagraForma));
   });
 
-  it("Granada-Zaidín (referencia): sus unidades y sus lagunas no cambian sin justificación", () => {
-    expect(zaidinAssets).toHaveLength(56);
+  it("expediente de ensayo: sus unidades y sus lagunas no cambian sin justificación", () => {
+    expect(zaidinAssets).toHaveLength(10);
     expect(cases.zaidin.units.length).toBe(shape(cases.zaidin).length);
     expect(shape(cases.zaidin)).toMatchInlineSnapshot(`
       [

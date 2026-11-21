@@ -33,7 +33,7 @@ const store = new Map<string, string>();
 
 const EXPORT_PATH = resolve(
   dirname(fileURLToPath(import.meta.url)),
-  "../fixtures/workspaces/granada-zaidin-synthetic-test.json"
+  "../fixtures/workspaces/municipio-ensayo-synthetic-test.json"
 );
 
 const FORBIDDEN_EDITORIAL_RE =
@@ -44,10 +44,10 @@ let answers: DiagnosticAnswers;
 
 beforeAll(() => {
   store.set(
-    "compas-ng:workspace:granada-zaidin",
+    "compas-ng:workspace:municipio-ensayo",
     readFileSync(EXPORT_PATH, "utf8")
   );
-  const ws = loadWorkspaceFromLocalStorage("granada-zaidin");
+  const ws = loadWorkspaceFromLocalStorage("municipio-ensayo");
   if (ws === null) throw new Error("El export vigente no rehidrata");
   answers = buildDiagnosticAnswers({
     workspace: ws,
@@ -59,7 +59,7 @@ beforeAll(() => {
   view = buildProfileIntegratedEditorialView(answers, {
     territory: ws.municipality.identity.name,
     status: "Documento de trabajo",
-    informeTitulo: "Informe de salud de El Zaidín",
+    informeTitulo: "Informe de Salud del Municipio de ensayo",
     generatedDate: "1 de enero de 2027",
   });
 });
@@ -100,7 +100,7 @@ describe("síntesis interpretativa del Perfil", () => {
     expect(assetsBlock?.whatItAdds).toContain(
       "de Localiza Salud, inventariados como capacidades potenciales"
     );
-    expect(assetsBlock?.whatItAdds).toContain("56 recursos de Localiza Salud");
+    expect(assetsBlock?.whatItAdds).toContain("10 recursos de Localiza Salud");
     expect(assetsBlock?.whatItAdds).not.toContain("recurso(s)");
     expect(view.sourceBlocks.map((block) => block.whatItDoesNotAllow)).toEqual([
       "No mide por sí solo prevalencia local ni distribución interna de desigualdad",
@@ -139,9 +139,9 @@ describe("síntesis interpretativa del Perfil", () => {
         },
       },
       {
-        territory: "Granada-Zaidín",
+        territory: "Municipio de ensayo",
         status: "Documento de trabajo",
-        informeTitulo: "Informe de salud de El Zaidín",
+        informeTitulo: "Informe de Salud del Municipio de ensayo",
         generatedDate: "1 de enero de 2027",
       }
     );

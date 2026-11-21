@@ -40,14 +40,14 @@ const store = new Map<string, string>();
 
 const EXPORT_PATH = resolve(
   dirname(fileURLToPath(import.meta.url)),
-  "../fixtures/workspaces/granada-zaidin-synthetic-test.json"
+  "../fixtures/workspaces/municipio-ensayo-synthetic-test.json"
 );
 
 let ws: MunicipalityWorkspace;
 let psl: LocalHealthProfile;
 let answers: DiagnosticAnswers;
 
-/** PSL real de Granada-Zaidín, parcheado al mínimo para atravesar los gates de
+/** PSL real de Municipio de ensayo, parcheado al mínimo para atravesar los gates de
  *  compilación (G-LHC-1..7) sin fabricar un PSL sintético. */
 function validatedPSL(base: LocalHealthProfile): LocalHealthProfile {
   return {
@@ -81,10 +81,10 @@ function baseInput(): CompileLocalHealthProfileInput {
 
 beforeAll(() => {
   store.set(
-    "compas-ng:workspace:granada-zaidin",
+    "compas-ng:workspace:municipio-ensayo",
     readFileSync(EXPORT_PATH, "utf8")
   );
-  const loaded = loadWorkspaceFromLocalStorage("granada-zaidin");
+  const loaded = loadWorkspaceFromLocalStorage("municipio-ensayo");
   if (loaded === null) throw new Error("El export vigente no rehidrata");
   ws = loaded;
   psl = createMunicipalityRuntime({ workspace: ws }).psl;

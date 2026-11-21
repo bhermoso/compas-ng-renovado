@@ -1,0 +1,2207 @@
+{
+  "schemaVersion": "1.0.0",
+  "municipality": {
+    "identity": {
+      "id": "municipio-ensayo",
+      "name": "Municipio de ensayo",
+      "province": "Granada",
+      "autonomousCommunity": "Andalucía",
+      "territorialType": "municipio"
+    },
+    "status": "draft",
+    "metadata": {
+      "createdAt": "2026-07-07T21:38:01.712Z",
+      "updatedAt": "2026-07-07T21:38:01.712Z",
+      "createdBy": "COMPÁS NG",
+      "version": "1.0.0"
+    }
+  },
+  "repository": {
+    "municipalityId": "municipio-ensayo",
+    "documents": [
+      {
+        "id": "ensayo-informe-salud",
+        "municipalityId": "municipio-ensayo",
+        "kind": "health-report",
+        "title": "Informe de Salud del Municipio de ensayo",
+        "status": "validated",
+        "source": {
+          "system": "Documento de ensayo",
+          "organization": "COMPÁS (ensayo)"
+        },
+        "sourceFileName": "informe-salud-municipio-ensayo.txt",
+        "sourceText": "INFORME DE LA SITUACIÓN DE SALUD DEL MUNICIPIO DE ENSAYO\n\nDocumento de ensayo para pruebas automáticas. No describe ningún territorio real.\n\n1. INTRODUCCIÓN\n\nEste informe de ensayo reproduce la estructura habitual de un Informe de Salud municipal para comprobar la lectura, la compilación y la trazabilidad del Perfil de Salud Local en COMPÁS.\n\n2. METODOLOGÍA\n\nSe describen fuentes de ensayo con la misma organización que un informe real: padrón, indicadores de morbilidad y mortalidad, Encuesta Andaluza de Salud y activos para la salud.\n\n3. ANÁLISIS SOCIODEMOGRÁFICO Y ECONÓMICO\n\nPoblación de ensayo: 20.000 habitantes. Población de 65 años o más: 18,0 %. Índice de envejecimiento de ensayo: 120. Tasa de paro registrada de ensayo: 15,0 %.\n\n4. ANÁLISIS EPIDEMIOLÓGICO\n\nMortalidad: las enfermedades del sistema circulatorio y los tumores son las primeras causas en el conjunto de datos de ensayo.\n\nMorbilidad: la hipertensión arterial, la diabetes y los trastornos de ansiedad son los problemas de salud más registrados en atención primaria en los datos de ensayo.\n\nCáncer: el cribado de cáncer de mama alcanza una cobertura de ensayo del 70,0 %.\n\nVacunación: la cobertura de vacunación antigripal en mayores de 65 años es del 60,0 % en los datos de ensayo.\n\n5. ANÁLISIS DE LA ENCUESTA ANDALUZA DE SALUD. PROBLEMAS DE SALUD Y FACTORES DE RIESGO\n\nSedentarismo de ensayo: 30,0 %. Consumo de tabaco de ensayo: 22,0 %. Apoyo social bajo de ensayo: 10,0 %.\n\n6. RECURSOS Y ACTIVOS EN SALUD\n\nEl municipio de ensayo cuenta con un centro de salud, un centro de participación activa, asociaciones vecinales y espacios deportivos.\n\n7. DISCUSIÓN\n\nLos datos de ensayo sitúan el envejecimiento, la salud mental y los hábitos de vida como ámbitos de interés para la deliberación.\n\n8. CONCLUSIONES\n\nConclusión de ensayo 1: el envejecimiento de la población requiere atención a la autonomía y la soledad no deseada.\nConclusión de ensayo 2: el bienestar emocional y la salud mental muestran necesidades en la población adulta.\nConclusión de ensayo 3: el sedentarismo y el tabaco son factores de riesgo prioritarios.",
+        "tags": [
+          "health-report",
+          "ensayo"
+        ],
+        "createdAt": "2026-11-21T00:00:00.000Z",
+        "updatedAt": "2026-11-21T00:00:00.000Z"
+      },
+      {
+        "id": "doc-ibse",
+        "municipalityId": "municipio-ensayo",
+        "kind": "redcap-export",
+        "title": "IBSE — Granada provincia (proxy piloto)",
+        "status": "uploaded",
+        "source": {
+          "system": "REDCap IBSE · contexto proxy del piloto"
+        },
+        "sourceFileName": "ibse-granada-provincia.csv",
+        "canGenerateEvidence": true,
+        "tags": [
+          "redcap-export",
+          "ibse"
+        ],
+        "createdAt": "2026-07-07T21:38:02.903Z",
+        "updatedAt": "2026-07-07T21:38:02.903Z"
+      },
+      {
+        "id": "doc-duke",
+        "municipalityId": "municipio-ensayo",
+        "kind": "complementary-study",
+        "title": "DUKE-EAS — Granada provincia (proxy piloto)",
+        "status": "uploaded",
+        "source": {
+          "system": "EAS Granada · contexto proxy del piloto"
+        },
+        "sourceFileName": "duke-eas-granada.csv",
+        "canGenerateEvidence": true,
+        "tags": [
+          "complementary-study",
+          "duke-eas"
+        ],
+        "createdAt": "2026-07-07T21:38:02.913Z",
+        "updatedAt": "2026-07-07T21:38:02.913Z"
+      },
+      {
+        "id": "doc-predimed",
+        "municipalityId": "municipio-ensayo",
+        "kind": "complementary-study",
+        "title": "PREDIMED-EAS — Granada provincia (proxy piloto)",
+        "status": "uploaded",
+        "source": {
+          "system": "EAS Granada · contexto proxy del piloto"
+        },
+        "sourceFileName": "predimed-eas-granada.csv",
+        "canGenerateEvidence": true,
+        "tags": [
+          "complementary-study",
+          "predimed-eas"
+        ],
+        "createdAt": "2026-07-07T21:38:02.915Z",
+        "updatedAt": "2026-07-07T21:38:02.915Z"
+      },
+      {
+        "id": "doc-sf12",
+        "municipalityId": "municipio-ensayo",
+        "kind": "complementary-study",
+        "title": "SF-12 EAS — Granada provincia (proxy piloto)",
+        "status": "uploaded",
+        "source": {
+          "system": "EAS Granada · contexto proxy del piloto"
+        },
+        "sourceFileName": "sf12-eas-granada.csv",
+        "canGenerateEvidence": true,
+        "tags": [
+          "complementary-study",
+          "sf12-eas"
+        ],
+        "createdAt": "2026-07-07T21:38:02.920Z",
+        "updatedAt": "2026-07-07T21:38:02.920Z"
+      },
+      {
+        "id": "doc-sueno",
+        "municipalityId": "municipio-ensayo",
+        "kind": "complementary-study",
+        "title": "Sueño EAS — Granada provincia (proxy piloto)",
+        "status": "uploaded",
+        "source": {
+          "system": "EAS Granada · contexto proxy del piloto"
+        },
+        "sourceFileName": "sueno-eas-granada.csv",
+        "canGenerateEvidence": true,
+        "tags": [
+          "complementary-study",
+          "sueno-eas"
+        ],
+        "createdAt": "2026-07-07T21:38:02.922Z",
+        "updatedAt": "2026-07-07T21:38:02.922Z"
+      },
+      {
+        "id": "doc-cage",
+        "municipalityId": "municipio-ensayo",
+        "kind": "complementary-study",
+        "title": "CAGE-EAS — Granada provincia (proxy piloto)",
+        "status": "uploaded",
+        "source": {
+          "system": "EAS Granada · contexto proxy del piloto"
+        },
+        "sourceFileName": "cage-eas-granada.csv",
+        "canGenerateEvidence": true,
+        "tags": [
+          "complementary-study",
+          "cage-eas"
+        ],
+        "createdAt": "2026-07-07T21:38:02.925Z",
+        "updatedAt": "2026-07-07T21:38:02.925Z"
+      },
+      {
+        "id": "doc-auditc",
+        "municipalityId": "municipio-ensayo",
+        "kind": "redcap-export",
+        "title": "AUDIT-C — origen externo (proxy piloto)",
+        "status": "uploaded",
+        "source": {
+          "system": "REDCap AUDIT-C · contexto proxy del piloto"
+        },
+        "sourceFileName": "auditc-municipal.csv",
+        "canGenerateEvidence": true,
+        "tags": [
+          "redcap-export",
+          "auditc"
+        ],
+        "createdAt": "2026-07-07T21:38:02.926Z",
+        "updatedAt": "2026-07-07T21:38:02.926Z"
+      },
+      {
+        "id": "doc-ipaq",
+        "municipalityId": "municipio-ensayo",
+        "kind": "complementary-study",
+        "title": "IPAQ-EAS — Granada provincia (proxy piloto)",
+        "status": "uploaded",
+        "source": {
+          "system": "EAS Granada · contexto proxy del piloto"
+        },
+        "sourceFileName": "ipaq-eas-granada.csv",
+        "canGenerateEvidence": true,
+        "tags": [
+          "complementary-study",
+          "ipaq-eas"
+        ],
+        "createdAt": "2026-07-07T21:38:02.928Z",
+        "updatedAt": "2026-07-07T21:38:02.928Z"
+      },
+      {
+        "id": "doc-ghq12",
+        "municipalityId": "municipio-ensayo",
+        "kind": "redcap-export",
+        "title": "GHQ-12 — origen externo (proxy piloto)",
+        "status": "uploaded",
+        "source": {
+          "system": "REDCap GHQ-12 · contexto proxy del piloto"
+        },
+        "sourceFileName": "ghq12-municipal.csv",
+        "canGenerateEvidence": true,
+        "tags": [
+          "redcap-export",
+          "ghq12"
+        ],
+        "createdAt": "2026-07-07T21:38:02.929Z",
+        "updatedAt": "2026-07-07T21:38:02.929Z"
+      },
+      {
+        "id": "doc-phq9",
+        "municipalityId": "municipio-ensayo",
+        "kind": "redcap-export",
+        "title": "PHQ-9 — origen externo (proxy piloto)",
+        "status": "uploaded",
+        "source": {
+          "system": "REDCap PHQ-9 · contexto proxy del piloto"
+        },
+        "sourceFileName": "phq9-municipal.csv",
+        "canGenerateEvidence": true,
+        "tags": [
+          "redcap-export",
+          "phq9"
+        ],
+        "createdAt": "2026-07-07T21:38:02.930Z",
+        "updatedAt": "2026-07-07T21:38:02.930Z"
+      },
+      {
+        "id": "doc-psqi",
+        "municipalityId": "municipio-ensayo",
+        "kind": "redcap-export",
+        "title": "PSQI — origen externo (proxy piloto)",
+        "status": "uploaded",
+        "source": {
+          "system": "REDCap PSQI · contexto proxy del piloto"
+        },
+        "sourceFileName": "psqi-municipal.csv",
+        "canGenerateEvidence": true,
+        "tags": [
+          "redcap-export",
+          "psqi"
+        ],
+        "createdAt": "2026-07-07T21:38:02.930Z",
+        "updatedAt": "2026-07-07T21:38:02.930Z"
+      },
+      {
+        "id": "doc-fagerstrom",
+        "municipalityId": "municipio-ensayo",
+        "kind": "redcap-export",
+        "title": "Fagerström — origen externo (proxy piloto)",
+        "status": "uploaded",
+        "source": {
+          "system": "REDCap Fagerström · contexto proxy del piloto"
+        },
+        "sourceFileName": "fagerstrom-municipal.csv",
+        "canGenerateEvidence": true,
+        "tags": [
+          "redcap-export",
+          "fagerstrom"
+        ],
+        "createdAt": "2026-07-07T21:38:02.931Z",
+        "updatedAt": "2026-07-07T21:38:02.931Z"
+      },
+      {
+        "id": "doc-sbq",
+        "municipalityId": "municipio-ensayo",
+        "kind": "redcap-export",
+        "title": "SBQ — origen externo (proxy piloto)",
+        "status": "uploaded",
+        "source": {
+          "system": "REDCap SBQ · contexto proxy del piloto"
+        },
+        "sourceFileName": "sbq-municipal.csv",
+        "canGenerateEvidence": true,
+        "tags": [
+          "redcap-export",
+          "sbq"
+        ],
+        "createdAt": "2026-07-07T21:38:02.932Z",
+        "updatedAt": "2026-07-07T21:38:02.932Z"
+      },
+      {
+        "id": "ensayo-localiza",
+        "municipalityId": "municipio-ensayo",
+        "kind": "localiza-salud",
+        "title": "Localiza Salud — Municipio de ensayo",
+        "status": "uploaded",
+        "source": {
+          "system": "Localiza Salud (ensayo)",
+          "collectedAt": "2026-11-21T15:35:28.729Z"
+        },
+        "sourceText": "Centro de participación activa de ensayo\tEspacio de ensayo para personas mayores con talleres de memoria, actividad física suave y voluntariado.\tCualquiera\tMayores de 64 años\tEnvejecimiento activo, Actividad física, Participación y acción comunitaria, Bienestar emocional\tMunicipio de ensayo\tMunicipio de ensayo\t+ info\nAsociación vecinal de ensayo\tAsociación de ensayo que organiza actividades de convivencia y difunde información de salud en el barrio.\tCualquiera\tPoblación general\tParticipación y acción comunitaria, Cultura y ocio, Bienestar emocional\tMunicipio de ensayo\tMunicipio de ensayo\t+ info\nGrupo de ayuda mutua de ensayo\tGrupo de ensayo de apoyo emocional entre iguales, con sesiones semanales.\tCualquiera\tAdultos (30-64 años), Jóvenes (18-29 años)\tBienestar emocional, Prevención del suicidio\tMunicipio de ensayo\tMunicipio de ensayo\t+ info\nPolideportivo municipal de ensayo\tInstalación deportiva de ensayo con programas de actividad física para todas las edades.\tCualquiera\tPoblación general, Mayores de 64 años\tActividad física, Envejecimiento activo\tMunicipio de ensayo\tMunicipio de ensayo\t+ info\nEscuela de pacientes de ensayo\tPrograma formativo de ensayo para personas con enfermedades crónicas y personas cuidadoras.\tCualquiera\tAdultos (30-64 años), Mayores de 64 años\tEnfermedades crónicas, Escuela de salud/formación, Personas cuidadoras\tMunicipio de ensayo\tMunicipio de ensayo\t+ info\nHuerto comunitario de ensayo\tHuerto de ensayo gestionado por vecinas y vecinos, con talleres de alimentación.\tCualquiera\tPoblación general\tAlimentación saludable, Naturaleza, Participación y acción comunitaria\tMunicipio de ensayo\tMunicipio de ensayo\t+ info\nAsociación de mujeres de ensayo\tAsociación de ensayo que trabaja la igualdad y la salud de las mujeres.\tMujeres\tAdultos (30-64 años)\tGénero/identidad, Salud sexual y reproductiva, Bienestar emocional\tMunicipio de ensayo\tMunicipio de ensayo\t+ info\nCentro joven de ensayo\tEspacio de ensayo para jóvenes con actividades de ocio saludable y prevención.\tCualquiera\tAdolescentes (12-17 años), Jóvenes (18-29 años)\tCultura y ocio, Bienestar emocional, Escuela de salud/formación\tMunicipio de ensayo\tMunicipio de ensayo\t+ info\nPrograma de acompañamiento de ensayo\tVoluntariado de ensayo que acompaña a personas mayores que viven solas.\tCualquiera\tMayores de 64 años\tEnvejecimiento activo, Bienestar emocional, Personas en riesgo de exclusión\tMunicipio de ensayo\tMunicipio de ensayo\t+ info\nBiblioteca municipal de ensayo\tBiblioteca de ensayo con clubes de lectura y talleres intergeneracionales.\tCualquiera\tPoblación general, Infancia: 6-11 años\tCultura y ocio, Otros\tMunicipio de ensayo\tMunicipio de ensayo\t+ info",
+        "canGenerateEvidence": true,
+        "tags": [
+          "localiza-salud"
+        ],
+        "createdAt": "2026-11-21T15:35:28.729Z",
+        "updatedAt": "2026-11-21T15:35:28.729Z"
+      }
+    ],
+    "createdAt": "2026-07-07T21:38:01.713Z",
+    "updatedAt": "2026-11-21T15:35:28.729Z"
+  },
+  "evidenceStore": {
+    "municipalityId": "municipio-ensayo",
+    "atoms": [
+      {
+        "id": "ibse:municipio-ensayo:meanTotal",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "IBSE – Índice total de bienestar socioemocional",
+        "content": "Índice total (media de los 8 ítems IBSE). Escala 0–100, mayor = mejor bienestar. Media municipal: 76.2 (n=814 registros válidos de 891 totales). Fuente: ibse-granada-provincia.csv.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "ibse",
+          "sourceLabel": "ibse-granada-provincia.csv",
+          "extractedAt": "2026-07-07T21:38:02.902Z",
+          "documentId": "doc-ibse"
+        },
+        "methodology": {
+          "description": "Agregado municipal calculado desde exportación REDCap. Instrumento IBSE (Bericat, 2014) adaptado para planificación local de salud.",
+          "limitations": [
+            "Los resultados son medias de la muestra disponible, no estimaciones poblacionales.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "ibse",
+          "indicator",
+          "meanTotal"
+        ],
+        "createdAt": "2026-07-07T21:38:02.902Z",
+        "updatedAt": "2026-07-07T21:38:02.902Z"
+      },
+      {
+        "id": "ibse:municipio-ensayo:meanFactorVinculo",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "IBSE – Factor Vínculo",
+        "content": "Sentido de pertenencia y relaciones afectivas (ítems: deprimido, solo). Escala 0–100. Media municipal: 64.6 (n=814 registros válidos de 891 totales). Fuente: ibse-granada-provincia.csv.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "ibse",
+          "sourceLabel": "ibse-granada-provincia.csv",
+          "extractedAt": "2026-07-07T21:38:02.902Z",
+          "documentId": "doc-ibse"
+        },
+        "methodology": {
+          "description": "Agregado municipal calculado desde exportación REDCap. Instrumento IBSE (Bericat, 2014) adaptado para planificación local de salud.",
+          "limitations": [
+            "Los resultados son medias de la muestra disponible, no estimaciones poblacionales.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "ibse",
+          "indicator",
+          "meanFactorVinculo"
+        ],
+        "createdAt": "2026-07-07T21:38:02.902Z",
+        "updatedAt": "2026-07-07T21:38:02.902Z"
+      },
+      {
+        "id": "ibse:municipio-ensayo:meanFactorSituacion",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "IBSE – Factor Situación",
+        "content": "Valoración de la situación vital actual (ítems: feliz, disfrutar). Escala 0–100. Media municipal: 84.4 (n=814 registros válidos de 891 totales). Fuente: ibse-granada-provincia.csv.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "ibse",
+          "sourceLabel": "ibse-granada-provincia.csv",
+          "extractedAt": "2026-07-07T21:38:02.902Z",
+          "documentId": "doc-ibse"
+        },
+        "methodology": {
+          "description": "Agregado municipal calculado desde exportación REDCap. Instrumento IBSE (Bericat, 2014) adaptado para planificación local de salud.",
+          "limitations": [
+            "Los resultados son medias de la muestra disponible, no estimaciones poblacionales.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "ibse",
+          "indicator",
+          "meanFactorSituacion"
+        ],
+        "createdAt": "2026-07-07T21:38:02.902Z",
+        "updatedAt": "2026-07-07T21:38:02.902Z"
+      },
+      {
+        "id": "ibse:municipio-ensayo:meanFactorControl",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "IBSE – Factor Control",
+        "content": "Control percibido sobre la propia vida (ítems: energía, tranquilo). Escala 0–100. Media municipal: 77.7 (n=814 registros válidos de 891 totales). Fuente: ibse-granada-provincia.csv.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "ibse",
+          "sourceLabel": "ibse-granada-provincia.csv",
+          "extractedAt": "2026-07-07T21:38:02.902Z",
+          "documentId": "doc-ibse"
+        },
+        "methodology": {
+          "description": "Agregado municipal calculado desde exportación REDCap. Instrumento IBSE (Bericat, 2014) adaptado para planificación local de salud.",
+          "limitations": [
+            "Los resultados son medias de la muestra disponible, no estimaciones poblacionales.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "ibse",
+          "indicator",
+          "meanFactorControl"
+        ],
+        "createdAt": "2026-07-07T21:38:02.902Z",
+        "updatedAt": "2026-07-07T21:38:02.902Z"
+      },
+      {
+        "id": "ibse:municipio-ensayo:meanFactorPersona",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "IBSE – Factor Persona",
+        "content": "Autopercepción e identidad personal (ítems: optimista, bienmismo). Escala 0–100. Media municipal: 78.3 (n=814 registros válidos de 891 totales). Fuente: ibse-granada-provincia.csv.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "ibse",
+          "sourceLabel": "ibse-granada-provincia.csv",
+          "extractedAt": "2026-07-07T21:38:02.902Z",
+          "documentId": "doc-ibse"
+        },
+        "methodology": {
+          "description": "Agregado municipal calculado desde exportación REDCap. Instrumento IBSE (Bericat, 2014) adaptado para planificación local de salud.",
+          "limitations": [
+            "Los resultados son medias de la muestra disponible, no estimaciones poblacionales.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "ibse",
+          "indicator",
+          "meanFactorPersona"
+        ],
+        "createdAt": "2026-07-07T21:38:02.902Z",
+        "updatedAt": "2026-07-07T21:38:02.902Z"
+      },
+      {
+        "id": "ibse:municipio-ensayo:resumen-interpretativo",
+        "municipalityId": "municipio-ensayo",
+        "kind": "qualitative-observation",
+        "title": "IBSE – Resumen interpretativo estructural (derivado)",
+        "content": "Síntesis automática derivada de IBSE_FACTORES. No es fuente primaria de evidencia cuantitativa. Índice IBSE total: 76.2/100 — alto (≥75/100). Factor con menor puntuación: Vínculo (64.6/100) — dimensión con menor bienestar relativo en la muestra. Factor con mayor puntuación: Situación (84.4/100) — dimensión con mayor bienestar relativo. Dispersión interfactorial: moderada (19.8 puntos). Muestra: 814 registro(s) válido(s) de 891 totales. [Contrato arquitectónico] IBSE_RESUMEN constituye una síntesis automática derivada del procesamiento de los resultados del estudio y requiere validación técnica humana antes de utilizarse como apoyo a la interpretación territorial o a la planificación.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "ibse",
+          "sourceLabel": "ibse-granada-provincia.csv",
+          "extractedAt": "2026-07-07T21:38:02.902Z",
+          "documentId": "doc-ibse"
+        },
+        "methodology": {
+          "description": "Síntesis automática derivada del procesamiento de los resultados de IBSE_FACTORES. Identifica el factor de menor puntuación, el de mayor puntuación y la dispersión interfactorial. IBSE_RESUMEN no es una fuente primaria de conocimiento ni una interpretación experta. No debe prevalecer sobre los datos cuantitativos (IBSE_FACTORES) cuando exista discrepancia. IBSE_RESUMEN constituye una síntesis automática derivada del procesamiento de los resultados del estudio y requiere validación técnica humana antes de utilizarse como apoyo a la interpretación territorial o a la planificación.",
+          "limitations": [
+            "[Regla del sistema] Los umbrales de clasificación (alto/medio/bajo) son heurísticos definidos por el sistema, no por el instrumento IBSE ni por criterios normativos o clínicos.",
+            "[Regla del sistema] La alerta por dispersión interfactorial alta (>20 puntos) es una regla automática del sistema, no una conclusión metodológica del instrumento IBSE (Bericat, 2014).",
+            "La interpretación es comparativa dentro de la muestra municipal, sin referencias poblacionales externas.",
+            "IBSE_RESUMEN debe emplearse solo como observación contextual de apoyo; IBSE_FACTORES constituye la fuente primaria de evidencia cuantitativa.",
+            "Los resultados son medias de la muestra disponible, no estimaciones poblacionales.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "ibse",
+          "qualitative-observation",
+          "ibse-resumen",
+          "ibse-derived"
+        ],
+        "createdAt": "2026-07-07T21:38:02.902Z",
+        "updatedAt": "2026-07-07T21:38:02.902Z"
+      },
+      {
+        "id": "duke-eas:municipio-ensayo:global",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "DUKE-EAS - Apoyo social funcional global",
+        "content": "Suma P5701..P5711. Media: 49.2/55. Apoyo bajo: 1658 de 3028 registros validos (54.8 %). Incompletos/no calculables en esta escala: 0 de 3028. Fuente: duke-eas-granada.csv. Recodificacion EAS: 0 = apoyo normal, 1 = apoyo bajo, 993 = Duke incompleto/no calculable.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "duke-eas-granada.csv",
+          "extractedAt": "2026-07-07T21:38:02.912Z",
+          "documentId": "doc-duke"
+        },
+        "methodology": {
+          "description": "Agregado municipal calculado desde CSV DUKE-EAS. La recodificacion implementada se reconstruyo empiricamente desde los microdatos EAS disponibles con reproduccion 100 %.",
+          "limitations": [
+            "DUKE-EAS: recodificacion reconstruida empiricamente desde los microdatos EAS disponibles con reproduccion 100 %. No se presenta como criterio clinico universal.",
+            "Los resultados son agregados de la muestra importada y requieren validacion tecnica antes de alimentar interpretacion territorial o planificacion.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "duke-eas",
+          "eas",
+          "complementary-study",
+          "indicator",
+          "global"
+        ],
+        "createdAt": "2026-07-07T21:38:02.913Z",
+        "updatedAt": "2026-07-07T21:38:02.913Z"
+      },
+      {
+        "id": "duke-eas:municipio-ensayo:confidencial",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "DUKE-EAS - Apoyo confidencial",
+        "content": "Suma P5701, P5702, P5706, P5707, P5708, P5709, P5710. Media: 31.1/35. Apoyo bajo: 1605 de 3028 registros validos (53.0 %). Incompletos/no calculables en esta escala: 0 de 3028. Fuente: duke-eas-granada.csv. Recodificacion EAS: 0 = apoyo normal, 1 = apoyo bajo, 993 = Duke incompleto/no calculable.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "duke-eas-granada.csv",
+          "extractedAt": "2026-07-07T21:38:02.912Z",
+          "documentId": "doc-duke"
+        },
+        "methodology": {
+          "description": "Agregado municipal calculado desde CSV DUKE-EAS. La recodificacion implementada se reconstruyo empiricamente desde los microdatos EAS disponibles con reproduccion 100 %.",
+          "limitations": [
+            "DUKE-EAS: recodificacion reconstruida empiricamente desde los microdatos EAS disponibles con reproduccion 100 %. No se presenta como criterio clinico universal.",
+            "Los resultados son agregados de la muestra importada y requieren validacion tecnica antes de alimentar interpretacion territorial o planificacion.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "duke-eas",
+          "eas",
+          "complementary-study",
+          "indicator",
+          "confidencial"
+        ],
+        "createdAt": "2026-07-07T21:38:02.913Z",
+        "updatedAt": "2026-07-07T21:38:02.913Z"
+      },
+      {
+        "id": "duke-eas:municipio-ensayo:afectivo",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "DUKE-EAS - Apoyo afectivo",
+        "content": "Suma P5703, P5704, P5705, P5711. Media: 18.1/20. Apoyo bajo: 1360 de 3028 registros validos (44.9 %). Incompletos/no calculables en esta escala: 0 de 3028. Fuente: duke-eas-granada.csv. Recodificacion EAS: 0 = apoyo normal, 1 = apoyo bajo, 993 = Duke incompleto/no calculable.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "duke-eas-granada.csv",
+          "extractedAt": "2026-07-07T21:38:02.912Z",
+          "documentId": "doc-duke"
+        },
+        "methodology": {
+          "description": "Agregado municipal calculado desde CSV DUKE-EAS. La recodificacion implementada se reconstruyo empiricamente desde los microdatos EAS disponibles con reproduccion 100 %.",
+          "limitations": [
+            "DUKE-EAS: recodificacion reconstruida empiricamente desde los microdatos EAS disponibles con reproduccion 100 %. No se presenta como criterio clinico universal.",
+            "Los resultados son agregados de la muestra importada y requieren validacion tecnica antes de alimentar interpretacion territorial o planificacion.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "duke-eas",
+          "eas",
+          "complementary-study",
+          "indicator",
+          "afectivo"
+        ],
+        "createdAt": "2026-07-07T21:38:02.913Z",
+        "updatedAt": "2026-07-07T21:38:02.913Z"
+      },
+      {
+        "id": "duke-eas:municipio-ensayo:cautela-recodificacion",
+        "municipalityId": "municipio-ensayo",
+        "kind": "methodological-caution",
+        "title": "DUKE-EAS - Cautela metodologica de recodificacion",
+        "content": "La recodificacion DUKE-EAS usada por COMPAS NG reproduce al 100 % los microdatos EAS disponibles, pero no se presenta como criterio clinico universal ni genera decisiones automaticas. Debe usarse como evidencia complementaria para interpretacion tecnica validada.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "duke-eas-granada.csv",
+          "extractedAt": "2026-07-07T21:38:02.912Z",
+          "documentId": "doc-duke"
+        },
+        "methodology": {
+          "description": "Cautela metodologica asociada al procesamiento DUKE-EAS como estudio complementario concreto.",
+          "limitations": [
+            "DUKE-EAS: recodificacion reconstruida empiricamente desde los microdatos EAS disponibles con reproduccion 100 %. No se presenta como criterio clinico universal.",
+            "Los resultados son agregados de la muestra importada y requieren validacion tecnica antes de alimentar interpretacion territorial o planificacion.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "duke-eas",
+          "eas",
+          "complementary-study",
+          "methodological-caution"
+        ],
+        "createdAt": "2026-07-07T21:38:02.913Z",
+        "updatedAt": "2026-07-07T21:38:02.913Z"
+      },
+      {
+        "id": "predimed-eas:municipio-ensayo:adherencia",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "PREDIMED-EAS - Adherencia a dieta mediterranea",
+        "content": "Puntuacion media PREDIMED-14: 7.6/14. Alta adherencia (>= 9): 270 de 712 registros validos (37.9 %). Adherencia media (7-8): 186 (26.1 %). Baja adherencia (<= 6): 256 (36.0 %). Registros sin puntuacion calculable: 2352 de 3064. Fuente: predimed-eas-granada.csv.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "predimed-eas-granada.csv",
+          "extractedAt": "2026-07-07T21:38:02.915Z",
+          "documentId": "doc-predimed"
+        },
+        "methodology": {
+          "description": "Agregado municipal calculado desde CSV PREDIMED-EAS. Puntuacion canonica del campo derivado EAS cuando esta disponible; en caso contrario, suma de los 14 items P36BPD01..P36BPD14_2023.",
+          "limitations": [
+            "Puntuacion canonica obtenida del campo derivado EAS (Predimed). No se recalcula el indice.",
+            "PREDIMED-14: adherencia baja <= 6, media 7-8, alta >= 9. Corte segun Martinez-Gonzalez (2012), adaptacion EAS Andalucia.",
+            "Los resultados son agregados de la muestra importada y requieren validacion tecnica antes de alimentar interpretacion territorial o planificacion.",
+            "76.8 % de registros sin puntuacion Predimed calculable. En los microdatos EAS READY, Predimed solo se calcula para registros de oleadas que incluyen el modulo PREDIMED-14.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "predimed-eas",
+          "eas",
+          "complementary-study",
+          "indicator",
+          "alimentacion"
+        ],
+        "createdAt": "2026-07-07T21:38:02.915Z",
+        "updatedAt": "2026-07-07T21:38:02.915Z"
+      },
+      {
+        "id": "predimed-eas:municipio-ensayo:cautela-metodologica",
+        "municipalityId": "municipio-ensayo",
+        "kind": "methodological-caution",
+        "title": "PREDIMED-EAS - Cautela metodologica",
+        "content": "El indice PREDIMED-14 mide adherencia a la dieta mediterranea mediante 14 items dicotomicos. Los cortes (baja <= 6, media 7-8, alta >= 9) siguen a Martinez-Gonzalez (2012) adaptados a la EAS de Andalucia. No es instrumento clinico ni genera decisiones automaticas. Debe usarse como evidencia complementaria para interpretacion tecnica validada.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "predimed-eas-granada.csv",
+          "extractedAt": "2026-07-07T21:38:02.915Z",
+          "documentId": "doc-predimed"
+        },
+        "methodology": {
+          "description": "Cautela metodologica asociada al procesamiento PREDIMED-EAS como estudio complementario concreto.",
+          "limitations": [
+            "Puntuacion canonica obtenida del campo derivado EAS (Predimed). No se recalcula el indice.",
+            "PREDIMED-14: adherencia baja <= 6, media 7-8, alta >= 9. Corte segun Martinez-Gonzalez (2012), adaptacion EAS Andalucia.",
+            "Los resultados son agregados de la muestra importada y requieren validacion tecnica antes de alimentar interpretacion territorial o planificacion.",
+            "76.8 % de registros sin puntuacion Predimed calculable. En los microdatos EAS READY, Predimed solo se calcula para registros de oleadas que incluyen el modulo PREDIMED-14.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "predimed-eas",
+          "eas",
+          "complementary-study",
+          "methodological-caution"
+        ],
+        "createdAt": "2026-07-07T21:38:02.915Z",
+        "updatedAt": "2026-07-07T21:38:02.915Z"
+      },
+      {
+        "id": "sf12-eas:municipio-ensayo:pcs12",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "SF-12 EAS - Componente Físico de Salud (PCS12_SP)",
+        "content": "Media PCS12_SP: 49.552 (escala 0-100; mayor = mejor salud física percibida). n válidos: 3047 de 3064. Sin puntuación: 17. Fuente: sf12-eas-granada.csv. Norma española: Vilagut et al. 2008 (Med Clín Barc 130(19):726-735).",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "sf12-eas-granada.csv",
+          "extractedAt": "2026-07-07T21:38:02.920Z",
+          "documentId": "doc-sf12"
+        },
+        "methodology": {
+          "description": "Puntuación canónica pre-calculada por la EAS aplicando coeficientes factoriales de la norma española. COMPÁS NG la consume directamente sin recalcular desde los 12 ítems.",
+          "limitations": [
+            "PCS12_SP y MCS12_SP son puntuaciones canónicas pre-calculadas por la Encuesta Andaluza de Salud aplicando los coeficientes factoriales de la norma española (Vilagut et al. 2008, Med Clín Barc 130(19):726-735). COMPÁS NG las consume directamente; no recalcula PCS ni MCS desde los 12 ítems.",
+            "Las puntuaciones están en escala 0-100 (media poblacional española ≈ 50, DT ≈ 10). Mayor puntuación indica mejor estado de salud percibida en el componente correspondiente.",
+            "Los resultados son agregados de la muestra importada y requieren validación técnica antes de alimentar interpretación territorial o planificación.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "sf12-eas",
+          "eas",
+          "complementary-study",
+          "indicator",
+          "salud-fisica"
+        ],
+        "createdAt": "2026-07-07T21:38:02.920Z",
+        "updatedAt": "2026-07-07T21:38:02.920Z"
+      },
+      {
+        "id": "sf12-eas:municipio-ensayo:mcs12",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "SF-12 EAS - Componente Mental de Salud (MCS12_SP)",
+        "content": "Media MCS12_SP: 51.139 (escala 0-100; mayor = mejor salud mental percibida). n válidos: 3047 de 3064. Sin puntuación: 17. Fuente: sf12-eas-granada.csv. Norma española: Vilagut et al. 2008 (Med Clín Barc 130(19):726-735).",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "sf12-eas-granada.csv",
+          "extractedAt": "2026-07-07T21:38:02.920Z",
+          "documentId": "doc-sf12"
+        },
+        "methodology": {
+          "description": "Puntuación canónica pre-calculada por la EAS aplicando coeficientes factoriales de la norma española. COMPÁS NG la consume directamente sin recalcular desde los 12 ítems.",
+          "limitations": [
+            "PCS12_SP y MCS12_SP son puntuaciones canónicas pre-calculadas por la Encuesta Andaluza de Salud aplicando los coeficientes factoriales de la norma española (Vilagut et al. 2008, Med Clín Barc 130(19):726-735). COMPÁS NG las consume directamente; no recalcula PCS ni MCS desde los 12 ítems.",
+            "Las puntuaciones están en escala 0-100 (media poblacional española ≈ 50, DT ≈ 10). Mayor puntuación indica mejor estado de salud percibida en el componente correspondiente.",
+            "Los resultados son agregados de la muestra importada y requieren validación técnica antes de alimentar interpretación territorial o planificación.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "sf12-eas",
+          "eas",
+          "complementary-study",
+          "indicator",
+          "salud-mental"
+        ],
+        "createdAt": "2026-07-07T21:38:02.920Z",
+        "updatedAt": "2026-07-07T21:38:02.920Z"
+      },
+      {
+        "id": "sf12-eas:municipio-ensayo:cautela-metodologica",
+        "municipalityId": "municipio-ensayo",
+        "kind": "methodological-caution",
+        "title": "SF-12 EAS - Cautela metodológica",
+        "content": "PCS12_SP y MCS12_SP son puntuaciones norm-based de salud percibida calculadas por la EAS con los coeficientes de Vilagut et al. 2008. COMPÁS NG no recalcula estas puntuaciones desde los 12 ítems porque el algoritmo factorial requiere acceso a los coeficientes de la norma española. No se generan indicadores dicotómicos, por cuartil ni por mediana: cualquier clasificación categórica futura requiere referencia metodológica explícita.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "sf12-eas-granada.csv",
+          "extractedAt": "2026-07-07T21:38:02.920Z",
+          "documentId": "doc-sf12"
+        },
+        "methodology": {
+          "description": "Cautela metodológica asociada al procesamiento SF-12 EAS como estudio complementario.",
+          "limitations": [
+            "PCS12_SP y MCS12_SP son puntuaciones canónicas pre-calculadas por la Encuesta Andaluza de Salud aplicando los coeficientes factoriales de la norma española (Vilagut et al. 2008, Med Clín Barc 130(19):726-735). COMPÁS NG las consume directamente; no recalcula PCS ni MCS desde los 12 ítems.",
+            "Las puntuaciones están en escala 0-100 (media poblacional española ≈ 50, DT ≈ 10). Mayor puntuación indica mejor estado de salud percibida en el componente correspondiente.",
+            "Los resultados son agregados de la muestra importada y requieren validación técnica antes de alimentar interpretación territorial o planificación.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "sf12-eas",
+          "eas",
+          "complementary-study",
+          "methodological-caution"
+        ],
+        "createdAt": "2026-07-07T21:38:02.920Z",
+        "updatedAt": "2026-07-07T21:38:02.920Z"
+      },
+      {
+        "id": "sueno-eas:municipio-ensayo:duracion-insuficiente",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "Sueño EAS - Duración insuficiente (P33_R)",
+        "content": "32.8 % de la muestra no duerme las horas recomendadas por la Sociedad Española del Sueño (P33_R=1). n con sueño insuficiente: 985 de 3004 válidos. Missing P33_R: 60 de 3064. Fuente: sueno-eas-granada.csv. Campo derivado oficial EAS — no recalculado desde ítems crudos.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "sueno-eas-granada.csv",
+          "extractedAt": "2026-07-07T21:38:02.922Z",
+          "documentId": "doc-sueno"
+        },
+        "methodology": {
+          "description": "P33_R es un campo derivado pre-calculado por la EAS que clasifica si la persona duerme las horas recomendadas. COMPÁS NG lo consume directamente sin reconstruirlo.",
+          "limitations": [
+            "P33_R y P33A son campos derivados oficiales de la Encuesta Andaluza de Salud (EAS). P33_R clasifica si la persona duerme las horas recomendadas por la Sociedad Española del Sueño. P33A recoge si las horas dormidas permiten descansar suficiente (calidad subjetiva). Son dimensiones independientes: no deben sumarse ni compararse directamente.",
+            "P33_R y P33A son indicadores propios de la Encuesta Andaluza de Salud (EAS) para monitorización del sueño en la población andaluza. No son escalas validadas externamente.",
+            "Se espera una discordancia del ~29 % entre P33_R y P33A en la muestra EAS, lo que es estadísticamente coherente con la literatura del sueño.",
+            "Los resultados son agregados de la muestra importada y requieren validación técnica antes de alimentar interpretación territorial o planificación.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "sueno-eas",
+          "eas",
+          "complementary-study",
+          "indicator",
+          "sueno"
+        ],
+        "createdAt": "2026-07-07T21:38:02.922Z",
+        "updatedAt": "2026-07-07T21:38:02.922Z"
+      },
+      {
+        "id": "sueno-eas:municipio-ensayo:calidad-subjetiva",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "Sueño EAS - Calidad subjetiva: no descansa suficiente (P33A)",
+        "content": "28.8 % de la muestra indica que las horas dormidas no le permiten descansar lo suficiente (P33A=0). n sin descanso suficiente: 665 de 2306 válidos. Missing P33A: 758 de 3064. Fuente: sueno-eas-granada.csv.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "sueno-eas-granada.csv",
+          "extractedAt": "2026-07-07T21:38:02.922Z",
+          "documentId": "doc-sueno"
+        },
+        "methodology": {
+          "description": "P33A es un ítem directo de la EAS sobre calidad subjetiva del sueño. Mide percepción de descanso, complementaria e independiente de P33_R (duración).",
+          "limitations": [
+            "P33_R y P33A son campos derivados oficiales de la Encuesta Andaluza de Salud (EAS). P33_R clasifica si la persona duerme las horas recomendadas por la Sociedad Española del Sueño. P33A recoge si las horas dormidas permiten descansar suficiente (calidad subjetiva). Son dimensiones independientes: no deben sumarse ni compararse directamente.",
+            "P33_R y P33A son indicadores propios de la Encuesta Andaluza de Salud (EAS) para monitorización del sueño en la población andaluza. No son escalas validadas externamente.",
+            "Se espera una discordancia del ~29 % entre P33_R y P33A en la muestra EAS, lo que es estadísticamente coherente con la literatura del sueño.",
+            "Los resultados son agregados de la muestra importada y requieren validación técnica antes de alimentar interpretación territorial o planificación.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "sueno-eas",
+          "eas",
+          "complementary-study",
+          "indicator",
+          "sueno"
+        ],
+        "createdAt": "2026-07-07T21:38:02.922Z",
+        "updatedAt": "2026-07-07T21:38:02.922Z"
+      },
+      {
+        "id": "sueno-eas:municipio-ensayo:cautela-metodologica",
+        "municipalityId": "municipio-ensayo",
+        "kind": "methodological-caution",
+        "title": "Sueño EAS - Cautela metodológica",
+        "content": "P33_R y P33A son indicadores propios de la EAS para monitorización del sueño en la población andaluza. No son escalas de sueño validadas externamente. P33_R mide duración (criterio cuantitativo SES); P33A mide calidad subjetiva percibida. Se espera ~29 % de discordancia entre ambas dimensiones, lo cual es metodológicamente coherente. Los datos reflejan la muestra EAS provincial, no la población de ningún municipio concreto.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "sueno-eas-granada.csv",
+          "extractedAt": "2026-07-07T21:38:02.922Z",
+          "documentId": "doc-sueno"
+        },
+        "methodology": {
+          "description": "Cautela metodológica asociada al procesamiento de Sueño EAS como estudio complementario.",
+          "limitations": [
+            "P33_R y P33A son campos derivados oficiales de la Encuesta Andaluza de Salud (EAS). P33_R clasifica si la persona duerme las horas recomendadas por la Sociedad Española del Sueño. P33A recoge si las horas dormidas permiten descansar suficiente (calidad subjetiva). Son dimensiones independientes: no deben sumarse ni compararse directamente.",
+            "P33_R y P33A son indicadores propios de la Encuesta Andaluza de Salud (EAS) para monitorización del sueño en la población andaluza. No son escalas validadas externamente.",
+            "Se espera una discordancia del ~29 % entre P33_R y P33A en la muestra EAS, lo que es estadísticamente coherente con la literatura del sueño.",
+            "Los resultados son agregados de la muestra importada y requieren validación técnica antes de alimentar interpretación territorial o planificación.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "sueno-eas",
+          "eas",
+          "complementary-study",
+          "methodological-caution"
+        ],
+        "createdAt": "2026-07-07T21:38:02.922Z",
+        "updatedAt": "2026-07-07T21:38:02.922Z"
+      },
+      {
+        "id": "cage-eas:municipio-ensayo:riesgo-alcoholismo",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "CAGE-EAS - Riesgo de alcoholismo (CAGE_R)",
+        "content": "0.6 % de la muestra con CAGE_R presenta riesgo de alcoholismo según el campo derivado oficial de la EAS. n con riesgo: 14 de 2513 válidos. Missing / no procede (abstinentes): 551 de 3064. Fuente: cage-eas-granada.csv. Campo derivado oficial EAS — no recalculado desde ítems crudos.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "cage-eas-granada.csv",
+          "extractedAt": "2026-07-07T21:38:02.924Z",
+          "documentId": "doc-cage"
+        },
+        "methodology": {
+          "description": "CAGE_R es un campo derivado pre-calculado por la EAS que clasifica el riesgo de alcoholismo. COMPÁS NG lo consume directamente sin reconstruirlo desde ítems individuales.",
+          "limitations": [
+            "CAGE_R y CAGE son campos derivados oficiales de la Encuesta Andaluza de Salud (EAS). COMPÁS NG los consume directamente sin recalcular el CAGE desde ítems individuales.",
+            "El missing en CAGE_R (~18 % en la EAS Granada) es estructural: corresponde a personas abstemias a las que el protocolo EAS no administra el test ('No procede'). No es missing aleatorio.",
+            "Los ítems de consumo episódico masivo de la EAS (oleada 2023) no forman parte de este análisis. Son instrumentos que miden dimensiones distintas del consumo de alcohol.",
+            "Los resultados son agregados de la muestra importada y requieren validación técnica antes de alimentar interpretación territorial o planificación.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "cage-eas",
+          "eas",
+          "complementary-study",
+          "indicator",
+          "alcohol"
+        ],
+        "createdAt": "2026-07-07T21:38:02.924Z",
+        "updatedAt": "2026-07-07T21:38:02.924Z"
+      },
+      {
+        "id": "cage-eas:municipio-ensayo:clasificacion-consumo",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "CAGE-EAS - Clasificación ordinal de consumo (CAGE)",
+        "content": "Entre los 2513 registros con CAGE válido: 2499 bebedores sociales (99.4 %), 7 consumo de riesgo (0.3 %), 3 consumo perjudicial (0.1 %), 4 dependencia alcohólica (0.2 %). Consumo de riesgo o superior: 14 personas. Fuente: cage-eas-granada.csv.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "cage-eas-granada.csv",
+          "extractedAt": "2026-07-07T21:38:02.924Z",
+          "documentId": "doc-cage"
+        },
+        "methodology": {
+          "description": "CAGE es el campo ordinal pre-calculado por la EAS que clasifica el nivel de consumo en 4 categorías. COMPÁS NG lo consume directamente sin reconstruirlo desde ítems individuales.",
+          "limitations": [
+            "CAGE_R y CAGE son campos derivados oficiales de la Encuesta Andaluza de Salud (EAS). COMPÁS NG los consume directamente sin recalcular el CAGE desde ítems individuales.",
+            "El missing en CAGE_R (~18 % en la EAS Granada) es estructural: corresponde a personas abstemias a las que el protocolo EAS no administra el test ('No procede'). No es missing aleatorio.",
+            "Los ítems de consumo episódico masivo de la EAS (oleada 2023) no forman parte de este análisis. Son instrumentos que miden dimensiones distintas del consumo de alcohol.",
+            "Los resultados son agregados de la muestra importada y requieren validación técnica antes de alimentar interpretación territorial o planificación.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "cage-eas",
+          "eas",
+          "complementary-study",
+          "indicator",
+          "alcohol"
+        ],
+        "createdAt": "2026-07-07T21:38:02.924Z",
+        "updatedAt": "2026-07-07T21:38:02.924Z"
+      },
+      {
+        "id": "cage-eas:municipio-ensayo:cautela-metodologica",
+        "municipalityId": "municipio-ensayo",
+        "kind": "methodological-caution",
+        "title": "CAGE-EAS - Cautela metodológica",
+        "content": "CAGE_R y CAGE son indicadores propios de la EAS para monitorización del consumo de alcohol en la población andaluza. COMPÁS NG los consume directamente sin recalcular el CAGE desde ítems individuales. El missing estructural (~18 % en Granada) corresponde a personas abstemias a las que el protocolo EAS no administra el test ('No procede'): no es missing aleatorio ni indica falta de datos. Los ítems de consumo episódico masivo de la EAS no forman parte de este análisis. Los datos reflejan la muestra EAS provincial, no la población de ningún municipio concreto.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "cage-eas-granada.csv",
+          "extractedAt": "2026-07-07T21:38:02.924Z",
+          "documentId": "doc-cage"
+        },
+        "methodology": {
+          "description": "Cautela metodológica asociada al procesamiento de CAGE-EAS como estudio complementario.",
+          "limitations": [
+            "CAGE_R y CAGE son campos derivados oficiales de la Encuesta Andaluza de Salud (EAS). COMPÁS NG los consume directamente sin recalcular el CAGE desde ítems individuales.",
+            "El missing en CAGE_R (~18 % en la EAS Granada) es estructural: corresponde a personas abstemias a las que el protocolo EAS no administra el test ('No procede'). No es missing aleatorio.",
+            "Los ítems de consumo episódico masivo de la EAS (oleada 2023) no forman parte de este análisis. Son instrumentos que miden dimensiones distintas del consumo de alcohol.",
+            "Los resultados son agregados de la muestra importada y requieren validación técnica antes de alimentar interpretación territorial o planificación.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "cage-eas",
+          "eas",
+          "complementary-study",
+          "methodological-caution"
+        ],
+        "createdAt": "2026-07-07T21:38:02.924Z",
+        "updatedAt": "2026-07-07T21:38:02.924Z"
+      },
+      {
+        "id": "auditc:municipio-ensayo:consumo-riesgo",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "AUDIT-C — Prevalencia de consumo de riesgo de alcohol",
+        "content": "21.2 % de la muestra adulta (n=18 de 85 registros válidos) presenta un score AUDIT-C ≥ 4 (consumo de riesgo). Score medio: 1.98/12. Distribución: sin consumo 28 personas, bajo riesgo (1–3) 39, riesgo (4–7) 15, alto riesgo (≥8) 3. Fuente: auditc-municipal.csv.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "auditc-municipal.csv",
+          "extractedAt": "2026-07-07T21:38:02.925Z",
+          "documentId": "doc-auditc"
+        },
+        "methodology": {
+          "description": "AUDIT-C: suma de los ítems Q1 (frecuencia), Q2 (cantidad habitual) y Q3 (frecuencia de consumo intensivo). Rango 0–12. Punto de corte ≥4 para consumo de riesgo.",
+          "limitations": [
+            "El AUDIT-C mide el patrón actual de consumo autorreferido de alcohol. Los resultados son estimaciones de la muestra y requieren validación técnica antes de alimentar interpretación territorial o planificación.",
+            "Punto de corte aplicado: score ≥ 4 (punto simplificado de uso general). El corte diferenciado por sexo (≥3 mujeres / ≥4 hombres, Bush et al. 1998) no se calcula en esta versión por ausencia del dato de sexo por participante. Si la muestra tiene alta proporción de mujeres, la prevalencia real de consumo de riesgo puede estar subestimada.",
+            "Un score 0 no equivale necesariamente a abstemia total: puede reflejar consumo ocasional muy esporádico que no activa los ítems Q2 y Q3.",
+            "Sin referencia provincial ni autonómica disponible para comparación territorial.",
+            "10 de 95 registros excluidos por datos incompletos o inválidos.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "auditc",
+          "complementary-study",
+          "indicator",
+          "alcohol"
+        ],
+        "createdAt": "2026-07-07T21:38:02.926Z",
+        "updatedAt": "2026-07-07T21:38:02.926Z"
+      },
+      {
+        "id": "auditc:municipio-ensayo:cautela-metodologica",
+        "municipalityId": "municipio-ensayo",
+        "kind": "methodological-caution",
+        "title": "AUDIT-C — Cautela metodológica",
+        "content": "El AUDIT-C mide el patrón actual de consumo autorreferido de alcohol mediante 3 ítems (frecuencia, cantidad y consumo intensivo). Punto de corte aplicado: ≥4 (general). El corte diferenciado por sexo (≥3 mujeres / ≥4 hombres) no se calcula en esta versión agregada, por lo que la prevalencia de riesgo en muestras con alta proporción de mujeres puede estar subestimada. No existe referencia provincial disponible para comparación territorial. Los datos reflejan la muestra importada, no la población municipal completa.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "auditc-municipal.csv",
+          "extractedAt": "2026-07-07T21:38:02.925Z",
+          "documentId": "doc-auditc"
+        },
+        "methodology": {
+          "description": "Cautela metodológica asociada al procesamiento de AUDIT-C como estudio complementario.",
+          "limitations": [
+            "El AUDIT-C mide el patrón actual de consumo autorreferido de alcohol. Los resultados son estimaciones de la muestra y requieren validación técnica antes de alimentar interpretación territorial o planificación.",
+            "Punto de corte aplicado: score ≥ 4 (punto simplificado de uso general). El corte diferenciado por sexo (≥3 mujeres / ≥4 hombres, Bush et al. 1998) no se calcula en esta versión por ausencia del dato de sexo por participante. Si la muestra tiene alta proporción de mujeres, la prevalencia real de consumo de riesgo puede estar subestimada.",
+            "Un score 0 no equivale necesariamente a abstemia total: puede reflejar consumo ocasional muy esporádico que no activa los ítems Q2 y Q3.",
+            "Sin referencia provincial ni autonómica disponible para comparación territorial.",
+            "10 de 95 registros excluidos por datos incompletos o inválidos.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "auditc",
+          "complementary-study",
+          "methodological-caution"
+        ],
+        "createdAt": "2026-07-07T21:38:02.926Z",
+        "updatedAt": "2026-07-07T21:38:02.926Z"
+      },
+      {
+        "id": "ipaq-eas:municipio-ensayo:actividad-alta",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "IPAQ-EAS - Alta actividad física (IPAQ_DICO)",
+        "content": "15.7 % de la muestra con IPAQ_DICO presenta alta actividad física (≥600 MET-min/sem o ≥150 min/sem vigorosa) según el campo derivado oficial de la EAS. n con alta actividad: 251 de 1603 válidos. Nivel no-alto (bajo o moderado): 84.3 % (n=1352). Missing / no evaluado: 1461 de 3064. Fuente: ipaq-eas-granada.csv. Campo derivado oficial EAS — no recalculado desde ítems crudos.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "ipaq-eas-granada.csv",
+          "extractedAt": "2026-07-07T21:38:02.927Z",
+          "documentId": "doc-ipaq"
+        },
+        "methodology": {
+          "description": "IPAQ_DICO es un campo derivado pre-calculado por la EAS que clasifica la actividad física en dos categorías: alta (1) y no-alta (0). COMPÁS NG lo consume directamente sin reconstruirlo desde ítems individuales.",
+          "limitations": [
+            "IPAQ_DICO y P34A_R son campos derivados oficiales de la Encuesta Andaluza de Salud (EAS). COMPÁS NG los consume directamente sin recalcular los MET-min/semana desde ítems individuales.",
+            "El missing en IPAQ_DICO (~48 % en la EAS Granada) es sustancial y puede reflejar personas mayores u otros grupos no evaluados. No es necesariamente missing aleatorio.",
+            "IPAQ_DICO = 0 incluye tanto actividad física baja como moderada: no equivale a sedentarismo total. Para sedentarismo específico, usar el SBQ.",
+            "P34A_R solo evalúa la inactividad en tiempo libre, no la actividad laboral ni doméstica.",
+            "Los resultados son agregados de la muestra importada y requieren validación técnica antes de alimentar interpretación territorial o planificación.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "ipaq-eas",
+          "eas",
+          "complementary-study",
+          "indicator",
+          "actividad-fisica"
+        ],
+        "createdAt": "2026-07-07T21:38:02.927Z",
+        "updatedAt": "2026-07-07T21:38:02.927Z"
+      },
+      {
+        "id": "ipaq-eas:municipio-ensayo:inactividad-tiempo-libre",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "IPAQ-EAS - Inactividad en tiempo libre (P34A_R)",
+        "content": "34.2 % de la muestra adulta es inactiva en tiempo libre (P34A_R = 1: no realiza actividad física en el ocio). n inactivos: 1047 de 3058 válidos. Activos en tiempo libre: 65.8 % (n=2011). Missing: 6 de 3064. Fuente: ipaq-eas-granada.csv.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "ipaq-eas-granada.csv",
+          "extractedAt": "2026-07-07T21:38:02.927Z",
+          "documentId": "doc-ipaq"
+        },
+        "methodology": {
+          "description": "P34A_R es un campo derivado de la EAS que identifica si la persona realiza actividad física en su tiempo libre. COMPÁS NG lo consume directamente.",
+          "limitations": [
+            "IPAQ_DICO y P34A_R son campos derivados oficiales de la Encuesta Andaluza de Salud (EAS). COMPÁS NG los consume directamente sin recalcular los MET-min/semana desde ítems individuales.",
+            "El missing en IPAQ_DICO (~48 % en la EAS Granada) es sustancial y puede reflejar personas mayores u otros grupos no evaluados. No es necesariamente missing aleatorio.",
+            "IPAQ_DICO = 0 incluye tanto actividad física baja como moderada: no equivale a sedentarismo total. Para sedentarismo específico, usar el SBQ.",
+            "P34A_R solo evalúa la inactividad en tiempo libre, no la actividad laboral ni doméstica.",
+            "Los resultados son agregados de la muestra importada y requieren validación técnica antes de alimentar interpretación territorial o planificación.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "ipaq-eas",
+          "eas",
+          "complementary-study",
+          "indicator",
+          "actividad-fisica"
+        ],
+        "createdAt": "2026-07-07T21:38:02.927Z",
+        "updatedAt": "2026-07-07T21:38:02.927Z"
+      },
+      {
+        "id": "ipaq-eas:municipio-ensayo:cautela-metodologica",
+        "municipalityId": "municipio-ensayo",
+        "kind": "methodological-caution",
+        "title": "IPAQ-EAS - Cautela metodológica",
+        "content": "IPAQ_DICO y P34A_R son indicadores propios de la EAS para monitorización de la actividad física en la población andaluza. COMPÁS NG los consume directamente sin recalcular los MET-min desde ítems individuales. El missing sustancial en IPAQ_DICO (~48 % en Granada) puede reflejar personas mayores u otros grupos no evaluados: no debe ignorarse en la interpretación. IPAQ_DICO = 0 incluye actividad baja y moderada: no equivale a sedentarismo. P34A_R solo evalúa el tiempo libre, no la actividad laboral ni doméstica. Los datos reflejan la muestra EAS provincial, no la población de ningún municipio concreto.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "ipaq-eas-granada.csv",
+          "extractedAt": "2026-07-07T21:38:02.927Z",
+          "documentId": "doc-ipaq"
+        },
+        "methodology": {
+          "description": "Cautela metodológica asociada al procesamiento de IPAQ-EAS como estudio complementario.",
+          "limitations": [
+            "IPAQ_DICO y P34A_R son campos derivados oficiales de la Encuesta Andaluza de Salud (EAS). COMPÁS NG los consume directamente sin recalcular los MET-min/semana desde ítems individuales.",
+            "El missing en IPAQ_DICO (~48 % en la EAS Granada) es sustancial y puede reflejar personas mayores u otros grupos no evaluados. No es necesariamente missing aleatorio.",
+            "IPAQ_DICO = 0 incluye tanto actividad física baja como moderada: no equivale a sedentarismo total. Para sedentarismo específico, usar el SBQ.",
+            "P34A_R solo evalúa la inactividad en tiempo libre, no la actividad laboral ni doméstica.",
+            "Los resultados son agregados de la muestra importada y requieren validación técnica antes de alimentar interpretación territorial o planificación.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "ipaq-eas",
+          "eas",
+          "complementary-study",
+          "methodological-caution"
+        ],
+        "createdAt": "2026-07-07T21:38:02.927Z",
+        "updatedAt": "2026-07-07T21:38:02.927Z"
+      },
+      {
+        "id": "ghq12:municipio-ensayo:malestar-psicologico",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "GHQ-12 — Prevalencia de probable malestar psicológico",
+        "content": "26.3 % de la muestra adulta (n=25 de 95 registros válidos) presenta un score GHQ-12 bimodal ≥ 3 (probable malestar psicológico). Score bimodal medio: 1.89/12. Distribución: sin indicadores (0–2) 70 personas, probable caso leve-moderado (3–6) 25, probable caso moderado-grave (7–12) 0. Fuente: ghq12-municipal.csv.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "ghq12-municipal.csv",
+          "extractedAt": "2026-07-07T21:38:02.928Z",
+          "documentId": "doc-ghq12"
+        },
+        "methodology": {
+          "description": "GHQ-12: 12 ítems sobre estado de salud mental en las últimas semanas. Scoring bimodal (0/0/1/1): valores 0,1 → 0; valores 2,3 → 1. Score total 0–12. Punto de corte ≥3. Validado en España: Sánchez-López & Dresch (2008), Psicothema.",
+          "limitations": [
+            "El GHQ-12 es un instrumento de cribado de malestar psicológico, no diagnóstico. Un score positivo (≥3 en scoring bimodal) no implica trastorno mental confirmado. Los resultados son estimaciones de la muestra y requieren validación técnica.",
+            "Scoring bimodal aplicado (0/0/1/1): valores 0,1 → 0; valores 2,3 → 1 por ítem. Punto de corte ≥ 3 validado en población española (Sánchez-López & Dresch, 2008).",
+            "El GHQ-12 evalúa el estado de las últimas semanas, no el estado crónico. Los resultados pueden variar significativamente entre períodos de recogida.",
+            "Sin referencia provincial ni autonómica disponible para comparación territorial directa.",
+            "5 de 100 registros excluidos por datos incompletos o inválidos.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "ghq12",
+          "complementary-study",
+          "indicator",
+          "salud-mental"
+        ],
+        "createdAt": "2026-07-07T21:38:02.929Z",
+        "updatedAt": "2026-07-07T21:38:02.929Z"
+      },
+      {
+        "id": "ghq12:municipio-ensayo:cautela-metodologica",
+        "municipalityId": "municipio-ensayo",
+        "kind": "methodological-caution",
+        "title": "GHQ-12 — Cautela metodológica",
+        "content": "El GHQ-12 es un instrumento de cribado de malestar psicológico, no un instrumento diagnóstico. Un score ≥3 (scoring bimodal) indica probable malestar psicológico que requeriría evaluación clínica adicional para confirmar cualquier diagnóstico. El instrumento evalúa el estado de las últimas semanas: los resultados pueden variar significativamente en función del momento de recogida. No mide dominios específicos (ansiedad vs. depresión) sino malestar general. Los datos reflejan la muestra importada, no la población municipal completa.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "ghq12-municipal.csv",
+          "extractedAt": "2026-07-07T21:38:02.928Z",
+          "documentId": "doc-ghq12"
+        },
+        "methodology": {
+          "description": "Cautela metodológica del GHQ-12 como estudio complementario de salud mental.",
+          "limitations": [
+            "El GHQ-12 es un instrumento de cribado de malestar psicológico, no diagnóstico. Un score positivo (≥3 en scoring bimodal) no implica trastorno mental confirmado. Los resultados son estimaciones de la muestra y requieren validación técnica.",
+            "Scoring bimodal aplicado (0/0/1/1): valores 0,1 → 0; valores 2,3 → 1 por ítem. Punto de corte ≥ 3 validado en población española (Sánchez-López & Dresch, 2008).",
+            "El GHQ-12 evalúa el estado de las últimas semanas, no el estado crónico. Los resultados pueden variar significativamente entre períodos de recogida.",
+            "Sin referencia provincial ni autonómica disponible para comparación territorial directa.",
+            "5 de 100 registros excluidos por datos incompletos o inválidos.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "ghq12",
+          "complementary-study",
+          "methodological-caution"
+        ],
+        "createdAt": "2026-07-07T21:38:02.929Z",
+        "updatedAt": "2026-07-07T21:38:02.929Z"
+      },
+      {
+        "id": "phq9:municipio-ensayo:sintomas-depresivos",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "PHQ-9 — Prevalencia de síntomas depresivos moderados o superiores",
+        "content": "13.0 % de la muestra adulta (n=10 de 77 registros válidos) presenta síntomas depresivos moderados o superiores (PHQ-9 ≥ 10). Score medio: 8.65/27. Distribución: mínimo (0–4) 2, leve (5–9) 65, moderado (10–14) 6, mod.grave (15–19) 4, grave (≥20) 0. Fuente: phq9-municipal.csv.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "phq9-municipal.csv",
+          "extractedAt": "2026-07-07T21:38:02.929Z",
+          "documentId": "doc-phq9"
+        },
+        "methodology": {
+          "description": "PHQ-9: 9 ítems sobre síntomas depresivos de las últimas 2 semanas (0–3 cada uno). Score 0–27. Punto de corte ≥10 para depresión moderada o superior. Kroenke et al. (2001).",
+          "limitations": [
+            "El PHQ-9 es un instrumento de cribado de síntomas depresivos, no diagnóstico. Un score ≥10 indica síntomas moderados o superiores que requieren evaluación clínica.",
+            "IMPORTANTE: El ítem 9 (ideación suicida) requiere protocolo específico de manejo. No administrar sin protocolo de derivación disponible.",
+            "El PHQ-9 evalúa los síntomas de las últimas 2 semanas, no el estado crónico. Punto de corte ≥10: sensibilidad 88 %, especificidad 88 % (Kroenke et al., 2001).",
+            "Sin referencia provincial disponible para comparación territorial.",
+            "3 de 80 registros excluidos por datos incompletos o inválidos.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "phq9",
+          "complementary-study",
+          "indicator",
+          "salud-mental"
+        ],
+        "createdAt": "2026-07-07T21:38:02.929Z",
+        "updatedAt": "2026-07-07T21:38:02.929Z"
+      },
+      {
+        "id": "phq9:municipio-ensayo:cautela-metodologica",
+        "municipalityId": "municipio-ensayo",
+        "kind": "methodological-caution",
+        "title": "PHQ-9 — Cautela metodológica",
+        "content": "El PHQ-9 es un instrumento de cribado de síntomas depresivos, no diagnóstico. Un score ≥10 indica probable depresión moderada o superior: requiere evaluación clínica. IMPORTANTE: El ítem 9 (ideación suicida) requiere protocolo de derivación específico. El PHQ-9 evalúa los síntomas de las últimas 2 semanas, no el estado crónico. Los datos reflejan la muestra importada, no la población municipal completa.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "phq9-municipal.csv",
+          "extractedAt": "2026-07-07T21:38:02.929Z",
+          "documentId": "doc-phq9"
+        },
+        "methodology": {
+          "description": "Cautela metodológica del PHQ-9 como estudio complementario.",
+          "limitations": [
+            "El PHQ-9 es un instrumento de cribado de síntomas depresivos, no diagnóstico. Un score ≥10 indica síntomas moderados o superiores que requieren evaluación clínica.",
+            "IMPORTANTE: El ítem 9 (ideación suicida) requiere protocolo específico de manejo. No administrar sin protocolo de derivación disponible.",
+            "El PHQ-9 evalúa los síntomas de las últimas 2 semanas, no el estado crónico. Punto de corte ≥10: sensibilidad 88 %, especificidad 88 % (Kroenke et al., 2001).",
+            "Sin referencia provincial disponible para comparación territorial.",
+            "3 de 80 registros excluidos por datos incompletos o inválidos.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "phq9",
+          "complementary-study",
+          "methodological-caution"
+        ],
+        "createdAt": "2026-07-07T21:38:02.929Z",
+        "updatedAt": "2026-07-07T21:38:02.929Z"
+      },
+      {
+        "id": "psqi:municipio-ensayo:mala-calidad-sueno",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "PSQI — Prevalencia de mala calidad del sueño",
+        "content": "31.0 % de la muestra adulta (n=18 de 58 registros válidos) presenta mala calidad del sueño (PSQI global >5). Score medio: 6.26/21. Distribución: buen dormidor (≤5) 40, mal dormidor leve-moderado (6–10) 10, mal dormidor grave (11–21) 8. Fuente: psqi-municipal.csv.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "psqi-municipal.csv",
+          "extractedAt": "2026-07-07T21:38:02.930Z",
+          "documentId": "doc-psqi"
+        },
+        "methodology": {
+          "description": "PSQI: 7 componentes pre-calculados (C1–C7), cada uno 0–3. Score global 0–21. Punto de corte >5 para mala calidad del sueño. Buysse et al. (1989). Validado en España: Royuela & Macías (1997).",
+          "limitations": [
+            "El PSQI evalúa la calidad subjetiva del sueño en el último mes. Punto de corte >5: mala calidad del sueño. Sensibilidad 89.6 %, especificidad 86.5 %. Buysse et al. (1989). Validado en España: Royuela & Macías (1997).",
+            "COMPÁS NG procesa los 7 componentes PSQI pre-calculados. Los componentes deben ser calculados por el profesional antes de exportar desde REDCap, ya que cada uno requiere múltiples ítems del cuestionario original.",
+            "El PSQI evalúa el estado del último mes: no refleja la calidad del sueño habitual a largo plazo.",
+            "Sin referencia provincial disponible para comparación territorial.",
+            "2 de 60 registros excluidos por datos incompletos o inválidos.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "psqi",
+          "complementary-study",
+          "indicator",
+          "sueno"
+        ],
+        "createdAt": "2026-07-07T21:38:02.930Z",
+        "updatedAt": "2026-07-07T21:38:02.930Z"
+      },
+      {
+        "id": "psqi:municipio-ensayo:cautela-metodologica",
+        "municipalityId": "municipio-ensayo",
+        "kind": "methodological-caution",
+        "title": "PSQI — Cautela metodológica",
+        "content": "El PSQI evalúa la calidad subjetiva del sueño del último mes: no refleja el estado habitual a largo plazo. COMPÁS NG procesa los 7 componentes pre-calculados: los componentes deben ser calculados por el profesional antes de exportar desde REDCap. Un score >5 identifica al participante como 'mal dormidor' pero no equivale a diagnóstico de trastorno del sueño. Los datos reflejan la muestra importada, no la población completa.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "psqi-municipal.csv",
+          "extractedAt": "2026-07-07T21:38:02.930Z",
+          "documentId": "doc-psqi"
+        },
+        "methodology": {
+          "description": "Cautela metodológica del PSQI como estudio complementario.",
+          "limitations": [
+            "El PSQI evalúa la calidad subjetiva del sueño en el último mes. Punto de corte >5: mala calidad del sueño. Sensibilidad 89.6 %, especificidad 86.5 %. Buysse et al. (1989). Validado en España: Royuela & Macías (1997).",
+            "COMPÁS NG procesa los 7 componentes PSQI pre-calculados. Los componentes deben ser calculados por el profesional antes de exportar desde REDCap, ya que cada uno requiere múltiples ítems del cuestionario original.",
+            "El PSQI evalúa el estado del último mes: no refleja la calidad del sueño habitual a largo plazo.",
+            "Sin referencia provincial disponible para comparación territorial.",
+            "2 de 60 registros excluidos por datos incompletos o inválidos.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "psqi",
+          "complementary-study",
+          "methodological-caution"
+        ],
+        "createdAt": "2026-07-07T21:38:02.930Z",
+        "updatedAt": "2026-07-07T21:38:02.930Z"
+      },
+      {
+        "id": "fagerstrom:municipio-ensayo:dependencia-nicotina",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "Fagerström (FTND) — Dependencia moderada o superior a la nicotina",
+        "content": "31.3 % de la muestra de fumadores activos (n=15 de 48 evaluados) presenta dependencia moderada o superior a la nicotina (FTND ≥5). Score medio: 4.31/10. Distribución: muy baja (0–2) 6, baja (3–4) 27, moderada (5) 4, alta (6–7) 6, muy alta (8–10) 5. Fuente: fagerstrom-municipal.csv. Solo fumadores activos.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "fagerstrom-municipal.csv",
+          "extractedAt": "2026-07-07T21:38:02.931Z",
+          "documentId": "doc-fagerstrom"
+        },
+        "methodology": {
+          "description": "FTND: 6 ítems sobre dependencia física a la nicotina. Score 0–10. Punto de corte ≥5 para dependencia moderada o superior. Solo fumadores activos. Heatherton et al. (1991). Validado en España: Becoña & Vázquez (1998).",
+          "limitations": [
+            "El Test de Fagerström solo se administra a fumadores activos. Los resultados reflejan la distribución de dependencia tabáquica en la submuestra de fumadores, no en la población adulta total. La prevalencia de tabaquismo no es calculable desde este instrumento.",
+            "Score ≥5 indica dependencia moderada o superior con alta probabilidad de síntomas de abstinencia. Heatherton et al. (1991). Validado en España: Becoña & Vázquez (1998).",
+            "El instrumento mide dependencia física a la nicotina, no la dependencia psicológica al tabaco.",
+            "Sin referencia provincial disponible para comparación territorial directa.",
+            "2 de 50 registros excluidos por datos incompletos o inválidos.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "fagerstrom",
+          "complementary-study",
+          "indicator",
+          "tabaquismo"
+        ],
+        "createdAt": "2026-07-07T21:38:02.931Z",
+        "updatedAt": "2026-07-07T21:38:02.931Z"
+      },
+      {
+        "id": "fagerstrom:municipio-ensayo:cautela-metodologica",
+        "municipalityId": "municipio-ensayo",
+        "kind": "methodological-caution",
+        "title": "Fagerström — Cautela metodológica",
+        "content": "El Test de Fagerström solo se administra a fumadores activos. Los resultados reflejan la distribución de dependencia tabáquica en la submuestra de fumadores, no en la población adulta total. El instrumento mide dependencia física a la nicotina: la dependencia psicológica no está incluida. Un score bajo no implica que sea fácil dejar de fumar. Los datos reflejan la muestra importada, no la población completa del municipio.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "fagerstrom-municipal.csv",
+          "extractedAt": "2026-07-07T21:38:02.931Z",
+          "documentId": "doc-fagerstrom"
+        },
+        "methodology": {
+          "description": "Cautela metodológica del Test de Fagerström como estudio complementario.",
+          "limitations": [
+            "El Test de Fagerström solo se administra a fumadores activos. Los resultados reflejan la distribución de dependencia tabáquica en la submuestra de fumadores, no en la población adulta total. La prevalencia de tabaquismo no es calculable desde este instrumento.",
+            "Score ≥5 indica dependencia moderada o superior con alta probabilidad de síntomas de abstinencia. Heatherton et al. (1991). Validado en España: Becoña & Vázquez (1998).",
+            "El instrumento mide dependencia física a la nicotina, no la dependencia psicológica al tabaco.",
+            "Sin referencia provincial disponible para comparación territorial directa.",
+            "2 de 50 registros excluidos por datos incompletos o inválidos.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "fagerstrom",
+          "complementary-study",
+          "methodological-caution"
+        ],
+        "createdAt": "2026-07-07T21:38:02.931Z",
+        "updatedAt": "2026-07-07T21:38:02.931Z"
+      },
+      {
+        "id": "sbq:municipio-ensayo:sedentarismo-alto",
+        "municipalityId": "municipio-ensayo",
+        "kind": "indicator",
+        "title": "SBQ — Prevalencia de comportamiento altamente sedentario (>8h/día)",
+        "content": "29.4 % de la muestra adulta (n=20 de 68 registros válidos) presenta comportamiento altamente sedentario (SBQ >8h/día). Media de tiempo sedentario: 9.90 h/día. Distribución: bajo (≤4h) 3, moderado (4–8h) 45, alto (>8h) 20. Fuente: sbq-municipal.csv.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "sbq-municipal.csv",
+          "extractedAt": "2026-07-07T21:38:02.932Z",
+          "documentId": "doc-sbq"
+        },
+        "methodology": {
+          "description": "SBQ: 9 ítems sobre tiempo sedentario diario (0–4 cada uno). Conversión a horas: 0→0h, 1→0.5h, 2→1.5h, 3→3h, 4→5h. Punto de corte >8h/día. Rosenberg et al. (2008, 2010).",
+          "limitations": [
+            "El SBQ estima el tiempo sedentario diario mediante una escala ordinal. Las horas se calculan usando el punto medio de cada categoría (midpoint): 0→0h, 1→0.5h, 2→1.5h, 3→3h, 4→5h. Las estimaciones son aproximaciones: las horas reales pueden diferir. Rosenberg et al. (2008, 2010).",
+            "Punto de corte clínico: >8h/día = comportamiento altamente sedentario. El sedentarismo es un factor de riesgo independiente del nivel de actividad física.",
+            "El comportamiento sedentario y la actividad física son dimensiones distintas: una persona puede ser activa y, a la vez, altamente sedentaria el resto del tiempo.",
+            "Sin referencia provincial disponible para comparación territorial.",
+            "2 de 70 registros excluidos por datos incompletos o inválidos.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "sbq",
+          "complementary-study",
+          "indicator",
+          "sedentarismo"
+        ],
+        "createdAt": "2026-07-07T21:38:02.932Z",
+        "updatedAt": "2026-07-07T21:38:02.932Z"
+      },
+      {
+        "id": "sbq:municipio-ensayo:cautela-metodologica",
+        "municipalityId": "municipio-ensayo",
+        "kind": "methodological-caution",
+        "title": "SBQ — Cautela metodológica",
+        "content": "El SBQ estima el tiempo sedentario mediante una escala ordinal convertida a horas con factores de conversión (midpoint). Las estimaciones son aproximaciones: las horas reales pueden diferir. El comportamiento sedentario es un factor de riesgo independiente del nivel de actividad física: una persona activa puede ser altamente sedentaria. Los datos reflejan la muestra importada, no la población municipal completa.",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "complementary-study",
+          "sourceLabel": "sbq-municipal.csv",
+          "extractedAt": "2026-07-07T21:38:02.932Z",
+          "documentId": "doc-sbq"
+        },
+        "methodology": {
+          "description": "Cautela metodológica del SBQ como estudio complementario.",
+          "limitations": [
+            "El SBQ estima el tiempo sedentario diario mediante una escala ordinal. Las horas se calculan usando el punto medio de cada categoría (midpoint): 0→0h, 1→0.5h, 2→1.5h, 3→3h, 4→5h. Las estimaciones son aproximaciones: las horas reales pueden diferir. Rosenberg et al. (2008, 2010).",
+            "Punto de corte clínico: >8h/día = comportamiento altamente sedentario. El sedentarismo es un factor de riesgo independiente del nivel de actividad física.",
+            "El comportamiento sedentario y la actividad física son dimensiones distintas: una persona puede ser activa y, a la vez, altamente sedentaria el resto del tiempo.",
+            "Sin referencia provincial disponible para comparación territorial.",
+            "2 de 70 registros excluidos por datos incompletos o inválidos.",
+            "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "sbq",
+          "complementary-study",
+          "methodological-caution"
+        ],
+        "createdAt": "2026-07-07T21:38:02.932Z",
+        "updatedAt": "2026-07-07T21:38:02.932Z"
+      },
+      {
+        "id": "ensayo-localiza-atom-1",
+        "municipalityId": "municipio-ensayo",
+        "kind": "asset",
+        "title": "Centro de participación activa de ensayo",
+        "content": "Centro de participación activa de ensayo\tEspacio de ensayo para personas mayores con talleres de memoria, actividad física suave y voluntariado.\tCualquiera\tMayores de 64 años\tEnvejecimiento activo, Actividad física, Participación y acción comunitaria, Bienestar emocional\tMunicipio de ensayo\tMunicipio de ensayo\t+ info",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "localiza-salud",
+          "documentId": "ensayo-localiza",
+          "sourceLabel": "Localiza Salud — Municipio de ensayo",
+          "extractedAt": "2026-11-21T15:35:28.729Z"
+        },
+        "methodology": {
+          "description": "Extracción textual inicial. Requiere revisión técnica antes de alimentar decisiones.",
+          "limitations": [
+            "Clasificación heurística inicial.",
+            "No establece causalidad.",
+            "No prioriza automáticamente."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "localiza-salud",
+          "asset"
+        ],
+        "createdAt": "2026-11-21T15:35:28.729Z",
+        "updatedAt": "2026-11-21T15:35:28.729Z"
+      },
+      {
+        "id": "ensayo-localiza-atom-2",
+        "municipalityId": "municipio-ensayo",
+        "kind": "asset",
+        "title": "Asociación vecinal de ensayo",
+        "content": "Asociación vecinal de ensayo\tAsociación de ensayo que organiza actividades de convivencia y difunde información de salud en el barrio.\tCualquiera\tPoblación general\tParticipación y acción comunitaria, Cultura y ocio, Bienestar emocional\tMunicipio de ensayo\tMunicipio de ensayo\t+ info",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "localiza-salud",
+          "documentId": "ensayo-localiza",
+          "sourceLabel": "Localiza Salud — Municipio de ensayo",
+          "extractedAt": "2026-11-21T15:35:28.729Z"
+        },
+        "methodology": {
+          "description": "Extracción textual inicial. Requiere revisión técnica antes de alimentar decisiones.",
+          "limitations": [
+            "Clasificación heurística inicial.",
+            "No establece causalidad.",
+            "No prioriza automáticamente."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "localiza-salud",
+          "asset"
+        ],
+        "createdAt": "2026-11-21T15:35:28.729Z",
+        "updatedAt": "2026-11-21T15:35:28.729Z"
+      },
+      {
+        "id": "ensayo-localiza-atom-3",
+        "municipalityId": "municipio-ensayo",
+        "kind": "asset",
+        "title": "Grupo de ayuda mutua de ensayo",
+        "content": "Grupo de ayuda mutua de ensayo\tGrupo de ensayo de apoyo emocional entre iguales, con sesiones semanales.\tCualquiera\tAdultos (30-64 años), Jóvenes (18-29 años)\tBienestar emocional, Prevención del suicidio\tMunicipio de ensayo\tMunicipio de ensayo\t+ info",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "localiza-salud",
+          "documentId": "ensayo-localiza",
+          "sourceLabel": "Localiza Salud — Municipio de ensayo",
+          "extractedAt": "2026-11-21T15:35:28.729Z"
+        },
+        "methodology": {
+          "description": "Extracción textual inicial. Requiere revisión técnica antes de alimentar decisiones.",
+          "limitations": [
+            "Clasificación heurística inicial.",
+            "No establece causalidad.",
+            "No prioriza automáticamente."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "localiza-salud",
+          "asset"
+        ],
+        "createdAt": "2026-11-21T15:35:28.729Z",
+        "updatedAt": "2026-11-21T15:35:28.729Z"
+      },
+      {
+        "id": "ensayo-localiza-atom-4",
+        "municipalityId": "municipio-ensayo",
+        "kind": "asset",
+        "title": "Polideportivo municipal de ensayo",
+        "content": "Polideportivo municipal de ensayo\tInstalación deportiva de ensayo con programas de actividad física para todas las edades.\tCualquiera\tPoblación general, Mayores de 64 años\tActividad física, Envejecimiento activo\tMunicipio de ensayo\tMunicipio de ensayo\t+ info",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "localiza-salud",
+          "documentId": "ensayo-localiza",
+          "sourceLabel": "Localiza Salud — Municipio de ensayo",
+          "extractedAt": "2026-11-21T15:35:28.729Z"
+        },
+        "methodology": {
+          "description": "Extracción textual inicial. Requiere revisión técnica antes de alimentar decisiones.",
+          "limitations": [
+            "Clasificación heurística inicial.",
+            "No establece causalidad.",
+            "No prioriza automáticamente."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "localiza-salud",
+          "asset"
+        ],
+        "createdAt": "2026-11-21T15:35:28.729Z",
+        "updatedAt": "2026-11-21T15:35:28.729Z"
+      },
+      {
+        "id": "ensayo-localiza-atom-5",
+        "municipalityId": "municipio-ensayo",
+        "kind": "asset",
+        "title": "Escuela de pacientes de ensayo",
+        "content": "Escuela de pacientes de ensayo\tPrograma formativo de ensayo para personas con enfermedades crónicas y personas cuidadoras.\tCualquiera\tAdultos (30-64 años), Mayores de 64 años\tEnfermedades crónicas, Escuela de salud/formación, Personas cuidadoras\tMunicipio de ensayo\tMunicipio de ensayo\t+ info",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "localiza-salud",
+          "documentId": "ensayo-localiza",
+          "sourceLabel": "Localiza Salud — Municipio de ensayo",
+          "extractedAt": "2026-11-21T15:35:28.729Z"
+        },
+        "methodology": {
+          "description": "Extracción textual inicial. Requiere revisión técnica antes de alimentar decisiones.",
+          "limitations": [
+            "Clasificación heurística inicial.",
+            "No establece causalidad.",
+            "No prioriza automáticamente."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "localiza-salud",
+          "asset"
+        ],
+        "createdAt": "2026-11-21T15:35:28.729Z",
+        "updatedAt": "2026-11-21T15:35:28.729Z"
+      },
+      {
+        "id": "ensayo-localiza-atom-6",
+        "municipalityId": "municipio-ensayo",
+        "kind": "asset",
+        "title": "Huerto comunitario de ensayo",
+        "content": "Huerto comunitario de ensayo\tHuerto de ensayo gestionado por vecinas y vecinos, con talleres de alimentación.\tCualquiera\tPoblación general\tAlimentación saludable, Naturaleza, Participación y acción comunitaria\tMunicipio de ensayo\tMunicipio de ensayo\t+ info",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "localiza-salud",
+          "documentId": "ensayo-localiza",
+          "sourceLabel": "Localiza Salud — Municipio de ensayo",
+          "extractedAt": "2026-11-21T15:35:28.729Z"
+        },
+        "methodology": {
+          "description": "Extracción textual inicial. Requiere revisión técnica antes de alimentar decisiones.",
+          "limitations": [
+            "Clasificación heurística inicial.",
+            "No establece causalidad.",
+            "No prioriza automáticamente."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "localiza-salud",
+          "asset"
+        ],
+        "createdAt": "2026-11-21T15:35:28.729Z",
+        "updatedAt": "2026-11-21T15:35:28.729Z"
+      },
+      {
+        "id": "ensayo-localiza-atom-7",
+        "municipalityId": "municipio-ensayo",
+        "kind": "asset",
+        "title": "Asociación de mujeres de ensayo",
+        "content": "Asociación de mujeres de ensayo\tAsociación de ensayo que trabaja la igualdad y la salud de las mujeres.\tMujeres\tAdultos (30-64 años)\tGénero/identidad, Salud sexual y reproductiva, Bienestar emocional\tMunicipio de ensayo\tMunicipio de ensayo\t+ info",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "localiza-salud",
+          "documentId": "ensayo-localiza",
+          "sourceLabel": "Localiza Salud — Municipio de ensayo",
+          "extractedAt": "2026-11-21T15:35:28.729Z"
+        },
+        "methodology": {
+          "description": "Extracción textual inicial. Requiere revisión técnica antes de alimentar decisiones.",
+          "limitations": [
+            "Clasificación heurística inicial.",
+            "No establece causalidad.",
+            "No prioriza automáticamente."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "localiza-salud",
+          "asset"
+        ],
+        "createdAt": "2026-11-21T15:35:28.729Z",
+        "updatedAt": "2026-11-21T15:35:28.729Z"
+      },
+      {
+        "id": "ensayo-localiza-atom-8",
+        "municipalityId": "municipio-ensayo",
+        "kind": "asset",
+        "title": "Centro joven de ensayo",
+        "content": "Centro joven de ensayo\tEspacio de ensayo para jóvenes con actividades de ocio saludable y prevención.\tCualquiera\tAdolescentes (12-17 años), Jóvenes (18-29 años)\tCultura y ocio, Bienestar emocional, Escuela de salud/formación\tMunicipio de ensayo\tMunicipio de ensayo\t+ info",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "localiza-salud",
+          "documentId": "ensayo-localiza",
+          "sourceLabel": "Localiza Salud — Municipio de ensayo",
+          "extractedAt": "2026-11-21T15:35:28.729Z"
+        },
+        "methodology": {
+          "description": "Extracción textual inicial. Requiere revisión técnica antes de alimentar decisiones.",
+          "limitations": [
+            "Clasificación heurística inicial.",
+            "No establece causalidad.",
+            "No prioriza automáticamente."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "localiza-salud",
+          "asset"
+        ],
+        "createdAt": "2026-11-21T15:35:28.729Z",
+        "updatedAt": "2026-11-21T15:35:28.729Z"
+      },
+      {
+        "id": "ensayo-localiza-atom-9",
+        "municipalityId": "municipio-ensayo",
+        "kind": "asset",
+        "title": "Programa de acompañamiento de ensayo",
+        "content": "Programa de acompañamiento de ensayo\tVoluntariado de ensayo que acompaña a personas mayores que viven solas.\tCualquiera\tMayores de 64 años\tEnvejecimiento activo, Bienestar emocional, Personas en riesgo de exclusión\tMunicipio de ensayo\tMunicipio de ensayo\t+ info",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "localiza-salud",
+          "documentId": "ensayo-localiza",
+          "sourceLabel": "Localiza Salud — Municipio de ensayo",
+          "extractedAt": "2026-11-21T15:35:28.729Z"
+        },
+        "methodology": {
+          "description": "Extracción textual inicial. Requiere revisión técnica antes de alimentar decisiones.",
+          "limitations": [
+            "Clasificación heurística inicial.",
+            "No establece causalidad.",
+            "No prioriza automáticamente."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "localiza-salud",
+          "asset"
+        ],
+        "createdAt": "2026-11-21T15:35:28.729Z",
+        "updatedAt": "2026-11-21T15:35:28.729Z"
+      },
+      {
+        "id": "ensayo-localiza-atom-10",
+        "municipalityId": "municipio-ensayo",
+        "kind": "asset",
+        "title": "Biblioteca municipal de ensayo",
+        "content": "Biblioteca municipal de ensayo\tBiblioteca de ensayo con clubes de lectura y talleres intergeneracionales.\tCualquiera\tPoblación general, Infancia: 6-11 años\tCultura y ocio, Otros\tMunicipio de ensayo\tMunicipio de ensayo\t+ info",
+        "confidence": "medium",
+        "provenance": {
+          "origin": "localiza-salud",
+          "documentId": "ensayo-localiza",
+          "sourceLabel": "Localiza Salud — Municipio de ensayo",
+          "extractedAt": "2026-11-21T15:35:28.729Z"
+        },
+        "methodology": {
+          "description": "Extracción textual inicial. Requiere revisión técnica antes de alimentar decisiones.",
+          "limitations": [
+            "Clasificación heurística inicial.",
+            "No establece causalidad.",
+            "No prioriza automáticamente."
+          ],
+          "requiresHumanValidation": true
+        },
+        "tags": [
+          "localiza-salud",
+          "asset"
+        ],
+        "createdAt": "2026-11-21T15:35:28.730Z",
+        "updatedAt": "2026-11-21T15:35:28.730Z"
+      }
+    ],
+    "createdAt": "2026-07-07T21:38:01.713Z",
+    "updatedAt": "2026-11-21T15:35:28.730Z"
+  },
+  "healthReport": {
+    "id": "ensayo-informe-salud-lectura",
+    "municipalityId": "municipio-ensayo",
+    "linkedDocumentId": "ensayo-informe-salud",
+    "sourceFileName": "informe-salud-municipio-ensayo.txt",
+    "title": "Informe de Salud del Municipio de ensayo",
+    "authors": [],
+    "body": {
+      "originalText": "INFORME DE LA SITUACIÓN DE SALUD DEL MUNICIPIO DE ENSAYO\n\nDocumento de ensayo para pruebas automáticas. No describe ningún territorio real.\n\n1. INTRODUCCIÓN\n\nEste informe de ensayo reproduce la estructura habitual de un Informe de Salud municipal para comprobar la lectura, la compilación y la trazabilidad del Perfil de Salud Local en COMPÁS.\n\n2. METODOLOGÍA\n\nSe describen fuentes de ensayo con la misma organización que un informe real: padrón, indicadores de morbilidad y mortalidad, Encuesta Andaluza de Salud y activos para la salud.\n\n3. ANÁLISIS SOCIODEMOGRÁFICO Y ECONÓMICO\n\nPoblación de ensayo: 20.000 habitantes. Población de 65 años o más: 18,0 %. Índice de envejecimiento de ensayo: 120. Tasa de paro registrada de ensayo: 15,0 %.\n\n4. ANÁLISIS EPIDEMIOLÓGICO\n\nMortalidad: las enfermedades del sistema circulatorio y los tumores son las primeras causas en el conjunto de datos de ensayo.\n\nMorbilidad: la hipertensión arterial, la diabetes y los trastornos de ansiedad son los problemas de salud más registrados en atención primaria en los datos de ensayo.\n\nCáncer: el cribado de cáncer de mama alcanza una cobertura de ensayo del 70,0 %.\n\nVacunación: la cobertura de vacunación antigripal en mayores de 65 años es del 60,0 % en los datos de ensayo.\n\n5. ANÁLISIS DE LA ENCUESTA ANDALUZA DE SALUD. PROBLEMAS DE SALUD Y FACTORES DE RIESGO\n\nSedentarismo de ensayo: 30,0 %. Consumo de tabaco de ensayo: 22,0 %. Apoyo social bajo de ensayo: 10,0 %.\n\n6. RECURSOS Y ACTIVOS EN SALUD\n\nEl municipio de ensayo cuenta con un centro de salud, un centro de participación activa, asociaciones vecinales y espacios deportivos.\n\n7. DISCUSIÓN\n\nLos datos de ensayo sitúan el envejecimiento, la salud mental y los hábitos de vida como ámbitos de interés para la deliberación.\n\n8. CONCLUSIONES\n\nConclusión de ensayo 1: el envejecimiento de la población requiere atención a la autonomía y la soledad no deseada.\nConclusión de ensayo 2: el bienestar emocional y la salud mental muestran necesidades en la población adulta.\nConclusión de ensayo 3: el sedentarismo y el tabaco son factores de riesgo prioritarios.",
+      "format": "plain",
+      "charCount": 2098,
+      "isAuthoritative": true
+    },
+    "sections": [
+      {
+        "key": "title-page",
+        "title": "Portada",
+        "bodyText": "INFORME DE LA SITUACIÓN DE SALUD DEL MUNICIPIO DE ENSAYO\n\nDocumento de ensayo para pruebas automáticas. No describe ningún territorio real.",
+        "sortOrder": 0,
+        "isAuthoritative": true
+      },
+      {
+        "key": "introduccion",
+        "title": "INTRODUCCIÓN",
+        "bodyText": "1. INTRODUCCIÓN\n\nEste informe de ensayo reproduce la estructura habitual de un Informe de Salud municipal para comprobar la lectura, la compilación y la trazabilidad del Perfil de Salud Local en COMPÁS.",
+        "sortOrder": 1,
+        "isAuthoritative": true
+      },
+      {
+        "key": "metodologia",
+        "title": "METODOLOGÍA",
+        "bodyText": "2. METODOLOGÍA\n\nSe describen fuentes de ensayo con la misma organización que un informe real: padrón, indicadores de morbilidad y mortalidad, Encuesta Andaluza de Salud y activos para la salud.",
+        "sortOrder": 2,
+        "isAuthoritative": true
+      },
+      {
+        "key": "other",
+        "title": "ANÁLISIS SOCIODEMOGRÁFICO Y ECONÓMICO",
+        "bodyText": "3. ANÁLISIS SOCIODEMOGRÁFICO Y ECONÓMICO\n\nPoblación de ensayo: 20.000 habitantes. Población de 65 años o más: 18,0 %. Índice de envejecimiento de ensayo: 120. Tasa de paro registrada de ensayo: 15,0 %.",
+        "sortOrder": 3,
+        "isAuthoritative": true
+      },
+      {
+        "key": "other",
+        "title": "ANÁLISIS EPIDEMIOLÓGICO",
+        "bodyText": "4. ANÁLISIS EPIDEMIOLÓGICO\n\nMortalidad: las enfermedades del sistema circulatorio y los tumores son las primeras causas en el conjunto de datos de ensayo.\n\nMorbilidad: la hipertensión arterial, la diabetes y los trastornos de ansiedad son los problemas de salud más registrados en atención primaria en los datos de ensayo.\n\nCáncer: el cribado de cáncer de mama alcanza una cobertura de ensayo del 70,0 %.\n\nVacunación: la cobertura de vacunación antigripal en mayores de 65 años es del 60,0 % en los datos de ensayo.",
+        "sortOrder": 4,
+        "isAuthoritative": true
+      },
+      {
+        "key": "other",
+        "title": "ANÁLISIS DE LA ENCUESTA ANDALUZA DE SALUD. PROBLEMAS DE SALUD Y FACTORES DE RIESGO",
+        "bodyText": "5. ANÁLISIS DE LA ENCUESTA ANDALUZA DE SALUD. PROBLEMAS DE SALUD Y FACTORES DE RIESGO\n\nSedentarismo de ensayo: 30,0 %. Consumo de tabaco de ensayo: 22,0 %. Apoyo social bajo de ensayo: 10,0 %.",
+        "sortOrder": 5,
+        "isAuthoritative": true
+      },
+      {
+        "key": "other",
+        "title": "RECURSOS Y ACTIVOS EN SALUD",
+        "bodyText": "6. RECURSOS Y ACTIVOS EN SALUD\n\nEl municipio de ensayo cuenta con un centro de salud, un centro de participación activa, asociaciones vecinales y espacios deportivos.",
+        "sortOrder": 6,
+        "isAuthoritative": true
+      },
+      {
+        "key": "discusion",
+        "title": "DISCUSIÓN",
+        "bodyText": "7. DISCUSIÓN\n\nLos datos de ensayo sitúan el envejecimiento, la salud mental y los hábitos de vida como ámbitos de interés para la deliberación.",
+        "sortOrder": 7,
+        "isAuthoritative": true
+      },
+      {
+        "key": "conclusiones",
+        "title": "CONCLUSIONES",
+        "bodyText": "8. CONCLUSIONES\n\nConclusión de ensayo 1: el envejecimiento de la población requiere atención a la autonomía y la soledad no deseada.\nConclusión de ensayo 2: el bienestar emocional y la salud mental muestran necesidades en la población adulta.\nConclusión de ensayo 3: el sedentarismo y el tabaco son factores de riesgo prioritarios.",
+        "sortOrder": 8,
+        "isAuthoritative": true
+      }
+    ],
+    "createdAt": "2026-11-21T00:00:00.000Z",
+    "updatedAt": "2026-11-21T00:00:00.000Z"
+  },
+  "ibseStudy": {
+    "id": "3834d85b-b851-4cba-8fd0-3c2340fbe308",
+    "municipalityId": "municipio-ensayo",
+    "sourceFileName": "ibse-granada-provincia.csv",
+    "aggregates": {
+      "n": 891,
+      "nValid": 814,
+      "meanTotal": 76.2,
+      "meanFactorVinculo": 64.6,
+      "meanFactorSituacion": 84.4,
+      "meanFactorControl": 77.7,
+      "meanFactorPersona": 78.3
+    },
+    "methodologicalCautions": [
+      "Los resultados son medias de la muestra disponible, no estimaciones poblacionales.",
+      "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+    ],
+    "createdAt": "2026-07-07T21:38:02.902Z",
+    "updatedAt": "2026-07-07T21:38:02.902Z"
+  },
+  "dukeStudy": {
+    "id": "d9800584-3748-49eb-80e4-7de760b9a8c3",
+    "municipalityId": "municipio-ensayo",
+    "sourceFileName": "duke-eas-granada.csv",
+    "aggregates": {
+      "n": 3028,
+      "nValidGlobal": 3028,
+      "nValidConfidential": 3028,
+      "nValidAffective": 3028,
+      "meanGlobal": 49.2,
+      "meanConfidential": 31.1,
+      "meanAffective": 18.1,
+      "lowGlobalCount": 1658,
+      "lowConfidentialCount": 1605,
+      "lowAffectiveCount": 1360,
+      "normalGlobalCount": 1370,
+      "normalConfidentialCount": 1423,
+      "normalAffectiveCount": 1668,
+      "incompleteGlobalCount": 0,
+      "incompleteConfidentialCount": 0,
+      "incompleteAffectiveCount": 0,
+      "lowGlobalPercentage": 54.8,
+      "lowConfidentialPercentage": 53,
+      "lowAffectivePercentage": 44.9
+    },
+    "methodologicalCautions": [
+      "DUKE-EAS: recodificacion reconstruida empiricamente desde los microdatos EAS disponibles con reproduccion 100 %. No se presenta como criterio clinico universal.",
+      "Los resultados son agregados de la muestra importada y requieren validacion tecnica antes de alimentar interpretacion territorial o planificacion.",
+      "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+    ],
+    "warnings": [],
+    "createdAt": "2026-07-07T21:38:02.912Z",
+    "updatedAt": "2026-07-07T21:38:02.912Z"
+  },
+  "predimedStudy": {
+    "id": "5001340f-b814-4e3a-8393-2a34f2de7841",
+    "municipalityId": "municipio-ensayo",
+    "sourceFileName": "predimed-eas-granada.csv",
+    "aggregates": {
+      "n": 3064,
+      "nValid": 712,
+      "meanScore": 7.6,
+      "lowCount": 256,
+      "mediumCount": 186,
+      "highCount": 270,
+      "lowPercentage": 36,
+      "mediumPercentage": 26.1,
+      "highPercentage": 37.9,
+      "incompleteCount": 2352
+    },
+    "methodologicalCautions": [
+      "Puntuacion canonica obtenida del campo derivado EAS (Predimed). No se recalcula el indice.",
+      "PREDIMED-14: adherencia baja <= 6, media 7-8, alta >= 9. Corte segun Martinez-Gonzalez (2012), adaptacion EAS Andalucia.",
+      "Los resultados son agregados de la muestra importada y requieren validacion tecnica antes de alimentar interpretacion territorial o planificacion.",
+      "76.8 % de registros sin puntuacion Predimed calculable. En los microdatos EAS READY, Predimed solo se calcula para registros de oleadas que incluyen el modulo PREDIMED-14.",
+      "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+    ],
+    "warnings": [],
+    "createdAt": "2026-07-07T21:38:02.915Z",
+    "updatedAt": "2026-07-07T21:38:02.915Z"
+  },
+  "sf12Study": {
+    "id": "11fd922c-11f2-4208-8a80-c8dfcb980264",
+    "municipalityId": "municipio-ensayo",
+    "sourceFileName": "sf12-eas-granada.csv",
+    "aggregates": {
+      "n": 3064,
+      "nValidPCS": 3047,
+      "nValidMCS": 3047,
+      "meanPCS": 49.552,
+      "meanMCS": 51.139,
+      "missingPCS": 17,
+      "missingMCS": 17
+    },
+    "methodologicalCautions": [
+      "PCS12_SP y MCS12_SP son puntuaciones canónicas pre-calculadas por la Encuesta Andaluza de Salud aplicando los coeficientes factoriales de la norma española (Vilagut et al. 2008, Med Clín Barc 130(19):726-735). COMPÁS NG las consume directamente; no recalcula PCS ni MCS desde los 12 ítems.",
+      "Las puntuaciones están en escala 0-100 (media poblacional española ≈ 50, DT ≈ 10). Mayor puntuación indica mejor estado de salud percibida en el componente correspondiente.",
+      "Los resultados son agregados de la muestra importada y requieren validación técnica antes de alimentar interpretación territorial o planificación.",
+      "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+    ],
+    "warnings": [],
+    "createdAt": "2026-07-07T21:38:02.920Z",
+    "updatedAt": "2026-07-07T21:38:02.920Z"
+  },
+  "suenoStudy": {
+    "id": "40b72e76-75c4-40e8-9ec3-fef7d969bb9f",
+    "municipalityId": "municipio-ensayo",
+    "sourceFileName": "sueno-eas-granada.csv",
+    "aggregates": {
+      "n": 3064,
+      "nValidP33R": 3004,
+      "missingP33R": 60,
+      "nInsufficientSleep": 985,
+      "pctInsufficientSleep": 32.8,
+      "nValidP33A": 2306,
+      "missingP33A": 758,
+      "nNoRest": 665,
+      "pctNoRest": 28.8
+    },
+    "methodologicalCautions": [
+      "P33_R y P33A son campos derivados oficiales de la Encuesta Andaluza de Salud (EAS). P33_R clasifica si la persona duerme las horas recomendadas por la Sociedad Española del Sueño. P33A recoge si las horas dormidas permiten descansar suficiente (calidad subjetiva). Son dimensiones independientes: no deben sumarse ni compararse directamente.",
+      "P33_R y P33A son indicadores propios de la Encuesta Andaluza de Salud (EAS) para monitorización del sueño en la población andaluza. No son escalas validadas externamente.",
+      "Se espera una discordancia del ~29 % entre P33_R y P33A en la muestra EAS, lo que es estadísticamente coherente con la literatura del sueño.",
+      "Los resultados son agregados de la muestra importada y requieren validación técnica antes de alimentar interpretación territorial o planificación.",
+      "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+    ],
+    "warnings": [],
+    "createdAt": "2026-07-07T21:38:02.922Z",
+    "updatedAt": "2026-07-07T21:38:02.922Z"
+  },
+  "cageStudy": {
+    "id": "24d197a1-1341-4528-bde5-a6f87af0ffbf",
+    "municipalityId": "municipio-ensayo",
+    "sourceFileName": "cage-eas-granada.csv",
+    "aggregates": {
+      "n": 3064,
+      "nValidCAGER": 2513,
+      "missingCAGER": 551,
+      "nRisk": 14,
+      "pctRisk": 0.6,
+      "nValidCAGE": 2513,
+      "nCAGE1": 2499,
+      "nCAGE2": 7,
+      "nCAGE3": 3,
+      "nCAGE4": 4
+    },
+    "methodologicalCautions": [
+      "CAGE_R y CAGE son campos derivados oficiales de la Encuesta Andaluza de Salud (EAS). COMPÁS NG los consume directamente sin recalcular el CAGE desde ítems individuales.",
+      "El missing en CAGE_R (~18 % en la EAS Granada) es estructural: corresponde a personas abstemias a las que el protocolo EAS no administra el test ('No procede'). No es missing aleatorio.",
+      "Los ítems de consumo episódico masivo de la EAS (oleada 2023) no forman parte de este análisis. Son instrumentos que miden dimensiones distintas del consumo de alcohol.",
+      "Los resultados son agregados de la muestra importada y requieren validación técnica antes de alimentar interpretación territorial o planificación.",
+      "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+    ],
+    "warnings": [],
+    "createdAt": "2026-07-07T21:38:02.924Z",
+    "updatedAt": "2026-07-07T21:38:02.924Z"
+  },
+  "auditcStudy": {
+    "id": "6ca9dff1-734a-4131-9887-3788480bdb97",
+    "municipalityId": "municipio-ensayo",
+    "sourceFileName": "auditc-municipal.csv",
+    "aggregates": {
+      "n": 95,
+      "nValid": 85,
+      "missing": 10,
+      "meanScore": 1.98,
+      "nPositive": 18,
+      "pctPositive": 21.2,
+      "nScore0": 28,
+      "nScore1to3": 39,
+      "nScore4to7": 15,
+      "nScore8to12": 3
+    },
+    "methodologicalCautions": [
+      "El AUDIT-C mide el patrón actual de consumo autorreferido de alcohol. Los resultados son estimaciones de la muestra y requieren validación técnica antes de alimentar interpretación territorial o planificación.",
+      "Punto de corte aplicado: score ≥ 4 (punto simplificado de uso general). El corte diferenciado por sexo (≥3 mujeres / ≥4 hombres, Bush et al. 1998) no se calcula en esta versión por ausencia del dato de sexo por participante. Si la muestra tiene alta proporción de mujeres, la prevalencia real de consumo de riesgo puede estar subestimada.",
+      "Un score 0 no equivale necesariamente a abstemia total: puede reflejar consumo ocasional muy esporádico que no activa los ítems Q2 y Q3.",
+      "Sin referencia provincial ni autonómica disponible para comparación territorial.",
+      "10 de 95 registros excluidos por datos incompletos o inválidos.",
+      "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+    ],
+    "warnings": [],
+    "createdAt": "2026-07-07T21:38:02.925Z",
+    "updatedAt": "2026-07-07T21:38:02.925Z"
+  },
+  "ipaqStudy": {
+    "id": "111aa9a9-2f37-470f-8f64-4a2c2d80ecba",
+    "municipalityId": "municipio-ensayo",
+    "sourceFileName": "ipaq-eas-granada.csv",
+    "aggregates": {
+      "n": 3064,
+      "nValidIPAQ": 1603,
+      "missingIPAQ": 1461,
+      "nHigh": 251,
+      "pctHigh": 15.7,
+      "nValidP34AR": 3058,
+      "missingP34AR": 6,
+      "nInactive": 1047,
+      "pctInactive": 34.2
+    },
+    "methodologicalCautions": [
+      "IPAQ_DICO y P34A_R son campos derivados oficiales de la Encuesta Andaluza de Salud (EAS). COMPÁS NG los consume directamente sin recalcular los MET-min/semana desde ítems individuales.",
+      "El missing en IPAQ_DICO (~48 % en la EAS Granada) es sustancial y puede reflejar personas mayores u otros grupos no evaluados. No es necesariamente missing aleatorio.",
+      "IPAQ_DICO = 0 incluye tanto actividad física baja como moderada: no equivale a sedentarismo total. Para sedentarismo específico, usar el SBQ.",
+      "P34A_R solo evalúa la inactividad en tiempo libre, no la actividad laboral ni doméstica.",
+      "Los resultados son agregados de la muestra importada y requieren validación técnica antes de alimentar interpretación territorial o planificación.",
+      "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+    ],
+    "warnings": [],
+    "createdAt": "2026-07-07T21:38:02.927Z",
+    "updatedAt": "2026-07-07T21:38:02.927Z"
+  },
+  "ghq12Study": {
+    "id": "6663705e-45b7-43d4-bf93-5ec04f213676",
+    "municipalityId": "municipio-ensayo",
+    "sourceFileName": "ghq12-municipal.csv",
+    "aggregates": {
+      "n": 100,
+      "nValid": 95,
+      "missing": 5,
+      "meanBimodal": 1.89,
+      "nPositive": 25,
+      "pctPositive": 26.3,
+      "nScore0to2": 70,
+      "nScore3to6": 25,
+      "nScore7to12": 0
+    },
+    "methodologicalCautions": [
+      "El GHQ-12 es un instrumento de cribado de malestar psicológico, no diagnóstico. Un score positivo (≥3 en scoring bimodal) no implica trastorno mental confirmado. Los resultados son estimaciones de la muestra y requieren validación técnica.",
+      "Scoring bimodal aplicado (0/0/1/1): valores 0,1 → 0; valores 2,3 → 1 por ítem. Punto de corte ≥ 3 validado en población española (Sánchez-López & Dresch, 2008).",
+      "El GHQ-12 evalúa el estado de las últimas semanas, no el estado crónico. Los resultados pueden variar significativamente entre períodos de recogida.",
+      "Sin referencia provincial ni autonómica disponible para comparación territorial directa.",
+      "5 de 100 registros excluidos por datos incompletos o inválidos.",
+      "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+    ],
+    "warnings": [],
+    "createdAt": "2026-07-07T21:38:02.928Z",
+    "updatedAt": "2026-07-07T21:38:02.928Z"
+  },
+  "phq9Study": {
+    "id": "92b90fb1-50e6-424b-912f-dbdc79cd3a9b",
+    "municipalityId": "municipio-ensayo",
+    "sourceFileName": "phq9-municipal.csv",
+    "aggregates": {
+      "n": 80,
+      "nValid": 77,
+      "missing": 3,
+      "meanScore": 8.65,
+      "nPositive": 10,
+      "pctPositive": 13,
+      "nScore0to4": 2,
+      "nScore5to9": 65,
+      "nScore10to14": 6,
+      "nScore15to19": 4,
+      "nScore20to27": 0
+    },
+    "methodologicalCautions": [
+      "El PHQ-9 es un instrumento de cribado de síntomas depresivos, no diagnóstico. Un score ≥10 indica síntomas moderados o superiores que requieren evaluación clínica.",
+      "IMPORTANTE: El ítem 9 (ideación suicida) requiere protocolo específico de manejo. No administrar sin protocolo de derivación disponible.",
+      "El PHQ-9 evalúa los síntomas de las últimas 2 semanas, no el estado crónico. Punto de corte ≥10: sensibilidad 88 %, especificidad 88 % (Kroenke et al., 2001).",
+      "Sin referencia provincial disponible para comparación territorial.",
+      "3 de 80 registros excluidos por datos incompletos o inválidos.",
+      "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+    ],
+    "warnings": [],
+    "createdAt": "2026-07-07T21:38:02.929Z",
+    "updatedAt": "2026-07-07T21:38:02.929Z"
+  },
+  "psqiStudy": {
+    "id": "2e8f91d5-3cfa-4e4a-b191-a3305fe4b76c",
+    "municipalityId": "municipio-ensayo",
+    "sourceFileName": "psqi-municipal.csv",
+    "aggregates": {
+      "n": 60,
+      "nValid": 58,
+      "missing": 2,
+      "meanScore": 6.26,
+      "nPositive": 18,
+      "pctPositive": 31,
+      "nScore0to5": 40,
+      "nScore6to10": 10,
+      "nScore11to21": 8
+    },
+    "methodologicalCautions": [
+      "El PSQI evalúa la calidad subjetiva del sueño en el último mes. Punto de corte >5: mala calidad del sueño. Sensibilidad 89.6 %, especificidad 86.5 %. Buysse et al. (1989). Validado en España: Royuela & Macías (1997).",
+      "COMPÁS NG procesa los 7 componentes PSQI pre-calculados. Los componentes deben ser calculados por el profesional antes de exportar desde REDCap, ya que cada uno requiere múltiples ítems del cuestionario original.",
+      "El PSQI evalúa el estado del último mes: no refleja la calidad del sueño habitual a largo plazo.",
+      "Sin referencia provincial disponible para comparación territorial.",
+      "2 de 60 registros excluidos por datos incompletos o inválidos.",
+      "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+    ],
+    "warnings": [],
+    "createdAt": "2026-07-07T21:38:02.930Z",
+    "updatedAt": "2026-07-07T21:38:02.930Z"
+  },
+  "fagerstromStudy": {
+    "id": "7c9abc4e-ba1a-4fa8-bc2b-8d5d5445f873",
+    "municipalityId": "municipio-ensayo",
+    "sourceFileName": "fagerstrom-municipal.csv",
+    "aggregates": {
+      "n": 50,
+      "nValid": 48,
+      "missing": 2,
+      "meanScore": 4.31,
+      "nPositive": 15,
+      "pctPositive": 31.3,
+      "nVeryLow": 6,
+      "nLow": 27,
+      "nModerate": 4,
+      "nHigh": 6,
+      "nVeryHigh": 5
+    },
+    "methodologicalCautions": [
+      "El Test de Fagerström solo se administra a fumadores activos. Los resultados reflejan la distribución de dependencia tabáquica en la submuestra de fumadores, no en la población adulta total. La prevalencia de tabaquismo no es calculable desde este instrumento.",
+      "Score ≥5 indica dependencia moderada o superior con alta probabilidad de síntomas de abstinencia. Heatherton et al. (1991). Validado en España: Becoña & Vázquez (1998).",
+      "El instrumento mide dependencia física a la nicotina, no la dependencia psicológica al tabaco.",
+      "Sin referencia provincial disponible para comparación territorial directa.",
+      "2 de 50 registros excluidos por datos incompletos o inválidos.",
+      "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+    ],
+    "warnings": [],
+    "createdAt": "2026-07-07T21:38:02.931Z",
+    "updatedAt": "2026-07-07T21:38:02.931Z"
+  },
+  "sbqStudy": {
+    "id": "0907b566-ef07-4a78-b324-e32952d76441",
+    "municipalityId": "municipio-ensayo",
+    "sourceFileName": "sbq-municipal.csv",
+    "aggregates": {
+      "n": 70,
+      "nValid": 68,
+      "missing": 2,
+      "meanHours": 9.9,
+      "nPositive": 20,
+      "pctPositive": 29.4,
+      "nLow": 3,
+      "nModerate": 45,
+      "nHigh": 20
+    },
+    "methodologicalCautions": [
+      "El SBQ estima el tiempo sedentario diario mediante una escala ordinal. Las horas se calculan usando el punto medio de cada categoría (midpoint): 0→0h, 1→0.5h, 2→1.5h, 3→3h, 4→5h. Las estimaciones son aproximaciones: las horas reales pueden diferir. Rosenberg et al. (2008, 2010).",
+      "Punto de corte clínico: >8h/día = comportamiento altamente sedentario. El sedentarismo es un factor de riesgo independiente del nivel de actividad física.",
+      "El comportamiento sedentario y la actividad física son dimensiones distintas: una persona puede ser activa y, a la vez, altamente sedentaria el resto del tiempo.",
+      "Sin referencia provincial disponible para comparación territorial.",
+      "2 de 70 registros excluidos por datos incompletos o inválidos.",
+      "Evidencia contextual (proxy) del expediente de ensayo: datos de ámbito provincial de Granada (EAS VI) o de origen externo al distrito. No constituyen estimación específica del distrito. Señal contextual para orientar la interpretación, pendiente de contraste territorial."
+    ],
+    "warnings": [],
+    "createdAt": "2026-07-07T21:38:02.932Z",
+    "updatedAt": "2026-07-07T21:38:02.932Z"
+  },
+  "createdAt": "2026-11-21T00:00:00.000Z",
+  "updatedAt": "2026-11-21T00:00:00.000Z"
+}

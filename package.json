@@ -9,7 +9,6 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:profile-fixture": "vitest run --config vitest.profile-fixture.config.ts",
     "test:reconstruction": "vitest run --config vitest.reconstruction.config.ts",
     "test:smoke": "node tests/home-complementary-studies.smoke.mjs",
     "test:atarfe": "node tests/load-atarfe-complete.mjs",

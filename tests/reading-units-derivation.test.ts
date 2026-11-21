@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { deriveReadingUnits, readLocalizaAssets, type LocalizaAssetRecord } from "../src/application/localiza-assets";
 import { THEMATIC_TOPICS, type ThematicPrioritisationStudy } from "../src/domain/thematic-prioritisation";
 
-const FIXTURE = resolve(dirname(fileURLToPath(import.meta.url)), "../fixtures/workspaces/granada-zaidin-synthetic-test.json");
+const FIXTURE = resolve(dirname(fileURLToPath(import.meta.url)), "../fixtures/workspaces/municipio-ensayo-synthetic-test.json");
 
 function collect(node: unknown, out: Array<{ id: string; kind: string; title: string; content: string }> = []) {
   if (Array.isArray(node)) node.forEach((n) => collect(n, out));
@@ -67,12 +67,12 @@ describe("derivación de unidades de lectura", () => {
     expect(d.units.map((u) => u.topicId).sort()).toEqual(["bienestar-emocional", "sexualidad-salud"]);
   });
 
-  it("Zaidín: cada activo con correspondencia aparece en sus temas; el resto queda aparte", () => {
+  it("expediente de ensayo: cada activo con correspondencia aparece en sus temas; el resto queda aparte", () => {
     const d = deriveReadingUnits({ assets: zaidinAssets });
     const conCorrespondencia = zaidinAssets.length - d.assetsWithoutValidatedCorrespondence.length;
-    expect(zaidinAssets).toHaveLength(56);
+    expect(zaidinAssets).toHaveLength(10);
     expect(conCorrespondencia).toBeGreaterThan(0);
-    expect(d.units.find((u) => u.topicId === "bienestar-emocional")?.capacity.assets.length).toBeGreaterThan(40);
+    expect(d.units.find((u) => u.topicId === "bienestar-emocional")?.capacity.assets.length).toBeGreaterThanOrEqual(6);
     expect(d.topicsWithoutSource).toContain("violencia-genero");
   });
 

@@ -14,7 +14,7 @@ import { THEMATIC_TOPICS } from "../src/domain/thematic-prioritisation";
 
 const FIXTURE = resolve(
   dirname(fileURLToPath(import.meta.url)),
-  "../fixtures/workspaces/granada-zaidin-synthetic-test.json"
+  "../fixtures/workspaces/municipio-ensayo-synthetic-test.json"
 );
 
 function collectAssetAtoms(node: unknown, out: Array<{ id: string; kind: string; title: string; content: string }> = []) {
@@ -32,17 +32,17 @@ function collectAssetAtoms(node: unknown, out: Array<{ id: string; kind: string;
 const atoms = collectAssetAtoms(JSON.parse(readFileSync(FIXTURE, "utf8")));
 
 describe("activo estructurado de Localiza Salud", () => {
-  it("lee los 56 activos de Granada-Zaidín sin dejar ninguno fuera", () => {
+  it("lee los 10 activos del expediente de ensayo sin dejar ninguno fuera", () => {
     const lectura = readLocalizaAssets(atoms);
-    expect(atoms).toHaveLength(56);
-    expect(lectura.records).toHaveLength(56);
+    expect(atoms).toHaveLength(10);
+    expect(lectura.records).toHaveLength(10);
     expect(lectura.unstructured).toHaveLength(0);
   });
 
   it("conserva las temáticas y la población tal como constan", () => {
     const [primero] = readLocalizaAssets(atoms).records;
-    expect(primero.nombre).toBe("ASOCIACIÓN ALFA (ALMANJÁYAR EN FAMILIA)");
-    expect(primero.tematicas.slice(0, 2)).toEqual(["Participación y acción comunitaria", "Cultura y ocio"]);
+    expect(primero.nombre).toBe("Centro de participación activa de ensayo");
+    expect(primero.tematicas.slice(0, 2)).toEqual(["Envejecimiento activo", "Actividad física"]);
     expect(primero.tematicas.length).toBeGreaterThan(2);
     expect(primero.poblacionDestinataria).toContain("Mayores de 64 años");
     expect(primero.estado).toBe("registrado-en-localiza");
@@ -57,8 +57,8 @@ describe("activo estructurado de Localiza Salud", () => {
   it("cuenta por temática declarada, no por palabras del texto", () => {
     const cuentas = new Map(countAssetsByTematica(readLocalizaAssets(atoms).records).map((c) => [c.tematica, c.count]));
     expect(cuentas.size).toBe(15);
-    expect(cuentas.get("Bienestar emocional")).toBe(47);
-    expect(cuentas.get("Prevención del suicidio")).toBe(2);
+    expect(cuentas.get("Bienestar emocional")).toBe(6);
+    expect(cuentas.get("Prevención del suicidio")).toBe(1);
   });
 });
 

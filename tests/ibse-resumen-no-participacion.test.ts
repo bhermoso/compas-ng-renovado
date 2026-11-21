@@ -30,8 +30,8 @@ import { createMunicipalityRuntime } from './helpers/legacyProfileRuntime';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const loadSeed = (rel: string) => {
-  const path = rel === "compas-ng-workspace-granada-zaidin.json"
-    ? resolve(root, "fixtures/workspaces/granada-zaidin-synthetic-test.json")
+  const path = rel === "municipio-ensayo"
+    ? resolve(root, "fixtures/workspaces/municipio-ensayo-synthetic-test.json")
     : resolve(root, "public/seeds", rel);
   return parseWorkspaceJSON(readFileSync(path, "utf8"))!;
 };
@@ -138,7 +138,7 @@ describe("OIT — sin candidatura espuria por síntesis derivada", () => {
   });
 });
 
-describe("workspaces canónicos — Atarfe y Granada-Zaidín", () => {
+describe("workspaces canónicos — Atarfe y expediente de ensayo", () => {
   it("Atarfe: 0 hallazgos cualitativos reales, conserva Informe + IBSE + 5 indicadores", () => {
     const ws = loadSeed("compas-ng-workspace-atarfe.json");
     const rt = createMunicipalityRuntime({ workspace: ws });
@@ -158,12 +158,13 @@ describe("workspaces canónicos — Atarfe y Granada-Zaidín", () => {
     expect(rt.psl.priorizacion.hasParticipatorySelection).toBe(false);
   });
 
-  it("Granada-Zaidín: 0 cualitativos reales, conserva 23 indicadores y 56 activos", () => {
-    const ws = loadSeed("compas-ng-workspace-granada-zaidin.json");
+  it("Municipio de ensayo: 0 cualitativos reales, conserva 23 indicadores y sus activos de ensayo", () => {
+    const ws = loadSeed("municipio-ensayo");
     const rt = createMunicipalityRuntime({ workspace: ws });
     expect(rt.psl.qualitativeFindingCount).toBe(0);
     expect(rt.psl.indicatorCount).toBe(23);
-    expect(rt.psl.assetCount).toBe(56);
+    expect(rt.psl.assetCount).toBe(ws.evidenceStore.atoms.filter((a) => a.kind === "asset").length);
+    expect(rt.psl.assetCount).toBe(10);
     // El IBSE_RESUMEN sigue presente en el expediente (no se elimina).
     expect(ws.evidenceStore.atoms.some((a) => isDerivedSynthesisAtom(a))).toBe(true);
     // No candidatura técnica espuria ni sustituto.

@@ -50,11 +50,11 @@ const store = new Map<string, string>();
 
 const EXPORT_PATH = resolve(
   dirname(fileURLToPath(import.meta.url)),
-  "../fixtures/workspaces/granada-zaidin-synthetic-test.json"
+  "../fixtures/workspaces/municipio-ensayo-synthetic-test.json"
 );
 
 function perfilConConocimiento(): PerfilLocalDeSalud {
-  let perfil = createPerfilLocalDeSalud("granada-zaidin");
+  let perfil = createPerfilLocalDeSalud("municipio-ensayo");
   perfil = addHypothesis(perfil, {
     espacio: "situacion-salud",
     enunciado: "El malestar emocional detectado se concentra en población cuidadora.",
@@ -83,10 +83,10 @@ let textoModelo: string;
 
 beforeAll(() => {
   store.set(
-    "compas-ng:workspace:granada-zaidin",
+    "compas-ng:workspace:municipio-ensayo",
     readFileSync(EXPORT_PATH, "utf8")
   );
-  const loaded = loadWorkspaceFromLocalStorage("granada-zaidin");
+  const loaded = loadWorkspaceFromLocalStorage("municipio-ensayo");
   if (loaded === null) throw new Error("El export vigente no rehidrata");
   const perfil = perfilConConocimiento();
   const ws: MunicipalityWorkspace = { ...loaded, perfilLocalDeSalud: perfil };
@@ -126,7 +126,7 @@ beforeAll(() => {
 describe("export PDF — capa común con el DOCX", () => {
   it("el PDF parte del mismo modelo documental que el DOCX", () => {
     // Mismo constructor, mismos nombres base: solo cambia la extensión.
-    expect(pslcPdfFileName(artifact)).toBe("psl-c-granada-zaidin-2027-2030.pdf");
+    expect(pslcPdfFileName(artifact)).toBe("psl-c-municipio-ensayo-2027-2030.pdf");
     expect(pslcPdfFileName(artifact)).toBe(
       pslcDocxFileName(artifact).replace(/\.docx$/, ".pdf")
     );
