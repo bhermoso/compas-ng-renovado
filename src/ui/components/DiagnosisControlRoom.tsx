@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { DocumentReference } from "./Documentation";
 import type { DocumentKind, TemporalScope } from "../../domain/repository";
 import type { DiagnosisControlSummary } from "../../application/diagnosis/diagnosisControlSummary";
@@ -111,5 +111,35 @@ export function DiagnosisControlRoom({ municipalityName, province, ineCode, summ
         </div>
       </details>
     </section>
+  );
+}
+
+/** Módulos plegables del expediente; su estado inicial lo controla App. */
+export function DiagnosisModuleSection({
+  id,
+  title,
+  description,
+  open,
+  onToggle,
+  children,
+}: {
+  id: string;
+  title: string;
+  description?: string;
+  open: boolean;
+  onToggle: (open: boolean) => void;
+  children: ReactNode;
+}) {
+  return (
+    <details id={id} className="diagnosis-module" open={open} onToggle={(event) => {
+      const next = event.currentTarget.open;
+      if (next !== open) onToggle(next);
+    }}>
+      <summary className="diagnosis-module__summary">
+        <span className="diagnosis-module__title">{title}</span>
+        {description && <span className="diagnosis-module__description">{description}</span>}
+      </summary>
+      <div className="diagnosis-module__body">{children}</div>
+    </details>
   );
 }
