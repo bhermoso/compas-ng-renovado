@@ -228,3 +228,7 @@
 }
 .documentation-dialog.docp .docp__summary button[aria-pressed="true"] span { color: var(--azul-profundo); text-decoration: underline; }
 .documentation-dialog.docp .docp__summary button:focus-visible { outline: 2px solid var(--azul); outline-offset: 3px; }
+/* En el índice, la nota del marco común sigue la escala del índice. */
+.documentation-dialog.docp .docp__common .panel-note { margin: 6px 0 4px; font-size: .76rem; line-height: 1.45; color: var(--texto-secundario); }
+.documentation-dialog.docp .docp__common .csf__item { padding: 6px 0; }
+.documentation-dialog.docp .docp__common .csf__text strong { font-size: .8rem; }
