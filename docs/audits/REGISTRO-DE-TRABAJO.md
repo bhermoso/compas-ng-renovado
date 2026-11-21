@@ -22,6 +22,74 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-21 · Retirada de Granada-Zaidín: fase 1 (aplicación)
+
+**Decisiones del responsable (21/11/2026):**
+- Eliminar el expediente de Granada-Zaidín por completo.
+- Conservar la línea Envejecimiento saludable en el catálogo común, con su
+  procedencia (Plan Local de Salud del Distrito Zaidín).
+- No fijar ámbito por defecto ni caso de referencia.
+- Borrar sus originales del árbol actual del repositorio; siguen en el
+  historial de Git.
+
+### Inventario de dependencias (hechos observados)
+
+- **38 ficheros de `src`** lo mencionan. Entre ellos:
+  - las migraciones propias del expediente (`correctZaidinHealthReport`,
+    `removeNonObservedZaidinStudies`, `replaceZaidinFinalDraft` y la marca de
+    documentación canónica);
+  - la vista de coordinación (`?vista=coordinacion-zaidin`);
+  - la propuesta `ZAIDIN_AGING_PROPOSAL`, de la que deriva la línea
+    Envejecimiento del catálogo para todos los municipios.
+- **95 ficheros de prueba** lo mencionan:
+  - 33 usan `fixtures/workspaces/granada-zaidin-synthetic-test.json` como
+    banco de pruebas del compilador del Perfil y de la lectura canónica;
+  - 15 leen el seed público;
+  - 6 leen `municipalities/granada-zaidin`;
+  - 5 leen el PDF del informe.
+- **24 ficheros de datos y documentación** fuera de `src` y `tests`: el seed,
+  `municipalities/granada-zaidin` (2,5 MB), el PDF del informe, scripts y
+  documentos.
+
+### Fase 1 (esta entrada): retirada de la aplicación
+
+- **Ámbitos.** Granada-Zaidín sale de la lista y del registro de expedientes
+  de partida. Si un navegador lo tenía como ámbito activo, deja de abrirse.
+- **Sin ámbito por defecto.** Sin elección previa, o si la elegida se retiró:
+  - se abre el selector;
+  - la barra muestra «Elige un ámbito» y no marca ninguno como activo.
+  - Por razones técnicas se carga el primer ámbito de la lista, pero no se
+    presenta como elegido. La elección se recuerda al recargar.
+- **Otros cambios:**
+  - se retiran el rótulo «Demostración» y el ámbito por defecto del panel de
+    administración, que ahora pide elegir el plan de salud;
+  - CLAUDE.md deja de fijar Granada-Zaidín como caso de referencia.
+- **Pruebas:**
+  - el mecanismo de hidratación (`municipality-seed-hydration`) se prueba con
+    Atarfe;
+  - se retiran dos casos propios de Granada-Zaidín: la comparación con su
+    export y su migración de documentación;
+  - nueva prueba `granada-zaidin-retired`.
+- **Comprobado en el navegador:** primera visita, navegador que tenía
+  Granada-Zaidín, navegador que tenía Atarfe, y elección de Alfacar y de Loja
+  con recarga.
+
+### Pendiente
+
+- **Fase 2:**
+  - sustituir los datos de Granada-Zaidín en las pruebas por otro banco de
+    pruebas (decisión: cuál, sintético o un expediente existente);
+  - retirar las migraciones y la vista de coordinación propias;
+  - borrar el seed, `municipalities/granada-zaidin`, el PDF del informe y
+    los scripts.
+- **Fase 3:** documentación histórica en `docs/` (marcarla como retirada o
+  archivarla) y contratos que lo citan.
+- **Firestore:** el expediente compartido sigue existiendo hasta que el
+  responsable lo elimine. Antes conviene descargar una copia de
+  recuperación.
+
+---
+
 ## 2026-11-21 · Fallos de la suite completa: paso 1
 
 **Publicado al empezar:** `7b47c58a53c89a50bd942f93d35a3632a251dbe0` (#198).
