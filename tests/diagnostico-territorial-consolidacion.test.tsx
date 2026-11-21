@@ -27,7 +27,8 @@ describe("Diagnóstico territorial consolidado", () => {
     expect(html).toContain("Períodos: Sin período observado declarado");
     expect(html).toContain("documentos activos");
     expect(html).toContain("Ver estado y cronología");
-    expect(html).toContain('class="diagnosis-home__details"');
+    expect(html).toContain('class="hp-cover diagnosis-home__head"');
+    expect(html).toContain('<details class="diagnosis-home__details hp-phase hp-phase--1">');
     expect(html).not.toContain("<nav");
     expect(html).not.toContain("Explorar el diagnóstico");
     expect(html).not.toContain("diagnosis-area-navigation");
