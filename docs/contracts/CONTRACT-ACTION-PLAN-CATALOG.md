@@ -1,6 +1,6 @@
 # CONTRATO DEL CATÁLOGO TEMÁTICO DEL PLAN DE ACCIÓN
 
-> PA-RELAS-02 · Versión 1.1 — 2026-11-09 (versión 1.0: 2026-09-04)  
+> PA-RELAS-02 · Versión 1.2 — 2026-11-21 (versión 1.1: 2026-11-09; versión 1.0: 2026-09-04)  
 > Estado: VIGENTE
 
 ## 1. Posición en la cadena
@@ -129,7 +129,7 @@ Desde 2026-09-24, `PlanPreparationDraft` puede transportar también:
 
 Estos campos se editan en `PlanPreparationPanel` y viajan a `PlanDocument` cuando se valida o exporta la versión del Plan de Acción. Preparan el consumo posterior por `LocalHealthPlanCompiler`, pero su presencia no convierte la preparación editable en aprobación institucional ni en Plan Local de Salud compilado.
 
-Para El Zaidín se presenta la propuesta editorial 92418 en cuatro bloques, con los
+Para El Zaidín (expediente retirado el 2026-11-21, §12) se presentaba la propuesta editorial 92418 en cuatro bloques, con los
 18 códigos específicos y sus indicadores originales. El catálogo 3.1 y sus
 revisiones se conservan como referencia formal anterior. No se traslada aprobación
 entre versiones ni se aplica esta redacción local a otros municipios. La adopción
@@ -235,8 +235,9 @@ El catálogo común presenta dos líneas:
 
 **Compatibilidad territorial y procedencia.**
 
-- El Zaidín conserva la edición final y su versión identificada, incluida la
-  redacción municipal y las decisiones ya presentes en el expediente.
+- El Zaidín conservaba la edición final y su versión identificada, incluida la
+  redacción municipal y las decisiones ya presentes en el expediente. Esta
+  excepción quedó sin efecto con la retirada del expediente (§12).
 - Zagra conserva su versión territorial y la migración auditada de 2026-10-28.
 - Los demás expedientes usan la plantilla
   `comun-cuatro-bloques-2026-11-04`, con cuatro grupos de identificadores
@@ -264,3 +265,22 @@ El catálogo común presenta dos líneas:
 La plantilla nueva solo incorpora estructura, material editorial de catálogo
 y reglas de compatibilidad. **No cambia datos ni el estado institucional
 de ningún expediente municipal.**
+
+## 12. Retirada del expediente Granada-Zaidín — 2026-11-21
+
+**Decisión del responsable:** Granada-Zaidín se retira de COMPÁS. Esta sección
+prevalece sobre las menciones anteriores a ese expediente.
+
+- El I Plan Local de Salud del Distrito Zaidín 2027–2030 sigue siendo el
+  **origen declarado** de los módulos de envejecimiento saludable y de
+  adicciones (§2). La procedencia se conserva en el catálogo común; no implica
+  que el expediente exista en COMPÁS.
+- Dejan de aplicarse la propuesta editorial 92418 (§7) y la excepción de la
+  edición final del Zaidín (§11). No hay rama territorial del Zaidín: el
+  catálogo ofrece a cualquier expediente la plantilla
+  `comun-cuatro-bloques-2026-11-04`, y Zagra conserva su versión territorial
+  (§10).
+- La notación de cuatro bloques (§10) y la jerarquía `ENV-OEST`, `ENV-OGb`,
+  `ENV-OEb.n` y `ENV-Ib.n` no cambian.
+- Los documentos del expediente retirado permanecen en el historial Git; no se
+  copian a ningún otro expediente ni salida.

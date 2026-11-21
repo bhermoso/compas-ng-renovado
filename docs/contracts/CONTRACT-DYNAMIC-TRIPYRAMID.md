@@ -35,7 +35,7 @@ registry resuelve alias de municipio (`"atarfe"` → INE `"18022"`), de modo que
 válido —o `unknown`— no es evaluable por estrato; una `mixed` con desglose válido pero sin referencia de
 un estrato tampoco, y el motivo distingue qué falta. Cuando el desglose es válido y ambas referencias
 están presentes, se muestran AMBOS dictámenes (menores de 16 con la referencia 6–15; 16+ con la adulta).
-Para municipios sin referencia verificada (p. ej. Granada-Zaidín), muestra «No evaluable» con el motivo; no se aplica una clasificación alternativa por n.
+Para ámbitos sin referencia verificada (p. ej. un distrito urbano sin padrón propio), muestra «No evaluable» con el motivo; no se aplica una clasificación alternativa por n.
 
 **Pendiente:** generación de `EvidenceAtom kind="sample-quality"`,
 persistencia en workspace, estratificación, ponderación, desplazamiento, comparación longitudinal,
