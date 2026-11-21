@@ -22,6 +22,64 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-21 · Plan de Acción con el diseño de Inicio (#192)
+
+**Publicado al empezar:** `70730b15760461d90d8df64e9bd769a681ce675b` (#191).
+**Publicado al terminar:** el commit de fusión de #192. Hay que comprobar
+`version.json` después de fusionar.
+
+### Cambio
+
+- **Portada.** Plan de Acción usa la portada común con la fase
+  «04 · Planificar». Desaparecen el desplegable único «Secciones del Plan de
+  Acción», la caja de título anterior y las pestañas internas.
+- **Secciones.** Cada sección es una columna de fase plegable:
+  - siempre: Líneas e indicadores y Plan resultante;
+  - con Lectura Estratégica Local, además: Lectura estratégica,
+    Participación y prioridades y Borrador de actuaciones.
+  - Solo hay una abierta a la vez, que ocupa el ancho completo; su contenido
+    se monta al abrirla.
+- **Interior:**
+  - la cabecera del catálogo sigue la jerarquía de la portada y sus
+    explicaciones pasan a «Cómo funciona»;
+  - desaparecen las cajas anidadas;
+  - los controles de validación y descarga tienen el estilo de la aplicación;
+  - el formulario G-PLS-7 se pliega y su estado sigue visible.
+- **Plan resultante** muestra el nombre del ámbito y no su identificador.
+
+### Comprobado con datos de prueba
+
+Expedientes de `public/seeds`.
+
+| Expediente | Tamaño | Al entrar | Líneas e indicadores abierta | Plan resultante abierto | Al plegar |
+|---|---|---|---|---|---|
+| Atarfe | 1280×720 | 1 pantalla | 1,5 pantallas | 1,6 pantallas | 1 pantalla |
+| Granada-Zaidín | 1280×720 | 1 pantalla | 1,5 pantallas | 2,2 pantallas (antes 2,8) | 1 pantalla |
+| Loja | 1280×720 | 1 pantalla | — | — | 1 pantalla |
+| Atarfe, Loja y Granada-Zaidín | 390×844 | 1 pantalla | — | — | 1 pantalla |
+
+- Ninguno de los tres expedientes activa la variante de cinco secciones: no
+  hay Lectura Estratégica Local. Esa variante no se ha observado en pantalla.
+- Integración continua: correcta.
+- Suite completa: los mismos 15 fallos previos.
+- `tests/plan-preparation.smoke.mjs`, que no está en la integración continua,
+  ya fallaba en `master` antes del cambio porque no encuentra la pestaña.
+
+### Comprobado con expedientes reales
+
+Nada. No hay credenciales en la sesión.
+
+### Pendiente
+
+- Observar la variante de cinco secciones con un expediente que tenga Lectura
+  Estratégica Local.
+- «Otras herramientas» de Diagnóstico sigue con el estilo anterior.
+- La denominación «Línea estratégica» de los módulos RELAS sigue pendiente de
+  decisión (véase la entrada anterior).
+- Revisar `tests/plan-preparation.smoke.mjs`.
+
+---
+
 ## 2026-11-21 · Auditoría de la versión publicada y navegación de escritorio
 
 **Publicado al empezar:** `0fe40edc75016cef9be67ef90116e79f4e175314` (#189).
