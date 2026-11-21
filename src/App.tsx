@@ -13,7 +13,7 @@ import { EMPTY_PROFILE_LIBRARY, isExternalProfileLibrary } from "./application/h
 import type { ExternalProfileLibrary } from "./domain/health-profile/ExternalHealthProfile";
 import { InitialLocalHealthPlanPanel } from "./ui/components/InitialLocalHealthPlanPanel";
 import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
-import { HomePortada } from "./ui/components/HomePortada";
+import { CompasCover, HomePortada, WorkspaceDisclosure } from "./ui/components/HomePortada";
 import { DocumentArchiveManager } from "./ui/components/DocumentArchiveManager";
 import { StrategicReferenceLibrary } from "./ui/components/StrategicReferenceLibrary";
 import { normalizeLojaMetadataRemotely } from "./application/workspace/normalizeLojaMetadataRemotely";
@@ -3946,7 +3946,7 @@ export default function App() {
         onConfirm={() => handleDeleteMunicipality(municipalityToDelete.id, municipalityToDelete)}
       />}
       {/* Barra de navegación con contexto municipal */}
-      <nav className={view === "inicio" ? "app-nav app-nav--home" : "app-nav"}>
+      <nav className="app-nav app-nav--home">
         <div className="app-nav__bar" />
         <div className="app-nav__inner">
           <span className="app-nav__brand">
@@ -3957,18 +3957,29 @@ export default function App() {
               <button
                 key={item.id}
                 type="button"
+                aria-current={view === item.id ? "page" : undefined}
                 className={
                   view === item.id
                     ? "app-nav__tab app-nav__tab--active"
                     : "app-nav__tab"
                 }
-                onClick={() => { setAgendaFocusId(undefined); setView(item.id); }}
+                onClick={() => { setAgendaFocusId(undefined); setView(item.id); window.scrollTo({top: 0, behavior: "auto"}); }}
               >
                 {item.phase && <span className="app-nav__phase" aria-hidden="true">{item.phase}</span>}
                 {item.label}
               </button>
             ))}
           </div>
+          <label className="app-nav__menu">
+            <span>Ir a</span>
+            <select value={NAV_ITEMS.some(item => item.id === view) ? view : ""} onChange={event => {
+              const next = NAV_ITEMS.find(item => item.id === event.currentTarget.value);
+              if (next) { setAgendaFocusId(undefined); setView(next.id); window.scrollTo({ top: 0, behavior: "auto" }); }
+            }}>
+              {!NAV_ITEMS.some(item => item.id === view) && <option value="" disabled>Seleccionar pestaña</option>}
+              {NAV_ITEMS.map(item => <option key={item.id} value={item.id}>{item.label}</option>)}
+            </select>
+          </label>
         </div>
 
         {/* Referencia del expediente cargado también en Inicio. */}
@@ -4041,7 +4052,7 @@ export default function App() {
         />
       )}
 
-      <main className={`app-shell${view === "inicio" ? " app-shell--home" : view === "repositorio" ? " app-shell--diagnosis" : ""}`}>
+      <main className={`app-shell${view === "inicio" ? " app-shell--home" : " app-shell--workspace"}`}>
         {/* Selector de municipio (se muestra sobre cualquier vista) */}
         {showMunicipalitySelector && (
           <section className="municipality-selector">
@@ -4160,7 +4171,7 @@ export default function App() {
 
         {/* ── ② Repositorio documental ─────────────────────── */}
         {view === "repositorio" && (
-          <section className="hp diagnosis-page" aria-labelledby="diagnosis-home-title">
+          <section className="hp diagnosis-page workspace-page" aria-labelledby="workspace-cover-title">
             {/* ── Sala de control: cabecera, resumen factual, matriz y línea temporal ── */}
             {(() => {
               const atoms = runtime.workspace.evidenceStore.atoms;
@@ -4468,14 +4479,19 @@ export default function App() {
           </section>
         )}
 
+        {view !== "inicio" && view !== "repositorio" && (
+          <section key={view} className="hp workspace-page" aria-labelledby="workspace-cover-title">
+            <CompasCover
+              title={NAV_ITEMS.find(item => item.id === view)?.label ?? (view === "analisis" ? "Análisis territorial" : "Lectura Estratégica Local")}
+              context="COMPÁS · Planificación Local de Salud"
+              subtitle={<><strong>{municipality.name}</strong>{municipality.province && ` · ${municipality.province}`}{municipality.ineCode && ` · INE ${municipality.ineCode}`}</>}
+            />
         {/* ── ③ Análisis territorial — interpretación territorial (Nivel 2) ── */}
         {/* Orden: resultados (B) → explicabilidad (C) → estado del proceso (A) */}
         {view === "analisis" && (
           <>
-            <LT1Panel lt1={runtime.lt1} />
-            <OITPanel oit={runtime.oit} />
-            <ReconciliacionPanel reconciliacion={runtime.reconciliacion} />
-            <PipelineTracePanel pipeline={runtime.pipeline} />
+            <WorkspaceDisclosure title="Resultados del análisis"><LT1Panel lt1={runtime.lt1} /><OITPanel oit={runtime.oit} /></WorkspaceDisclosure>
+            <WorkspaceDisclosure title="Conciliación y trazabilidad"><ReconciliacionPanel reconciliacion={runtime.reconciliacion} /><PipelineTracePanel pipeline={runtime.pipeline} /></WorkspaceDisclosure>
           </>
         )}
 
@@ -4483,6 +4499,7 @@ export default function App() {
         {view === "psl" && (
           <>
             <ExternalProfileDashboard
+              compact
               key={workspace.municipality.identity.id}
               municipalityId={workspace.municipality.identity.id}
               municipalityName={municipality.name}
@@ -4503,18 +4520,7 @@ export default function App() {
         {/* ── ⑤ Priorizaciones — técnica y participativa ──────── */}
         {view === "priorizacion" && (
           <>
-            <section className="workspace-panel">
-              <p className="eyebrow">Plan Local de Salud 2027–2030</p>
-              <h2>Priorización territorial</h2>
-              <p className="panel-note">
-                COMPÁS organiza información para la deliberación: áreas candidatas
-                derivadas del Perfil de Salud Local y resultados de la encuesta
-                ciudadana en REDCap. No recoge votos dentro de la aplicación ni
-                sustituye la encuesta; interpreta sus resultados cuando se importa
-                el CSV del proyecto participativo.
-              </p>
-            </section>
-            {/* Candidaturas técnicas — derivadas del PSL */}
+            <WorkspaceDisclosure title="Candidaturas técnicas">
             <PrioritizationPanel
               prioritization={runtime.prioritization}
               externalSource={(() => {
@@ -4526,10 +4532,8 @@ export default function App() {
               pslIsStale={runtime.pslIsStale}
               hasInsufficientEvidence={pipelineIsEmpty}
             />
-            {/* Participación ciudadana — proceso independiente de selección temática */}
-            <div className="repo-section-divider">
-              <span className="repo-section-divider__text">Participación ciudadana</span>
-            </div>
+            </WorkspaceDisclosure>
+            <WorkspaceDisclosure title="Participación ciudadana">
             <ThematicPrioritisationPanel
               savedIds={
                 runtime.workspace.thematicPrioritisation?.selectedTopicIds ?? []
@@ -4541,12 +4545,14 @@ export default function App() {
               municipalityId={runtime.workspace.municipality.identity.id}
               municipalityName={runtime.workspace.municipality.identity.name}
             />
+            </WorkspaceDisclosure>
           </>
         )}
 
         {/* ── ⑥ Lectura Estratégica Local + PAI ───────────────── */}
         {view === "lectura" && (
-          runtime.lectura ? (
+          <WorkspaceDisclosure title="Lectura y propuesta técnica">
+          {runtime.lectura ? (
             <>
               <LecturaEstrategicaView lectura={runtime.lectura} />
               {runtime.pai && <PAIView pai={runtime.pai} />}
@@ -4565,12 +4571,14 @@ export default function App() {
                 {runtime.profileValidation.detail}
               </p>
             </section>
-          )
+          )}
+          </WorkspaceDisclosure>
         )}
 
         {/* ── ⑦ Plan de Acción — MTE + selección deliberativa + PAI ── */}
         {view === "plan" && (
-          runtime.lectura ? (
+          <WorkspaceDisclosure title="Secciones del Plan de Acción">
+          {runtime.lectura ? (
             <>
             <section className="workspace-panel">
               <p className="eyebrow">Plan Local de Salud 2027–2030</p>
@@ -4738,13 +4746,17 @@ export default function App() {
                 onSave={handleSaveActionPlanModuleReview}
               />
             </>
-          )
+          )}
+          </WorkspaceDisclosure>
         )}
 
         {/* ── ⑧ Plan Local de Salud — esbozo previo a las actuaciones ── */}
         {view === "plan-local" && (
           <>
-          <InitialLocalHealthPlanPanel workspace={workspace} pslIsStale={runtime.pslIsStale} />
+          <WorkspaceDisclosure title="Documento del Plan Local de Salud">
+            <InitialLocalHealthPlanPanel workspace={workspace} pslIsStale={runtime.pslIsStale} />
+          </WorkspaceDisclosure>
+          <WorkspaceDisclosure title="Estructura y contenido del Plan">
           <LocalHealthPlanOutline
             municipalityId={workspace.municipality.identity.id}
             municipalityName={municipality.name}
@@ -4758,11 +4770,13 @@ export default function App() {
             drafts={workspace.planPreparationDrafts ?? []}
             agendaActuations={workspace.agendaActuations ?? []}
           />
+          </WorkspaceDisclosure>
           </>
         )}
 
         {/* ── Agenda de actuaciones por entornos (registro de trabajo; sin condicionar a PSL validado: decisión provisional) */}
         {view === "agenda" && (
+          <WorkspaceDisclosure title="Agenda de actuaciones" open={agendaFocusId ? true : undefined}>
           <AgendaBoard
             key={`${municipality.id}-${agendaFocusId ?? ""}`}
             municipalityId={municipality.id}
@@ -4775,10 +4789,12 @@ export default function App() {
             focusId={agendaFocusId}
             onGoToPlan={() => setView("plan")}
           />
+          </WorkspaceDisclosure>
         )}
 
         {/* ── ⑨ Evaluación — espacio canónico (pendiente de implementación) */}
         {view === "evaluacion" && (
+          <WorkspaceDisclosure title="Seguimiento e informe de evaluación">
           <section className="workspace-panel">
             <p className="eyebrow">Evaluación del Plan · {municipality.name}</p>
             <h2>Evaluación del Plan Local de Salud</h2>
@@ -4792,10 +4808,12 @@ export default function App() {
               fase de seguimiento y evaluación.
             </p>
           </section>
+          </WorkspaceDisclosure>
         )}
 
         {/* ── Gestor de Encuestas de Salud (GES) */}
         {view === "ges" && (
+          <WorkspaceDisclosure title="Proyectos de encuesta">
           <GESPanel
             key={municipality.id}
             onPreparationDirtyChange={onPreparationDirtyChange}
@@ -4809,8 +4827,11 @@ export default function App() {
             isImportingProjectDataset={isImportingProjectDataset}
             importProjectDatasetMessage={importProjectDatasetMessage}
           />
+          </WorkspaceDisclosure>
         )}
 
+          </section>
+        )}
       </main>
 
       <footer className="app-persistence-footer" aria-label="Herramientas de custodia del expediente">

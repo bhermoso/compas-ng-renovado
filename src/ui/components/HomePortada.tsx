@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { InstitutionalLogoBand } from "./InstitutionalLogoBand";
 import "./HomePortada.css";
 
@@ -36,32 +37,51 @@ interface HomePortadaProps {
   municipality: { name: string; province?: string; ineCode?: string };
   onChangeMunicipality: () => void;
 }
+const COVER_LOGOS = ["consejeria", "distrito-sanitario", "relas", "violencia-genero", "rasselh"];
+
+export function CompasCover({ title, context, subtitle, side }: {
+  title?: string;
+  context?: string;
+  subtitle?: ReactNode;
+  side?: ReactNode;
+}) {
+  return (
+    <header className="hp-cover">
+      <div className="hp-cover__context">
+        <p className="hp-cover__chain">Marco estratégico · Estrategia de Promoción de una Vida Saludable en Andalucía</p>
+        {context && <p className="hp-cover__chain">{context}</p>}
+      </div>
+      <div className="hp-cover__brand">
+        {title
+          ? <h2 id="workspace-cover-title" className="hp-cover__section-title">{title}</h2>
+          : <h1 className="home-cover__wordmark hp-cover__wordmark">COMPÁS</h1>}
+        <hr className="home-cover__rule hp-cover__rule" />
+        {subtitle && <p className={title ? "hp-cover__territory" : "hp-cover__subtitle"}>{subtitle}</p>}
+      </div>
+      <div className="hp-cover__side">
+        <InstitutionalLogoBand variant="cover" ids={COVER_LOGOS} />
+        {side}
+      </div>
+    </header>
+  );
+}
+
+export function WorkspaceDisclosure({ title, children, open }: { title: string; children: ReactNode; open?: boolean }) {
+  return (
+    <details className="workspace-disclosure" open={open}>
+      <summary><strong>{title}</strong></summary>
+      <div className="workspace-disclosure__body">{children}</div>
+    </details>
+  );
+}
+
 export function HomePortada(_props: HomePortadaProps) {
   return (
     <div className="hp" aria-label="Portada de COMPÁS">
-      <header className="hp-cover">
-        <div className="hp-cover__context">
-          <p className="hp-cover__chain">
-            Marco RELAS · Planificación Local de Salud · Salud pública municipal · Andalucía
-          </p>
-
-        </div>
-        <div className="hp-cover__brand">
-          <h1 className="home-cover__wordmark hp-cover__wordmark">COMPÁS</h1>
-          <hr className="home-cover__rule hp-cover__rule" />
-          <p className="hp-cover__subtitle">Herramienta en desarrollo para la planificación local en salud</p>
-        </div>
-        <div className="hp-cover__side">
-          <InstitutionalLogoBand
-            variant="cover"
-            ids={["consejeria", "distrito-sanitario", "relas", "violencia-genero", "rasselh"]}
-          />
-          <p className="hp-cover__mission">
-            Prototipo para elaborar Planes Locales de Salud municipales con el marco RELAS y la
-            experiencia de COMPÁS. No está desplegado oficialmente.
-          </p>
-        </div>
-      </header>
+      <CompasCover
+        subtitle="Herramienta en desarrollo para la planificación local en salud"
+        side={<p className="hp-cover__mission">Prototipo para elaborar Planes Locales de Salud municipales con la metodología RELAS y la experiencia de COMPÁS. No está desplegado oficialmente.</p>}
+      />
 
       <section className="hp-cycle" aria-labelledby="hp-cycle-title">
         <h2 id="hp-cycle-title" className="hp-cycle__title">El ciclo de planificación local en salud</h2>
