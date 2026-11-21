@@ -62,6 +62,7 @@ import {
   resolveSeedMigration,
   readActiveMunicipalityId,
   saveActiveMunicipalityId,
+  ACTIVE_MUNICIPALITY_STORAGE_KEY,
   sanitizeCustomMunicipalities,
   mergeMunicipalityCatalog,
   type WorkspaceLoadResult,
@@ -182,14 +183,12 @@ const DEMO_MUNICIPALITIES: CreateMunicipalityContextInput[] = [
   { id: "atarfe",         name: "Atarfe",              province: "Granada", ineCode: "18022", createdBy: "COMPÁS" },
   { id: "churriana",      name: "Churriana de la Vega", province: "Granada", ineCode: "18062", createdBy: "COMPÁS" },
   { id: "fuente-vaqueros", name: "Fuente Vaqueros",      province: "Granada", ineCode: "18079", createdBy: "COMPÁS" },
-  // Distrito inframunicipal — sin código INE propio. BADEA solo como contexto de Granada capital (18087).
-  { id: "granada-zaidin", name: "Granada-Zaidín",       province: "Granada", territorialType: "distrito", createdBy: "COMPÁS" },
   { id: "loja",            name: "Loja",                  province: "Granada", ineCode: "18122", createdBy: "COMPÁS" },
   { id: "zagra",          name: "Zagra",               province: "Granada", ineCode: "18913", createdBy: "COMPÁS" },
 ];
 const DEMO_MUNICIPALITY_IDS = DEMO_MUNICIPALITIES.map((municipality) => municipality.id);
-/** Caso de referencia con estudios sintéticos; el único ámbito que se rotula como demostración. */
-const SYNTHETIC_DEMO_MUNICIPALITY_ID = "granada-zaidin";
+/** Expedientes retirados de COMPÁS: no se ofrecen ni se abren, aunque quede una copia en el navegador o en Firebase. */
+const RETIRED_MUNICIPALITY_IDS: readonly string[] = ["granada-zaidin"];
 
 const CUSTOM_MUNICIPALITIES_KEY = "compas-ng:custom-municipalities";
 const DELETED_MUNICIPALITIES_KEY = "compas-ng:deleted-municipalities";
@@ -199,7 +198,13 @@ function readDeletedMunicipalityIds(): string[] {
     return Array.isArray(ids) ? ids.filter((id): id is string => typeof id === "string") : [];
   } catch { return []; }
 }
-const DEFAULT_MUNICIPALITY_ID = "granada-zaidin";
+/** Sin ámbito por defecto: si no hay uno elegido en este navegador, se pide elegirlo al entrar. */
+function hasChosenMunicipality(municipalities: readonly Pick<CreateMunicipalityContextInput, "id">[]): boolean {
+  try {
+    const stored = localStorage.getItem(ACTIVE_MUNICIPALITY_STORAGE_KEY)?.trim();
+    return !!stored && municipalities.some((municipality) => municipality.id === stored);
+  } catch { return false; }
+}
 const WORKSPACE_PERSISTENCE_FAILURE_MESSAGE =
   "No se pudo guardar el espacio de trabajo en este navegador. Descarga una copia de recuperación antes de recargar.";
 const WORKSPACE_EXTENDED_STORAGE_MESSAGE =
@@ -227,10 +232,9 @@ function resolveInitialMunicipality(
   const municipalities = mergeMunicipalityCatalog(
     DEMO_MUNICIPALITIES,
     customMunicipalities
-  ).filter((municipality) => !readDeletedMunicipalityIds().includes(municipality.id));
-  const fallback =
-    municipalities.find((municipality) => municipality.id === DEFAULT_MUNICIPALITY_ID) ??
-    municipalities[0] ?? DEMO_MUNICIPALITIES[0];
+  ).filter((municipality) => !readDeletedMunicipalityIds().includes(municipality.id) && !RETIRED_MUNICIPALITY_IDS.includes(municipality.id));
+  // Solo técnico: la aplicación necesita un expediente cargado; el selector se abre para elegir.
+  const fallback = municipalities[0] ?? DEMO_MUNICIPALITIES[0];
   const activeId = readActiveMunicipalityId(municipalities, fallback.id);
   return municipalities.find((municipality) => municipality.id === activeId) ?? fallback;
 }
@@ -468,7 +472,11 @@ export default function App() {
     useState<string | null>(null);
   const [remotePersistenceMessage, setRemotePersistenceMessage] =
     useState<string | null>(null);
-  const [showMunicipalitySelector, setShowMunicipalitySelector] = useState(false);
+  // Sin ámbito por defecto: en la primera visita (o si el elegido se retiró) se abre el selector.
+  const [municipalityChosen, setMunicipalityChosen] = useState(() =>
+    hasChosenMunicipality(mergeMunicipalityCatalog(DEMO_MUNICIPALITIES, readCustomMunicipalitiesFromLocalStorage())
+      .filter((municipality) => !RETIRED_MUNICIPALITY_IDS.includes(municipality.id))));
+  const [showMunicipalitySelector, setShowMunicipalitySelector] = useState(() => !municipalityChosen);
   // La barra de navegación es fija, pero el selector de ámbito se abre al principio
   // de la vista: si la página está desplazada, se lleva el selector a la vista,
   // justo debajo de la barra.
@@ -1597,7 +1605,7 @@ export default function App() {
 
   const allMunicipalities = useMemo(
     () => mergeMunicipalityCatalog(DEMO_MUNICIPALITIES, customMunicipalities)
-      .filter((municipality) => !readDeletedMunicipalityIds().includes(municipality.id)),
+      .filter((municipality) => !readDeletedMunicipalityIds().includes(municipality.id) && !RETIRED_MUNICIPALITY_IDS.includes(municipality.id)),
     [customMunicipalities]
   );
 
@@ -3846,6 +3854,14 @@ export default function App() {
   function handleChangeMunicipality(municipalityId: string) {
     const muni = allMunicipalities.find((m) => m.id === municipalityId);
     if (muni === undefined) return;
+    if (!municipalityChosen && municipalityId === workspace.municipality.identity.id) {
+      // El expediente ya está cargado por razones técnicas: basta con registrar la elección.
+      saveActiveMunicipalityId(municipalityId);
+      setMunicipalityChosen(true);
+      setShowMunicipalitySelector(false);
+      return;
+    }
+    setMunicipalityChosen(true);
     switchToMunicipality(municipalityId, muni);
   }
 
@@ -3941,7 +3957,7 @@ export default function App() {
         nextCustomMunicipalities
       );
       const fallback = nextCatalog.find((municipality) =>
-        !locallyDeletedWorkspaceIdsRef.current.has(municipality.id));
+        !locallyDeletedWorkspaceIdsRef.current.has(municipality.id) && !RETIRED_MUNICIPALITY_IDS.includes(municipality.id));
       if (fallback) switchToMunicipality(fallback.id, fallback, true);
     }
 
@@ -4005,8 +4021,9 @@ export default function App() {
           <div className="app-nav__municipality-row">
             <span className="app-nav__context-label">Expediente cargado:</span>
             <span className="app-nav__municipality-name">
-              {municipality.name}
+              {municipalityChosen ? municipality.name : "Elige un ámbito"}
             </span>
+            {municipalityChosen && <>
             <span className="app-nav__municipality-sep">·</span>
             <span className="app-nav__secondary-context">{municipality.province}</span>
             {municipality.territorialType && municipality.territorialType !== "municipio" && (
@@ -4023,11 +4040,7 @@ export default function App() {
                 <span className="app-nav__secondary-context">INE {municipality.ineCode}</span>
               </>
             )}
-            {/* Solo Granada-Zaidín es un caso de demostración (estudios sintéticos). Los demás
-                ámbitos iniciales son expedientes reales con datos en Firebase. */}
-            {municipality.id === SYNTHETIC_DEMO_MUNICIPALITY_ID && (
-              <span className="app-nav__municipality-badge">Demostración</span>
-            )}
+            </>}
             <button
               type="button"
               className="app-nav__municipality-btn"
@@ -4075,6 +4088,7 @@ export default function App() {
         {showMunicipalitySelector && (
           <section className="municipality-selector">
             <p className="municipality-selector__warning">
+              {municipalityChosen ? "" : "Elige el ámbito con el que vas a trabajar. "}
               Cada ámbito conserva su expediente en este navegador. Al cambiar,
               se carga el ámbito seleccionado. Descarga una copia para conservar
               el trabajo fuera de este equipo.
@@ -4084,7 +4098,7 @@ export default function App() {
                 <div
                   key={m.id}
                   className={
-                    municipality.id === m.id
+                    municipalityChosen && municipality.id === m.id
                       ? "municipality-selector__option municipality-selector__option--active"
                       : "municipality-selector__option"
                   }

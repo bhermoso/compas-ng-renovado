@@ -56,22 +56,18 @@ const store = new Map<string, string>();
 // Seed desplegable REAL (el fichero que Vite copia a dist/).
 const SEED_PATH = resolve(
   dirname(fileURLToPath(import.meta.url)),
-  "../public/seeds/compas-ng-workspace-granada-zaidin.json"
+  "../public/seeds/compas-ng-workspace-atarfe.json"
 );
 const SEED_RAW = readFileSync(SEED_PATH, "utf8");
+// Atarfe se retiró de COMPÁS (2026-11-21): el mecanismo se prueba con Atarfe.
+const SEED_DOCS = JSON.parse(SEED_RAW).repository.documents.length;
+const SEED_ATOMS = JSON.parse(SEED_RAW).evidenceStore.atoms.length;
 
-// Export restaurable de origen. El seed desplegable puede conservar material
-// histórico adicional, pero debe mantener las fuentes observadas y los activos.
-const CANONICAL_EXPORT_PATH = resolve(
-  dirname(fileURLToPath(import.meta.url)),
-  "../municipalities/granada-zaidin/exports/compas-ng-workspace-granada-zaidin.json"
-);
-
-const GRANADA_SEED_INPUT = {
-  id: "granada-zaidin",
-  name: "Granada-Zaidín",
+const ATARFE_SEED_INPUT = {
+  id: "atarfe",
+  name: "Atarfe",
   province: "Granada",
-  territorialType: "distrito",
+  ineCode: "18022",
   createdBy: "test",
 };
 
@@ -91,11 +87,11 @@ function throwingFetch(): typeof fetch {
   }) as unknown as typeof fetch;
 }
 
-const GRANADA_INPUT = {
-  id: "granada-zaidin",
-  name: "Granada-Zaidín",
+const ATARFE_INPUT = {
+  id: "atarfe",
+  name: "Atarfe",
   province: "Granada",
-  territorialType: "distrito",
+  ineCode: "18022",
   createdBy: "test",
 };
 const ALFACAR_INPUT = {
@@ -112,39 +108,39 @@ beforeEach(() => {
 
 describe("hidratación de expedientes municipales desde seed", () => {
   it("1. localStorage vacío: un municipio con seed carga el expediente canónico", async () => {
-    const ws = await loadMunicipalitySeed("granada-zaidin", {
+    const ws = await loadMunicipalitySeed("atarfe", {
       baseUrl: "/",
       fetchImpl: okFetch(SEED_RAW),
     });
     expect(ws).not.toBeNull();
-    expect(ws?.municipality.identity.id).toBe("granada-zaidin");
-    expect(ws?.municipality.identity.name).toBe("Granada-Zaidín");
+    expect(ws?.municipality.identity.id).toBe("atarfe");
+    expect(ws?.municipality.identity.name).toBe("Atarfe");
   });
 
-  it("2. Granada-Zaidín carga 8 documentos reales y 56 evidencias de activos", async () => {
-    const ws = await loadMunicipalitySeed("granada-zaidin", {
+  it("2. Atarfe carga los documentos y evidencias de su seed", async () => {
+    const ws = await loadMunicipalitySeed("atarfe", {
       baseUrl: "/",
       fetchImpl: okFetch(SEED_RAW),
     });
-    expect(ws?.repository.documents.length).toBe(8);
-    expect(ws?.evidenceStore.atoms.length).toBe(56);
+    expect(ws?.repository.documents.length).toBe(SEED_DOCS);
+    expect(ws?.evidenceStore.atoms.length).toBe(SEED_ATOMS);
   });
 
   it("3. un workspace local existente prevalece sobre el seed", () => {
-    // Sembrar un expediente local con contenido para granada-zaidin.
+    // Sembrar un expediente local con contenido para atarfe.
     const localWs = JSON.parse(SEED_RAW) as MunicipalityWorkspace;
     expect(saveWorkspaceToLocalStorage(localWs)).toBe(true);
 
-    const result = loadOrCreateMunicipalityWorkspace("granada-zaidin", GRANADA_INPUT);
+    const result = loadOrCreateMunicipalityWorkspace("atarfe", ATARFE_INPUT);
     // El seed NO se hidrata (no hay carrera): gana el local.
     expect(result.seedPending).toBe(false);
-    expect(result.workspace.repository.documents.length).toBe(8);
-    expect(result.workspace.evidenceStore.atoms.length).toBe(56);
+    expect(result.workspace.repository.documents.length).toBe(SEED_DOCS);
+    expect(result.workspace.evidenceStore.atoms.length).toBe(SEED_ATOMS);
   });
 
   it("4a. seed con schemaVersion incorrecto → rechazado (null)", async () => {
     const bad = JSON.stringify({ ...JSON.parse(SEED_RAW), schemaVersion: "9.9.9" });
-    const ws = await loadMunicipalitySeed("granada-zaidin", {
+    const ws = await loadMunicipalitySeed("atarfe", {
       baseUrl: "/",
       fetchImpl: okFetch(bad),
     });
@@ -154,7 +150,7 @@ describe("hidratación de expedientes municipales desde seed", () => {
   it("4b. seed con identidad municipal que no concuerda → rechazado (null)", async () => {
     const parsed = JSON.parse(SEED_RAW);
     parsed.municipality.identity.id = "otro-municipio";
-    const ws = await loadMunicipalitySeed("granada-zaidin", {
+    const ws = await loadMunicipalitySeed("atarfe", {
       baseUrl: "/",
       fetchImpl: okFetch(JSON.stringify(parsed)),
     });
@@ -163,10 +159,10 @@ describe("hidratación de expedientes municipales desde seed", () => {
 
   it("4c. HTTP no-ok o error de red → rechazado (null), sin lanzar", async () => {
     expect(
-      await loadMunicipalitySeed("granada-zaidin", { baseUrl: "/", fetchImpl: notOkFetch() })
+      await loadMunicipalitySeed("atarfe", { baseUrl: "/", fetchImpl: notOkFetch() })
     ).toBeNull();
     expect(
-      await loadMunicipalitySeed("granada-zaidin", { baseUrl: "/", fetchImpl: throwingFetch() })
+      await loadMunicipalitySeed("atarfe", { baseUrl: "/", fetchImpl: throwingFetch() })
     ).toBeNull();
   });
 
@@ -191,8 +187,8 @@ describe("hidratación de expedientes municipales desde seed", () => {
     });
   });
 
-  it("5b. granada-zaidin sin expediente local → seedPending true con placeholder vacío", () => {
-    const result = loadOrCreateMunicipalityWorkspace("granada-zaidin", GRANADA_INPUT);
+  it("5b. atarfe sin expediente local → seedPending true con placeholder vacío", () => {
+    const result = loadOrCreateMunicipalityWorkspace("atarfe", ATARFE_INPUT);
     expect(result.seedPending).toBe(true);
     expect(result.workspace.repository.documents.length).toBe(0);
     expect(result.workspace.evidenceStore.atoms.length).toBe(0);
@@ -202,8 +198,8 @@ describe("hidratación de expedientes municipales desde seed", () => {
     // Mientras pendingSeedId apunta al municipio actual → OMITE el guardado.
     expect(
       shouldSkipPersistence({
-        workspaceMunicipalityId: "granada-zaidin",
-        pendingSeedId: "granada-zaidin",
+        workspaceMunicipalityId: "atarfe",
+        pendingSeedId: "atarfe",
         protectedEmptyWorkspaceId: null,
         isEmpty: true,
       })
@@ -211,7 +207,7 @@ describe("hidratación de expedientes municipales desde seed", () => {
     // Tras terminar la hidratación (pendingSeedId liberado) → SÍ persiste.
     expect(
       shouldSkipPersistence({
-        workspaceMunicipalityId: "granada-zaidin",
+        workspaceMunicipalityId: "atarfe",
         pendingSeedId: null,
         protectedEmptyWorkspaceId: null,
         isEmpty: false,
@@ -220,7 +216,7 @@ describe("hidratación de expedientes municipales desde seed", () => {
     // Comprobación de extremo a extremo del efecto: con seedPending y guardado
     // omitido, localStorage permanece vacío (no se guarda el placeholder).
     store.clear();
-    const result = loadOrCreateMunicipalityWorkspace("granada-zaidin", GRANADA_INPUT);
+    const result = loadOrCreateMunicipalityWorkspace("atarfe", ATARFE_INPUT);
     const skip = shouldSkipPersistence({
       workspaceMunicipalityId: result.workspace.municipality.identity.id,
       pendingSeedId: result.seedPending
@@ -230,98 +226,71 @@ describe("hidratación de expedientes municipales desde seed", () => {
       isEmpty: true,
     });
     if (!skip) saveWorkspaceToLocalStorage(result.workspace);
-    expect(store.has("compas-ng:workspace:granada-zaidin")).toBe(false);
+    expect(store.has("compas-ng:workspace:atarfe")).toBe(false);
   });
 
   it("7. la URL del seed funciona con el BASE_URL de GitHub Pages", async () => {
-    const seed = MUNICIPALITY_SEEDS["granada-zaidin"];
+    const seed = MUNICIPALITY_SEEDS["atarfe"];
     expect(municipalitySeedUrl(seed, "/COMPAS_NG/")).toBe(
-      "/COMPAS_NG/seeds/compas-ng-workspace-granada-zaidin.json"
+      "/COMPAS_NG/seeds/compas-ng-workspace-atarfe.json"
     );
     // El loader pide EXACTAMENTE esa URL bajo el base de Pages.
     let requested = "";
-    await loadMunicipalitySeed("granada-zaidin", {
+    await loadMunicipalitySeed("atarfe", {
       baseUrl: "/COMPAS_NG/",
       fetchImpl: okFetch(SEED_RAW, (u) => {
         requested = u;
       }),
     });
-    expect(requested).toBe("/COMPAS_NG/seeds/compas-ng-workspace-granada-zaidin.json");
+    expect(requested).toBe("/COMPAS_NG/seeds/compas-ng-workspace-atarfe.json");
   });
 
   it("8. el seed desplegable existe en public/ (Vite lo copia a dist) y es válido", () => {
     const parsed = JSON.parse(SEED_RAW);
     expect(parsed.schemaVersion).toBe("1.0.0");
-    expect(parsed.municipality.identity.id).toBe("granada-zaidin");
-    expect(parsed.municipality.identity.name).toBe("Granada-Zaidín");
-    expect(parsed.repository.documents.length).toBe(8);
-    expect(parsed.evidenceStore.atoms.length).toBe(56);
+    expect(parsed.municipality.identity.id).toBe("atarfe");
+    expect(parsed.municipality.identity.name).toBe("Atarfe");
+    expect(parsed.repository.documents.length).toBe(SEED_DOCS);
+    expect(parsed.evidenceStore.atoms.length).toBe(SEED_ATOMS);
     // La ruta registrada coincide con el fichero desplegable.
-    expect(MUNICIPALITY_SEEDS["granada-zaidin"].path).toBe(
-      "seeds/compas-ng-workspace-granada-zaidin.json"
+    expect(MUNICIPALITY_SEEDS["atarfe"].path).toBe(
+      "seeds/compas-ng-workspace-atarfe.json"
     );
-  });
-
-  it("8b. el seed desplegable conserva las fuentes del export restaurable y añade solo el histórico archivado", () => {
-    const seed = parseWorkspaceJSON(SEED_RAW)!;
-    const canonicalRawText = readFileSync(CANONICAL_EXPORT_PATH, "utf8");
-    const canonicalRaw = JSON.parse(canonicalRawText) as MunicipalityWorkspace;
-    const canonical = parseWorkspaceJSON(canonicalRawText)!;
-    expect(seed.repository.documents.length).toBe(8);
-    expect(canonicalRaw.repository.documents.length).toBe(7);
-    expect(canonical.repository.documents.length).toBe(8);
-    expect(seed.repository.documents.map((document) => document.id).sort()).toEqual(
-      canonical.repository.documents.map((document) => document.id).sort()
-    );
-    expect(seed.evidenceStore.atoms.length).toBe(canonicalRaw.evidenceStore.atoms.length);
-    expect(seed.evidenceStore.atoms.length).toBe(56);
-    expect(new Set(seed.evidenceStore.atoms.map((atom) => atom.id))).toEqual(
-      new Set(canonicalRaw.evidenceStore.atoms.map((atom) => atom.id))
-    );
-    const canonicalIds = new Set(canonicalRaw.repository.documents.map((document) => document.id));
-    const seedIds = new Set(seed.repository.documents.map((document) => document.id));
-    for (const id of canonicalIds) expect(seedIds.has(id), id).toBe(true);
-    const extraDocs = seed.repository.documents.filter((document) => !canonicalIds.has(document.id));
-    expect(extraDocs).toHaveLength(1);
-    expect(extraDocs[0].kind).toBe("health-report");
-    const historical = seed.repository.documents.find((document) => document.id === "1ca11945-44a2-4af5-b779-bb02582eb516");
-    expect(historical?.kind).toBe("other");
-    expect(historical?.status).toBe("archived");
   });
 
   // ── Migración: placeholder vacío de la versión anterior → seed canónico ────────
 
-  it("6b. MIGRACIÓN: localStorage con Granada-Zaidín válido pero prístino → al arrancar carga el seed (8/56)", async () => {
+  it("6b. MIGRACIÓN: localStorage con Atarfe válido pero prístino → al arrancar carga el seed (documentos y evidencias del seed)", async () => {
     // Un navegador de la versión anterior guardó un expediente VÁLIDO pero VACÍO
     // (creado por createCompleteMunicipalityWorkspace). Debe considerarse placeholder.
-    const placeholder = createCompleteMunicipalityWorkspace(GRANADA_SEED_INPUT);
+    const placeholder = createCompleteMunicipalityWorkspace(ATARFE_SEED_INPUT);
     expect(isEmptyWorkspaceForPersistenceGuard(placeholder)).toBe(true);
     expect(saveWorkspaceToLocalStorage(placeholder)).toBe(true);
 
     // Arranque: se detecta el placeholder y se marca la hidratación del seed.
-    const result = loadOrCreateMunicipalityWorkspace("granada-zaidin", GRANADA_INPUT);
+    const result = loadOrCreateMunicipalityWorkspace("atarfe", ATARFE_INPUT);
     expect(result.seedPending).toBe(true);
     expect(result.workspace.repository.documents.length).toBe(0);
-    expect(shouldReplaceWithSeed(result.workspace, "granada-zaidin")).toBe(true);
+    expect(shouldReplaceWithSeed(result.workspace, "atarfe")).toBe(true);
 
     // Hidratación asíncrona (misma decisión que el efecto de App).
-    const seed = await loadMunicipalitySeed("granada-zaidin", {
+    const seed = await loadMunicipalitySeed("atarfe", {
       baseUrl: "/",
       fetchImpl: okFetch(SEED_RAW),
     });
-    const hydrated = shouldReplaceWithSeed(result.workspace, "granada-zaidin")
+    const hydrated = shouldReplaceWithSeed(result.workspace, "atarfe")
       ? seed
       : result.workspace;
-    expect(hydrated?.repository.documents.length).toBe(8);
-    expect(hydrated?.evidenceStore.atoms.length).toBe(56);
+    expect(hydrated?.repository.documents.length).toBe(SEED_DOCS);
+    expect(hydrated?.evidenceStore.atoms.length).toBe(SEED_ATOMS);
   });
 
   it("7b. un workspace local NO vacío prevalece: no se sustituye por el seed", () => {
     // Expediente local con contenido humano real (priorización ciudadana).
     const local: MunicipalityWorkspace = {
-      ...createCompleteMunicipalityWorkspace(GRANADA_SEED_INPUT),
+      ...createCompleteMunicipalityWorkspace(ATARFE_SEED_INPUT),
       thematicPrioritisation: {
-        municipalityId: "granada-zaidin",
+        municipalityId: "atarfe",
         selectedTopicIds: ["bienestar-emocional"],
         updatedAt: "2026-07-01T00:00:00.000Z",
       },
@@ -329,10 +298,10 @@ describe("hidratación de expedientes municipales desde seed", () => {
     expect(isEmptyWorkspaceForPersistenceGuard(local)).toBe(false);
     expect(saveWorkspaceToLocalStorage(local)).toBe(true);
 
-    const result = loadOrCreateMunicipalityWorkspace("granada-zaidin", GRANADA_INPUT);
+    const result = loadOrCreateMunicipalityWorkspace("atarfe", ATARFE_INPUT);
     // No es placeholder: prevalece y NO se hidrata el seed.
     expect(result.seedPending).toBe(false);
-    expect(shouldReplaceWithSeed(result.workspace, "granada-zaidin")).toBe(false);
+    expect(shouldReplaceWithSeed(result.workspace, "atarfe")).toBe(false);
     expect(result.workspace.thematicPrioritisation?.selectedTopicIds).toEqual([
       "bienestar-emocional",
     ]);
@@ -352,13 +321,6 @@ const ATARFE_MARKER = "atarfe-localiza-v1";
 const ATARFE_MIGRATION = INCREMENTAL_SEED_MIGRATIONS.find(
   (m) => m.municipalityId === "atarfe"
 )!;
-const ATARFE_INPUT = {
-  id: "atarfe",
-  name: "Atarfe",
-  province: "Granada",
-  ineCode: "18022",
-  createdBy: "test",
-};
 const LOJA_SEED_PATH = resolve(
   dirname(fileURLToPath(import.meta.url)),
   "../public/seeds/compas-ng-workspace-loja.json"
@@ -469,17 +431,6 @@ describe("sincronización incremental de expedientes canónicos", () => {
     );
     expect(resolveSeedMigration(once)).toEqual({ kind: "none" });
     expect(applySeedDocumentMigration(once, atarfeSeed(), migration)).toBe(once);
-  });
-
-  it("Granada-Zaidín también propone sincronización completa si falta la marca", () => {
-    const zaidin = JSON.parse(SEED_RAW) as MunicipalityWorkspace;
-    const migration = INCREMENTAL_SEED_MIGRATIONS.find(
-      (item) => item.municipalityId === "granada-zaidin"
-    )!;
-    expect(resolveSeedMigration(zaidin)).toEqual({
-      kind: "download-and-merge",
-      migration,
-    });
   });
 
   it("un placeholder vacío sigue usando hidratación completa, no migración", () => {

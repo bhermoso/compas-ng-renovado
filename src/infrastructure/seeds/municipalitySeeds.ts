@@ -25,18 +25,12 @@ export interface MunicipalitySeed {
  * Registro generico de seeds canonicos. SOLO se registran municipios con un export
  * real vigente y rehidratable.
  *
- * Estado (2026-10-09): expedientes canonicos cargables = Granada-Zaidin,
- * Atarfe, Alfacar, Fuente Vaqueros y Loja. Churriana de la Vega y Zagra NO
+ * Estado (2026-11-21): expedientes canonicos cargables = Atarfe, Alfacar, Fuente Vaqueros y Loja. Churriana de la Vega y Zagra NO
  * tienen export real: se abren vacios hasta que exista uno. No se inventa
  * contenido; las fixtures sinteticas o provinciales NO se promueven a datos de
- * produccion.
+ * produccion. Granada-Zaidin se retiro de COMPAS el 2026-11-21.
  */
 export const MUNICIPALITY_SEEDS: Readonly<Record<string, MunicipalitySeed>> = {
-  "granada-zaidin": {
-    municipalityId: "granada-zaidin",
-    expectedName: "Granada-Zaidín",
-    path: "seeds/compas-ng-workspace-granada-zaidin.json",
-  },
   atarfe: {
     municipalityId: "atarfe",
     expectedName: "Atarfe",

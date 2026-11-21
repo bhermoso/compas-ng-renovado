@@ -12,7 +12,7 @@ Producto prioritario: el Perfil de Salud Local — documento científico, editor
 - Modelo canónico único (Art. 17 bis / I-LHPM-8): pantalla, visor, DOCX, PDF e impresión son el mismo documento. Ninguna representación puede divergir.
 - Cadena (Art. 16 bis / I-LHPM-9): evidencia, lectura integrada, conclusiones, recomendaciones del Perfil, frontera, priorización, Plan de Acción, actuaciones y agendas anuales. El Perfil concluye y recomienda (Conocer, Contrastar, Abordar; Art. 8 quater); las prioridades son del Grupo Motor; las líneas, objetivos e indicadores, del Plan de Acción; las actuaciones (responsable, plazo, recurso), de las agendas anuales de implantación, separadas del Plan de Acción (v2.3.1).
 - Estructura del Perfil (Art. 16 quater, contrato v2.2.0): la conclusión es la unidad; el cuerpo tiene siete apartados y la evidencia completa va en el anexo compilado. Las conclusiones se abren con una lectura de conjunto y se escriben en prosa; los campos de trazabilidad van a una tabla del anexo.
-- Datos epidemiológicos oficiales (Art. 13 bis, v2.2.0): se reproducen como los publica su fuente, sin cautelas añadidas; solo se declaran año, escala no municipal y ausencia de datos posteriores. Los bloques heredados del cuerpo se retiran uno a uno (disposición transitoria), sin que Granada-Zaidín cambie sin justificación.
+- Datos epidemiológicos oficiales (Art. 13 bis, v2.2.0): se reproducen como los publica su fuente, sin cautelas añadidas; solo se declaran año, escala no municipal y ausencia de datos posteriores. Los bloques heredados del cuerpo se retiran uno a uno (disposición transitoria).
 - Autoría acotada (Art. 16): el cuerpo diagnóstico es compilado y trazable, no editable a mano. La autoría humana vive en el cierre interpretativo y el enriquecimiento.
 - El Perfil tiene una sola salida (Art. 17 ter), que se abre con seis páginas de datos comparables en el orden del marco de determinantes sociales (Art. 4 quater, v2.5.0): portada, contexto y población, ejes de desigualdad, condiciones de vida, servicios, salud y bienestar. El NHS y la salida comparativa breve se retiraron el 2026-10-23: no restaurarlos como salida aparte ni crear representaciones derivadas sin reformar el contrato.
 - Panel comparable (Art. 17 quater, v2.3.0): núcleo cerrado de indicadores; comparadores Distrito, provincia y Andalucía cuando la fuente los publica; colores solo con intervalos o significación de la fuente; renta por sección censal del INE como eje de desigualdad interna.
@@ -35,7 +35,7 @@ Producto prioritario: el Perfil de Salud Local — documento científico, editor
 ## Municipios de prueba
 - Zagra: Informe + priorización ciudadana (evidencia participativa, 0 átomos)
 - Atarfe: Informe + IBSE con datos reales
-- Granada-Zaidín: Informe + 13 estudios sintéticos + 56 activos. Caso de referencia de la lectura canónica: no debe cambiar sin justificación.
+- Granada-Zaidín se retiró de COMPÁS el 2026-11-21 (decisión del responsable). No hay caso de referencia fijado ni ámbito por defecto: la aplicación pide elegirlo. La línea Envejecimiento saludable del catálogo común conserva como procedencia el Plan Local de Salud del Distrito Zaidín.
 
 ## Referencias externas (solo consulta, nunca copiar)
 - Desktop/COMPAS_REPO_DEPURADO_20260409: repo histórico, la mina.

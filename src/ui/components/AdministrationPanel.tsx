@@ -5,7 +5,7 @@ import {ProfileRemoteAuditPanel} from './ProfileRemoteAuditPanel';
 import {accessError,createTerritorialAccount,createTerritorialSpace,listTerritorialSpaces,listManagedAccounts,saveManagedAccess,type ManagedAccount,type NewAccount,type TerritorialSpace} from '../../infrastructure/relas/AdminAccounts';
 const project='https://console.firebase.google.com/project/compas-98dd7';
 export default function AdministrationPanel({client,onOpenApp,onOpenScope}:{client:RelasClient;onOpenApp:()=>void;onOpenScope:(scope:string)=>void}) {
- const [selectedScope,setSelectedScope]=useState('granada-zaidin');
+ const [selectedScope,setSelectedScope]=useState('');
  const [spaces,setSpaces]=useState<TerritorialSpace[]>([]);
  const [spaceType,setSpaceType]=useState<TerritorialSpace['type']>('municipio');const [ineCode,setIneCode]=useState('');const [districtName,setDistrictName]=useState('');const [mancName,setMancName]=useState('');
  const pending=useMemo(()=>availableMunicipalities(spaces),[spaces]);const everyMunicipality=useMemo(()=>allMunicipalities(),[]);
@@ -44,7 +44,7 @@ export default function AdministrationPanel({client,onOpenApp,onOpenScope}:{clie
   </section>
   <section className="admin-section"><h2>Crear acceso para un plan de salud</h2><p>Indica el correo de la persona responsable y su plan. COMPAS creará una contraseña aleatoria y la mostrará una sola vez. Para entrar, la persona usará como usuario ese correo y como contraseña la contraseña generada que le entregues. La cuenta de coordinación podrá consultar y editar su borrador compartido; sus cambios quedarán como propuestas pendientes de revisión administrativa.</p>
    <form onSubmit={async e=>{e.preventDefault();setBusy(true);setMessage('Creando cuenta…');try{const account={...await createTerritorialAccount(client,email),scope:selectedScope,role};setCreated({...account,granted:false});await grant(account);}catch(error){setMessage(accessError(error));}finally{setBusy(false);}}}>
-    <label>Plan de salud<select disabled={busy||!!created} value={selectedScope} onChange={e=>setSelectedScope(e.target.value)}>{spaces.length===0&&<option value="">Crea primero el espacio territorial</option>}{groupSpaces(spaces).map(g=><optgroup key={g.type} label={g.label}>{g.spaces.map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</optgroup>)}</select></label>
+    <label>Plan de salud<select disabled={busy||!!created} value={selectedScope} onChange={e=>setSelectedScope(e.target.value)}>{spaces.length===0?<option value="">Crea primero el espacio territorial</option>:<option value="" disabled>Elige el plan de salud</option>}{groupSpaces(spaces).map(g=><optgroup key={g.type} label={g.label}>{g.spaces.map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</optgroup>)}</select></label>
     <label>Usuario: correo de la persona responsable<input disabled={busy||!!created} required type="email" autoComplete="off" value={email} onChange={e=>setEmail(e.target.value)}/></label>
     <label>Permiso<select disabled={busy||!!created} value={role} onChange={e=>setRole(e.target.value as typeof role)}><option value="coordinator">Coordinación: consultar y editar borradores</option><option value="reader">Consulta: solo lectura</option></select></label>
     <button disabled={busy||!!created||!email||!spaces.some(s=>s.id===selectedScope)}>Crear usuario, contraseña y acceso</button>
