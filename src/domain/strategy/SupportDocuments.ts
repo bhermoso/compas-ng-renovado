@@ -80,7 +80,8 @@ export const SUPPORT_DOCUMENTS: readonly SupportDocument[] = Object.freeze([
     title: "I Plan Estratégico de Salud Mental y Adicciones de Andalucía 2026–2029",
     issuer: "Consejería de Sanidad, Presidencia y Emergencias, Junta de Andalucía",
     period: "2026–2029",
-    location: { kind: "url", url: "https://www.juntadeandalucia.es/sites/default/files/inline-files/2026/05/PESMAA.pdf" },
+    location: { kind: "compas", path: "docs/source-material/strategic-frameworks/PESMAA 2026-2029.pdf" },
+    note: "Original descargado el 21/11/2026 de la sede de la Junta de Andalucía (juntadeandalucia.es/sites/default/files/inline-files/2026/05/PESMAA.pdf); SHA-256 ca19fbf2466bdf4ced8630aae698adf2817321d4c68abd0b5b1280e7f477bd86.",
   },
   {
     id: "sns-salud-mental",

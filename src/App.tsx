@@ -16,6 +16,8 @@ import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
 import { CompasCover, HomePortada, WorkspaceDisclosure } from "./ui/components/HomePortada";
 import { DocumentArchiveManager } from "./ui/components/DocumentArchiveManager";
 import { StrategicReferenceLibrary } from "./ui/components/StrategicReferenceLibrary";
+import { CommonStrategicFramework } from "./ui/components/CommonStrategicFramework";
+import { STRATEGIC_REFERENCES } from "./application/strategic-reference-library";
 import { normalizeLojaMetadataRemotely } from "./application/workspace/normalizeLojaMetadataRemotely";
 import { DocumentReviewInbox } from "./ui/components/DocumentReviewInbox";
 import { DiagnosisControlRoom, DiagnosisModuleSection } from "./ui/components/DiagnosisControlRoom";
@@ -4270,7 +4272,13 @@ export default function App() {
               />
             </details>
 
-            <details id="diagnosis-tools-drawer" className="diagnosis-tools-drawer hp-phase hp-phase--4">
+            {/* Marco estratégico común: el mismo en todos los expedientes; no es documentación municipal. */}
+            <details className="diagnosis-common-framework hp-phase hp-phase--4" data-testid="diagnosis-common-framework">
+              <summary><strong>Marco estratégico común</strong><span>{STRATEGIC_REFERENCES.length} documentos · iguales en todos los expedientes</span></summary>
+              <div className="diagnosis-common-framework__body"><CommonStrategicFramework /></div>
+            </details>
+
+            <details id="diagnosis-tools-drawer" className="diagnosis-tools-drawer hp-phase hp-phase--5">
               <summary><strong>Otras herramientas del diagnóstico</strong><span>Bibliotecas, custodia y análisis</span></summary>
               <div className="diagnosis-tools-drawer__body">
             {/* Biblioteca de referencia institucional: no pertenece al expediente

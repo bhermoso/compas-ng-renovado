@@ -43,7 +43,9 @@ export interface StrategicMigrationAudit {
 /** Coincidencia exclusiva con la ruta oficial empaquetada: un título similar
  * no demuestra identidad documental, vigencia ni archivo idéntico. */
 function exactReference(doc: MunicipalDocument): string | undefined {
-  return STRATEGIC_REFERENCES.find(r => doc.source.url?.trim() === r.sourcePath)?.id;
+  const source = doc.source.url?.trim();
+  if (!source) return undefined;
+  return STRATEGIC_REFERENCES.find(r => source === r.sourcePath || source === r.url)?.id;
 }
 
 function disposition(doc: MunicipalDocument): {kind: StrategicDisposition; reason: string; matchedReferenceId?: string} {

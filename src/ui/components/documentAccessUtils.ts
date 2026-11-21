@@ -4,6 +4,7 @@ import esca from '../../../docs/source-material/strategic-frameworks/Estrategia 
 import esa from '../../../docs/source-material/strategic-frameworks/Estrategia de Salud de Andalucia 2030-ESA.pdf?url';
 import plizdFv from '../../../docs/source-material/territorial-documentation/PLIZD_FUENTE_VAQUEROS_2024.pdf?url';
 import mayores from '../../../docs/source-material/strategic-frameworks/Plan de mayores 2020-23.pdf?url';
+import pesmaa from '../../../docs/source-material/strategic-frameworks/PESMAA 2026-2029.pdf?url';
 
 // Resolve the original paths too: existing municipal workspaces retain them.
 export const bundledDocuments: Record<string, string> = {
@@ -12,6 +13,7 @@ export const bundledDocuments: Record<string, string> = {
   'docs/source-material/strategic-frameworks/Estrategia de Salud Comunitaria de Andalucia 2026-2030-ESCA.pdf': esca,
   'docs/source-material/strategic-frameworks/Estrategia de Salud de Andalucia 2030-ESA.pdf': esa,
   'docs/source-material/strategic-frameworks/Plan de mayores 2020-23.pdf': mayores,
+  'docs/source-material/strategic-frameworks/PESMAA 2026-2029.pdf': pesmaa,
   'docs/source-material/territorial-documentation/PLIZD_FUENTE_VAQUEROS_2024.pdf': plizdFv,
 };
 
