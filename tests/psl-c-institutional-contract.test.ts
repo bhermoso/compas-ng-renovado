@@ -2,7 +2,7 @@
  * tests/psl-c-institutional-contract.test.ts
  *
  * CONTRATO INSTITUCIONAL del PSL-C compilado, verificado sobre la narrativa
- * real del expediente vigente Granada-Zaidín 56/92.
+ * real del expediente vigente Municipio de ensayo 56/92.
  *
  * El contrato asegura que el artefacto congelado:
  *   1. puede contener conclusiones interpretativas sustantivas;
@@ -56,12 +56,12 @@ const store = new Map<string, string>();
 
 const EXPORT_PATH = resolve(
   dirname(fileURLToPath(import.meta.url)),
-  "../fixtures/workspaces/granada-zaidin-synthetic-test.json"
+  "../fixtures/workspaces/municipio-ensayo-synthetic-test.json"
 );
 
 /** Espacio de conocimiento del técnico, como en el flujo real. */
 function perfilConConocimiento(): PerfilLocalDeSalud {
-  let perfil = createPerfilLocalDeSalud("granada-zaidin");
+  let perfil = createPerfilLocalDeSalud("municipio-ensayo");
   perfil = addInterpretation(perfil, {
     espacio: "determinantes",
     enunciado:
@@ -123,10 +123,10 @@ let artifact: LocalHealthProfileArtifact;
 
 beforeAll(() => {
   store.set(
-    "compas-ng:workspace:granada-zaidin",
+    "compas-ng:workspace:municipio-ensayo",
     readFileSync(EXPORT_PATH, "utf8")
   );
-  const loaded = loadWorkspaceFromLocalStorage("granada-zaidin");
+  const loaded = loadWorkspaceFromLocalStorage("municipio-ensayo");
   if (loaded === null) throw new Error("El export vigente no rehidrata");
   const perfil = perfilConConocimiento();
   ws = { ...loaded, perfilLocalDeSalud: perfil };
@@ -172,7 +172,7 @@ describe("contrato PSL-C — conclusiones interpretativas", () => {
   it("el artefacto contiene conclusiones interpretativas sustantivas", () => {
     const c = artifact.conclusiones.content;
     expect(c.length).toBeGreaterThan(1000);
-    expect(c).toContain("El diagnóstico apunta a un distrito");
+    expect(c).toContain("El diagnóstico apunta a un municipio");
     expect(c).toContain("Síntesis diagnóstica del equipo técnico.");
     expect(c).toContain("Lectura desde la epidemiología social");
   });
@@ -224,7 +224,7 @@ describe("contrato PSL-C — cautelas de escala", () => {
   it("preserva las cautelas proxy/demo y de escala del diagnóstico", () => {
     const c = artifact.conclusiones.content;
     expect(c).toContain("contexto exploratorio");
-    expect(c).toMatch(/no constituyen? (una )?estimación específica del distrito/);
+    expect(c).toMatch(/no constituyen? (una )?estimación específica del municipio/);
     expect(c).toContain("demo/proxy");
     expect(artifact.cautelasMetodologicas.nota.length).toBeGreaterThan(0);
   });

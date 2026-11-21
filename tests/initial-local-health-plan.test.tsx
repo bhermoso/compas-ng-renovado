@@ -7,7 +7,7 @@ import { externalProfileFixture } from './helpers/externalProfileFixture';
  * contenido; cada elemento una vez), aísla la ruta B histórica para artefactos
  * legacy, y no reconstruye desde `provenance`/`conclusiones.content`.
  *
- * Cobertura: Atarfe y Granada-Zaidín.
+ * Cobertura: Atarfe y Municipio de ensayo.
  */
 
 import { describe, it, expect, beforeAll } from "vitest";
@@ -46,8 +46,8 @@ const store = new Map<string, string>();
 
 const DIR = dirname(fileURLToPath(import.meta.url));
 const exportPath = (muni: string, file: string) =>
-  muni === "granada-zaidin"
-    ? resolve(DIR, "..", "fixtures", "workspaces", "granada-zaidin-synthetic-test.json")
+  muni === "municipio-ensayo"
+    ? resolve(DIR, "..", "fixtures", "workspaces", "municipio-ensayo-synthetic-test.json")
     : resolve(DIR, "..", "municipalities", muni, "exports", file);
 
 function validatedPSL(base: LocalHealthProfile): LocalHealthProfile {
@@ -111,7 +111,7 @@ let zaidin: Caso;
 let atarfe: Caso;
 
 beforeAll(() => {
-  zaidin = cargar("granada-zaidin", "compas-ng-workspace-granada-zaidin.json");
+  zaidin = cargar("municipio-ensayo", "compas-ng-workspace-municipio-ensayo.json");
   atarfe = cargar("atarfe", "compas-ng-workspace-atarfe.json");
 });
 
@@ -126,7 +126,7 @@ import type { PlanDocument } from "../src/domain/action-plan-catalog/PlanDocumen
 
 function workspace(): MunicipalityWorkspace {
  const current: PlanDocument = {
-  schemaVersion: 1, municipalityId: "granada-zaidin", status: "validated",
+  schemaVersion: 1, municipalityId: "municipio-ensayo", status: "validated",
   generatedAt: "2026-09-28T09:00:00Z", validatedBy: "Grupo Motor",
   paragraphs: [{text: "Edadismo", heading: true}, {text: "Reducir las actitudes edadistas entre las personas participantes en intervenciones comunitarias."}],
   traceabilityLinks: [{
@@ -142,7 +142,7 @@ function workspace(): MunicipalityWorkspace {
    indicatorCode: "ENV-I5.1",
    indicatorTitle: "% de participantes que reducen actitudes edadistas.",
    indicatorRole: "action-plan",
-   indicatorWorksheetKey: "granada-zaidin/env-2027-2030/ENV-I5.1",
+   indicatorWorksheetKey: "municipio-ensayo/env-2027-2030/ENV-I5.1",
    indicatorFichaStatus: "linked-actions",
    actionCards: [{
     id: "a1",

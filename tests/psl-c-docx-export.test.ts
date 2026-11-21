@@ -53,11 +53,11 @@ const store = new Map<string, string>();
 
 const EXPORT_PATH = resolve(
   dirname(fileURLToPath(import.meta.url)),
-  "../fixtures/workspaces/granada-zaidin-synthetic-test.json"
+  "../fixtures/workspaces/municipio-ensayo-synthetic-test.json"
 );
 
 function perfilConConocimiento(): PerfilLocalDeSalud {
-  let perfil = createPerfilLocalDeSalud("granada-zaidin");
+  let perfil = createPerfilLocalDeSalud("municipio-ensayo");
   perfil = addHypothesis(perfil, {
     espacio: "situacion-salud",
     enunciado: "El malestar emocional detectado se concentra en población cuidadora.",
@@ -86,10 +86,10 @@ let textoCompleto: string;
 
 beforeAll(() => {
   store.set(
-    "compas-ng:workspace:granada-zaidin",
+    "compas-ng:workspace:municipio-ensayo",
     readFileSync(EXPORT_PATH, "utf8")
   );
-  const loaded = loadWorkspaceFromLocalStorage("granada-zaidin");
+  const loaded = loadWorkspaceFromLocalStorage("municipio-ensayo");
   if (loaded === null) throw new Error("El export vigente no rehidrata");
   const perfil = perfilConConocimiento();
   const ws: MunicipalityWorkspace = { ...loaded, perfilLocalDeSalud: perfil };
@@ -193,7 +193,7 @@ describe("export DOCX — estructura del modelo documental", () => {
       (s) => s.title === "Capacidades y oportunidades comunitarias"
     );
     const textoCap = capacidades!.paragraphs.join("\n");
-    expect(textoCap).toContain("56 activos");
+    expect(textoCap).toContain("10 activos");
     expect(textoCap).toContain("no prueban cobertura ni resultado");
     expect(textoCap).toContain("requieren validación territorial");
   });
@@ -230,8 +230,8 @@ describe("export DOCX — estructura del modelo documental", () => {
   });
 
   it("el nombre de archivo es estable y seguro", () => {
-    expect(pslcDocxFileName(artifact)).toBe("psl-c-granada-zaidin-2027-2030.docx");
-    expect(model.fileName).toBe("psl-c-granada-zaidin-2027-2030.docx");
+    expect(pslcDocxFileName(artifact)).toBe("psl-c-municipio-ensayo-2027-2030.docx");
+    expect(model.fileName).toBe("psl-c-municipio-ensayo-2027-2030.docx");
   });
 });
 

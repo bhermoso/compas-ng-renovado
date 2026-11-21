@@ -6,6 +6,9 @@
  * filtrar nombres técnicos («estilo Atarfe», «Abril2023», «.docx») en el
  * producto visible: pantalla, visor institucional, DOCX y PDF.
  *
+ * Granada-Zaidín se retiró de COMPÁS (2026-11-21): las pruebas de su denominación
+ * institucional («Informe de salud de El Zaidín») se retiraron con él.
+ *
  * Decisión protegida: el dato bruto persistido/congelado NO se modifica
  * (el artefacto conserva su contenido histórico exacto); el saneado es de
  * presentación/exportación. Y el aviso «Narrativa anterior» acompaña a los
@@ -46,7 +49,7 @@ const store = new Map<string, string>();
 
 const EXPORT_PATH = resolve(
   dirname(fileURLToPath(import.meta.url)),
-  "../fixtures/workspaces/granada-zaidin-synthetic-test.json"
+  "../fixtures/workspaces/municipio-ensayo-synthetic-test.json"
 );
 
 const TITULO_LEGADO = "Informe Salud Granada Abril2023 estilo Atarfe";
@@ -57,10 +60,10 @@ let artifactLegado: LocalHealthProfileArtifact;
 
 beforeAll(() => {
   store.set(
-    "compas-ng:workspace:granada-zaidin",
+    "compas-ng:workspace:municipio-ensayo",
     readFileSync(EXPORT_PATH, "utf8")
   );
-  const loaded = loadWorkspaceFromLocalStorage("granada-zaidin");
+  const loaded = loadWorkspaceFromLocalStorage("municipio-ensayo");
   if (loaded === null) throw new Error("El export vigente no rehidrata");
   ws = loaded;
   const generado = createMunicipalityRuntime({ workspace: ws }).psl;
@@ -77,7 +80,7 @@ beforeAll(() => {
     conclusiones: {
       ...generado.conclusiones,
       content: generado.conclusiones.content
-        .split("Informe de salud de El Zaidín")
+        .split("Informe de Salud del Municipio de ensayo")
         .join(TITULO_LEGADO),
     },
   };
@@ -124,12 +127,6 @@ function renderPantalla(): string {
 // ══════════════════════════════════════════════════════════════════════════════
 
 describe("PSL legado — pantalla saneada", () => {
-  it("muestra la denominación institucional y nunca el título técnico", () => {
-    const html = renderPantalla();
-    expect(html).toContain("Informe de salud de El Zaidín");
-    expect(html).not.toContain("estilo Atarfe");
-    expect(html).not.toContain("Abril2023");
-  });
 
   it("muestra el aviso «Narrativa anterior» con las instrucciones", () => {
     const html = renderPantalla();
@@ -157,26 +154,7 @@ describe("PSL legado — pantalla saneada", () => {
 // ══════════════════════════════════════════════════════════════════════════════
 
 describe("PSL-C legado — visor y exports saneados", () => {
-  it("el visor institucional no filtra el título técnico", () => {
-    const html = renderToStaticMarkup(
-      <PSLCArtifactViewer artifact={artifactLegado} />
-    );
-    expect(html).not.toContain("estilo Atarfe");
-    expect(html).not.toContain("Abril2023");
-    expect(html).toContain("Informe de salud de El Zaidín");
-  });
 
-  it("el modelo documental (fuente única de DOCX y PDF) queda saneado", () => {
-    const model = buildPSLCDocumentModel(artifactLegado);
-    const texto = [
-      model.title,
-      ...model.portada,
-      ...model.sections.flatMap((s) => [s.title, ...s.paragraphs]),
-    ].join("\n");
-    expect(texto).not.toContain("estilo Atarfe");
-    expect(texto).not.toContain("Abril2023");
-    expect(texto).toContain("Informe de salud de El Zaidín");
-  });
 
   it("DOCX y PDF legados se generan válidos desde el modelo saneado", async () => {
     const docx = await exportPSLCArtifactToDocxBuffer(artifactLegado);

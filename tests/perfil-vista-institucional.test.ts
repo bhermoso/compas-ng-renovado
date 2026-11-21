@@ -46,7 +46,7 @@ const store = new Map<string, string>();
 
 const EXPORT_PATH = resolve(
   dirname(fileURLToPath(import.meta.url)),
-  "../fixtures/workspaces/granada-zaidin-synthetic-test.json"
+  "../fixtures/workspaces/municipio-ensayo-synthetic-test.json"
 );
 
 let psl: LocalHealthProfile;
@@ -54,10 +54,10 @@ let model: InstitutionalProfileViewModel;
 
 beforeAll(() => {
   store.set(
-    "compas-ng:workspace:granada-zaidin",
+    "compas-ng:workspace:municipio-ensayo",
     readFileSync(EXPORT_PATH, "utf8")
   );
-  const ws = loadWorkspaceFromLocalStorage("granada-zaidin");
+  const ws = loadWorkspaceFromLocalStorage("municipio-ensayo");
   if (ws === null) throw new Error("El export vigente no rehidrata");
   psl = createMunicipalityRuntime({ workspace: ws }).psl;
   model = buildInstitutionalProfileViewModel(psl);
@@ -101,7 +101,7 @@ describe("vista institucional — documento principal sobre el export vigente 56
   it("el documento es borrador asistido hasta autoría humana y cita la fuente primaria", () => {
     expect(model.isDraft).toBe(true);
     expect(model.primarySource.present).toBe(true);
-    expect(model.primarySource.title).toBe("Informe de salud de El Zaidín");
+    expect(model.primarySource.title).toBe("Informe de Salud del Municipio de ensayo");
   });
 
   it("los capítulos no contienen recomendaciones ni lenguaje de Plan de Acción", () => {

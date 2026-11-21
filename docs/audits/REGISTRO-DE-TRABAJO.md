@@ -22,6 +22,77 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-21 · Retirada de Granada-Zaidín: fase 2, paso 2 (expediente de ensayo neutro)
+
+**Decisiones del responsable:**
+- Loja como banco de pruebas real, cuando se pueda leer Firestore con
+  credenciales.
+- Expediente de ensayo neutro aparte para los estudios complementarios.
+- Solo Atarfe tiene un estudio complementario real (IBSE).
+
+### Hechos observados
+
+- **El antiguo expediente de ensayo** (`granada-zaidin-synthetic-test.json`)
+  contenía:
+  - el texto real del Informe de Salud de Granada-Zaidín de 2023 (441 KB);
+  - 56 activos reales de Localiza;
+  - informes de zona;
+  - 13 estudios: los de la EAS con agregados provinciales públicos de Granada
+    («proxy piloto») y los demás de fixtures municipales sintéticas.
+- **Lo usaban 36 ficheros de prueba:**
+  - 17 de ellos formaban una «suite metodológica histórica» fuera de la
+    integración continua, pendiente de realinear con Perfil 2.0. Fallaban
+    todos: 138 fallos en 325 casos.
+  - Las otras 19 eran pruebas activas.
+- **Loja en el repositorio** tiene 6 documentos, 0 evidencias, sin informe con
+  texto, sin estudios y sin Perfil. Su expediente completo está en Firestore.
+
+### Cambio
+
+- **Nuevo expediente de ensayo** `fixtures/workspaces/municipio-ensayo-synthetic-test.json`
+  («Municipio de ensayo»), generado con `scripts/demo/build-municipio-ensayo.gen.ts`
+  y las funciones de la propia aplicación:
+  - los 13 estudios conservan sus agregados de ensayo, sin atribuirse a
+    ningún municipio;
+  - un Informe de Salud de ensayo, analizado con el mismo analizador de
+    secciones (9 secciones);
+  - 10 activos de ensayo en formato Localiza (8 columnas, vocabulario de
+    Localiza Salud);
+  - en total, 15 documentos y 46 evidencias. El generador comprueba que no
+    queda ninguna mención a Granada-Zaidín.
+- **Las 19 pruebas activas usan el expediente de ensayo.** Recuentos, nombres
+  y textos se derivan de él. La instantánea de singularidad no cambia: mismas
+  cinco unidades y mismas lagunas.
+- **Se retiran:**
+  - la suite histórica (17 ficheros), su configuración
+    `vitest.profile-fixture.config.ts` y el script `test:profile-fixture`;
+  - tres pruebas de la denominación institucional de Granada-Zaidín
+    («Informe de salud de El Zaidín») en `psl-legado-saneado`;
+  - el antiguo expediente de ensayo.
+
+### Comprobado
+
+- Las 19 pruebas pasan: 189 casos.
+- Suite completa: los mismos 3 fallos pendientes.
+- `npm run build`: correcto.
+- Pruebas de humo: correctas.
+
+### Pendiente (fase 2)
+
+- **Paso 1:** inventario de Loja en Firestore (requiere `COMPAS_FIREBASE_SA_JSON`).
+- **Paso 3:** pruebas con datos reales de Loja, según lo que se decida
+  publicar.
+- **Paso 4:**
+  - retirar el código propio de Granada-Zaidín: migraciones, vista de
+    coordinación, denominación institucional y scripts;
+  - retirar sus datos: seed, `municipalities/granada-zaidin` y el PDF del
+    informe;
+  - retirar las 15 pruebas que leen el seed público y las 6 que leen
+    `municipalities/`.
+- **Paso 5:** contratos.
+
+---
+
 ## 2026-11-21 · Retirada de Granada-Zaidín: fase 1 (aplicación)
 
 **Decisiones del responsable (21/11/2026):**

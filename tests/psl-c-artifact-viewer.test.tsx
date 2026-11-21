@@ -3,7 +3,7 @@
  *
  * Visor institucional de solo lectura del artefacto congelado PSL-C.
  * Renderiza el componente a marcado estático (sin navegador) sobre un
- * artefacto compilado desde el expediente vigente Granada-Zaidín 56/92 y
+ * artefacto compilado desde el expediente vigente Municipio de ensayo 56/92 y
  * verifica que el documento visible:
  *   - contiene portada, base documental, conclusiones, estado del
  *     conocimiento y cautelas;
@@ -51,11 +51,11 @@ const store = new Map<string, string>();
 
 const EXPORT_PATH = resolve(
   dirname(fileURLToPath(import.meta.url)),
-  "../fixtures/workspaces/granada-zaidin-synthetic-test.json"
+  "../fixtures/workspaces/municipio-ensayo-synthetic-test.json"
 );
 
 function perfilConConocimiento(): PerfilLocalDeSalud {
-  let perfil = createPerfilLocalDeSalud("granada-zaidin");
+  let perfil = createPerfilLocalDeSalud("municipio-ensayo");
   perfil = addInterpretation(perfil, {
     espacio: "determinantes",
     enunciado:
@@ -113,10 +113,10 @@ let html: string;
 
 beforeAll(() => {
   store.set(
-    "compas-ng:workspace:granada-zaidin",
+    "compas-ng:workspace:municipio-ensayo",
     readFileSync(EXPORT_PATH, "utf8")
   );
-  const loaded = loadWorkspaceFromLocalStorage("granada-zaidin");
+  const loaded = loadWorkspaceFromLocalStorage("municipio-ensayo");
   if (loaded === null) throw new Error("El export vigente no rehidrata");
   const perfil = perfilConConocimiento();
   ws = { ...loaded, perfilLocalDeSalud: perfil };
@@ -136,7 +136,7 @@ beforeAll(() => {
 
 describe("visor PSL-C — documento institucional renderizado", () => {
   it("renderiza portada con municipio, versión y validación; el hash vive en el anexo", () => {
-    expect(html).toContain("Perfil de Salud Local de Granada-Zaidín");
+    expect(html).toContain("Perfil de Salud Local de Municipio de ensayo");
     expect(html).toContain("PSL-C/v1");
     expect(html).toContain("Artefacto institucional congelado");
     expect(html).toContain("Equipo técnico de salud pública");
@@ -146,7 +146,7 @@ describe("visor PSL-C — documento institucional renderizado", () => {
   });
 
   it("muestra la base documental en el anexo y declara la compilación institucional", () => {
-    expect(html).toContain("92 elementos");
+    expect(html).toContain("46 elementos"); // 36 evidencias de estudios + 10 activos del expediente de ensayo
     expect(html).toContain("estudios complementarios");
     expect(html).toContain("se preserva íntegro y se referencia sin atomizar");
     expect(html).toContain(
@@ -162,7 +162,7 @@ describe("visor PSL-C — documento institucional renderizado", () => {
     expect(html).toContain("Capacidades y oportunidades comunitarias");
     expect(html).toContain("Incertidumbres críticas");
     expect(html).toContain("Conclusiones para la deliberación");
-    expect(html).toContain("El diagnóstico apunta a un distrito");
+    expect(html).toContain("El diagnóstico apunta a un municipio");
     expect(html).toContain("Síntesis diagnóstica del equipo técnico.");
     expect(html).toContain("contexto exploratorio");
     expect(html).toContain("Ninguna de estas lecturas constituye causalidad demostrada");

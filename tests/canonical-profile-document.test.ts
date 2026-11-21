@@ -6,7 +6,7 @@
  * invariante estructural y byte a byte entre el PREVIEW canónico (construible
  * antes de compilar) y la REPRESENTACIÓN SELLADA por la compilación.
  *
- * Cobertura: Atarfe y Granada-Zaidín (integrated) + caso pending coherente.
+ * Cobertura: Atarfe y Municipio de ensayo (integrated) + caso pending coherente.
  */
 
 import { describe, it, expect, beforeAll } from "vitest";
@@ -55,8 +55,8 @@ const store = new Map<string, string>();
 
 const DIR = dirname(fileURLToPath(import.meta.url));
 const exportPath = (muni: string, file: string) =>
-  muni === "granada-zaidin"
-    ? resolve(DIR, "..", "fixtures", "workspaces", "granada-zaidin-synthetic-test.json")
+  muni === "municipio-ensayo"
+    ? resolve(DIR, "..", "fixtures", "workspaces", "municipio-ensayo-synthetic-test.json")
     : resolve(DIR, "..", "municipalities", muni, "exports", file);
 
 /** Fuerza el estado validado exigido por la compilación, preservando el contenido. */
@@ -115,7 +115,7 @@ let zaidin: Caso;
 let atarfe: Caso;
 
 beforeAll(() => {
-  zaidin = cargarCaso("granada-zaidin", "compas-ng-workspace-granada-zaidin.json");
+  zaidin = cargarCaso("municipio-ensayo", "compas-ng-workspace-municipio-ensayo.json");
   atarfe = cargarCaso("atarfe", "compas-ng-workspace-atarfe.json");
 });
 
@@ -143,7 +143,7 @@ function compilarSellado(caso: Caso) {
 }
 
 const CASOS = (): Array<[string, () => Caso]> => [
-  ["Granada-Zaidín", () => zaidin],
+  ["Municipio de ensayo", () => zaidin],
   ["Atarfe", () => atarfe],
 ];
 

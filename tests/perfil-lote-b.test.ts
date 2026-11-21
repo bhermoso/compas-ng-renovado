@@ -3,7 +3,7 @@
  *
  *   F1 — La cabecera enumera las tres fuentes reales de Atarfe (Informe, IBSE,
  *        Localiza Salud); las tarjetas «Bienestar escolar»→IBSE y «Capacidades
- *        comunitarias»→Localiza Salud. Granada-Zaidín (IBSE provincial proxy) no
+ *        comunitarias»→Localiza Salud. Municipio de ensayo (IBSE provincial proxy) no
  *        cambia: su IBSE no entra como señal principal y conserva sus 6 fuentes.
  *   F2 — Jerarquía trazador/indicadores con concordancia gramatical («1 indicador
  *        trazador», no «1 indicadores»); etiquetas demo/proxy derivadas de la
@@ -30,8 +30,8 @@ import type { MunicipalityWorkspace } from "../src/domain/workspace";
 
 const _dir = dirname(fileURLToPath(import.meta.url));
 function seed(id: string): MunicipalityWorkspace {
-  const path = id === "granada-zaidin"
-    ? resolve(_dir, "../fixtures/workspaces/granada-zaidin-synthetic-test.json")
+  const path = id === "municipio-ensayo"
+    ? resolve(_dir, "../fixtures/workspaces/municipio-ensayo-synthetic-test.json")
     : resolve(_dir, `../public/seeds/compas-ng-workspace-${id}.json`);
   return parseWorkspaceJSON(
     readFileSync(path, "utf8")
@@ -56,9 +56,9 @@ function viewOf(ws: MunicipalityWorkspace, informe: string) {
 }
 
 const atarfe = seed("atarfe");
-const zaidin = seed("granada-zaidin");
+const zaidin = seed("municipio-ensayo");
 const ATARFE_INFORME = "Informe de la situación de salud en el municipio de Atarfe";
-const ZAIDIN_INFORME = "Informe de salud Granada-Zaidín";
+const ZAIDIN_INFORME = "Informe de salud Municipio de ensayo";
 
 describe("Lote B · F1 — cabecera y atribuciones de fuentes", () => {
   it("F1.1 Atarfe: la cabecera enumera Informe, IBSE y Localiza Salud", () => {
@@ -76,7 +76,7 @@ describe("Lote B · F1 — cabecera y atribuciones de fuentes", () => {
     expect(capacidades?.source).toBe("Localiza Salud");
   });
 
-  it("F1.3 REGRESIÓN Granada-Zaidín: su IBSE provincial NO entra como fuente principal y conserva Localiza", () => {
+  it("F1.3 REGRESIÓN Municipio de ensayo: su IBSE provincial NO entra como fuente principal y conserva Localiza", () => {
     const view = viewOf(zaidin, ZAIDIN_INFORME);
     // El IBSE de Zaidín es proxy provincial (Lote A): no figura como fuente suelta.
     expect(view.header.sources).not.toContain("IBSE");
@@ -97,7 +97,7 @@ describe("Lote B · F2 — jerarquía trazador/indicadores y etiquetas demo/prox
     expect(estudios!.whatItAdds).toContain("1 estudio y 1 indicador trazador destacado");
   });
 
-  it("F2.2 REGRESIÓN Granada-Zaidín: concordancia plural intacta", () => {
+  it("F2.2 REGRESIÓN Municipio de ensayo: concordancia plural intacta", () => {
     const view = viewOf(zaidin, ZAIDIN_INFORME);
     const estudios = view.sourceBlocks.find((b) => b.id === "estudios");
     expect(estudios).toBeDefined();
@@ -115,7 +115,7 @@ describe("Lote B · F2 — jerarquía trazador/indicadores y etiquetas demo/prox
     expect(refs.every((r) => r.demoProxy === false)).toBe(true);
   });
 
-  it("F2.4 REGRESIÓN Granada-Zaidín: sí tiene comparador provincial y filas demo/proxy", () => {
+  it("F2.4 REGRESIÓN Municipio de ensayo: sí tiene comparador provincial y filas demo/proxy", () => {
     const refs = buildIndicatorComparisonReferences({ workspace: zaidin }).references;
     expect(refs.some((r) => r.provinceReference !== undefined)).toBe(true);
     expect(refs.some((r) => r.demoProxy === true)).toBe(true);
@@ -131,7 +131,7 @@ describe("Lote B · F3 — contador «Cuestiones para contraste» = agenda Grupo
     // El KPI toma groupMotorAgenda.length (2), no areasDeIntervencion.length (1).
   });
 
-  it("F3.2 REGRESIÓN Granada-Zaidín: groupMotorAgenda = 6 (contador y tarjetas del mismo origen)", () => {
+  it("F3.2 REGRESIÓN Municipio de ensayo: groupMotorAgenda = 6 (contador y tarjetas del mismo origen)", () => {
     const view = viewOf(zaidin, ZAIDIN_INFORME);
     expect(view.groupMotorAgenda.length).toBe(6);
   });
