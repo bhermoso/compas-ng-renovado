@@ -95,8 +95,15 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
   const visibleSections = useMemo(() => organizeMunicipalDocuments(filtered).filter(section => section.documents.length > 0), [filtered]);
   return (
     <section className="workspace-panel dam" aria-labelledby="dam-title">
+      <details className="dam__disclosure">
+        <summary className="dam__disclosure-summary">
+          <span className="dam__disclosure-title"><span className="eyebrow">Diagnóstico · Fuente documental única</span><strong id="dam-title">Gestor documental del expediente</strong></span>
+          <span className="dam__disclosure-count"><strong>{archive.length}</strong> fichas · <strong>{archive.filter(isActive).length}</strong> activas</span>
+          <span className="dam__disclosure-toggle">Abrir gestor</span>
+        </summary>
+        <div className="dam__expanded">
       <div className="panel-header dam__head">
-        <div><p className="eyebrow">Diagnóstico · Fuente documental única</p><h2 id="dam-title">Gestor documental del expediente</h2></div>
+        <div><p className="eyebrow">Archivo del ámbito</p><h2>Documentos y evidencias</h2></div>
         <p className="panel-note">Un único índice para informes, PDF, DOCX, estudios CSV y activos. Cada ficha muestra su procedencia, el texto conservado y la disponibilidad del archivo; los paneles metodológicos presentan resultados, no nuevos originales.</p>
       </div>
       <div className="dam__summary">
@@ -144,6 +151,8 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
         {!filtered.length && <p>No hay documentos con ese criterio.</p>}
         
       </>}
+        </div>
+      </details>
     </section>
   );
 }

@@ -24,7 +24,7 @@ import { findDuplicateGroups, findExistingCopy, retireDuplicateDocument } from "
 import { sha256Hex } from "./application/document-ingestion/sha256";
 import { canDeleteDocumentVersion, createDocumentRevision } from "./application/document-files/documentRevisions";
 import { MAX_WORKSPACE_ORIGINALS_BYTES, decideOriginalUpload, decodeDocumentOriginal, documentOriginalsBytes, documentDerivativesBytes, encodeDocumentOriginal, formatMegabytes, mergeDocumentOriginals, mergeDocumentDerivatives, profileOriginalsBytes, pruneDocumentOriginals, type StoredDocumentOriginal, type StoredDocumentDerivative } from "./application/document-files/documentOriginals";
-import { buildDiagnosisControlSummary, type DiagnosisModuleId } from "./application/diagnosis/diagnosisControlSummary";
+import { buildDiagnosisControlSummary } from "./application/diagnosis/diagnosisControlSummary";
 import { replaceZaidinFinalDraft } from "./application/workspace/replaceZaidinFinalDraft";
 import { regroupZagraActionPlan } from "./application/workspace/regroupZagraActionPlan";
 import { processPdfHealthReport } from './application/health-report/ProcessPdfHealthReport';
@@ -267,16 +267,8 @@ function withContentSha256(repository: MunicipalDocumentRepository, documentId: 
   return { ...repository, documents: repository.documents.map((d) => (d.id === documentId ? { ...d, contentSha256 } : d)) };
 }
 
-/** Secciones de detalle de la sala de control del diagnóstico. */
+/** Secciones de detalle del diagnóstico. */
 type DiagnosisSectionId = "health-report" | "studies" | "assets" | "documents" | "manual" | "evidence";
-const DIAGNOSIS_SECTION_OF_MODULE: Record<DiagnosisModuleId, DiagnosisSectionId> = {
-  "health-report": "health-report",
-  studies: "studies",
-  assets: "assets",
-  frameworks: "documents",
-  "other-sources": "documents",
-  evidence: "evidence",
-};
 
 /** Opciones de los cargadores existentes cuando los invoca la bandeja de revisión. */
 type LoaderOptions = {
@@ -581,15 +573,19 @@ export default function App() {
   const [declaresOpenAnswers, setDeclaresOpenAnswers] = useState(false);
   const [plainText, setPlainText] = useState("");
   const [kind, setKind] = useState<DocumentKind>("territorial-documentation");
-  // Sala de control del diagnóstico: secciones de detalle abiertas.
+  // El diagnóstico comienza compacto; los módulos se despliegan a demanda.
   const [pendingStatisticsRevision, setPendingStatisticsRevision] = useState<{ municipalityId: string; results: ProfileResult[]; note: string } | null>(null);
-  const [openDiagModules, setOpenDiagModules] = useState<ReadonlySet<DiagnosisSectionId>>(() => new Set(["studies"]));
+  const [openDiagModules, setOpenDiagModules] = useState<ReadonlySet<DiagnosisSectionId>>(() => new Set());
   const toggleDiagnosisModule = useCallback((id: DiagnosisSectionId, open: boolean) => {
     setOpenDiagModules((previous) => {
       const next = new Set(previous);
       if (open) next.add(id); else next.delete(id);
       return next;
     });
+  }, []);
+  const openDiagnosisToolbox = useCallback(() => {
+    const toolbox = document.getElementById("diagnosis-tools-drawer");
+    if (toolbox instanceof HTMLDetailsElement) toolbox.open = true;
   }, []);
   // Huellas de los originales conservados en este navegador, para reconocer
   // copias de documentos anteriores a que se registrara contentSha256.
@@ -706,11 +702,6 @@ export default function App() {
     return () => { cancelled = true; };
   }, [workspace.repository.documents, workspace.documentOriginals, workspace.externalProfileLibrary, workspace.municipality.identity.id, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
 
-  const openDiagnosisModule = useCallback((module: DiagnosisModuleId) => {
-    const section = DIAGNOSIS_SECTION_OF_MODULE[module];
-    toggleDiagnosisModule(section, true);
-    requestAnimationFrame(() => document.getElementById(`diag-mod-${section}`)?.scrollIntoView({ behavior: "smooth", block: "start" }));
-  }, [toggleDiagnosisModule]);
   const [lastProcessedDocument, setLastProcessedDocument] =
     useState<MunicipalDocument | null>(null);
   const [lastAtomCount, setLastAtomCount] = useState<number>(0);
@@ -4210,9 +4201,9 @@ export default function App() {
               return (
                 <DiagnosisControlRoom
                   municipalityName={municipality.name}
+                  province={workspace.municipality.identity.province}
+                  ineCode={workspace.municipality.identity.ineCode}
                   summary={summary}
-                  kindLabels={DOCUMENT_KINDS}
-                  onOpenModule={openDiagnosisModule}
                 />
               );
             })()}
@@ -4226,10 +4217,13 @@ export default function App() {
               originalCapacity={`${formatMegabytes(documentOriginalsBytes(runtime.workspace.documentOriginals) + documentDerivativesBytes(runtime.workspace.documentDerivedFiles) + profileOriginalsBytes(runtime.workspace.externalProfileLibrary))} / ${formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)}`}
               canWrite={documentWriteAllowed}
               persistence={remotePersistenceMessage ?? ""}
-              onOpenUploader={() => document.getElementById("document-review-title")?.scrollIntoView({behavior:"smooth",block:"start"})}
-              onOpenAssetValidations={() => { toggleDiagnosisModule("documents", true); requestAnimationFrame(() => document.getElementById("diag-mod-documents")?.scrollIntoView({behavior:"smooth",block:"start"})); }}
+              onOpenUploader={() => { openDiagnosisToolbox(); requestAnimationFrame(() => document.getElementById("document-review-title")?.scrollIntoView({behavior:"smooth",block:"start"})); }}
+              onOpenAssetValidations={() => { openDiagnosisToolbox(); toggleDiagnosisModule("documents", true); requestAnimationFrame(() => document.getElementById("diag-mod-documents")?.scrollIntoView({behavior:"smooth",block:"start"})); }}
             />
 
+            <details id="diagnosis-tools-drawer" className="diagnosis-tools-drawer">
+              <summary><strong>Otras herramientas del diagnóstico</strong><span>Bibliotecas, estadística, custodia, incorporación y módulos de análisis</span></summary>
+              <div className="diagnosis-tools-drawer__body">
             {/* Biblioteca de referencia institucional: no pertenece al expediente
                 municipal y no alimenta el diagnóstico ni las evidencias. */}
             <StrategicReferenceLibrary
@@ -4469,24 +4463,8 @@ export default function App() {
               />
             </DiagnosisModuleSection>
 
-            {/* ── BLOQUE 6: Continuación del proceso ── */}
-            <section className="diag-continue workspace-panel">
-              <div className="diag-continue__inner">
-                <div>
-                  <p className="diag-continue__label">Siguiente paso</p>
-                  <p className="diag-continue__text">
-                    Revisar el diagnóstico e iniciar la elaboración del Perfil de Salud Local
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className="diag-continue__btn"
-                  onClick={() => setView("psl")}
-                >
-                  Ir al Perfil de Salud Local →
-                </button>
               </div>
-            </section>
+            </details>
           </>
         )}
 

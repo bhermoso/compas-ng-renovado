@@ -41,6 +41,8 @@ export interface DiagnosisTimelineEntry {
   documentId: string;
   title: string;
   kind: DocumentKind;
+  /** Período observado declarado, para identificar el alcance temporal del expediente. */
+  observedPeriod?: string;
   /** Fecha o período declarados; ausente si no consta (no se rellena con fechas técnicas). */
   dateLabel?: string;
   /** Clave de orden: AAAA[-MM[-DD]] declarada; ausente si no consta. */
@@ -104,9 +106,15 @@ export function declaredScopeOf(document: MunicipalDocument): { scope: TemporalS
   return { scope: "undetermined", source: "none" };
 }
 
+function observedPeriodOf(document: MunicipalDocument): string | undefined {
+  const period = document.temporal?.observedPeriod;
+  if (period?.literal) return period.literal;
+  return [period?.from?.value, period?.to?.value].filter(Boolean).join("–") || undefined;
+}
+
 function timelineDate(document: MunicipalDocument): { dateLabel?: string; sortKey?: string } {
   const declared = document.temporal?.documentDate?.value;
-  const period = document.temporal?.observedPeriod?.literal;
+  const period = observedPeriodOf(document);
   if (declared) return { dateLabel: period ? `${declared} · período ${period}` : declared, sortKey: declared };
   if (period) {
     const year = /\d{4}/.exec(period)?.[0];
@@ -136,7 +144,7 @@ export function buildDiagnosisControlSummary(input: DiagnosisControlInput): Diag
   const timeline = active
     .map((document): DiagnosisTimelineEntry => {
       const { scope, source } = declaredScopeOf(document);
-      return { documentId: document.id, title: document.title, kind: document.kind, ...timelineDate(document), scope, scopeSource: source };
+      return { documentId: document.id, title: document.title, kind: document.kind, observedPeriod: observedPeriodOf(document), ...timelineDate(document), scope, scopeSource: source };
     })
     .sort((a, b) => {
       if (a.sortKey && b.sortKey) return b.sortKey.localeCompare(a.sortKey) || a.title.localeCompare(b.title, "es");
