@@ -1,0 +1,230 @@
+/* Plataforma documental del expediente: índice por funciones y ficha de cada
+   documento, con la jerarquía de la portada de Inicio. */
+
+.documentation-launcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.documentation-launcher__count {
+  min-width: 1.6em;
+  padding: 1px 6px;
+  border-bottom: 2px solid var(--azul);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.documentation-dialog.docp {
+  width: min(1120px, calc(100vw - 24px));
+  height: min(86vh, 860px);
+  max-height: none;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--borde);
+  border-radius: 0;
+  box-shadow: 0 18px 55px color-mix(in srgb, var(--tinta-azul) 22%, transparent);
+  color: var(--texto-principal);
+  background: var(--blanco);
+}
+.documentation-dialog.docp[open] { display: flex; flex-direction: column; }
+
+.documentation-dialog.docp .docp__head {
+  position: static;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: end;
+  gap: 8px 20px;
+  margin: 0;
+  padding: 18px clamp(16px, 3vw, 28px) 12px;
+  border-bottom: 1px solid var(--borde);
+  background: var(--blanco);
+}
+.documentation-dialog.docp .docp__heading { min-width: 0; }
+.documentation-dialog.docp .docp__heading .hp-cover__chain { margin: 0 0 4px; }
+.documentation-dialog.docp .docp__head h2 {
+  margin: 0;
+  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+  line-height: 1.2;
+  color: var(--tinta-azul);
+  overflow-wrap: anywhere;
+}
+.documentation-dialog.docp .docp__head .hp-cover__rule { margin: 8px 0 0; width: min(240px, 60%); }
+.documentation-dialog.docp .docp__stats { margin: 0; font-size: .8rem; color: var(--texto-secundario); white-space: nowrap; }
+.documentation-dialog.docp .docp__close,
+.documentation-dialog.docp .docp__back button,
+.documentation-dialog.docp .docp__filter button {
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 1px solid var(--borde);
+  background: var(--blanco);
+  color: var(--azul-profundo);
+  font: inherit;
+  font-size: .86rem;
+  cursor: pointer;
+}
+.documentation-dialog.docp .docp__close:focus-visible,
+.documentation-dialog.docp .docp__back button:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+
+.documentation-dialog.docp .docp__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr);
+}
+
+/* Índice */
+.documentation-dialog.docp .docp__index {
+  min-height: 0;
+  overflow: auto;
+  padding: 12px 16px 16px clamp(16px, 3vw, 28px);
+  border-right: 1px solid var(--borde);
+  background: var(--fondo-secundario, #f6f8fa);
+}
+.documentation-dialog.docp .docp__search { display: grid; gap: 4px; font-size: .78rem; color: var(--texto-secundario); }
+.documentation-dialog.docp .docp__search input[type=search] {
+  margin: 0;
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 1px solid var(--borde);
+  background: var(--blanco);
+  font: inherit;
+  font-size: .9rem;
+}
+.documentation-dialog.docp .docp__filter { margin: 10px 0 0; font-size: .8rem; line-height: 1.45; }
+.documentation-dialog.docp .docp__group { margin-top: 14px; }
+.documentation-dialog.docp .docp__group h3 {
+  margin: 0 0 4px;
+  font-size: .72rem;
+  font-weight: 750;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--texto-secundario);
+}
+.documentation-dialog.docp .docp__group ul { margin: 0; padding: 0; list-style: none; }
+.documentation-dialog.docp .docp__item {
+  margin: 0;
+  padding: 7px 0 7px 10px;
+  border-left: 3px solid transparent;
+  border-bottom: 1px solid var(--borde);
+}
+.documentation-dialog.docp .docp__item--current { border-left-color: var(--azul); background: var(--blanco); }
+.documentation-dialog.docp .docp__item .document-reference {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--azul-profundo);
+  font: inherit;
+  font-size: .86rem;
+  font-weight: 650;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+}
+.documentation-dialog.docp .docp__item small { display: block; margin-top: 2px; font-size: .72rem; color: var(--texto-secundario); }
+.documentation-dialog.docp .docp__chips { display: flex; flex-wrap: wrap; gap: 4px 8px; margin-top: 3px; }
+.documentation-dialog.docp .docp__chip { font-size: .68rem; color: var(--texto-secundario); border-bottom: 1px solid var(--borde); }
+.documentation-dialog.docp .docp__chip--ok { color: var(--texto-principal); border-bottom-color: var(--verde); }
+.documentation-dialog.docp .docp__chip--muted { color: var(--texto-terciario); }
+.documentation-dialog.docp .docp__common { margin-top: 18px; padding-top: 8px; border-top: 3px solid var(--amarillo); }
+.documentation-dialog.docp .docp__common > summary { cursor: pointer; font-size: .82rem; font-weight: 700; color: var(--tinta-azul); }
+.documentation-dialog.docp .docp__common .csf__list { grid-template-columns: minmax(0, 1fr); }
+
+/* Ficha */
+.documentation-dialog.docp .docp__detail {
+  min-height: 0;
+  overflow: auto;
+  padding: 14px clamp(16px, 3vw, 28px) 24px;
+}
+.documentation-dialog.docp .docp__back { display: none; margin: 0 0 10px; }
+.documentation-dialog.docp .docp__detail p { margin: .6rem 0; line-height: 1.55; }
+.documentation-dialog.docp .docp__intro { color: var(--texto-secundario); font-size: .9rem; }
+.documentation-dialog.docp .docp__summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px 16px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.documentation-dialog.docp .docp__summary li {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 8px 0;
+  border-top: 3px solid var(--azul);
+}
+.documentation-dialog.docp .docp__summary li:nth-child(6n+2) { border-top-color: var(--cyan); }
+.documentation-dialog.docp .docp__summary li:nth-child(6n+3) { border-top-color: var(--verde); }
+.documentation-dialog.docp .docp__summary li:nth-child(6n+4) { border-top-color: var(--amarillo); }
+.documentation-dialog.docp .docp__summary li:nth-child(6n+5) { border-top-color: var(--naranja); }
+.documentation-dialog.docp .docp__summary li:nth-child(6n+6) { border-top-color: var(--rojo); }
+.documentation-dialog.docp .docp__summary strong { font-size: 1.5rem; line-height: 1; color: var(--tinta-azul); font-variant-numeric: tabular-nums; }
+.documentation-dialog.docp .docp__summary span { font-size: .86rem; font-weight: 650; }
+.documentation-dialog.docp .docp__summary small { font-size: .74rem; color: var(--texto-secundario); line-height: 1.4; }
+
+.documentation-dialog.docp .documentation-overview { border-radius: 0; border: 0; border-top: 3px solid var(--azul); background: var(--fondo-secundario, #f6f8fa); }
+.documentation-dialog.docp .documentation-status { border-radius: 0; border: 0; border-bottom: 1px solid var(--borde); background: none; padding: 2px 0; }
+.documentation-dialog.docp .documentation-status--ok { border-bottom-color: var(--verde); color: var(--texto-principal); }
+.documentation-dialog.docp .docp__detail li { margin: .4rem 0; }
+
+@media (max-width: 760px) {
+  .documentation-dialog.docp { width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; }
+  .documentation-dialog.docp .docp__head { grid-template-columns: minmax(0, 1fr) auto; }
+  .documentation-dialog.docp .docp__stats { grid-column: 1 / -1; grid-row: 2; white-space: normal; }
+  .documentation-dialog.docp .docp__body { grid-template-columns: minmax(0, 1fr); }
+  .documentation-dialog.docp .docp__index { border-right: 0; }
+  .documentation-dialog.docp .docp__body:not(.docp__body--detail) .docp__detail { display: none; }
+  .documentation-dialog.docp .docp__body--detail .docp__index { display: none; }
+  .documentation-dialog.docp .docp__back { display: block; }
+}
+
+/* La plataforma lee de izquierda a derecha; ningún estilo global de diálogo la centra. */
+.documentation-dialog.docp,
+.documentation-dialog.docp * { text-align: left; }
+.documentation-dialog.docp .docp__summary strong { text-align: left; }
+
+/* Bloques de la ficha: líneas de color en lugar de cajas redondeadas. */
+.documentation-dialog.docp .documentation-overview { padding: 12px 14px; margin: 0 0 12px; }
+.documentation-dialog.docp .documentation-overview p { margin: 0 0 4px; }
+.documentation-dialog.docp .documentation-technical,
+.documentation-dialog.docp .documentation-management,
+.documentation-dialog.docp .documentation-transcript {
+  margin: 10px 0;
+  padding: 8px 0;
+  border: 0;
+  border-top: 1px solid var(--borde);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.documentation-dialog.docp .documentation-technical > summary,
+.documentation-dialog.docp .documentation-management > summary,
+.documentation-dialog.docp .documentation-transcript > summary {
+  padding: 4px 0;
+  font-size: .88rem;
+  font-weight: 700;
+  color: var(--azul-profundo);
+  cursor: pointer;
+}
+.documentation-dialog.docp .documentation-metadata { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px 18px; margin: 8px 0 0; }
+.documentation-dialog.docp .documentation-metadata div { display: grid; gap: 1px; }
+.documentation-dialog.docp .documentation-metadata dt { font-size: .72rem; color: var(--texto-secundario); }
+.documentation-dialog.docp .documentation-metadata dd { margin: 0; font-size: .82rem; overflow-wrap: anywhere; }
+.documentation-dialog.docp .docp__detail a,
+.documentation-dialog.docp .docp__detail button:not(.document-reference) { border-radius: 0; }
+.documentation-dialog.docp .documentation-text { max-height: 50vh; overflow: auto; font-size: .86rem; }
+.documentation-dialog.docp .docp__summary button {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.documentation-dialog.docp .docp__summary button[aria-pressed="true"] span { color: var(--azul-profundo); text-decoration: underline; }
+.documentation-dialog.docp .docp__summary button:focus-visible { outline: 2px solid var(--azul); outline-offset: 3px; }

@@ -13,7 +13,7 @@ export const MUNICIPAL_DOCUMENT_SECTIONS = [
   { id: "assets", label: "04 · Activos para la salud", detail: "Inventarios y recursos comunitarios del ámbito" },
   { id: "prioritization", label: "05 · Priorización", detail: "Resultados y documentos de priorización participativa" },
   { id: "plans", label: "06 · Planes de Acción municipales", detail: "Planes y borradores propios, no marcos generales" },
-  { id: "strategic", label: "07 · Referencias estratégicas aún registradas", detail: "Pendientes de cotejo con la biblioteca común, no forman parte de la evidencia local" },
+  { id: "strategic", label: "07 · Copias municipales de marcos comunes", detail: "El marco estratégico común es el mismo en todos los expedientes; estas copias no forman parte de la evidencia local" },
   { id: "other", label: "08 · Otras fuentes territoriales", detail: "Documentación local que requiere clasificación" },
 ] as const;
 
