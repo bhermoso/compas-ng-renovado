@@ -11,6 +11,11 @@ describe("Reordenación de estadística territorial hacia Diagnóstico", () => {
     expect(app).toContain("onSave={handleSaveTerritorialStatistics}");
     expect(app).toContain("snapshots={workspace.territorialStatistics}");
   });
+  it("la estadística se ofrece directamente antes de las herramientas secundarias", () => {
+    const otherTools = app.indexOf('<details id="diagnosis-tools-drawer"');
+    expect(otherTools).toBeGreaterThan(0);
+    expect(app.slice(0, otherTools)).toContain('data-testid="diagnosis-territorial-statistics"');
+  });
   it("el Perfil ya no reproduce la pestaña de descarga estadística", () => {
     expect(profile).not.toContain("['statistics','Estadística territorial']");
     expect(profile).not.toContain("statisticsPanel");
