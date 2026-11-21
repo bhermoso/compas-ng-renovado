@@ -12,10 +12,19 @@ describe("Instrumentos de recogida por línea del Plan de Acción", () => {
       const html = renderToStaticMarkup(<PlanningInstrumentCatalog notationModule={module} indicatorCode={code} indicatorDisplayCode={code} />);
       for (const axis of AGING_AXES) expect(html).not.toContain(`<option>${axis}</option>`);
       expect(html).not.toContain("mediciones del Zaidín");
-      expect(html).toContain("no tiene todavía instrumentos de recogida preparados");
-      expect(html).toContain(module.title);
     });
   }
+  it("Bienestar emocional ofrece los instrumentos que usan el PESMAA y la EPVSA", () => {
+    const html = renderToStaticMarkup(<PlanningInstrumentCatalog notationModule={EMOTIONAL_WELLBEING_MODULE} indicatorCode="BEM-I1.1" indicatorDisplayCode="BEM-I1.1" />);
+    expect(html).toContain("IBSE (Bericat)");
+    expect(html).toContain("KIDSCREEN");
+    expect(html).toContain("Instrumento de la estrategia");
+    expect(html).toContain("<option>Bienestar emocional</option>");
+  });
+  it("Adicciones declara que no tiene instrumentos preparados", () => {
+    const html = renderToStaticMarkup(<PlanningInstrumentCatalog notationModule={ADDICTIONS_MODULE} indicatorCode="ADI-I1.1" indicatorDisplayCode="ADI-I1.1" />);
+    expect(html).toContain("no tiene todavía instrumentos de recogida preparados");
+  });
   it("Envejecimiento saludable conserva su catálogo y sus ejes", () => {
     const html = renderToStaticMarkup(<PlanningInstrumentCatalog notationModule={HEALTHY_AGING_MODULE} indicatorCode="ENV-I5.1" indicatorDisplayCode="ENV-I5.1" />);
     for (const axis of AGING_AXES) expect(html).toContain(`<option>${axis}</option>`);
