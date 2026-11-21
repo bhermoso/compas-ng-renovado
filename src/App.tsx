@@ -4235,7 +4235,7 @@ export default function App() {
             {/* La estadística territorial es una fuente del diagnóstico.
                 Su incorporación al Perfil genera siempre una revisión separada. */}
             <details className="diagnosis-territorial-statistics hp-phase hp-phase--3" data-testid="diagnosis-territorial-statistics">
-              <summary><strong>Estadística territorial oficial · INE e IECA</strong><span>Descargar, conservar y comparar datos del ámbito</span></summary>
+              <summary><strong>Estadística territorial oficial · INE e IECA</strong><span>Indicadores y descargas</span></summary>
               <TerritorialStatisticsPanel
                 key={workspace.municipality.identity.id}
                 municipalityId={workspace.municipality.identity.id}
@@ -4255,7 +4255,7 @@ export default function App() {
             </details>
 
             <details id="diagnosis-tools-drawer" className="diagnosis-tools-drawer hp-phase hp-phase--4">
-              <summary><strong>Otras herramientas del diagnóstico</strong><span>Bibliotecas, custodia, incorporación y módulos de análisis</span></summary>
+              <summary><strong>Otras herramientas del diagnóstico</strong><span>Bibliotecas, custodia y análisis</span></summary>
               <div className="diagnosis-tools-drawer__body">
             {/* Biblioteca de referencia institucional: no pertenece al expediente
                 municipal y no alimenta el diagnóstico ni las evidencias. */}

@@ -17,6 +17,8 @@ describe("Portada municipal e indicadores compactos", () => {
   it("no duplica el expediente ni el selector municipal dentro de la portada", () => {
     const html = renderToStaticMarkup(<HomePortada onNavigate={()=>{}} municipality={{name:"Loja",province:"Granada",ineCode:"18122"}} onChangeMunicipality={()=>{}}/>);
     expect(html).toContain("El ciclo de planificación local en salud");
+    expect(html).toContain("Estrategia de Promoción de una Vida Saludable en Andalucía");
+    expect(html).toContain("ilogo-band--cover");
     expect(html).not.toContain("Expediente cargado");
     expect(html).not.toContain("Cambiar ámbito");
     expect(html).not.toContain("INE 18122");

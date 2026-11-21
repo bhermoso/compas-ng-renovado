@@ -11292,6 +11292,7 @@ h3 {
 }
 @media (max-width: 560px) {
   .diagnosis-page.hp { gap: 8px 12px; }
+  .diagnosis-page.workspace-page.hp { padding-block: 12px; }
   .diagnosis-page > details > summary,
   .diagnosis-page .dam__disclosure-summary { min-height: 0; }
   .diagnosis-home__sources,
