@@ -292,7 +292,7 @@ export function DocumentIngestionPanel({
           <p className="ingestion-hint">
             Ejemplo:{" "}
             <code>
-              Centro de Salud Zaidín Sur | Atención primaria SAS — Distrito AP Granada-Metropolitano
+              Centro de salud del municipio | Atención primaria SAS
             </code>
           </p>
           <p className="ingestion-hint">
@@ -306,9 +306,9 @@ export function DocumentIngestionPanel({
             aria-label="Contenido del documento pegado como texto"
             onChange={(event) => onPlainTextChange(event.target.value)}
             placeholder={
-              "Centro Participación Activa Mayores Zaidín | Talleres deportivos y socioculturales para mayores\n" +
+              "Centro de participación activa para mayores | Talleres deportivos y socioculturales para mayores\n" +
               "Cruz Roja Granada | Atención social y voluntariado\n" +
-              "Unidad Salud Mental Comunitaria Zaidín | SAS — atención comunitaria en salud mental"
+              "Unidad de salud mental comunitaria | SAS — atención comunitaria en salud mental"
             }
             rows={7}
           />
@@ -317,7 +317,7 @@ export function DocumentIngestionPanel({
               value={title}
               aria-label="Título y fuente del documento"
               onChange={(event) => onTitleChange(event.target.value)}
-              placeholder="Título del listado (ej. Localiza Salud — Granada-Zaidín 2023)"
+              placeholder="Título del listado (ej. Localiza Salud — municipio 2023)"
             />
             <button
               type="button"
@@ -408,7 +408,7 @@ export function DocumentIngestionPanel({
               value={title}
               aria-label="Título y fuente del documento"
               onChange={(event) => onTitleChange(event.target.value)}
-              placeholder="Título y fuente (ej. Informe Vigía Zaidín Centro Este — 2023)"
+              placeholder="Título y fuente (ej. Informe de la zona básica de salud — 2023)"
             />
             <button
               type="button"
@@ -500,7 +500,7 @@ export function DocumentIngestionPanel({
               value={title}
               aria-label="Título y fuente del documento"
               onChange={(event) => onTitleChange(event.target.value)}
-              placeholder="Título y fuente (ej. Acta 1 Grupo Motor Granada-Zaidín — marzo 2024)"
+              placeholder="Título y fuente (ej. Acta 1 del Grupo Motor — marzo 2024)"
             />
             <button
               type="button"
@@ -564,7 +564,7 @@ export function DocumentIngestionPanel({
             value={plainText}
             aria-label="Contenido del documento pegado como texto"
             onChange={(event) => onPlainTextChange(event.target.value)}
-            placeholder={"Pega aquí la evidencia comparativa o la serie histórica relevante.\nEjemplo: Tasa de mortalidad evitable 2018–2023 — Zona básica Zaidín Sur: evolución descendente del 12 % al 9 %."}
+            placeholder={"Pega aquí la evidencia comparativa o la serie histórica relevante.\nEjemplo: Tasa de mortalidad evitable 2018–2023 — zona básica de salud: evolución descendente del 12 % al 9 %."}
             rows={8}
           />
           <div className="document-form">
@@ -572,7 +572,7 @@ export function DocumentIngestionPanel({
               value={title}
               aria-label="Título y fuente del documento"
               onChange={(event) => onTitleChange(event.target.value)}
-              placeholder="Título y período (ej. Evolución indicadores salud Zaidín 2018–2023)"
+              placeholder="Título y período (ej. Evolución de indicadores de salud 2018–2023)"
             />
             <button
               type="button"

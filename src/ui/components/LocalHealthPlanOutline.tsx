@@ -8,8 +8,6 @@ import {
   resolvedPlanDecisionText,
 } from "../../domain/action-plan-catalog/DefinitiveActionPlanProjection";
 import {
-  ZAIDIN_AGING_PROPOSAL,
-  createZaidinFinalActionPlanDraft,
   thematicBlockNameFor,
   type PlanPreparationDraft,
 } from "../../domain/action-plan-catalog/PlanPreparationDraft";
@@ -52,13 +50,7 @@ export function LocalHealthPlanOutline({
     () => ACTION_PLAN_CATALOG.map((module) => municipalActionPlanModule(municipalityId, module)),
     [municipalityId]
   );
-  const effectiveDrafts = useMemo(() => {
-    if (municipalityId !== "granada-zaidin") return drafts;
-    const current = drafts.find((draft) => draft.moduleId === ZAIDIN_AGING_PROPOSAL.id && draft.version === ZAIDIN_AGING_PROPOSAL.version);
-    if (current) return drafts;
-    const previous = drafts.find((draft) => draft.moduleId === ZAIDIN_AGING_PROPOSAL.id);
-    return [...drafts.filter((draft) => draft.moduleId !== ZAIDIN_AGING_PROPOSAL.id), createZaidinFinalActionPlanDraft(previous)];
-  }, [municipalityId, drafts]);
+  const effectiveDrafts = drafts;
   const active = useMemo(
     () => buildDefinitiveActionPlanProjection(municipalityId, modules, effectiveDrafts),
     [municipalityId, modules, effectiveDrafts]
@@ -69,13 +61,13 @@ export function LocalHealthPlanOutline({
     0
   );
 
-  const territorialName = municipalityId === "granada-zaidin" ? `Distrito ${municipalityName.replace(/^Granada-/, "")}` : municipalityName;
+  const territorialName = municipalityName;
   return (
     <article className="workspace-panel psl-outline" aria-labelledby="pls-outline-title">
       <header className="pcm-module__header">
         <div>
           <p className="eyebrow">Esbozo de trabajo · Plan Local de Salud 2027–2030</p>
-          <h2 id="pls-outline-title">Plan Local de Salud {municipalityId === "granada-zaidin" ? "del" : "de"} {territorialName}</h2>
+          <h2 id="pls-outline-title">Plan Local de Salud de {territorialName}</h2>
           <p className="panel-note">{municipalityName} · {province}</p>
         </div>
         <span className="status-pill" data-outline-status={LOCAL_HEALTH_PLAN_OUTLINE_STATUS}>Borrador evolutivo</span>

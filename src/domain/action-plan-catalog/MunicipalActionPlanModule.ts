@@ -68,7 +68,6 @@ export const ZAGRA_AGING_PROPOSAL: ActionPlanCatalogModule = {
 export function municipalActionPlanModule(municipalityId: string, original: ActionPlanCatalogModule): ActionPlanCatalogModule {
   if (original.id !== HEALTHY_AGING_MODULE.id) return original;
   if (municipalityId === "zagra") return ZAGRA_AGING_PROPOSAL;
-  if (municipalityId === "granada-zaidin") return ZAIDIN_AGING_PROPOSAL;
   return COMMON_AGING_FOUR_BLOCKS;
 }
 

@@ -1,4 +1,3 @@
-import zaidin from '../../../docs/source-material/health-reports/informe-salud-zaidin-abril-2023.pdf?url';
 import epvsa from '../../../docs/source-material/strategic-frameworks/08_Lineas_EPVSA_02abril24.pdf?url';
 import esca from '../../../docs/source-material/strategic-frameworks/Estrategia de Salud Comunitaria de Andalucia 2026-2030-ESCA.pdf?url';
 import esa from '../../../docs/source-material/strategic-frameworks/Estrategia de Salud de Andalucia 2030-ESA.pdf?url';
@@ -8,7 +7,6 @@ import pesmaa from '../../../docs/source-material/strategic-frameworks/PESMAA 20
 
 // Resolve the original paths too: existing municipal workspaces retain them.
 export const bundledDocuments: Record<string, string> = {
-  'docs/source-material/health-reports/informe-salud-zaidin-abril-2023.pdf': zaidin,
   'docs/source-material/strategic-frameworks/08_Lineas_EPVSA_02abril24.pdf': epvsa,
   'docs/source-material/strategic-frameworks/Estrategia de Salud Comunitaria de Andalucia 2026-2030-ESCA.pdf': esca,
   'docs/source-material/strategic-frameworks/Estrategia de Salud de Andalucia 2030-ESA.pdf': esa,

@@ -126,10 +126,6 @@ describe("perfiles reales — sin cambios en datos y conclusiones guardadas", ()
   it.each([
     ["public/seeds/compas-ng-workspace-atarfe.json", 26],
     ["municipalities/atarfe/exports/compas-ng-workspace-atarfe.json", 26],
-    ["public/seeds/compas-ng-workspace-granada-zaidin.json", 56],
-    ["municipalities/granada-zaidin/exports/compas-ng-workspace-granada-zaidin.json", 56],
-    ["municipalities/granada-zaidin/exports/compas-ng-workspace-granada-zaidin-MANUAL-56-92.json", 56],
-    ["municipalities/granada-zaidin/exports/compas-ng-workspace-granada-zaidin-reproducible-minimo.json", 15],
   ] as const)("%s conserva %i evidencias sin átomos SAM ocultos", (path, count) => {
     const raw = readFileSync(path, "utf8");
     const w = JSON.parse(raw) as MunicipalityWorkspace;

@@ -321,7 +321,7 @@ export function LegacyActionPlanCatalogPanel(props: LegacyActionPlanCatalogPanel
           <ul>{SUPPORT_DOCUMENTS.map(doc => <li key={doc.id}><SupportDocumentLink doc={doc}/> · {doc.title}. {doc.issuer}. {doc.period}.{doc.location.kind === "compas" ? " Original conservado en COMPÁS." : " Consulta en la dirección pública."}{doc.note ? ` ${doc.note}` : ""}</li>)}</ul>
         </details>
         <details className="pcm-help-fold"><summary>Cómo funciona</summary>
-        <p className="panel-note">Consulta en cualquier expediente las propuestas documentadas de Granada-Zaidín y los demás módulos del catálogo: objetivos estratégicos, objetivos generales y específicos, indicadores y fichas técnicas. Selecciona y adapta los elementos en el borrador propio del territorio; nunca se importan como acuerdos aprobados.</p>
+        <p className="panel-note">Consulta en cualquier expediente los módulos del catálogo: objetivos estratégicos, objetivos generales y específicos, indicadores y fichas técnicas. Selecciona y adapta los elementos en el borrador propio del territorio; nunca se importan como acuerdos aprobados.</p>
         <p className="pcm-source">Cada módulo indica fuente y versión. Las fichas de indicador y de actuación permiten preparar instrumentos de medición y recogida de datos. Los planes de acción, programas y compromisos operativos deben concretarse localmente, sin copiarlos automáticamente de otro expediente.</p>
         <p className="panel-note">
           {directTerritorialEdit

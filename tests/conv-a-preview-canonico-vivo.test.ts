@@ -154,7 +154,6 @@ function sealedAndReadEditorialView(ws: MunicipalityWorkspace) {
 describe("CONV-A · vivo ≡ sellado (preview efímero == editorialView sellada y leída)", () => {
   const casos: Array<[string, () => MunicipalityWorkspace]> = [
     ["Atarfe (integrado)", () => seed("atarfe")],
-    ["Granada-Zaidín (integrado)", () => seed("granada-zaidin")],
     ["Zagra (lectura pendiente)", () => zagraWorkspace()],
   ];
   for (const [label, wsF] of casos) {

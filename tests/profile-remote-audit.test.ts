@@ -5,7 +5,7 @@ import {describe,expect,it} from 'vitest';
 import type {MunicipalityWorkspace} from '../src/domain/workspace';
 import {inspectRemoteProfile,profileParity,PROFILE_AUDIT_SCOPES} from '../src/application/health-profile/profileRemoteAudit';
 import {externalProfileFixture} from './helpers/externalProfileFixture';
-import seed from '../public/seeds/compas-ng-workspace-granada-zaidin.json';
+import seed from '../fixtures/workspaces/municipio-ensayo-synthetic-test.json';
 
 function pdf(id:string){
  const buf=Buffer.from('%PDF-1.7\nAudit test only\n%%EOF');

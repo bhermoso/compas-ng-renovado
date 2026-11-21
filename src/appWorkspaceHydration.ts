@@ -3,7 +3,6 @@ import type { CreateMunicipalityContextInput } from "./domain/municipality";
 import {
   createCompleteMunicipalityWorkspace,
   isEmptyWorkspaceForPersistenceGuard,
-  removeNonObservedZaidinStudies,
 } from "./application/workspace";
 import {
   loadWorkspaceFromLocalStorage,
@@ -57,14 +56,6 @@ export interface SeedDocumentMigration {
  * reconciliación genérica del seed: solo se migra exactamente lo declarado aquí.
  */
 export const INCREMENTAL_SEED_MIGRATIONS: readonly SeedDocumentMigration[] = [
-  {
-    municipalityId: "granada-zaidin",
-    documentId: "__all__",
-    marker: "granada-zaidin-documentacion-canonica-v1",
-    mergeAllDocuments: true,
-    expectedMinDocuments: 8,
-    expectedMinEvidenceAtoms: 56,
-  },
   {
     municipalityId: "atarfe",
     documentId: "__all__",
@@ -519,7 +510,7 @@ export function loadOrCreateMunicipalityWorkspace(
 ): WorkspaceLoadResult {
   const loaded = loadWorkspaceFromLocalStorage(municipalityId);
   if (loaded !== null) {
-    const migrated = removeNonObservedZaidinStudies(loaded);
+    const migrated = loaded;
     // Placeholder vacío de la versión anterior: sustituible por el seed. Un
     // expediente con contenido real conserva seedPending=false y prevalece.
     const isReplaceablePlaceholder =

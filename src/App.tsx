@@ -27,7 +27,6 @@ import { sha256Hex } from "./application/document-ingestion/sha256";
 import { canDeleteDocumentVersion, createDocumentRevision } from "./application/document-files/documentRevisions";
 import { MAX_WORKSPACE_ORIGINALS_BYTES, decideOriginalUpload, decodeDocumentOriginal, documentOriginalsBytes, documentDerivativesBytes, encodeDocumentOriginal, formatMegabytes, mergeDocumentOriginals, mergeDocumentDerivatives, profileOriginalsBytes, pruneDocumentOriginals, type StoredDocumentOriginal, type StoredDocumentDerivative } from "./application/document-files/documentOriginals";
 import { buildDiagnosisControlSummary } from "./application/diagnosis/diagnosisControlSummary";
-import { replaceZaidinFinalDraft } from "./application/workspace/replaceZaidinFinalDraft";
 import { regroupZagraActionPlan } from "./application/workspace/regroupZagraActionPlan";
 import { processPdfHealthReport } from './application/health-report/ProcessPdfHealthReport';
 import { extractPdfText } from './infrastructure/pdf/extractPdfText';
@@ -592,7 +591,7 @@ export default function App() {
 
   useEffect(() => {
     if (pendingSeedId || protectedEmptyWorkspaceIdRef.current === workspace.municipality.identity.id) return;
-    setWorkspace(previous => regroupZagraActionPlan(replaceZaidinFinalDraft(previous)));
+    setWorkspace(previous => regroupZagraActionPlan(previous));
   }, [workspace, pendingSeedId]);
 
   const [title, setTitle] = useState("");
@@ -1967,7 +1966,7 @@ export default function App() {
     } catch(error) {setLastHealthReportMessage((error as Error).message);} finally {setIsLoadingHealthReport(false);}
   }, [setWorkspace, workspace.healthReport, workspace.municipality.identity.id, workspace.repository.documents]);
 
-  // The bundled Zaidín PDF was previously registered without text. Process it once
+  // A bundled health-report PDF registered without text is processed once
   // when encountered; never replace later reports or validated snapshots.
   useEffect(() => {
     const report = workspace.healthReport;

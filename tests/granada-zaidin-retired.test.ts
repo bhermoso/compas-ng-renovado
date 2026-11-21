@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { MUNICIPALITY_SEEDS } from "../src/infrastructure/seeds/municipalitySeeds";
 
@@ -22,5 +22,20 @@ describe("Retirada de Granada-Zaidín y ausencia de ámbito por defecto", () => 
 
   it("no queda rótulo de demostración", () => {
     expect(app).not.toContain("SYNTHETIC_DEMO_MUNICIPALITY_ID");
+  });
+
+  it("sus datos, originales y código propio ya no están en el repositorio", () => {
+    for (const path of [
+      "public/seeds/compas-ng-workspace-granada-zaidin.json",
+      "municipalities/granada-zaidin",
+      "docs/source-material/health-reports/informe-salud-zaidin-abril-2023.pdf",
+      "fixtures/workspaces/granada-zaidin-synthetic-test.json",
+      "src/application/workspace/correctZaidinHealthReport.ts",
+      "src/application/workspace/removeNonObservedZaidinStudies.ts",
+      "src/application/workspace/replaceZaidinFinalDraft.ts",
+      "src/ui/components/CoordinatorPreview.tsx",
+    ]) expect(existsSync(path), path).toBe(false);
+    expect(readFileSync("src/main.tsx", "utf8")).not.toContain("coordinacion-zaidin");
+    expect(readFileSync("src/ui/components/documentAccessUtils.ts", "utf8")).not.toContain("zaidin");
   });
 });

@@ -10,7 +10,7 @@ const fichaStatusText = (status: string) =>
 export function planActionParagraphs(plan: PlanDocument): PlanParagraph[] {
  const paragraphs: PlanParagraph[] = [
   {text:"Plan de Acción",heading:true},
-  {text:"Ámbito: "+(plan.municipalityId==="granada-zaidin"?"Granada-Zaidín":plan.municipalityId)},
+  {text:"Ámbito: "+plan.municipalityId},
   {text:plan.status==="validated"?"Versión validada técnicamente":"BORRADOR — sin validar"},
   {text:"Fecha de versión: "+plan.generatedAt},
   ...(plan.validatedBy?[{text:"Validación técnica: "+plan.validatedBy}]:[]),

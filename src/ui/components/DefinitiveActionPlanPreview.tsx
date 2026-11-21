@@ -232,7 +232,7 @@ export function DefinitiveActionPlanPreview({municipalityId, municipalityName: v
   drafts?: PlanPreparationDraft[];
   worksheets?: IndicatorWorksheet[];
 }) {
-  const municipalityName = municipalityId === "granada-zaidin" ? "El Zaidín" : visibleName ?? municipalityId;
+  const municipalityName = visibleName ?? municipalityId;
   const active = useMemo(() => buildDefinitiveActionPlanProjection(municipalityId, modules, drafts), [municipalityId, modules, drafts]);
   const traceability = useMemo(() => buildActionPlanTraceability(municipalityId, active, worksheets), [municipalityId, active, worksheets]);
 

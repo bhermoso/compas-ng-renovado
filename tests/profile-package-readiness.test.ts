@@ -2,7 +2,7 @@ import {describe,expect,it} from 'vitest';
 import type {MunicipalityWorkspace} from '../src/domain/workspace';
 import {inspectProfilePackage} from '../src/application/health-profile/profilePackageReadiness';
 import {externalProfileFixture} from './helpers/externalProfileFixture';
-import seed from '../public/seeds/compas-ng-workspace-granada-zaidin.json';
+import seed from '../fixtures/workspaces/municipio-ensayo-synthetic-test.json';
 
 function fixture(){
  const workspace=structuredClone(seed) as unknown as MunicipalityWorkspace;

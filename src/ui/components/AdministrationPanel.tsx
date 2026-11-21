@@ -14,8 +14,8 @@ export default function AdministrationPanel({client,onOpenApp,onOpenScope}:{clie
  const [email,setEmail]=useState('');const [role,setRole]=useState<'coordinator'|'reader'>('coordinator');
  const [accounts,setAccounts]=useState<ManagedAccount[]>([]);const [busy,setBusy]=useState(false);const [message,setMessage]=useState('');
  const [created,setCreated]=useState<(NewAccount&{scope:string;role:'coordinator'|'reader';granted:boolean})>();
- const accessUrl=new URL('?vista=relas-zaidin',window.location.href).href;
- useEffect(()=>{let live=true;void Promise.all([listManagedAccounts(client),listTerritorialSpaces(client)]).then(([rows,territories])=>{if(live){setAccounts(rows);setSpaces(territories);if(territories.length&&!territories.some(s=>s.id==='granada-zaidin'))setSelectedScope(territories[0].id);}}).catch(e=>{if(live)setMessage(accessError(e));});return()=>{live=false;};},[client]);
+ const accessUrl=new URL(window.location.pathname,window.location.origin).href;
+ useEffect(()=>{let live=true;void Promise.all([listManagedAccounts(client),listTerritorialSpaces(client)]).then(([rows,territories])=>{if(live){setAccounts(rows);setSpaces(territories);}}).catch(e=>{if(live)setMessage(accessError(e));});return()=>{live=false;};},[client]);
  async function grant(account:NewAccount&{scope:string;role:'coordinator'|'reader'}) {
   const managed={uid:account.uid,email:account.email,scope:account.scope,role:account.role,active:true};
   await saveManagedAccess(client,managed);

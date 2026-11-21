@@ -4,7 +4,7 @@ import { resolve } from 'node:path';
 import { parseProfileStructure } from '../src/application/health-profile/profileStructure';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import seed from '../public/seeds/compas-ng-workspace-granada-zaidin.json';
+import seed from '../fixtures/workspaces/municipio-ensayo-synthetic-test.json';
 import type { MunicipalityWorkspace } from '../src/domain/workspace';
 import { EMPTY_PROFILE_LIBRARY, appendExternalProfile, archiveExternalProfileVersion, deleteExternalProfileVersion, importProfileFile, isExternalProfileLibrary, prepareImportedProfileRevision, profileAttachmentBlob, readExternalProfilePackage } from '../src/application/health-profile/externalProfiles';
 import { createMunicipalityRuntime } from '../src/application/runtime';

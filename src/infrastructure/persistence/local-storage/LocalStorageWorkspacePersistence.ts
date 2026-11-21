@@ -1,6 +1,5 @@
 import { isExternalProfileLibrary } from '../../../application/health-profile/externalProfiles';
 import { linkFuenteVaquerosPlizdOriginal } from '../../../application/workspace/linkFuenteVaquerosPlizdOriginal';
-import { correctZaidinHealthReport } from '../../../application/workspace/correctZaidinHealthReport';
 import type { MunicipalityWorkspace } from "../../../domain/workspace";
 import { isStructurallySaneStrataCounts, normalizeIBSESampleScope } from "../../../domain/ibse";
 
@@ -434,7 +433,7 @@ export function parseWorkspaceJSON(
 
     if (!hasCoreWorkspaceCollections(parsed)) return null;
 
-    return linkFuenteVaquerosPlizdOriginal(correctZaidinHealthReport(normalizeCanonicalDocuments(parsed as MunicipalityWorkspace)));
+    return linkFuenteVaquerosPlizdOriginal(normalizeCanonicalDocuments(parsed as MunicipalityWorkspace));
   } catch {
     return null;
   }

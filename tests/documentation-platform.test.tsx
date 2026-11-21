@@ -7,8 +7,11 @@ import { STRATEGIC_REFERENCES } from "../src/application/strategic-reference-lib
 // «Consultar documentación»: índice por funciones, ficha por documento y el
 // marco estratégico común separado de los documentos del municipio.
 describe("Plataforma documental del expediente", () => {
-  const zaidin = JSON.parse(readFileSync("public/seeds/compas-ng-workspace-granada-zaidin.json", "utf8"));
-  const html = renderToStaticMarkup(<DocumentationProvider workspace={zaidin}><p>contenido</p></DocumentationProvider>);
+  // Expediente de ensayo con una copia municipal de un marco común (PDF incluido en la compilación).
+  const ensayo = JSON.parse(readFileSync("fixtures/workspaces/municipio-ensayo-synthetic-test.json", "utf8"));
+  const [first] = ensayo.repository.documents;
+  ensayo.repository.documents.push({ ...first, id: "copia-epvsa", kind: "strategic-framework", title: "EPVSA — copia municipal de ensayo", sourceText: undefined, sourceFileName: "08_Lineas_EPVSA_02abril24.pdf", source: { system: "Copia municipal de ensayo", url: "docs/source-material/strategic-frameworks/08_Lineas_EPVSA_02abril24.pdf" }, tags: ["strategic-framework"] });
+  const html = renderToStaticMarkup(<DocumentationProvider workspace={ensayo}><p>contenido</p></DocumentationProvider>);
 
   it("ordena el índice por función municipal", () => {
     expect(html).toContain("01 · Informes de Salud");
@@ -30,6 +33,6 @@ describe("Plataforma documental del expediente", () => {
 
   it("el botón conserva su rótulo y muestra el número de fichas", () => {
     expect(html).toContain("Consultar documentación");
-    expect(html).toContain(`documentation-launcher__count">${zaidin.repository.documents.length}<`);
+    expect(html).toContain(`documentation-launcher__count">${ensayo.repository.documents.length}<`);
   });
 });
