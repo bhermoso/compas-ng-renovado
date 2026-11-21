@@ -1,0 +1,252 @@
+# Registro de trabajo de COMPÁS renovado
+
+Este registro deja constancia, por fecha, de lo que se ha comprobado en la
+aplicación publicada, de lo que ha cambiado y de lo que queda pendiente. Lo
+puede retomar cualquier sesión de trabajo, sea quien sea el asistente o la
+persona que la conduzca. Las conversaciones no son fuente: cuando una entrada
+recoge una afirmación hecha en una conversación, indica si se ha comprobado.
+
+## Cómo se escribe una entrada
+
+- La entrada más reciente va arriba.
+- Cada entrada indica el commit que servía GitHub Pages al empezar
+  (`version.json`) y el que sirve al terminar.
+- Cada comprobación declara con qué datos se hizo: expediente del repositorio
+  (`public/seeds`), expediente real en Firestore (`compas-98dd7`) o datos
+  sintéticos. Una comprobación con expedientes del repositorio no acredita el
+  comportamiento con perfiles, historiales y originales reales.
+- Se separan hechos observados, inferencias, decisiones institucionales o del
+  responsable e hipótesis. «No verificado» es una respuesta válida.
+- Las credenciales no se escriben aquí. Se nombra la variable de entorno que
+  las contiene, nunca su valor.
+
+---
+
+## 2026-11-21 · Auditoría de la versión publicada y navegación de escritorio
+
+**Publicado al empezar:** `0fe40edc75016cef9be67ef90116e79f4e175314` (#189).
+**Publicado al terminar:** `240fcd2d7f841bd129e6d8250d35e718d4877f29` (#190),
+construido a las 09:04:42 UTC.
+El paquete `App-*.js` servido por Pages es idéntico byte a byte al construido
+en local desde ese commit.
+
+### Hechos observados
+
+**Integración continua**
+
+- El flujo *Plan document validation* estaba en rojo desde #185 (21-nov,
+  00:53 UTC). Se fusionaron con él en rojo #185, #186, #187, #188 y #189.
+  - La causa era `tests/fuente-vaqueros-hydration.smoke.mjs`, que esperaba un
+    encabezado `<h2>` con el nombre del municipio. #185 retiró ese encabezado
+    por diseño.
+  - Con #190 la prueba localiza el municipio en la cabecera común. Abre el
+    gestor documental y su catálogo, que están plegados por diseño, antes de
+    comprobar el documento.
+  - La condición verificada no cambia: 1 documento y 29 evidencias, también
+    tras recargar con el JSON del seed bloqueado. El flujo vuelve a estar en
+    verde.
+- La suite completa (`npx vitest run`) tiene 15 fallos. Son los mismos 15 que
+  ya fallaban en `dab5d78` (#184), antes del rediseño de interfaz. Ninguno
+  figura en la lista que ejecuta la integración continua:
+  - contratos de color sin valores literales: `agenda-visual-contract`,
+    `citizen-participation-summary`, `local-health-cycle-phase-strip`,
+    `sam-assess-sample`, `sam-tripyramid`;
+  - `diagnosis-control-summary`;
+  - `document-ingestion-origins`, idempotencia de Localiza;
+  - `ibse-restoration-audit`;
+  - `pa-relas-02-ui`;
+  - `plan-preparation`, cuatro casos;
+  - `profile-dashboard`, secciones censales;
+  - `psl-c-impresion-regimen`, un solo bloque `@media print`.
+
+**Vista inicial de las nueve pestañas**
+
+- Se comprobó con los expedientes de Atarfe, Loja y Granada-Zaidín de
+  `public/seeds`, a 1280×720 y a 390×844.
+- Ninguna de las 54 vistas tiene desplazamiento vertical ni horizontal.
+- Todas comparten la cabecera común: marco EPVSA, caja de logos y línea de seis
+  colores.
+- El desbordamiento horizontal de Inicio en móvil (671 px de ancho sobre
+  390 px), observado en `373e1c2`, ya no se produce desde #189.
+
+**Navegación de escritorio** (corregida en #190)
+
+- A 1280, 1440, 1600 y 1920 px, la barra de pestañas tenía un ancho fijo de
+  1124 px. Plan Local de Salud, 05 Implantación, 06 Evaluación y Gestor de
+  Encuestas solo eran accesibles desplazando una barra horizontal de 3 px.
+- Desde #190:
+  - a partir de 961 px caben las nueve pestañas, y las etiquetas largas se
+    parten en dos líneas por un punto fijo («Perfil de / Salud Local»);
+  - entre 761 y 960 px se usa el selector «Ir a», como en móvil.
+- Prueba estática: `tests/nav-desktop-fit.test.ts`.
+
+**Paneles abiertos** (expediente de Atarfe del repositorio, 1280×720)
+
+| Acceso | Alto de la página abierta | Observación |
+|---|---|---|
+| Diagnóstico · Ver estado y cronología | 1,5 pantallas | Métricas, línea temporal y filtros. |
+| Diagnóstico · Gestor documental | 1,5 pantallas | Cabecera editorial y línea de color. El catálogo se abre aparte. |
+| Diagnóstico · Estadística territorial | 1,4 pantallas | Cabecera editorial y línea de color. |
+| Diagnóstico · Otras herramientas | 2,7 pantallas | 15 desplegables internos; tarjetas de estilo anterior. |
+| Plan de Acción · Secciones | 2,2 pantallas | Dos cabeceras de estilo anterior en caja propia («Plan Local de Salud 2027–2030», «Plan de Acción · edición directa»); 122 desplegables internos. |
+
+Al volver a plegar cualquiera de ellos, la vista regresa a una pantalla.
+
+**Errata** (corregida en #190)
+
+- La sección 1 del esbozo del Plan Local de Salud decía «ciclo de planificación
+  local en salud delAtarfe». Ahora dice «de Atarfe».
+
+**Líneas estratégicas de la EPVSA**
+
+- La fuente oficial en el repositorio es
+  `docs/source-material/strategic-frameworks/08_Lineas_EPVSA_02abril24.pdf`.
+  Establece 4 líneas (LE 1 a LE 4) y 10 objetivos estratégicos
+  (OE 1.1 a 1.7, OE 2.1, OE 3.1 y OE 4.1).
+- `src/domain/agenda/historicEpvsaStructure.ts` reproduce literalmente líneas
+  y objetivos. Solo lo usa el selector de actuaciones-tipo de Implantación.
+- `src/domain/strategy/StrategicFrameworkRegistry.ts` y
+  `src/application/epvsa/EPVSATranslator.ts` titulan las líneas con
+  denominaciones que no figuran en la fuente: «LE1 · Acción local en salud y
+  comunidad», «LE2 · Entornos y estilos de vida saludables», «LE3 · Equidad,
+  determinantes sociales y vulnerabilidades» y «LE4 · Gobernanza, evaluación y
+  conocimiento para la salud».
+  - Esas denominaciones no aparecen en ninguna de las nueve pestañas.
+  - Se recorrieron con todos los desplegables abiertos y el expediente de
+    Granada-Zaidín. `EPVSAPanel` no está montado en la aplicación.
+- Los nombres oficiales de las líneas tampoco aparecen en ninguna pestaña. La
+  biblioteca estratégica de Diagnóstico ofrece el PDF como documento
+  («Líneas estratégicas EPVSA»).
+- El Plan de Acción rotula como «Línea estratégica» los tres módulos del
+  catálogo RELAS: Envejecimiento saludable, Prevención y abordaje de las
+  adicciones, y Bienestar emocional y salud mental.
+  - La EPVSA solo figura como procedencia de algunos elementos
+    (`ActionPlanCatalog.ts`):
+    - Bienestar emocional: 13 de 41 elementos.
+    - Envejecimiento saludable: 7 de 45.
+    - Adicciones: 0 de 30.
+  - Todas esas referencias remiten a objetivos de la LE 1 (OE 1.4, OE 1.6 y
+    OE 1.7). Las LE 2, LE 3 y LE 4 no aparecen.
+
+### Comprobado con datos de prueba
+
+- Las cinco pruebas de humo de la integración continua, en local.
+- La lista de la integración continua: 305 de 305.
+- `npm run build`.
+- Vistas iniciales y paneles abiertos con los expedientes del repositorio.
+- Carga de un perfil sintético en formato Markdown en Perfil de Salud Local:
+  se abre la revisión previa, pero guardar exige sesión de Firebase. No se
+  guardó nada.
+- Descarga de Estadística territorial para Atarfe (INE 18022) contra los
+  servicios reales del INE y el IECA, en local y sin escribir en Firestore. La
+  descarga avanzó hasta la consulta 21 de 24, pero no terminó en unos 5
+  minutos.
+  - No se pudieron observar las descargas guardadas, el detalle por bloques ni
+    la preparación de una revisión del Perfil.
+  - No queda establecido si se trata de lentitud del IECA o de un fallo del
+    panel.
+
+### Comprobado con expedientes reales
+
+Nada. La aplicación publicada exige usuario y contraseña de Firebase, y la
+sesión no disponía de credenciales.
+
+### Afirmaciones previas no verificadas en esta sesión
+
+Proceden del trabajo realizado el mismo día en otra conversación. Se conservan
+como punto de partida, no como hecho comprobado.
+
+- Que con #189 «pasaron 88 pruebas». La integración continua de esa rama falló
+  tres veces antes de fusionarse (`8da3268`, `0366def`, `dfaa6e3`). No consta
+  qué 88 pruebas se ejecutaron.
+- Que las nueve vistas iniciales cabían sin desplazamiento con un expediente de
+  prueba.
+  - **Confirmado** en cuanto al desplazamiento vertical.
+  - No advertía que cuatro pestañas quedaban ocultas en escritorio.
+- Que Perfil permite abrir el documento y Gestión y versiones. Con los
+  expedientes del repositorio, que no traen Perfil, solo se ofrecen «Incorporar
+  un perfil» y «Comprobar PDF original».
+- Que en Firestore los expedientes vigentes de Atarfe y Loja conservan dos
+  descargas del 18-11-2026 cada uno (Atarfe: 408 y 498 observaciones; Loja: 582
+  y 697), con sus fuentes.
+- Que el informe de salud de Atarfe es una reconstrucción a partir del texto
+  conservado y que su original no está acreditado. También queda por
+  distinguir, en Loja, la referencia al documento de la comprobación efectiva
+  de su original.
+
+### Inferencias
+
+- La cabecera «Marco estratégico · Estrategia de Promoción de una Vida
+  Saludable en Andalucía» no tiene aún correspondencia en el Plan de Acción.
+  Ningún módulo se presenta anclado a una línea EPVSA identificable por su
+  nombre oficial.
+- Fusionar con la integración continua en rojo dejó sin detectar durante cinco
+  PRs que la prueba había dejado de comprobar la hidratación.
+
+### Decisiones pendientes del responsable
+
+- Denominación de los módulos del catálogo RELAS en el Plan de Acción, hoy
+  «Línea estratégica». Para el responsable, «líneas estratégicas» son las de la
+  EPVSA. La propuesta es «Módulo del catálogo RELAS».
+- Si se incorpora al Plan de Acción una referencia plegable con las 4 líneas y
+  los 10 objetivos oficiales de la EPVSA, indicando a cuáles se ancla cada
+  módulo.
+- Si se sustituyen las denominaciones no oficiales de
+  `StrategicFrameworkRegistry.ts` y `EPVSATranslator.ts` por las de la fuente.
+  No son visibles hoy, pero son la base de un traductor que podría volver a
+  montarse.
+
+### Hipótesis
+
+- La descarga incompleta de Estadística territorial puede deberse a la
+  latencia de las consultas del IECA (la 21 de 24 es una consulta BADEA) más
+  que a la interfaz. Para confirmarlo, conviene repetir la descarga con un
+  tiempo de espera mayor o consultar el registro de red del panel.
+
+### Pendiente, por orden
+
+1. **Auditoría con expedientes reales**, con la cuenta lectora descrita más
+   abajo. Comparar Inicio, Diagnóstico y Perfil en escritorio y en móvil,
+   cerrados y abiertos.
+2. **Recorridos de punta a punta:**
+   - Diagnóstico → Estadística → descargas guardadas → detalle → preparación de
+     una revisión del Perfil.
+   - Diagnóstico → Gestor documental → catálogo y búsqueda → ficha → original,
+     procedencia y revisiones.
+   - Perfil → documento completo → originales → versiones y validación.
+   - Plan de Acción → líneas y objetivos → indicadores y procedencia.
+3. **Lectura directa de Firestore** para verificar las afirmaciones previas:
+   descargas guardadas, revisión activa de cada Perfil, originales y huellas
+   SHA-256. Solo lectura.
+4. **Plan de Acción y «Otras herramientas»** de Diagnóstico: llevarlos a la
+   composición de Inicio, con una sola cabecera y bloques plegados por módulo.
+5. **EPVSA**, según las decisiones pendientes.
+6. **PRs abiertas por revisar:**
+   - #169: procedencia y versiones del archivo. Su descripción pide no
+     fusionarla sin verificar.
+   - #161: cotejo bajo demanda contra Firebase.
+7. **Menores:**
+   - retirar `tmp-noop.txt`, que se declara a sí mismo residuo;
+   - los 15 fallos previos de la suite completa;
+   - actualizar las fechas de `README.md` y `ROADMAP.md`, que siguen en
+     septiembre.
+
+### Acceso y entorno
+
+- El entorno de sesión en la nube «compas-ng-renovado» es personal y está
+  asociado a este repositorio. Su red admite:
+  - GitHub Pages: `bhermoso.github.io`;
+  - Firebase: `firestore.googleapis.com`, `identitytoolkit.googleapis.com`,
+    `securetoken.googleapis.com` y `oauth2.googleapis.com`;
+  - INE: `servicios.ine.es` y `www.ine.es`;
+  - IECA: `www.ieca.junta-andalucia.es` y `www.juntadeandalucia.es`.
+- Credenciales previstas, que introduce el responsable en la configuración del
+  entorno y no se registran aquí:
+  - `COMPAS_AUDIT_EMAIL` y `COMPAS_AUDIT_PASSWORD`: cuenta de COMPÁS con rol
+    `reader` en los ámbitos que se auditen.
+  - `COMPAS_FIREBASE_SA_JSON`: cuenta de servicio del proyecto `compas-98dd7`
+    con el rol *Cloud Datastore Viewer*, de solo lectura.
+- Cualquier modificación de datos en Firestore exige antes:
+  - identificar el problema y la revisión activa;
+  - preparar el cotejo y una copia recuperable;
+  - conservar la distinción entre documentos originales y reconstrucciones.

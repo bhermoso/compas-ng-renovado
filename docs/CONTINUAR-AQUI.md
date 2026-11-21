@@ -1,5 +1,10 @@
 # Continuación de COMPAS NG
 
+**Desde el 21 de noviembre de 2026, el punto de partida para retomar el trabajo
+es el [Registro de trabajo](audits/REGISTRO-DE-TRABAJO.md)**: versión
+publicada, comprobaciones con su fuente de datos, cambios y pendientes, por
+fecha. Lo que sigue es contexto anterior.
+
 Actualización de limpieza del 13 de septiembre de 2026: la foto de estado
 operativa está en [Estado actual y criterio de limpieza](ESTADO-ACTUAL-COMPAS-NG.md).
 El acceso autenticado para responsables territoriales queda fuera del flujo
