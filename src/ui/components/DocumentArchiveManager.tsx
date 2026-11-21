@@ -94,12 +94,11 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
   const sections = useMemo(() => organizeMunicipalDocuments(archive), [archive]);
   const visibleSections = useMemo(() => organizeMunicipalDocuments(filtered).filter(section => section.documents.length > 0), [filtered]);
   return (
-    <section className="workspace-panel dam" aria-labelledby="dam-title">
+    <section className="dam hp-phase hp-phase--2" aria-labelledby="dam-title">
       <details className="dam__disclosure">
         <summary className="dam__disclosure-summary">
-          <span className="dam__disclosure-title"><span className="eyebrow">Diagnóstico · Fuente documental única</span><strong id="dam-title">Gestor documental del expediente</strong></span>
-          <span className="dam__disclosure-count"><strong>{archive.length}</strong> fichas · <strong>{archive.filter(isActive).length}</strong> activas</span>
-          <span className="dam__disclosure-toggle">Abrir gestor</span>
+          <strong id="dam-title">Gestor documental del expediente</strong>
+          <span>{archive.length} fichas · {archive.filter(isActive).length} activas</span>
         </summary>
         <div className="dam__expanded">
       <div className="panel-header dam__head">

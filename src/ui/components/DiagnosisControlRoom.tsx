@@ -53,24 +53,26 @@ export function DiagnosisControlRoom({ municipalityName, province, ineCode, summ
   const { metrics } = summary;
 
   return (
-    <section className="workspace-panel diagnosis-home" aria-labelledby="diagnosis-home-title">
-      <header className="diagnosis-home__head">
-        <div>
-          <p className="diagnosis-home__phase">01 · Diagnosticar</p>
-          <h2 id="diagnosis-home-title">Diagnóstico territorial</h2>
+    <>
+      <header className="hp-cover diagnosis-home__head">
+        <div className="hp-cover__context">
+          <p className="hp-cover__chain">01 · Diagnosticar</p>
         </div>
-        <div className="diagnosis-home__identity">
+        <div className="hp-cover__brand">
+          <h2 id="diagnosis-home-title">Diagnóstico territorial</h2>
+          <hr className="home-cover__rule hp-cover__rule" />
+        </div>
+        <div className="hp-cover__side diagnosis-home__identity">
           <strong>{municipalityName}</strong>
-          {province && <span>{province}</span>}
-          {ineCode && <span>INE {ineCode}</span>}
+          {(province || ineCode) && <span>{[province, ineCode && `INE ${ineCode}`].filter(Boolean).join(" · ")}</span>}
           <span>Períodos: {periodLabel}</span>
         </div>
       </header>
 
-      <details className="diagnosis-home__details">
+      <details className="diagnosis-home__details hp-phase hp-phase--1">
         <summary>
-          <span><strong>{metrics.activeDocuments}</strong> documentos activos · <strong>{metrics.evidence}</strong> evidencias · <strong>{metrics.studiesLoaded}/{metrics.totalStudies}</strong> instrumentos</span>
-          <span className="diagnosis-home__toggle">Ver estado y cronología</span>
+          <strong>Ver estado y cronología</strong>
+          <span>{metrics.activeDocuments} documentos activos · {metrics.evidence} evidencias · {metrics.studiesLoaded}/{metrics.totalStudies} instrumentos</span>
         </summary>
         <div className="diagnosis-home__body">
           <dl className="diagnosis-home__metrics" aria-label="Resumen del expediente">
@@ -110,7 +112,7 @@ export function DiagnosisControlRoom({ municipalityName, province, ineCode, summ
           </details>
         </div>
       </details>
-    </section>
+    </>
   );
 }
 

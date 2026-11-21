@@ -4041,7 +4041,7 @@ export default function App() {
         />
       )}
 
-      <main className={view === "inicio" ? "app-shell app-shell--home" : "app-shell"}>
+      <main className={`app-shell${view === "inicio" ? " app-shell--home" : view === "repositorio" ? " app-shell--diagnosis" : ""}`}>
         {/* Selector de municipio (se muestra sobre cualquier vista) */}
         {showMunicipalitySelector && (
           <section className="municipality-selector">
@@ -4160,7 +4160,7 @@ export default function App() {
 
         {/* ── ② Repositorio documental ─────────────────────── */}
         {view === "repositorio" && (
-          <>
+          <section className="hp diagnosis-page" aria-labelledby="diagnosis-home-title">
             {/* ── Sala de control: cabecera, resumen factual, matriz y línea temporal ── */}
             {(() => {
               const atoms = runtime.workspace.evidenceStore.atoms;
@@ -4223,7 +4223,7 @@ export default function App() {
 
             {/* La estadística territorial es una fuente del diagnóstico.
                 Su incorporación al Perfil genera siempre una revisión separada. */}
-            <details className="workspace-panel diagnosis-territorial-statistics" data-testid="diagnosis-territorial-statistics">
+            <details className="diagnosis-territorial-statistics hp-phase hp-phase--3" data-testid="diagnosis-territorial-statistics">
               <summary><strong>Estadística territorial oficial · INE e IECA</strong><span>Descargar, conservar y comparar datos del ámbito</span></summary>
               <TerritorialStatisticsPanel
                 key={workspace.municipality.identity.id}
@@ -4243,7 +4243,7 @@ export default function App() {
               />
             </details>
 
-            <details id="diagnosis-tools-drawer" className="diagnosis-tools-drawer">
+            <details id="diagnosis-tools-drawer" className="diagnosis-tools-drawer hp-phase hp-phase--4">
               <summary><strong>Otras herramientas del diagnóstico</strong><span>Bibliotecas, custodia, incorporación y módulos de análisis</span></summary>
               <div className="diagnosis-tools-drawer__body">
             {/* Biblioteca de referencia institucional: no pertenece al expediente
@@ -4465,7 +4465,7 @@ export default function App() {
 
               </div>
             </details>
-          </>
+          </section>
         )}
 
         {/* ── ③ Análisis territorial — interpretación territorial (Nivel 2) ── */}
