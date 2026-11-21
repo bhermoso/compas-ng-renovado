@@ -22,6 +22,67 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-21 · Plataforma documental del expediente («Consultar documentación»)
+
+**Publicado al empezar:** `abffd381c6902272b106c5943b783ed2d2521042` (#193).
+**Publicado al terminar:** el commit de fusión de esta PR. Hay que comprobar
+`version.json` después de fusionar.
+
+### Hechos observados antes del cambio
+
+- La ventana «Consultar documentación» era una lista plana con todas las
+  fichas. Las copias municipales de marcos se mostraban como «Marco
+  estratégico y normativo», mezcladas con los documentos del municipio.
+- La ficha marcaba «Original pendiente» en documentos cuyo PDF se descargaba
+  desde la misma ficha, por ejemplo el Informe de Salud de Granada-Zaidín.
+  - Causa: solo contaba los originales guardados en el expediente
+    (`documentOriginals`), no los PDF conservados en COMPÁS.
+
+### Cambio
+
+- **Ventana a pantalla casi completa,** con la cabecera de la portada:
+  expediente, título y línea de seis colores. Muestra las cifras del
+  expediente: fichas, fichas con archivo de origen y fichas archivadas.
+- **Índice a la izquierda,** organizado por función municipal (01 Informes de
+  Salud … 08 Otras fuentes).
+  - Búsqueda por título, archivo, procedencia, tipo, etiquetas o fecha.
+  - Cada ficha muestra su tipo, su fecha o periodo declarado (nunca la fecha
+    de carga), la disponibilidad del archivo de origen, si hay texto
+    conservado, su versión y si está archivada.
+- **Ficha a la derecha:** el contenido de antes (procedencia, original,
+  transcripción, trazabilidad, versiones y operaciones), con líneas en lugar de
+  cajas.
+  - Sin documento seleccionado, un resumen por funciones; cada función filtra
+    el índice.
+- **Marco estratégico común,** al pie del índice y separado de los documentos
+  del municipio. Las copias municipales se agrupan en «07 · Copias municipales
+  de marcos comunes».
+- **Disponibilidad del archivo de origen,** con un criterio único:
+  - original en el expediente;
+  - PDF conservado en COMPÁS;
+  - enlace a la fuente;
+  - sin original.
+
+  El texto conservado no cuenta como original.
+- **Móvil:** índice y ficha a pantalla completa, con «← Índice documental»
+  para volver.
+
+### Comprobado con datos de prueba
+
+- Atarfe y Granada-Zaidín de `public/seeds`, a 1280×720 y 390×844: índice,
+  ficha, búsqueda y marco común, sin desbordamiento horizontal ni errores de
+  página.
+- Integración continua: correcta.
+- Suite completa: los mismos 15 fallos previos.
+- `tests/documentation-references.smoke.mjs` está desfasada (usa la ruta
+  `/COMPAS_NG/`) y no está en la integración continua. No se ha adaptado.
+
+### Comprobado con expedientes reales
+
+Nada.
+
+---
+
 ## 2026-11-21 · Marco estratégico común y PESMAA
 
 **Publicado al empezar:** `c9ecb788289cd5e81382ac1620e3b512e289fa77` (#192).
