@@ -258,6 +258,20 @@ const NAV_ITEMS: { id: AppView; label: string; phase?: string }[] = [
   { id: "evaluacion",    label: "Evaluación", phase: "06" },
   { id: "ges",           label: "Gestor de Encuestas" },
 ];
+/** En escritorio una etiqueta larga se parte en dos líneas por un punto fijo
+ * («Perfil de / Salud Local»), nunca en tres; el texto accesible no cambia. */
+const NAV_LABEL_BREAKS: Record<string, [string, string]> = {
+  "Diagnóstico territorial": ["Diagnóstico", "territorial"],
+  "Perfil de Salud Local": ["Perfil de", "Salud Local"],
+  "Plan de Acción": ["Plan de", "Acción"],
+  "Plan Local de Salud": ["Plan Local", "de Salud"],
+  "Gestor de Encuestas": ["Gestor de", "Encuestas"],
+};
+function navLabelLines(label: string) {
+  const parts = NAV_LABEL_BREAKS[label];
+  if (!parts) return label;
+  return <><span className="app-nav__label-line">{parts[0]}</span> <span className="app-nav__label-line">{parts[1]}</span></>;
+}
 // Vistas eliminadas de la navegación principal pero accesibles para desarrollo:
 // "analisis" (D-002) y "lectura" (D-004).
 
@@ -3966,7 +3980,7 @@ export default function App() {
                 onClick={() => { setAgendaFocusId(undefined); setView(item.id); window.scrollTo({top: 0, behavior: "auto"}); }}
               >
                 {item.phase && <span className="app-nav__phase" aria-hidden="true">{item.phase}</span>}
-                {item.label}
+                <span className="app-nav__label">{navLabelLines(item.label)}</span>
               </button>
             ))}
           </div>

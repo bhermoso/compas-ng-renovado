@@ -11819,6 +11819,35 @@ h3 {
   .app-nav__municipality-row { gap: 7px; }
   .app-nav__context-label { font-size: .67rem; }
 }
+/* Escritorio: las nueve pestañas caben siempre en la barra. Sin desplazamiento
+   horizontal oculto; las etiquetas largas pasan a dos líneas antes que esconder
+   Implantación, Evaluación o el Gestor de Encuestas. */
+@media (min-width: 761px) {
+  .app-nav .app-nav__inner { padding-inline: 24px; gap: 12px; }
+  .app-nav .app-nav__tabs { overflow: visible; gap: 2px; justify-content: space-between; }
+  .app-nav .app-nav__tab {
+    flex: 0 1 auto;
+    min-width: min-content;
+    white-space: normal;
+    text-wrap: balance;
+    text-align: left;
+    line-height: 1.15;
+    padding: 6px 8px;
+    gap: 0;
+    font-size: .84rem;
+  }
+  .app-nav .app-nav__tab .app-nav__phase { min-width: 1.9em; margin-right: 6px; flex-shrink: 0; }
+  .app-nav .app-nav__label-line { white-space: nowrap; }
+}
+@media (min-width: 961px) and (max-width: 1100px) {
+  .app-nav .app-nav__tab { font-size: .78rem; padding: 5px 6px; }
+}
+/* Por debajo de 960 px las nueve pestañas no caben legibles: selector «Ir a». */
+@media (min-width: 761px) and (max-width: 960px) {
+  .app-nav .app-nav__tabs { display: none; }
+  .app-nav .app-nav__menu { display: flex; width: 100%; gap: 8px; align-items: center; font-size: .82rem; }
+  .app-nav .app-nav__menu select { flex: 1; min-width: 0; min-height: 36px; padding: 4px 8px; border: 1px solid var(--borde); background: var(--blanco); color: var(--texto-principal); }
+}
 @media (max-width: 760px) {
   .app-nav .app-nav__tabs,
   .app-nav__secondary-context,

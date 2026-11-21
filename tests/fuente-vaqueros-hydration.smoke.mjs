@@ -39,8 +39,14 @@ try {
   for (let visit = 0; visit < 2; visit++) {
     if (visit === 0) await page.goto(url); else await page.reload();
     await page.locator(".app-nav__tab", { hasText: "Diagnóstico territorial" }).click();
-    await page.getByRole("heading", { name: "Fuente Vaqueros", exact: true }).waitFor();
-    await page.getByText("PLIZD+ 2024-2028").first().waitFor({ timeout: 15000 });
+    // Desde #185 el municipio figura en la cabecera común de la pestaña, no como encabezado propio.
+    await page.locator(".hp-cover strong", { hasText: /^Fuente Vaqueros$/ }).first().waitFor();
+    // El gestor documental empieza plegado: se abre para comprobar que el documento hidratado es visible.
+    const archive = page.locator("details.dam__disclosure").first();
+    if (!(await archive.evaluate(el => el.open))) await archive.locator("summary.dam__disclosure-summary").click();
+    const catalog = archive.getByRole("button", { name: "Mostrar catálogo y buscar" });
+    if (await catalog.count()) await catalog.click();
+    await archive.getByText("PLIZD+ 2024-2028").first().waitFor({ timeout: 15000 });
     await page.waitForFunction(() => {
       const raw = localStorage.getItem("compas-ng:workspace:fuente-vaqueros");
       if (!raw) return false;
