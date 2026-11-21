@@ -9,13 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:reconstruction": "vitest run --config vitest.reconstruction.config.ts",
     "test:smoke": "node tests/home-complementary-studies.smoke.mjs",
     "test:atarfe": "node tests/load-atarfe-complete.mjs",
-    "rebuild:zaidin": "vitest run --config vitest.rebuild.config.ts scripts/demo/rebuild-granada-zaidin.gen.ts",
     "rebuild:atarfe": "vitest run --config vitest.rebuild.config.ts scripts/demo/rebuild-atarfe.gen.ts",
-    "restore:zaidin": "vitest run --config vitest.rebuild.config.ts scripts/demo/restore-zaidin-console.gen.ts",
-    "inject:ugc-sourcetext": "vitest run --config vitest.rebuild.config.ts scripts/demo/inject-ugc-sourcetext.gen.ts",
     "test:relas": "firebase emulators:exec --only firestore,auth --project demo-compas-relas \"node --test tests/relas-firebase.rules.test.mjs && vitest run --config vitest.admin.config.ts\""
   },
   "dependencies": {

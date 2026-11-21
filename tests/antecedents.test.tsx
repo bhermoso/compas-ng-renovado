@@ -20,7 +20,7 @@ import { ProfileIntegratedEditorialPreview } from "../src/ui/components/ProfileI
 import { setMunicipalDocumentCycle } from "../src/domain/repository";
 import type { MunicipalityWorkspace } from "../src/domain/workspace";
 
-const SEEDS = ["alfacar", "atarfe", "fuente-vaqueros", "granada-zaidin", "loja"];
+const SEEDS = ["alfacar", "atarfe", "fuente-vaqueros", "loja"];
 const load = (id: string): MunicipalityWorkspace =>
   parseWorkspaceJSON(readFileSync(`public/seeds/compas-ng-workspace-${id}.json`, "utf8"))!;
 

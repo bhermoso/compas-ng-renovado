@@ -22,6 +22,97 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-21 · Retirada de Granada-Zaidín: fase 2, paso 4 (código, datos y pruebas)
+
+### Retirado del repositorio
+
+- **Datos.**
+  - El seed público (`public/seeds/compas-ng-workspace-granada-zaidin.json`).
+  - `municipalities/granada-zaidin`: exportaciones, material fuente, Localiza
+    y consola de restauración.
+  - El PDF del Informe de Salud (`informe-salud-zaidin-abril-2023.pdf`). La
+    aplicación publicada deja de servirlo.
+- **Scripts y configuración.**
+  - `buildGranadaZaidinWorkspace`, `rebuild-granada-zaidin`,
+    `restore-zaidin-console` e `inject-ugc-sourcetext`, con sus scripts de
+    `package.json`.
+  - `vitest.reconstruction.config.ts` y su prueba, que dependía de DOCX
+    privados de Granada-Zaidín.
+- **Código propio.**
+  - Las migraciones `correctZaidinHealthReport`,
+    `removeNonObservedZaidinStudies` y `replaceZaidinFinalDraft`, y la marca
+    de documentación canónica de Granada-Zaidín en la hidratación.
+  - La vista de coordinación `?vista=coordinacion-zaidin`
+    (`CoordinatorPreview` y su CSS).
+  - El borrador final automático de Granada-Zaidín en el Plan de Acción y en
+    el esbozo del Plan Local de Salud.
+  - La rama de Granada-Zaidín en `municipalActionPlanModule`.
+  - La denominación «Informe de salud de El Zaidín»: la tabla de
+    denominaciones institucionales queda vacía.
+  - El nombre «El Zaidín» en el Plan resultante y en la exportación del Plan.
+  - Los ocho extractores específicos de su informe en la lectura estructurada,
+    con sus funciones auxiliares (unas 670 líneas).
+- **Interfaz.**
+  - Los ejemplos con nombres de Granada-Zaidín en los formularios de
+    incorporación se sustituyen por ejemplos genéricos.
+  - El panel de administración ya no preselecciona plan de salud.
+  - El enlace de acceso deja de usar `?vista=relas-zaidin`, que no era una
+    ruta: los enlaces antiguos siguen llevando al acceso.
+
+### Se conserva a propósito
+
+- **El catálogo común de Envejecimiento saludable** (`ZAIDIN_AGING_PROPOSAL`
+  y su procedencia: «Plan Local de Salud del Distrito Zaidín»).
+- **`browserRecovery`** sigue aceptando, en copias antiguas, el borrador de la
+  vista de coordinación y el identificador `granada-zaidin`. Así una
+  restauración no falla ni lo recrea como ámbito propio; la lista de retirados
+  lo mantiene oculto.
+
+### Pruebas
+
+- **Retiradas por ser propias de Granada-Zaidín.**
+  - Sustitución del borrador final.
+  - Retirada de estudios no observados.
+  - Informe original.
+  - Composición 56/92.
+  - Informes de zona.
+  - Cambio de informe (corrección de su PDF).
+  - Lectura N1b de informes de zona, cuya única prueba usaba sus dos informes
+    reales; el módulo queda sin cobertura hasta tener informes de zona de
+    ensayo.
+  - Casos sueltos en otras pruebas.
+  - Tres pruebas de humo: vista de coordinación, acceso a su informe y
+    referencias documentales, esta última ya desfasada.
+- **Adaptadas.**
+  - Acceso a documentos y plataforma documental, con copias municipales de
+    ensayo de marcos comunes.
+  - Esbozo del Plan Local de Salud con Loja.
+  - Árbol operativo del Plan con Alfacar.
+  - Antecedentes y recursos de Localiza sin Granada-Zaidín.
+- **`granada-zaidin-retired`** comprueba ahora también que sus datos y su
+  código propio no están en el repositorio.
+
+### Comprobado
+
+- `npm run build`: correcto.
+- Suite completa: los mismos 3 fallos pendientes.
+- Pruebas de humo de la integración continua: correctas.
+- Vistas iniciales de Atarfe y Loja: sin desplazamiento.
+
+### Pendiente
+
+- **Pruebas de humo fuera de la integración continua** que aún citan
+  Granada-Zaidín como dato de ejemplo: `admin-panel`, `browser-recovery`,
+  `indicator-worksheet`, `plan-preparation`, `profile-complete-review` y
+  `profile-pdf-enrichment`. Varias ya fallaban antes.
+- **Paso 5:** contratos y documentación histórica de `docs/` (7 documentos
+  con su nombre).
+- **Paso 1 y paso 3:** Loja, con credenciales.
+- **Firestore:** el responsable elimina el expediente compartido desde la
+  aplicación, con copia previa.
+
+---
+
 ## 2026-11-21 · Retirada de Granada-Zaidín: fase 2, paso 2 (expediente de ensayo neutro)
 
 **Decisiones del responsable:**

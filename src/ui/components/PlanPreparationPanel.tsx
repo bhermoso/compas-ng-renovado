@@ -286,7 +286,7 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
   {canEditProposal && <div className="pcm-bulk-actions" role="group" aria-label={`Incorporación de propuestas de ${module.title}`}>
    <button type="button" onClick={() => applyModuleSelection("included")}>Incorporar módulo completo al borrador</button>
    <button type="button" onClick={() => applyModuleSelection("excluded")}>Excluir módulo del borrador</button>
-   <p className="panel-note">Se guardan únicamente decisiones de preparación para {municipalityId}. Se respetan las redacciones locales modificadas al incorporar. No se copian datos de seguimiento ni acuerdos de Granada-Zaidín y no se aprueba el Plan.</p>
+   <p className="panel-note">Se guardan únicamente decisiones de preparación para {municipalityId}. Se respetan las redacciones locales modificadas al incorporar. No se copian datos de seguimiento ni acuerdos del Plan Local de Salud del Distrito Zaidín, del que procede el catálogo, y no se aprueba el Plan.</p>
   </div>}
   {control(module.id, module.strategicObjective, [])}
   {module.generalObjectives.map(general => {

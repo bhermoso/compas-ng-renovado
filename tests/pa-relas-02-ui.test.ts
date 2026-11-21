@@ -1,3 +1,5 @@
+import { municipalActionPlanModule } from "../src/domain/action-plan-catalog/MunicipalActionPlanModule";
+import { HEALTHY_AGING_MODULE } from "../src/domain/action-plan-catalog/ActionPlanCatalog";
 import { ACTION_PLAN_CATALOG } from "../src/domain/action-plan-catalog/ActionPlanCatalog";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -97,18 +99,33 @@ describe("PA-RELAS-02 — representación editorial", () => {
   });
 
   it("muestra un árbol operativo que vincula objetivo, indicador, actuación y actividad", () => {
-    const first = ZAIDIN_AGING_PROPOSAL.generalObjectives[0].specificObjectives[0];
+    // Módulo común de Envejecimiento en un municipio cualquiera, con un borrador explícito.
+    const module = municipalActionPlanModule("alfacar", HEALTHY_AGING_MODULE);
+    const general = module.generalObjectives[0];
+    const first = general.specificObjectives[0];
+    const draft = {
+      municipalityId: "alfacar",
+      moduleId: module.id,
+      version: module.version,
+      updatedAt: "2026-11-21T00:00:00.000Z",
+      decisions: {
+        [module.id]: { status: "included" as const, sourceText: module.strategicObjective },
+        [general.code]: { status: "included" as const, sourceText: general.title },
+        [first.code]: { status: "included" as const, sourceText: first.title },
+        [first.indicator.code]: { status: "included" as const, sourceText: first.indicator.title },
+      },
+    };
     const sheet = createIndicatorWorksheet({
-      municipalityId: "granada-zaidin",
-      moduleId: ZAIDIN_AGING_PROPOSAL.id,
-      moduleVersion: ZAIDIN_AGING_PROPOSAL.version,
-      line: ZAIDIN_AGING_PROPOSAL.title,
-      generalObjective: ZAIDIN_AGING_PROPOSAL.generalObjectives[0].code,
+      municipalityId: "alfacar",
+      moduleId: module.id,
+      moduleVersion: module.version,
+      line: module.title,
+      generalObjective: general.code,
       objective: first.code,
       indicatorCode: first.indicator.code,
       indicator: first.indicator.title,
       unit: first.indicator.unit,
-      source: ZAIDIN_AGING_PROPOSAL.sourceLabel,
+      source: module.sourceLabel,
     });
     sheet.actions = [{
       id: "action-tree",
@@ -134,12 +151,12 @@ describe("PA-RELAS-02 — representación editorial", () => {
     }];
 
     const html = renderToStaticMarkup(createElement(ActionPlanCatalogPanel, {
-      municipalityId: "granada-zaidin",
+      municipalityId: "alfacar",
       lectura,
       selection,
       eligibleModules: getEligibleActionPlanModules(lectura, selection),
       reviews: [],
-      drafts: [],
+      drafts: [draft],
       onDraftChange: () => {},
       worksheets: [sheet],
       onWorksheetChange: () => {},

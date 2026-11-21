@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { ACTION_PLAN_CATALOG, HEALTHY_AGING_MODULE } from "../src/domain/action-plan-catalog/ActionPlanCatalog";
 import { municipalActionPlanModule, ZAGRA_AGING_PROPOSAL, COMMON_AGING_FOUR_BLOCKS_VERSION } from "../src/domain/action-plan-catalog/MunicipalActionPlanModule";
-import { ZAIDIN_AGING_PROPOSAL, thematicBlockNameFor, type PlanPreparationDraft } from "../src/domain/action-plan-catalog/PlanPreparationDraft";
+import { thematicBlockNameFor, type PlanPreparationDraft } from "../src/domain/action-plan-catalog/PlanPreparationDraft";
 import { regroupZagraActionPlan } from "../src/application/workspace/regroupZagraActionPlan";
 import { createCompleteMunicipalityWorkspace } from "../src/application/workspace";
 import { buildDefinitiveActionPlanProjection } from "../src/domain/action-plan-catalog/DefinitiveActionPlanProjection";
@@ -28,8 +28,9 @@ describe("Plan de Acción de Zagra en cuatro bloques", () => {
     }
   });
 
-  it("conserva la edición territorial de Zaidín y Zagra y ofrece cuatro bloques al resto, sin cambiar adicciones", () => {
-    expect(municipalActionPlanModule("granada-zaidin", HEALTHY_AGING_MODULE)).toBe(ZAIDIN_AGING_PROPOSAL);
+  it("conserva la edición territorial de Zagra y ofrece cuatro bloques al resto, sin cambiar adicciones", () => {
+    // Granada-Zaidín se retiró de COMPÁS (2026-11-21): recibe el módulo común como cualquier otro ámbito.
+    expect(municipalActionPlanModule("granada-zaidin", HEALTHY_AGING_MODULE).version).toBe(COMMON_AGING_FOUR_BLOCKS_VERSION);
     const loja = municipalActionPlanModule("loja", HEALTHY_AGING_MODULE);
     expect(loja.version).toBe(COMMON_AGING_FOUR_BLOCKS_VERSION);
     expect(loja.generalObjectives.map(g => g.thematicBlockName)).toEqual(["Edadismo", "Soledad no deseada", "Autonomía", "Participación"]);

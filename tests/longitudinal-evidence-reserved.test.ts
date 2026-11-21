@@ -61,11 +61,6 @@ describe("Workspaces de prueba — sin átomos longitudinal-snapshot", () => {
     expect(atoms).toHaveLength(0);
   });
 
-  it("Granada-Zaidín no contiene átomos longitudinal-snapshot", () => {
-    const seed = loadSeed("granada-zaidin");
-    const atoms = atomsFromSeed(seed).filter((a) => a.kind === "longitudinal-snapshot");
-    expect(atoms).toHaveLength(0);
-  });
 });
 
 // ── 3. Compilador PSL — sin longitudinal-snapshot en secciones ───────────

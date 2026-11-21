@@ -23,9 +23,9 @@ import { buildHealthReportStructuredReading } from "../health-report";
 
 // ── Denominación institucional del Informe ────────────────────────────────────
 
-const TITULOS_INSTITUCIONALES: Record<string, string> = {
-  "granada-zaidin": "Informe de salud de El Zaidín",
-};
+// Denominaciones institucionales registradas por ámbito. Granada-Zaidín, el único
+// caso registrado, se retiró de COMPÁS el 21/11/2026.
+const TITULOS_INSTITUCIONALES: Record<string, string> = {};
 
 /**
  * Título visible del Informe en producto (pantalla, PSL-C, DOCX, PDF).

@@ -1,6 +1,6 @@
 import { createMunicipalityRuntime as legacyProfileFixture } from './helpers/legacyProfileRuntime';
 import { describe, expect, it } from 'vitest';
-import seed from '../public/seeds/compas-ng-workspace-granada-zaidin.json';
+import seed from '../fixtures/workspaces/municipio-ensayo-synthetic-test.json';
 import type { MunicipalityWorkspace } from '../src/domain/workspace';
 import { buildHealthReportStructuredReading } from '../src/application/health-report/HealthReportStructuredReading';
 import { createMunicipalityRuntime } from '../src/application/runtime';
@@ -46,13 +46,6 @@ describe('Mortality extraction preserves the source rather than supplying defaul
     expect(cause.value).toContain('19%');
     expect(cause.value).not.toContain('27%');
     expect(cause.period).toBe('2024');
-  });
-  it('does not assign Zaidin clinical geography to another municipality', () => {
-    const text = '4.1.1.- Enfermedades Crónicas\nDiabetes Mellitus\nLa prevalencia documentada fue del 7% en 2025.\n4.1.2.- Incidencia de Cáncer';
-    const result = buildHealthReportStructuredReading(syntheticReport(text));
-    expect(result.findings.some(f => f.geography.label.includes('Zaidín'))).toBe(false);
-    expect(result.extractionNotes.join(' ')).toContain('no se aplican a este territorio');
-    expect(result.sections.length).toBeGreaterThan(0);
   });
 });
 

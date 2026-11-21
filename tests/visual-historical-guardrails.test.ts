@@ -80,20 +80,6 @@ describe("Contrato COMPÁS · segunda pasada de módulos históricos", () => {
     expect(css("ui/components/SamTriPyramid.css")).toContain("repeating-linear-gradient");
   });
 
-  it("la vista aislada de coordinación respeta la paleta canónica", () => {
-    const s = css("ui/components/CoordinatorPreview.css");
-    const colors = [...new Set([...s.matchAll(/#[0-9a-fA-F]{3,8}\b/g)].map(m => m[0].toLowerCase()))];
-    const allowed = new Set([
-      "#0074c8", "#00acd9", "#94d40b", "#ffb61b", "#ff6600", "#dc143c",
-      "#f8fafc", "#e2e8f0", "#1e293b", "#64748b", "#fff", "#ffffff",
-    ]);
-    expect(colors.filter(c => !allowed.has(c))).toEqual([]);
-    expect((s.match(/linear-gradient\(/g) ?? [])).toHaveLength(1);
-    expect(s).toContain(".coord-header::after");
-    expect(s).toContain(".coord-layout nav button[aria-current]");
-    expect(s).not.toContain("#fff0cd");
-    expect(s).not.toContain("box-shadow:0 8px");
-  });
 
   it("la navegación transversal ya no muestra una pastilla por fase", () => {
     const s = css("index.css");

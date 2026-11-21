@@ -22,7 +22,6 @@ export default defineConfig({
       '**/node_modules/**',
       '**/.git/**',
       'tests/admin-accounts.integration.test.ts',
-      'tests/granada-zaidin-reconstruction.test.ts',
     ],
   },
 })

@@ -1,14 +1,28 @@
 import { describe, it, expect } from 'vitest';
 import { DocumentOriginalManagementContext } from '../src/ui/components/DocumentOriginalManagement';
 import { renderToStaticMarkup } from 'react-dom/server';
-import seed from '../public/seeds/compas-ng-workspace-granada-zaidin.json';
+import seed from '../fixtures/workspaces/municipio-ensayo-synthetic-test.json';
 import { documentAccessUrl, documentDownloadFileName, isPdfDocumentAccess } from '../src/ui/components/documentAccessUtils';
 import { DocumentRepositoryPanel } from '../src/ui/components/DocumentRepositoryPanel';
 import { DocumentAccess } from '../src/ui/components/DocumentAccess';
-import type { MunicipalDocumentRepository } from '../src/domain/repository';
+import type { MunicipalDocument, MunicipalDocumentRepository } from '../src/domain/repository';
+
+// Expediente de ensayo con tres copias municipales de marcos comunes (PDF incluidos en la
+// compilación) y un Informe de Salud con PDF en una dirección pública de ensayo.
+const FRAMEWORK_COPIES: [string, string][] = [
+ ['EPVSA — copia municipal de ensayo', 'docs/source-material/strategic-frameworks/08_Lineas_EPVSA_02abril24.pdf'],
+ ['ESCA — copia municipal de ensayo', 'docs/source-material/strategic-frameworks/Estrategia de Salud Comunitaria de Andalucia 2026-2030-ESCA.pdf'],
+ ['Plan de mayores — copia municipal de ensayo', 'docs/source-material/strategic-frameworks/Plan de mayores 2020-23.pdf'],
+];
+const testRepository = (): MunicipalDocumentRepository => {
+ const base = seed.repository as MunicipalDocumentRepository;
+ const documents = base.documents.map(d => d.kind === 'health-report' ? {...d, source: {...d.source, url: 'https://example.org/informe-salud-ensayo.pdf'}} : d);
+ const copies = FRAMEWORK_COPIES.map(([title, url], i): MunicipalDocument => ({...documents[0], id: `copia-marco-${i}`, kind: 'strategic-framework', title, sourceFileName: url.split('/').pop(), sourceText: undefined, source: {system: 'Copia municipal de ensayo', url}, tags: ['strategic-framework']}));
+ return {...base, documents: [...documents, ...copies]};
+};
 
 describe('Acceso a documentos del repositorio', () => {
- const repository = seed.repository as MunicipalDocumentRepository;
+ const repository = testRepository();
  it('ofrece acceso a los tres PDF ya referenciados en los expedientes', () => {
   const documents = repository.documents.filter(d => d.kind === 'strategic-framework');
   expect(documents).toHaveLength(3);
@@ -60,7 +74,7 @@ describe('Acceso a documentos del repositorio', () => {
 
 describe('Gestión documental contextual en todas las fichas',()=>{
  it('expone versión, archivo y eliminación a usuarios con permisos de escritura',()=>{
-  const document=seed.repository.documents.find(d=>d.kind==='health-report')!;
+  const document=testRepository().documents.find(d=>d.kind==='health-report')!;
   const tools={
    municipalityId: document.municipalityId,
    originals:[],storeOriginal:async()=>{},createRevision:async()=>{},
@@ -80,7 +94,7 @@ describe('Gestión documental contextual en todas las fichas',()=>{
   expect(html).toContain('Descargar PDF original');
  });
  it('no permite alterar un documento de otro municipio desde la biblioteca transversal',()=>{
-  const document=seed.repository.documents.find(d=>d.kind==='health-report')!;
+  const document=testRepository().documents.find(d=>d.kind==='health-report')!;
   const manager={
    municipalityId:'municipio-distinto', originals:[],
    storeOriginal:async()=>{},createRevision:async()=>{},archiveDocument:async()=>{},deleteDocument:async()=>true,
@@ -96,7 +110,7 @@ describe('Gestión documental contextual en todas las fichas',()=>{
   expect(html).not.toContain('Adjuntar el archivo original');
  });
  it('oculta acciones destructivas en una ficha de solo lectura',()=>{
-  const document=seed.repository.documents.find(d=>d.kind==='health-report')!;
+  const document=testRepository().documents.find(d=>d.kind==='health-report')!;
   const html=renderToStaticMarkup(<DocumentAccess document={document}/>);
   expect(html).not.toContain('Eliminar documento');
   expect(html).not.toContain('Archivar documento');
