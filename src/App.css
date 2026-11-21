@@ -11291,12 +11291,15 @@ h3 {
   .diagnosis-page.hp { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 560px) {
-  .diagnosis-page.hp { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .diagnosis-page.hp { gap: 8px 12px; }
   .diagnosis-page > details > summary,
   .diagnosis-page .dam__disclosure-summary { min-height: 0; }
   .diagnosis-home__sources,
   .diagnosis-home__module-status ul { grid-template-columns: 1fr; }
   .diagnosis-home__kind { grid-column: 1 / -1; }
+}
+@media (max-width: 350px) {
+  .diagnosis-page.hp { grid-template-columns: minmax(0, 1fr); }
 }
 
 
@@ -11728,7 +11731,7 @@ h3 {
    Los módulos extensos siguen teniendo scroll natural; no se fija el alto de
    tablas, documentos, lectores, formularios ni paneles de contenido.
    Clases acotadas al shell de trabajo para no afectar a la portada. */
-#root .app-shell:not(.app-shell--home) {
+#root .app-shell:not(.app-shell--home):not(.app-shell--workspace) {
   padding: clamp(14px, 2.5vw, 30px) clamp(16px, 3vw, 36px) 32px;
 }
 #root .app-shell:not(.app-shell--home) .hero,
@@ -11782,7 +11785,7 @@ h3 {
 }
 /* La lectura y la operabilidad prevalecen sobre la densidad. */
 @media (max-width: 760px) {
-  #root .app-shell:not(.app-shell--home) {
+  #root .app-shell:not(.app-shell--home):not(.app-shell--workspace) {
     padding: 12px 12px 24px;
   }
   #root .app-shell:not(.app-shell--home) .panel-header {
@@ -11816,7 +11819,11 @@ h3 {
   .app-nav__context-label { font-size: .67rem; }
 }
 @media (max-width: 760px) {
-  .app-nav .app-nav__tabs { display: none; }
+  .app-nav .app-nav__tabs,
+  .app-nav__secondary-context,
+  .app-nav__municipality-sep { display: none; }
+  .app-nav--home .app-nav__municipality-row { flex-wrap: wrap; overflow: visible; padding-inline: 12px; }
+  .app-nav--home .app-nav__municipality-name { white-space: normal; flex-shrink: 1; }
   .app-nav .app-nav__inner { padding: 5px 12px; }
   .app-nav__menu { display: flex; width: 100%; gap: 8px; align-items: center; font-size: .82rem; }
   .app-nav__menu select {

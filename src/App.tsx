@@ -3990,19 +3990,19 @@ export default function App() {
               {municipality.name}
             </span>
             <span className="app-nav__municipality-sep">·</span>
-            <span>{municipality.province}</span>
+            <span className="app-nav__secondary-context">{municipality.province}</span>
             {municipality.territorialType && municipality.territorialType !== "municipio" && (
               <>
                 <span className="app-nav__municipality-sep">·</span>
-                <span>{TERRITORIAL_TYPE_LABEL[municipality.territorialType] ?? municipality.territorialType}</span>
+                <span className="app-nav__secondary-context">{TERRITORIAL_TYPE_LABEL[municipality.territorialType] ?? municipality.territorialType}</span>
               </>
             )}
             <span className="app-nav__municipality-sep">·</span>
-            <span>Plan Local de Salud 2027–2030</span>
+            <span className="app-nav__secondary-context">Plan Local de Salud 2027–2030</span>
             {municipality.ineCode && (
               <>
                 <span className="app-nav__municipality-sep">·</span>
-                <span>INE {municipality.ineCode}</span>
+                <span className="app-nav__secondary-context">INE {municipality.ineCode}</span>
               </>
             )}
             {/* Solo Granada-Zaidín es un caso de demostración (estudios sintéticos). Los demás

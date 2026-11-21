@@ -83,8 +83,8 @@ export function HomePortada(_props: HomePortadaProps) {
         side={<p className="hp-cover__mission">Prototipo para elaborar Planes Locales de Salud municipales con la metodología RELAS y la experiencia de COMPÁS. No está desplegado oficialmente.</p>}
       />
 
-      <section className="hp-cycle" aria-labelledby="hp-cycle-title">
-        <h2 id="hp-cycle-title" className="hp-cycle__title">El ciclo de planificación local en salud</h2>
+      <details className="hp-cycle workspace-disclosure">
+        <summary><strong>El ciclo de planificación local en salud</strong></summary>
         <ol className="hp-cycle__phases">
           {PHASES.map((p, i) => (
             <li key={p.n} className={`hp-phase hp-phase--${i + 1}`}>
@@ -107,7 +107,7 @@ export function HomePortada(_props: HomePortadaProps) {
             <span>compila el Perfil, el Plan de Acción y las agendas anuales</span>
           </div>
         </div>
-      </section>
+      </details>
 
       <p className="hp-note">
         Las decisiones corresponden al equipo técnico, a la ciudadanía y a la autoridad competente;

@@ -14,17 +14,20 @@
 }
 
 /* Pie de custodia y acceso a documentación, compactos en la portada. */
-#root:has(.app-shell--home) .app-persistence-footer { margin: 0 auto; }
-#root:has(.app-shell--home) .app-persistence-footer .app-status-strip { padding: 6px 0; }
+#root:has(.app-shell--home, .app-shell--workspace) .app-persistence-footer { margin: 0 auto; }
+#root:has(.app-shell--home, .app-shell--workspace) .app-persistence-footer .app-status-strip { padding: 6px 0; }
 /* En la portada, el acceso a la documentación comparte fila con el pie. */
-#root:has(.app-shell--home) .documentation-launcher { margin: -34px 24px 6px auto; padding: .3rem .9rem; font-size: .85rem; position: relative; }
+#root:has(.app-shell--home, .app-shell--workspace) .documentation-launcher { margin: -34px 24px 6px auto; padding: .3rem .9rem; font-size: .85rem; position: relative; }
 /* El ciclo de planificación de la cabecera, más compacto en la portada:
    solo cambia el espaciado, no su contenido ni su lógica. */
-#root:has(.app-shell--home) .lhpc__inner { padding-top: 4px; padding-bottom: 4px; }
-#root:has(.app-shell--home) .lhpc__phase { padding-top: 4px; padding-bottom: 4px; }
+#root:has(.app-shell--home, .app-shell--workspace) .lhpc__inner { padding-top: 4px; padding-bottom: 4px; }
+#root:has(.app-shell--home, .app-shell--workspace) .lhpc__phase { padding-top: 4px; padding-bottom: 4px; }
 
 .hp {
   flex: 1 1 auto;
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -108,19 +111,7 @@
 }
 
 /* ── Ciclo ─────────────────────────────────────────────────── */
-.hp-cycle {
-  border-top: 1px solid var(--borde);
-  padding-top: clamp(6px, 1.4vh, 18px);
-}
-
-.hp-cycle__title {
-  margin: 0 0 clamp(6px, 1.2vh, 14px);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-  color: var(--azul);
-}
+.hp-cycle[open] > summary { margin-bottom: 12px; }
 
 .hp-cycle__phases {
   list-style: none;
@@ -242,7 +233,7 @@
 
 /* Ventanas estrechas: la portada vuelve a fluir en vertical. */
 @media (max-width: 960px) {
-  #root:has(.app-shell--home) .documentation-launcher { margin: 6px auto 10px; }
+  #root:has(.app-shell--home, .app-shell--workspace) .documentation-launcher { margin: 6px auto 10px; }
   .hp-cover { grid-template-columns: 1fr; }
   .hp-cover__side { align-items: flex-start; }
   .hp-cover__mission { text-align: left; }
@@ -340,6 +331,11 @@
 .workspace-disclosure > summary:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
 .workspace-disclosure + .workspace-disclosure { border-color: var(--cyan); }
 .workspace-disclosure__body { min-width: 0; padding: 10px 0; border-top: 1px solid var(--borde); }
+.workspace-page .workspace-disclosure__body > .workspace-panel {
+  max-width: none;
+  padding-inline: 0;
+  border: 0;
+}
 .workspace-page .external-profile--compact { width: 100%; margin: 0; }
 .external-profile--compact .ep-compact-status { margin-bottom: 8px; font-size: .85rem; }
 .external-profile--compact .ep-tabs--primary {
@@ -368,6 +364,9 @@
 }
 @media (max-width: 560px) {
   .hp .ilogo-band--cover { gap: 5px 9px; }
-  .hp .ilogo-band--cover .ilogo-band__img { height: 22px; max-width: 100%; }
+  .hp .ilogo-band--cover .ilogo-band__img[class] { height: 22px; max-width: 100%; }
+  .hp .ilogo-band--cover .ilogo-band__label { max-width: 100%; white-space: normal; }
+  .hp { padding-inline: 16px; }
+  .hp-cycle__phases, .hp-cycle__plan { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .workspace-page > .hp-cover { gap: 5px; }
 }

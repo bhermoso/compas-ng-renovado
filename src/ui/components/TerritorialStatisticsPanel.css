@@ -36,3 +36,38 @@
 .pu-delta section{margin:10px 0;border-top:1px solid var(--ep-line);padding-top:8px}
 .pu-delta h4{font-size:12.5px;margin:8px 0 4px}
 .pu-delta pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:280px;overflow:auto;margin:4px 0;padding:8px;border:1px solid var(--ep-line);background:var(--fondo-principal);font:inherit}
+
+/* Un panel abierto conserva la jerarquía de la portada del expediente. */
+.diagnosis-page .tsp {
+  --ep-line: var(--borde);
+  --ep-muted: var(--texto-secundario);
+  gap: 12px;
+  margin-top: 0;
+}
+.diagnosis-page .tsp-head { border: 0; padding: 0; }
+.diagnosis-page .tsp-head > p { margin-bottom: 10px; }
+.diagnosis-page .tsp button {
+  padding: 6px 10px;
+  min-height: 36px;
+  border: 1px solid var(--borde);
+  background: var(--blanco);
+  color: var(--azul-profundo);
+  cursor: pointer;
+}
+.diagnosis-page .tsp button.ep-primary,
+.diagnosis-page .tsp button[aria-pressed="true"] {
+  border-color: var(--azul-profundo);
+  background: var(--azul-profundo);
+  color: var(--blanco);
+}
+.diagnosis-page .tsp button:disabled { opacity: .55; cursor: default; }
+.diagnosis-page .tsp button:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+.diagnosis-page .tsp-history { border-top: 3px solid var(--cyan); padding-top: 8px; }
+.diagnosis-page .tsp-empty { border: 0; border-top: 1px solid var(--borde); padding: 10px 0; }
+.diagnosis-page .tsp-block.workspace-disclosure {
+  border: 0;
+  border-top: 3px solid var(--verde);
+  padding: 0;
+}
+.diagnosis-page .tsp-block.workspace-disclosure > :not(summary) { margin-top: 8px; }
+.diagnosis-page .tsp-block.workspace-disclosure > summary { padding-block: 8px; }
