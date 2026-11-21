@@ -11208,7 +11208,7 @@ h3 {
 .originals-status__warning ul { margin: 0.3rem 0 0; padding-left: 1.2rem; }
 
 /* Diagnóstico comparte la portada y los acentos de fase de Inicio. */
-#root .app-shell.app-shell--diagnosis {
+#root .app-shell.app-shell--workspace {
   min-height: 0;
   flex: 1 1 auto;
   display: flex;
@@ -11223,22 +11223,9 @@ h3 {
   gap: clamp(12px, 2vh, 24px) 16px;
   padding: clamp(18px, 4vh, 48px) clamp(16px, 4vw, 40px);
 }
-.diagnosis-home__head,
+.diagnosis-page > .hp-cover,
 .diagnosis-page > details[open],
 .diagnosis-page > .dam:has(> details[open]) { grid-column: 1 / -1; }
-.diagnosis-home__head h2 {
-  margin: 0;
-  color: var(--azul-profundo);
-  font-size: clamp(1.9rem, 4vw, 3.8rem);
-  line-height: 1.05;
-  letter-spacing: -.035em;
-}
-.diagnosis-home__identity {
-  gap: 3px;
-  font-size: .88rem;
-  color: var(--texto-secundario);
-}
-.diagnosis-home__identity strong { color: var(--texto-principal); font-size: 1.12rem; }
 .diagnosis-page > .hp-phase { min-width: 0; }
 .diagnosis-page > details > summary,
 .diagnosis-page .dam__disclosure-summary {
@@ -11302,15 +11289,18 @@ h3 {
 .dam__expanded .dam__controls { margin: 8px 0; }
 @media (max-width: 960px) {
   .diagnosis-page.hp { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .diagnosis-home__head { grid-template-areas: "chain" "brand" "side"; }
 }
 @media (max-width: 560px) {
-  .diagnosis-page.hp { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .diagnosis-page.hp { gap: 8px 12px; }
+  .diagnosis-page.workspace-page.hp { padding-block: 12px; }
   .diagnosis-page > details > summary,
   .diagnosis-page .dam__disclosure-summary { min-height: 0; }
   .diagnosis-home__sources,
   .diagnosis-home__module-status ul { grid-template-columns: 1fr; }
   .diagnosis-home__kind { grid-column: 1 / -1; }
+}
+@media (max-width: 350px) {
+  .diagnosis-page.hp { grid-template-columns: minmax(0, 1fr); }
 }
 
 
@@ -11742,7 +11732,7 @@ h3 {
    Los módulos extensos siguen teniendo scroll natural; no se fija el alto de
    tablas, documentos, lectores, formularios ni paneles de contenido.
    Clases acotadas al shell de trabajo para no afectar a la portada. */
-#root .app-shell:not(.app-shell--home) {
+#root .app-shell:not(.app-shell--home):not(.app-shell--workspace) {
   padding: clamp(14px, 2.5vw, 30px) clamp(16px, 3vw, 36px) 32px;
 }
 #root .app-shell:not(.app-shell--home) .hero,
@@ -11796,7 +11786,7 @@ h3 {
 }
 /* La lectura y la operabilidad prevalecen sobre la densidad. */
 @media (max-width: 760px) {
-  #root .app-shell:not(.app-shell--home) {
+  #root .app-shell:not(.app-shell--home):not(.app-shell--workspace) {
     padding: 12px 12px 24px;
   }
   #root .app-shell:not(.app-shell--home) .panel-header {
@@ -11816,6 +11806,7 @@ h3 {
   white-space: nowrap;
   color: var(--texto-terciario);
 }
+.app-nav__menu { display: none; }
 .app-nav--home .app-nav__municipality-row {
   min-height: 32px;
   height: auto;
@@ -11827,4 +11818,22 @@ h3 {
 @media (max-width: 600px) {
   .app-nav__municipality-row { gap: 7px; }
   .app-nav__context-label { font-size: .67rem; }
+}
+@media (max-width: 760px) {
+  .app-nav .app-nav__tabs,
+  .app-nav__secondary-context,
+  .app-nav__municipality-sep { display: none; }
+  .app-nav--home .app-nav__municipality-row { flex-wrap: wrap; overflow: visible; padding-inline: 12px; }
+  .app-nav--home .app-nav__municipality-name { white-space: normal; flex-shrink: 1; }
+  .app-nav .app-nav__inner { padding: 5px 12px; }
+  .app-nav__menu { display: flex; width: 100%; gap: 8px; align-items: center; font-size: .82rem; }
+  .app-nav__menu select {
+    flex: 1;
+    min-width: 0;
+    min-height: 36px;
+    padding: 4px 8px;
+    border: 1px solid var(--borde);
+    background: var(--blanco);
+    color: var(--texto-principal);
+  }
 }

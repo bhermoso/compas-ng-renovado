@@ -89,10 +89,10 @@ try{
   await statistics.waitFor({state:"visible",timeout:5000});
   assert(await otherTools.evaluate(el=>!el.open),"Las herramientas secundarias deben empezar plegadas");
   assert(!(await statistics.locator(".tsp").isVisible()),"La estadística debe empezar plegada");
-  await statistics.locator("summary").click();
+  await statistics.locator(":scope > summary").click();
   assert(await statistics.locator(".tsp").isVisible(),"No se abre la estadística territorial en Diagnóstico");
   assert(await otherTools.evaluate(el=>!el.open),"El acceso estadístico depende de las herramientas secundarias");
-  await statistics.locator("summary").click();
+  await statistics.locator(":scope > summary").click();
   assert(!(await statistics.locator(".tsp").isVisible()),"La estadística no vuelve a plegarse");
   await page.getByRole("button",{name:/Perfil de Salud Local/i}).first().click();
   const tabs=page.locator(".ep-tabs--primary");

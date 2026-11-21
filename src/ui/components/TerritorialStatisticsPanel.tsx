@@ -108,9 +108,10 @@ export function TerritorialStatisticsPanel({ municipalityId, municipalityName, i
 
   return <section className="tsp" aria-labelledby="tsp-title">
     <header className="tsp-head">
-      <p className="ep-eyebrow">Estadística territorial oficial · INE e IECA</p>
-      <h2 id="tsp-title">Datos para la próxima revisión del Perfil</h2>
-      <p>Descarga de las fuentes oficiales los indicadores de determinantes sociales y desigualdad del catálogo ({TERRITORIAL_INDICATORS.length} indicadores), con su procedencia y fecha de consulta. La descarga se guarda en el expediente y se compara con el Perfil vigente, que no cambia.</p>
+      <p className="hp-cover__chain">Fuentes oficiales · INE e IECA</p>
+      <h2 id="tsp-title" className="hp-cover__section-title">Estadística territorial</h2>
+      <hr className="home-cover__rule hp-cover__rule" />
+      <p>{municipalityName} · {TERRITORIAL_INDICATORS.length} indicadores de determinantes sociales y desigualdad, con fuente y fecha de consulta. Los datos guardados se pueden incorporar a una nueva revisión del Perfil.</p>
       <div className="tsp-run">
         <label>Código INE del municipio
           <input value={code} onChange={e => setCode(e.target.value)} inputMode="numeric" maxLength={5} disabled={busy} placeholder="18011"/>
@@ -141,8 +142,8 @@ export function TerritorialStatisticsPanel({ municipalityId, municipalityName, i
         {shown.grid && <button type="button" onClick={() => download(shown.grid!.geojson, `${base}-malla-250m.geojson`, 'application/geo+json')}>↓ Malla de 250 m (GeoJSON)</button>}
       </div>
 
-      {activeProfile && merge && <section className="tsp-block tsp-revision">
-        <h3>Llevar estos datos al Perfil</h3>
+      {activeProfile && merge && <details className="workspace-disclosure tsp-block tsp-revision">
+        <summary><strong>Llevar estos datos al Perfil</strong></summary>
         <p>Se prepara una nueva revisión de «{activeProfile.title}» con los indicadores de esta descarga: <strong>{count('añadido')} añadidos</strong> y <strong>{count('actualizado')} actualizados</strong> (dato más reciente o valor distinto del publicado por la fuente); {count('conservado')} se conservan como están. Los añadidos se muestran en las páginas de datos del Perfil, en el orden del marco de determinantes sociales: «Contexto y población», «Ejes de desigualdad» (con la desigualdad por sección), «Condiciones de vida» y «Servicios».</p>
         <p className="ep-help">El texto del Perfil no cambia, y la revisión vigente tampoco: la nueva queda en revisión hasta que la valides. El PDF original adjunto no contiene estos datos; la revisión lo declara entre sus limitaciones.</p>
         <details><summary>Ver los cambios uno a uno ({merge.changes.length})</summary>
@@ -158,10 +159,10 @@ export function TerritorialStatisticsPanel({ municipalityId, municipalityName, i
           </button>
           {fresh && <span className="ep-help">Guarda antes la descarga en el expediente, para que la revisión remita a ella.</span>}
         </div>}
-      </section>}
+      </details>}
 
-      <section className="tsp-block">
-        <h3>Cobertura frente al Perfil vigente</h3>
+      <details className="workspace-disclosure tsp-block">
+        <summary><strong>Cobertura frente al Perfil vigente</strong></summary>
         <p className="ep-help">{activeProfile ? `Comparado con «${activeProfile.title}». La coincidencia se busca por el nombre del indicador y se compara en la misma escala: si el Perfil da el dato de una sección, con esa sección. Conviene comprobarla.` : 'El expediente no tiene Perfil vigente: todos los indicadores figuran como ausentes.'}</p>
         <div className="tsp-scroll"><table className="tsp-table">
           <thead><tr><th>Indicador</th><th>Descargado</th><th>En el Perfil vigente</th><th>Estado</th></tr></thead>
@@ -172,13 +173,13 @@ export function TerritorialStatisticsPanel({ municipalityId, municipalityName, i
             <td>{STATUS_LABEL[c.status]}</td>
           </tr>)}</tbody>
         </table></div>
-      </section>
+      </details>
 
       {domains.map(d => {
         const rows = results.filter(r => r.topic === DOMAIN_LABEL[d]);
         if (!rows.length) return null;
-        return <section key={d} className="tsp-block">
-          <h3>{DOMAIN_LABEL[d]}</h3>
+        return <details key={d} className="workspace-disclosure tsp-block">
+          <summary><strong>{DOMAIN_LABEL[d]}</strong></summary>
           <div className="tsp-scroll"><table className="tsp-table tsp-table--values">
             <thead><tr><th>Indicador</th><th>{municipalityName}</th><th>Comparadores publicados</th><th>Año</th><th>Fuente</th></tr></thead>
             <tbody>{rows.map(r => <tr key={r.id}>
@@ -189,30 +190,30 @@ export function TerritorialStatisticsPanel({ municipalityId, municipalityName, i
               <td><small>{r.source} · {r.page}</small></td>
             </tr>)}</tbody>
           </table></div>
-        </section>;
+        </details>;
       })}
 
-      {sections && sections.rows.length > 0 && <section className="tsp-block">
-        <h3>Por sección censal ({sections.rows.length})</h3>
+      {sections && sections.rows.length > 0 && <details className="workspace-disclosure tsp-block">
+        <summary><strong>Por sección censal ({sections.rows.length})</strong></summary>
         <p className="ep-help">Datos agregados de cada sección; no se atribuyen a calles, viviendas ni personas.{sections.rows.length < 2 ? ' Con una sola sección no hay diferencias internas que analizar.' : ''}</p>
         <div className="tsp-scroll"><table className="tsp-table">
           <thead><tr><th>Sección</th>{sections.fichas.map(f => <th key={f.id}>{f.title} <small>({f.unit})</small></th>)}</tr></thead>
           <tbody>{sections.rows.map(r => <tr key={r.code}><td>{r.code}</td>{r.values.map((v, i) => <td key={i} className="tsp-num">{v ? v.literal : '—'}</td>)}</tr>)}</tbody>
         </table></div>
-      </section>}
+      </details>}
 
-      {shown.grid && <section className="tsp-block">
-        <h3>Malla de 250 m ({shown.grid.year})</h3>
+      {shown.grid && <details className="workspace-disclosure tsp-block">
+        <summary><strong>Malla de 250 m ({shown.grid.year})</strong></summary>
         <p>{shown.grid.cellCount} celdas con población en el término municipal. Sumas de las celdas publicadas: {shown.grid.totals.map(t => `${t.label.toLowerCase()} ${t.sum.toLocaleString('es-ES')}${t.secretCells ? ` (${t.secretCells} celdas con secreto estadístico, no sumadas)` : ''}`).join('; ')}.</p>
         <p className="ep-help">Las sumas de la malla no sustituyen a las cifras oficiales del municipio; sirven para localizar dónde vive la población dentro del término.</p>
-      </section>}
+      </details>}
 
-      {shown.failures.length > 0 && <section className="tsp-block tsp-failures">
-        <h3>Incidencias de la descarga</h3>
+      {shown.failures.length > 0 && <details className="workspace-disclosure tsp-block tsp-failures">
+        <summary><strong>Incidencias de la descarga</strong></summary>
         <ul>{shown.failures.map((f, i) => <li key={i}><strong>{f.scope}</strong>: {f.message}</li>)}</ul>
-      </section>}
+      </details>}
 
-      <details className="tsp-block"><summary>Fuentes consultadas ({shown.sources.length})</summary>
+      <details className="workspace-disclosure tsp-block"><summary><strong>Fuentes consultadas ({shown.sources.length})</strong></summary>
         <ul className="tsp-sources">{shown.sources.map(s => <li key={s.id}><strong>{s.provider}</strong> · {s.product} · {s.title} ({s.table}) · <a href={s.url} target="_blank" rel="noopener noreferrer">dirección de consulta</a>{s.notes ? <small>{s.notes}</small> : null}</li>)}</ul>
       </details>
     </>}

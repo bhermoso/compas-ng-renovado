@@ -102,7 +102,11 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
         </summary>
         <div className="dam__expanded">
       <div className="panel-header dam__head">
-        <div><p className="eyebrow">Archivo del ámbito</p><h2>Documentos y evidencias</h2></div>
+        <div>
+          <p className="hp-cover__chain">Archivo del ámbito</p>
+          <h2 className="hp-cover__section-title">Documentos y evidencias</h2>
+          <hr className="home-cover__rule hp-cover__rule" />
+        </div>
         <p className="panel-note">Un único índice para informes, PDF, DOCX, estudios CSV y activos. Cada ficha muestra su procedencia, el texto conservado y la disponibilidad del archivo; los paneles metodológicos presentan resultados, no nuevos originales.</p>
       </div>
       <div className="dam__summary">

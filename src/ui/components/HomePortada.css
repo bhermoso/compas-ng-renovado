@@ -14,17 +14,20 @@
 }
 
 /* Pie de custodia y acceso a documentación, compactos en la portada. */
-#root:has(.app-shell--home) .app-persistence-footer { margin: 0 auto; }
-#root:has(.app-shell--home) .app-persistence-footer .app-status-strip { padding: 6px 0; }
+#root:has(.app-shell--home, .app-shell--workspace) .app-persistence-footer { margin: 0 auto; }
+#root:has(.app-shell--home, .app-shell--workspace) .app-persistence-footer .app-status-strip { padding: 6px 0; }
 /* En la portada, el acceso a la documentación comparte fila con el pie. */
-#root:has(.app-shell--home) .documentation-launcher { margin: -34px 24px 6px auto; padding: .3rem .9rem; font-size: .85rem; position: relative; }
+#root:has(.app-shell--home, .app-shell--workspace) .documentation-launcher { margin: -34px 24px 6px auto; padding: .3rem .9rem; font-size: .85rem; position: relative; }
 /* El ciclo de planificación de la cabecera, más compacto en la portada:
    solo cambia el espaciado, no su contenido ni su lógica. */
-#root:has(.app-shell--home) .lhpc__inner { padding-top: 4px; padding-bottom: 4px; }
-#root:has(.app-shell--home) .lhpc__phase { padding-top: 4px; padding-bottom: 4px; }
+#root:has(.app-shell--home, .app-shell--workspace) .lhpc__inner { padding-top: 4px; padding-bottom: 4px; }
+#root:has(.app-shell--home, .app-shell--workspace) .lhpc__phase { padding-top: 4px; padding-bottom: 4px; }
 
 .hp {
   flex: 1 1 auto;
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -108,19 +111,7 @@
 }
 
 /* ── Ciclo ─────────────────────────────────────────────────── */
-.hp-cycle {
-  border-top: 1px solid var(--borde);
-  padding-top: clamp(6px, 1.4vh, 18px);
-}
-
-.hp-cycle__title {
-  margin: 0 0 clamp(6px, 1.2vh, 14px);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-  color: var(--azul);
-}
+.hp-cycle[open] > summary { margin-bottom: 12px; }
 
 .hp-cycle__phases {
   list-style: none;
@@ -242,7 +233,7 @@
 
 /* Ventanas estrechas: la portada vuelve a fluir en vertical. */
 @media (max-width: 960px) {
-  #root:has(.app-shell--home) .documentation-launcher { margin: 6px auto 10px; }
+  #root:has(.app-shell--home, .app-shell--workspace) .documentation-launcher { margin: 6px auto 10px; }
   .hp-cover { grid-template-columns: 1fr; }
   .hp-cover__side { align-items: flex-start; }
   .hp-cover__mission { text-align: left; }
@@ -294,3 +285,88 @@
 .hp-phase__btn, .hp-cycle__plan-btn { cursor: default; }
 .hp-phase__btn:hover .hp-phase__verb,
 .hp-cycle__plan-btn:hover strong { color: inherit; text-decoration: none; }
+
+/* La identidad de Inicio encabeza también las pestañas de trabajo. */
+.workspace-page.hp {
+  justify-content: flex-start;
+  padding: clamp(12px, 2.5vh, 28px) clamp(16px, 4vw, 40px);
+}
+.workspace-page.hp:not(.diagnosis-page) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  align-content: start;
+  align-items: start;
+  column-gap: 16px;
+}
+.workspace-page > .hp-cover,
+.workspace-page > .external-profile,
+.workspace-page > .workspace-disclosure[open] { grid-column: 1 / -1; }
+.workspace-page > .hp-cover { margin-bottom: 4px; }
+.hp-cover__section-title {
+  margin: 0;
+  font-size: clamp(1.55rem, 3.25vw, 3.25rem);
+  line-height: 1.05;
+  letter-spacing: -.025em;
+  color: var(--azul-profundo);
+}
+.hp-cover__territory { margin: 0; color: var(--texto-secundario); font-size: .85rem; }
+.workspace-disclosure {
+  min-width: 0;
+  border-top: 3px solid var(--azul);
+}
+.workspace-disclosure > summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  cursor: pointer;
+  list-style: none;
+  color: var(--texto-principal);
+  font-size: .94rem;
+}
+.workspace-disclosure > summary::-webkit-details-marker { display: none; }
+.workspace-disclosure > summary::after { content: "▼" / ""; color: var(--azul-profundo); font-size: .7rem; }
+.workspace-disclosure[open] > summary::after { content: "▲" / ""; }
+.workspace-disclosure > summary:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+.workspace-disclosure + .workspace-disclosure { border-color: var(--cyan); }
+.workspace-disclosure__body { min-width: 0; padding: 10px 0; border-top: 1px solid var(--borde); }
+.workspace-page .workspace-disclosure__body > .workspace-panel {
+  max-width: none;
+  padding-inline: 0;
+  border: 0;
+}
+.workspace-page .external-profile--compact { width: 100%; margin: 0; }
+.external-profile--compact .ep-compact-status { margin-bottom: 8px; font-size: .85rem; }
+.external-profile--compact .ep-tabs--primary {
+  gap: 6px 12px;
+  padding: 0;
+  margin: 0 0 10px;
+  border: 0;
+  background: none;
+}
+.external-profile--compact .ep-tabs--primary button {
+  flex: 1 1 auto;
+  min-height: 36px;
+  padding: 5px 10px;
+  border: 0;
+  border-radius: 0;
+  border-top: 3px solid var(--cyan);
+  white-space: normal;
+  color: var(--texto-principal);
+}
+.external-profile--compact .ep-tabs--primary button[aria-expanded="true"] { border-color: var(--azul); background: var(--fondo-principal); }
+.external-profile--compact .ep-tabs--primary button::after { content: "▼" / ""; color: var(--azul-profundo); font-size: .68rem; }
+.external-profile--compact .ep-tabs--primary button[aria-expanded="true"]::after { content: "▲" / ""; }
+.external-profile--compact .ep-legacy { margin: 8px 0 0; padding: 0; }
+@media (max-width: 960px) {
+  .hp-cover { grid-template-areas: "chain" "brand" "side"; }
+}
+@media (max-width: 560px) {
+  .hp .ilogo-band--cover { gap: 5px 9px; }
+  .hp .ilogo-band--cover .ilogo-band__img[class] { height: 22px; max-width: 100%; }
+  .hp .ilogo-band--cover .ilogo-band__label { max-width: 100%; white-space: normal; }
+  .hp { padding-inline: 16px; }
+  .hp-cycle__phases, .hp-cycle__plan { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .workspace-page > .hp-cover { gap: 5px; }
+}

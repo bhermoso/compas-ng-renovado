@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { CompasCover } from "./HomePortada";
 import { DocumentReference } from "./Documentation";
 import type { DocumentKind, TemporalScope } from "../../domain/repository";
 import type { DiagnosisControlSummary } from "../../application/diagnosis/diagnosisControlSummary";
@@ -54,20 +55,12 @@ export function DiagnosisControlRoom({ municipalityName, province, ineCode, summ
 
   return (
     <>
-      <header className="hp-cover diagnosis-home__head">
-        <div className="hp-cover__context">
-          <p className="hp-cover__chain">01 · Diagnosticar</p>
-        </div>
-        <div className="hp-cover__brand">
-          <h2 id="diagnosis-home-title">Diagnóstico territorial</h2>
-          <hr className="home-cover__rule hp-cover__rule" />
-        </div>
-        <div className="hp-cover__side diagnosis-home__identity">
-          <strong>{municipalityName}</strong>
-          {(province || ineCode) && <span>{[province, ineCode && `INE ${ineCode}`].filter(Boolean).join(" · ")}</span>}
-          <span>Períodos: {periodLabel}</span>
-        </div>
-      </header>
+      <CompasCover
+        title="Diagnóstico territorial"
+        context="01 · Diagnosticar"
+        subtitle={<><strong>{municipalityName}</strong>{province && ` · ${province}`}{ineCode && ` · INE ${ineCode}`}</>}
+        side={<p className="hp-cover__mission">Períodos: {periodLabel}</p>}
+      />
 
       <details className="diagnosis-home__details hp-phase hp-phase--1">
         <summary>
