@@ -1,46 +1,53 @@
 /**
- * Catálogo institucional transversal de COMPÁS. No forma parte de ningún
- * MunicipalityWorkspace ni produce EvidenceAtoms municipales.
+ * Marco estratégico común de COMPÁS. No forma parte de ningún
+ * MunicipalityWorkspace ni produce EvidenceAtoms municipales: es el mismo para
+ * todos los expedientes, y de él proceden objetivos e indicadores del Plan de
+ * Acción.
  *
- * Estos cuatro PDF están incluidos en el build y se resuelven a través
- * de documentAccessUrl. Un registro no equivale a validar la vigencia de
- * un marco: fecha y ámbito deben revisarse antes de aplicarlo.
+ * Fuente única: el repertorio de documentación de apoyo (SupportDocuments).
+ * La biblioteca de Diagnóstico y la «Documentación de apoyo» del Plan de
+ * Acción muestran así los mismos documentos, con su denominación oficial.
+ * Un registro no equivale a validar la vigencia de un marco: fecha y ámbito
+ * deben revisarse antes de aplicarlo.
  */
+import { SUPPORT_DOCUMENTS, type SupportDocument } from "../domain/strategy/SupportDocuments";
+
 export interface StrategicReference {
   id: string;
+  shortName: string;
+  /** Denominación oficial del documento. */
   title: string;
-  scope: "andalucia";
-  sourcePath: string;
+  issuer: string;
+  period: string;
+  scope: "andalucia" | "espana";
+  /** Ruta del PDF conservado en COMPÁS, si lo conserva. */
+  sourcePath?: string;
+  /** Dirección pública, cuando COMPÁS no conserva el original. */
+  url?: string;
   category: "estrategia" | "plan";
+  note?: string;
 }
 
-export const STRATEGIC_REFERENCES: readonly StrategicReference[] = [
-  {
-    id: "epvsa",
-    title: "Líneas estratégicas EPVSA",
-    scope: "andalucia",
-    sourcePath: "docs/source-material/strategic-frameworks/08_Lineas_EPVSA_02abril24.pdf",
-    category: "estrategia",
-  },
-  {
-    id: "esca-2026-2030",
-    title: "Estrategia de Salud Comunitaria de Andalucía 2026–2030",
-    scope: "andalucia",
-    sourcePath: "docs/source-material/strategic-frameworks/Estrategia de Salud Comunitaria de Andalucia 2026-2030-ESCA.pdf",
-    category: "estrategia",
-  },
-  {
-    id: "esa-2030",
-    title: "Estrategia de Salud de Andalucía 2030",
-    scope: "andalucia",
-    sourcePath: "docs/source-material/strategic-frameworks/Estrategia de Salud de Andalucia 2030-ESA.pdf",
-    category: "estrategia",
-  },
-  {
-    id: "mayores-2020-2023",
-    title: "Plan Estratégico Integral para Personas Mayores en Andalucía 2020–2023",
-    scope: "andalucia",
-    sourcePath: "docs/source-material/strategic-frameworks/Plan de mayores 2020-23.pdf",
-    category: "plan",
-  },
-] as const;
+/** Orden de lectura: marco general, salud comunitaria, vida saludable, planes sectoriales y referencias estatales. */
+const ORDER = ["esa-2030", "esca", "epvsa", "epvsa-indicadores", "pesma-a", "mayores", "sns-salud-mental", "ena-2017-2024"];
+
+function toReference(doc: SupportDocument): StrategicReference {
+  const estatal = /Ministerio|Gobierno para el Plan Nacional/.test(doc.issuer);
+  return {
+    id: doc.id,
+    shortName: doc.shortName,
+    title: doc.title,
+    issuer: doc.issuer,
+    period: doc.period,
+    scope: estatal ? "espana" : "andalucia",
+    ...(doc.location.kind === "compas" ? { sourcePath: doc.location.path } : { url: doc.location.url }),
+    category: /^(I )?Plan\b/.test(doc.title) ? "plan" : "estrategia",
+    ...(doc.note ? { note: doc.note } : {}),
+  };
+}
+
+export const STRATEGIC_REFERENCES: readonly StrategicReference[] = Object.freeze(
+  [...SUPPORT_DOCUMENTS]
+    .sort((a, b) => (ORDER.indexOf(a.id) + 1 || 99) - (ORDER.indexOf(b.id) + 1 || 99))
+    .map(toReference),
+);

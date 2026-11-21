@@ -11217,7 +11217,7 @@ h3 {
 }
 .diagnosis-page.hp {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   align-content: start;
   align-items: start;
   gap: clamp(12px, 2vh, 24px) 16px;
@@ -11282,7 +11282,17 @@ h3 {
 .diagnosis-home__module-status small { grid-column:1/-1; color:var(--texto-secundario); }
 .dam__expanded,
 .diagnosis-territorial-statistics > .tsp,
+.diagnosis-common-framework__body,
 .diagnosis-tools-drawer__body { padding: 14px 0; border-top: 1px solid var(--borde); }
+/* Marco estratégico común: lista compacta, igual en todos los expedientes. */
+.csf { display: grid; gap: 8px; }
+.csf__list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; margin: 0; padding: 0; list-style: none; }
+.csf__item { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--borde); }
+.csf__text { display: grid; gap: 2px; min-width: 0; }
+.csf__text strong { font-size: .86rem; line-height: 1.3; color: var(--texto-principal); }
+.csf__text small { font-size: .74rem; line-height: 1.35; color: var(--texto-secundario); }
+.csf__item a { flex-shrink: 0; font-size: .78rem; font-weight: 650; color: var(--azul-profundo); }
+@media (max-width: 760px) { .csf__list { grid-template-columns: minmax(0, 1fr); } }
 .dam__expanded .dam__head { margin-bottom: 10px; }
 .dam__expanded .dam__head h2 { font-size: 1.2rem; }
 .dam__expanded .dam__municipal-map,
@@ -11291,6 +11301,13 @@ h3 {
   .diagnosis-page.hp { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 560px) {
+  /* En móvil, la línea de estado de cada acceso ocupa una sola línea para que la entrada quepa en pantalla. */
+  .diagnosis-page > details > summary span,
+  .diagnosis-page .dam__disclosure-summary span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .diagnosis-page.hp { gap: 8px 12px; }
   .diagnosis-page.workspace-page.hp { padding-block: 12px; }
   .diagnosis-page > details > summary,
@@ -11964,6 +11981,11 @@ h3 {
 @media (max-width: 600px) {
   .app-nav__municipality-row { gap: 7px; }
   .app-nav__context-label { font-size: .67rem; }
+}
+/* En teléfonos estrechos el nombre del ámbito y «Cambiar ámbito» caben en una
+   línea sin la etiqueta: el municipio sigue visible en todas las pestañas. */
+@media (max-width: 420px) {
+  .app-nav__context-label { display: none; }
 }
 /* Escritorio: las nueve pestañas caben siempre en la barra. Sin desplazamiento
    horizontal oculto; las etiquetas largas pasan a dos líneas antes que esconder

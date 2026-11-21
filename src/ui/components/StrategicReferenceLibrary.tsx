@@ -6,7 +6,6 @@ import { auditStrategicMigration } from "../../application/strategic-migration-a
 import { normalizeKnownMunicipalDocumentKinds } from "../../application/workspace/normalizeKnownMunicipalDocuments";
 import { createBackup, inspectBackup } from "../../infrastructure/recovery/browserRecovery";
 import { bundledDocuments } from "./documentAccessUtils";
-import { documentAccessUrl } from "./documentAccessUtils";
 import "./StrategicReferenceLibrary.css";
 
 /** Contenedor transversal de consulta. No atribuye sus documentos al municipio
@@ -95,24 +94,12 @@ export function StrategicReferenceLibrary({workspace,onNormalizeLojaRemote}: Str
   return <section className="workspace-panel srl" aria-labelledby="srl-title">
     <header className="srl__head">
       <div>
-        <p className="eyebrow">COMPÁS · Biblioteca compartida</p>
-        <h2 id="srl-title">Documentación de referencia estratégica</h2>
+        <p className="eyebrow">COMPÁS · Marco estratégico común</p>
+        <h2 id="srl-title">Copias municipales de marcos estratégicos</h2>
       </div>
       <span className="srl__count">{STRATEGIC_REFERENCES.length} documentos comunes</span>
     </header>
-    <p className="panel-note">Estos marcos son referencias para todos los ámbitos. No pertenecen a Atarfe, Loja ni a otro municipio y no se cuentan como evidencia de salud local. Su presencia no certifica vigencia ni aplicación institucional.</p>
-    <details className="srl__references">
-      <summary>Consultar biblioteca estratégica común · {STRATEGIC_REFERENCES.length} documentos</summary>
-      <ul>
-        {STRATEGIC_REFERENCES.map(item => {
-          const url = documentAccessUrl(item.sourcePath);
-          return <li key={item.id}>
-            <span><strong>{item.title}</strong><small>Ámbito: Andalucía · {item.category === "plan" ? "Plan" : "Estrategia"}</small></span>
-            {url ? <a href={url} target="_blank" rel="noopener noreferrer">Abrir PDF de referencia</a> : <span>Archivo no accesible</span>}
-          </li>;
-        })}
-      </ul>
-    </details>
+    <p className="panel-note">El marco estratégico común se consulta en el acceso «Marco estratégico común» de Diagnóstico y es el mismo en todos los expedientes. Aquí se revisan las copias de esos marcos que algunos expedientes guardaron como documento propio; no se cuentan como evidencia de salud local ni se borran sin revisión.</p>
     <details className="srl__references srl__migration" data-testid="strategic-migration-audit">
       <summary>Auditar duplicados estratégicos del expediente · {audit.totals.strategic} fichas</summary>
       <p>Inventario de solo lectura. Una coincidencia en la ruta de origen es un candidato de referencia, <strong>no una autorización para borrar</strong> ni una comprobación del original en Firebase.</p>

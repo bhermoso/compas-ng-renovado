@@ -22,6 +22,95 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-21 · Marco estratégico común y PESMAA
+
+**Publicado al empezar:** `c9ecb788289cd5e81382ac1620e3b512e289fa77` (#192).
+**Publicado al terminar:** el commit de fusión de esta PR. Hay que comprobar
+`version.json` después de fusionar.
+
+### Hechos observados
+
+- **Había dos listas de marcos que no coincidían.**
+  - La biblioteca común de Diagnóstico (`STRATEGIC_REFERENCES`) tenía 4
+    documentos: no incluía el PESMAA y titulaba la EPVSA «Líneas estratégicas
+    EPVSA».
+  - La «Documentación de apoyo» del Plan de Acción (`SUPPORT_DOCUMENTS`) tenía
+    8, con denominación oficial, organismo y vigencia.
+- **La biblioteca común no dependía del expediente,** pero estaba dentro de
+  «Otras herramientas», que empieza plegado.
+- **Lo que el responsable veía en unos expedientes y no en otros eran copias
+  municipales.** En `public/seeds`, Granada-Zaidín guarda como documentos
+  propios tres marcos (EPVSA, ESCA y Plan de mayores); Atarfe, Loja, Alfacar y
+  Fuente Vaqueros no guardan ninguno. Por eso el gestor documental de
+  Granada-Zaidín los muestra y el de los demás no.
+  - En Firestore: no verificado.
+- **El PESMAA se ha incorporado.**
+  - Original: *I Plan Estratégico de Salud Mental y Adicciones de Andalucía
+    2026–2029*, 334 páginas, descargado de la sede de la Junta de Andalucía
+    (`juntadeandalucia.es/sites/default/files/inline-files/2026/05/PESMAA.pdf`).
+  - SHA-256: `ca19fbf2466bdf4ced8630aae698adf2817321d4c68abd0b5b1280e7f477bd86`.
+  - Contiene 6 líneas estratégicas. El OE01 «Aumentar el bienestar emocional
+    de la población andaluza» coincide literalmente con la cita del módulo
+    Bienestar emocional y salud mental del catálogo.
+
+### Cambio
+
+- **Fuente única.** La biblioteca común deriva ahora de la documentación de
+  apoyo: las mismas 8 referencias en Diagnóstico y en el Plan de Acción, con su
+  denominación oficial.
+  - Orden: ESA 2030, ESCA, EPVSA (líneas, objetivos e indicadores; y la ficha
+    de indicadores), PESMAA, Plan de mayores, Estrategia de Salud Mental del SNS
+    y Estrategia Nacional sobre Adicciones.
+  - Desaparece «Líneas estratégicas EPVSA»; se usa la denominación oficial de
+    la estrategia.
+- **PESMAA.** Se conserva en
+  `docs/source-material/strategic-frameworks/PESMAA 2026-2029.pdf` y se incluye
+  en la compilación.
+- **Diagnóstico.**
+  - «Marco estratégico común» es un acceso de primer nivel, igual en todos los
+    expedientes. La entrada pasa a cinco columnas.
+  - «Otras herramientas» conserva la revisión de las copias municipales de
+    marcos.
+- **Sin cambios en datos.** No se ha borrado ni movido ninguna copia municipal.
+  Retirarlas exige una operación sobre Firestore con cotejo y copia
+  recuperable.
+- **Ajustes de móvil:**
+  - la línea de estado de cada acceso de Diagnóstico se recorta a una línea;
+  - por debajo de 420 px se oculta la etiqueta «Expediente cargado:», mientras
+    el nombre del ámbito y «Cambiar ámbito» siguen visibles.
+
+### Estadística territorial y Perfil externo
+
+Hechos comprobados en el código (`TerritorialStatisticsPanel.tsx`,
+`ExternalProfileDashboard.tsx`, `externalProfiles.ts`,
+`MunicipalityRuntime.ts`). No se han observado con un expediente real.
+
+1. «Preparar la nueva revisión del Perfil» (en Diagnóstico → Estadística)
+   abre en Perfil un borrador que:
+   - es una copia del Perfil vigente, con identificador nuevo;
+   - declara `revisionOf` = vigente y `status: review`;
+   - lleva los indicadores añadidos o actualizados;
+   - añade a sus limitaciones una nota que dice que el PDF original no
+     contiene esos datos.
+2. El texto del Perfil, sus adjuntos originales y la versión vigente no
+   cambian.
+3. Al guardar, la revisión se añade a la biblioteca de versiones, pero
+   `activeId` sigue apuntando a la vigente.
+4. Priorización, Lectura Estratégica Local y Plan de Acción leen el Perfil
+   vigente (`activeId`). Mientras nadie pulse «Establecer como vigente» en
+   Gestión y versiones, la cadena aguas abajo no cambia.
+
+Inferencia: la decisión de que la estadística condicione la priorización y el
+Plan es explícita y humana, y queda registrada como cambio de versión vigente.
+
+### Pendiente
+
+- Decidir si se retiran las copias municipales de marcos en Granada-Zaidín, y
+  en los expedientes reales que las tengan, con cotejo previo en Firestore.
+- Comprobar en Firestore qué expedientes guardan copias de marcos.
+
+---
+
 ## 2026-11-21 · Plan de Acción con el diseño de Inicio (#192)
 
 **Publicado al empezar:** `70730b15760461d90d8df64e9bd769a681ce675b` (#191).

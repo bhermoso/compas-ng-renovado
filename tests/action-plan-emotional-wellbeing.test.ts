@@ -99,6 +99,6 @@ describe("Procedencia del catálogo y documentación de apoyo", () => {
         if (p?.kind !== "propio") expect((p?.documents ?? []).length).toBeGreaterThan(0);
       }
     }
-    expect(SUPPORT_DOCUMENTS.filter((d) => d.location.kind === "compas").map((d) => d.id).sort()).toEqual(["epvsa", "esa-2030", "esca", "mayores"]);
+    expect(SUPPORT_DOCUMENTS.filter((d) => d.location.kind === "compas").map((d) => d.id).sort()).toEqual(["epvsa", "esa-2030", "esca", "mayores", "pesma-a"]);
   });
 });
