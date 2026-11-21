@@ -16,7 +16,7 @@
 /* Evaluación SAM: filas y fuentes, no tarjetas de estado. */
 .sam-panel{
   border:0;border-top:1px solid var(--borde);border-radius:0;
-  background:#fff;padding:16px 0;
+  background:var(--blanco);padding:16px 0;
 }
 .sam-panel__figures{gap:0;border-top:1px solid var(--borde)}
 .sam-panel__figures div{padding:12px 10px 9px 0;border-bottom:1px solid var(--borde)}

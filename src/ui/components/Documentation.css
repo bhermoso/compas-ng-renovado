@@ -79,7 +79,7 @@
   overflow: auto;
   padding: 12px 16px 16px clamp(16px, 3vw, 28px);
   border-right: 1px solid var(--borde);
-  background: var(--fondo-secundario, #f6f8fa);
+  background: var(--fondo-secundario);
 }
 .documentation-dialog.docp .docp__search { display: grid; gap: 4px; font-size: .78rem; color: var(--texto-secundario); }
 .documentation-dialog.docp .docp__search input[type=search] {
@@ -164,7 +164,7 @@
 .documentation-dialog.docp .docp__summary span { font-size: .86rem; font-weight: 650; }
 .documentation-dialog.docp .docp__summary small { font-size: .74rem; color: var(--texto-secundario); line-height: 1.4; }
 
-.documentation-dialog.docp .documentation-overview { border-radius: 0; border: 0; border-top: 3px solid var(--azul); background: var(--fondo-secundario, #f6f8fa); }
+.documentation-dialog.docp .documentation-overview { border-radius: 0; border: 0; border-top: 3px solid var(--azul); background: var(--fondo-secundario); }
 .documentation-dialog.docp .documentation-status { border-radius: 0; border: 0; border-bottom: 1px solid var(--borde); background: none; padding: 2px 0; }
 .documentation-dialog.docp .documentation-status--ok { border-bottom-color: var(--verde); color: var(--texto-principal); }
 .documentation-dialog.docp .docp__detail li { margin: .4rem 0; }

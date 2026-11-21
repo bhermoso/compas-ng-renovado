@@ -4,6 +4,7 @@ import { prepareIBSEImport } from "../src/application/ibse/prepareIBSEImport";
 import { createCompleteMunicipalityWorkspace } from "../src/application/workspace";
 import { parseWorkspaceJSON, serializeWorkspaceForStorage } from "../src/infrastructure/persistence/local-storage";
 import { createIBSEStudy } from "../src/domain/ibse";
+import { addMunicipalDocument } from "../src/domain/repository";
 
 describe("recuperación IBSE con muestra mixta y trazabilidad", () => {
   it("declara mixed con menores y adultos válidos aunque una edad no sea interpretable", () => {
@@ -37,6 +38,9 @@ describe("recuperación IBSE con muestra mixta y trazabilidad", () => {
     const ws = createCompleteMunicipalityWorkspace({id:"atarfe",name:"Atarfe",province:"Granada",ineCode:"18022"});
     const aggregates = {n:910,nValid:811,meanTotal:62.2,meanFactorVinculo:72.4,meanFactorSituacion:60.3,meanFactorControl:51.1,meanFactorPersona:65};
     const previousStudy = createIBSEStudy({ municipalityId:"atarfe", sourceFileName:"ibse-atarfe.csv", aggregates, methodologicalCautions:[] });
+    // Como en un expediente real, el estudio tiene su documento de origen; sin él,
+    // el saneamiento de la persistencia lo retira (estudio sin documento).
+    ws.repository = addMunicipalDocument(ws.repository, { id: "ibse-doc", kind: "redcap-export", title: "IBSE - ibse-atarfe.csv", tags: ["ibse"] });
     ws.ibseStudy = previousStudy;
     ws.ibseStudyHistory = [{replacedAt:"2026-11-20T00:00:00Z",previousStudy,documents:[],evidence:[]}];
     const back = parseWorkspaceJSON(serializeWorkspaceForStorage(ws));

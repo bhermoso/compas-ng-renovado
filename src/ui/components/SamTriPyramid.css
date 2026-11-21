@@ -39,7 +39,7 @@
 /* Pirámide SAM: conservar los patrones de datos; retirar la decoración. */
 .sam-tripyramid{
   border:0;border-top:1px solid var(--borde);border-radius:0;
-  padding:16px 0;background:#fff;
+  padding:16px 0;background:var(--blanco);
 }
 .sam-tripyramid__empty{background:transparent;border-left:2px solid var(--amarillo)}
 .sam-tripyramid__swatch{border-radius:0}

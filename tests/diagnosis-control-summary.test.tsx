@@ -58,14 +58,15 @@ describe("DiagnosisControlRoom", () => {
     const repo = add(empty, { id: "hr", kind: "health-report", title: "Informe de Salud de Zagra" });
     const summary = buildDiagnosisControlSummary({ ...base, repository: repo, healthReportLoaded: true });
     const html = renderToStaticMarkup(<DiagnosisControlRoom municipalityName="Zagra" summary={summary} kindLabels={[{ value: "health-report", label: "Informe de Salud" }]} onOpenModule={() => {}} />);
+    // Diseño de Inicio (#185, #188): portada común y accesos plegables; sin estados globales.
     expect(html).toContain("Zagra");
-    expect(html).toContain("Sala de control");
-    expect(html).toContain("Resumen de las fuentes, los documentos y las evidencias asociados a este ámbito.");
+    expect(html).toContain("Diagnóstico territorial");
+    expect(html).toContain("Ver estado y cronología");
     expect(html).not.toContain("Diagnóstico en elaboración");
     expect(html).not.toContain("Diagnóstico vacío");
-    expect(html).toContain("Sin alcance temporal declarado");
-    expect(html).toContain("Estudios complementarios");
-    expect(html).toContain("Ver detalle");
+    expect(html).toContain("Sin alcance temporal");
+    expect(html).toContain("Línea temporal de las fuentes");
+    expect(html).toContain("Estado detallado de fuentes y módulos");
     expect(html).toContain("Informe de Salud de Zagra");
     expect(html).toContain("Fecha no declarada");
     expect(html).not.toContain(">health-report<");

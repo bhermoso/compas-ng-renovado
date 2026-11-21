@@ -1,3 +1,4 @@
+import { ACTION_PLAN_CATALOG } from "../src/domain/action-plan-catalog/ActionPlanCatalog";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
@@ -39,13 +40,15 @@ describe("PA-RELAS-02 — representación editorial", () => {
       onWorksheetChange: () => {},
       onSave: () => [],
     }));
-    expect(html).toContain("Líneas estratégicas disponibles");
+    // Las tres líneas del catálogo se consultan sin selección; una ficha por objetivo específico.
+    const specific = ACTION_PLAN_CATALOG.reduce((n, m) => n + m.generalObjectives.reduce((k, g) => k + g.specificObjectives.length, 0), 0);
     expect(html).toContain("Envejecimiento saludable");
     expect(html).toContain("Prevención y abordaje de las adicciones");
+    expect(html).toContain("Bienestar emocional y salud mental");
     expect(html).toContain("Puedes examinar su arquitectura");
     expect(html).not.toContain("Aceptar todo");
-    expect(html.match(/Ver ficha técnica propuesta/g)).toHaveLength(30);
-    expect(html.match(/Gestionar actuaciones/g)).toHaveLength(30);
+    expect(html.match(/Ver ficha técnica propuesta/g)).toHaveLength(specific);
+    expect(html.match(/Gestionar actuaciones/g)).toHaveLength(specific);
     expect(html).toContain("Método de cálculo");
     expect(html).toContain("Criterio de calidad");
   });
