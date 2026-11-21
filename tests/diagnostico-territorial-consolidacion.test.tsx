@@ -8,7 +8,7 @@ import type { IBSEStudy } from "../src/domain/ibse";
 import type { MunicipalDocumentRepository } from "../src/domain/repository";
 
 describe("Diagnóstico territorial consolidado", () => {
-  it("conserva los módulos en auditoría y muestra navegación principal de cuatro áreas", () => {
+  it("muestra una portada compacta y reserva el detalle para desplegar", () => {
     const summary = buildDiagnosisControlSummary({
       repository: seed.repository as MunicipalDocumentRepository,
       evidenceCount: 0,
@@ -18,14 +18,23 @@ describe("Diagnóstico territorial consolidado", () => {
       assetCount: 0,
     });
     const html = renderToStaticMarkup(
-      <DiagnosisControlRoom municipalityName="Atarfe" summary={summary} onOpenModule={() => {}} />
+      <DiagnosisControlRoom municipalityName="Atarfe" province="Granada" ineCode="18022" summary={summary} />
     );
-    expect(html).toContain("Explorar el diagnóstico");
-    expect(html).toContain("Estudios e indicadores");
-    expect(html).toContain("Fuentes documentales");
+    expect(html).toContain("01 · Diagnosticar");
+    expect(html).toContain("Atarfe");
+    expect(html).toContain("Granada");
+    expect(html).toContain("INE 18022");
+    expect(html).toContain("Períodos: Sin período observado declarado");
+    expect(html).toContain("documentos activos");
+    expect(html).toContain("Ver estado y cronología");
+    expect(html).toContain('class="diagnosis-home__details"');
+    expect(html).not.toContain("<nav");
+    expect(html).not.toContain("Explorar el diagnóstico");
+    expect(html).not.toContain("diagnosis-area-navigation");
+    expect(html).toContain("Estudios complementarios");
     expect(html).toContain("Activos para la salud");
-    expect(html).toContain("Evidencias y diagnóstico");
-    expect(html).toContain("Estado detallado de módulos y fuentes");
+    expect(html).toContain("Evidencias registradas");
+    expect(html).toContain("Estado detallado de fuentes y módulos");
     expect(html).toContain("<details");
   });
 
