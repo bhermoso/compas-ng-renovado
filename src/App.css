@@ -11323,7 +11323,8 @@ h3 {
 /* Plan de Acción comparte la portada de Inicio y el ritmo de columnas de
    Diagnóstico: una columna de color por sección; la sección abierta ocupa el
    ancho completo y su contenido solo se monta al abrirla. */
-.plan-page.hp {
+/* Selector reforzado: prevalece sobre «.workspace-page.hp:not(.diagnosis-page)» de HomePortada.css. */
+.hp.workspace-page.plan-page:not(.diagnosis-page) {
   display: grid;
   grid-template-columns: repeat(var(--plan-cols, 4), minmax(0, 1fr));
   align-content: start;
@@ -11363,7 +11364,7 @@ h3 {
 .plan-page > details > summary:focus-visible { outline: 2px solid var(--azul); outline-offset: 3px; }
 .plan-page__body { padding: 14px 0; border-top: 1px solid var(--borde); }
 @media (max-width: 960px) {
-  .plan-page.hp { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hp.workspace-page.plan-page:not(.diagnosis-page) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 560px) {
   .plan-page.hp { gap: 8px 12px; }
@@ -11371,8 +11372,98 @@ h3 {
   .plan-page > details > summary { min-height: 0; }
 }
 @media (max-width: 350px) {
-  .plan-page.hp { grid-template-columns: minmax(0, 1fr); }
+  .hp.workspace-page.plan-page:not(.diagnosis-page) { grid-template-columns: minmax(0, 1fr); }
 }
+/* Perfil de Salud Local: portada común y una columna de fase por espacio. El
+   componente del Perfil se integra en la rejilla (display: contents) para que
+   sus accesos sean columnas y el espacio abierto ocupe el ancho completo. */
+/* Selector reforzado: prevalece sobre «.workspace-page.hp:not(.diagnosis-page)» de HomePortada.css. */
+.hp.workspace-page.profile-page:not(.diagnosis-page) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  align-content: start;
+  align-items: start;
+  gap: clamp(12px, 2vh, 24px) 16px;
+  padding: clamp(18px, 4vh, 48px) clamp(16px, 4vw, 40px);
+}
+.profile-page > .hp-cover { grid-column: 1 / -1; }
+.profile-page .external-profile--compact,
+.profile-page .external-profile--compact .ep-spaces { display: contents; }
+.profile-page .external-profile--compact > :not(.hp-phase):not(.ep-spaces) { grid-column: 1 / -1; order: 2; min-width: 0; }
+.profile-page .external-profile--compact > .hp-phase,
+.profile-page .external-profile--compact .ep-space { order: 1; min-width: 0; }
+.profile-page .external-profile--compact > details.hp-phase[open] { grid-column: 1 / -1; order: 1; }
+.profile-page .external-profile--compact > input { display: none; }
+.profile-page .ep-space,
+.profile-page .external-profile--compact > details.hp-phase > summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  align-content: start;
+  width: 100%;
+  min-height: 68px;
+  margin: 0;
+  padding: 10px 0 8px;
+  border: 0;
+  border-top: 3px solid var(--borde);
+  border-radius: 0;
+  background: none;
+  color: var(--texto-principal);
+  font: inherit;
+  text-align: left;
+  list-style: none;
+  cursor: pointer;
+}
+.profile-page .external-profile--compact > details.hp-phase > summary::-webkit-details-marker { display: none; }
+.profile-page .external-profile--compact > details.hp-phase > summary { border-top: 0; }
+.profile-page .ep-space.hp-phase--1 { border-top-color: var(--azul); }
+.profile-page .ep-space.hp-phase--2 { border-top-color: var(--cyan); }
+.profile-page .ep-space.hp-phase--3 { border-top-color: var(--verde); }
+.profile-page .ep-space.hp-phase--4 { border-top-color: var(--amarillo); }
+.profile-page .ep-space.hp-phase--5 { border-top-color: var(--naranja); }
+.profile-page .ep-space.hp-phase--6 { border-top-color: var(--rojo); }
+.profile-page .ep-space[aria-expanded="true"] { background: var(--fondo-secundario, #f6f8fa); }
+.profile-page .ep-space strong,
+.profile-page .external-profile--compact > details.hp-phase > summary strong { font-size: .94rem; line-height: 1.25; }
+.profile-page .ep-space span,
+.profile-page .external-profile--compact > details.hp-phase > summary span {
+  grid-row: 2;
+  font-size: .8rem;
+  line-height: 1.35;
+  color: var(--texto-secundario);
+}
+.profile-page .ep-space::after,
+.profile-page .external-profile--compact > details.hp-phase > summary::after {
+  content: "▼" / "";
+  grid-column: 2;
+  grid-row: 1;
+  color: var(--azul-profundo);
+  font-size: .72rem;
+}
+.profile-page .ep-space[aria-expanded="true"]::after,
+.profile-page .external-profile--compact > details.hp-phase[open] > summary::after { content: "▲" / ""; }
+.profile-page .ep-space[aria-expanded="true"] strong { color: var(--azul-profundo); }
+.profile-page .ep-space:focus-visible,
+.profile-page .external-profile--compact > details.hp-phase > summary:focus-visible { outline: 2px solid var(--azul); outline-offset: 3px; }
+.profile-page .ep-access__body,
+.profile-page .external-profile--compact > details.ep-legacy[open] > :not(summary) { padding: 14px 0 0; border-top: 1px solid var(--borde); }
+.profile-page .external-profile--compact > details.ep-legacy[open] > summary { margin-bottom: 0; }
+@media (max-width: 560px) {
+  .hp.workspace-page.profile-page:not(.diagnosis-page) { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; }
+  .profile-page.workspace-page.hp { padding-block: 12px; }
+  .profile-page .ep-space,
+  .profile-page .external-profile--compact > details.hp-phase > summary { min-height: 0; }
+  .profile-page .ep-space span,
+  .profile-page .external-profile--compact > details.hp-phase > summary span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* La flecha se superpone para que el título use todo el ancho de la columna. */
+  .profile-page .ep-space,
+  .profile-page .external-profile--compact > details.hp-phase > summary { position: relative; grid-template-columns: minmax(0, 1fr); padding-right: 14px; }
+  .profile-page .ep-space::after,
+  .profile-page .external-profile--compact > details.hp-phase > summary::after { position: absolute; top: 12px; right: 0; }
+  .profile-page .ep-space strong,
+  .profile-page .external-profile--compact > details.hp-phase > summary strong { font-size: .84rem; }
+}
+
 /* Interior de las secciones del Plan: la jerarquía de la portada, sin cajas
    anidadas ni controles con el estilo por defecto del navegador. */
 /* Prefijo con #root para prevalecer sobre «#root .app-shell:not(.app-shell--home) .workspace-panel». */

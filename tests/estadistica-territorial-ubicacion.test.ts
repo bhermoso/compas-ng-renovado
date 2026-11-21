@@ -19,7 +19,7 @@ describe("Reordenación de estadística territorial hacia Diagnóstico", () => {
   it("el Perfil ya no reproduce la pestaña de descarga estadística", () => {
     expect(profile).not.toContain("['statistics','Estadística territorial']");
     expect(profile).not.toContain("statisticsPanel");
-    expect(profile).toContain("['versions','Gestión y versiones']");
+    expect(profile).toContain("['versions','Gestión y versiones'");
   });
   it("la revisión viaja al Perfil sin alterar el vigente directamente", () => {
     expect(app).toContain("setPendingStatisticsRevision({municipalityId: municipality.id, results, note})");

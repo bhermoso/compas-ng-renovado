@@ -22,6 +22,62 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-21 · Perfil de Salud Local con el diseño de Inicio
+
+**Publicado al empezar:** `35799144ae8ca68a6235beaee4706c7f3a03a088` (#195).
+**Publicado al terminar:** el commit de fusión de esta PR. Hay que comprobar
+`version.json` después de fusionar.
+
+### Cambio
+
+- **Portada.** Perfil usa la portada común con la fase «02 · Perfilar». A la
+  derecha muestra la versión vigente (título, periodo, validada o en
+  revisión) y el número de revisiones pendientes. Sin Perfil, recuerda que se
+  elabora fuera de COMPÁS y que condiciona la priorización y el Plan de
+  Acción.
+- **Espacios del Perfil.** Son columnas de fase con línea de estado:
+  - Perfil: indicadores, y si es la versión vigente o no;
+  - Documento completo;
+  - Gestión y versiones: número de versiones y estado;
+  - Actualizador de perfiles;
+  - Laboratorio experimental;
+  - Comprobar PDF original.
+
+  Sin Perfil, las columnas son «Incorporar un perfil», «Comprobar PDF
+  original» y, si hay legado, «Perfiles anteriores de COMPÁS».
+- **El espacio abierto** se despliega a todo el ancho bajo las columnas. Su
+  contenido, sus funciones y la persistencia no cambian.
+- **Especificidad CSS.** La regla general `.workspace-page.hp:not(.diagnosis-page)`
+  de `HomePortada.css` prevalecía sobre las rejillas propias de Perfil y de Plan
+  de Acción. Los selectores se han reforzado; en Plan de Acción el número de
+  columnas vuelve a seguir el número de secciones.
+
+### Comprobado con datos de prueba
+
+- **Atarfe de `public/seeds`,** sin Perfil y con un Perfil sintético: dos
+  versiones, v1 validada y vigente y v2 en revisión.
+  - El Perfil sintético se inyectó solo en el navegador de prueba; no se
+    escribió en Firebase.
+  - A 1280×720 y 390×844 la entrada cabe en una pantalla y al replegar
+    vuelve a una pantalla.
+  - Espacios abiertos a 1280×720: Perfil 2,7 pantallas, Documento 1,4,
+    Gestión y versiones 2,9, Actualizador 1,7 y Laboratorio 4,4.
+- Integración continua: correcta.
+- Suite completa: los mismos 15 fallos previos.
+- Pruebas de humo: correctas.
+- Las nueve pestañas siguen sin desplazamiento en su vista de entrada.
+
+### Comprobado con expedientes reales
+
+Nada.
+
+### Pendiente
+
+- El interior de Gestión y versiones y del Laboratorio conserva su estilo
+  anterior y es largo: 2,9 y 4,4 pantallas.
+
+---
+
 ## 2026-11-21 · Plataforma documental del expediente («Consultar documentación»)
 
 **Publicado al empezar:** `abffd381c6902272b106c5943b783ed2d2521042` (#193).

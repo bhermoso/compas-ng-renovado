@@ -4594,7 +4594,42 @@ export default function App() {
           );
         })()}
 
-        {view !== "inicio" && view !== "repositorio" && view !== "plan" && (
+        {/* ── Perfil de Salud Local: portada común y una columna por espacio, como Diagnóstico ── */}
+        {view === "psl" && (() => {
+          const library = workspace.externalProfileLibrary;
+          const active = library?.profiles.find(p => p.id === library.activeId);
+          const pending = (library?.profiles ?? []).filter(p => p.id !== library?.activeId && p.status === "review" && !p.archivedAt).length;
+          return (
+            <section key="psl" className="hp profile-page workspace-page" aria-labelledby="workspace-cover-title">
+              <CompasCover
+                title="Perfil de Salud Local"
+                context="02 · Perfilar"
+                subtitle={<><strong>{municipality.name}</strong>{municipality.province && ` · ${municipality.province}`}{municipality.ineCode && ` · INE ${municipality.ineCode}`}</>}
+                side={<p className="hp-cover__mission">{active
+                  ? <>Vigente: <strong>{active.title}</strong>{active.period && ` · ${active.period}`} · {active.status === "validated" ? "validada" : "en revisión"}{pending > 0 && ` · ${pending} ${pending === 1 ? "revisión pendiente" : "revisiones pendientes"}`}</>
+                  : "Ningún Perfil incorporado. El Perfil se elabora fuera de COMPÁS y condiciona la priorización y el Plan de Acción."}</p>}
+              />
+              <ExternalProfileDashboard
+                compact
+                key={workspace.municipality.identity.id}
+                municipalityId={workspace.municipality.identity.id}
+                municipalityName={municipality.name}
+                library={workspace.externalProfileLibrary ?? EMPTY_PROFILE_LIBRARY}
+                authorName={remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || ""}
+                legacyProfiles={workspace.compiledProfiles}
+                legacyText={workspace.validatedPSL?.conclusiones.content}
+                onSave={handleSaveExternalProfiles}
+                incomingTerritorialRevision={pendingStatisticsRevision?.municipalityId === municipality.id ? pendingStatisticsRevision : undefined}
+                onIncomingTerritorialRevisionConsumed={() => setPendingStatisticsRevision(null)}
+                updaterMunicipalities={allMunicipalities.filter(m => m.territorialType === undefined || m.territorialType === "municipio").map(m => ({ id: m.id, name: m.name }))}
+                onRunProfileUpdates={handleProfileUpdates}
+                onDirtyChange={onProfileDirtyChange}
+              />
+            </section>
+          );
+        })()}
+
+        {view !== "inicio" && view !== "repositorio" && view !== "plan" && view !== "psl" && (
           <section key={view} className="hp workspace-page" aria-labelledby="workspace-cover-title">
             <CompasCover
               title={NAV_ITEMS.find(item => item.id === view)?.label ?? (view === "analisis" ? "Análisis territorial" : "Lectura Estratégica Local")}
@@ -4611,27 +4646,6 @@ export default function App() {
         )}
 
         {/* Perfil de Salud Local: páginas de datos, lectura y versiones del Perfil guardado en Firebase. */}
-        {view === "psl" && (
-          <>
-            <ExternalProfileDashboard
-              compact
-              key={workspace.municipality.identity.id}
-              municipalityId={workspace.municipality.identity.id}
-              municipalityName={municipality.name}
-              library={workspace.externalProfileLibrary ?? EMPTY_PROFILE_LIBRARY}
-              authorName={remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || ""}
-              legacyProfiles={workspace.compiledProfiles}
-              legacyText={workspace.validatedPSL?.conclusiones.content}
-              onSave={handleSaveExternalProfiles}
-              incomingTerritorialRevision={pendingStatisticsRevision?.municipalityId === municipality.id ? pendingStatisticsRevision : undefined}
-              onIncomingTerritorialRevisionConsumed={() => setPendingStatisticsRevision(null)}
-              updaterMunicipalities={allMunicipalities.filter(m => m.territorialType === undefined || m.territorialType === "municipio").map(m => ({ id: m.id, name: m.name }))}
-              onRunProfileUpdates={handleProfileUpdates}
-              onDirtyChange={onProfileDirtyChange}
-            />
-          </>
-        )}
-
         {/* ── ⑤ Priorizaciones — técnica y participativa ──────── */}
         {view === "priorizacion" && (
           <>

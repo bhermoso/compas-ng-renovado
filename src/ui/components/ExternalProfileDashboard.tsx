@@ -15,7 +15,6 @@ import { ProfileUpdaterPanel, type ProfileUpdateOutcome } from './ProfileUpdater
 import { printCompleteProfile } from './printCompleteProfile';
 import type { ProfileUpdateKind } from '../../application/health-profile/profileUpdater';
 import type { ProfileTextPackage } from '../../application/health-profile/profileTextOperations';
-import { WorkspaceDisclosure } from './HomePortada';
 import './ExternalProfileDashboard.css';
 
 interface Props {
@@ -228,6 +227,13 @@ export function ExternalProfileDashboard({compact=false,municipalityId,municipal
   try{await onSave(next, progress => setMessage(progress));setMessage(success);}catch(e){setError(e instanceof Error?e.message:'No se ha podido guardar en Firebase.');setMessage('');}finally{setBusy(false);}
  }
  function patch(change:Partial<ExternalHealthProfile>){setDraft(p=>p?{...p,...change}:p);}
+ const spaces = selected ? ([
+  ['results','Perfil', `${selected.results.length} indicadores · ${selected.id===library.activeId?'versión vigente':'revisión no vigente'}`],
+  ['document','Documento completo', structure ? 'Lectura por apartados' : pdf ? 'PDF original adjunto' : 'Sin texto extraíble'],
+  ['versions','Gestión y versiones', `${library.profiles.length} ${library.profiles.length===1?'versión':'versiones'} · ${selected.status==='validated'?'validada':'en revisión'}`],
+  ...(onRunProfileUpdates ? [['updater','Actualizador de perfiles','Nuevas fuentes, en una revisión aparte'] as const] : []),
+  ['laboratory','Laboratorio experimental','Ensayos editoriales sin efecto en el Perfil'],
+ ] as const) : [];
  return <section className={compact ? "external-profile external-profile--compact" : "external-profile"} aria-label="Perfil de Salud Local">
   {!compact && !selected && <header className="ep-header"><div className="ep-header__body"><div><p className="ep-eyebrow">PERFIL DE SALUD LOCAL · {municipalityName}</p><h1>Incorporar un perfil</h1></div></div></header>}
   <input className="ep-sr-only" ref={fileInput} type="file" aria-label="Cargar perfil" multiple accept=".pdf,.docx,.txt,.md,.json" disabled={busy} onChange={e=>void loadFiles(e.currentTarget.files)} />
@@ -296,18 +302,21 @@ export function ExternalProfileDashboard({compact=false,municipalityId,municipal
     </section>
    <div className="ep-editor__footer"><p>Se guardará una versión en revisión. El guardado solo finaliza al confirmarlo Firebase; no cierres la pestaña mientras aparezca «Guardando…».</p><button className="ep-primary" disabled={busy||!draft.title.trim()} type="submit">{busy?'Guardando en Firebase…':'Guardar perfil en Firebase'}</button></div>
    </fieldset>
-  </form> : !selected ? compact ? <WorkspaceDisclosure title="Incorporar un perfil">
-    <p>Selecciona el documento y los archivos asociados al Perfil de Salud Local.</p>
-    <button className="ep-primary" type="button" disabled={busy} onClick={()=>fileInput.current?.click()}>Seleccionar el perfil</button>
-  </WorkspaceDisclosure> : <><div className="ep-empty"><div className="ep-paper" aria-hidden="true"><span>COMPÁS</span><i/><i/><i/><i/><i/></div>
+  </form> : !selected ? compact ? <details className="ep-access hp-phase hp-phase--1">
+    <summary><strong>Incorporar un perfil</strong><span>Ninguna versión en este expediente</span></summary>
+    <div className="ep-access__body">
+     <p>Selecciona el documento elaborado fuera de COMPÁS y sus archivos asociados: PDF, Word DOCX, texto, Markdown o paquete de resultados JSON. Hasta 20 MB por archivo; se guardan en Firebase.</p>
+     <button className="ep-primary" type="button" disabled={busy} onClick={()=>fileInput.current?.click()}>Seleccionar el perfil</button>
+    </div>
+  </details> : <><div className="ep-empty"><div className="ep-paper" aria-hidden="true"><span>COMPÁS</span><i/><i/><i/><i/><i/></div>
    <div><p className="ep-eyebrow">PERFIL DE SALUD LOCAL · EXPEDIENTE MUNICIPAL</p><h2>{legacyProfiles.length>0||legacyText ? "Ya existe un perfil anterior de COMPÁS" : "Incorpora el Perfil de Salud Local"}</h2>
    <p>{legacyProfiles.length>0||legacyText ? "El expediente conserva un perfil elaborado previamente en COMPÁS. Puedes consultarlo más abajo, en «Perfiles anteriores de COMPÁS». Si también deseas incorporar un documento externo, se guardará por separado y no sustituirá el anterior." : "Carga el documento elaborado fuera de COMPÁS. Podrás consultarlo, descargar sus originales, editar una revisión y presentar sus resultados con la identidad institucional."}</p>
    <p className="ep-formats">PDF · Word DOCX · texto · Markdown · paquete de resultados JSON</p>
    <button className="ep-primary" type="button" disabled={busy} onClick={()=>fileInput.current?.click()}>Seleccionar el perfil</button>
    <p className="ep-help">Hasta 20 MB por archivo. Originales, texto, resultados y versiones se guardan en Firebase. El navegador es una caché.</p></div>
   </div></> : <>
-   {compact && <p className="ep-compact-status"><strong>{selected.title}</strong>{selected.period && ` · ${selected.period}`} · {selected.status==='validated'?'Validada':'En revisión'}</p>}
-   <nav className="ep-tabs ep-tabs--primary" aria-label="Espacios del perfil">{([['results','Perfil'],['document','Documento completo'],['versions','Gestión y versiones'],...(onRunProfileUpdates?[['updater','Actualizador de perfiles'] as const]:[]),['laboratory','Laboratorio experimental']] as const).map(([key,label])=><button key={key} type="button" aria-current={!compact&&tab===key?'page':undefined} aria-expanded={compact ? tab===key : undefined} onClick={()=>setTab(current=>compact&&current===key?null:key)}>{label}</button>)}</nav>
+   {compact ? <div className="ep-spaces" role="group" aria-label="Espacios del perfil">{spaces.map(([key,label,detail],index)=><button key={key} type="button" className={`ep-space hp-phase hp-phase--${(index % 6) + 1}`} aria-expanded={tab===key} onClick={()=>setTab(current=>current===key?null:key)}><strong>{label}</strong><span>{detail}</span></button>)}</div>
+   : <nav className="ep-tabs ep-tabs--primary" aria-label="Espacios del perfil">{spaces.map(([key,label])=><button key={key} type="button" aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>}
    {(!compact || tab!==null) && selected.reviewFlags && selected.reviewFlags.length > 0 && <div className="ep-review-flags" role="note"><strong>Para revisar en esta revisión</strong><ul>{selected.reviewFlags.map((f,i)=><li key={i}><b>{f.target}</b>: {f.reason}</li>)}</ul><small>Marcas del Actualizador de perfiles. No forman parte del texto publicado.</small></div>}
    {(!compact || tab==='versions') && <div className="ep-document-toolbar" aria-label="Acceso a archivos y versiones">
      <div className="ep-document-toolbar__top">
@@ -366,8 +375,8 @@ export function ExternalProfileDashboard({compact=false,municipalityId,municipal
     {selected.id===library.activeId&&selected.status==='review'&&<section className="ep-validation"><div><h3>Revisión técnica</h3><p>La incorporación no valida el contenido. La validación quedará vinculada a esta versión y a tu cuenta.</p></div><button disabled={busy} onClick={()=>{if(!authorName.trim()){setError('Identifícate para registrar la validación.');return;}if(window.confirm('¿Registrar la validación técnica de esta versión con tu cuenta?'))void commit({...library,profiles:library.profiles.map(p=>p.id===selected.id?{...p,status:'validated',validatedAt:new Date().toISOString(),validatedBy:authorName}:p)},'Validación técnica registrada en Firebase.');}}>Registrar validación técnica</button></section>}
    </main>}
   </>}
-  {!draft&&(compact ? <WorkspaceDisclosure title="Comprobar PDF original"><ProfileOriginalVerifier key={municipalityId} library={library}/></WorkspaceDisclosure> : <ProfileOriginalVerifier key={municipalityId} library={library}/>)}
-  {(legacyProfiles.length>0||legacyText)&&<details className={compact ? "ep-legacy workspace-disclosure" : "ep-legacy"} open={!compact && !selected ? true : undefined}><summary>Consultar perfiles anteriores de COMPÁS · legado conservado</summary><p>Estos documentos históricos se conservan. No se regeneran ni se convierten automáticamente en el perfil externo vigente.</p>{legacyText&&<details><summary>Texto del perfil anterior</summary><p className="ep-legacy-text">{legacyText}</p></details>}{legacyProfiles.map(a=><details key={a.id}><summary>{a.portada.municipalityName} · {a.artifactVersion}</summary><PSLCArtifactViewer artifact={a}/></details>)}</details>}
+  {!draft&&(compact ? <details className={`ep-access hp-phase hp-phase--${selected ? Math.min(spaces.length, 5) + 1 : 2}`}><summary><strong>Comprobar PDF original</strong><span>Cotejar un PDF con los registros, sin guardar</span></summary><div className="ep-access__body"><ProfileOriginalVerifier key={municipalityId} library={library}/></div></details> : <ProfileOriginalVerifier key={municipalityId} library={library}/>)}
+  {(legacyProfiles.length>0||legacyText)&&<details className={compact ? "ep-legacy ep-access hp-phase hp-phase--3" : "ep-legacy"} open={!compact && !selected ? true : undefined}>{compact ? <summary><strong>Perfiles anteriores de COMPÁS</strong><span>Legado conservado, no vigente</span></summary> : <summary>Consultar perfiles anteriores de COMPÁS · legado conservado</summary>}<p>Estos documentos históricos se conservan. No se regeneran ni se convierten automáticamente en el perfil externo vigente.</p>{legacyText&&<details><summary>Texto del perfil anterior</summary><p className="ep-legacy-text">{legacyText}</p></details>}{legacyProfiles.map(a=><details key={a.id}><summary>{a.portada.municipalityName} · {a.artifactVersion}</summary><PSLCArtifactViewer artifact={a}/></details>)}</details>}
   {(!compact || tab!==null || draft) && <footer className="ep-footnote">Documento elaborado fuera de COMPÁS · Contenido y gráficos trazables a su versión · Conservación completa en Firebase</footer>}
  </section>;
 }
