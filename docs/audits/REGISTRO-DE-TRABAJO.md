@@ -22,6 +22,75 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-21 · Instrumentos de medición que traen las estrategias
+
+**Publicado al empezar:** `09b92603c21358a89a156772421d2eba8c2d0833` (#197).
+
+### Hechos observados (cotejo de las fuentes)
+
+- **PESMAA 2026–2029, capítulo de evaluación (págs. 332 y siguientes).** Por
+  cada objetivo estratégico recoge indicador, fuente, valor de referencia,
+  desagregación y meta. Para el OE1 «Aumentar el bienestar emocional de la
+  población andaluza»:
+  - indicador 1: «Índice Bienestar Emocional de la población Infantil
+    (KIDSCREEN). Población de 8 a 16 años». Encuesta Andaluza de Salud 2023;
+    referencia global 58,51 (niñas 57,54; niños 58,93);
+  - indicador 2: «Índice de Bienestar Emocional (IBSE). Población > 16 años».
+    Encuesta Andaluza de Salud 2023; referencia global 75,94 (mujeres 73,98;
+    hombres 78,01).
+- **EPVSA, ficha de indicadores (02/04/2024),** todos con la Encuesta Andaluza
+  de Salud como fuente:
+  - 1.4.1: Kidscreen;
+  - 1.4.2 y 1.4.3: SF-12 (componentes físico y mental);
+  - 1.4.4: felicidad, en escala de 0 a 10;
+  - 1.4.5: DUKE (apoyo social y afectivo);
+  - 1.6.3: pregunta de la EAS sobre uso de aparatos electrónicos.
+- **COMPÁS ya explota como estudios complementarios** el IBSE, el SF-12 de la
+  EAS y el Duke-UNC-11 de la EAS. KIDSCREEN no está implementado.
+- **Procedencia de BEM-I1.1 corregida.** Figuraba como propia de COMPÁS, con
+  la nota de que la EPVSA no usa el IBSE. Es cierto para la EPVSA, pero el
+  PESMAA sí lo usa (OE1, indicador 2). Pasa a «adaptada», con la cita
+  literal.
+- **Adicciones.** Los indicadores del módulo ADI (competencias preventivas,
+  percepción de riesgo, ocio, controles de venta a menores, detección y
+  derivación) son de proceso o de evaluación pre-post de programas. En el
+  capítulo de evaluación del PESMAA, los indicadores de adicciones se miden
+  con sistemas de registro (SIPASDA, historia clínica, FAISEM), no con
+  escalas. ESTUDES aparece en el análisis de situación, no en la evaluación.
+  - No se ha encontrado en el PESMAA ni en la EPVSA un instrumento que mida
+    los indicadores ADI tal como están redactados.
+  - No se han revisado el contenido de la Estrategia de Salud Mental del SNS
+    ni el de la Estrategia Nacional sobre Adicciones.
+
+### Cambio
+
+- **Catálogo de instrumentos:** nuevo tipo «Instrumento de la estrategia»,
+  cuya evidencia cita literalmente la fuente. Para Bienestar emocional hay
+  seis:
+
+  | Instrumento | Objetivos |
+  |---|---|
+  | IBSE | BEM-OE1.1, 1.2, 1.3 y 2.1 |
+  | KIDSCREEN | BEM-OE1.1 |
+  | SF-12 (componente mental) | BEM-OE1.1 |
+  | Felicidad de 0 a 10 | BEM-OE1.1 |
+  | Duke-UNC-11 | BEM-OE2.2 |
+  | Pregunta de la EAS sobre pantallas | BEM-OE3.3 |
+
+  Cada uno declara sus límites. Por ejemplo, la comparabilidad del monitor
+  municipal con la EAS, o que KIDSCREEN no está implementado en COMPÁS.
+- **Adicciones** sigue declarando que no tiene instrumentos preparados.
+
+### Decisión pendiente del responsable
+
+- **Adicciones:** diseñar localmente los cuestionarios pre-post de sus
+  indicadores, o reformular los indicadores para usar las fuentes del PESMAA
+  (SIPASDA), ESTUDES o los estudios que ya tiene COMPÁS (AUDIT-C, CAGE,
+  Fagerström). Inferencia: AUDIT-C, CAGE y Fagerström miden consumo, no
+  competencias ni percepción de riesgo.
+
+---
+
 ## 2026-11-21 · Dependencias entre líneas del Plan de Acción: instrumentos de recogida
 
 **Publicado al empezar:** `92d9f1bb70508390f94fd28987a6d7693f756774` (#196).
