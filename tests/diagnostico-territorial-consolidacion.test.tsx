@@ -34,7 +34,7 @@ describe("Diagnóstico territorial consolidado", () => {
     expect(html).toContain("Estudios complementarios");
     expect(html).toContain("Activos para la salud");
     expect(html).toContain("Evidencias registradas");
-    expect(html).toContain("Estado detallado de módulos y fuentes");
+    expect(html).toContain("Estado detallado de fuentes y módulos");
     expect(html).toContain("<details");
   });
 
