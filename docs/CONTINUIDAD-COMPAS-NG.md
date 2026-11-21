@@ -2,6 +2,8 @@
 
 > Actualización de referencia — 10/09/2026: las secciones históricas de este documento no describen todas las capacidades actuales. Ya existe autenticación y almacenamiento territorial parcial en Firebase. Consultar [inventario funcional y hoja de ruta](planning/INVENTARIO-Y-HOJA-DE-RUTA-COMPAS.md) y [administración general](ADMINISTRACION-GENERAL-COMPAS.md) antes de continuar. Se conserva el texto anterior como historial.
 
+> Granada-Zaidín se retiró de COMPÁS el 21 de noviembre de 2026. Las secciones que lo mencionan son historial: los archivos que citan (semillas, exportaciones, informe PDF, código de corrección y documentos `ZAIDIN-*`) ya no están en el árbol y pueden consultarse en Git en el commit `1b5dba6`.
+
 Actualizado: 10 de septiembre de 2026. Este documento es un punto de entrada;
 el estado efectivo se comprueba en Git, los expedientes y los despliegues.
 No se debe reconstruir el proyecto a partir de una conversación.
@@ -49,7 +51,7 @@ Las referencias a intentos de publicación siguientes describen el estado histó
 
 ## Fuente documental del Zaidín
 
-Leer docs/ZAIDIN-INFORME-ORIGINAL-Y-PERFIL.md.
+Documento retirado con el expediente (consultable en Git, commit `1b5dba6`).
 
 El original aportado es «informe salud granada-zaidin completo abril 2023.pdf»:
 130 páginas, 4.226.437 bytes, portada de abril de 2023. Archivo incorporado:

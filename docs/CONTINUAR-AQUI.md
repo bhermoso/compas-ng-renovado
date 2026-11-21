@@ -5,6 +5,11 @@ es el [Registro de trabajo](audits/REGISTRO-DE-TRABAJO.md)**: versión
 publicada, comprobaciones con su fuente de datos, cambios y pendientes, por
 fecha. Lo que sigue es contexto anterior.
 
+Granada-Zaidín se retiró de COMPÁS el 21 de noviembre de 2026. Las secciones
+que lo mencionan son historial: los archivos que citan (semillas, exportaciones,
+informe PDF, código de corrección y documentos `ZAIDIN-*`) ya no están en el árbol
+y pueden consultarse en Git en el commit `1b5dba6`.
+
 Actualización de limpieza del 13 de septiembre de 2026: la foto de estado
 operativa está en [Estado actual y criterio de limpieza](ESTADO-ACTUAL-COMPAS-NG.md).
 El acceso autenticado para responsables territoriales queda fuera del flujo
@@ -20,7 +25,6 @@ Referencia técnica comprobada el 11 de septiembre de 2026: master `e1475705ce9e
 
 1. [Inventario funcional y hoja de ruta](planning/INVENTARIO-Y-HOJA-DE-RUTA-COMPAS.md).
 2. [Administración y espacios territoriales](ADMINISTRACION-GENERAL-COMPAS.md).
-3. [Fuentes y perfil de Zaidín](ZAIDIN-INFORME-ORIGINAL-Y-PERFIL.md).
 
 Los pasos 1 y 2 de la hoja de ruta están documentados. El siguiente recorrido es fuente → revisión del perfil → borrador compartido → ficha. No confundir una entrega documental con nuevas funcionalidades de la aplicación.
 

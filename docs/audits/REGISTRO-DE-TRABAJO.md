@@ -22,6 +22,49 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-21 · Retirada de Granada-Zaidín: fase 2, paso 5 (contratos y documentación histórica)
+
+Pages al empezar: `1b5dba6`. Solo documentación; no cambia código ni datos.
+
+### Contratos reformados
+
+- **CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY 2.5.1.** La disposición
+  transitoria del Art. 16 quater y la hipótesis sobre el número de conclusiones
+  dejan de citar Granada-Zaidín como caso de referencia y se refieren a los
+  expedientes de prueba Zagra, Atarfe y Loja. Sin cambios de doctrina.
+- **CONTRACT-ACTION-PLAN-CATALOG 1.2 (§12).** El I Plan Local de Salud del
+  Distrito Zaidín sigue como origen declarado de los módulos de envejecimiento
+  saludable y adicciones. Quedan sin efecto la propuesta 92418 (§7) y la
+  excepción de la edición final del Zaidín (§11); no hay rama territorial
+  propia. Los apartados anteriores se conservan como historial, con remisión
+  al §12.
+- **CONTRACT-TERRITORIAL-STATISTICS 1.2.1** y **CONTRACT-DYNAMIC-TRIPYRAMID.**
+  Los ejemplos de ámbito inframunicipal ya no nombran Granada-Zaidín.
+- **CONTRACT-INDEX.** Recoge las dos versiones nuevas.
+
+### Documentación histórica retirada del árbol
+
+Se retiran siete documentos, consultables en Git en `1b5dba6`:
+`COORDINACION-ZAIDIN-PROTOTIPO`, `ZAIDIN-CONCEPTOS-INDICADORES-REVISION`,
+`ZAIDIN-CUATRO-BLOQUES-ENTREGA`, `ZAIDIN-INFORME-ORIGINAL-Y-PERFIL`,
+`audits/ZAIDIN-EXTERNAL-PSL-FULL-EXPEDIENT-INVENTORY-2026-11-03` y, en
+`methodology/reconstruction`, `GRANADA-ZAIDIN-ACTIVOS-LOCALIZA-AUDIT` y
+`GRANADA-ZAIDIN-RECONSTRUCTION-PACK`. `CONTINUAR-AQUI.md` y
+`CONTINUIDAD-COMPAS-NG.md` advierten de que sus secciones sobre Zaidín son
+historial.
+
+### Queda
+
+- Comentarios de código que usan Granada-Zaidín como ejemplo
+  (`profileSynthesisView.ts`, `territorialGrammar.ts`) y los seis smokes fuera
+  de CI que aún lo usan.
+- Las secciones históricas de `CONTRACT-ACTION-PLAN-CATALOG` (§2, §7, §10, §11)
+  siguen nombrando el Zaidín como antecedente, a propósito.
+- Paso 1 (inventario de Loja en Firestore): requiere `COMPAS_FIREBASE_SA_JSON`
+  en el entorno.
+
+---
+
 ## 2026-11-21 · Retirada de Granada-Zaidín: fase 2, paso 4 (código, datos y pruebas)
 
 ### Retirado del repositorio

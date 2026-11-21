@@ -2,7 +2,7 @@
 
 > Estadística territorial oficial para el Perfil de Salud Local: búsqueda, descarga,
 > conservación e integración en la revisión.
-> Versión 1.2.0 — 2026-11-18
+> Versión 1.2.1 — 2026-11-21
 > Estado: VIGENTE
 >
 > Desarrolla el dominio «determinantes sociales» y el eje de desigualdad del
@@ -122,7 +122,7 @@ Una fuente nueva entra por reforma de este contrato y nueva versión del catálo
    diferencias internas.
 4. Las sumas de la malla localizan la población dentro del término; no sustituyen
    las cifras oficiales del municipio.
-5. Un ámbito COMPÁS que no es municipio (Granada-Zaidín) no tiene código INE propio.
+5. Un ámbito COMPÁS que no es municipio (por ejemplo, un distrito urbano) no tiene código INE propio.
    Se descarga el municipio matriz y sus secciones; seleccionar las secciones del
    ámbito queda pendiente (§12).
 
@@ -193,7 +193,7 @@ El paquete no modifica la revisión vigente ni constituye validación.
    distintos (68519, 68520, 66600, 67127). Usarlas exige comprobar que miden lo mismo.
 3. **Series temporales.** La descarga toma el último año publicado. La tendencia
    entre ciclos (Art. 17 quater, 5) puede obtenerse pidiendo más periodos.
-4. **Ámbitos inframunicipales de COMPÁS.** Asociar a Granada-Zaidín sus secciones
+4. **Ámbitos inframunicipales de COMPÁS.** Asociar a un ámbito inframunicipal sus secciones
    censales requiere una relación declarada entre ámbito y secciones.
 5. **Ficha municipal del SIMA.** Se publica como hoja de cálculo; leerla exigiría
    incorporar un lector de ese formato.
@@ -243,6 +243,7 @@ Las tablas por provincia de las otras siete provincias andaluzas figuran en `cat
 
 | Fecha | Versión | Cambio | Responsable |
 |---|---|---|---|
+| 2026-11-21 | 1.2.1 | Ejemplos de ámbito inframunicipal sin nombre propio tras la retirada de Granada-Zaidín de COMPÁS. Sin cambios de regla. | COMPÁS NG |
 | 2026-11-18 | 1.2.0 | Catálogo 2026-11-18: 46 indicadores en los bloques del marco de determinantes sociales (contrato metodológico v2.5.0); nueve nuevos (paro y pensión media por sexo, paro de larga duración, viviendas no principales, alquiler por sección, centros de atención primaria y de servicios sociales); los recuentos dejan de compararse con ámbitos superiores. El IECA sirve sus API desde www.ieca.junta-andalucia.es: la dirección anterior redirige y esa redirección bloquea la consulta desde el navegador; se usa como respaldo | COMPÁS NG |
 | 2026-11-18 | 1.1.0 | §10 bis: nueva revisión del Perfil con los datos descargados (añadir, sustituir o conservar por indicador y escala; destino en las páginas de datos; el texto no cambia). Cobertura comparada en la escala del resultado del Perfil. Valor numérico tomado de la representación publicada por el IECA. Motivo: el autor pidió que los datos se reflejen en el Perfil | COMPÁS NG |
 | 2026-11-17 | 1.0.0 | Creación: fuentes, catálogo de 37 indicadores, descarga, valor literal, comparadores, conservación y paquete para la revisión. Comprobado contra las API del INE y del IECA con Alfacar (18011). Encargo del autor: «todo el circuito», integración como paquete para la revisión, cuatro fuentes | COMPÁS NG |

@@ -1,7 +1,7 @@
 # CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY
 
 > Contrato metodológico canónico del Perfil de Salud Local (PSL) en COMPÁS NG.
-> Versión 2.5.0 — 2026-11-18 (historial en el registro de revisiones)
+> Versión 2.5.1 — 2026-11-21 (historial en el registro de revisiones)
 > Estado: VIGENTE
 >
 > Este contrato define qué debe ser metodológicamente un Perfil de Salud Local,
@@ -510,7 +510,7 @@ El Perfil es un argumento: su unidad es la conclusión, y se lee como un texto d
 
 **Unidades de lectura.** Las unidades (Art. 4 bis) siguen siendo la forma en que el sistema organiza la evidencia. En el cuerpo figuran a través de las conclusiones, las convergencias y las lagunas, y completas en el anexo.
 
-**Disposición transitoria.** Mientras la implementación no ensamble esta estructura, el cuerpo heredado (señales por fuente, lectura integrada en hilos, síntesis interpretativa, señales para deliberación, cierre de la lectura y matriz de evidencia) sigue generándose y debe retirarse del cuerpo bloque a bloque, sin que el caso de referencia Granada-Zaidín cambie sin justificación. Los identificadores técnicos del código (por ejemplo, el tipo `orientacion`) no se alteran por este contrato. El compilador heredado (`src/application/proposals/chosenClosing.ts`) sigue presentando las conclusiones en campos fijos hasta que se adapte a la versión 2.2.0; no se modifica para no alterar el caso de referencia Granada-Zaidín sin justificación. Los Perfiles elaborados fuera de COMPÁS siguen ya el apartado 2 vigente.
+**Disposición transitoria.** Mientras la implementación no ensamble esta estructura, el cuerpo heredado (señales por fuente, lectura integrada en hilos, síntesis interpretativa, señales para deliberación, cierre de la lectura y matriz de evidencia) sigue generándose y debe retirarse del cuerpo bloque a bloque, sin que los expedientes de prueba (Zagra, Atarfe y Loja) cambien sin justificación. Los identificadores técnicos del código (por ejemplo, el tipo `orientacion`) no se alteran por este contrato. El compilador heredado (`src/application/proposals/chosenClosing.ts`) sigue presentando las conclusiones en campos fijos hasta que se adapte a la versión 2.2.0; no se modifica para no alterar sin justificación los expedientes de prueba. Los Perfiles elaborados fuera de COMPÁS siguen ya el apartado 2 vigente.
 
 *Consecuencia si se viola:* el Perfil vuelve a crecer por acumulación de bloques que no se alimentan entre sí, y el lector no puede seguir un argumento.
 
@@ -650,7 +650,7 @@ Los instrumentos de COMPÁS producen datos individuales que permiten calcular in
 El compilador exige contenido no vacío en los capítulos de autoría humana. ¿Cómo distingue el sistema entre texto de autoría genuina y andamiaje mínimamente modificado? ¿Es esta distinción técnicamente verificable o recae íntegramente en la responsabilidad deontológica del equipo técnico?
 
 **H-LHPM-7 — Número máximo de conclusiones**
-¿Cuál es el número máximo de conclusiones del cuerpo del Perfil (el modelo propone entre tres y seis)? Se decide tras probar la estructura del Art. 16 quater con Zagra, Atarfe y Granada-Zaidín. Hasta entonces, el contrato no fija un tope.
+¿Cuál es el número máximo de conclusiones del cuerpo del Perfil (el modelo propone entre tres y seis)? Se decide tras probar la estructura del Art. 16 quater con Zagra, Atarfe y Loja. Hasta entonces, el contrato no fija un tope.
 
 ---
 
@@ -905,3 +905,4 @@ El panel de salud usa el núcleo común de indicadores, declara sus comparadores
 | 2026-11-17 | 2.3.1 (aclaración) | Se incorpora la aclaración de aplicación a producción externa redactada el 12-11-2026 (procedente de la PR #120, no fusionada): contenido, cautelas, estructura y modelo canónico rigen también para el Perfil elaborado fuera de COMPÁS; la importación conserva y representa, no produce diagnóstico nuevo | COMPÁS NG |
 | 2026-11-17 | 2.4.0 | Art. 17 quater: desarrollo del dominio de determinantes sociales y del eje de desigualdad mediante `CONTRACT-TERRITORIAL-STATISTICS` (catálogo de 37 indicadores con ficha y tabla por provincia; descarga del INE y del IECA conservada como material para la revisión, sin modificar la vigente). Motivo: los cuatro Perfiles vigentes usan una parte pequeña de la estadística oficial disponible (sin Gini, P80/P20 ni fuentes de ingreso). Encargo del autor del 2026-11-17 | COMPÁS NG |
 | 2026-11-18 | 2.5.0 | Nuevo Art. 4 quater: el Perfil es un informe de salud basado en los determinantes sociales, con el marco de la Comisión sobre Determinantes Sociales de la Salud de la OMS (Solar e Irwin, 2010) adaptado por la Comisión para Reducir las Desigualdades Sociales en Salud en España (2010). Art. 17 ter: seis páginas de datos en el orden del marco (portada; contexto y población; ejes de desigualdad; condiciones de vida; servicios; salud y bienestar), con compatibilidad para los Perfiles anteriores. Decisión del autor del 2026-11-18: «que el perfil de salud local sea verdaderamente un informe de salud basado en los determinantes sociales de la salud» | COMPÁS NG |
+| 2026-11-21 | 2.5.1 | Retirada de Granada-Zaidín de COMPÁS (decisión del responsable, 2026-11-21): deja de ser caso de referencia. La disposición transitoria del Art. 16 quater (incluida la nota sobre `chosenClosing.ts`) y la hipótesis abierta sobre el número de conclusiones se refieren a los expedientes de prueba Zagra, Atarfe y Loja. Sin cambios de doctrina. | COMPÁS NG |
