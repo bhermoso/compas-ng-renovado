@@ -95,7 +95,7 @@ try{
   await statistics.locator(":scope > summary").click();
   assert(!(await statistics.locator(".tsp").isVisible()),"La estadística no vuelve a plegarse");
   await page.getByRole("button",{name:/Perfil de Salud Local/i}).first().click();
-  const tabs=page.locator(".ep-tabs--primary");
+  const tabs=page.locator(".ep-tabs--primary, .ep-spaces");
   if (await tabs.count() > 0) {
     assert(!(await tabs.innerText()).includes("Estadística territorial"),"El Perfil conserva la pestaña territorial duplicada");
   }
