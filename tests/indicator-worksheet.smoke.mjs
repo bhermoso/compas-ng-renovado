@@ -6,9 +6,16 @@ import { mkdir } from "node:fs/promises";
 import { createServer } from "vite";
 import { chromium } from "playwright";
 
-const server = await createServer({ server: { host: "127.0.0.1", port: 0 } });
+// La portada exige sesión (main.tsx): se monta la aplicación directamente, con los expedientes públicos de Loja y Atarfe.
+const appDirect = { name: "app-direct", configureServer(s) { s.middlewares.use("/app-direct", async (_q, res) => {
+  res.setHeader("Content-Type", "text/html");
+  res.end(await s.transformIndexHtml("/app-direct", `<html><body><div id="root"></div><script type="module">import React from 'react';import {createRoot} from 'react-dom/client';import App from '/src/App.tsx';import '/src/index.css';createRoot(document.getElementById('root')).render(React.createElement(App));</script></body></html>`));
+}); } };
+const server = await createServer({ plugins: [appDirect], server: { host: "127.0.0.1", port: 0 } });
 await server.listen();
 const output = process.env.COMPAS_TEST_OUTPUT;
+// Un espacio por indicador de la plantilla común: envejecimiento saludable (18), adicciones (12) y bienestar emocional (17).
+const WORKSHEETS = 47;
 let browser;
 try {
   browser = await chromium.launch({ headless: true,
@@ -19,10 +26,18 @@ try {
   const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   const address = server.httpServer.address();
-  await page.goto(`http://127.0.0.1:${address.port}/COMPAS_NG/`);
-  const plan = () => page.locator(".app-nav__tab").filter({ hasText: "Plan de Acción" }).click();
+  await page.goto(`http://127.0.0.1:${address.port}/app-direct`);
+  // Plan de Acción con el diseño de Inicio: se abre «Líneas e indicadores» y la primera línea.
+  const plan = async () => {
+    await page.locator(".app-nav__tab").filter({ hasText: "Plan de Acción" }).click();
+    const section = page.locator("details.plan-page__section").first();
+    if (await section.getAttribute("open") === null) await section.locator(":scope > summary").click();
+    const line = page.locator("details.pcm-line-fold").first();
+    if (await line.getAttribute("open") === null) await line.locator(":scope > summary").click();
+  };
   const changeMunicipality = async (name, id) => {
-    await page.getByRole("button", { name: /Cambiar ámbito/ }).click();
+    await page.waitForTimeout(1000);
+    if (!(await page.locator(".municipality-selector").isVisible())) await page.getByRole("button", { name: /Cambiar ámbito|Elige un ámbito/ }).first().click();
     await page.locator(".municipality-selector__option").filter({ hasText: name }).click();
     await page.waitForFunction((id) => {
       const raw = localStorage.getItem(`compas-ng:workspace:${id}`);
@@ -39,10 +54,10 @@ try {
     return sheet;
   };
   const snapshot = (id) => page.evaluate((id) => JSON.parse(localStorage.getItem(`compas-ng:workspace:${id}`)), id);
+  await changeMunicipality("Loja", "loja");
   await plan();
-  await changeMunicipality("Zaidín", "granada-zaidin");
-  assert.equal(await page.locator(".indicator-worksheet").count(), 30);
-  const before = await snapshot("granada-zaidin");
+  assert.equal(await page.locator(".indicator-worksheet").count(), WORKSHEETS);
+  const before = await snapshot("loja");
   let sheet = await openSheet();
   const owner = "RESPONSABLE DE PRUEBA — no es un dato real";
   assert.equal(await sheet.getByLabel("Persona y entidad responsables de consolidar el indicador").inputValue(), "");
@@ -55,8 +70,8 @@ try {
   await action.getByLabel("Numerador o recuento observado (si se dispone)").fill("0");
   await action.getByRole("button", { name: "Añadir entrega de datos", exact: true }).click();
   await sheet.getByRole("button", { name: "Añadir periodo de consolidación", exact: true }).click();
-  await page.waitForFunction(() => JSON.parse(localStorage.getItem("compas-ng:workspace:granada-zaidin")).indicatorWorksheets?.[0]?.consolidations.length === 1);
-  const saved = await snapshot("granada-zaidin");
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem("compas-ng:workspace:loja")).indicatorWorksheets?.[0]?.consolidations.length === 1);
+  const saved = await snapshot("loja");
   assert.equal(saved.indicatorWorksheets[0].actions[0].returns.length, 2);
   assert.equal(saved.indicatorWorksheets[0].consolidations[0].status, "pending");
   assert.deepEqual(saved.indicatorWorksheets[0].consolidations[0].values, {});
@@ -66,17 +81,16 @@ try {
   const downloaded = page.waitForEvent("download");
   await sheet.getByRole("button", { name: "Descargar dossier del indicador (Word)", exact: true }).click();
   const download = await downloaded;
-  assert.match(download.suggestedFilename(), /granada-zaidin-ENV-I5\.1\.docx$/);
+  assert.match(download.suggestedFilename(), /loja-ENV-I1\.1\.docx$/);
   assert.equal(await download.failure(), null);
   if (output) { await mkdir(output, { recursive: true }); await download.saveAs(`${output}/ficha-exportada-prueba.docx`); }
 
   await changeMunicipality("Atarfe", "atarfe");
+  await plan();
   sheet = await openSheet();
   assert.equal(await sheet.getByLabel("Persona y entidad responsables de consolidar el indicador").inputValue(), "");
-  await changeMunicipality("Zaidín", "granada-zaidin");
-  await page.reload(); await plan();
-  // Existing app starts in Atarfe after reload; reopen the saved municipality.
-  await changeMunicipality("Zaidín", "granada-zaidin");
+  await changeMunicipality("Loja", "loja");
+  await page.reload(); await page.waitForTimeout(1500); await plan();
   sheet = await openSheet();
   assert.equal(await sheet.getByLabel("Persona y entidad responsables de consolidar el indicador").inputValue(), owner);
   assert.equal(await sheet.getByLabel("Numerador o recuento observado (si se dispone)").first().inputValue(), "0");
@@ -88,7 +102,7 @@ try {
   await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(await sheet.evaluate((element) => element.scrollWidth <= element.clientWidth + 1), true);
   assert.deepEqual(errors, []);
-  console.log("PASS: 30 espacios de seguimiento; fichas de actuación, entregas, Word, recarga, aislamiento municipal, cancelación de borrado y pantalla estrecha.");
+  console.log(`PASS: ${WORKSHEETS} espacios de seguimiento; fichas de actuación, entregas, Word, recarga, aislamiento municipal, cancelación de borrado y pantalla estrecha.`);
 } finally {
   await browser?.close();
   await server.close();
