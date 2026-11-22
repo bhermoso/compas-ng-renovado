@@ -539,6 +539,21 @@ describe("localiza-salud — formato pipe, idempotencia y contrato de selector",
       (a) => a.provenance.origin === "localiza-salud"
     );
     expect(localizaAtoms).toHaveLength(2);
+    expect(r2!.atomsCreated).toBe(0);
+  });
+
+  it("dos fichas distintas con el mismo título siguen separadas al recargar", () => {
+    const r1 = ingestManualDocument({
+      repository: makeRepository(), evidenceStore: makeStore(), kind: "localiza-salud",
+      title: "Localiza Salud — carga 1", plainText: "Cruz Roja Granada | Voluntariado y atención social",
+    });
+    const r2 = ingestManualDocument({
+      repository: r1!.repository, evidenceStore: r1!.evidenceStore, kind: "localiza-salud",
+      title: "Localiza Salud — carga 2",
+      plainText: ["Cruz Roja Granada | Voluntariado y atención social", "Cruz Roja Granada | Taller de primeros auxilios"].join("\n"),
+    });
+    expect(r2!.atomsCreated).toBe(1);
+    expect(r2!.evidenceStore.atoms.filter((a) => a.provenance.origin === "localiza-salud")).toHaveLength(2);
   });
 
   it("health-report no genera EvidenceAtom (canGenerateEvidence=false por defecto)", () => {

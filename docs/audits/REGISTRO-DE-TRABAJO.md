@@ -22,6 +22,27 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-22 · Localiza Salud: una recarga no duplica fichas
+
+Pages al empezar: `90188cc`.
+
+- **Decisión del responsable (2026-11-22).** Cargar de nuevo el mismo listado de
+  Localiza no debe duplicar activos.
+- **Cambio.** Al incorporar un listado de Localiza, se omite la ficha idéntica,
+  columna a columna (sin distinguir espacios ni mayúsculas), a otra ya presente
+  en el expediente. Se mantiene la regla anterior: no se fusiona por título;
+  dos fichas distintas con el mismo nombre siguen separadas.
+- **Alcance (inferencia del código).** Si al recargar se elige sustituir la
+  versión anterior, sus activos se archivan antes y la carga nueva los crea; el
+  cambio actúa cuando se conservan las dos cargas.
+- **Límite (hipótesis no comprobada en la interfaz).** Si después se elimina la
+  primera carga, sus activos se retiran con ella y la segunda no los recupera.
+- **Comprobado.** `document-ingestion-origins` (44/44, con una prueba nueva para
+  fichas distintas del mismo título). Suite completa: 3108 pruebas correctas,
+  ningún fallo.
+
+---
+
 ## 2026-11-22 · Borrador antiguo del Plan de Acción: redacción visible en solo lectura
 
 Pages al empezar: `432f279`.
