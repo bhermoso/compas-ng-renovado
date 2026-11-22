@@ -10341,6 +10341,11 @@ h3 {
   .pie-reading-card p,
   .pie-agenda-card p,
   .pie-closing-column li { orphans: 3; widows: 3; }
+
+  /* Plan de Acción y Diagnóstico (antes en un segundo bloque de impresión).
+     .tp-modal se duplica para ganar a la sombra que le da una regla general posterior. */
+  .tp-modal.tp-modal{box-shadow:none}
+  .pcm-line-decision,.pcm-general,.pcm-specific,.diagnosis-matrix__card {break-inside:avoid}
 }
 
 /* ── Composición documental del Perfil de Salud Local ────────────────────── */
@@ -11825,10 +11830,6 @@ h3 {
 }
 @media(max-width:460px) {
   .diag-status__list,.diagnosis-control__metrics,.diagnosis-matrix{grid-template-columns:1fr}
-}
-@media print{
-  .tp-modal{box-shadow:none}
-  .pcm-line-decision,.pcm-general,.pcm-specific,.diagnosis-matrix__card {break-inside:avoid}
 }
 
 

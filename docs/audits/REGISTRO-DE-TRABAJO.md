@@ -22,6 +22,23 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-22 · Impresión del Perfil: un solo bloque `@media print`
+
+Pages al empezar: `848a564`.
+
+- **Cambio.** El segundo bloque de impresión de `src/App.css` (sombra del modal y
+  `break-inside: avoid` en el Plan y el Diagnóstico) pasa al final del bloque
+  único. La regla del modal se escribe `.tp-modal.tp-modal`: una regla general
+  posterior le da sombra y, sin más especificidad, ganaría al imprimir.
+- **Comparación antes/después (hechos).** En impresión emulada, con todos los
+  `<details>` abiertos, los estilos calculados de cada elemento coinciden y el
+  PDF tiene el mismo tamaño en Perfil (Atarfe), Plan de Acción (Loja),
+  Diagnóstico (Atarfe) e Inicio (Loja). El modal conserva la sombra en pantalla
+  y no la tiene al imprimir, como antes. Datos: expedientes del repositorio.
+- **Prueba.** `psl-c-impresion-regimen` pasa y entra en la CI.
+
+---
+
 ## 2026-11-22 · Retirada de Granada-Zaidín: pruebas de navegador fuera de CI y restos visibles
 
 Pages al empezar: `6bfaf4e`. Comprobaciones con expedientes del repositorio
