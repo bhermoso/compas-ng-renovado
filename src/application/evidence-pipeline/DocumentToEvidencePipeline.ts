@@ -279,6 +279,11 @@ function transformOpenAnswers(
   return { store, atomsCreated };
 }
 
+/** Clave de una ficha de Localiza: el registro completo, sin diferencias de espacios ni mayúsculas. */
+function localizaRecordKey(content: string): string {
+  return content.normalize("NFC").replace(/\s+/g, " ").trim().toLocaleLowerCase("es");
+}
+
 export function transformDocumentToEvidence(
   input: TransformDocumentToEvidenceInput
 ): TransformDocumentToEvidenceResult {
@@ -306,8 +311,19 @@ export function transformDocumentToEvidence(
   let store = input.store;
   const atomsCreated: EvidenceAtom[] = [];
 
+  // Recarga de Localiza Salud (decisión del responsable, 2026-11-22): una ficha
+  // idéntica, columna a columna, a otra ya incorporada al expediente es la misma
+  // ficha cargada de nuevo y no se vuelve a crear. Fichas distintas con el mismo
+  // título siguen separadas (véase la nota de abajo).
+  const alreadyLoaded = input.document.kind === "localiza-salud"
+    ? new Set(input.store.atoms
+        .filter((atom) => atom.provenance.origin === "localiza-salud")
+        .map((atom) => localizaRecordKey(atom.content)))
+    : new Set<string>();
+
   for (let index = 0; index < lines.length; index++) {
     const content = lines[index];
+    if (alreadyLoaded.has(localizaRecordKey(content))) continue;
     const kind = classifyEvidenceKind(content, input.document.kind);
 
     const atom = createEvidenceAtom({
