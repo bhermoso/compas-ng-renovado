@@ -12128,3 +12128,12 @@ h3 {
     color: var(--texto-principal);
   }
 }
+
+/* Borrador de una versión antigua: aviso y redacción guardada en solo lectura. */
+.pcm-legacy-draft > [role="alert"] { margin: 0 0 10px; padding: 8px 12px; border-left: 3px solid var(--amarillo); color: var(--texto-principal); }
+.pcm-legacy-draft__saved > summary { cursor: pointer; font-weight: 650; color: var(--azul-profundo); }
+.pcm-legacy-draft__saved dl { margin: 8px 0 0; }
+.pcm-legacy-draft__saved dl > div { padding: 8px 0; border-bottom: 1px solid var(--borde); }
+.pcm-legacy-draft__saved dt { font-size: .78rem; font-weight: 700; color: var(--texto-secundario); font-variant-numeric: tabular-nums; }
+.pcm-legacy-draft__saved dd { margin: 2px 0 0; line-height: 1.5; }
+.pcm-legacy-draft__saved dd small { display: block; margin-top: 2px; color: var(--texto-secundario); }

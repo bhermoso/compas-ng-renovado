@@ -65,18 +65,24 @@ describe("Preparación independiente del Plan", () => {
   expect(html).not.toContain("<summary>Edadismo</summary>");
   expect(html).toContain("ENV-OG5 · Reducir el edadismo y promover una imagen social positiva de las personas mayores");
  });
- it("conserva el borrador anterior y avisa de la revisión editorial", () => {
+ it("conserva el borrador anterior, lo bloquea y muestra su redacción en solo lectura", () => {
  const previous = {...draft, version: "zaidin-4-bloques-2026-09-09", decisions: {"ENV-OE1.1": {status: "modified" as const, sourceText: "Autonomía funcional anterior", text: "Redacción propia que debe conservarse"}}};
  const before = JSON.stringify(previous);
  const html = renderToStaticMarkup(<PlanPreparationPanel module={ZAIDIN_AGING_PROPOSAL} municipalityId={draft.municipalityId} draft={previous} onChange={() => {}} renderWorksheet={() => null}/>);
+ // Decisión del responsable (2026-11-22): aviso y bloqueo, con la redacción guardada visible en solo lectura.
+ expect(html).toContain("La versión del borrador requiere revisión de compatibilidad");
  expect(html).toContain("Redacción propia que debe conservarse");
- expect(html).toContain("La referencia de partida ha cambiado");
+ expect(html).toContain("Texto de partida: Autonomía funcional anterior");
+ expect(html).toContain("ENV-OE1.1 · Modificado");
+ expect(html).toContain("solo lectura");
+ expect(html).not.toMatch(/<(select|textarea|input)\b/);
  expect(JSON.stringify(previous)).toBe(before);
+ const current = renderToStaticMarkup(<PlanPreparationPanel module={ZAIDIN_AGING_PROPOSAL} municipalityId={draft.municipalityId} onChange={() => {}} renderWorksheet={() => null}/>);
  const participation = ZAIDIN_AGING_PROPOSAL.generalObjectives.find(g => g.code === "ENV-OG4")!;
  expect(participation.specificObjectives.map(o => o.code)).toEqual(expect.arrayContaining(["ENV-OE8.1", "ENV-OE8.2"]));
  expect(participation.specificObjectives.map(o => o.code)).not.toContain("ENV-OE9.1");
- expect(html).toContain("Objetivo estratégico vigente");
- expect(html).toContain("<strong>envejecimiento saludable</strong>");
+ expect(current).toContain("Objetivo estratégico vigente");
+ expect(current).toContain("<strong>envejecimiento saludable</strong>");
  });
  it("persiste decisiones sin crear evidencia ni revisiones formales", () => {
  const workspace = createCompleteMunicipalityWorkspace({id: draft.municipalityId, name: "Prueba"});

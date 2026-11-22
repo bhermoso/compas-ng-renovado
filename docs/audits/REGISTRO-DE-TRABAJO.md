@@ -22,6 +22,23 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-22 · Borrador antiguo del Plan de Acción: redacción visible en solo lectura
+
+Pages al empezar: `432f279`.
+
+- **Decisión del responsable (2026-11-22).** Un borrador guardado con una versión
+  del catálogo que no es la vigente sigue bloqueado, y además muestra su redacción
+  guardada en solo lectura.
+- **Cambio.** `PlanPreparationPanel` mantiene el aviso y añade la lista de
+  decisiones guardadas: código tal como se guardó, estado, texto vigente y texto
+  de partida. Sin controles de edición; el borrador no se modifica.
+- **Comprobado (hechos).** Prueba `plan-preparation` (11/11), las dos pruebas de
+  navegador de la CI sobre versiones incompatibles y una revisión visual con un
+  borrador de prueba en el expediente público de Loja. Suite completa: 3106
+  pruebas correctas y 1 fallo, el de idempotencia de Localiza.
+
+---
+
 ## 2026-11-22 · Impresión del Perfil: un solo bloque `@media print`
 
 Pages al empezar: `848a564`.

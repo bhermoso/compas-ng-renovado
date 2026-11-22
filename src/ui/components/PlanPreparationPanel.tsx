@@ -47,6 +47,24 @@ export function SupportDocumentLink({ doc }: { doc: SupportDocument }) {
   return <a href={href} target="_blank" rel="noopener noreferrer" title={`${doc.title} · ${doc.period}`}>{doc.shortName}</a>;
 }
 
+const SAVED_STATUS_LABEL: Record<PlanPreparationDecision["status"], string> = {
+ pending: "Pendiente", included: "Incluido", modified: "Modificado", excluded: "Excluido",
+};
+
+/** Redacción guardada de un borrador que no puede abrirse para editar: se muestra tal cual, en solo lectura. */
+function SavedDraftReadOnly({draft}: {draft: PlanPreparationDraft}) {
+ const entries = Object.entries(draft.decisions);
+ if (!entries.length) return <p className="panel-note">El borrador guardado no contiene decisiones.</p>;
+ return <details className="pcm-legacy-draft__saved" open>
+  <summary>Redacción guardada · versión {draft.version} · {draft.updatedAt.slice(0, 10)} · solo lectura</summary>
+  <p className="panel-note">Códigos y textos tal como se guardaron. Para volver a editarlo hace falta revisar su compatibilidad con la versión vigente del catálogo.</p>
+  <dl>{entries.map(([code, decision]) => <div key={code}>
+   <dt>{code} · {SAVED_STATUS_LABEL[decision.status]}</dt>
+   <dd>{decision.text ?? decision.sourceText}{decision.text && decision.text !== decision.sourceText && <small> Texto de partida: {decision.sourceText}</small>}</dd>
+  </div>)}</dl>
+ </details>;
+}
+
 export function PlanPreparationPanel({module, municipalityId, draft, onChange, review, onReviewChange, canEditProposal=true, canReview=false, reviewIsCurrent=true, renderWorksheet, persistenceMessage}: {
  persistenceMessage?: string;
  module: ActionPlanCatalogModule;
@@ -61,7 +79,10 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
  renderWorksheet: (module: ActionPlanCatalogModule, general: CatalogGeneralObjectiveTemplate, specific: CatalogSpecificObjectiveTemplate) => ReactNode;
 }) {
  if (draft && (draft.municipalityId !== municipalityId || draft.moduleId !== module.id || draft.version !== module.version)) {
-  return <section role="alert">La versión del borrador requiere revisión de compatibilidad. Se conserva sin modificar y no se puede editar.</section>;
+  return <section className="pcm-legacy-draft">
+   <p role="alert">La versión del borrador requiere revisión de compatibilidad. Se conserva sin modificar y no se puede editar.</p>
+   <SavedDraftReadOnly draft={draft} />
+  </section>;
  }
  const revised = module.version === ZAIDIN_PROPOSAL_VERSION;
  const fourBlocks = module.generalObjectives.length === 4 && module.generalObjectives.every(general => Boolean(general.thematicBlockName));
