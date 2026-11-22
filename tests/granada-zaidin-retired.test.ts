@@ -38,4 +38,8 @@ describe("Retirada de Granada-Zaidín y ausencia de ámbito por defecto", () => 
     expect(readFileSync("src/main.tsx", "utf8")).not.toContain("coordinacion-zaidin");
     expect(readFileSync("src/ui/components/documentAccessUtils.ts", "utf8")).not.toContain("zaidin");
   });
+
+  it("las propuestas de actuación de la ficha no nombran el Zaidín en otros expedientes", () => {
+    expect(readFileSync("src/domain/action-plan-catalog/ActionWorksheetProposal.ts", "utf8")).not.toMatch(/zaid/i);
+  });
 });

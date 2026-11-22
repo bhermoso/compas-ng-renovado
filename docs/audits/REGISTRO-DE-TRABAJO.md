@@ -22,6 +22,53 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-22 · Retirada de Granada-Zaidín: pruebas de navegador fuera de CI y restos visibles
+
+Pages al empezar: `6bfaf4e`. Comprobaciones con expedientes del repositorio
+(`public/seeds`) y PDF de ensayo, en navegador aislado; ninguna con Firestore.
+
+### Pruebas adaptadas (todas pasan en local)
+
+Muchas ya fallaban antes de la retirada: usaban la ruta antigua `/COMPAS_NG/` y
+una portada sin acceso. Ahora montan la aplicación directamente o usan la entrada
+actual.
+
+- `admin-panel`: Loja en lugar de Zaidín; la portada muestra «COMPAS · Acceso».
+- `plan-preparation` e `indicator-worksheet`: Loja (y Atarfe), con los apartados
+  plegados del diseño de Inicio y los códigos visibles de la plantilla común
+  (ENV-OE1.1, ENV-I1.1; el expediente guarda ENV-OE5.1, ENV-I5.1). La plantilla
+  común da 47 fichas de indicador (18 + 12 + 17).
+- `profile-pdf-enrichment`: el PDF del Informe incorporado se simula con el PLIZD
+  de Fuente Vaqueros, solo como PDF de ensayo (252 páginas, huella verificada).
+  Las subidas usan PDF generados en la prueba. Las cargas están ahora en
+  Diagnóstico › «Carga manual por tipo»; el aviso de Perfil desactualizado se
+  comprueba con `pslIsStale`.
+- `browser-recovery`: Atarfe y Fuente Vaqueros; la copia incluye el PLIZD. Se
+  conserva el borrador de la antigua demostración de coordinación porque las
+  copias anteriores pueden contenerlo.
+- `relas-login`: la portada ordinaria; la vista `relas-zaidin` ya no existe.
+- `relas-firebase.rules`: ámbito `loja`. **No ejecutada**: requiere el emulador
+  de Firebase, que no está instalado en esta sesión.
+- `profile-complete-review`: se retira la rama de Zaidín. **Sigue fallando** por
+  un motivo anterior: con Loja el Perfil sale `archived` y la prueba espera
+  `generated`.
+
+### Restos visibles corregidos
+
+- Las dos propuestas de actuación de la ficha ENV-I1.1 decían «El Zaidín» en
+  cualquier expediente (observado en Loja). Ahora dicen «el territorio». Prueba
+  en `granada-zaidin-retired`.
+- Dos comentarios de código con Zaidín como ejemplo.
+
+### Queda (no tocado)
+
+Código con ramas o comentarios de Zaidín, sin efecto visible comprobado:
+`badeaMunicipalContext` (caso `granada-zaidin`), lectura UGC de
+`HealthReportStructuredReading`, condición de `MunicipalActionPlanModule`,
+`PlanPreparationDraft` (`ZAIDIN_*`) y comentarios en `health-profile`.
+
+---
+
 ## 2026-11-21 · Retirada de Granada-Zaidín: fase 2, paso 5 (contratos y documentación histórica)
 
 Pages al empezar: `1b5dba6`. Solo documentación; no cambia código ni datos.

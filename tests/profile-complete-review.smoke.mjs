@@ -14,11 +14,6 @@ try {
   await page.goto(`${base}?vista=app`);
   const result = await page.evaluate(async ({base, scope}) => {
     const ws = await (await fetch(`${base}seeds/compas-ng-workspace-${scope}.json`)).json();
-    if (scope === 'granada-zaidin') {
-      const { processPdfHealthReport } = await import(`${base}src/application/health-report/ProcessPdfHealthReport.ts`);
-      const bytes = await (await fetch(`${base}docs/source-material/health-reports/informe-salud-zaidin-abril-2023.pdf`)).arrayBuffer();
-      ws.healthReport = await processPdfHealthReport(ws.healthReport, bytes);
-    }
     const territory = ws.municipality.identity.name;
     const api = await import(`${base}src/application/health-profile/index.ts`);
     const { createMunicipalityRuntime } = await import(`${base}src/application/runtime/index.ts`);

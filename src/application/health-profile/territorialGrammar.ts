@@ -46,7 +46,7 @@ export interface TerritorialLexicon {
    *  "del barrio"). */
   delScope: string;
   /** true solo para distritos inframunicipales con lectura por Unidad Asistencial
-   *  (p. ej. Granada-Zaidín): habilita la mención legítima "Unidad Asistencial". */
+   *  (p. ej. un distrito urbano): habilita la mención legítima "Unidad Asistencial". */
   usaUnidadAsistencial: boolean;
 }
 

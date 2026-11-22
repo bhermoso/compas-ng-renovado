@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import {initializeTestEnvironment, assertFails, assertSucceeds} from '@firebase/rules-unit-testing';
 import {doc, getDoc, setDoc, writeBatch, serverTimestamp, deleteDoc, getDocs, collection} from 'firebase/firestore';
 let env;
-const scope='granada-zaidin';
+const scope='loja';
 const path=`relas_scopes/${scope}/drafts/aging`;
 before(async()=>{env=await initializeTestEnvironment({projectId:'demo-compas-relas',firestore:{rules:readFileSync('firebase/firestore.rules','utf8')}});});
 after(async()=>{await env?.cleanup();});

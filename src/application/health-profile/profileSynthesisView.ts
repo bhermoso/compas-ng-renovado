@@ -168,7 +168,7 @@ export function buildProfileSynthesis(
   // IBSE — señal principal SOLO cuando es medición LOCAL del ámbito (Lote A / F4):
   // el IBSE municipal (p. ej. Atarfe) es un +1 propio y debe figurar como fuente y
   // como señal principal de la lectura; el monitor provincial usado como proxy
-  // (p. ej. Granada-Zaidín) permanece como contexto y NO se añade aquí.
+  // (sin escala municipal declarada) permanece como contexto y NO se añade aquí.
   const ibseRefPrincipal = ref(answers, "ibse-indice-total");
   if (ibseRefPrincipal !== undefined && ibseRefPrincipal.esLocal) {
     const ibseBlock = bloque("bienestar-socioemocional-escolar");
