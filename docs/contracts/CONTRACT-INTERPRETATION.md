@@ -439,7 +439,7 @@ interpretativa.
 | Contrato | Relación |
 |---|---|
 | `CONTRACT-EVIDENCE.md` | Define los `EvidenceAtom` que son las entradas del MIT |
-| `CONTRACT-MIT-PSL.md` | Formaliza el MIT, la Reconciliación y el PSL como objetos de dominio |
+| `CONTRACT-MIT-PSL.md` (histórico; doctrina vigente del Perfil: `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`) | Formalizaba el MIT, la Reconciliación y el PSL como objetos de dominio |
 | `CONTRACT-ACTION-PLAN.md` | Define los motores del Nivel 3 que consumen el PSL (capa de deliberación y decisión) |
 | `CONTRACT-TERRITORIAL-STRUCTURAL-INFERENCE.md` | Reserva arquitectónica para la futura Inferencia Estructural Territorial |
 | `ARCHITECTURE-CONSTITUTION.md` | Arts. 5, 6 y 9 establecen los principios de separación y transparencia que fundamentan este contrato |

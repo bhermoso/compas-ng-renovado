@@ -1,7 +1,7 @@
 /**
  * profileVisualContract
  *
- * Versión operativa de docs/architecture/PROFILE-VISUAL-CONTRACT.md.
+ * Versión operativa de docs/historico/contratos-perfil/PROFILE-VISUAL-CONTRACT.md (histórico).
  * La visualización del Perfil responde preguntas diagnósticas y declara
  * siempre fuente, escala y cautela. Pequeño, puro y testeable.
  */

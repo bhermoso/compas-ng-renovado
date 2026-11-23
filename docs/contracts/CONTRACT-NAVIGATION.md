@@ -222,7 +222,7 @@ produce son objetos distintos.
 
 La interfaz debe mantener esta distinción visible. No deben confundirse. La estructura
 del Perfil es **adaptativa**: no fija seis ni siete capítulos obligatorios (ver
-`CONTRACT-MIT-PSL` §6.1.1 bis).
+`CONTRACT-MIT-PSL` §6.1.1 bis (histórico; doctrina vigente del Perfil: `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`)).
 
 ### 8.2 Denominaciones canónicas de los productos en la interfaz
 
@@ -278,9 +278,9 @@ Este contrato aplica el Art. 5 (separación evidencia/interpretación/propuesta)
 
 ### Con los contratos de producto certificados
 
-- `CONTRACT-PSL-COMPAS`: los términos de este contrato en §4.1 y §8.2 son coherentes con el Producto 3 tal como está definido.
-- `CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER`: el PSL-C como "documento institucional" coincide con la denominación de §8.2.
-- `CONTRACT-MIT-PSL`: la lectura del PSL es **única y adaptativa**; su cobertura conceptual (Conclusiones, Cierre interpretativo, Síntesis y Priorización, etc.) se muestra según la riqueza del expediente, **sin recuento obligatorio de capítulos** (§6.1.1 bis).
+- `CONTRACT-PSL-COMPAS` (histórico; doctrina vigente del Perfil: `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`): los términos de este contrato en §4.1 y §8.2 son coherentes con el Producto 3 tal como está definido.
+- `CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER` (histórico; doctrina vigente del Perfil: `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`): el PSL-C como "documento institucional" coincide con la denominación de §8.2.
+- `CONTRACT-MIT-PSL` (histórico; doctrina vigente del Perfil: `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`): la lectura del PSL es **única y adaptativa**; su cobertura conceptual (Conclusiones, Cierre interpretativo, Síntesis y Priorización, etc.) se muestra según la riqueza del expediente, **sin recuento obligatorio de capítulos** (§6.1.1 bis).
 - `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY` Art. 17 ter: el Perfil tiene una sola salida. No hay denominación canónica de un «Producto 4» separado.
 
 ---
@@ -325,7 +325,7 @@ Este contrato no define:
 | `ARCHITECTURE-CONSTITUTION` Arts. 3, 5 | Base del principio de primacía del proceso |
 | `FOUNDATIONS §2` | Municipio como unidad de trabajo |
 | `OPERATING-CONSTITUTION` Bloque F | Terminología única sin duplicidades |
-| `CONTRACT-PSL-COMPAS` | Producto 3 y sus términos canónicos |
+| `CONTRACT-PSL-COMPAS` (histórico; doctrina vigente del Perfil: `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`) | Producto 3 y sus términos canónicos |
 | `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY` Art. 17 ter | Una sola salida del Perfil; PSL-NHS retirado |
 | `CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT` | Denominación canónica del Producto 7 |
 | `docs/methodology/METHODOLOGICAL-FOUNDATIONS-LOCAL-HEALTH-PLANNING §I.3` | Las seis etapas canónicas del ciclo institucional |

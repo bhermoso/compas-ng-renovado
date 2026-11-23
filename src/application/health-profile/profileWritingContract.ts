@@ -2,7 +2,7 @@
  * profileWritingContract
  *
  * Contrato de escritura del Perfil Local de Salud (versión operativa de
- * docs/architecture/PROFILE-WRITING-CONTRACT.md). Pequeño y puro: constantes
+ * docs/historico/contratos-perfil/PROFILE-WRITING-CONTRACT.md, histórico). Pequeño y puro: constantes
  * y un verificador de fronteras que los tests y la narrativa pueden usar.
  *
  * Fórmula de escritura: señal de salud → mecanismo social plausible →

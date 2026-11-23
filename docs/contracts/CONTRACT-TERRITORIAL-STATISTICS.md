@@ -31,7 +31,7 @@ sin alterar la revisión vigente.
 1. **Material para la revisión, no evidencia del Perfil vigente.** Una descarga no
    modifica el Perfil vigente, no genera `EvidenceAtom` y no cambia la lectura de
    ningún expediente. Llega al Perfil cuando el equipo redactor la incorpora en
-   una revisión nueva (`CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION` v1.1).
+   una revisión nueva (`CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY`).
 2. **Datos, no diagnóstico.** Los valores describen el territorio. No priorizan,
    no recomiendan y no establecen relaciones causales con la salud (Art. 8 y 8 bis).
 3. **Excepción acotada a la doctrina del piloto BADEA.** El piloto de 2026-07
@@ -161,7 +161,7 @@ El paquete no modifica la revisión vigente ni constituye validación.
 
 1. Desde una descarga guardada, el usuario puede preparar una **nueva revisión** del
    Perfil vigente. La vigente no cambia; la nueva queda «en revisión» hasta que el
-   usuario la guarda y la valida (`CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION`).
+   usuario la guarda y la valida (`CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY`).
 2. Reglas de incorporación, por indicador y escala (municipio o sección):
    - **Ausente en el Perfil:** se añade.
    - **Dato más reciente** o **mismo periodo con valor distinto del publicado por la

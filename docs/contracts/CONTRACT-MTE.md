@@ -120,7 +120,7 @@ El MTE **no puede** recibir ni acceder a:
 
 | Gate | Condición | Tipo | Resultado si no se cumple |
 |---|---|---|---|
-| **G-MTE-1** | `psl.status` distinto de `superseded` y `archived` (la validación es criterio de calidad, no requisito: `CONTRACT-PROFILE-VALIDATION-QUALITY`) | Bloqueante | `{ ok: false, violations: [G-MTE-1] }` |
+| **G-MTE-1** | `psl.status` distinto de `superseded` y `archived` (la validación es criterio de calidad, no requisito: `CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY`, que integra el antiguo `CONTRACT-PROFILE-VALIDATION-QUALITY`) | Bloqueante | `{ ok: false, violations: [G-MTE-1] }` |
 | **G-MTE-2** | `psl.areasDeIntervencion.length >= 1` | No bloqueante | Artefacto generado con `escenarios: []`; `hasTranslatableContent: false` |
 | **G-MTE-3** | `frameworkProvider` disponible y operativo | Bloqueante | `{ ok: false, violations: [G-MTE-3] }` |
 
@@ -330,7 +330,7 @@ Cuando el Producto 6 se diseñe, su contrato debe referenciar
 | Documento | Relación |
 |---|---|
 | `CONTRACT-STRATEGIC-SCENARIO.md` | Define `EscenarioEstratégico`, la entidad de dominio que el MTE produce |
-| `CONTRACT-MIT-PSL.md` | Define el `LocalHealthProfile` y la regla PSL-C1 |
+| `CONTRACT-MIT-PSL.md` (histórico; doctrina vigente del Perfil: `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`) | Definía el `LocalHealthProfile` y la regla PSL-C1 |
 | `CONTRACT-ACTION-PLAN.md` | Define el consumidor primario y las reglas MTE-1, MTE-2, MTE-3 (vigentes) |
 | `CONTRACT-INTERPRETATION.md` | Define las capas de conocimiento; la `LecturaEstrategicaLocal` opera entre capa 4 y capa 5 |
 | `CONTRACT-STRATEGIC-TRANSLATION.md` | Archivado — diseño conceptual previo supersedido por este contrato |

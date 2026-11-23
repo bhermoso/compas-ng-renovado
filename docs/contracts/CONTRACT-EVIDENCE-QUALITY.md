@@ -166,7 +166,7 @@ Un dato con baja calidad muestral no se descarta: se registra con sus limitacion
 
 - Calidad muestral → ver CONTRACT-DYNAMIC-TRIPYRAMID.md (Tripirámide Dinámica).
 - Integración con EvidenceStore → ver CONTRACT-EVIDENCE.md.
-- Uso por MIT → ver CONTRACT-MIT-PSL.md.
+- Uso por MIT → ver CONTRACT-MIT-PSL.md (histórico; doctrina vigente del Perfil: `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`).
 
 ---
 

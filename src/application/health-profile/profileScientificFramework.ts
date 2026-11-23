@@ -1,7 +1,7 @@
 /**
  * profileScientificFramework
  *
- * Versión operativa de docs/architecture/PROFILE-SCIENTIFIC-FRAMEWORK.md:
+ * Versión operativa de docs/historico/contratos-perfil/PROFILE-SCIENTIFIC-FRAMEWORK.md (histórico):
  * principios científicos del Perfil traducidos a reglas verificables y a la
  * taxonomía cerrada de estatus causal. Pequeño, puro y testeable.
  */

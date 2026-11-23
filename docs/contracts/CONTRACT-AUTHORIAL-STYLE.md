@@ -161,7 +161,7 @@ su continuación. Cuando el autor amplíe el script:
 Este contrato es transversal. Se aplica junto con:
 
 - `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`;
-- `PROFILE-WRITING-CONTRACT`;
+- `docs/guides/GUIA-ESCRITURA-PERFIL.md` (procede del §0 del antiguo `PROFILE-WRITING-CONTRACT`);
 - `CONTRACT-ACTION-PLAN-CATALOG`;
 - `CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT`;
 - `CONTRACT-NAVIGATION`;

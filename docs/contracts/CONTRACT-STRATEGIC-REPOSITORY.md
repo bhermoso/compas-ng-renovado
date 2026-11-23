@@ -179,7 +179,7 @@ Disponibilidad para el Motor de Traducción Estratégica
 
 - Motor de Traducción Estratégica → CONTRACT-STRATEGIC-TRANSLATION.md
 - Documentos municipales → CONTRACT-REPOSITORY.md
-- Perfil de Salud Local → CONTRACT-MIT-PSL.md
+- Perfil de Salud Local → CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md (antes CONTRACT-MIT-PSL.md, histórico)
 
 ---
 
