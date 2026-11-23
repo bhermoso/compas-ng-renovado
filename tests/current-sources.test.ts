@@ -84,4 +84,28 @@ describe("una sola versión vigente de cada fuente del proceso actual", () => {
     expect(next.repository.documents.map(d => d.id)).toContain("localiza-1");
     expect(next.ibseStudyHistory).toHaveLength(1);
   });
+
+  it("casos hallados en Firebase: informe antiguo con otro tipo, series duplicadas y copias del informe sustituido", () => {
+    const state = base();
+    const add = (id: string, kind: Parameters<typeof addMunicipalDocument>[1]["kind"], tags: string[], createdAt: string) => {
+      state.repository = addMunicipalDocument(state.repository, { id, kind, title: id, tags });
+      state.repository.documents = state.repository.documents.map(document => document.id === id ? { ...document, createdAt } : document);
+    };
+    add("informe-otro-tipo", "other", ["health-report", "primary-source"], "2026-10-05T10:00:00.000Z");
+    add("series-1", "longitudinal-evidence", ["longitudinal-evidence"], "2026-10-26T04:34:00.000Z");
+    add("series-2", "longitudinal-evidence", ["longitudinal-evidence"], "2026-10-26T04:44:00.000Z");
+    state.previousHealthReports = [
+      { linkedDocumentId: "desaparecido" },
+      { linkedDocumentId: "informe-2018" },
+    ] as NonNullable<typeof state.previousHealthReports>;
+    const plan = planCurrentSourcesConsolidation(state);
+    const byLabel = Object.fromEntries(plan.entries.map(entry => [entry.label, entry]));
+    expect(byLabel["Informe de salud"].remove.map(d => d.id).sort()).toEqual(["informe-1", "informe-otro-tipo"]);
+    expect(byLabel["Series comparadas entre ciclos"].keep?.id).toBe("series-2");
+    expect(byLabel["Series comparadas entre ciclos"].remove.map(d => d.id)).toEqual(["series-1"]);
+    const next = applyCurrentSourcesConsolidation(state, plan, now);
+    expect(next.previousHealthReports?.map(report => report.linkedDocumentId)).toEqual(["informe-2018"]);
+    expect(next.repository.documents.map(d => d.id)).toContain("informe-2018");
+    expect(planCurrentSourcesConsolidation(next).isEmpty).toBe(true);
+  });
 });

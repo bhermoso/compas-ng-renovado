@@ -22,6 +22,38 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-23 · Lectura de Firestore y casos que la regla de fuente vigente no cubría
+
+Pages al empezar: `312b627`.
+
+- **Acceso.** Lectura de `relas_scopes/*/workspace/current` y de sus fragmentos
+  desde el panel de navegador de la aplicación de escritorio, con la sesión de
+  COMPÁS del responsable. La red de la sesión en la nube sigue sin llegar a
+  Firestore. Solo lectura; los ocho expedientes superan la comprobación de
+  integridad (número de fragmentos y longitud).
+- **Hechos observados en Firestore (expediente real).**
+  - Alfacar: dos «INFORME SALUD ALFACAR 2026». El de 5/10 tiene tipo `other`
+    con la etiqueta `health-report` y la regla no lo reconocía como informe.
+    Una copia «anterior» del informe remite a un documento que ya no existe.
+  - Atarfe: tres exports IBSE; dos marcados `ibse-history` (el diccionario y
+    una copia previa de las respuestas 0–100) y dos entradas de historial.
+  - Granada-Zaidín: la «Conversión histórica del informe — Word estilo Atarfe»
+    (tipo `other`, sin ciclo declarado) convive con el PDF original de abril
+    de 2023, que es el informe vinculado.
+  - Loja: dos «Series comparadas entre ciclos. Loja, 2003-2026», la segunda
+    «versión corregida», cada una con 28 evidencias: la serie entra dos veces
+    en el diagnóstico. Dos Localiza Salud (18/10 y 6/11) y 162 evidencias de
+    activos archivadas.
+  - Churriana, Fuente Vaqueros, Láchar y Zagra: una sola versión vigente de
+    cada fuente; los documentos antiguos de Fuente Vaqueros y Zagra (PSL 2018)
+    están declarados de ciclo histórico.
+- **Cambio.** La fuente «Informe de salud» incluye los documentos con la
+  etiqueta `health-report` aunque su tipo sea otro; nueva fuente «Series
+  comparadas entre ciclos»; las copias «anteriores» del informe que no remiten
+  a un documento histórico se eliminan.
+- **No verificado.** Las reglas de Firestore desplegadas: el token de la sesión
+  de COMPÁS no permite leerlas.
+
 ## 2026-11-23 · Una sola versión vigente de cada fuente del proceso actual
 
 Pages al empezar: `0965d88`.
