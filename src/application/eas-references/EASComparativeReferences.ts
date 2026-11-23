@@ -54,10 +54,10 @@ export interface EASComparativeReferenceInput {
 }
 
 const METHOD =
-  "Referencias comparativas calculadas desde microdatos EAS mediante los mismos parsers y fórmulas COMPÁS NG; Granada provincia se usa como proxy piloto y Andalucía como referencia autonómica.";
+  "Referencias comparativas calculadas desde microdatos EAS mediante los mismos parsers y fórmulas de COMPÁS; Granada provincia se usa como proxy piloto y Andalucía como referencia autonómica.";
 
 export const EAS_COMPARATIVE_REFERENCE_CAUTION =
-  "Granada-Zaidín no dispone de estimación distrital propia en estos fixtures. El valor Granada corresponde a Granada provincia como proxy piloto/contextual; no debe redactarse como dato específico del distrito.";
+  "Los fixtures no contienen estimaciones municipales ni distritales. El valor Granada corresponde a Granada provincia como proxy contextual; no debe redactarse como dato del municipio o del distrito.";
 
 const round1 = (value: number): number => Math.round(value * 10) / 10;
 const round2 = (value: number): number => Math.round(value * 100) / 100;
