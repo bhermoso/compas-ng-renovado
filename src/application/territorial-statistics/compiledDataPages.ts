@@ -8,6 +8,7 @@
  * si falta un valor, la frase se omite, no se completa.
  */
 import type { TerritorialObservation, TerritorialStatisticsSnapshot } from "../../domain/territorial-statistics/TerritorialStatistics";
+import { municipalObservation } from "./revisionPackage";
 
 export interface CompiledPages {
   contexto: string[];
@@ -25,10 +26,14 @@ const LEVELS = ["provincia", "andalucia", "espana"] as const;
 
 export function compileDataPages(s: TerritorialStatisticsSnapshot): CompiledPages {
   const M = s.municipalityName;
-  const obs = (id: string, level: TerritorialObservation["level"] = "municipio") =>
-    s.observations.find(o => o.indicatorId === id && o.level === level && o.value !== null);
-  const sections = [...new Set(s.observations.filter(o => o.level === "seccion").map(o => o.territoryCode))].sort();
-  const sec = (id: string, code: string) => s.observations.find(o => o.indicatorId === id && o.territoryCode === code);
+  const obs = (id: string, level: TerritorialObservation["level"] = "municipio") => {
+    const local = municipalObservation(s, id);
+    if (!local || local.value === null) return undefined;
+    if (level === "municipio") return local;
+    return s.observations.find(o => o.indicatorId === id && o.level === level && o.value !== null && o.period === local.period);
+  };
+  const sections = [...new Set(s.observations.filter(o => o.level === "seccion" && o.territoryCode.startsWith(s.ineCode)).map(o => o.territoryCode))].sort();
+  const sec = (id: string, code: string) => s.observations.find(o => o.indicatorId === id && o.level === "seccion" && o.territoryCode === code);
   const provName = obs("adrh-renta-neta-persona", "provincia")?.territoryName ?? s.observations.find(o => o.level === "provincia")?.territoryName ?? "";
   const lit = (o: TerritorialObservation) => o.literal.replace(/\s*%$/, "");
   const num = (o: TerritorialObservation) => lit(o);
@@ -93,7 +98,7 @@ export function compileDataPages(s: TerritorialStatisticsSnapshot): CompiledPage
   const contexto: string[] = [];
   {
     const sentences: string[] = [];
-    const urb = s.observations.find(o => o.indicatorId === "ieca-grado-urbanizacion" && o.level === "municipio");
+    const urb = municipalObservation(s, "ieca-grado-urbanizacion");
     if (urb) sentences.push(`El IECA clasifica ${M} como ${urb.literal.toLowerCase()} según la tipología europea de celdas de población${cite(urb)}.`);
     const edad = obs("adrh-edad-media"), hogar = obs("adrh-tamano-hogar");
     if (edad) sentences.push(`La edad media es de ${num(edad)} años en ${edad.period}${cmp("adrh-edad-media")}${cite(edad, obs("adrh-edad-media", "andalucia"))}.`);
@@ -158,7 +163,7 @@ export function compileDataPages(s: TerritorialStatisticsSnapshot): CompiledPage
       ["ieca-tasa-desempleo-registrado-hombres", "Hombres · %"], ["ieca-paro-larga-duracion", "Paro registrado de más de un año · % del paro"],
     ]);
     if (t.length) {
-      const urb = s.observations.find(o => o.indicatorId === "ieca-grado-urbanizacion" && o.level === "municipio");
+      const urb = municipalObservation(s, "ieca-grado-urbanizacion");
       condiciones.push(...t, `${sourcesNote(["ieca-tasa-desempleo-registrado", "ieca-paro-larga-duracion"])} La tasa cuenta personas registradas como desempleadas por cada cien de 16 a 64 años. Los valores de la provincia y de Andalucía corresponden a sus municipios ${urb ? `de la categoría «${urb.literal.toLowerCase()}», la misma que ${M}` : "de la misma categoría de urbanización"}.`);
     }
     const p = obs("ieca-paro-registrado"), pm = obs("ieca-paro-registrado-mujeres"), ph = obs("ieca-paro-registrado-hombres");

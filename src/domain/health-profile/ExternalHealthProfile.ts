@@ -84,7 +84,12 @@ export interface ProfileCondition {
  op: '<' | '>' | '<=' | '>=';
  right: ProfileValueRef | { value: number };
 }
-export interface ProfileReviewFlag { target: string; reason: string }
+export interface ProfileReviewFlag {
+ target: string;
+ reason: string;
+ /** Permite sustituir la marca al volver a comprobar su causa. Las marcas antiguas pueden carecer de esta referencia. */
+ check?: { kind: "binding" | "condition" | "recommendation"; key: string };
+}
 export interface ExternalProfileLibrary {
  profiles: ExternalHealthProfile[];
  attachments: ProfileAttachment[];

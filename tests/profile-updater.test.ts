@@ -89,6 +89,16 @@ describe("actualizador de perfiles", () => {
     expect(s.conclusions.map(c => c.id)).toEqual(["C1"]);
   });
 
+  it("excluye del texto y la tabla un comparador de otro año", () => {
+    const revised = { ...snapshot, observations: snapshot.observations.map(o => o.level === "provincia" ? { ...o, period: "2023" } : o) };
+    const r = buildProfileUpdate({
+      library, snapshots: [revised], kinds: ["paginas-datos"], author: "B",
+      now: new Date("2026-11-18T15:00:00Z"), newId: () => "corr",
+    });
+    expect(r.profile!.text).toContain("En 2024, la renta neta media por persona es de 12.924 euros, frente a 13.342 en Andalucía");
+    expect(r.profile!.text).not.toContain("13.509");
+  });
+
   it("la segunda actualización sustituye lo compilado y no lo duplica", () => {
     const once = rebuildDataPages(text, snapshot, true, true).text;
     const twice = rebuildDataPages(once, snapshot, true, true).text;
@@ -110,6 +120,52 @@ describe("actualizador de perfiles", () => {
 });
 
 describe("campos del paquete derivados del texto (CONTRACT-PROFILE-UPDATER §8)", () => {
+  it("vacía los campos si un paquete suprime la última conclusión, recomendación y lectura", () => {
+    const original: ExternalHealthProfile = {
+      ...base,
+      text: [
+        "2. Conclusiones", "Una lectura de conjunto", "El resumen.", "C1. La única conclusión.",
+        "5. Recomendaciones", "R1. Cuidados", "Abordar. Valorar apoyos.", "Fundamento: C1.",
+        "7. Autoría y revisión", "Perfil elaborado por el equipo.",
+      ].join("\n\n"),
+      summary: "El resumen.",
+      findings: ["C1. La única conclusión."],
+      areas: [{ id: "R1", title: "R1. Cuidados. Valorar apoyos.", rationale: "Abordar · Deriva de C1" }],
+    };
+    const r = buildProfileUpdate({
+      library: { ...library, profiles: [original] }, kinds: ["paquete-texto"], author: "B",
+      now: new Date("2026-11-18T15:00:00Z"), newId: () => "corr",
+      textPackage: {
+        schema: "compas-profile-text-package/v1", createdAt: "2026-11-18", author: "B", note: "",
+        entries: [{ municipalityId: "alfacar", baseTitle: original.title, operations: [
+          { op: "replace-section", heading: "2. Conclusiones", paragraphs: [] },
+          { op: "replace-section", heading: "5. Recomendaciones", paragraphs: [] },
+        ] }],
+      },
+    });
+    expect(r.blocked).toBeUndefined();
+    expect(r.profile).toMatchObject({ summary: "", findings: [], areas: [] });
+    expect(original.findings).toEqual(["C1. La única conclusión."]);
+  });
+
+  it("conserva las marcas y campos aportados de un Perfil antiguo al corregir rótulos", () => {
+    const original: ExternalHealthProfile = {
+      ...base, text: "Quién vive aquí\n\nTexto del equipo.",
+      summary: "Resumen aportado.", findings: ["Conclusión aportada."],
+      areas: [{ id: "r1", title: "Recomendación aportada.", rationale: "Revisión técnica." }],
+      reviewFlags: [{ target: "C1", reason: "Verificar la fuente." }],
+    };
+    const r = buildProfileUpdate({
+      library: { ...library, profiles: [original] }, kinds: ["rotulos"], author: "B",
+      now: new Date("2026-11-18T15:00:00Z"), newId: () => "corr",
+    });
+    expect(r.blocked).toBeUndefined();
+    expect(r.profile!.text).toContain("Contexto y población");
+    expect(r.profile).toMatchObject({
+      summary: original.summary, findings: original.findings, areas: original.areas, reviewFlags: original.reviewFlags,
+    });
+  });
+
   const body = [
     "2. Conclusiones", "Una lectura de conjunto", "Primera lectura.", "Segunda lectura.",
     "C1. Conclusión uno.", "C2. Conclusión dos.",

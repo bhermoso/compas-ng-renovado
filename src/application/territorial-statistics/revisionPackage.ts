@@ -29,45 +29,22 @@ function sourceLine(snapshot: TerritorialStatisticsSnapshot, sourceId: string): 
 }
 
 export function municipalObservation(snapshot: TerritorialStatisticsSnapshot, indicatorId: string): TerritorialObservation | undefined {
-  return snapshot.observations.find(o => o.indicatorId === indicatorId && o.level === "municipio");
+  return snapshot.observations.find(o =>
+    o.indicatorId === indicatorId && o.level === "municipio" && o.territoryCode === snapshot.ineCode
+  );
 }
 
 /** Resultados municipales con sus comparadores publicados, listos para el paquete. */
 export function revisionResults(snapshot: TerritorialStatisticsSnapshot, catalog: IndicatorFicha[] = TERRITORIAL_INDICATORS): ProfileResult[] {
-  const out: ProfileResult[] = [];
-  for (const ficha of catalog) {
+  return catalog.flatMap(ficha => {
     const local = municipalObservation(snapshot, ficha.id);
-    if (!local) continue;
-    const comparisons = COMPARATOR_ORDER.flatMap(level => {
-      const c = snapshot.observations.find(o => o.indicatorId === ficha.id && o.level === level);
-      return c && c.value !== null ? [{ label: COMPARATOR_LABEL(c), value: c.value }] : [];
-    });
-    const { text, locator } = sourceLine(snapshot, local.sourceId);
-    const cautions = [...ficha.cautions];
-    if (local.derived) cautions.push(`${local.derived.method} Valores publicados: ${local.derived.inputs.map(i => `${i.label} ${i.value}`).join("; ")}.`);
-    if (local.secret) cautions.push("Dato protegido por secreto estadístico en la fuente.");
-    out.push({
-      id: `ts-${ficha.id}`,
-      title: ficha.title,
-      value: ficha.unit === "%" ? local.literal.replace(/\s*%$/, "") : local.literal,
-      unit: ficha.unit,
-      source: text,
-      page: locator,
-      period: local.period,
-      caution: cautions.join(" "),
-      topic: DOMAIN_LABEL[ficha.domain],
-      scale: "Municipal",
-      temporalContext: "current",
-      ...(local.value !== null ? { chartValue: local.value } : {}),
-      ...(comparisons.length ? { comparisons } : {}),
-    });
-  }
-  return out;
+    return local ? [{ ...resultFrom(snapshot, ficha, local, territorialResultId(ficha.id)), scale: "Municipal" }] : [];
+  });
 }
 
 // ── Cobertura frente al Perfil vigente ───────────────────────────────────────
 
-export type CoverageStatus = "ausente" | "actualizable" | "al-dia" | "revisar-valor" | "otro-periodo" | "otra-medida" | "sin-dato";
+export type CoverageStatus = "ausente" | "actualizable" | "al-dia" | "revisar-valor" | "otro-periodo" | "otra-medida" | "sin-dato" | "ambiguo";
 
 export interface CoverageRow {
   indicatorId: string;
@@ -100,21 +77,59 @@ export function sectionCodeOf(result: Pick<ProfileResult, "title" | "scale">, in
   return short ? `${ineCode}${short}` : undefined;
 }
 
-/** Resultados del Perfil que corresponden a un indicador: los municipales primero. */
+const normalizeScope = (value: string) => value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().trim();
+const NON_MUNICIPAL_SCOPE = /\b(?:provincia(?:l)?|comarca(?:l)?|distrito|distrital|barrio|zona basica|ambito supramunicipal|andalucia|espana|autonomic[oa]|nacional|seccion(?:es)?|celda(?:s)?)\b/;
+const NON_MUNICIPAL_TITLE = /\b(?:provincia(?:l)?|comarca(?:l)?|distrital|autonomic[oa]|nacional|seccion censal)\b|\b(?:distrito|barrio|zona basica)\s+|(?:^|[(:·–-])\s*(?:andalucia|espana)\b/;
+const MUNICIPAL_SCOPE = /^(?:(?:ambito|escala|nivel)\s+)?(?:municipal|municipio)\b/;
+
+function comparableScope(result: ProfileResult, ineCode: string): { section?: string } | undefined {
+  const scope = normalizeScope(result.scale ?? "");
+  const title = normalizeScope(result.title);
+  const section = sectionCodeOf(result, ineCode);
+  if (section) {
+    // Un código de otro municipio o una escala declarada incompatible
+    // no se reinterpretan como una sección de este expediente.
+    const declaredSection = !scope || /\bseccion(?:es)?\b/.test(scope) || scope === section;
+    return section.startsWith(ineCode) && declaredSection ? { section } : undefined;
+  }
+  if (NON_MUNICIPAL_SCOPE.test(scope) || NON_MUNICIPAL_TITLE.test(title)) return undefined;
+  // Compatibilidad con las antiguas entregas locales que omitían la escala.
+  if (!scope || MUNICIPAL_SCOPE.test(scope)) return {};
+  return undefined;
+}
+
+const territorialResultId = (indicatorId: string, section?: string) =>
+  `ts-${indicatorId}${section ? `-${section}` : ""}`;
+
+/** Resultados compatibles por indicador y ámbito. Un identificador territorial prima sobre el nombre. */
 function profileMatches(ficha: IndicatorFicha, results: ProfileResult[], ineCode: string) {
   const re = new RegExp(ficha.profileMatch, "i");
-  return results.filter(r => re.test(r.title)).map(r => ({ result: r, section: sectionCodeOf(r, ineCode) }))
-    .sort((x, y) => Number(!!x.section) - Number(!!y.section));
+  return results.flatMap(result => {
+    const scope = comparableScope(result, ineCode);
+    if (!scope) return [];
+    const canonicalId = territorialResultId(ficha.id, scope.section);
+    const identified = result.id === canonicalId || result.id.startsWith(`${canonicalId}:`);
+    // Las filas procedentes de otro indicador conocido no se vuelven a emparejar por título.
+    if (!identified && (result.id.startsWith("ts-") || !re.test(result.title))) return [];
+    return [{ result, section: scope.section, identified }];
+  });
+}
+
+function preferredProfileMatches(matches: ReturnType<typeof profileMatches>, section?: string) {
+  const scoped = matches.filter(match => match.section === section);
+  const identified = scoped.filter(match => match.identified);
+  return identified.length ? identified : scoped;
 }
 
 /** Estado de un valor descargado frente al resultado del Perfil en la misma escala. */
-function compareWithProfile(ficha: IndicatorFicha, local: TerritorialObservation, found: ProfileResult): Exclude<CoverageStatus, "ausente" | "sin-dato"> {
+function compareWithProfile(ficha: IndicatorFicha, local: TerritorialObservation, found: ProfileResult): Exclude<CoverageStatus, "ausente" | "ambiguo"> {
+  if (local.value === null) return "sin-dato";
+  if ((ficha.unit === "%") !== /%/.test(`${found.unit} ${found.value}`)) return "otra-medida";
   const py = yearOf(found.period), dy = yearOf(local.period);
   if (py && dy > py) return "actualizable";
   if (py && py > dy) return "otro-periodo";
-  if ((ficha.unit === "%") !== /%/.test(`${found.unit} ${found.value}`)) return "otra-medida";
   const p = parseEs(found.value);
-  if (local.value === null || !p) return "al-dia";
+  if (!p) return "revisar-valor";
   const d = Math.min(p.decimals, decimalsOf(local.literal));
   const round = (x: number) => Math.round(x * 10 ** d) / 10 ** d;
   return round(p.n) === round(local.value) ? "al-dia" : "revisar-valor";
@@ -128,16 +143,23 @@ function compareWithProfile(ficha: IndicatorFicha, local: TerritorialObservation
  */
 export function profileCoverage(snapshot: TerritorialStatisticsSnapshot, profile?: Pick<ExternalHealthProfile, "results">, catalog: IndicatorFicha[] = TERRITORIAL_INDICATORS): CoverageRow[] {
   return catalog.map(ficha => {
-    const match = profileMatches(ficha, profile?.results ?? [], snapshot.ineCode)[0];
-    const found = match?.result;
-    const section = match?.section;
-    const all = snapshot.observations.filter(o => o.indicatorId === ficha.id);
-    const local = section ? all.find(o => o.territoryCode === section) : all.find(o => o.level === "municipio") ?? all.find(o => o.level === "seccion");
+    const matches = profileMatches(ficha, profile?.results ?? [], snapshot.ineCode);
+    const municipal = preferredProfileMatches(matches);
+    const sectionObservations = snapshot.observations.filter(o =>
+      o.indicatorId === ficha.id && o.level === "seccion" && o.territoryCode.startsWith(snapshot.ineCode));
+    const sections = matches.flatMap(match => match.section ? [match.section] : []);
+    const section = municipal.length ? undefined
+      : sectionObservations.find(o => sections.includes(o.territoryCode))?.territoryCode ?? sections[0];
+    const candidates = section ? preferredProfileMatches(matches, section) : municipal;
+    const found = candidates.length === 1 ? candidates[0].result : undefined;
+    const local = section ? sectionObservations.find(o => o.territoryCode === section)
+      : municipalObservation(snapshot, ficha.id) ?? (municipal.length ? undefined : sectionObservations[0]);
     const row: CoverageRow = { indicatorId: ficha.id, title: ficha.title, domain: ficha.domain, status: "sin-dato" };
     if (local) row.downloaded = { literal: local.level === "municipio" || section ? local.literal : "Por sección censal", period: local.period, territory: local.level === "seccion" ? `sección ${local.territoryCode}` : local.territoryName };
     if (found) row.inProfile = { title: found.title, value: found.value, unit: found.unit, period: found.period, scale: found.scale };
+    if (candidates.length > 1) return { ...row, status: "ambiguo" };
     if (!local) return row;
-    row.status = found ? compareWithProfile(ficha, local, found) : "ausente";
+    row.status = found ? compareWithProfile(ficha, local, found) : local.value === null ? "sin-dato" : "ausente";
     return row;
   });
 }
@@ -155,12 +177,13 @@ export const SECTION_REVISION_INDICATORS = [
 ];
 
 export interface RevisionChange {
-  kind: "añadido" | "actualizado" | "conservado";
+  kind: "añadido" | "actualizado" | "conservado" | "por revisar";
   indicatorId: string;
   title: string;
   scale: string;
   value: string;
   period: string;
+  issue?: "ambiguo";
   /** Valor del Perfil vigente que se sustituye o se conserva. */
   previous?: { title: string; value: string; period: string; reason: CoverageStatus };
 }
@@ -168,8 +191,8 @@ export interface RevisionChange {
 const withoutPercent = (literal: string, unit: string) => (unit === "%" ? literal.replace(/\s*%$/, "") : literal);
 
 function resultFrom(snapshot: TerritorialStatisticsSnapshot, ficha: IndicatorFicha, o: TerritorialObservation, id: string): ProfileResult {
-  const comparisons = o.level === "municipio" ? (["provincia", "andalucia", "espana"] as const).flatMap(level => {
-    const c = snapshot.observations.find(x => x.indicatorId === ficha.id && x.level === level);
+  const comparisons = o.level === "municipio" ? COMPARATOR_ORDER.flatMap(level => {
+    const c = snapshot.observations.find(x => x.indicatorId === ficha.id && x.level === level && x.period === o.period);
     return c && c.value !== null ? [{ label: COMPARATOR_LABEL(c), value: c.value }] : [];
   }) : [];
   const { text, locator } = sourceLine(snapshot, o.sourceId);
@@ -215,21 +238,33 @@ function alignSectionLabels(ficha: IndicatorFicha, ids: string[], next: ProfileR
  */
 export function mergeTerritorialResults(snapshot: TerritorialStatisticsSnapshot, results: ProfileResult[], catalog: IndicatorFicha[] = TERRITORIAL_INDICATORS): { results: ProfileResult[]; changes: RevisionChange[] } {
   const next = [...results];
+  const usedIds = new Set(results.map(result => result.id));
   const changes: RevisionChange[] = [];
-  const sectionCount = new Set(snapshot.observations.filter(o => o.level === "seccion").map(o => o.territoryCode)).size;
+  const sectionCount = new Set(snapshot.observations
+    .filter(o => o.level === "seccion" && o.territoryCode.startsWith(snapshot.ineCode))
+    .map(o => o.territoryCode)).size;
   for (const ficha of catalog) {
     const obs = snapshot.observations.filter(o => o.indicatorId === ficha.id &&
-      (o.level === "municipio" || (o.level === "seccion" && sectionCount > 1 && SECTION_REVISION_INDICATORS.includes(ficha.id))));
+      ((o.level === "municipio" && o.territoryCode === snapshot.ineCode) ||
+        (o.level === "seccion" && o.territoryCode.startsWith(snapshot.ineCode) &&
+          sectionCount > 1 && SECTION_REVISION_INDICATORS.includes(ficha.id))));
     const matches = profileMatches(ficha, results, snapshot.ineCode);
     for (const o of obs) {
-      // Un resultado que ya vino de la estadística territorial conserva su identificador: se reconoce
-      // por él aunque su título no responda al patrón del catálogo (evita duplicarlo en cada revisión).
-      const canonicalId = `ts-${ficha.id}${o.level === "seccion" ? `-${o.territoryCode}` : ""}`;
-      const found = matches.find(m => (o.level === "municipio" ? !m.section : m.section === o.territoryCode))?.result
-        ?? results.find(r => r.id === canonicalId);
+      const section = o.level === "seccion" ? o.territoryCode : undefined;
+      const canonicalId = territorialResultId(ficha.id, section);
+      const candidates = preferredProfileMatches(matches, section);
       const scale = o.level === "municipio" ? "Municipio" : `Sección censal ${o.territoryCode}`;
+      if (candidates.length > 1) {
+        changes.push({ kind: "por revisar", indicatorId: ficha.id, title: ficha.title, scale, value: o.literal, period: o.period, issue: "ambiguo" });
+        continue;
+      }
+      const found = candidates[0]?.result;
       if (!found) {
-        next.push(resultFrom(snapshot, ficha, o, canonicalId));
+        // Una ficha antigua con un ID reservado y otra escala queda intacta.
+        let id = canonicalId;
+        for (let suffix = 2; usedIds.has(id); suffix++) id = `${canonicalId}:${suffix}`;
+        usedIds.add(id);
+        next.push(resultFrom(snapshot, ficha, o, id));
         changes.push({ kind: "añadido", indicatorId: ficha.id, title: ficha.title, scale, value: o.literal, period: o.period });
         continue;
       }

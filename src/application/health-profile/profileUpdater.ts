@@ -13,7 +13,10 @@ import { latestSnapshot } from "../territorial-statistics/snapshots";
 import { mergeTerritorialResults, REVISION_TOPIC } from "../territorial-statistics/revisionPackage";
 import { COMPILED_CONTEXT_MARK, compileDataPages } from "../territorial-statistics/compiledDataPages";
 import { DATA_PAGE_HEADINGS } from "./profileStructure";
-import { applyTextPackage, dependentRecommendations, deriveProfileFields, evaluateConditions, refreshBindings, type ProfileTextPackage } from "./profileTextOperations";
+import {
+  applyTextPackage, bindingReviewCheck, conditionReviewCheck, dependentRecommendations,
+  deriveProfileFields, evaluateConditions, refreshBindings, type ProfileTextPackage,
+} from "./profileTextOperations";
 import type { ProfileBinding, ProfileCondition, ProfileReviewFlag } from "../../domain/health-profile/ExternalHealthProfile";
 
 export type ProfileUpdateKind = "paginas-datos" | "indicadores" | "rotulos" | "cifras-conclusiones" | "paquete-texto" | "campos-derivados";
@@ -53,6 +56,7 @@ const LEGACY_TOPIC: Record<string, string> = {
 };
 const norm = (s: string | undefined) => (s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase();
 const dmy = (d: Date) => `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 
 /**
  * Siguiente número de revisión: sube la versión menor («0.8.2» → «0.9.0»); una
@@ -172,11 +176,13 @@ export function buildProfileUpdate(input: ProfileUpdateInput): ProfileUpdateResu
   const snapshot = latestSnapshot(input.snapshots);
   if ((kinds.includes("paginas-datos") || kinds.includes("indicadores") || kinds.includes("cifras-conclusiones")) && !snapshot) return { base, changes: [], blocked: "El expediente no tiene ninguna descarga de estadística territorial guardada." };
   const changes: string[] = [];
+  const indicatorIssues: string[] = [];
   let text = base.text;
   let results = base.results;
   let bindings: ProfileBinding[] | undefined = base.bindings;
   let conditions: ProfileCondition[] | undefined = base.conditions;
-  const flags: ProfileReviewFlag[] = [];
+  const baseFlags = base.reviewFlags ?? [];
+  let flags = baseFlags;
   const date = dmy(input.now);
 
   if (kinds.includes("paquete-texto")) {
@@ -202,6 +208,10 @@ export function buildProfileUpdate(input: ProfileUpdateInput): ProfileUpdateResu
     results = merged.results;
     const added = merged.changes.filter(c => c.kind === "añadido").length, updated = merged.changes.filter(c => c.kind === "actualizado").length;
     changes.push(`Indicadores: ${added} añadidos y ${updated} actualizados desde la descarga del ${snapshot.retrievedAt.slice(0, 10)}.`);
+    for (const issue of merged.changes.filter(c => c.issue === "ambiguo")) {
+      indicatorIssues.push(`Revisar «${issue.title}» (${issue.scale}). Hay varias filas compatibles en el Perfil.`);
+    }
+    changes.push(...indicatorIssues);
   }
   if (kinds.includes("rotulos")) {
     let retopic = 0;
@@ -209,23 +219,45 @@ export function buildProfileUpdate(input: ProfileUpdateInput): ProfileUpdateResu
     if (retopic) changes.push(`${retopic} indicadores reasignados a las páginas del modelo nuevo.`);
   }
   if (kinds.includes("cifras-conclusiones") && snapshot) {
+    const currentFlags: ProfileReviewFlag[] = [];
+    const checked = [
+      ...(bindings ?? []).map(bindingReviewCheck),
+      ...(conditions ?? []).map(conditionReviewCheck),
+    ];
     if (bindings?.length) {
       const r = refreshBindings(text, bindings, snapshot);
-      text = r.text; bindings = r.bindings; flags.push(...r.flags);
+      text = r.text; bindings = r.bindings; currentFlags.push(...r.flags);
       if (r.changes.length) changes.push(`Cifras de las conclusiones actualizadas: ${r.changes.join(" ")}`);
     }
-    if (conditions?.length) flags.push(...evaluateConditions(conditions, snapshot));
-    const marked = [...new Set(flags.map(f => f.target).filter(t => /^C\d+$/.test(t)))];
-    flags.push(...dependentRecommendations(text, marked));
-    if (flags.length) changes.push(`Para revisar: ${[...new Set(flags.map(f => f.target))].join(", ")}.`);
-    else if (bindings?.length || conditions?.length) changes.push("Las condiciones de las conclusiones se siguen cumpliendo.");
+    if (conditions?.length) currentFlags.push(...evaluateConditions(conditions, snapshot));
+    if (checked.length) {
+      // Solo retirar una marca si su comprobación declarada se ha ejecutado.
+      // Las marcas históricas sin identificador siguen visibles para el equipo.
+      const retained = baseFlags.filter(({ check: previous }) => !previous || (
+        previous.kind !== "recommendation" &&
+        !checked.some(check => check.kind === previous.kind && check.key === previous.key)
+      ));
+      const marked = [...new Set([...retained, ...currentFlags].map(flag => flag.target).filter(target => /^C\d+$/.test(target)))];
+      flags = [...retained, ...currentFlags, ...dependentRecommendations(text, marked)];
+      const unique = new Map(flags.map(flag => [JSON.stringify([flag.target, flag.reason, flag.check]), flag]));
+      flags = [...unique.values()];
+      if (flags.length && !same(flags, baseFlags)) {
+        changes.push(`Para revisar: ${[...new Set(flags.map(flag => flag.target))].join(", ")}.`);
+      } else if (!flags.length && baseFlags.length) {
+        changes.push("Las comprobaciones repetidas resolvieron las marcas de revisión.");
+      }
+    }
   }
   // Resumen, conclusiones y recomendaciones del paquete siguen al texto (CONTRACT-PROFILE-UPDATER §8).
   let derived: { summary: string; findings: string[]; areas: ExternalHealthProfile["areas"] } = { summary: base.summary, findings: base.findings, areas: base.areas };
   if (text !== base.text || kinds.includes("campos-derivados")) {
     const d = deriveProfileFields(text, base.areas);
-    const next = { summary: d.summary ?? base.summary, findings: d.findings.length ? d.findings : base.findings, areas: d.areas.length ? d.areas : base.areas };
-    const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+    const original = text === base.text ? d : deriveProfileFields(base.text, base.areas);
+    const next = {
+      summary: d.summary ?? (original.summary === undefined ? base.summary : ""),
+      findings: d.findings ?? (original.findings === undefined ? base.findings : []),
+      areas: d.areas ?? (original.areas === undefined ? base.areas : []),
+    };
     const touched = [!same(next.summary, base.summary) ? "resumen (lectura de conjunto)" : "", !same(next.findings, base.findings) ? `conclusiones (${next.findings.length})` : "", !same(next.areas, base.areas) ? `recomendaciones (${next.areas.length})` : ""].filter(Boolean);
     if (touched.length) { derived = next; changes.push(`Campos del paquete derivados del texto: ${touched.join(", ")}.`); }
   }
@@ -238,10 +270,14 @@ export function buildProfileUpdate(input: ProfileUpdateInput): ProfileUpdateResu
   const limitationsFixed = limitations.some((l, i) => l !== base.limitations.filter(Boolean)[i]);
   if (limitationsFixed && kinds.includes("campos-derivados")) changes.push("Notas de limitaciones: los archivos originales adjuntos se nombran por su nombre.");
   const derivedChanged = derived.summary !== base.summary || derived.findings !== base.findings || derived.areas !== base.areas || (limitationsFixed && kinds.includes("campos-derivados"));
-  const linksChanged = bindings !== base.bindings || conditions !== base.conditions;
-  if (!changes.length || (text === base.text && results === base.results && !linksChanged && !flags.length && !derivedChanged)) return { base, changes: [], blocked: "Los cambios elegidos no modifican este Perfil." };
+  const linksChanged = !same(bindings, base.bindings) || !same(conditions, base.conditions);
+  const resultsChanged = !same(results, base.results);
+  const flagsChanged = !same(flags, baseFlags);
+  if (text === base.text && !resultsChanged && !linksChanged && !flagsChanged && !derivedChanged) {
+    return { base, changes: indicatorIssues, blocked: "Los cambios elegidos no modifican este Perfil." };
+  }
 
-  const { from, to } = nextRevisionNumber(base.title, text === base.text && results === base.results && !linksChanged);
+  const { from, to } = nextRevisionNumber(base.title, text === base.text && !resultsChanged && !linksChanged);
   const title = to ? base.title.replace(/revisión\s+\d+\.\d+(?:\.\d+)?\s*·\s*\d{2}\/\d{2}\/\d{4}/i, `revisión ${to} · ${date}`) : `${base.title} · actualización ${date}`;
   text = bumpCoverRevision(text, from, to, date);
   text = appendAuthorship(text, `Revisión ${to ?? "actualizada"}, ${date}, generada con el Actualizador de perfiles de COMPÁS a partir de la revisión ${from ?? "anterior"}: ${changes.join(" ")} El resto del texto no cambia. Pendiente de revisión técnica.`);

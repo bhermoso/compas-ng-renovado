@@ -23,14 +23,26 @@ const isHeading = (p: string) => {
   return /^\d{1,2}\.\s+\S/.test(t) || /^Anexo [A-Z]\./.test(t) || /^Referencias$/i.test(t) || LECTURA.test(t) ||
     /^(Contexto y población|Ejes de desigualdad|Condiciones de vida|Servicios|Salud y bienestar|Quién vive aquí|Panel de salud|Desigualdad)$/i.test(t) || /^[A-ZÁÉÍÓÚÑ][^.\n]{1,40} en datos$/.test(t);
 };
-const isConclusion = (p: string, id?: string) => (id ? p.trim().startsWith(`${id}. `) : /^C\d+\.\s/.test(p.trim()));
+const isConclusion = (p: string, id?: string) => {
+  const match = /^(C\d+)\.\s/.exec(p.trim())?.[1];
+  return match !== undefined && (id === undefined || match === id);
+};
+const recommendationId = (p: string) => /^(R\d+)\.\s/.exec(p.trim())?.[1];
+const isFundamento = (p: string) => /^Fundamento:/.test(p.trim());
 
-/** Índices [inicio, fin) del cuerpo de una sección encabezada por `heading` (la primera que aparece). */
+/** Índices [inicio, fin) del cuerpo de una sección identificada por un rótulo único. */
 function sectionRange(paras: string[], heading: string): [number, number] | undefined {
-  const at = paras.findIndex(p => p.trim() === heading.trim());
-  if (at < 0) return undefined;
+  const matches = (p: string) => LECTURA.test(heading.trim()) ? LECTURA.test(p.trim()) : p.trim() === heading.trim();
+  const at = paras.findIndex(matches);
+  if (at < 0 || at !== paras.findLastIndex(matches)) return undefined;
+  const numbered = /^\d{1,2}\.\s+\S/.test(heading.trim());
   let end = at + 1;
-  while (end < paras.length && !isHeading(paras[end]) && !(LECTURA.test(heading) && isConclusion(paras[end]))) end++;
+  while (end < paras.length) {
+    const paragraph = paras[end];
+    if (isHeading(paragraph) && !(numbered && LECTURA.test(paragraph.trim()))) break;
+    if (LECTURA.test(heading.trim()) && isConclusion(paragraph)) break;
+    end++;
+  }
   return [at + 1, end];
 }
 
@@ -38,46 +50,103 @@ function sectionRange(paras: string[], heading: string): [number, number] | unde
 function targetIndices(paras: string[], target: string): number[] {
   if (target === "LECTURA") { const r = sectionRange(paras, "Una lectura de conjunto"); return r ? Array.from({ length: r[1] - r[0] }, (_, i) => r[0] + i) : []; }
   const i = paras.findIndex(p => isConclusion(p, target));
-  return i < 0 ? [] : [i];
+  return i < 0 || i !== paras.findLastIndex(p => isConclusion(p, target)) ? [] : [i];
+}
+
+function recommendationFundamentos(paras: string[], start: number): number[] {
+  const fundamentos: number[] = [];
+  for (let index = start + 1; index < paras.length; index++) {
+    const paragraph = paras[index];
+    if (recommendationId(paragraph) || isHeading(paragraph) || isConclusion(paragraph)) break;
+    if (isFundamento(paragraph)) fundamentos.push(index);
+  }
+  return fundamentos;
 }
 
 // ── Capa 2: vínculos y condiciones ──────────────────────────────────────────
 
 function observationFor(s: TerritorialStatisticsSnapshot, ref: ProfileValueRef): TerritorialObservation | undefined {
-  return s.observations.find(o => o.indicatorId === ref.indicatorId && o.level === ref.level && (!ref.territoryCode || o.territoryCode === ref.territoryCode));
+  const code = ref.territoryCode || (ref.level === "municipio" ? s.ineCode : undefined);
+  const observations = s.observations.filter(o =>
+    o.indicatorId === ref.indicatorId && o.level === ref.level && (!code || o.territoryCode === code)
+  );
+  return observations.length === 1 ? observations[0] : undefined;
 }
 const valueText = (o: TerritorialObservation) => o.literal.replace(/\s*%$/, "");
 const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-/** Sustituye la n-ésima aparición de `literal` como número completo (sin tocar cifras más largas). */
-function replaceNth(text: string, literal: string, next: string, n: number): string | undefined {
-  const re = new RegExp(`(?<![\\d.,])${escape(literal)}(?![\\d]|[.,]\\d)`, "g");
-  let i = 0;
-  let done = false;
-  const out = text.replace(re, m => { i++; if (i === n) { done = true; return next; } return m; });
-  return done ? out : undefined;
+type ReviewCheck = NonNullable<ProfileReviewFlag["check"]>;
+const valueRefKey = (ref: ProfileValueRef) => [ref.indicatorId, ref.level, ref.territoryCode || null];
+export const bindingReviewCheck = (binding: ProfileBinding): ReviewCheck => ({
+  kind: "binding",
+  key: JSON.stringify([binding.target, valueRefKey(binding.ref), binding.field, binding.occurrence ?? null]),
+});
+export const conditionReviewCheck = (condition: ProfileCondition): ReviewCheck => ({
+  kind: "condition",
+  key: JSON.stringify([condition.target, valueRefKey(condition.left), condition.op,
+    "value" in condition.right ? condition.right.value : valueRefKey(condition.right)]),
+});
+
+interface BindingEdit {
+  bindingIndex: number;
+  start: number;
+  end: number;
+  value: string;
+}
+
+function literalLocations(paras: string[], binding: ProfileBinding) {
+  const re = new RegExp(`(?<![\\p{L}\\d.,+−-])${escape(binding.literal)}(?![\\p{L}\\d]|[.,]\\d)`, "gu");
+  return targetIndices(paras, binding.target).flatMap(paragraph =>
+    [...paras[paragraph].matchAll(re)].map(match => ({ paragraph, start: match.index, end: match.index + match[0].length }))
+  );
 }
 
 export interface BindingRefresh { text: string; bindings: ProfileBinding[]; changes: string[]; flags: ProfileReviewFlag[] }
 
 export function refreshBindings(text: string, bindings: ProfileBinding[], snapshot: TerritorialStatisticsSnapshot): BindingRefresh {
   const paras = text.split("\n\n");
-  const out: ProfileBinding[] = [];
+  const out = [...bindings];
   const changes: string[] = [];
   const flags: ProfileReviewFlag[] = [];
-  for (const b of bindings) {
-    const o = observationFor(snapshot, b.ref);
-    if (!o || (b.field === "value" && o.value === null)) { flags.push({ target: b.target, reason: `La descarga no trae ${b.ref.indicatorId} (${b.ref.level}); la cifra ${b.literal} queda sin actualizar.` }); out.push(b); continue; }
-    const next = b.field === "value" ? valueText(o) : o.period;
-    if (next === b.literal) { out.push(b); continue; }
-    const idx = targetIndices(paras, b.target);
-    let replaced = false;
-    for (const i of idx) {
-      const r = replaceNth(paras[i], b.literal, next, b.occurrence ?? 1);
-      if (r !== undefined) { paras[i] = r; replaced = true; break; }
+  const byParagraph = new Map<number, BindingEdit[]>();
+  const flag = (binding: ProfileBinding, reason: string) => flags.push({
+    target: binding.target, reason, check: bindingReviewCheck(binding),
+  });
+  for (const [bindingIndex, b] of bindings.entries()) {
+    const locations = literalLocations(paras, b);
+    const location = b.occurrence === undefined
+      ? (locations.length === 1 ? locations[0] : undefined)
+      : locations[b.occurrence - 1];
+    if (!location) {
+      flag(b, locations.length
+        ? `La aparición enlazada de «${b.literal}» en ${b.target} no está identificada de forma inequívoca.`
+        : `No se encuentra «${b.literal}» en ${b.target}; revisa el vínculo con el texto.`);
+      continue;
     }
-    if (replaced) { changes.push(`${b.target}: ${b.literal} → ${next} (${b.ref.indicatorId}, ${b.field === "value" ? "valor" : "año"}).`); out.push({ ...b, literal: next }); }
-    else { flags.push({ target: b.target, reason: `No se encuentra «${b.literal}» en ${b.target}; el texto cambió desde que se enlazó la cifra.` }); out.push(b); }
+    const o = observationFor(snapshot, b.ref);
+    if (!o || o.value === null || (b.field === "period" && !o.period.trim())) {
+      flag(b, `La descarga no trae un valor publicado e inequívoco para ${b.ref.indicatorId} (${b.ref.level}); se conserva ${b.literal}.`);
+      continue;
+    }
+    const edits = byParagraph.get(location.paragraph) ?? [];
+    edits.push({ bindingIndex, start: location.start, end: location.end, value: b.field === "value" ? valueText(o) : o.period });
+    byParagraph.set(location.paragraph, edits);
+  }
+  for (const [paragraph, edits] of byParagraph) {
+    // Resolver todos los destinos sobre el texto de partida. Una cifra recién
+    // escrita no puede convertirse en el destino de otro vínculo de la misma pasada.
+    for (const edit of edits.sort((a, b) => b.start - a.start)) {
+      const binding = bindings[edit.bindingIndex];
+      if (edits.some(other => other !== edit && other.start < edit.end && edit.start < other.end)) {
+        flag(binding, `Varios vínculos apuntan a la cifra «${binding.literal}» en ${binding.target}.`);
+        continue;
+      }
+      if (edit.value === binding.literal) continue;
+      const before = paras[paragraph];
+      paras[paragraph] = before.slice(0, edit.start) + edit.value + before.slice(edit.end);
+      out[edit.bindingIndex] = { ...binding, literal: edit.value };
+      changes.push(`${binding.target}: ${binding.literal} → ${edit.value} (${binding.ref.indicatorId}, ${binding.field === "value" ? "valor" : "año"}).`);
+    }
   }
   return { text: paras.join("\n\n"), bindings: out, changes, flags };
 }
@@ -87,9 +156,10 @@ export function evaluateConditions(conditions: ProfileCondition[], snapshot: Ter
   for (const c of conditions) {
     const l = observationFor(snapshot, c.left)?.value;
     const r = "value" in c.right ? c.right.value : observationFor(snapshot, c.right)?.value;
-    if (l === undefined || l === null || r === undefined || r === null) { flags.push({ target: c.target, reason: `No se puede comprobar que ${c.statement}: falta un valor en la descarga.` }); continue; }
+    const check = conditionReviewCheck(c);
+    if (l === undefined || l === null || r === undefined || r === null) { flags.push({ target: c.target, reason: `No se puede comprobar que ${c.statement}: falta un valor inequívoco en la descarga.`, check }); continue; }
     const ok = c.op === "<" ? l < r : c.op === ">" ? l > r : c.op === "<=" ? l <= r : l >= r;
-    if (!ok) flags.push({ target: c.target, reason: `Ya no se cumple que ${c.statement} (${l} frente a ${r}).` });
+    if (!ok) flags.push({ target: c.target, reason: `Ya no se cumple que ${c.statement} (${l} frente a ${r}).`, check });
   }
   return flags;
 }
@@ -99,17 +169,12 @@ export function dependentRecommendations(text: string, conclusionIds: string[]):
   if (!conclusionIds.length) return [];
   const paras = text.split("\n\n");
   const flags: ProfileReviewFlag[] = [];
-  let current: string | undefined;
-  for (const p of paras) {
-    const r = /^(R\d+)\.\s/.exec(p.trim());
-    if (r) { current = r[1]; continue; }
-    const f = /^Fundamento:\s*(.+)$/.exec(p.trim());
-    if (f && current) {
-      const cited = f[1].split(/[,\s.]+/).filter(x => /^C\d+$/.test(x));
-      const hit = cited.filter(c => conclusionIds.includes(c));
-      if (hit.length) flags.push({ target: current, reason: `Se apoya en ${hit.join(", ")}, marcada para revisar.` });
-      current = undefined;
-    }
+  for (const [index, paragraph] of paras.entries()) {
+    const target = recommendationId(paragraph);
+    if (!target) continue;
+    const cited = recommendationFundamentos(paras, index).flatMap(i => paras[i].trim().match(/\bC\d+\b/g) ?? []);
+    const hit = [...new Set(cited.filter(id => conclusionIds.includes(id)))];
+    if (hit.length) flags.push({ target, reason: `Se apoya en ${hit.join(", ")}, marcada para revisar.`, check: { kind: "recommendation", key: target } });
   }
   return flags;
 }
@@ -140,6 +205,21 @@ export interface ProfileTextPackage {
 
 const isObj = (x: unknown): x is Record<string, unknown> => typeof x === "object" && x !== null && !Array.isArray(x);
 const strs = (x: unknown): x is string[] => Array.isArray(x) && x.every(v => typeof v === "string");
+const isReviewTarget = (x: unknown) => typeof x === "string" && /^(LECTURA|C\d+)$/.test(x);
+const isValueRef = (x: unknown): x is ProfileValueRef =>
+  isObj(x) && typeof x.indicatorId === "string" && x.indicatorId.trim() !== "" &&
+  typeof x.level === "string" && ["municipio", "seccion", "provincia", "andalucia", "espana"].includes(x.level) &&
+  (x.territoryCode === undefined || (typeof x.territoryCode === "string" && x.territoryCode.trim() !== ""));
+const validBindings = (x: unknown) => Array.isArray(x) && x.every(b =>
+  isObj(b) && isReviewTarget(b.target) && isValueRef(b.ref) && (b.field === "value" || b.field === "period") &&
+  typeof b.literal === "string" && b.literal.trim() !== "" &&
+  (b.occurrence === undefined || (typeof b.occurrence === "number" && Number.isSafeInteger(b.occurrence) && b.occurrence > 0))
+);
+const validConditions = (x: unknown) => Array.isArray(x) && x.every(c =>
+  isObj(c) && isReviewTarget(c.target) && typeof c.statement === "string" && c.statement.trim() !== "" &&
+  isValueRef(c.left) && typeof c.op === "string" && ["<", ">", "<=", ">="].includes(c.op) &&
+  (isValueRef(c.right) || (isObj(c.right) && typeof c.right.value === "number" && Number.isFinite(c.right.value)))
+);
 
 export function parseTextPackage(raw: unknown): ProfileTextPackage {
   if (!isObj(raw) || raw.schema !== "compas-profile-text-package/v1" || !Array.isArray(raw.entries)) throw new Error("El archivo no es un paquete de texto de Perfil (compas-profile-text-package/v1).");
@@ -152,7 +232,7 @@ export function parseTextPackage(raw: unknown): ProfileTextPackage {
         (o.op === "set-fundamento" && typeof o.recommendation === "string" && /^R\d+$/.test(o.recommendation) && strs(o.conclusions)) ||
         (o.op === "replace-paragraph" && typeof o.startsWith === "string" && o.startsWith.length >= 8 && typeof o.text === "string") ||
         (o.op === "add-references" && strs(o.references)) ||
-        (o.op === "set-links" && Array.isArray(o.bindings) && Array.isArray(o.conditions));
+        (o.op === "set-links" && validBindings(o.bindings) && validConditions(o.conditions));
       if (!ok) throw new Error(`Operación no válida en ${e.municipalityId}: ${JSON.stringify(o).slice(0, 120)}`);
     }
   }
@@ -170,11 +250,15 @@ export function applyTextPackage(base: Pick<ExternalHealthProfile, "text" | "bin
   for (const o of entry.operations) {
     if (o.op === "replace-section") {
       const r = sectionRange(paras, o.heading);
-      if (!r) { problems.push(`No existe la sección «${o.heading}».`); continue; }
+      if (!r) { problems.push(`No se encuentra una sección única «${o.heading}».`); continue; }
       paras = [...paras.slice(0, r[0]), ...o.paragraphs, ...paras.slice(r[1])];
       changes.push(`Sección «${o.heading}» sustituida.`);
     } else if (o.op === "upsert-conclusion") {
       const i = paras.findIndex(p => isConclusion(p, o.id));
+      if (i >= 0 && i !== paras.findLastIndex(p => isConclusion(p, o.id))) {
+        problems.push(`La conclusión ${o.id} aparece más de una vez.`);
+        continue;
+      }
       if (i >= 0) { paras[i] = o.text; changes.push(`${o.id} sustituida.`); continue; }
       let last = -1;
       paras.forEach((p, k) => { if (isConclusion(p)) last = k; });
@@ -182,10 +266,16 @@ export function applyTextPackage(base: Pick<ExternalHealthProfile, "text" | "bin
       paras.splice(last + 1, 0, o.text);
       changes.push(`${o.id} añadida.`);
     } else if (o.op === "set-fundamento") {
-      const r = paras.findIndex(p => p.trim().startsWith(`${o.recommendation}. `));
-      const f = r < 0 ? -1 : paras.findIndex((p, k) => k > r && /^Fundamento:/.test(p.trim()));
-      if (f < 0) { problems.push(`No se encuentra el fundamento de ${o.recommendation}.`); continue; }
-      paras[f] = `Fundamento: ${o.conclusions.join(", ")}.`;
+      const matches = (p: string) => recommendationId(p) === o.recommendation;
+      const start = paras.findIndex(matches);
+      const fundamentos = start >= 0 && start === paras.findLastIndex(matches)
+        ? recommendationFundamentos(paras, start)
+        : [];
+      if (fundamentos.length !== 1) {
+        problems.push(`No se encuentra un fundamento único en ${o.recommendation}.`);
+        continue;
+      }
+      paras[fundamentos[0]] = `Fundamento: ${o.conclusions.join(", ")}.`;
       changes.push(`Fundamento de ${o.recommendation}: ${o.conclusions.join(", ")}.`);
     } else if (o.op === "replace-paragraph") {
       const hits = paras.map((p, k) => (p.trim().startsWith(o.startsWith) ? k : -1)).filter(k => k >= 0);
@@ -207,6 +297,7 @@ export function applyTextPackage(base: Pick<ExternalHealthProfile, "text" | "bin
       changes.push(`${o.bindings.length} cifras enlazadas y ${o.conditions.length} condiciones fijadas.`);
     }
   }
+  if (problems.length) return { ...base, changes: [], problems };
   return { text: paras.join("\n\n"), bindings, conditions, changes, problems };
 }
 
@@ -220,15 +311,19 @@ export function applyTextPackage(base: Pick<ExternalHealthProfile, "text" | "bin
  * Se conserva la forma del título de las recomendaciones del Perfil de partida
  * (con o sin el rótulo de la recomendación).
  */
-export interface DerivedProfileFields { summary?: string; findings: string[]; areas: Array<{ id: string; title: string; rationale: string }> }
+export interface DerivedProfileFields {
+  summary?: string;
+  findings?: string[];
+  areas?: ExternalHealthProfile["areas"];
+}
 
 export function deriveProfileFields(text: string, baseAreas: Array<{ id: string; title: string }> = []): DerivedProfileFields {
   const paras = text.split("\n\n").map(p => p.trim());
   const findings = paras.filter(p => /^C\d+\.\s/.test(p));
   const r = sectionRange(paras, "Una lectura de conjunto");
-  const summary = r && r[1] > r[0] ? paras.slice(r[0], r[1]).join("\n\n") : undefined;
+  const summary = r ? paras.slice(r[0], r[1]).join("\n\n") : undefined;
   const withHeading = !baseAreas.length || baseAreas.some(a => { const h = paras.find(p => p.startsWith(`${a.id}. `)); return !!h && a.title.startsWith(`${h}. `); });
-  const areas: DerivedProfileFields["areas"] = [];
+  const areas: ExternalHealthProfile["areas"] = [];
   paras.forEach((p, i) => {
     const m = /^(R\d+)\.\s+(.+)$/.exec(p);
     if (!m || !paras[i + 2]?.startsWith("Fundamento:")) return;
@@ -237,5 +332,9 @@ export function deriveProfileFields(text: string, baseAreas: Array<{ id: string;
     const fundamento = paras[i + 2].slice("Fundamento:".length).trim().replace(/\.$/, "");
     areas.push({ id: m[1], title: withHeading ? `${m[1]}. ${m[2]}. ${t[2]}` : `${m[1]}. ${t[2]}`, rationale: `${t[1]} · Deriva de ${fundamento}` });
   });
-  return { ...(summary ? { summary } : {}), findings, areas };
+  // Un apartado identificado puede estar vacío. Si el texto es de un formato
+  // antiguo y no ofrece ese apartado, el llamador conserva los campos aportados.
+  const hasConclusions = findings.length > 0 || paras.some(p => /^\d{1,2}\.\s+Conclusiones\b/i.test(p));
+  const hasRecommendations = areas.length > 0 || paras.some(p => /^\d{1,2}\.\s+Recomendaciones\b/i.test(p));
+  return { summary, findings: hasConclusions ? findings : undefined, areas: hasRecommendations ? areas : undefined };
 }
