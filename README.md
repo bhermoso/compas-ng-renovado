@@ -34,7 +34,7 @@ npm run dev
 ```bash
 npm run build
 npm test          # suite ordinaria
-npm run lint      # 23 errores y 3 avisos preexistentes a 23/11/2026
+npm run lint      # 21 errores y 3 avisos preexistentes a 23/11/2026
 ```
 
 Suites con condiciones especiales:
