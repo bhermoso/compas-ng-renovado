@@ -22,6 +22,39 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-23 · Limpieza de los expedientes de Firebase: una versión vigente por fuente
+
+Pages al empezar y al terminar: `2b0fb2a`.
+
+- **Autorización del responsable (2026-11-23):** «fusiona y limpia».
+- **Copia previa.** Los ocho expedientes, tal como estaban en Firestore, se
+  guardaron en el perfil del panel de navegador de la aplicación de escritorio
+  (IndexedDB `compas-copia-firebase-20261123`, comprobada por longitud) y se
+  descargaron como `compas-firebase-copia-20261123-antes-limpieza.json`. La
+  descarga no se ha podido comprobar en disco.
+- **Aplicado con «Dejar solo la última versión»**, en la aplicación publicada:
+  - Atarfe: se eliminan el diccionario IBSE y la copia anterior de las
+    respuestas 0–100, y los dos historiales de sustitución. Quedan un informe,
+    un Localiza Salud y un IBSE (el original vinculado, 21 evidencias).
+  - Alfacar: se elimina el informe del 5/10 y la copia anterior del informe.
+    Quedan un informe, un Localiza Salud y una priorización.
+  - Loja: se eliminan el Localiza Salud del 18/10 y la primera «Serie
+    comparada entre ciclos»; las evidencias pasan de 61 a 33 al desaparecer las
+    28 repetidas. Quedan un informe, un Localiza Salud y una serie.
+- **Comprobación posterior en Firestore:** los tres expedientes superan la
+  integridad y tienen una sola versión vigente de cada fuente; el informe
+  vinculado existe en los tres.
+- **No aplicado.** Granada-Zaidín está retirado de la aplicación
+  (`RETIRED_MUNICIPALITY_IDS`) y no puede abrirse para limpiarlo; en Firestore
+  conserva la conversión Word del informe junto al PDF vinculado y una copia
+  «anterior». Pendiente de decisión: conservarlo como archivo o eliminarlo.
+- **Fallo observado.** El primer intento en Atarfe acabó en «Firebase contiene
+  una revisión diferente»: el autoguardado posterior a la recuperación del
+  expediente estaba en curso cuando se lanzó el guardado de la limpieza, y el
+  segundo guardado partía de la revisión anterior. No se perdió nada (Firebase
+  conservaba el expediente íntegro). Se repitió tras recargar y esperar a que
+  terminara el autoguardado. Pendiente: serializar los guardados remotos.
+
 ## 2026-11-23 · Lectura de Firestore y casos que la regla de fuente vigente no cubría
 
 Pages al empezar: `312b627`.
