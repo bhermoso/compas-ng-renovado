@@ -55,9 +55,9 @@ Actualizador de perfiles: aplica cambios declarados (rótulos del modelo, págin
 ---
 
 ### CONTRACT-TERRITORIAL-STATISTICS
-**Estado:** VIGENTE — 1.0.0, 2026-11-17
+**Estado:** VIGENTE — 1.3.0, 2026-11-23
 
-Búsqueda, descarga, conservación e integración de la estadística territorial oficial (Atlas de Renta y Censo anual del INE; BADEA y malla de 250 m del IECA) para los indicadores de determinantes sociales y desigualdad del Art. 17 quater. Catálogo de 37 indicadores con ficha; regla del valor literal, secreto estadístico y derivados declarados; comparadores solo publicados; instantáneas inmutables en el expediente; paquete para la revisión con cobertura frente al Perfil vigente. No modifica el Perfil vigente ni genera evidencia.
+Búsqueda, descarga, conservación e integración de la estadística territorial oficial (Atlas de Renta y Censo anual del INE; BADEA y malla de 250 m del IECA) para los indicadores de determinantes sociales y desigualdad del Art. 17 quater. Catálogo de 37 indicadores con ficha; regla del valor literal, secreto estadístico y derivados declarados; comparadores solo publicados; una sola instantánea inmutable en el expediente, la última guardada; paquete para la revisión con cobertura frente al Perfil vigente. No modifica el Perfil vigente ni genera evidencia.
 
 **Productores:** panel «Estadística territorial» del expediente.
 **Consumidores:** equipo redactor de la revisión del Perfil.

@@ -22,6 +22,41 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-23 · Archivo del expediente
+
+Pages al empezar: `acf6cb9`.
+
+- **Hechos observados en Firestore (`compas-98dd7`).** De 87 documentos en los siete
+  expedientes, 6 tienen el original guardado. Localiza Salud se carga pegando el texto
+  y nunca tiene archivo. Las descargas de estadística territorial se acumulaban sin
+  poder borrarse (Alfacar 4, Loja 3, Atarfe 2, Zagra 2, Churriana, Fuente Vaqueros
+  y Láchar 1).
+- **Hechos observados en el código.** Las acciones sobre un documento (descargar,
+  adjuntar, nueva versión, archivar, eliminar) estaban dentro de la ficha, en un
+  apartado plegado; la carga, en «Otras herramientas del diagnóstico».
+- **Relación con el Perfil (código).** El Perfil es un registro aparte con sus propios
+  archivos y no enlaza con documentos del expediente. Eliminar o sustituir un
+  documento con evidencias cambia la fecha de las evidencias y marca un Perfil
+  validado como «Validación desactualizada»; su texto no cambia. Adjuntar un archivo
+  a una ficha no toca las evidencias. El actualizador del Perfil usa solo la descarga
+  estadística más reciente.
+- **Decisión del responsable.** «prepárala»: una sola pantalla con todo lo cargado y
+  copia única para la estadística territorial.
+- **Cambios.** «Archivo del expediente» sustituye al «Gestor documental»: documentos
+  por función, con Ver, Descargar, Abrir fuente, Adjuntar archivo, Nueva versión,
+  Eliminar o Archivar en cada fila; descargas estadísticas con Descargar CSV y
+  Eliminar; Perfiles con sus archivos. La carga universal se abre desde la propia
+  pantalla. El aviso de eliminar y de nueva versión dice cuántas evidencias se
+  retiran y si un Perfil validado quedará marcado. Adjuntar admite PDF, DOCX, CSV,
+  hojas de cálculo, texto, JSON y ZIP. CONTRACT-TERRITORIAL-STATISTICS 1.3.0 (§9,
+  I-TS-9). Portadas de sección: los logos pasan a una segunda fila antes de
+  montarse sobre el título (comprobado en la web publicada con la regla inyectada:
+  a 1000 × 1100 los logos invadían «Diagnóstico territorial»; con la regla, sin
+  solape a 1000, 1536 y 1920 px de ancho, en Diagnóstico y Perfil).
+- **Pendiente.** Adjuntar los archivos de los 81 documentos sin original (el
+  responsable tiene la documentación). Límite: 40 MB por expediente, sumando los
+  archivos del Perfil; Loja puede no caber entera.
+
 ## 2026-11-23 · Reforma de los contratos del Perfil y contrato de evaluación
 
 Pages al empezar: `e410372`.

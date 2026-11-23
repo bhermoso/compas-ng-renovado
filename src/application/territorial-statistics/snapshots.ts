@@ -1,10 +1,9 @@
 /**
- * Conservación de descargas en el expediente. Las instantáneas son acumulativas e
- * inmutables; solo se retira una por decisión expresa del usuario.
+ * Conservación de descargas en el expediente. Cada instantánea es inmutable. Al
+ * guardar una nueva sustituye a las anteriores (copia única, CONTRACT-TERRITORIAL-STATISTICS §9);
+ * el usuario puede eliminar cualquiera desde el Archivo del expediente.
  */
 import type { TerritorialStatisticsSnapshot } from "../../domain/territorial-statistics/TerritorialStatistics";
-
-export const MAX_TERRITORIAL_SNAPSHOTS = 6;
 
 const isObj = (x: unknown): x is Record<string, unknown> => typeof x === "object" && x !== null && !Array.isArray(x);
 const str = (x: unknown): x is string => typeof x === "string";
@@ -17,12 +16,6 @@ export function isTerritorialStatisticsSnapshot(x: unknown, municipalityId: stri
   const ids = new Set((x.sources as unknown[]).map(s => (isObj(s) ? s.id : undefined)));
   return (x.observations as unknown[]).every(o => isObj(o) && str(o.indicatorId) && str(o.territoryCode) && str(o.literal) && str(o.period) &&
     (o.value === null || (typeof o.value === "number" && Number.isFinite(o.value))) && ids.has(o.sourceId));
-}
-
-/** Añade una descarga; conserva como máximo las seis más recientes. */
-export function appendSnapshot(list: TerritorialStatisticsSnapshot[] | undefined, snapshot: TerritorialStatisticsSnapshot): TerritorialStatisticsSnapshot[] {
-  const prev = (list ?? []).filter(s => s.id !== snapshot.id);
-  return [...prev, snapshot].sort((a, b) => a.retrievedAt.localeCompare(b.retrievedAt)).slice(-MAX_TERRITORIAL_SNAPSHOTS);
 }
 
 export function latestSnapshot(list: TerritorialStatisticsSnapshot[] | undefined): TerritorialStatisticsSnapshot | undefined {

@@ -7,9 +7,10 @@ import { useMemo, useState } from 'react';
 import type { ExternalHealthProfile, ProfileResult } from '../../domain/health-profile/ExternalHealthProfile';
 import type { TerritorialStatisticsSnapshot } from '../../domain/territorial-statistics/TerritorialStatistics';
 import {
-  DOMAIN_LABEL, TERRITORIAL_INDICATORS, appendSnapshot, findAndalusianIneCodes, latestSnapshot, profileCoverage, provenanceCsv,
+  DOMAIN_LABEL, TERRITORIAL_INDICATORS, findAndalusianIneCodes, latestSnapshot, profileCoverage, provenanceCsv,
   mergeTerritorialResults, retrieveTerritorialStatistics, revisionPackage, revisionResults, sectionCsv, sectionTable, type CoverageStatus,
 } from '../../application/territorial-statistics';
+import { replaceTerritorialSnapshots } from '../../application/document-files/expedienteArchive';
 import './TerritorialStatisticsPanel.css';
 
 interface Props {
@@ -97,9 +98,9 @@ export function TerritorialStatisticsPanel({ municipalityId, municipalityName, i
     if (!fresh || !onSave) return;
     setBusy(true); setError('');
     try {
-      await onSave(appendSnapshot(saved, fresh), m => setMessage(m));
+      await onSave(replaceTerritorialSnapshots(fresh), m => setMessage(m));
       setSelectedId(fresh.id); setFresh(undefined);
-      setMessage('Descarga guardada en el expediente y confirmada por Firebase.');
+      setMessage(saved.length ? 'Descarga guardada en Firebase; sustituye a la anterior.' : 'Descarga guardada en el expediente y confirmada por Firebase.');
     } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
     finally { setBusy(false); }
   }
@@ -118,7 +119,7 @@ export function TerritorialStatisticsPanel({ municipalityId, municipalityName, i
           <input value={code} onChange={e => setCode(e.target.value)} inputMode="numeric" maxLength={5} disabled={busy} placeholder="18011"/>
         </label>
         <button type="button" className="ep-primary" disabled={busy || !/^\d{5}$/.test(code.trim())} onClick={() => void run()}>Descargar indicadores</button>
-        {fresh && onSave && <button type="button" className="ep-primary" disabled={busy} onClick={() => void save()}>Guardar en el expediente</button>}
+        {fresh && onSave && <button type="button" className="ep-primary" disabled={busy} onClick={() => void save()}>{saved.length ? 'Guardar y sustituir la anterior' : 'Guardar en el expediente'}</button>}
         {fresh && <button type="button" disabled={busy} onClick={() => { setFresh(undefined); setMessage(''); }}>Descartar descarga</button>}
       </div>
       {!ineCode && <p className="ep-help">El expediente no tiene código INE registrado: indícalo para esta descarga o búscalo por el nombre del municipio. El código usado queda guardado con la descarga. <button type="button" disabled={busy} onClick={() => void lookup()}>Buscar el código de «{municipalityName}»</button></p>}

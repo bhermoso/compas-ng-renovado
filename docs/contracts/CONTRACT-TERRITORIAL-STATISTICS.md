@@ -2,7 +2,7 @@
 
 > Estadística territorial oficial para el Perfil de Salud Local: búsqueda, descarga,
 > conservación e integración en la revisión.
-> Versión 1.2.1 — 2026-11-21
+> Versión 1.3.0 — 2026-11-23
 > Estado: VIGENTE
 >
 > Desarrolla el dominio «determinantes sociales» y el eje de desigualdad del
@@ -132,9 +132,13 @@ Una fuente nueva entra por reforma de este contrato y nueva versión del catálo
    municipio, código INE, fecha, autor, versión del catálogo, fuentes con su
    dirección de consulta, observaciones, malla e incidencias.
 2. Se guarda en el expediente compartido (campo `territorialStatistics`) solo
-   cuando el usuario lo decide, tras revisarla. Se conservan las seis más recientes.
-3. Una descarga no sustituye a otra: el expediente puede mostrar la evolución de
-   las fuentes entre revisiones.
+   cuando el usuario lo decide, tras revisarla.
+3. Copia única: la descarga guardada sustituye a las anteriores, como el resto de
+   fuentes del expediente. El usuario puede eliminar cualquier descarga desde el
+   Archivo del expediente, salvo la única que quede si el Perfil vigente tiene cifras
+   o condiciones enlazadas: se comprueban contra la descarga más reciente.
+4. La evolución entre ciclos se obtiene pidiendo más periodos a la fuente (§12.3),
+   no conservando descargas anteriores.
 
 ## 10. Paquete para la revisión
 
@@ -185,6 +189,7 @@ El paquete no modifica la revisión vigente ni constituye validación.
 | I-TS-6 | Un comparador no publicado se omite; no se estima. |
 | I-TS-7 | El dato de sección o de celda no se atribuye a unidades menores. |
 | I-TS-8 | Las descargas guardadas son inmutables y conservan la versión del catálogo. |
+| I-TS-9 | El expediente conserva una sola descarga: la última guardada. |
 
 ## 12. Cuestiones abiertas
 
@@ -243,6 +248,7 @@ Las tablas por provincia de las otras siete provincias andaluzas figuran en `cat
 
 | Fecha | Versión | Cambio | Responsable |
 |---|---|---|---|
+| 2026-11-23 | 1.3.0 | §9: copia única (la descarga guardada sustituye a las anteriores) y eliminación desde el Archivo del expediente, con bloqueo de la única descarga si el Perfil tiene cifras enlazadas. I-TS-9. Sustituye a «se conservan las seis más recientes» y a la conservación de la evolución entre descargas. Decisión del responsable: «prepárala», sobre la propuesta de aplicar a la estadística la regla de las demás fuentes | COMPÁS NG |
 | 2026-11-21 | 1.2.1 | Ejemplos de ámbito inframunicipal sin nombre propio tras la retirada de Granada-Zaidín de COMPÁS. Sin cambios de regla. | COMPÁS NG |
 | 2026-11-18 | 1.2.0 | Catálogo 2026-11-18: 46 indicadores en los bloques del marco de determinantes sociales (contrato metodológico v2.5.0); nueve nuevos (paro y pensión media por sexo, paro de larga duración, viviendas no principales, alquiler por sección, centros de atención primaria y de servicios sociales); los recuentos dejan de compararse con ámbitos superiores. El IECA sirve sus API desde www.ieca.junta-andalucia.es: la dirección anterior redirige y esa redirección bloquea la consulta desde el navegador; se usa como respaldo | COMPÁS NG |
 | 2026-11-18 | 1.1.0 | §10 bis: nueva revisión del Perfil con los datos descargados (añadir, sustituir o conservar por indicador y escala; destino en las páginas de datos; el texto no cambia). Cobertura comparada en la escala del resultado del Perfil. Valor numérico tomado de la representación publicada por el IECA. Motivo: el autor pidió que los datos se reflejen en el Perfil | COMPÁS NG |
