@@ -156,53 +156,41 @@ Toda lógica que los distinga debe operar sobre los tags.
 
 ## 4. Canonicidad
 
-Un documento es **canónico** cuando el sistema garantiza que solo puede haber
-una versión activa de ese tipo por municipio en cada momento. COMPÁS NG
-implementa dos mecanismos de canonicidad distintos:
+Un documento es **canónico** cuando solo puede haber un ejemplar vigente de esa
+fuente en el proceso actual del municipio. Decisión del responsable
+(2026-11-23): en el proceso actual solo existe el último ejemplar de cada fuente.
+Cargar uno nuevo **sustituye y elimina** el anterior, con sus originales, sus
+derivados y su evidencia, en el expediente y en Firebase. No se archiva ni se
+guarda como historial.
 
-### 4.1 Canónico por `kind`
+### 4.1 Fuentes canónicas
 
-Solo puede existir un documento activo con ese `kind` en el repositorio del
-municipio. Al registrar uno nuevo, el anterior se elimina automáticamente junto
-con toda su evidencia derivada.
-
-Tipos canónicos por `kind`:
-
-- `health-report` (Informe de Salud)
-- `community-asset` (Activos Comunitarios)
-
-La función que implementa esta garantía es `replaceMunicipalDocumentByKind`.
-
-### 4.2 Canónico por `tag`
-
-Dentro de un `kind` acumulable, un tag concreto determina que solo puede
-existir un documento activo con ese tag en el repositorio del municipio. Al
-registrar un nuevo documento con ese tag, todos los documentos previos con el
-mismo tag se eliminan junto con su evidencia derivada.
-
-Tags canónicos actuales (ambos sobre `kind: "redcap-export"`):
-
-| Tag canónico | Instrumento |
+| Fuente | Cómo se identifica |
 |---|---|
-| `"ibse"` | IBSE — Índice de Bienestar Socioemocional |
-| `"thematic-prioritisation"` | Priorización Temática |
+| Informe de Salud | `kind: "health-report"` |
+| Localiza Salud | `kind: "localiza-salud"` |
+| Priorización temática | tag `"thematic-prioritisation"` |
+| Cada estudio complementario (IBSE, DUKE, PREDIMED, SF-12, Sueño, CAGE, AUDIT-C, IPAQ, GHQ-12, PHQ-9, PSQI, Fagerström, SBQ) | su tag de estudio (`"ibse"`, `"phq9"`…) |
 
-La función que implementa esta garantía es `removeDocumentsByTag`, que opera
-sobre tags en lugar de `kind`.
+La sustitución la aplican `retireCurrentPredecessors` al cargar y
+`applyCurrentSourcesConsolidation` para depurar un expediente existente
+(`src/application/workspace/currentSources.ts`). La depuración muestra antes qué
+se conserva y qué se elimina, y exige confirmación.
 
-### 4.3 Acumulable
+### 4.2 Acumulable
 
 El resto de tipos documentales son acumulables: pueden coexistir múltiples
-documentos del mismo `kind` en el repositorio. Cada uno tiene su propio
-`documentId` y su propia evidencia derivada.
+documentos del mismo `kind`. Cada uno tiene su propio `documentId` y su propia
+evidencia derivada.
 
-### 4.4 Histórico
+### 4.3 Histórico
 
-Un documento en estado `archived` permanece en el repositorio como referencia
-histórica. No participa activamente en el pipeline analítico, pero su
-trazabilidad se preserva. La distinción entre `archived` e histórico depende
-del flujo institucional: el repositorio solo garantiza la persistencia del
-estado, no su interpretación.
+Un documento declarado de ciclo histórico (`cycle.status === "historical"`)
+pertenece a otro ciclo del proceso (un informe, un perfil o un plan de años
+anteriores) y **nunca se elimina** por la regla de sustitución: se conserva como
+antecedente con valor comparativo. La declaración la hace el equipo técnico; no
+se infiere. Un ejemplar anterior del mismo proceso no es histórico, aunque esté
+en estado `archived`.
 
 ---
 
@@ -299,21 +287,11 @@ que una ingesta manual.
 
 ### Sustituir
 
-La sustitución solo aplica a documentos canónicos y tiene dos variantes:
-
-**Por `kind`** (`replaceMunicipalDocumentByKind`): elimina todos los documentos
-previos del mismo `kind` y registra el nuevo. Se usa para `health-report` y
-`community-asset`. La purga de evidencia derivada asociada es responsabilidad
-de la capa de aplicación.
-
-**Por `tag`** (`removeDocumentsByTag` + `addMunicipalDocument`): elimina todos
-los documentos que incluyan el tag canónico y registra el nuevo. Se usa para
-IBSE y Priorización Temática. La purga de evidencia derivada asociada es
-responsabilidad de la capa de aplicación.
-
-En ambos casos, la sustitución es irreversible en la sesión activa: los datos
-del documento anterior desaparecen del repositorio y su evidencia derivada se
-purga del `EvidenceStore`.
+Solo aplica a las fuentes canónicas (§4.1). El nuevo ejemplar se registra y los
+anteriores del proceso actual se eliminan con sus originales, derivados,
+evidencias, validaciones de activos y conciliaciones. Los documentos de ciclo
+histórico no se tocan. La sustitución es irreversible salvo con una copia
+descargada del expediente.
 
 ### Eliminar (`removeMunicipalDocument`)
 
@@ -467,3 +445,4 @@ Una actualización conserva el original y las revisiones anteriores; se vincula 
 | 2026-06-24 | Primera redacción. Incorpora la distinción canonicidad-por-kind vs canonicidad-por-tag introducida en commit `1e582f5`. |
 | 2026-07-07 | **Revisión D-HR-01 + selector documental.** Tabla de `DocumentKind` ampliada con `strategic-framework` y columna de visibilidad en selector. `health-report` actualizado: DOCX/PDF aceptados; no genera EvidenceAtom (D-HR-01 resuelta). `community-asset` aclarado como tipo interno/legado. `localiza-salud` declarado como vía visible única para activos. `eas-variable`, `cmi-indicator` y `other` marcados como no expuestos en selector. |
 | 2026-09-24 | Localiza Salud queda fijada como fuente principal/preferente de activos cuando exista o pueda obtenerse; otras menciones de activos quedan como indicios complementarios o pendientes de reconciliación. |
+| 2026-11-23 | **Una sola versión vigente de cada fuente del proceso actual** (decisión del responsable): Informe de Salud, Localiza Salud, priorización temática y cada estudio complementario. La sustitución elimina el ejemplar anterior en lugar de archivarlo; lo histórico se identifica por ciclo declarado y se conserva. Depuración de expedientes existentes con vista previa y confirmación. |

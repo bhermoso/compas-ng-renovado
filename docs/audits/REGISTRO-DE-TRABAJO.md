@@ -22,6 +22,36 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-23 · Una sola versión vigente de cada fuente del proceso actual
+
+Pages al empezar: `0965d88`.
+
+- **Decisión del responsable (2026-11-23).** «Solo debe haber un ejemplar de
+  cada cosa, el último»: un informe de salud, un estudio complementario (en
+  Atarfe, el IBSE de respuestas normalizadas), una priorización, un Localiza
+  Salud. Lo histórico de otro ciclo, distinto, se conserva.
+- **Cambio.**
+  - `currentSources.ts`: identifica cada fuente canónica, elimina los
+    ejemplares anteriores del proceso actual con sus originales, derivados,
+    evidencias, validaciones de activos, conciliaciones e historiales, y
+    respeta los documentos declarados de ciclo histórico.
+  - Informe de Salud, estudios complementarios (también IBSE), Localiza Salud y
+    priorización temática sustituyen y eliminan al cargar. Se retira el
+    archivado y los historiales de sustitución que se añadieron en la #213 y
+    los que ya existían para el IBSE y los informes.
+  - Panel «Versiones vigentes de las fuentes» al pie de cada página: muestra
+    qué se conserva y qué se eliminaría en el expediente abierto, y lo aplica
+    con confirmación. Solo se activa con el expediente recuperado de Firebase.
+  - `CONTRACT-REPOSITORY` §4 y «Sustituir» reescritos con la regla.
+- **Comprobado (hechos).** Suite completa: 2977 pruebas correctas, 2 omitidas
+  (3 nuevas para la regla; 2 de la #213 reescritas). Compilación correcta. Lint
+  sin cambios.
+- **No comprobado.** La depuración sobre los expedientes reales de Firestore:
+  la aplica el responsable desde el panel, expediente por expediente, después de
+  descargar una copia.
+
+---
+
 ## 2026-11-23 · Integridad de la custodia documental y del Actualizador del Perfil (PR #209 consolidada)
 
 Pages al empezar: `b8b3149`.

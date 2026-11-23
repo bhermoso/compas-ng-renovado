@@ -2,7 +2,13 @@ import { addMunicipalDocument, type AddMunicipalDocumentInput } from "../../doma
 import type { HealthReportDocument } from "../../domain/health-report";
 import type { MunicipalityWorkspace } from "../../domain/workspace";
 import { PENDING_DOCUMENT_REVIEW } from "../document-files/documentRevisions";
+import { isHistoricalDocument, retireCurrentPredecessors } from "../workspace/currentSources";
 
+/**
+ * Registra el Informe de Salud vigente. El informe anterior del proceso actual
+ * se elimina con sus originales y evidencias (una sola versión vigente). Un
+ * informe declarado de ciclo histórico se conserva como antecedente.
+ */
 export function registerHealthReport(
   workspace: MunicipalityWorkspace,
   report: HealthReportDocument,
@@ -11,25 +17,16 @@ export function registerHealthReport(
 ): MunicipalityWorkspace {
   const previous = workspace.repository.documents.find(item => item.id === workspace.healthReport?.linkedDocumentId);
   const pending = workspace.repository.documents.find(item => item.id === document.id);
-  const added = pending ?? addMunicipalDocument(workspace.repository, {
-    ...document,
-    ...(previous ? { revisionOf: previous.id, revisionNumber: (previous.revisionNumber ?? 1) + 1 } : {}),
-  }).documents.at(-1)!;
-  const retained = workspace.repository.documents.map(item => {
-    if (item.id === added.id) return {
-      ...item, tags: item.tags.filter(tag => tag !== PENDING_DOCUMENT_REVIEW), updatedAt: now,
-    };
-    if (item.id === previous?.id || (!previous && item.kind === "health-report" &&
-      item.status !== "rejected" && !item.tags.includes(PENDING_DOCUMENT_REVIEW))) {
-      return { ...item, status: "archived" as const, updatedAt: now };
-    }
-    return item;
-  });
-  return {
+  const added = pending ?? addMunicipalDocument(workspace.repository, document).documents.at(-1)!;
+  const documents = workspace.repository.documents.map(item => item.id === added.id
+    ? { ...item, tags: item.tags.filter(tag => tag !== PENDING_DOCUMENT_REVIEW), updatedAt: now }
+    : item);
+  const keepsPreviousAsHistory = previous !== undefined && isHistoricalDocument(previous) && workspace.healthReport !== undefined;
+  const registered: MunicipalityWorkspace = {
     ...workspace,
-    repository: { ...workspace.repository, documents: pending ? retained : [...retained, added], updatedAt: now },
-    previousHealthReports: workspace.healthReport
-      ? [...(workspace.previousHealthReports ?? []), workspace.healthReport]
+    repository: { ...workspace.repository, documents: pending ? documents : [...documents, added], updatedAt: now },
+    previousHealthReports: keepsPreviousAsHistory
+      ? [...(workspace.previousHealthReports ?? []), workspace.healthReport!]
       : workspace.previousHealthReports,
     healthReport: report,
     evidenceStore: {
@@ -39,4 +36,5 @@ export function registerHealthReport(
     },
     updatedAt: now,
   };
+  return retireCurrentPredecessors(registered, { kind: "health-report" }, added.id, now);
 }

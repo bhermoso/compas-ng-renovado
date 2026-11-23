@@ -70,7 +70,8 @@ import {
 import { createMunicipalityRuntime } from "./application/runtime";
 import { ingestManualDocument, extractDocxText, removeEquivalentStrategicFramework } from "./application/document-ingestion";
 import { registerHealthReport } from "./application/health-report/registerHealthReport";
-import { activeStudyDocumentId, activeStudyDocuments, replaceComplementaryStudy, STUDY_DOCUMENT_TAGS } from "./application/document-ingestion/studyDocuments";
+import { activeStudyDocuments, replaceComplementaryStudy, STUDY_DOCUMENT_TAGS } from "./application/document-ingestion/studyDocuments";
+import { applyCurrentSourcesConsolidation, planCurrentSourcesConsolidation, retireCurrentPredecessors } from "./application/workspace/currentSources";
 import { confirmsDocumentDeletion, deleteWorkspaceDocument } from "./application/document-files/deleteWorkspaceDocument";
 import type { ComplementaryStudyKey } from "./domain/workspace/MunicipalityWorkspace";
 import { assetEntriesOfDocument } from "./application/evidence-pipeline";
@@ -149,6 +150,7 @@ import {
   type RemoteWorkspaceRevision,
 } from "./infrastructure/relas/RemoteWorkspace";
 import { RemoteSyncPanel } from "./ui/components/RemoteSyncPanel";
+import { CurrentSourcesPanel } from "./ui/components/CurrentSourcesPanel";
 import { WorkspacePersistenceIndicator } from "./ui/components/WorkspacePersistenceIndicator";
 import { profileSaveErrorMessage, profileSaveProgressMessage } from "./application/health-profile/profileSaveFeedback";
 import { syncRemoteCatalog } from "./application/remote-catalog/syncRemoteCatalog";
@@ -341,18 +343,6 @@ function isThematicPrioritisationDocument(
   document: MunicipalDocument | undefined
 ): boolean {
   return hasDocumentTag(document, THEMATIC_PRIORITISATION_DOCUMENT_TAG);
-}
-
-function removeDocumentsByTag(
-  repository: MunicipalDocumentRepository,
-  tag: string
-): MunicipalDocumentRepository {
-  const now = new Date().toISOString();
-  return {
-    ...repository,
-    documents: repository.documents.filter((document) => !document.tags.includes(tag)),
-    updatedAt: now,
-  };
 }
 
 function attachDocumentIdToAtoms(
@@ -1654,6 +1644,7 @@ export default function App() {
 
   catalogIdsRef.current = new Set(allMunicipalities.map((m) => m.id));
   activeIdRef.current = municipality.id;
+  const currentSourcesPlan = useMemo(() => planCurrentSourcesConsolidation(workspace), [workspace]);
   const compasDocumentLibrary = useMemo(
     () =>
       collectCompasDocumentLibrary(
@@ -1670,42 +1661,19 @@ export default function App() {
   function handleProcessDocument() {
     const isLocaliza = kind === "localiza-salud";
     const oldLocaliza = workspace.repository.documents.filter(d => d.kind === "localiza-salud" && d.status !== "archived" && d.status !== "rejected");
-    // Warning + choice: the administrator owns every change. No silent deletion.
-    let decision: "append" | "archive" = "append";
+    // Una sola versión vigente de Localiza Salud: la nueva carga sustituye a la anterior (currentSources).
     if (isLocaliza && oldLocaliza.length) {
-      const choice = window.prompt(
-        "Ya hay " + oldLocaliza.length + " listado(s) de Localiza Salud en este expediente.\n" +
-        "La nueva carga ha sido seleccionada como Activos Localiza Salud por el responsable.\n" +
-        "1 · Cancelar; nada cambia.\n" +
-        "2 · Añadir una fuente adicional (puede repetir fichas; revisar después).\n" +
-        "3 · Archivar el/los listado(s) anteriores y utilizar el nuevo (se conservan documentos, evidencias históricas y validaciones).\n" +
-        "Escribe 1, 2 o 3:", "1"
-      );
-      if (!choice || choice.trim() === "1") return;
-      if (choice.trim() !== "2" && choice.trim() !== "3") {
-        window.alert("Opción no reconocida. No se ha modificado el expediente.");
-        return;
-      }
-      decision = choice.trim() === "3" ? "archive" : "append";
+      if (!window.confirm(
+        "Ya hay un listado de Localiza Salud en este expediente.\n" +
+        "El nuevo lo sustituirá: el anterior se eliminará del expediente y de Firebase, con sus fichas y su validación.\n" +
+        "Los listados declarados de ciclo histórico se conservan.\n¿Continuar?"
+      )) return;
     } else if (kind === "community-asset" && workspace.repository.documents.some(d=>d.kind==="community-asset" && d.status!=="archived")) {
       if (!window.confirm("Ya hay una fuente de activos comunitarios. La nueva se añadirá sin eliminar la anterior; revisa después los posibles registros repetidos. ¿Continuar?")) return;
     }
-    // Archiving never destroys a source, evidence or human validation.
     const now = new Date().toISOString();
-    const baseRepository = decision === "archive" && isLocaliza ? {
-      ...workspace.repository,
-      documents: workspace.repository.documents.map(d => oldLocaliza.some(o=>o.id===d.id)
-        ? {...d,status:"archived" as const,updatedAt:now} : d),
-      updatedAt:now,
-    } : workspace.repository;
-    const retiredAtoms = decision === "archive" && isLocaliza
-      ? workspace.evidenceStore.atoms.filter(a => oldLocaliza.some(document => evidenceHasDocument(a, document.id)))
-      : [];
-    const baseEvidence = retiredAtoms.length ? {
-      ...workspace.evidenceStore,
-      atoms: workspace.evidenceStore.atoms.filter(a => !retiredAtoms.some(old => old.id === a.id)),
-      updatedAt: now,
-    } : workspace.evidenceStore;
+    const baseRepository = workspace.repository;
+    const baseEvidence = workspace.evidenceStore;
     const result = ingestManualDocument({
       repository: baseRepository,
       evidenceStore: baseEvidence,
@@ -1729,13 +1697,11 @@ export default function App() {
           note: "Registro incorporado expresamente como listado de activos validados.",
         })
       : result.repository;
-    setWorkspace(prev => prev.municipality.identity.id !== workspace.municipality.identity.id ? prev : ({
-      ...prev,
-      repository: nextRepository,
-      evidenceStore: result.evidenceStore,
-      ...(retiredAtoms.length ? { archivedAssetEvidence: [...(prev.archivedAssetEvidence ?? []), ...retiredAtoms] } : {}),
-      updatedAt: new Date().toISOString(),
-    }));
+    setWorkspace(prev => {
+      if (prev.municipality.identity.id !== workspace.municipality.identity.id) return prev;
+      const next = { ...prev, repository: nextRepository, evidenceStore: result.evidenceStore, updatedAt: now };
+      return isLocaliza ? retireCurrentPredecessors(next, { kind: "localiza-salud" }, result.document.id, now) : next;
+    });
     setLastProcessedDocument(result.document);
     setLastAtomCount(result.atomsCreated);
     setTitle("");
@@ -2371,21 +2337,8 @@ export default function App() {
       setWorkspace((prev) => {
         const now = new Date().toISOString();
         if (prev.municipality.identity.id !== study.municipalityId) return prev;
-        const priorId = activeStudyDocumentId(prev, "ibseStudy", IBSE_DOCUMENT_TAG);
-        const priorDocuments = prev.repository.documents.filter(d => d.id === priorId);
-        const oldEvidence = prev.evidenceStore.atoms.filter(
-          atom => atom.municipalityId === prev.municipality.identity.id && atom.provenance.origin === "ibse"
-        );
-        // No destruir fichas ni originales antiguos: archivar su asociación activa.
-        const repositoryWithoutPrior = {
-          ...prev.repository,
-          updatedAt: now,
-          documents: prev.repository.documents.map(d =>
-            d.id === priorId
-              ? { ...d, status: "archived" as const, updatedAt: now, tags: [...d.tags.filter(tag => tag !== IBSE_DOCUMENT_TAG), "ibse-history"] }
-              : d
-          ),
-        };
+        // Una sola versión vigente: el IBSE anterior del proceso actual se elimina al final (currentSources).
+        const repositoryWithoutPrior = prev.repository;
         const nextRepository = addMunicipalDocument(repositoryWithoutPrior, {
           id: documentId,
           kind: "redcap-export",
@@ -2396,7 +2349,6 @@ export default function App() {
           },
           sourceFileName: file.name,
           tags: ["redcap-export", IBSE_DOCUMENT_TAG],
-          ...(priorDocuments[0] ? { revisionOf: priorDocuments[0].id, revisionNumber: (priorDocuments[0].revisionNumber ?? 1) + 1 } : {}),
         });
         let nextStore = {
           ...prev.evidenceStore,
@@ -2411,23 +2363,20 @@ export default function App() {
           const key = stableAssetKey(atom.municipalityId, atom.provenance.origin, atom.title);
           nextStore = upsertEvidenceAtom(nextStore, atom, key);
         }
-        return {
+        return retireCurrentPredecessors({
           ...prev,
           repository: nextRepository,
           ibseStudy: study,
           studySourceDocumentIds: { ...prev.studySourceDocumentIds, ibseStudy: documentId },
-          ibseStudyHistory: prev.ibseStudy
-            ? [...(prev.ibseStudyHistory ?? []), { replacedAt: now, previousStudy: prev.ibseStudy, documents: priorDocuments, evidence: oldEvidence }]
-            : prev.ibseStudyHistory,
           documentOriginals: mergeDocumentOriginals(prev.documentOriginals ?? [], [original]),
           evidenceStore: nextStore,
           updatedAt: now,
-        };
+        }, { kind: "study", key: "ibseStudy" }, documentId, now);
       });
       const warn = warnings.length > 0 ? ` Avisos: ${warnings.join(" ")}` : "";
       setIbseMessage(
         aggregates.nValid > 0
-          ? `IBSE preparado: ${aggregates.nValid} registros válidos · Media total: ${aggregates.meanTotal} · ${ibseAtoms.length} indicadores. Estudio anterior archivado; confirma la sincronización del expediente en Firebase.${warn}`
+          ? `IBSE preparado: ${aggregates.nValid} registros válidos · Media total: ${aggregates.meanTotal} · ${ibseAtoms.length} indicadores. El estudio anterior se ha sustituido; confirma la sincronización del expediente en Firebase.${warn}`
           : `CSV procesado sin registros válidos.${warn}`
       );
       return true;
@@ -3100,10 +3049,7 @@ export default function App() {
         const nextRepository =
           shouldRegisterDocument
             ? addMunicipalDocument(
-                removeDocumentsByTag(
-                  prev.repository,
-                  THEMATIC_PRIORITISATION_DOCUMENT_TAG
-                ),
+                prev.repository,
                 {
                   id: documentId,
                   kind: "redcap-export",
@@ -3118,7 +3064,7 @@ export default function App() {
               )
             : prev.repository;
 
-        return {
+        const imported: MunicipalityWorkspace = {
           ...prev,
           repository: nextRepository,
           thematicPrioritisationStudy: study,
@@ -3141,6 +3087,9 @@ export default function App() {
           }),
           updatedAt: now,
         };
+        return shouldRegisterDocument
+          ? retireCurrentPredecessors(imported, { kind: "prioritisation" }, documentId, now)
+          : imported;
       });
       if (study.completeRecords > 0) {
         setPendingTopics([...study.topFiveTopicIds]);
@@ -4414,6 +4363,17 @@ export default function App() {
           signedIn={remoteClient.auth.currentUser !== null}
         >
           <BackupPanel workspace={workspace} ready={pendingSeedId === null && pendingMigration === null} />
+          <CurrentSourcesPanel
+            plan={currentSourcesPlan}
+            municipalityName={municipality.name}
+            disabled={pendingSeedId !== null || pendingMigration !== null || remoteHydratedMunicipalityId !== workspace.municipality.identity.id}
+            onApply={() => {
+              const now = new Date().toISOString();
+              setWorkspace(prev => prev.municipality.identity.id !== workspace.municipality.identity.id
+                ? prev
+                : applyCurrentSourcesConsolidation(prev, planCurrentSourcesConsolidation(prev), now));
+            }}
+          />
           <RemoteSyncPanel client={remoteClient} />
         </WorkspacePersistenceIndicator>
       </footer>
