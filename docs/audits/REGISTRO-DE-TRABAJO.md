@@ -22,6 +22,51 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-23 · Retirada del código sin uso y de las fotografías de Zagra
+
+Pages al empezar: `c4d020f`.
+
+- **Decisión del responsable (2026-11-23).** Retirar el código del Perfil que
+  generaba COMPÁS y el resto del código sin uso; quitar las fotografías del
+  repositorio. La reconexión de la evaluación y de las referencias EAS queda
+  pendiente de decisión.
+- **Método.** Mapa de importaciones desde `src/main.tsx`, resolviendo los
+  archivos índice nombre a nombre. Se retira lo que no alcanza ningún camino
+  de la aplicación.
+- **Cambio.**
+  - 52 archivos de `src` (48 módulos y 4 índices que quedaban vacíos; 7265 líneas): la vista del Perfil generado
+    (`LocalHealthProfileView`, `ProfileIntegratedEditorialPreview`), su espacio
+    interpretativo (`ui/components/health-profile`), la validación
+    institucional del Perfil generado (`approvePSL`, `invalidatePSL`,
+    `createFormalValidation`, `FormalValidationForm`), los paneles anteriores
+    de Plan de Acción, propuestas y agenda (`ActionPlanPanel`,
+    `CanonicalActionPlanPanel`, `AuthoredProposalPanel`, `ProposalMenuPanel`,
+    `ProposalReviewMode`, `AgendaPanel`) y otros módulos sin uso.
+  - Se conservan, aunque hoy no se usan en la aplicación: las referencias EAS
+    (`EASComparativeReferences` y adaptadores), `Esa2030.ts`,
+    `MonitoringPanel`, `AgendaResultSummary`, `QuestionnaireBuilderPanel`,
+    `EPVSAPanel`, los módulos SAM y SFA, y `buildLocalHealthProfile`,
+    `createMunicipalInventory`, `municipality-context` y
+    `HealthReportToEvidencePipeline`, que las pruebas de código vivo usan
+    para construir expedientes de prueba.
+  - 14 archivos de prueba dedicados solo al código retirado se eliminan; en
+    otros 6 se retiran los casos que lo usaban.
+  - `municipalities/zagra/exports`: se retiran 18 fotografías con personas
+    reconocibles (14 de 2017 y 4 de grupo); el manifiesto lo registra y
+    `.gitignore` excluye imágenes en `municipalities/`. Siguen en el historial
+    de Git.
+  - Índice de contratos: GOV-PSL-02 y GOV-PSL-03, retirados.
+- **Comprobado (hechos).** Compilación correcta. Suite completa: 2954 pruebas
+  correctas, 2 omitidas (antes 3108; la diferencia son las pruebas del código
+  retirado). Lint: 23 errores y 3 avisos (antes 26 errores; ninguno nuevo).
+- **Pendiente.** Los contratos que describen el Perfil generado
+  (`CONTRACT-PSL-COMPAS`, `CONTRACT-MIT-PSL`, `CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER`)
+  siguen sin reformar. Microdatos individuales en `fixtures/` (IBSE Atarfe,
+  EAS): sin decisión. Ramas integradas: el borrado no fue posible desde la
+  sesión de trabajo en la nube.
+
+---
+
 ## 2026-11-23 · Una sola fuente escrita: documentos de arranque y referencias al repositorio anterior
 
 Pages al empezar: `033304a`.
