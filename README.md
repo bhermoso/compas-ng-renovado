@@ -8,8 +8,8 @@ el Plan de Acción y las agendas anuales de implantación.
 - Repositorio de trabajo: `bhermoso/compas-ng-renovado`, rama `master`.
 - Web publicada: https://bhermoso.github.io/compas-ng-renovado/ (se publica al
   fusionar en `master`; `version.json` indica el commit servido).
-- Expedientes: custodia en Firebase (`compas-98dd7`). Los de `public/seeds/`
-  son copias iniciales de octubre de 2026 y solo sirven de ensayo.
+- Expedientes: custodia en Firebase (`compas-98dd7`), única fuente. La web no
+  publica copias de expedientes; las de `fixtures/seeds/` son fixtures de prueba.
 
 ## Dónde empezar
 
@@ -49,8 +49,8 @@ Suites con condiciones especiales:
   planificación.
 - `src/application`: motores, compiladores y servicios puros.
 - `src/ui/components`: paneles de la aplicación.
-- `src/infrastructure`: persistencia local, Firebase y expedientes iniciales.
-- `public/seeds`: expedientes iniciales distribuidos con la aplicación.
+- `src/infrastructure`: persistencia local y Firebase.
+- `fixtures/seeds`: copias antiguas de expedientes, solo para pruebas.
 - `firebase/firestore.rules`: reglas de Firestore vigentes.
 - `docs/contracts`: contratos metodológicos y técnicos.
 - `docs/audits`: registro de trabajo y auditorías.

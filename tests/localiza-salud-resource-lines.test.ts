@@ -31,7 +31,7 @@ describe("listado de Localiza Salud", () => {
   it("el recuento de las semillas no cambia", () => {
     const expected: Record<string, number> = { alfacar: 7, atarfe: 20 };
     for (const [id, n] of Object.entries(expected)) {
-      const ws = parseWorkspaceJSON(readFileSync(`public/seeds/compas-ng-workspace-${id}.json`, "utf8"))!;
+      const ws = parseWorkspaceJSON(readFileSync(`fixtures/seeds/compas-ng-workspace-${id}.json`, "utf8"))!;
       const docs = ws.repository.documents.filter((d) => d.kind === "localiza-salud");
       expect(docs.flatMap(assetEntriesOfDocument)).toHaveLength(n);
     }

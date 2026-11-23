@@ -32,7 +32,7 @@ const _dir = dirname(fileURLToPath(import.meta.url));
 function seed(id: string): MunicipalityWorkspace {
   const path = id === "municipio-ensayo"
     ? resolve(_dir, "../fixtures/workspaces/municipio-ensayo-synthetic-test.json")
-    : resolve(_dir, `../public/seeds/compas-ng-workspace-${id}.json`);
+    : resolve(_dir, `../fixtures/seeds/compas-ng-workspace-${id}.json`);
   return parseWorkspaceJSON(
     readFileSync(path, "utf8")
   )!;

@@ -2,11 +2,10 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import type { MunicipalityWorkspace } from "../src/domain/workspace";
 import { normalizeKnownMunicipalDocumentKinds, validateHistoricalNormalization } from "../src/application/workspace/normalizeKnownMunicipalDocuments";
-import { loadMunicipalitySeed } from "../src/infrastructure/seeds/municipalitySeeds";
 import { municipalDocumentSection } from "../src/application/municipal-document-organization";
 
 function source(id: "loja" | "atarfe"): MunicipalityWorkspace {
-  return JSON.parse(readFileSync(new URL(`../public/seeds/compas-ng-workspace-${id}.json`,import.meta.url),"utf8")) as MunicipalityWorkspace;
+  return JSON.parse(readFileSync(new URL(`../fixtures/seeds/compas-ng-workspace-${id}.json`,import.meta.url),"utf8")) as MunicipalityWorkspace;
 }
 
 describe("Normalización no destructiva de documentos de Loja y Atarfe",()=>{
@@ -43,10 +42,5 @@ describe("Normalización no destructiva de documentos de Loja y Atarfe",()=>{
     expect(result.workspace).toBe(atarfe);
     expect(JSON.stringify(result.workspace)).toBe(before);
     expect(result.workspace.ibseStudy).toBeDefined();
-  });
-  it("el loader incorpora la corrección al seed de Loja sin tocar el JSON original",async()=>{
-    const loaded=await loadMunicipalitySeed("loja",{baseUrl:"/"});
-    expect(loaded?.repository.documents.find(d=>d.id==="doc-action-plan-loja-2022")?.kind).toBe("territorial-documentation");
-    expect(source("loja").repository.documents.find(d=>d.id==="doc-action-plan-loja-2022")?.kind).toBe("strategic-framework");
   });
 });

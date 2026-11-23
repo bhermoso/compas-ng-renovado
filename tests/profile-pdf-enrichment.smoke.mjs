@@ -21,11 +21,11 @@ try {
  browser=await chromium.launch({executablePath:process.env.COMPAS_TEST_CHROMIUM,headless:true,args:['--no-sandbox']});
  const page=await browser.newPage();page.on('pageerror',e=>console.log('PAGE ERROR',e.message));page.on('console',m=>{if(m.type()==='error')console.log('BROWSER',m.text());});const base='http://127.0.0.1:'+server.httpServer.address().port+server.config.base;
  await page.goto(base+'?vista=recuperacion');
- // Expediente de prueba en un almacenamiento aislado: el seed público de Fuente Vaqueros con un Informe de
+ // Expediente de prueba en un almacenamiento aislado: el expediente de prueba de Fuente Vaqueros con un Informe de
  // Salud en PDF incorporado y sin texto. Como PDF se usa el PLIZD de Fuente Vaqueros 2024, el único PDF
  // territorial del repositorio: aquí solo sirve para probar la extracción; no es su Informe de Salud.
  const baseline=await page.evaluate(async({base,pdf,id})=>{
-  const seed=await (await fetch(base+'seeds/compas-ng-workspace-'+id+'.json')).json();
+  const seed=await (await fetch(base+'fixtures/seeds/compas-ng-workspace-'+id+'.json')).json();
   const now='2026-11-21T00:00:00.000Z',docId='doc-prueba-informe-pdf';
   seed.repository.documents.push({id:docId,municipalityId:id,kind:'health-report',title:'PDF de prueba para la extracción del Informe de Salud',status:'validated',
    source:{system:'Prueba automática',url:pdf},sourceFileName:'PLIZD_FUENTE_VAQUEROS_2024.pdf',tags:['health-report','prueba'],createdAt:now,updatedAt:now});

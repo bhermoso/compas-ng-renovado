@@ -3,7 +3,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { chromium } from 'playwright';
 
-// Public seed only; isolated browser storage. Never writes a production workspace.
+// Test fixture only; isolated browser storage. Never writes a production workspace.
 const base = process.env.COMPAS_QA_URL ?? 'http://127.0.0.1:5187/compas-ng-renovado/';
 const out = path.resolve(process.env.COMPAS_QA_OUTPUT ?? 'work/profile-review');
 const scope = process.env.COMPAS_QA_SCOPE ?? 'loja';
@@ -13,7 +13,7 @@ try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   await page.goto(`${base}?vista=app`);
   const result = await page.evaluate(async ({base, scope}) => {
-    const ws = await (await fetch(`${base}seeds/compas-ng-workspace-${scope}.json`)).json();
+    const ws = await (await fetch(`${base}fixtures/seeds/compas-ng-workspace-${scope}.json`)).json();
     const territory = ws.municipality.identity.name;
     const api = await import(`${base}src/application/health-profile/index.ts`);
     const { createMunicipalityRuntime } = await import(`${base}src/application/runtime/index.ts`);

@@ -4,7 +4,7 @@ import { normalizeLojaMetadataRemotely } from "../src/application/workspace/norm
 import type { MunicipalityWorkspace } from "../src/domain/workspace";
 
 function fixture(id: "loja" | "atarfe"): MunicipalityWorkspace {
-  return JSON.parse(readFileSync(new URL(`../public/seeds/compas-ng-workspace-${id}.json`,import.meta.url),"utf8")) as MunicipalityWorkspace;
+  return JSON.parse(readFileSync(new URL(`../fixtures/seeds/compas-ng-workspace-${id}.json`,import.meta.url),"utf8")) as MunicipalityWorkspace;
 }
 
 describe("Corrección remota de metadatos con control de revisión",()=>{

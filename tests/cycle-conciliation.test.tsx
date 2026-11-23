@@ -16,7 +16,7 @@ import {
 import type { MunicipalityWorkspace } from "../src/domain/workspace";
 
 const load = (id: string): MunicipalityWorkspace =>
-  parseWorkspaceJSON(readFileSync(`public/seeds/compas-ng-workspace-${id}.json`, "utf8"))!;
+  parseWorkspaceJSON(readFileSync(`fixtures/seeds/compas-ng-workspace-${id}.json`, "utf8"))!;
 
 function setup(declare: boolean) {
   const base = load("atarfe");

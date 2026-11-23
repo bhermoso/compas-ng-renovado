@@ -29,7 +29,7 @@ const DIR = dirname(fileURLToPath(import.meta.url));
 
 function loadSeed(name: string): unknown {
   return JSON.parse(
-    readFileSync(resolve(DIR, "..", "public", "seeds", `compas-ng-workspace-${name}.json`), "utf-8")
+    readFileSync(resolve(DIR, "..", "fixtures", "seeds", `compas-ng-workspace-${name}.json`), "utf-8")
   );
 }
 
@@ -71,7 +71,7 @@ describe("LocalHealthProfileCompiler — longitudinal solo como contador", () =>
       "../src/application/health-profile-compiler"
     );
     const atarfeSeed = JSON.parse(
-      readFileSync(resolve(DIR, "..", "public", "seeds", "compas-ng-workspace-atarfe.json"), "utf-8")
+      readFileSync(resolve(DIR, "..", "fixtures", "seeds", "compas-ng-workspace-atarfe.json"), "utf-8")
     ) as { municipality: { identity: { id: string; name: string } }; validatedPSL?: import("../src/domain/health-profile").LocalHealthProfile };
 
     if (!atarfeSeed.validatedPSL) {

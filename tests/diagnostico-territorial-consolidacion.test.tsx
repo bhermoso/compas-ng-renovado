@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { DiagnosisControlRoom } from "../src/ui/components/DiagnosisControlRoom";
 import { buildDiagnosisControlSummary } from "../src/application/diagnosis/diagnosisControlSummary";
 import { EstudiosComplementariosPanel } from "../src/ui/components/EstudiosComplementariosPanel";
-import seed from "../public/seeds/compas-ng-workspace-atarfe.json";
+import seed from "../fixtures/seeds/compas-ng-workspace-atarfe.json";
 import type { IBSEStudy } from "../src/domain/ibse";
 import type { MunicipalDocumentRepository } from "../src/domain/repository";
 

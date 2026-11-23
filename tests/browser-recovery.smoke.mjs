@@ -15,7 +15,7 @@ try {
  const createPage=async()=>{const context=await browser.newContext();const page=await context.newPage();await page.goto(base+'?vista=recuperacion');await page.getByRole('heading',{name:'Conservar y recuperar el trabajo'}).waitFor();return page;};
  const source=await createPage();
  assert.equal(await source.evaluate(()=>localStorage.length),0,'Recovery must not hydrate seeds');
- const seeds=await Promise.all(SCOPES.map(id=>readFile('public/seeds/compas-ng-workspace-'+id+'.json','utf8')));
+ const seeds=await Promise.all(SCOPES.map(id=>readFile('fixtures/seeds/compas-ng-workspace-'+id+'.json','utf8')));
  await source.evaluate(async({seeds,PLIZD,scopes})=>{
   for(const text of seeds){const w=JSON.parse(text);
    // El PLIZD de Fuente Vaqueros se distribuye con la aplicación: la copia debe incluir el PDF, no solo su referencia.
