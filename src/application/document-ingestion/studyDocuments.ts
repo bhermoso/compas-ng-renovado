@@ -2,6 +2,7 @@ import { stableAssetKey, upsertEvidenceAtom, type EvidenceAtom } from "../../dom
 import { addMunicipalDocument, type AddMunicipalDocumentInput } from "../../domain/repository";
 import type { ComplementaryStudyKey, MunicipalityWorkspace } from "../../domain/workspace/MunicipalityWorkspace";
 import { PENDING_DOCUMENT_REVIEW } from "../document-files/documentRevisions";
+import { retireCurrentPredecessors } from "../workspace/currentSources";
 
 export const STUDY_DOCUMENT_TAGS: Record<ComplementaryStudyKey, string> = {
   ibseStudy: "ibse",
@@ -69,20 +70,11 @@ export function replaceComplementaryStudy<Key extends Exclude<ComplementaryStudy
   evidence: EvidenceAtom[],
   now: string,
 ): MunicipalityWorkspace {
-  const previousStudy = workspace[key];
-  const previousId = activeStudyDocumentId(workspace, key, tag);
-  const documents = workspace.repository.documents.filter(item => item.id === previousId);
-  const previousEvidence = workspace.evidenceStore.atoms.filter(atom =>
-    atom.municipalityId === workspace.municipality.identity.id && isStudyEvidence(atom, key, tag)
-  );
-  const retiredIds = new Set(previousEvidence.map(atom => atom.id));
-  const previous = documents[0];
-  const repository = {
-    ...workspace.repository,
-    documents: workspace.repository.documents.map(item => item.id === previousId
-      ? { ...item, status: "archived" as const, updatedAt: now }
-      : item),
-  };
+  // Una sola versión vigente: el estudio anterior del proceso actual se elimina
+  // con sus documentos, originales y evidencias (currentSources).
+  const retiredIds = new Set(workspace.evidenceStore.atoms
+    .filter(atom => atom.municipalityId === workspace.municipality.identity.id && isStudyEvidence(atom, key, tag))
+    .map(atom => atom.id));
   let evidenceStore = {
     ...workspace.evidenceStore,
     atoms: workspace.evidenceStore.atoms.filter(atom => !retiredIds.has(atom.id)),
@@ -91,20 +83,13 @@ export function replaceComplementaryStudy<Key extends Exclude<ComplementaryStudy
   for (const atom of evidence) {
     evidenceStore = upsertEvidenceAtom(evidenceStore, atom, stableAssetKey(atom.municipalityId, atom.provenance.origin, atom.title));
   }
-  return {
+  const registered: MunicipalityWorkspace = {
     ...workspace,
     [key]: study,
-    repository: addMunicipalDocument(repository, {
-      ...document,
-      ...(previous ? { revisionOf: previous.id, revisionNumber: (previous.revisionNumber ?? 1) + 1 } : {}),
-    }),
+    repository: addMunicipalDocument(workspace.repository, document),
     studySourceDocumentIds: { ...workspace.studySourceDocumentIds, [key]: document.id },
-    complementaryStudyHistory: previousStudy
-      ? [...(workspace.complementaryStudyHistory ?? []), {
-          studyKey: key, replacedAt: now, previousStudy, documents, evidence: previousEvidence,
-        }]
-      : workspace.complementaryStudyHistory,
     evidenceStore,
     updatedAt: now,
   };
+  return retireCurrentPredecessors(registered, { kind: "study", key }, document.id, now);
 }

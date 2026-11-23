@@ -20,7 +20,7 @@ const reopen = (state: ReturnType<typeof workspace>) => parseWorkspaceJSON(seria
 const file = (id: string) => encodeDocumentOriginal(id, new File([id], id + ".pdf"));
 
 describe("integridad documental", () => {
-  it("conserva ambas fichas y originales del Informe tras releer y activar la revisión", async () => {
+  it("un Informe nuevo del proceso actual sustituye al anterior y elimina su ficha y su original", async () => {
     const initial = workspace();
     const report = (linkedDocumentId: string) => createHealthReportDocumentFromPdf({
       municipalityId, linkedDocumentId, title: "Informe", sourceFileName: linkedDocumentId + ".pdf",
@@ -35,11 +35,24 @@ describe("integridad documental", () => {
     expect(pending.healthReport?.linkedDocumentId).toBe("anterior");
     const next = reopen(registerHealthReport(pending, report("nueva"), pending.repository.documents[1], now));
     expect(next.healthReport?.linkedDocumentId).toBe("nueva");
-    expect(next.previousHealthReports?.map(item => item.linkedDocumentId)).toEqual(["anterior"]);
-    expect(next.repository.documents[0].status).toBe("archived");
-    expect(next.repository.documents[1].revisionOf).toBe("anterior");
-    expect(next.repository.documents[1].tags).not.toContain(PENDING_DOCUMENT_REVIEW);
-    expect(next.documentOriginals?.map(original => original.name)).toEqual(["anterior.pdf", "nueva.pdf"]);
+    expect(next.previousHealthReports ?? []).toEqual([]);
+    expect(next.repository.documents.map(doc => doc.id)).toEqual(["nueva"]);
+    expect(next.repository.documents[0].revisionOf).toBeUndefined();
+    expect(next.repository.documents[0].tags).not.toContain(PENDING_DOCUMENT_REVIEW);
+    expect(next.documentOriginals?.map(original => original.name)).toEqual(["nueva.pdf"]);
+  });
+
+  it("un Informe declarado de ciclo histórico se conserva al cargar el actual", () => {
+    const initial = workspace();
+    const report = (linkedDocumentId: string) => createHealthReportDocumentFromPdf({
+      municipalityId, linkedDocumentId, title: "Informe", sourceFileName: linkedDocumentId + ".pdf",
+      authors: [], arrayBuffer: new ArrayBuffer(0),
+    });
+    const first = registerHealthReport(initial, report("2018"), { id: "2018", kind: "health-report", title: "Informe 2018" }, now);
+    first.repository.documents = first.repository.documents.map(doc => ({ ...doc, cycle: { status: "historical" as const, referenceYear: 2018 } }));
+    const next = registerHealthReport(first, report("2026"), { id: "2026", kind: "health-report", title: "Informe 2026" }, now);
+    expect(next.repository.documents.map(doc => doc.id)).toEqual(["2018", "2026"]);
+    expect(next.previousHealthReports?.map(item => item.linkedDocumentId)).toEqual(["2018"]);
   });
 
   it("las copias derivadas cuentan en el límite común de las revisiones", async () => {
@@ -81,7 +94,7 @@ describe("integridad documental", () => {
     expect(confirmsDocumentDeletion(reopen(deleted.next), "anexo")).toBe(true);
   });
 
-  it("la sustitución de un estudio conserva la ficha, el original y las evidencias anteriores", async () => {
+  it("la sustitución de un estudio elimina la ficha, el original y las evidencias anteriores", async () => {
     const state = workspace();
     const oldStudy = { sourceFileName: "previo.csv" } as NonNullable<typeof state.phq9Study>;
     state.phq9Study = oldStudy;
@@ -100,10 +113,9 @@ describe("integridad documental", () => {
       [atom("después", "nuevo")], now,
     );
     expect(next.studySourceDocumentIds?.phq9Study).toBe("nuevo");
-    expect(next.repository.documents[0].status).toBe("archived");
-    expect(next.repository.documents[1].revisionOf).toBe("previo");
-    expect(next.documentOriginals).toEqual(state.documentOriginals);
-    expect(next.complementaryStudyHistory?.[0].evidence.map(item => item.id)).toEqual(["antes"]);
+    expect(next.repository.documents.map(item => item.id)).toEqual(["nuevo"]);
+    expect(next.documentOriginals).toEqual([]);
+    expect(next.complementaryStudyHistory).toBeUndefined();
     expect(next.evidenceStore.atoms.map(item => item.id)).toEqual(["después"]);
   });
 
