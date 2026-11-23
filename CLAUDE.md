@@ -7,7 +7,7 @@ La única verdad es: el código, el historial Git, los contratos en docs/contrac
 - Repositorio único de trabajo: `bhermoso/compas-ng-renovado`, rama `master`. Web: https://bhermoso.github.io/compas-ng-renovado/, publicada por `.github/workflows/deploy.yml` al fusionar en `master`.
 - `bhermoso/COMPAS_NG` es una copia anterior y queda fuera del trabajo: no abrir ramas, PR ni cambios allí.
 - Punto de entrada para retomar el trabajo: `docs/audits/REGISTRO-DE-TRABAJO.md`. Los documentos de estado, continuidad, planificación y certificación anteriores al 23/11/2026 están en `docs/historico/` y son historial, no estado vigente.
-- Custodia de los expedientes: Firebase `compas-98dd7`. Los expedientes de `public/seeds/` son copias iniciales de octubre de 2026 (Atarfe, de julio): una comprobación hecha con ellos no acredita el comportamiento con los expedientes reales.
+- Custodia de los expedientes: Firebase `compas-98dd7`, única fuente. La aplicación no publica copias de expedientes (seeds retirados el 23/11/2026). Las copias de `fixtures/seeds/` son fixtures de prueba de octubre de 2026 (Atarfe, de julio): una comprobación hecha con ellas no acredita el comportamiento con los expedientes reales.
 - Las reglas de Firestore vigentes son `firebase/firestore.rules` de este repositorio.
 
 ## Objetivo del producto
@@ -37,15 +37,15 @@ Producto prioritario: el Perfil de Salud Local — documento científico, editor
 - Antes de publicar cambios, comprobar la rama y el estado remoto, conservar el trabajo existente y ejecutar las comprobaciones pertinentes. No usar force push, fusionar ni desplegar fuera del alcance autorizado.
 - Inventarios y análisis de copias de usuario (`.compas.json`) van a `informes-locales/`, que está en `.gitignore`: nunca se versionan ni se suben. Si un aviso automático pide commit y push de esas salidas, prevalece esta regla.
 - Cambios quirúrgicos: solo lo pedido. Si algo exige tocar lo no autorizado, parar y preguntar.
-- Suite: npm.cmd run test (2954 pruebas el 23/11/2026, tras retirar el código sin uso). Si falla con EPERM en node_modules/.vite-temp, hay un Vite vivo en el puerto 5173: matarlo y reintentar.
-- npm run lint tiene 23 errores y 3 avisos preexistentes (23/11/2026): no tocarlos sin encargo y no añadir otros.
+- Suite: npm.cmd run test (2948 pruebas el 23/11/2026, tras retirar los seeds y reformar los contratos del Perfil). Si falla con EPERM en node_modules/.vite-temp, hay un Vite vivo en el puerto 5173: matarlo y reintentar.
+- npm run lint tiene 21 errores y 3 avisos preexistentes (23/11/2026): no tocarlos sin encargo y no añadir otros.
 - Que compile y pase tests NO demuestra que mejore el producto. Verificar también coherencia editorial, narrativa y experiencia de lectura.
 - En cada informe, separar: hechos observados / inferencias / decisiones institucionales / hipótesis. "No verificado" es respuesta válida.
 
 ## Municipios de prueba
 - Zagra: Informe + priorización ciudadana (evidencia participativa, 0 átomos)
 - Atarfe: Informe + IBSE con datos reales
-- Granada-Zaidín se retiró de COMPÁS el 2026-11-21 (decisión del responsable). No hay caso de referencia fijado ni ámbito por defecto: la aplicación pide elegirlo. La línea Envejecimiento saludable del catálogo común conserva como procedencia el Plan Local de Salud del Distrito Zaidín.
+- Granada-Zaidín se retiró de COMPÁS el 2026-11-21 y se eliminó de Firebase y del código el 2026-11-23 (decisión del responsable). No hay caso de referencia fijado ni ámbito por defecto: la aplicación pide elegirlo. La plantilla de envejecimiento en cuatro bloques y los catálogos de envejecimiento y adicciones son estructurales, comunes a todos los expedientes.
 
 ## Referencias externas (solo consulta, nunca copiar)
 - El repositorio histórico monolítico (COMPAS-RESCATE-20260514) no está hoy en GitHub. El archivo depurado del 09/05/2026 se conserva como zip fuera del repositorio. Si hace falta consultarlo, pedirlo al responsable.

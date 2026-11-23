@@ -8,93 +8,16 @@ import {
   loadWorkspaceFromLocalStorage,
   hasWorkspaceInLocalStorage,
 } from "./infrastructure/persistence/local-storage";
-import { hasMunicipalitySeed } from "./infrastructure/seeds";
 
 /**
  * appWorkspaceHydration
  *
  * Composición a nivel de aplicación: decide cómo cargar el expediente de un
- * municipio (localStorage prioritario → seed canónico → placeholder vacío) y el
- * guard de persistencia que evita la carrera de la hidratación asíncrona.
+ * municipio (localStorage prioritario → placeholder vacío; Firebase se recupera
+ * después) y el guard de persistencia que protege una copia local ilegible.
  * Vive fuera de `App.tsx` para ser testable sin renderizar el componente (los
  * tests SSR no ejecutan efectos) y sin disparar `react-refresh/only-export-components`.
  */
-
-/**
- * Migración incremental de un documento de seed a un expediente ya persistido.
- * A diferencia del reemplazo completo (`shouldReplaceWithSeed`), añade los
- * documentos y átomos canónicos que falten, preservando todo el trabajo del
- * usuario. La marca versionada evita duplicidades, pero no permite que una copia
- * local más pobre tape la base documental oficial del expediente.
- */
-export interface SeedDocumentMigration {
-  municipalityId: string;
-  documentId: string;
-  marker: string;
-  /** Fusiona todos los documentos y átomos del seed en una sola migración. */
-  mergeAllDocuments?: boolean;
-  /** Umbral mínimo esperable para detectar copias locales incompletas. */
-  expectedMinDocuments?: number;
-  /** Umbral mínimo esperable de átomos de evidencia derivados del seed. */
-  expectedMinEvidenceAtoms?: number;
-  /**
-   * Sustituye el estudio IBSE canónico (mismo id que el del seed) y sus átomos por
-   * los del seed. Solo actúa si el expediente conserva el estudio canónico: un IBSE
-   * importado por la persona usuaria (otro id) o un documento IBSE eliminado no se tocan.
-   */
-  refreshCanonicalIbseStudy?: boolean;
-  /**
-   * Documentos canónicos cuyo texto fuente se actualiza al del seed. Solo si el
-   * documento sigue en el expediente, no se ha eliminado y cada línea que conserva
-   * figura en el texto del seed (la persona usuaria no ha añadido nada propio).
-   */
-  refreshCanonicalDocumentIds?: readonly string[];
-}
-
-/**
- * Lista blanca CERRADA de migraciones incrementales autorizadas. No es una
- * reconciliación genérica del seed: solo se migra exactamente lo declarado aquí.
- */
-export const INCREMENTAL_SEED_MIGRATIONS: readonly SeedDocumentMigration[] = [
-  {
-    municipalityId: "atarfe",
-    documentId: "__all__",
-    // v5 (2026-11-10): IBSE por estratos (menores de 16 y 16 o más, con sus medias;
-    // el registro con año de nacimiento 1993 pasa a 33 años). Incluye v4: documento
-    // de Localiza Salud con 20 recursos (recuento de activos) e IBSE recalculado
-    // desde los ítems en escala común 0–100.
-    marker: "atarfe-documentacion-canonica-v5",
-    mergeAllDocuments: true,
-    expectedMinDocuments: 3,
-    expectedMinEvidenceAtoms: 26,
-    refreshCanonicalIbseStudy: true,
-    refreshCanonicalDocumentIds: ["doc-localiza-atarfe"],
-  },
-  {
-    municipalityId: "alfacar",
-    documentId: "__all__",
-    marker: "alfacar-documentacion-base-v1",
-    mergeAllDocuments: true,
-    expectedMinDocuments: 2,
-    expectedMinEvidenceAtoms: 7,
-  },
-  {
-    municipalityId: "fuente-vaqueros",
-    documentId: "__all__",
-    marker: "fuente-vaqueros-documentacion-canonica-v2",
-    mergeAllDocuments: true,
-    expectedMinDocuments: 1,
-    expectedMinEvidenceAtoms: 29,
-  },
-  {
-    municipalityId: "loja",
-    documentId: "__all__",
-    marker: "loja-documentacion-base-v1",
-    mergeAllDocuments: true,
-    expectedMinDocuments: 6,
-    expectedMinEvidenceAtoms: 0,
-  },
-];
 
 export const ACTIVE_MUNICIPALITY_STORAGE_KEY = "compas-ng:active-municipality";
 
@@ -169,240 +92,21 @@ export function saveActiveMunicipalityId(municipalityId: string): boolean {
   }
 }
 
-/**
- * Acción de migración incremental resuelta para un expediente:
- *   - none               → nada que hacer (marca presente, u otro municipio).
- *   - backfill-marker     → ya contiene el documento pero falta la marca: se estampa
- *                           localmente, sin descargar el seed ni duplicar nada.
- *   - download-and-merge  → falta marca y documento: hay que descargar el seed,
- *                           fusionar el doc + sus átomos y estampar la marca (atómico).
- */
-export type SeedMigrationAction =
-  | { kind: "none" }
-  | { kind: "backfill-marker"; migration: SeedDocumentMigration }
-  | { kind: "download-and-merge"; migration: SeedDocumentMigration };
-
 export interface WorkspaceLoadResult {
   workspace: MunicipalityWorkspace;
   protectExistingStorage: boolean;
-  /**
-   * true cuando NO hay expediente local válido pero existe un seed canónico para
-   * el municipio: el workspace devuelto es un placeholder vacío que debe hidratarse
-   * de forma asíncrona desde el seed. Mientras esté pendiente, el placeholder NO se
-   * persiste (evita la carrera que guarda un expediente vacío antes de la carga).
-   */
-  seedPending: boolean;
-  /**
-   * Migración incremental pendiente para un expediente CON CONTENIDO (no vacío).
-   * Mutuamente excluyente con `seedPending`: si el expediente se va a reemplazar
-   * entero por el seed, no procede migración incremental. `{ kind: "none" }` cuando
-   * no hay nada que migrar.
-   */
-  seedMigration: SeedMigrationAction;
-}
-
-function migrationForMunicipality(
-  municipalityId: string
-): SeedDocumentMigration | undefined {
-  return INCREMENTAL_SEED_MIGRATIONS.find(
-    (migration) => migration.municipalityId === municipalityId
-  );
-}
-
-function hasExpectedSeedBaseline(
-  workspace: MunicipalityWorkspace,
-  migration: SeedDocumentMigration
-): boolean {
-  const hasExpectedDocs =
-    migration.expectedMinDocuments === undefined ||
-    workspace.repository.documents.length >= migration.expectedMinDocuments;
-  const hasExpectedAtoms =
-    migration.expectedMinEvidenceAtoms === undefined ||
-    workspace.evidenceStore.atoms.length >= migration.expectedMinEvidenceAtoms;
-  return hasExpectedDocs && hasExpectedAtoms;
-}
-
-function hasSeedBaselineRegression(
-  current: MunicipalityWorkspace,
-  stored: MunicipalityWorkspace
-): boolean {
-  const migration = migrationForMunicipality(current.municipality.identity.id);
-  if (migration === undefined) return false;
-  return hasExpectedSeedBaseline(current, migration) && !hasExpectedSeedBaseline(stored, migration);
 }
 
 /**
- * Resuelve la migración incremental aplicable a un expediente. Predicado puro:
- * si la copia local no alcanza el mínimo documental del seed canónico, se fuerza
- * la descarga y fusión aunque exista una marca antigua. La marca solo cierra la
- * migración cuando el expediente conserva la base esperada.
- */
-export function resolveSeedMigration(
-  current: MunicipalityWorkspace
-): SeedMigrationAction {
-  const id = current.municipality.identity.id;
-  for (const migration of INCREMENTAL_SEED_MIGRATIONS) {
-    if (migration.municipalityId !== id) continue;
-    const hasMarker = (current.appliedSeedMigrations ?? []).includes(
-      migration.marker
-    );
-    // La marca aplicada es definitiva: una baja intencional no debe resucitarse
-    // por caer por debajo de un recuento histórico mínimo.
-    if (hasMarker) return { kind: "none" };
-    const hasDoc = current.repository.documents.some(
-      (d) => d.id === migration.documentId
-    );
-    if (hasDoc) return { kind: "backfill-marker", migration };
-    return { kind: "download-and-merge", migration };
-  }
-  return { kind: "none" };
-}
-
-/** Añade una marca de migración al expediente (idempotente). Puro. */
-function withMarker(
-  workspace: MunicipalityWorkspace,
-  marker: string
-): MunicipalityWorkspace {
-  const current = workspace.appliedSeedMigrations ?? [];
-  if (current.includes(marker)) return workspace;
-  return { ...workspace, appliedSeedMigrations: [...current, marker] };
-}
-
-/**
- * Caso `backfill-marker`: el expediente ya contiene el documento (p. ej. tras una
- * hidratación limpia previa a esta versión). Solo registra la marca; no descarga
- * ni duplica. Puro.
- */
-export function backfillSeedMigrationMarker(
-  current: MunicipalityWorkspace,
-  migration: SeedDocumentMigration
-): MunicipalityWorkspace {
-  return withMarker(current, migration.marker);
-}
-
-/**
- * Caso `download-and-merge`: fusiona el documento del seed y sus átomos derivados
- * (los que apuntan a `documentId`) en el expediente actual, y estampa la marca —
- * TODO en un único objeto devuelto (atómico al persistir). Preserva íntegramente
- * documentos, evidencias y trabajo del usuario. Determinista: usa el sello canónico
- * del documento del seed (no `new Date()`). Idempotente por marca y por id de átomo.
- */
-/** Contenido comparable del estudio IBSE (sin fechas). */
-function ibseContent(study: NonNullable<MunicipalityWorkspace["ibseStudy"]>): string {
-  const { aggregates, strataCounts, ageSexObserved, methodologicalCautions, sampleScope } = study;
-  return JSON.stringify({ aggregates, strataCounts, ageSexObserved, methodologicalCautions, sampleScope });
-}
-
-export function applySeedDocumentMigration(
-  current: MunicipalityWorkspace,
-  seed: MunicipalityWorkspace,
-  migration: SeedDocumentMigration,
-  options: { stamp?: string } = {}
-): MunicipalityWorkspace {
-  const seedDocs = migration.mergeAllDocuments
-    ? seed.repository.documents
-    : seed.repository.documents.filter((d) => d.id === migration.documentId);
-  if (seedDocs.length === 0) return current;
-
-  const existingDocIds = new Set(current.repository.documents.map((d) => d.id));
-  const existingAtomIds = new Set(current.evidenceStore.atoms.map((a) => a.id));
-  const migratedDocIds = new Set(seedDocs.map((d) => d.id));
-  const deletedIds = new Set((current.deletedDocuments ?? []).map(d => d.documentId));
-  const docsToAdd = seedDocs.filter((d) => !existingDocIds.has(d.id) && !deletedIds.has(d.id));
-  // Estudio IBSE canónico desactualizado: se sustituyen estudio y átomos por los del seed.
-  const refreshIbse =
-    migration.refreshCanonicalIbseStudy === true &&
-    seed.ibseStudy !== undefined &&
-    current.ibseStudy !== undefined &&
-    current.ibseStudy.id === seed.ibseStudy.id &&
-    ibseContent(current.ibseStudy) !== ibseContent(seed.ibseStudy) &&
-    !deletedIds.has("doc-ibse-" + current.municipality.identity.id);
-  const ibseAtomPrefix = `ibse:${current.municipality.identity.id}:`;
-  const seedIbseAtoms = refreshIbse
-    ? seed.evidenceStore.atoms.filter((a) => a.id.startsWith(ibseAtomPrefix))
-    : [];
-  const refreshedIbseIds = new Set(seedIbseAtoms.map((a) => a.id));
-  const linesOf = (text: string | undefined) =>
-    (text ?? "").split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-  const refreshedDocs = new Map(
-    (migration.refreshCanonicalDocumentIds ?? []).flatMap((id) => {
-      const mine = current.repository.documents.find((d) => d.id === id);
-      const theirs = seed.repository.documents.find((d) => d.id === id);
-      if (!mine || !theirs || deletedIds.has(id) || mine.sourceText === theirs.sourceText) return [];
-      if (mine.status === "archived" || mine.status === "rejected") return [];
-      const seedLines = new Set(linesOf(theirs.sourceText));
-      if (!linesOf(mine.sourceText).every((l) => seedLines.has(l))) return [];
-      return [[id, theirs.sourceText] as const];
-    })
-  );
-  const atomsToAdd = seed.evidenceStore.atoms.filter(
-    (a) =>
-      a.provenance.documentId !== undefined &&
-      migratedDocIds.has(a.provenance.documentId) &&
-      !deletedIds.has(a.provenance.documentId) &&
-      !existingAtomIds.has(a.id)
-  );
-  if (
-    (current.appliedSeedMigrations ?? []).includes(migration.marker) &&
-    docsToAdd.length === 0 &&
-    atomsToAdd.length === 0 &&
-    !refreshIbse &&
-    refreshedDocs.size === 0
-  ) {
-    return current;
-  }
-  // Nunca retroceder la fecha del expediente: una fecha anterior haría que una copia
-  // compartida más reciente lo sustituyera y bloquearía su guardado en Firebase.
-  const stamp =
-    options.stamp ??
-    (current.updatedAt > seed.updatedAt ? current.updatedAt : seed.updatedAt);
-  const currentDocuments = refreshedDocs.size === 0
-    ? current.repository.documents
-    : current.repository.documents.map((d) =>
-        refreshedDocs.has(d.id) ? { ...d, sourceText: refreshedDocs.get(d.id)! } : d
-      );
-  const baseAtoms = refreshIbse
-    ? current.evidenceStore.atoms.map((a) => (refreshedIbseIds.has(a.id) ? seedIbseAtoms.find((s) => s.id === a.id)! : a))
-    : current.evidenceStore.atoms;
-
-  const merged: MunicipalityWorkspace = {
-    ...current,
-    repository:
-      docsToAdd.length === 0 && refreshedDocs.size === 0
-        ? current.repository
-        : {
-            ...current.repository,
-            documents: [...currentDocuments, ...docsToAdd],
-            updatedAt: stamp,
-          },
-    evidenceStore:
-      atomsToAdd.length === 0 && !refreshIbse
-        ? current.evidenceStore
-        : {
-            ...current.evidenceStore,
-            atoms: [...baseAtoms, ...atomsToAdd],
-            updatedAt: stamp,
-          },
-    ...(refreshIbse ? { ibseStudy: seed.ibseStudy } : {}),
-    updatedAt: stamp,
-  };
-  return withMarker(merged, migration.marker);
-}
-
-/**
- * Decide si el efecto de persistencia debe OMITIR el guardado. Se omite (a) durante
- * la hidratación asíncrona del seed del municipio —no persistir el placeholder
- * vacío evita la carrera que dejaría el expediente vacío permanente— o (b) cuando
- * el guard protege un expediente vacío sobre datos locales que no rehidrataron.
+ * Decide si el efecto de persistencia debe OMITIR el guardado: cuando el guard
+ * protege un expediente vacío sobre datos locales que no rehidrataron.
  * Predicado puro y testable.
  */
 export function shouldSkipPersistence(params: {
   workspaceMunicipalityId: string;
-  pendingSeedId: string | null;
   protectedEmptyWorkspaceId: string | null;
   isEmpty: boolean;
 }): boolean {
-  if (params.pendingSeedId === params.workspaceMunicipalityId) return true;
   if (
     params.protectedEmptyWorkspaceId === params.workspaceMunicipalityId &&
     params.isEmpty
@@ -413,15 +117,8 @@ export function shouldSkipPersistence(params: {
 }
 
 /**
- * Decide si el placeholder actual puede sustituirse por el seed canónico. SOLO se
- * sustituye cuando el workspace en memoria es del municipio del seed y está VACÍO
- * según la definición canónica `isEmptyWorkspaceForPersistenceGuard` (sin
- * documentos, evidencias, estudios, priorización, perfiles compilados ni ningún
- * otro contenido humano). Nunca sobreescribe contenido real. Predicado puro.
- */
-/**
  * Decide si la copia ampliada de IndexedDB debe prevalecer sobre la copia cargada
- * desde localStorage o seed. IndexedDB se consulta siempre porque localStorage
+ * desde localStorage. IndexedDB se consulta siempre porque localStorage
  * puede conservar una copia válida pero antigua si agotó su cuota.
  */
 export function shouldRestoreIndexedDbWorkspace(
@@ -434,17 +131,8 @@ export function shouldRestoreIndexedDbWorkspace(
   const currentIsEmpty = isEmptyWorkspaceForPersistenceGuard(current);
   const storedIsEmpty = isEmptyWorkspaceForPersistenceGuard(stored);
   if (currentIsEmpty && !storedIsEmpty) return true;
-  // Una copia vacía de IndexedDB puede ser más reciente que el seed porque se
-  // creó antes de que terminara la hidratación. Nunca debe borrar contenido real.
+  // Una copia vacía nunca borra contenido real, aunque sea más reciente.
   if (!currentIsEmpty && storedIsEmpty) return false;
-  // Si el workspace actual ya contiene la base canónica de un municipio con
-  // seed, una copia persistida más pobre no puede sustituirlo por ser más nueva.
-  // Si una copia más reciente tiene la marca de migración, una menor cantidad
-  // de documentos puede reflejar eliminaciones deliberadas y debe respetarse.
-  const migration = INCREMENTAL_SEED_MIGRATIONS.find(m => m.municipalityId === current.municipality.identity.id);
-  const applied = migration !== undefined && (stored.appliedSeedMigrations ?? []).includes(migration.marker);
-  const explicitDeletions = (stored.deletedDocuments?.length ?? 0) > 0;
-  if (hasSeedBaselineRegression(current, stored) && !((applied || explicitDeletions) && stored.updatedAt > current.updatedAt)) return false;
   if (stored.updatedAt > current.updatedAt) return true;
   // La copia ligera de localStorage no lleva los originales del Diagnóstico y
   // se guarda con la misma fecha que la copia de IndexedDB o la remota. A
@@ -482,62 +170,22 @@ export function withCarriedDocumentOriginals(
   };
 }
 
-export function shouldReplaceWithSeed(
-  current: MunicipalityWorkspace,
-  seedMunicipalityId: string
-): boolean {
-  return (
-    current.municipality.identity.id === seedMunicipalityId &&
-    isEmptyWorkspaceForPersistenceGuard(current)
-  );
-}
-
 /**
- * Carga el expediente de un municipio. Prioridad:
- *   1. Un expediente local válido y CON CONTENIDO real gana SIEMPRE (no se toca).
- *   2. Un expediente local válido pero PRÍSTINO/VACÍO es un placeholder de la
- *      versión anterior (creado por `createCompleteMunicipalityWorkspace`); si el
- *      municipio tiene seed canónico, se marca `seedPending` para sustituirlo.
- *   3. Sin ninguna entrada local y con seed → placeholder vacío + `seedPending`.
- *   4. Entrada local presente pero que no rehidrata (esquema anterior/corrupta) →
- *      se protege y NO se hidrata (hay trabajo del usuario que no debe pisarse).
- * La sustitución efectiva la realiza el llamador de forma asíncrona (ver
- * `shouldReplaceWithSeed`), nunca sobre contenido real.
+ * Carga el expediente de un municipio desde este navegador:
+ *   1. Un expediente local válido se usa tal cual; Firebase decide después si
+ *      hay una copia compartida más reciente.
+ *   2. Sin entrada local → placeholder vacío.
+ *   3. Entrada local presente pero que no rehidrata (esquema anterior o dañada) →
+ *      placeholder protegido: no se persiste para no pisar ese trabajo.
  */
 export function loadOrCreateMunicipalityWorkspace(
   municipalityId: string,
   input: CreateMunicipalityContextInput
 ): WorkspaceLoadResult {
   const loaded = loadWorkspaceFromLocalStorage(municipalityId);
-  if (loaded !== null) {
-    const migrated = loaded;
-    // Placeholder vacío de la versión anterior: sustituible por el seed. Un
-    // expediente con contenido real conserva seedPending=false y prevalece.
-    const isReplaceablePlaceholder =
-      isEmptyWorkspaceForPersistenceGuard(migrated) &&
-      hasMunicipalitySeed(municipalityId);
-    return {
-      workspace: migrated,
-      protectExistingStorage: false,
-      seedPending: isReplaceablePlaceholder,
-      // La migración incremental solo aplica a un expediente CON contenido que no
-      // se va a reemplazar entero. Si es placeholder reemplazable, el seed completo
-      // (que ya trae el documento y su marca) lo cubre.
-      seedMigration: isReplaceablePlaceholder
-        ? { kind: "none" }
-        : resolveSeedMigration(migrated),
-    };
-  }
-
-  // Hay entrada local pero no rehidrata (esquema anterior/corrupta): se protege y
-  // NO se hidrata seed —hay trabajo del usuario que no debe pisarse—.
-  const hasCorruptLocal = hasWorkspaceInLocalStorage(municipalityId);
-
+  if (loaded !== null) return { workspace: loaded, protectExistingStorage: false };
   return {
     workspace: createCompleteMunicipalityWorkspace(input),
-    protectExistingStorage: hasCorruptLocal,
-    // Solo se hidrata desde seed cuando no existe NINGUNA entrada local.
-    seedPending: !hasCorruptLocal && hasMunicipalitySeed(municipalityId),
-    seedMigration: { kind: "none" },
+    protectExistingStorage: hasWorkspaceInLocalStorage(municipalityId),
   };
 }

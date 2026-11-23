@@ -8,7 +8,6 @@ import {
 } from "../../application/complementary-studies";
 import { ANDALUSIA_REFERENCE_VALUE_BY_INDICATOR } from "../../application/eas-references";
 import type { IBSEStudy } from "../../domain/ibse";
-import { loadMunicipalitySeed } from "../../infrastructure/seeds/municipalitySeeds";
 import type { DUKEStudy } from "../../domain/duke";
 import type { PREDIMEDStudy } from "../../domain/predimed";
 import type { SF12Study } from "../../domain/sf12";
@@ -312,16 +311,6 @@ export function EstudiosComplementariosPanel({
   const [granadaReferences, setGranadaReferences] = useState<GranadaTerritorialReferences>();
   const [ibseAdjustmentTarget, setIBSEAdjustmentTarget] = useState<IBSEAdjustmentTarget>("none");
   const invalidIbse = ibseStudy !== undefined && ibseStudy.aggregates.nValid === 0;
-  const [atarfeReferenceIBSE, setAtarfeReferenceIBSE] = useState<IBSEStudy>();
-  useEffect(() => {
-    if (!invalidIbse || ibseStudy?.municipalityId !== "atarfe") return;
-    let alive = true;
-    void loadMunicipalitySeed("atarfe", {baseUrl: import.meta.env.BASE_URL}).then(seed => {
-      if (alive && seed?.ibseStudy && seed.ibseStudy.aggregates.nValid > 0) setAtarfeReferenceIBSE(seed.ibseStudy);
-    });
-    return () => { alive = false; };
-  }, [invalidIbse, ibseStudy?.municipalityId]);
-
   useEffect(() => {
     let active = true;
     loadGranadaTerritorialReferences()
@@ -488,13 +477,6 @@ export function EstudiosComplementariosPanel({
             <section className="workspace-panel" role="alert">
               <h3>Importación IBSE inválida: no hay respuestas puntuables</h3>
               <p>El archivo «{ibseStudy.sourceFileName}» no aporta registros IBSE válidos. El valor 0/100 no es una medición del bienestar. No debe compararse con Granada ni utilizarse en el diagnóstico.</p>
-              {atarfeReferenceIBSE && (
-                <div>
-                  <p><strong>Consulta de recuperación — expediente de referencia de Atarfe.</strong> Los resultados siguientes proceden del expediente inicial de COMPÁS, no del CSV inválido que aparece actualmente en Firebase. Se muestran para recuperar el acceso al trabajo previo; no se han restituido ni validado como versión definitiva.</p>
-                  <IBSEPanel ibseStudy={atarfeReferenceIBSE} municipalityName={municipalityName} />
-                  <p>Antes de restituir el estudio compartido hay que contrastarlo con el CSV REDCap de respuestas y resolver la diferencia de medias documentada.</p>
-                </div>
-              )}
             </section>
           ) : <IBSEPanel ibseStudy={ibseStudy} isLoading={isLoadingIBSE} message={ibseMessage} onLoadCSV={onLoadIBSECSV} municipalityName={municipalityName} />}
         </StudyRow>

@@ -13,24 +13,11 @@ import { createHash } from "node:crypto";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseWorkspaceJSON } from "../src/infrastructure/persistence/local-storage";
-import {
-  loadMunicipalitySeed,
-  municipalitySeedUrl,
-  hasMunicipalitySeed,
-  MUNICIPALITY_SEEDS,
-} from "../src/infrastructure/seeds";
-import {
-  loadOrCreateMunicipalityWorkspace,
-  shouldReplaceWithSeed,
-} from "../src/appWorkspaceHydration";
+import { loadOrCreateMunicipalityWorkspace } from "../src/appWorkspaceHydration";
 import {
   saveWorkspaceToLocalStorage,
   buildWorkspaceStorageKey,
 } from "../src/infrastructure/persistence/local-storage";
-import {
-  createCompleteMunicipalityWorkspace,
-  isEmptyWorkspaceForPersistenceGuard,
-} from "../src/application/workspace";
 import { createMunicipalityRuntime } from './helpers/legacyProfileRuntime';
 import { validateCompilationPreconditions } from "../src/application/health-profile-compiler";
 import {
@@ -78,7 +65,7 @@ const EXPORT_PATH = resolve(
   _dir,
   "../municipalities/atarfe/exports/compas-ng-workspace-atarfe.json"
 );
-const SEED_PATH = resolve(_dir, "../public/seeds/compas-ng-workspace-atarfe.json");
+const SEED_PATH = resolve(_dir, "../fixtures/seeds/compas-ng-workspace-atarfe.json");
 
 const EXPORT_RAW = readFileSync(EXPORT_PATH, "utf8");
 const SEED_RAW = readFileSync(SEED_PATH, "utf8");
@@ -110,13 +97,6 @@ const SYNTHETIC_STUDY_FIELDS = [
 ];
 const PROVINCIAL_TAGS = ["duke-eas", "predimed-eas", "sf12-eas", "sueno-eas", "cage-eas", "ipaq-eas"];
 const SYNTHETIC_TAGS = ["auditc", "ghq12", "phq9", "psqi", "fagerstrom", "sbq"];
-
-function okFetch(body: string, onUrl?: (url: string) => void): typeof fetch {
-  return (async (url: string) => {
-    onUrl?.(url);
-    return { ok: true, status: 200, text: async () => body };
-  }) as unknown as typeof fetch;
-}
 
 beforeEach(() => {
   store.clear();
@@ -155,39 +135,18 @@ describe("expediente canónico de Atarfe", () => {
     expect(exportBuf.equals(seedBuf)).toBe(true);
   });
 
-  it("5. el seed desplegable existe en public/ (Vite lo copia a dist) y es válido", () => {
+  it("5. el expediente de prueba de Atarfe es válido", () => {
     const ws = parseWorkspaceJSON(SEED_RAW);
     expect(ws).not.toBeNull();
     expect(ws!.municipality.identity.id).toBe("atarfe");
     expect(ws!.repository.documents).toHaveLength(3);
     expect(ws!.evidenceStore.atoms).toHaveLength(26);
-    expect(MUNICIPALITY_SEEDS["atarfe"].path).toBe("seeds/compas-ng-workspace-atarfe.json");
-  });
-
-  it("6. placeholder vacío de Atarfe → migra al seed (3 docs / 26 evidencias)", async () => {
-    const placeholder = createCompleteMunicipalityWorkspace(ATARFE_INPUT);
-    expect(isEmptyWorkspaceForPersistenceGuard(placeholder)).toBe(true);
-    expect(saveWorkspaceToLocalStorage(placeholder)).toBe(true);
-
-    const result = loadOrCreateMunicipalityWorkspace("atarfe", ATARFE_INPUT);
-    expect(result.seedPending).toBe(true);
-    expect(shouldReplaceWithSeed(result.workspace, "atarfe")).toBe(true);
-
-    const seed = await loadMunicipalitySeed("atarfe", {
-      baseUrl: "/",
-      fetchImpl: okFetch(SEED_RAW),
-    });
-    const hydrated = shouldReplaceWithSeed(result.workspace, "atarfe") ? seed : result.workspace;
-    expect(hydrated?.repository.documents).toHaveLength(3);
-    expect(hydrated?.evidenceStore.atoms).toHaveLength(26);
   });
 
   it("7. workspace local no vacío de Atarfe → preservado (no se sustituye)", () => {
     const local = parseWorkspaceJSON(EXPORT_RAW)!; // 3 docs, 26 atoms (contenido real)
     expect(saveWorkspaceToLocalStorage(local)).toBe(true);
     const result = loadOrCreateMunicipalityWorkspace("atarfe", ATARFE_INPUT);
-    expect(result.seedPending).toBe(false);
-    expect(shouldReplaceWithSeed(result.workspace, "atarfe")).toBe(false);
     expect(result.workspace.repository.documents).toHaveLength(3);
   });
 
@@ -234,23 +193,6 @@ describe("expediente canónico de Atarfe", () => {
     expect(orphans).toHaveLength(0);
     // Cada átomo IBSE está enlazado a un documento existente.
     expect(ws.evidenceStore.atoms.every((a) => a.provenance.documentId !== undefined)).toBe(true);
-  });
-
-  it("11. la carga funciona bajo el BASE_URL de GitHub Pages /compas-ng-renovado/", async () => {
-    expect(hasMunicipalitySeed("atarfe")).toBe(true);
-    expect(municipalitySeedUrl(MUNICIPALITY_SEEDS["atarfe"], "/compas-ng-renovado/")).toBe(
-      "/compas-ng-renovado/seeds/compas-ng-workspace-atarfe.json"
-    );
-    let requested = "";
-    const ws = await loadMunicipalitySeed("atarfe", {
-      baseUrl: "/compas-ng-renovado/",
-      fetchImpl: okFetch(SEED_RAW, (u) => {
-        requested = u;
-      }),
-    });
-    expect(requested).toBe("/compas-ng-renovado/seeds/compas-ng-workspace-atarfe.json");
-    expect(ws?.municipality.identity.id).toBe("atarfe");
-    expect(ws?.evidenceStore.atoms).toHaveLength(26);
   });
 
   it("12. el builder real, serializado por la capa de persistencia, reproduce el export byte a byte", async () => {

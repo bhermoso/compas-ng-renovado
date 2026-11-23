@@ -4,7 +4,7 @@ import { organizeMunicipalDocuments, municipalDocumentSection } from "../src/app
 import type { MunicipalityWorkspace } from "../src/domain/workspace";
 
 const loadSeed = (municipality: "atarfe"|"loja"): MunicipalityWorkspace =>
-  JSON.parse(readFileSync(new URL(`../public/seeds/compas-ng-workspace-${municipality}.json`, import.meta.url), "utf8")) as MunicipalityWorkspace;
+  JSON.parse(readFileSync(new URL(`../fixtures/seeds/compas-ng-workspace-${municipality}.json`, import.meta.url), "utf8")) as MunicipalityWorkspace;
 
 describe("Organización real de Atarfe y Loja, sin modificar expedientes", () => {
   it("Atarfe conserva informe, IBSE y activos sin marcos comunes duplicados", () => {

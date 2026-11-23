@@ -32,7 +32,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const loadSeed = (rel: string) => {
   const path = rel === "municipio-ensayo"
     ? resolve(root, "fixtures/workspaces/municipio-ensayo-synthetic-test.json")
-    : resolve(root, "public/seeds", rel);
+    : resolve(root, "fixtures/seeds", rel);
   return parseWorkspaceJSON(readFileSync(path, "utf8"))!;
 };
 

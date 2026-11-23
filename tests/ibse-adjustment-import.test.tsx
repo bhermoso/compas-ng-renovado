@@ -34,7 +34,7 @@ describe("IBSE import with a separate demographic adjustment", () => {
     expect(adjustment.metrics.meanFactorVinculo.adjustedMean).toBeCloseTo(60);
     expect(parsed.aggregates).toEqual(parseIBSECSV(csv).aggregates);
     const study = createIBSEStudy({ municipalityId: id, sourceFileName: "synthetic.csv", ...parsed });
-    const workspace = parseWorkspaceJSON(readFileSync("public/seeds/compas-ng-workspace-atarfe.json", "utf8"))!;
+    const workspace = parseWorkspaceJSON(readFileSync("fixtures/seeds/compas-ng-workspace-atarfe.json", "utf8"))!;
     workspace.ibseStudy = study;
     const restored = parseWorkspaceJSON(serializeWorkspaceForStorage(workspace))!.ibseStudy!;
     expect(restored.demographicAdjustment).toEqual(adjustment);

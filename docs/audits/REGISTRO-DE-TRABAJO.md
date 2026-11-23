@@ -59,7 +59,41 @@ Pages al empezar: `e410372`.
   lectura completa.
 - **Pendiente.** Implementar el menú de elección sobre el Perfil cargado y la
   evaluación; lectura completa y cotejo de los cuatro Perfiles.
-- **Verificación.** Suite: 2977 pasan, 2 omitidas (sin cambios de código).
+- **Verificación.** Suite, ya con las PR #219 y #220: 2948 pasan, 2 omitidas.
+
+## 2026-11-23 · Guardados en Firebase en serie (PR #219)
+
+- **Hecho observado.** Al limpiar Atarfe, el guardado de la limpieza chocó con
+  el autoguardado que sigue a la recuperación del expediente: los dos partían
+  de la misma revisión.
+- **Cambio.** Los guardados remotos van en cola (`serialQueue.ts`); cada uno
+  lee la revisión que confirmó el anterior. Prueba nueva:
+  `tests/serial-queue.test.ts`.
+
+## 2026-11-23 · Retirada de los seeds públicos
+
+Pages al empezar: `e410372`.
+
+- **Decisión del responsable (2026-11-23):** retirar las semillas públicas.
+  Motivo: los expedientes de Firebase contienen hoy textos completos, imágenes
+  incrustadas y algún dato de contacto personal, y GitHub Pages los publicaría
+  en abierto. Firebase queda como única fuente.
+- **Cambio.**
+  - `public/seeds/` pasa a `fixtures/seeds/` (fuera del despliegue), solo como
+    fixtures de prueba. Se retiran las copias incluidas en el código de Loja y
+    Fuente Vaqueros.
+  - Se retira el mecanismo de hidratación y migración desde seeds
+    (`src/infrastructure/seeds`, `pendingSeedId`, `pendingMigration` y las
+    funciones de migración de `appWorkspaceHydration.ts`). La carga queda así:
+    copia local del navegador o placeholder vacío, y después Firebase.
+  - Se retira la «consulta de recuperación» del IBSE de Atarfe, que leía el seed.
+  - Pruebas: se retiran las del mecanismo y la prueba de humo de hidratación de
+    Fuente Vaqueros (también del flujo `plan-document.yml`); una prueba nueva
+    cubre la carga local. Las pruebas de humo que leían seeds leen las fixtures.
+- **Verificación.** Suite: 2947 pasan, 2 omitidas; build correcto, sin
+  `seeds/` en `dist`; lint baja a 21 errores y 3 avisos.
+- **Inferencia.** Un navegador sin copia local y sin sesión abre el expediente
+  vacío; con sesión, lo recupera de Firebase. No verificado en el navegador.
 
 ## 2026-11-23 · Granada-Zaidín eliminado de Firebase; reglas desplegadas comprobadas
 
