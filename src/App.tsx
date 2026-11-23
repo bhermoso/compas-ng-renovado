@@ -5,6 +5,7 @@ import type { ProfileTextPackage } from "./application/health-profile/profileTex
 import type { ProfileUpdateOutcome } from "./ui/components/ProfileUpdaterPanel";
 import { appendExternalProfile } from "./application/health-profile/externalProfiles";
 import { isTerritorialStatisticsSnapshot } from "./application/territorial-statistics/snapshots";
+import { territorialSnapshotDeletionBlock } from "./application/document-files/expedienteArchive";
 import type { TerritorialStatisticsSnapshot } from "./domain/territorial-statistics/TerritorialStatistics";
 import { ExternalProfileDashboard } from "./ui/components/ExternalProfileDashboard";
 import { TerritorialStatisticsPanel } from "./ui/components/TerritorialStatisticsPanel";
@@ -14,7 +15,7 @@ import type { ExternalProfileLibrary } from "./domain/health-profile/ExternalHea
 import { InitialLocalHealthPlanPanel } from "./ui/components/InitialLocalHealthPlanPanel";
 import { DeleteWorkspaceDialog } from "./ui/components/DeleteWorkspaceDialog";
 import { CompasCover, HomePortada, WorkspaceDisclosure } from "./ui/components/HomePortada";
-import { DocumentArchiveManager } from "./ui/components/DocumentArchiveManager";
+import { ExpedienteArchive } from "./ui/components/ExpedienteArchive";
 import { StrategicReferenceLibrary } from "./ui/components/StrategicReferenceLibrary";
 import { CommonStrategicFramework } from "./ui/components/CommonStrategicFramework";
 import { STRATEGIC_REFERENCES } from "./application/strategic-reference-library";
@@ -1310,6 +1311,13 @@ export default function App() {
     });
     setRemotePersistenceMessage("Estadística territorial guardada y confirmada por Firebase.");
   }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingIndexedDbHydrationId, setWorkspace]);
+
+  /** Retira una descarga de estadística territorial del expediente compartido. */
+  const handleDeleteTerritorialSnapshot = useCallback(async (snapshotId: string) => {
+    const block = territorialSnapshotDeletionBlock(workspace, snapshotId);
+    if (block) throw new Error(block);
+    await handleSaveTerritorialStatistics((workspace.territorialStatistics ?? []).filter(s => s.id !== snapshotId));
+  }, [workspace, handleSaveTerritorialStatistics]);
 
   const handleSaveDeliberativePrioritySelection = useCallback((input: {
     selectedScenarioIds: string[];
@@ -3651,17 +3659,50 @@ export default function App() {
               );
             })()}
 
-            {/* Punto único de control de todo el archivo documental, incluidos activos y CSV. */}
-            <DocumentArchiveManager
-              repository={runtime.workspace.repository}
-              onSetDocumentCycle={documentWriteAllowed ? handleSetDocumentCycle : undefined}
-              evidence={runtime.workspace.evidenceStore.atoms}
-              originalIds={(runtime.workspace.documentOriginals ?? []).map(o => o.documentId)}
-              originalCapacity={`${formatMegabytes(workspaceDocumentBytes(runtime.workspace))} / ${formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)}`}
+            {/* Archivo del expediente: todo lo cargado, con sus acciones a la vista. */}
+            <ExpedienteArchive
+              workspace={runtime.workspace}
               canWrite={documentWriteAllowed}
               persistence={remotePersistenceMessage ?? ""}
-              onOpenUploader={() => { openDiagnosisToolbox(); requestAnimationFrame(() => document.getElementById("document-review-title")?.scrollIntoView({behavior:"smooth",block:"start"})); }}
+              localOnly={localOnlyOriginals}
+              onStoreOriginal={handleStoreDocumentOriginal}
+              onCreateRevision={handleCreateDocumentRevision}
+              onArchiveDocument={handleArchiveDocument}
+              onDeleteDocument={handleDeleteDocument}
+              onSetDocumentCycle={documentWriteAllowed ? handleSetDocumentCycle : undefined}
+              onDeleteTerritorialSnapshot={handleDeleteTerritorialSnapshot}
+              onOpenProfile={() => { setView("psl"); window.scrollTo({ top: 0, behavior: "auto" }); }}
+              onOpenTerritorialStatistics={() => {
+                const panel = document.querySelector('[data-testid="diagnosis-territorial-statistics"]');
+                if (panel instanceof HTMLDetailsElement) { panel.open = true; requestAnimationFrame(() => panel.scrollIntoView({ behavior: "smooth", block: "start" })); }
+              }}
               onOpenAssetValidations={() => { openDiagnosisToolbox(); toggleDiagnosisModule("documents", true); requestAnimationFrame(() => document.getElementById("diag-mod-documents")?.scrollIntoView({behavior:"smooth",block:"start"})); }}
+              uploader={
+              <DocumentReviewInbox
+                key={runtime.workspace.municipality.identity.id}
+                municipality={runtime.workspace.municipality.identity.name}
+                repository={runtime.workspace.repository}
+                declaredBy={remoteClient.auth.currentUser?.email || remoteClient.auth.currentUser?.displayName || ""}
+                documentKinds={DOCUMENT_KINDS}
+                isImporting={isLoadingHealthReport === true || isLoadingDocumentFile === true || Object.values(studyCsvLoaders).some((loader) => loader.loading)}
+                connectedInstruments={Object.keys(studyCsvLoaders)}
+                registeredHealthReport={runtime.workspace.healthReport ? { title: runtime.workspace.healthReport.title, sourceFileName: runtime.workspace.healthReport.sourceFileName } : undefined}
+                storageNotice={storageSummary()}
+                localHashes={knownOriginalHashes}
+                getLoaderMessage={(route, studyId) =>
+                  route === "health-report" ? lastHealthReportMessage
+                    : route === "document-file" ? documentFileMessage
+                    : studyId !== undefined ? studyCsvLoaders[studyId]?.message : undefined
+                }
+                onImport={(file, request) =>
+                  request.route === "health-report"
+                    ? handleLoadHealthReport(file, { temporal: request.temporal, contentSha256: request.contentSha256 })
+                    : request.route === "study-csv"
+                      ? handleInboxStudyCsv(file, request.studyId, request.temporal, request.contentSha256)
+                      : handleLoadDocumentFile(file, { kind: request.kind, declaresOpenAnswers: false, temporal: request.temporal, contentSha256: request.contentSha256 })
+                }
+              />
+              }
             />
 
             {/* La estadística territorial es una fuente del diagnóstico.
@@ -3723,30 +3764,6 @@ export default function App() {
                 : undefined}
             />
 
-            {/* ── Originales en el expediente compartido ── */}
-            {(() => {
-              const stored = runtime.workspace.documentOriginals ?? [];
-              const used = workspaceDocumentBytes(runtime.workspace);
-              const titleOf = (id: string) => runtime.workspace.repository.documents.find((d) => d.id === id)?.title ?? id;
-              return (
-                <section className="workspace-panel originals-status" aria-label="Originales en el expediente compartido">
-                  <p className="originals-status__line">
-                    <strong>Archivos en el expediente compartido:</strong> {stored.length} originales · {(runtime.workspace.documentDerivedFiles ?? []).length} derivados · {formatMegabytes(used)} de {formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)}, contando los del Perfil.
-                    {remoteClient.auth.currentUser ? " Se guardan en Firebase con el expediente." : " Sin sesión iniciada, se guardan solo en este navegador."}
-                  </p>
-                  {localOnlyOriginals.length > 0 && (
-                    <div role="alert" className="originals-status__warning">
-                      <strong>Solo en este navegador:</strong>
-                      <ul>
-                        {localOnlyOriginals.map((o) => (
-                          <li key={o.documentId}>{titleOf(o.documentId)} · {o.reason === "too-large" ? "supera los 20 MB por archivo" : o.reason === "different-hash" ? "no coincide con la huella de la ficha" : "no cabe en el límite del expediente"}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </section>
-              );
-            })()}
 
             {/* ── Documentos repetidos: detección y retirada confirmada ── */}
             {(() => {
@@ -3771,31 +3788,6 @@ export default function App() {
               );
             })()}
 
-            {/* ── Entrada universal: análisis, revisión e incorporación ── */}
-            <DocumentReviewInbox
-              key={runtime.workspace.municipality.identity.id}
-              municipality={runtime.workspace.municipality.identity.name}
-              repository={runtime.workspace.repository}
-              declaredBy={remoteClient.auth.currentUser?.email || remoteClient.auth.currentUser?.displayName || ""}
-              documentKinds={DOCUMENT_KINDS}
-              isImporting={isLoadingHealthReport === true || isLoadingDocumentFile === true || Object.values(studyCsvLoaders).some((loader) => loader.loading)}
-              connectedInstruments={Object.keys(studyCsvLoaders)}
-              registeredHealthReport={runtime.workspace.healthReport ? { title: runtime.workspace.healthReport.title, sourceFileName: runtime.workspace.healthReport.sourceFileName } : undefined}
-              storageNotice={storageSummary()}
-              localHashes={knownOriginalHashes}
-              getLoaderMessage={(route, studyId) =>
-                route === "health-report" ? lastHealthReportMessage
-                  : route === "document-file" ? documentFileMessage
-                  : studyId !== undefined ? studyCsvLoaders[studyId]?.message : undefined
-              }
-              onImport={(file, request) =>
-                request.route === "health-report"
-                  ? handleLoadHealthReport(file, { temporal: request.temporal, contentSha256: request.contentSha256 })
-                  : request.route === "study-csv"
-                    ? handleInboxStudyCsv(file, request.studyId, request.temporal, request.contentSha256)
-                    : handleLoadDocumentFile(file, { kind: request.kind, declaresOpenAnswers: false, temporal: request.temporal, contentSha256: request.contentSha256 })
-              }
-            />
 
             {/* ── Detalle por módulo: paneles existentes, plegados ── */}
             <DiagnosisModuleSection id="diag-mod-health-report" title="Informe de Salud" description="Visor del Informe incorporado" open={openDiagModules.has("health-report")} onToggle={(open) => toggleDiagnosisModule("health-report", open)}>

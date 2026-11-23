@@ -71,7 +71,7 @@ export interface MunicipalityWorkspace {
   /**
    * Descargas de estadística territorial oficial (INE, IECA) para la próxima
    * revisión del Perfil (CONTRACT-TERRITORIAL-STATISTICS). No son evidencia del
-   * Perfil vigente ni lo modifican. Acumulativas; se conservan las más recientes.
+   * Perfil vigente ni lo modifican. Copia única: una descarga guardada sustituye a las anteriores.
    */
   territorialStatistics?: import('../territorial-statistics/TerritorialStatistics').TerritorialStatisticsSnapshot[];
   /** Originales de los documentos del Diagnóstico, completos y con huella, compartidos en Firebase. */

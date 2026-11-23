@@ -6,7 +6,7 @@
  */
 import { describe, expect, it } from "vitest";
 import {
-  INE_TABLES, TERRITORIAL_INDICATORS, appendSnapshot, findAndalusianIneCodes, ineSuffix, mergeTerritorialResults, sectionCodeOf, isTerritorialStatisticsSnapshot, literalEs,
+  INE_TABLES, TERRITORIAL_INDICATORS, findAndalusianIneCodes, ineSuffix, mergeTerritorialResults, sectionCodeOf, isTerritorialStatisticsSnapshot, literalEs,
   parseBadea, profileCoverage, provenanceCsv, repairText, retrieveTerritorialStatistics, revisionResults, sectionCsv,
 } from "../src/application/territorial-statistics";
 
@@ -243,12 +243,6 @@ describe("paquete para la revisión", () => {
     expect(secc.some(l => l.startsWith("1801101002;"))).toBe(true);
   });
 
-  it("las descargas se acumulan y se conservan las seis más recientes", () => {
-    const base = { schema: "compas-territorial-statistics/v1" as const, municipalityId: "a", municipalityName: "A", ineCode: "18011", catalogVersion: "x", sources: [], observations: [], failures: [] };
-    let list = [] as ReturnType<typeof appendSnapshot>;
-    for (let i = 1; i <= 8; i++) list = appendSnapshot(list, { ...base, id: `s${i}`, retrievedAt: `2026-11-${String(i).padStart(2, "0")}T00:00:00Z` });
-    expect(list.map(s => s.id)).toEqual(["s3", "s4", "s5", "s6", "s7", "s8"]);
-  });
 });
 
 describe("búsqueda del código INE por nombre", () => {

@@ -310,6 +310,11 @@
   color: var(--azul-profundo);
 }
 .hp-cover__territory { margin: 0; color: var(--texto-secundario); font-size: .85rem; }
+/* Portada de sección: el título conserva su ancho y los logos pasan a una segunda
+   fila antes de montarse sobre él. */
+.hp-cover:has(> .hp-cover__brand .hp-cover__section-title) { grid-template-columns: minmax(min-content, max-content) minmax(0, 1fr); }
+.hp-cover:has(> .hp-cover__brand .hp-cover__section-title) .ilogo-band--cover { flex-wrap: wrap; row-gap: 8px; }
+.hp-cover__brand { min-width: 0; }
 .workspace-disclosure {
   min-width: 0;
   border-top: 3px solid var(--azul);
