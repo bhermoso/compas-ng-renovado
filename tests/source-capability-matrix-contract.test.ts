@@ -77,12 +77,11 @@ describe("CONTRACT-SOURCE-CAPABILITY-MATRIX", () => {
     expect(matrix).toContain("ruta más específica disponible");
   });
 
-  it("fija Localiza Salud como fuente principal de activos", () => {
+  it("fija Localiza Salud como fuente exclusiva de activos", () => {
     expect(matrix).toContain("SCM-I8");
-    expect(matrix).toContain("Localiza Salud como fuente principal de activos");
-    expect(matrix).toContain("Fuente principal/preferente de activos");
-    expect(matrix).toContain("se tratan como indicio contextual o capacidad potencial");
-    expect(matrix).toContain("complementarios, contextuales o pendientes de reconciliación");
+    expect(matrix).toContain("Localiza Salud como fuente exclusiva de activos");
+    expect(matrix).toContain("Fuente exclusiva de la lectura de activos del Perfil");
+    expect(matrix).toContain("se conservan como candidatos pendientes de reconciliación con Localiza Salud y no entran en la lectura del Perfil");
     expect(matrix).toContain("No sustituyen Localiza Salud ni reabren `community-asset` como vía visible");
   });
 
@@ -97,10 +96,10 @@ describe("CONTRACT-SOURCE-CAPABILITY-MATRIX", () => {
       read("contracts/CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md")
     );
     expect(methodology).toContain("CONTRACT-SOURCE-CAPABILITY-MATRIX");
-    expect(methodology).toContain("estatuto operativo de cada fuente admisible");
+    expect(methodology).toContain("Estatuto operativo de cada fuente admisible");
     expect(methodology).toContain("efecto sobre el Perfil");
-    expect(methodology).toContain("Localiza Salud");
-    expect(methodology).toContain("fuente principal/preferente para el mapa de activos del Perfil");
-    expect(methodology).toContain("pendientes de reconciliación");
+    // Decisión del responsable del 2026-11-23: Localiza Salud, fuente exclusiva.
+    expect(methodology).toContain("Localiza Salud es la fuente exclusiva de la lectura de activos del Perfil");
+    expect(methodology).toContain("pendiente de reconciliación");
   });
 });

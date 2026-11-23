@@ -13,16 +13,18 @@ La única verdad es: el código, el historial Git, los contratos en docs/contrac
 ## Objetivo del producto
 Producto prioritario: el Perfil de Salud Local — documento científico, editorial e institucional de referencia. Toda decisión se justifica contra una pregunta: ¿acerca esto al Perfil a su forma definitiva? Si la respuesta no es claramente afirmativa, detente y explica por qué antes de tocar código.
 
-## Doctrina vigente (commit 298f195, no reabrir)
-- Contrato rector: docs/contracts/CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md (versión vigente en el propio contrato)
+## Doctrina vigente (contrato metodológico v3.0.0, 23/11/2026; no reabrir)
+- El Perfil se rige por cuatro documentos: `docs/contracts/CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md` (rector: qué es, qué afirma, estructura, aceptación), `docs/contracts/CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY.md` (entrega, custodia, cotejo, menú, validación, publicación), `docs/contracts/CONTRACT-PROFILE-UPDATER.md` (cambios de modelo o datos) y `docs/guides/GUIA-ESCRITURA-PERFIL.md`. Los contratos anteriores del Perfil están en `docs/historico/contratos-perfil/` y no son vigentes.
+- El Perfil se elabora fuera de COMPÁS y se carga: quien redacta propone; el equipo técnico elige y valida; COMPÁS conserva, muestra y comprueba, y no genera ni completa afirmaciones (Alcance, Art. 16).
 - Regla N+1 (Art. 7 bis A / I-LHPM-7): Informe solo no es Perfil. Perfil = Informe + al menos una de: estudios complementarios, activos, priorización ciudadana.
-- Modelo canónico único (Art. 17 bis / I-LHPM-8): pantalla, visor, DOCX, PDF e impresión son el mismo documento. Ninguna representación puede divergir.
-- Cadena (Art. 16 bis / I-LHPM-9): evidencia, lectura integrada, conclusiones, recomendaciones del Perfil, frontera, priorización, Plan de Acción, actuaciones y agendas anuales. El Perfil concluye y recomienda (Conocer, Contrastar, Abordar; Art. 8 quater); las prioridades son del Grupo Motor; las líneas, objetivos e indicadores, del Plan de Acción; las actuaciones (responsable, plazo, recurso), de las agendas anuales de implantación, separadas del Plan de Acción (v2.3.1).
-- Estructura del Perfil (Art. 16 quater, contrato v2.2.0): la conclusión es la unidad; el cuerpo tiene siete apartados y la evidencia completa va en el anexo compilado. Las conclusiones se abren con una lectura de conjunto y se escriben en prosa; los campos de trazabilidad van a una tabla del anexo.
-- Datos epidemiológicos oficiales (Art. 13 bis, v2.2.0): se reproducen como los publica su fuente, sin cautelas añadidas; solo se declaran año, escala no municipal y ausencia de datos posteriores. Los bloques heredados del cuerpo se retiran uno a uno (disposición transitoria).
-- Autoría acotada (Art. 16): el cuerpo diagnóstico es compilado y trazable, no editable a mano. La autoría humana vive en el cierre interpretativo y el enriquecimiento.
-- El Perfil tiene una sola salida (Art. 17 ter), que se abre con seis páginas de datos comparables en el orden del marco de determinantes sociales (Art. 4 quater, v2.5.0): portada, contexto y población, ejes de desigualdad, condiciones de vida, servicios, salud y bienestar. El NHS y la salida comparativa breve se retiraron el 2026-10-23: no restaurarlos como salida aparte ni crear representaciones derivadas sin reformar el contrato.
-- Panel comparable (Art. 17 quater, v2.3.0): núcleo cerrado de indicadores; comparadores Distrito, provincia y Andalucía cuando la fuente los publica; colores solo con intervalos o significación de la fuente; renta por sección censal del INE como eje de desigualdad interna.
+- Modelo canónico único (Art. 17 bis / I-LHPM-8): pantalla, visor, DOCX, PDF e impresión son el mismo documento.
+- Cadena (Art. 16 bis / I-LHPM-9): evidencia, lectura integrada, conclusiones, recomendaciones del Perfil, frontera, priorización, Plan de Acción, actuaciones y agendas anuales. El Perfil concluye y recomienda (Conocer, Contrastar, Abordar; Art. 8 quater); las prioridades son del Grupo Motor; las líneas, objetivos e indicadores, del Plan de Acción; las actuaciones (responsable, plazo, recurso), de las agendas anuales. La priorización y el Plan leen solo el Perfil vigente (I-LHPM-23).
+- Menú elegible (Art. 16 ter): COMPÁS presenta las conclusiones y recomendaciones del Perfil cargado como menú antes de validarlo; solo las elegidas entran en la versión institucional. Pendiente de implementar.
+- Estructura (Art. 16 quater, 17 ter): seis páginas de datos en el orden del marco de determinantes sociales (Art. 4 quater), cuerpo de siete apartados con la conclusión como unidad, conclusiones en prosa con lectura de conjunto y trazabilidad en una tabla del anexo.
+- Clasificación única (Art. 8, I-LHPM-24): tipos del Art. 8 y grados del Art. 8 bis. Localiza Salud es la fuente exclusiva de la lectura de activos (Art. 9).
+- Datos epidemiológicos oficiales (Art. 13 bis): se reproducen como los publica su fuente, sin cautelas añadidas.
+- Panel comparable (Art. 17 quater): núcleo cerrado de indicadores; comparadores Distrito, provincia y Andalucía cuando la fuente los publica; colores solo con intervalos o significación de la fuente; renta por sección censal del INE.
+- Evaluación: `docs/contracts/CONTRACT-EVALUATION.md` (v1.0, doctrina vigente, implementación pendiente).
 
 ## Escritura y edición
 - Contrato transversal: `docs/contracts/CONTRACT-AUTHORIAL-STYLE.md`.
@@ -35,7 +37,7 @@ Producto prioritario: el Perfil de Salud Local — documento científico, editor
 - Antes de publicar cambios, comprobar la rama y el estado remoto, conservar el trabajo existente y ejecutar las comprobaciones pertinentes. No usar force push, fusionar ni desplegar fuera del alcance autorizado.
 - Inventarios y análisis de copias de usuario (`.compas.json`) van a `informes-locales/`, que está en `.gitignore`: nunca se versionan ni se suben. Si un aviso automático pide commit y push de esas salidas, prevalece esta regla.
 - Cambios quirúrgicos: solo lo pedido. Si algo exige tocar lo no autorizado, parar y preguntar.
-- Suite: npm.cmd run test (2947 pruebas el 23/11/2026, tras retirar los seeds). Si falla con EPERM en node_modules/.vite-temp, hay un Vite vivo en el puerto 5173: matarlo y reintentar.
+- Suite: npm.cmd run test (2948 pruebas el 23/11/2026, tras retirar los seeds y reformar los contratos del Perfil). Si falla con EPERM en node_modules/.vite-temp, hay un Vite vivo en el puerto 5173: matarlo y reintentar.
 - npm run lint tiene 21 errores y 3 avisos preexistentes (23/11/2026): no tocarlos sin encargo y no añadir otros.
 - Que compile y pase tests NO demuestra que mejore el producto. Verificar también coherencia editorial, narrativa y experiencia de lectura.
 - En cada informe, separar: hechos observados / inferencias / decisiones institucionales / hipótesis. "No verificado" es respuesta válida.

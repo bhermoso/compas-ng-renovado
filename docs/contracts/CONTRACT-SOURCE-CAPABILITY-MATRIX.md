@@ -1,7 +1,7 @@
 # CONTRACT-SOURCE-CAPABILITY-MATRIX
 
 > Matriz contractual de capacidades de fuente para el Perfil de Salud Local.
-> Versión 1.2 — 2026-10-23
+> Versión 1.3 — 2026-11-23
 > Estado: VIGENTE
 >
 > Este contrato define qué tipos de información puede soportar, cargar e
@@ -53,8 +53,8 @@ La matriz es el puente entre `CONTRACT-REPOSITORY`, `CONTRACT-EVIDENCE`,
 | Exportación REDCap genérica | `DocumentKind: "redcap-export"`; `origin: "redcap"` si no hay origen más específico | Variable | Sí | Entrada estructurada genérica hasta que un parser específico la clasifique. | Activa genérica |
 | Priorización ciudadana por votación | `redcap-export` + tag `"thematic-prioritisation"`; `origin: "citizen-participation"` | Variable canónica por tag | Sí | Evidencia participativa: preferencias, prioridades percibidas y base para deliberación. | Activa |
 | Selección deliberativa del Grupo Motor | Objeto de priorización deliberativa del workspace | Variable | No ordinaria | Decisión posterior que orienta planificación; no sustituye al diagnóstico. | Activa |
-| Localiza Salud / activos comunitarios | `DocumentKind: "localiza-salud"`; `origin: "localiza-salud"` | Variable acumulable | Sí | Fuente principal/preferente de activos cuando exista o pueda obtenerse; activos y capacidades potenciales; equilibrio activos-déficits. | Activa |
-| Activos comunitarios legado | `DocumentKind: "community-asset"`; `origin: "community-assets"` | Variable interna/legado | Sí | Compatibilidad con datos anteriores; activos/capacidades que no deben desplazar Localiza Salud como fuente principal visible. | Legacy activo |
+| Localiza Salud / activos comunitarios | `DocumentKind: "localiza-salud"`; `origin: "localiza-salud"` | Variable acumulable | Sí | Fuente exclusiva de la lectura de activos del Perfil; recursos y activos validados; equilibrio activos-déficits. | Activa |
+| Activos comunitarios legado | `DocumentKind: "community-asset"`; `origin: "community-assets"` | Variable interna/legado | Sí | Compatibilidad con datos anteriores; activos/capacidades que no entran en la lectura del Perfil ni desplazan a Localiza Salud. | Legacy activo |
 | Marco estratégico y normativo | `DocumentKind: "strategic-framework"`; `origin: "strategic-framework"` | Variable acumulable | Sí | Contexto institucional: EPVSA, ESCA, RELAS, estrategias autonómicas o estatales. | Activa |
 | Documentación territorial de contexto | `DocumentKind: "territorial-documentation"`; `origin: "territorial-documentation"` | Variable acumulable | Sí si hay texto procesable | Determinantes, contexto social, económico, urbano, institucional o clínico-asistencial. | Activa |
 | Informes ERACIS u otros diagnósticos de programa | Normalmente `territorial-documentation`; `documentNature` pendiente si se especializa | Variable acumulable | Sí si hay texto procesable | Diagnóstico social/territorial complementario; desigualdades, vulnerabilidad, barrios, colectivos. | Activa por ruta genérica |
@@ -80,9 +80,8 @@ Una fuente nueva entra por la ruta más específica disponible:
 2. Si es un estudio con parser estructurado, usa su importador específico.
 3. Si es una priorización por votación, usa la ruta de priorización temática.
 4. Si es inventario de activos, usa `localiza-salud`. Si los activos aparecen
-   mencionados en otra fuente, se tratan como indicio contextual o capacidad
-   potencial y deben reconciliarse con Localiza Salud cuando exista o pueda
-   obtenerse.
+   mencionados en otra fuente, se conservan como candidatos pendientes de
+   reconciliación con Localiza Salud y no entran en la lectura del Perfil.
 5. Si es estrategia, norma, plan autonómico, plan sectorial, plan estratégico
    temático o marco RELAS/ESCA, usa `strategic-framework`.
 6. Si es diagnóstico social, informe ERACIS, diagnóstico de barrio, informe de
@@ -157,14 +156,14 @@ Una estrategia autonómica, plan sectorial o marco normativo puede orientar la
 lectura y la planificación posterior, pero no demuestra por sí solo un problema
 de salud local.
 
-**SCM-I8 — Localiza Salud como fuente principal de activos**
+**SCM-I8 — Localiza Salud como fuente exclusiva de activos**
 
-Siempre que exista o pueda obtenerse una fuente Localiza Salud, el mapa de
-activos del Perfil se construye desde `localiza-salud`. Los activos mencionados
-en ERACIS, material cualitativo, documentación territorial, informes de programa
-u otros documentos pueden señalar capacidades potenciales, pero quedan como
-complementarios, contextuales o pendientes de reconciliación. No sustituyen
-Localiza Salud ni reabren `community-asset` como vía visible.
+La lectura de activos del Perfil se construye solo desde `localiza-salud`
+(contrato metodológico v3.0.0, Art. 9). Los activos mencionados en ERACIS,
+material cualitativo, documentación territorial, informes de programa u otros
+documentos se conservan como candidatos pendientes de reconciliación y no
+entran en la lectura. No sustituyen Localiza Salud ni reabren `community-asset`
+como vía visible.
 
 ---
 
@@ -176,7 +175,7 @@ Localiza Salud ni reabren `community-asset` como vía visible.
 | `CONTRACT-EVIDENCE` | Define `EvidenceAtom`, `EvidenceOrigin`, confianza, procedencia e IntegrityGuard. |
 | `CONTRACT-COMPLEMENTARY-STUDIES` | Define los 13 instrumentos estructurados y sus pipelines. |
 | `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY` | Define cómo el Perfil usa fuentes, afirma, interpreta y declara incertidumbre. |
-| `PROFILE-VISUAL-CONTRACT` | Define cómo se visualizan fuentes, escalas, cautelas.
+| `CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY` | Define cómo se entregan, cotejan y representan las fuentes del Perfil. |
 
 ---
 
@@ -184,6 +183,7 @@ Localiza Salud ni reabren `community-asset` como vía visible.
 
 | Fecha | Versión | Cambio | Responsable |
 |---|---|---|---|
+| 2026-11-23 | 1.3 | Localiza Salud pasa a fuente exclusiva de la lectura de activos (contrato metodológico v3.0.0, Art. 9; decisión del responsable) | COMPÁS |
 | 2026-10-23 | 1.2 | Se retiran la columna y la sección «salida comparativa breve» (decisión del autor: solo Perfil general); las secciones 7 y 8 pasan a 6 y 7 | COMPÁS NG |
 | 2026-09-24 | 1.1 | Localiza Salud queda fijada como fuente principal/preferente para activos; otras menciones quedan como indicios complementarios o pendientes de reconciliación | COMPÁS NG |
 | 2026-09-24 | 1.0 | Creación de la matriz de capacidades de fuentes y su relación con las dos salidas del Perfil | COMPÁS NG |

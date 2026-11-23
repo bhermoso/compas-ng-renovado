@@ -1,28 +1,38 @@
 # CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY
 
-> Contrato metodológico canónico del Perfil de Salud Local (PSL) en COMPÁS NG.
-> Versión 2.5.1 — 2026-11-21 (historial en el registro de revisiones)
-> Estado: VIGENTE
+> Contrato metodológico canónico del Perfil de Salud Local (PSL) en COMPÁS.
+> Versión 3.0.0 — 2026-11-23 (historial en el registro de revisiones)
+> Estado: VIGENTE. Contrato rector del Perfil.
 >
-> Este contrato define qué debe ser metodológicamente un Perfil de Salud Local,
-> qué puede afirmar y qué no puede afirmar, cómo se construye su evidencia y
+> Este contrato define qué es metodológicamente un Perfil de Salud Local, qué
+> puede afirmar y qué no, cómo se construye su evidencia, cómo se estructura y
 > qué condiciones debe cumplir para ser aceptable como documento institucional.
 >
-> No describe implementación. No define tipos de datos. No especifica compiladores.
-> Es el documento normativo que antecede y condiciona a CONTRACT-MIT-PSL,
-> CONTRACT-PSL-COMPAS y CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER.
+> No describe implementación ni tipos de datos. El Perfil se rige por cuatro
+> documentos, cada uno con su pregunta:
+>
+> | Documento | Responde a |
+> |---|---|
+> | Este contrato | Qué es el Perfil, qué puede afirmar, cómo se estructura y cuándo es aceptable |
+> | [`CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY`](CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY.md) | Cómo llega un Perfil a COMPÁS y cómo se custodia, se coteja, se elige, se valida y se publica |
+> | [`CONTRACT-PROFILE-UPDATER`](CONTRACT-PROFILE-UPDATER.md) | Cómo se aplica un cambio de modelo o de datos a cualquier expediente |
+> | [Guía de escritura del Perfil](../guides/GUIA-ESCRITURA-PERFIL.md) | Cómo se escribe: lector, voz, prosa, citas y comprobación antes de entregar |
+>
+> Si otro documento contradice a este, prevalece este.
 
 ---
 
 ## Alcance
 
-**Aplicación a producción externa (aclaración 12-11-2026).** El contenido, las cautelas, la estructura y el modelo canónico se aplican también al Perfil elaborado fuera de COMPÁS. En esa ruta, la redacción, elección de conclusiones/recomendaciones y preparación del anexo corresponden al equipo redactor externo; las menciones a generación o anexo compilado describen el mecanismo histórico, no una instrucción para completar el documento al cargarlo. La importación conserva y representa; no produce diagnóstico nuevo. La [guía de entrega](../guides/ENTREGA-PERFIL-EXTERNO.md) desarrolla esta ruta y el [contrato externo](CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION.md) mantiene su aprobación técnica pendiente. Esta aclaración no valida perfiles ni altera la frontera con la priorización y el Plan.
+Este contrato rige el Perfil de Salud Local de COMPÁS, lo redacte quien lo redacte. Desde el 29 de octubre de 2026 el Perfil se elabora fuera de la aplicación y se carga en el expediente; COMPÁS no genera diagnóstico.
 
+El reparto de papeles es este:
 
-Este contrato aplica a:
-- El `LocalHealthProfile` como objeto analítico del sistema.
-- El `LocalHealthProfileArtifact` (PSL-C) como documento institucional compilado.
-- Todo proceso de producción, validación y entrega del Perfil de Salud Local en COMPÁS NG.
+- **Quien redacta propone.** El equipo redactor, persona o equipo identificable, escribe el Perfil completo: páginas de datos, cuerpo, conclusiones, recomendaciones y anexo, conforme a este contrato y a la guía de escritura.
+- **El equipo técnico elige.** Sobre el Perfil cargado, el equipo técnico del municipio elige o descarta cada conclusión y cada recomendación (Art. 16 ter) y valida la revisión (Art. 17).
+- **COMPÁS conserva, muestra y comprueba.** Custodia los originales, presenta el documento y el menú de elección, registra elecciones y validaciones y comprueba lo que puede comprobarse sin interpretar. No completa, no reescribe y no genera afirmaciones del Perfil.
+
+Este contrato aplica a todo Perfil que se cargue, conserve, elija, valide o publique en COMPÁS, y a sus revisiones.
 
 Este contrato no aplica a:
 - El Plan de Acción, la Agenda ni el Marco de Seguimiento.
@@ -99,7 +109,7 @@ Las unidades en que el Perfil organiza su lectura integrada se derivan del exped
 
 Un tema que el Informe de Salud trata y que la priorización temática no recoge (el envejecimiento y la dependencia, por ejemplo) no genera por sí solo una unidad de lectura. Puede hacerlo si una persona del equipo técnico lo declara como eje de lectura.
 
-1. **Declaración.** El eje se declara con su definición, las dimensiones del Informe que agrupa y la autoría y la fecha de quien lo declara. Sin declaración, el tema no genera unidad ni conclusión compilada.
+1. **Declaración.** El eje se declara con su definición, las dimensiones del Informe que agrupa y la autoría y la fecha de quien lo declara. Sin declaración, el tema no genera unidad ni conclusión.
 2. **Estatuto.** Un eje es una agrupación de evidencia, no un hallazgo. Declararlo no lo prioriza: priorizar corresponde al Grupo Motor (Art. 3).
 3. **Versión.** Cada cambio del eje es una versión nueva, con autoría y fecha.
 
@@ -116,7 +126,7 @@ El Perfil es un informe de salud basado en los determinantes sociales. Su marco 
 
 ### Art. 5. Perfil como explicación territorial
 
-El Perfil no es la acumulación de datos: es su explicación. La diferencia entre acumular y explicar es la distinción entre el EvidenceStore —que contiene los datos— y el Perfil —que los organiza en una lectura con sentido.
+El Perfil no es la acumulación de datos: es su explicación. La diferencia entre acumular y explicar es la distinción entre el expediente —que contiene los datos— y el Perfil —que los organiza en una lectura con sentido.
 
 La explicación territorial del Perfil tiene tres movimientos:
 
@@ -152,7 +162,7 @@ El Perfil puede integrar evidencia de las siguientes familias:
 | **Informes institucionales** | Diagnósticos producidos por el sistema sanitario, servicios sociales u otras instituciones |
 | **Evidencia longitudinal** | Cambios observados entre ciclos diagnósticos anteriores y el actual |
 | **Cautelas metodológicas** | Limitaciones de las fuentes anteriores que condicionan la interpretación |
-| **Marcos estratégicos y normativos** | Orientaciones programáticas autonómicas o estatales relevantes para la planificación (EPVSA, ESCA, RELAS, etc.) |
+| **Marcos estratégicos y normativos** | Orientaciones programáticas autonómicas o estatales relevantes para la planificación: Estrategia de Salud de Andalucía 2030 (ESA), EPVSA, ESCA, Plan Estratégico de Salud Mental y Adicciones de Andalucía 2026–2029 (PESMAA), RELAS y otros que el expediente incorpore |
 
 Ninguna familia tiene rango superior a las demás. El Perfil declara de qué familia proviene cada afirmación y con qué nivel de confianza metodológica.
 
@@ -161,8 +171,8 @@ Ninguna familia tiene rango superior a las demás. El Perfil declara de qué fam
 El Informe de Salud del municipio (Informe de Situación de Salud u equivalente) tiene un estatuto diferenciado del resto de las fuentes de evidencia:
 
 1. **Es la base epidemiológica oficial del Perfil.** Sintetiza el estado de salud de la población desde la perspectiva del sistema sanitario público. El Perfil lo referencia como fuente primaria, no lo sustituye.
-2. **Se preserva íntegro.** El Informe de Salud se carga, conserva y visualiza como documento, no como evidencia atomizada. El sistema no lo transforma en unidades de evidencia ordinarias del EvidenceStore.
-3. **No genera EvidenceAtom en el flujo activo del producto.** Las secciones del Informe no se convierten en átomos de evidencia ni alimentan el Motor de Interpretación Territorial como evidencia estructurada. Ver D-HR-01 en el Gap Register.
+2. **Se preserva íntegro.** El Informe de Salud se carga, conserva y visualiza como documento, no como evidencia atomizada. COMPÁS no lo transforma en unidades de evidencia ordinarias del expediente.
+3. **No se atomiza.** Las secciones del Informe no se convierten en unidades de evidencia del expediente ni alimentan una lectura automática. El Perfil cita el Informe con su apartado, tabla o página.
 4. **El Perfil contextualiza el Informe, no lo reemplaza.** Lo que el Perfil añade, una vez cumplida la regla N+1, es la lectura integrada: determinantes sociales, estudios complementarios, activos y capacidades, y priorización ciudadana. Esta lectura enriquece el Informe sin modificarlo.
 5. **Admite DOCX y PDF.** Ambos formatos se aceptan. El DOCX permite visualización estructurada; el PDF se preserva como fuente primaria sin extracción de contenido.
 
@@ -180,23 +190,23 @@ Cualquiera de estas fuentes puede activar la regla N+1, en cualquier combinació
 
 ### Art. 7 ter. Limitaciones diagnósticas y áreas territoriales
 
-El sistema puede detectar observaciones sobre la calidad de la base documental (ausencia de determinantes, cautelas metodológicas, base insuficiente). Estas observaciones son **limitaciones diagnósticas** (`limitacionesDiagnosticas` en el modelo del MIT), no áreas territoriales de intervención.
+Las observaciones sobre la calidad de la base documental (ausencia de determinantes, cautelas metodológicas, base insuficiente) son **limitaciones diagnósticas**, no áreas territoriales de intervención.
 
 **Reglas de separación obligatorias:**
 
 - Una carencia de información no es un área de intervención territorial.
 - Una cautela metodológica no es una candidatura para la deliberación del Grupo Motor.
 - La ausencia de determinantes identificados no puede escalar a área priorizable.
-- Los conflictos interpretativos internos del sistema no son áreas de intervención.
+- Las discrepancias de método entre fuentes no son áreas de intervención.
 - Las limitaciones diagnósticas se declaran como lagunas (Art. 8) o decisiones posteriores, no como áreas.
 
 Solo pueden pasar a la sección de áreas de intervención del Perfil los aspectos que representen **tensiones territoriales sustantivas** con base en datos reales: convergencia de determinantes, activos en relación con necesidades identificadas, hallazgos participativos contrastados con indicadores. Las limitaciones diagnósticas se muestran, como máximo, como "Aspectos pendientes de contraste" o "Limitaciones del diagnóstico".
 
-### Art. 7 quater. Capítulo VI — Cierre interpretativo
+### Art. 7 quater. Cierre del Perfil
 
-El Capítulo VI del Perfil es el **Cierre interpretativo y recomendaciones del Perfil**. No es "Plan de acción".
+El Perfil se cierra con sus conclusiones y sus recomendaciones (Art. 16 quater, apartados 2 a 5). Ese cierre no es un Plan de Acción.
 
-El cierre interpretativo establece:
+El cierre establece:
 - Qué comprensión del territorio emerge del conjunto del diagnóstico.
 - Qué tensiones o patrones deben contrastarse con el Grupo Motor.
 - Qué capacidades territoriales pueden sostener el proceso comunitario.
@@ -205,7 +215,7 @@ El cierre interpretativo establece:
 
 Cada recomendación cita las conclusiones o lagunas de las que deriva y, si se apoya en una relación, su grado de sustento (Art. 8 bis). Una recomendación de tipo «Abordar» solo puede apoyarse en relaciones de grado 1 o 2.
 
-El Capítulo VI no establece compromisos, no selecciona prioridades y no asigna líneas estratégicas, no ordena las recomendaciones entre sí y no fija actuaciones operativas (responsable, plazo, recurso, indicador de ejecución). Las líneas, los objetivos y los indicadores pertenecen al Plan de Acción; las actuaciones, con su responsable, plazo y recurso, a las agendas anuales de implantación del Plan Local de Salud (CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT §3.1 bis; CONTRACT-AGENDA-ACTUATIONS). Ambos son productos distintos del Perfil. El Perfil termina cuando el territorio queda comprendido y las recomendaciones están formuladas.
+El cierre no establece compromisos, no selecciona prioridades y no asigna líneas estratégicas, no ordena las recomendaciones entre sí y no fija actuaciones operativas (responsable, plazo, recurso, indicador de ejecución). Las líneas, los objetivos y los indicadores pertenecen al Plan de Acción; las actuaciones, con su responsable, plazo y recurso, a las agendas anuales de implantación del Plan Local de Salud (CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT §3.1 bis; CONTRACT-AGENDA-ACTUATIONS). Ambos son productos distintos del Perfil. El Perfil termina cuando el territorio queda comprendido y las recomendaciones están formuladas.
 
 ### Art. 8. Tipos de afirmación
 
@@ -237,6 +247,8 @@ El Perfil opera con exactamente ocho tipos de afirmación. Toda afirmación incl
 
 El Perfil declara siempre el tipo de afirmación que realiza. Las interpretaciones no se presentan como hechos. Las hipótesis no se presentan como interpretaciones. Las lagunas no se ocultan.
 
+**Clasificación única.** El estatuto de una afirmación se rige solo por estos ocho tipos y, cuando se apoya en una relación, por los tres grados del Art. 8 bis. No se usan otras clasificaciones del conocimiento ni del estatus causal.
+
 ### Art. 8 bis. Relaciones entre determinantes y problemas de salud
 
 El Perfil puede formular relaciones entre potenciales determinantes y problemas de salud del territorio. Toda relación es una hipótesis (Art. 8) y cumple estas condiciones:
@@ -247,13 +259,13 @@ El Perfil puede formular relaciones entre potenciales determinantes y problemas 
    - *Grado 2 — Documentada en referencia externa:* la relación procede de una fuente de ámbito superior o de la literatura, con fuente verificable (por ejemplo, valores de la Encuesta Andaluza de Salud para Andalucía o Granada), etiquetada «no local». No sustituye el dato municipal.
    - *Grado 3 — Plausible, sin sustento verificado:* se marca «no verificado». No sostiene una recomendación de tipo «Abordar»; admite recomendaciones de tipo «Conocer» y «Contrastar» (Art. 8 quater).
 3. **Lenguaje proporcionado al sustento.** «Se asocia con», «coexiste con» o «es compatible con». «Causa», «provoca» o «explica» solo cuando la fuente citada demuestra causalidad y así lo dice.
-4. **Tabla declarada.** Las relaciones elegibles proceden de una tabla versionada y validada por una persona, como las correspondencias del Art. 4 bis. El sistema no infiere relaciones por coincidencia de términos en un texto.
+4. **Tabla declarada.** Las relaciones elegibles proceden de una tabla versionada y validada por una persona, como las correspondencias del Art. 4 bis. COMPÁS no infiere relaciones por coincidencia de términos en un texto.
 5. **Escala.** Una asociación observada en un ámbito superior no se atribuye al municipio ni a las personas que lo habitan; se declara la escala (Art. 13).
 6. **Contraevidencia.** Si consta evidencia que contradice la relación, se declara junto a ella (Art. 14).
 
 ### Art. 8 ter. La afirmación como unidad y la cadena de lectura
 
-Cada frase del cuerpo del Perfil es una afirmación con los campos siguientes: tipo (Art. 8), texto, evidencia con localización, origen (compilada por el sistema desde átomos, o redactada por el equipo técnico), afirmaciones de las que deriva, grado de sustento cuando se apoya en una relación (Art. 8 bis) y, si requiere elección, su estado (Art. 16 ter). La evidencia es obligatoria; solo la cautela y la laguna pueden limitarse a remitir a otra afirmación.
+Cada afirmación del cuerpo del Perfil tiene tipo (Art. 8), texto, evidencia con localización, afirmaciones de las que deriva, grado de sustento cuando se apoya en una relación (Art. 8 bis) y, si requiere elección, su estado (Art. 16 ter). La evidencia es obligatoria; solo la cautela y la laguna pueden limitarse a remitir a otra afirmación. En el cuerpo, el tipo se nota en cómo se dice; los campos constan en la tabla de trazabilidad del anexo (Art. 16 quater).
 
 La conclusión no es un tipo más: es el paso en que las afirmaciones de los pasos anteriores se resumen o se interpretan, y sus afirmaciones son de los tipos que ese paso admite. La lectura de cada unidad (Art. 4 bis) recorre cinco pasos. Cada paso admite solo ciertos tipos y tiene una prohibición propia.
 
@@ -267,7 +279,7 @@ La conclusión no es un tipo más: es el paso en que las afirmaciones de los pas
 
 1. **Referencias no locales.** Las referencias de ámbito autonómico o provincial (por ejemplo, la Encuesta Andaluza de Salud) entran en el paso de análisis solo como referencia comparativa rotulada «no local», con encuesta, año y tabla. Nunca sustituyen el dato municipal.
 2. **Tabla de relaciones.** Las relaciones del paso de inferencia constan en una tabla declarada y versionada, con su grado y su fuente. La valida una persona del equipo técnico, y cada versión lleva su autoría y su fecha.
-3. **Generación.** Una regla puede generar una conclusión de tipo hecho («la tabla declara esta relación, con este grado, esta autoría y esta evidencia») solo cuando la relación consta en la tabla, está validada por una persona, es de grado 1 o 2 y conserva la evidencia que la sostiene. Ninguna regla genera interpretaciones, hipótesis ni recomendaciones, que exigen autoría humana (Art. 8); para la recomendación el sistema puede ofrecer un borrador en el formulario de redacción, que no es una propuesta del menú ni entra en el Perfil hasta que una persona lo redacta como suyo. Las relaciones de grado 3 o sin validar no generan nada y su motivo consta. Una propuesta generada nace pendiente y su identificador incluye la versión de la relación.
+3. **Autoría.** Todas las afirmaciones del Perfil las redacta el equipo redactor. COMPÁS no genera afirmaciones: puede comprobar que una relación citada consta en la tabla declarada, con su grado y su fuente, y señalar lo que no consta.
 
 *Consecuencia si se viola:* el Perfil contiene frases que no se pueden clasificar ni rastrear, o una recomendación descansa en una relación sin sustento.
 
@@ -300,7 +312,7 @@ Los activos no son un apartado opcional ni un complemento pedagógico del diagn�
 
 La descripción de activos obedece a las mismas exigencias de trazabilidad que cualquier otra evidencia: fuente identificada, tipo de activo, accesibilidad y relación con las necesidades de salud identificadas.
 
-Cuando exista o pueda obtenerse Localiza Salud, esta será la fuente principal/preferente para el mapa de activos del Perfil. Otras fuentes -ERACIS, documentación territorial, material cualitativo, diagnósticos de programas, memorias participativas o informes institucionales- pueden aportar indicios sobre capacidades del territorio, pero no sustituyen Localiza Salud: deben declararse como complementarias, contextuales o pendientes de reconciliación.
+Localiza Salud es la fuente exclusiva de la lectura de activos del Perfil: solo entra en ella lo que consta en Localiza Salud (Art. 9 bis). Otras fuentes —ERACIS, documentación territorial, material cualitativo, diagnósticos de programas, memorias participativas o informes institucionales— pueden señalar recursos, que se conservan como candidatos pendientes de registro en Localiza y no se cuentan en la lectura. Si el municipio no tiene registros en Localiza Salud, el Perfil lo declara como laguna.
 
 Un Perfil que solo diagnostica déficits viola su función metodológica.
 
@@ -368,7 +380,7 @@ Cada indicador cuantitativo del Perfil se presenta con su referente de comparaci
 
 Cuando no existe referente disponible, el indicador se presenta sin comparación y se declara esa ausencia. Presentar un indicador como si la comparación fuera posible cuando no lo es constituye una falsedad metodológica.
 
-En el contexto de COMPÁS NG, el referente provincial es más informativo que el referente nacional para municipios andaluces de tamaño pequeño y medio, por razones de comparabilidad socioeconómica y demográfica. El referente nacional se usa cuando no existe referente provincial o cuando el instrumento tiene validación normativa de ámbito estatal sin desagregación provincial.
+En COMPÁS, el referente provincial es más informativo que el referente nacional para municipios andaluces de tamaño pequeño y medio, por razones de comparabilidad socioeconómica y demográfica. El referente nacional se usa cuando no existe referente provincial o cuando el instrumento tiene validación normativa de ámbito estatal sin desagregación provincial.
 
 **Comparación temporal**
 
@@ -389,7 +401,7 @@ Las principales fuentes de incertidumbre que el Perfil debe declarar son:
 - Brechas temporales entre los datos disponibles y el momento del diagnóstico.
 - Representatividad limitada del proceso participativo.
 
-Las muestras municipales de COMPÁS NG no permiten inferencia estadística rigurosa comparable a la de encuestas de referencia poblacional. Los comparadores son indicativos, no estadísticamente significativos. La falsa precisión es más peligrosa que la incertidumbre reconocida.
+Las muestras municipales de COMPÁS no permiten inferencia estadística rigurosa comparable a la de encuestas de referencia poblacional. Los comparadores son indicativos, no estadísticamente significativos. La falsa precisión es más peligrosa que la incertidumbre reconocida.
 
 ### Art. 13 bis. Datos epidemiológicos oficiales
 
@@ -402,7 +414,7 @@ Se mantienen, porque son hechos y no juicios sobre el dato:
 - La escala, cuando el dato no es municipal (Art. 13, dato de ámbito superior usado como contexto).
 - La ausencia de datos posteriores, dicha como un hecho sobre el conocimiento del municipio («No hay datos posteriores a 2015»).
 
-Las cautelas del Art. 13 siguen rigiendo para los estudios realizados en el municipio con COMPÁS NG, para la representatividad de los procesos participativos y para el uso de datos no locales como si fueran municipales.
+Las cautelas del Art. 13 siguen rigiendo para los estudios realizados en el municipio con COMPÁS, para la representatividad de los procesos participativos y para el uso de datos no locales como si fueran municipales.
 
 *Consecuencia si se viola:* el Perfil desautoriza la fuente oficial que le da base, sin capacidad para corregirla, y el lector pierde la referencia sobre qué cifras sostienen el diagnóstico.
 
@@ -437,7 +449,7 @@ El error metodológico más frecuente en la articulación ESCA-Perfil es present
 
 #### 15.3 La ESCA no es un instrumento de evaluación ni un estudio complementario
 
-La ESCA es un plan operativo estratégico. No es una escala, no es un instrumento psicométrico, no genera puntuaciones, no produce datos cuantitativos para el EvidenceStore del Perfil. El Perfil no trata la ESCA como una fuente de evidencia sobre la población.
+La ESCA es un plan operativo estratégico. No es una escala, no es un instrumento psicométrico, no genera puntuaciones, no produce datos cuantitativos para el expediente. El Perfil no trata la ESCA como una fuente de evidencia sobre la población.
 
 #### 15.4 Las líneas estratégicas de la ESCA no son objetivos municipales
 
@@ -447,24 +459,13 @@ Las líneas estratégicas de la ESCA definen la orientación del sistema sanitar
 
 ## Capítulo VI — Autoría y validación
 
-### Art. 16. No automatización de decisiones
+### Art. 16. Autoría y papel de COMPÁS
 
-Ningún output generado automáticamente por el sistema puede presentarse en el Perfil como decisión territorial, como prioridad seleccionada ni como recomendación del Perfil sin validación humana explícita.
+El Perfil es de autoría humana en su totalidad. Su autoridad metodológica depende de que pueda reconstruirse la cadena que va desde la fuente hasta la afirmación.
 
-El sistema genera:
-- Organización de la evidencia en el EvidenceStore.
-- Síntesis de patrones emergentes en la interpretación territorial.
-- Propuestas de recomendación para que el equipo las valide, las matice o las descarte.
-- Andamiaje de capítulos para redacción humana.
-
-El cuerpo diagnóstico del Perfil es compilado, trazable y no editable libremente. Su autoridad metodológica depende de que pueda reconstruirse la cadena que va desde la fuente hasta la afirmación. La autoría humana no reescribe el diagnóstico como texto libre: lo interpreta, lo matiza y lo asume en los espacios de cierre y enriquecimiento previstos.
-
-El equipo técnico produce:
-- Las conclusiones diagnósticas del territorio.
-- El cierre interpretativo con el alcance y las limitaciones del diagnóstico.
-- La narración de la deliberación de priorización.
-
-Los capítulos de conclusiones y cierre interpretativo del Perfil son siempre de autoría humana. El andamiaje del sistema es un punto de partida para la redacción, no su sustituto. El Perfil compilado como documento institucional no puede generarse mientras esos capítulos contengan andamiaje no reemplazado por texto de autoría del equipo técnico.
+1. **Quien redacta propone.** El equipo redactor escribe el cuerpo, las conclusiones, las recomendaciones, las páginas de datos y el anexo, y declara su autoría y la versión.
+2. **El equipo técnico elige y valida.** Elige o descarta las conclusiones y las recomendaciones (Art. 16 ter) y valida la revisión (Art. 17).
+3. **COMPÁS conserva, muestra y comprueba.** Conserva el original y sus revisiones, presenta el documento y el menú de elección, registra elecciones, descartes y validaciones con autoría y fecha, y comprueba lo verificable (estructura, citas que remiten a fuentes del expediente, relaciones que constan en la tabla declarada). No genera ni completa afirmaciones del Perfil, ni presenta como decisión, prioridad o recomendación nada que no haya escrito y elegido una persona.
 
 ### Art. 16 bis. Cadena del conocimiento
 
@@ -474,23 +475,25 @@ La cadena metodológica del Perfil es:
 
 El Perfil llega hasta las recomendaciones. La priorización corresponde al Grupo Motor; las líneas estratégicas, los objetivos y los indicadores, al Plan de Acción; y las actuaciones, con sus responsables, recursos y plazos, a las agendas anuales de implantación del Plan Local de Salud, que son un instrumento separado del Plan de Acción (CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT §3.1 bis). La frontera entre Perfil y Plan no es un muro: todo elemento posterior debe poder derivarse de las recomendaciones y conclusiones del Perfil, y toda recomendación y conclusión debe poder trazarse hasta la evidencia que la sostiene.
 
+**Solo el Perfil vigente.** La priorización y el Plan de Acción leen únicamente la revisión vigente del Perfil y sus conclusiones y recomendaciones elegidas. No leen borradores, revisiones históricas, propuestas descartadas ni piezas intermedias del expediente. Cambiar de revisión vigente es una acción explícita y no modifica por sí misma la priorización ni el Plan (I-LHPM-23).
+
 ### Art. 16 ter. Conclusiones y recomendaciones como menú elegible
 
-Las conclusiones y las recomendaciones del Perfil se presentan al equipo técnico como un menú de propuestas. El equipo elige cuáles asume y descarta las demás.
+Las conclusiones y las recomendaciones del Perfil se presentan al equipo técnico como un menú. El equipo elige cuáles asume y descarta las demás.
 
-1. **Propuesta.** El sistema genera cada propuesta a partir de las relaciones y lecturas declaradas (Art. 8 bis, 9 ter). Cada una lleva su texto, su tipo (conclusión o recomendación), la evidencia o relación de la que deriva y su grado de sustento. Ninguna nace elegida: el sistema puede ordenar las propuestas, pero no marca ninguna.
-1 bis. **Propuestas del equipo técnico.** El equipo puede redactar conclusiones y recomendaciones en el cierre interpretativo (Art. 16) cuando la lectura no las genera, por ejemplo cuando se apoyan en cifras del Informe que aún no son átomos de evidencia. Cada una cita la evidencia de la que parte, declara sus salvedades y, si se apoya en una relación, su grado de sustento (Art. 8 bis); una recomendación deriva de conclusiones o lagunas registradas. Entra en el mismo menú, rotulada «redactada por el equipo técnico», y no nace elegida: registrarla no equivale a elegirla. El cuerpo diagnóstico sigue siendo compilado; estas propuestas solo llegan a él si se eligen.
-2. **Elección.** El equipo técnico elige o descarta cada propuesta, con su autoría y la fecha. Puede ajustar la redacción de una propuesta elegida, que conserva el vínculo con la evidencia de origen. El descarte admite un motivo, que se recomienda registrar.
-3. **Lo que entra en el Perfil.** Solo las propuestas elegidas figuran en el cuerpo del Perfil canónico, y lo hacen igual en pantalla, visor, DOCX, PDF e impresión (Art. 17 bis). Las descartadas no se muestran en el cuerpo, pero se conservan en el registro del expediente: no se borran.
-4. **Resolución previa a la versión institucional.** El Perfil no puede generarse como documento institucional mientras queden propuestas sin resolver. En borrador, las pendientes se muestran como tales.
-5. **Coherencia.** Descartar una propuesta no suprime la evidencia ni la lectura integrada de las que deriva. Si dos propuestas elegidas se contradicen, el Perfil lo declara (Art. 14).
-6. **Elegir no es priorizar.** La elección es una validación técnica de lo que el Perfil afirma y orienta. La priorización entre necesidades sigue siendo deliberación del Grupo Motor (Art. 3).
-7. **Interpretaciones e hipótesis.** Las interpretaciones y las hipótesis, que exigen autoría humana (Art. 8), pasan por este mismo menú y siguen las mismas reglas de elección, descarte y resolución previa a la versión institucional.
-8. **Ubicación y modo de revisión.** Las conclusiones y las recomendaciones ocupan el final del cuerpo del Perfil, en el orden del Art. 16 quater, y después la frontera de decisión (Art. 16 bis). No se intercalan en las unidades ni abren el documento. El menú no es un documento aparte: es un modo de revisión del mismo Perfil, con los controles de elegir y descartar junto a cada propuesta. Los controles son interfaz y no contenido: fuera del modo de revisión se muestra solo lo elegido, y el texto es idéntico en todas las representaciones (Art. 17 bis).
+1. **Propuesta.** Cada conclusión (C1, C2…) y cada recomendación (R1, R2…) del Perfil cargado es una propuesta. El equipo redactor las entrega en el documento y en el paquete estructurado, con su texto, su tipo, la evidencia o la relación de la que derivan y su grado de sustento. Ninguna nace elegida.
+2. **Menú en COMPÁS.** COMPÁS presenta ese menú sobre el Perfil cargado, antes de validarlo, como modo de revisión del mismo documento: junto a cada propuesta, los controles de elegir y descartar. Los controles son interfaz, no contenido.
+3. **Elección.** El equipo técnico elige o descarta cada propuesta, con autoría y fecha. El descarte admite un motivo, que se recomienda registrar. Las elecciones se registran sobre esa revisión exacta.
+4. **Lo que entra en el Perfil.** Solo las propuestas elegidas figuran en la versión institucional. COMPÁS no suprime texto de un original: si se descarta alguna propuesta, la versión institucional es una revisión nueva del equipo redactor que solo contiene las elegidas, o, hasta que exista, la representación de COMPÁS rotula como descartadas las que lo están. Las descartadas se conservan en el registro del expediente.
+5. **Resolución previa a la validación.** Una revisión no puede validarse mientras queden propuestas sin resolver. En borrador, las pendientes se muestran como tales.
+6. **Ajustes de redacción.** El equipo técnico puede pedir al equipo redactor que ajuste la redacción de una propuesta elegida; el ajuste produce una revisión nueva, que conserva el vínculo con la evidencia de origen.
+7. **Coherencia.** Descartar una propuesta no suprime la evidencia de la que deriva. Si dos propuestas elegidas se contradicen, el Perfil lo declara (Art. 14).
+8. **Elegir no es priorizar.** La elección es una validación técnica de lo que el Perfil afirma y orienta. La priorización entre necesidades sigue siendo deliberación del Grupo Motor (Art. 3).
+9. **Ubicación.** Las conclusiones y las recomendaciones ocupan el final del cuerpo del Perfil, en el orden del Art. 16 quater, seguidas de la frontera de decisión (Art. 16 bis). No se intercalan en las unidades ni abren el documento, y el texto es idéntico en todas las representaciones (Art. 17 bis).
 
 ### Art. 16 quater. Estructura del Perfil
 
-El Perfil es un argumento: su unidad es la conclusión, y se lee como un texto de diagnóstico, no como un conjunto de fichas. Una cuestión de salud figura en el cuerpo solo si sostiene una conclusión o deja una laguna que condiciona una. La evidencia por fuente, por tema y por cifra no forma parte del cuerpo: consta en el anexo compilado.
+El Perfil es un argumento: su unidad es la conclusión, y se lee como un texto de diagnóstico, no como un conjunto de fichas. Una cuestión de salud figura en el cuerpo solo si sostiene una conclusión o deja una laguna que condiciona una. La evidencia por fuente, por tema y por cifra no forma parte del cuerpo: consta en el anexo.
 
 **Precondición.** La estructura rige para un Perfil, es decir, cuando se cumple la regla N+1 (Art. 7 bis A). Si solo existe el Informe de Salud, el producto es el Informe de Salud y no tiene esta estructura.
 
@@ -502,15 +505,13 @@ El Perfil es un argumento: su unidad es la conclusión, y se lee como un texto d
 4. **Lo que no sabemos.** Las lagunas que condicionan una conclusión, cada una con el dato que la cerraría.
 5. **Recomendaciones del Perfil.** En el formato del Art. 8 quater.
 6. **Paso al Plan de Acción.** Texto fijo de la frontera de decisión (Art. 16 bis): qué recibe el Plan (las conclusiones, las recomendaciones y las lagunas elegidas), que la priorización corresponde al Grupo Motor, que el Plan de Acción fija las líneas estratégicas, los objetivos y los indicadores, y que las actuaciones, con sus responsables, recursos y plazos, se concretan en las agendas anuales de implantación, fuera del Plan de Acción. El apartado no atribuye al Plan de Acción actuaciones, responsables, recursos ni plazos. Redacción de referencia: «El Grupo Motor recibe las conclusiones y las recomendaciones que el equipo técnico elija y las preguntas abiertas. A partir de aquí decide qué priorizar; el Plan de Acción fija las líneas estratégicas, los objetivos y los indicadores, y las actuaciones, con sus responsables, recursos y plazos, se concretan después en las agendas anuales de implantación.»
-7. **Autoría y validación.** Responsable técnico, fechas y registro de lo compilado por el sistema, lo declarado por el equipo y lo redactado por el equipo (Art. 17).
+7. **Autoría y validación.** Equipo redactor, responsable técnico, versión, fechas, elecciones y validación (Art. 17).
 
-**Anexo compilado.** Evidencia por fuente, cifras con procedencia, relaciones declaradas y unidades de lectura (Art. 4 bis). Lo genera el sistema y no admite edición manual. Es parte del mismo documento (Art. 17 bis) y es el único lugar donde figura la evidencia completa.
+**Anexo.** Evidencia por fuente, cifras con procedencia, relaciones declaradas con su grado, unidades de lectura (Art. 4 bis) y tabla de trazabilidad de las conclusiones. Lo prepara el equipo redactor y COMPÁS no lo reescribe al cargarlo. Es parte del mismo documento (Art. 17 bis) y es el único lugar donde figura la evidencia completa.
 
 **Longitud.** El cuerpo no crece con el número de fuentes. El número máximo de conclusiones se fija tras probar la estructura con municipios de distinta riqueza de fuentes (H-LHPM-7).
 
-**Unidades de lectura.** Las unidades (Art. 4 bis) siguen siendo la forma en que el sistema organiza la evidencia. En el cuerpo figuran a través de las conclusiones, las convergencias y las lagunas, y completas en el anexo.
-
-**Disposición transitoria.** Mientras la implementación no ensamble esta estructura, el cuerpo heredado (señales por fuente, lectura integrada en hilos, síntesis interpretativa, señales para deliberación, cierre de la lectura y matriz de evidencia) sigue generándose y debe retirarse del cuerpo bloque a bloque, sin que los expedientes de prueba (Zagra, Atarfe y Loja) cambien sin justificación. Los identificadores técnicos del código (por ejemplo, el tipo `orientacion`) no se alteran por este contrato. El compilador heredado (`src/application/proposals/chosenClosing.ts`) sigue presentando las conclusiones en campos fijos hasta que se adapte a la versión 2.2.0; no se modifica para no alterar sin justificación los expedientes de prueba. Los Perfiles elaborados fuera de COMPÁS siguen ya el apartado 2 vigente.
+**Unidades de lectura.** Las unidades (Art. 4 bis) son la forma en que se organiza la evidencia. En el cuerpo figuran a través de las conclusiones, las convergencias y las lagunas, y completas en el anexo.
 
 *Consecuencia si se viola:* el Perfil vuelve a crecer por acumulación de bloques que no se alimentan entre sí, y el lector no puede seguir un argumento.
 
@@ -526,7 +527,7 @@ La validación técnica del Perfil es el acto mediante el cual el equipo técnic
 
 La validación no certifica que el diagnóstico es exhaustivo. Certifica que es honesto sobre su propio alcance.
 
-Una vez compilado como artefacto institucional, el Perfil es inmutable. Si el diagnóstico cambia —porque llegan nuevos datos o porque se detecta un error— debe generarse un nuevo artefacto con nueva versión y nueva validación. El artefacto anterior no se elimina: queda en el historial como registro del diagnóstico en ese momento.
+Una revisión validada es inmutable. Si el diagnóstico cambia —porque llegan nuevos datos o porque se detecta un error— el equipo redactor entrega una revisión nueva, que requiere nueva elección y nueva validación. La revisión anterior no se elimina: queda en el historial como registro del diagnóstico en ese momento.
 
 ---
 
@@ -617,13 +618,13 @@ Un Perfil de Salud Local es metodológicamente aceptable cuando puede responders
 | **Contradicciones declaradas** | ¿Las contradicciones entre fuentes están explícitamente reconocidas, sin resolución artificial? |
 | **Equilibrio activos-déficits** | ¿Los activos comunitarios tienen la misma visibilidad que los indicadores de necesidad? |
 | **No prescripción** | ¿El Perfil no prescribe automáticamente prioridades, actuaciones ni compromisos? |
-| **Autoría identificable** | ¿Los capítulos interpretativos tienen autoría humana explícita, con nombre y cargo? |
-| **Estructura breve** | ¿El cuerpo se limita a los apartados del Art. 16 quater y la evidencia por fuente consta en el anexo compilado? |
+| **Autoría identificable** | ¿El Perfil declara equipo redactor y responsable técnico, con nombre y cargo? |
+| **Estructura breve** | ¿El cuerpo se limita a los apartados del Art. 16 quater y la evidencia por fuente consta en el anexo? |
 | **Alcance delimitado** | ¿El Perfil declara qué no ha podido medir o conocer en este ciclo diagnóstico? |
 | **Separación de etapas** | ¿El Perfil no anticipa decisiones de planificación que corresponden a etapas posteriores? |
 | **Equidad transversal** | ¿El diagnóstico incorpora la perspectiva de quién está en peor situación dentro del territorio? |
 
-Un Perfil que no supera alguno de estos criterios requiere revisión antes de compilarse como documento institucional.
+Un Perfil que no supera alguno de estos criterios requiere una revisión nueva antes de validarse.
 
 ---
 
@@ -631,26 +632,24 @@ Un Perfil que no supera alguno de estos criterios requiere revisión antes de co
 
 Las siguientes cuestiones no tienen todavía resolución normativa en este contrato. Mientras estén abiertas, la responsabilidad recae en el juicio del equipo técnico.
 
-**H-LHPM-1 — Versiones del Perfil técnico según destinatario**
-¿Qué versión del Perfil compilado —la lectura completa o una síntesis breve— se entrega de forma predeterminada a cada destinatario institucional? (La lectura es única y adaptativa, sin recuento obligatorio de capítulos; ver Fundamentos del Perfil único.) Esta decisión afecta al compilador y al ciclo de vida del artefacto.
+**H-LHPM-1 — Versiones del Perfil según destinatario.** *Cerrada (v3.0.0):* el Art. 17 ter fija una sola salida para todos los destinatarios.
 
 **H-LHPM-2 — Umbral mínimo de participación ciudadana para compilación**
-¿Qué nivel de participación es metodológicamente suficiente para que el Perfil pueda compilarse? ¿Basta con la priorización temática por cuestionario? ¿Es necesario que los grupos más vulnerables hayan tenido acceso representativo? Esta decisión determina si la participación es un requisito de calidad o un gate del compilador.
+¿Qué nivel de participación es metodológicamente suficiente para que el Perfil pueda validarse? ¿Basta con la priorización temática por cuestionario? ¿Es necesario que los grupos más vulnerables hayan tenido acceso representativo? Esta decisión determina si la participación es un requisito de calidad o una condición de validación.
 
 **H-LHPM-3 — Síntesis de activos comunitarios extensos**
 Cuando el mapa de activos es extenso, ¿cómo se sintetizan en el documento? ¿Como tipología agregada, listado completo, selección según áreas de intervención emergentes o referencia a documento separado? Esta decisión afecta a la estructura del capítulo de interpretación territorial.
 
 **H-LHPM-4 — Desagregación por sexo: obligatoria o recomendada**
-Los instrumentos de COMPÁS producen datos individuales que permiten calcular indicadores por sexo. ¿Es la desagregación por sexo un requisito estructural del Perfil o una recomendación que el equipo técnico incorpora en los capítulos de autoría humana sin soporte estructurado del sistema?
+Los instrumentos de COMPÁS producen datos individuales que permiten calcular indicadores por sexo. ¿Es la desagregación por sexo un requisito estructural del Perfil o una recomendación para el equipo redactor?
 
 **H-LHPM-5 — Posición de la ESCA en el cuerpo del Perfil**
 ¿Debe el Perfil declarar explícitamente qué actuaciones ESCA están activas en el municipio como dato de contexto del diagnóstico? ¿O esa información pertenece exclusivamente al capítulo de articulación institucional del Plan Local de Salud? Esta decisión determina el alcance del capítulo de marco estratégico del Perfil.
 
-**H-LHPM-6 — Verificabilidad del contenido humano**
-El compilador exige contenido no vacío en los capítulos de autoría humana. ¿Cómo distingue el sistema entre texto de autoría genuina y andamiaje mínimamente modificado? ¿Es esta distinción técnicamente verificable o recae íntegramente en la responsabilidad deontológica del equipo técnico?
+**H-LHPM-6 — Verificabilidad del contenido humano.** *Cerrada (v3.0.0):* COMPÁS ya no genera andamiaje; todo el Perfil es de autoría del equipo redactor (Art. 16).
 
 **H-LHPM-7 — Número máximo de conclusiones**
-¿Cuál es el número máximo de conclusiones del cuerpo del Perfil (el modelo propone entre tres y seis)? Se decide tras probar la estructura del Art. 16 quater con Zagra, Atarfe y Loja. Hasta entonces, el contrato no fija un tope.
+¿Cuál es el número máximo de conclusiones del cuerpo del Perfil (el modelo propone entre tres y seis)? Se decide tras comprobar los Perfiles vigentes de Alfacar, Atarfe, Loja y Zagra contra este contrato. Hasta entonces, el contrato no fija un tope.
 
 ---
 
@@ -662,13 +661,13 @@ El Perfil nunca contiene compromisos de actuación, responsables de ejecución, 
 
 *Consecuencia si se viola:* la legitimidad epistémica del diagnóstico queda comprometida; el Plan Local de Salud que se derive del Perfil carece de base diagnóstica independiente.
 
-*Fuente:* METHODOLOGICAL-FOUNDATIONS-LOCAL-HEALTH-PLANNING PM-2, PM-13; CONTRACT-MIT-PSL PSL-C1.
+*Fuente:* METHODOLOGICAL-FOUNDATIONS-LOCAL-HEALTH-PLANNING PM-2, PM-13.
 
 ---
 
 **I-LHPM-2 — Trazabilidad completa de las afirmaciones**
 
-Toda afirmación del Perfil que no sea una laguna declarada o una decisión posterior debe ser trazable hasta su evidencia de origen en el EvidenceStore o en el repositorio documental.
+Toda afirmación del Perfil que no sea una laguna declarada o una decisión posterior debe ser trazable hasta su evidencia de origen en el expediente o en sus documentos.
 
 *Consecuencia si se viola:* el Perfil no puede auditarse como documento institucional; cualquier tercero puede impugnar sus afirmaciones sin posibilidad de refutación.
 
@@ -676,13 +675,13 @@ Toda afirmación del Perfil que no sea una laguna declarada o una decisión post
 
 ---
 
-**I-LHPM-3 — Autoría humana en capítulos interpretativos**
+**I-LHPM-3 — Autoría humana**
 
-Los capítulos de conclusiones y cierre interpretativo del Perfil solo pueden contener texto redactado por el equipo técnico. El andamiaje generado por el sistema no puede presentarse como contenido de autoría humana.
+Todo el texto del Perfil lo redacta el equipo redactor, con autoría declarada. COMPÁS no genera ni completa afirmaciones del Perfil.
 
-*Consecuencia si se viola:* el Perfil compilado no tiene autor técnico identificable; sus conclusiones carecen de responsabilidad institucional.
+*Consecuencia si se viola:* el Perfil no tiene autor identificable y sus conclusiones carecen de responsabilidad institucional.
 
-*Fuente:* METHODOLOGICAL-FOUNDATIONS-LOCAL-HEALTH-PLANNING PM-20; CONTRACT-PSL-COMPAS PSL-P3-3; CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER G-LHC-2, G-LHC-3.
+*Fuente:* METHODOLOGICAL-FOUNDATIONS-LOCAL-HEALTH-PLANNING PM-20; Art. 16.
 
 ---
 
@@ -708,7 +707,7 @@ El Perfil integra activos comunitarios con el mismo rango metodológico que los 
 
 **I-LHPM-6 bis — Informe de Salud como fuente primaria no atomizable**
 
-El Informe de Salud no se convierte en evidencia ordinaria del sistema. El Perfil lo referencia como fuente diagnóstica primaria pero no lo transforma en `EvidenceAtom`. Las secciones del Informe no alimentan el MIT como evidencia estructurada.
+El Informe de Salud no se convierte en evidencia ordinaria del expediente. El Perfil lo cita como fuente diagnóstica primaria, con su apartado, tabla o página, y sus secciones no alimentan ninguna lectura automática.
 
 *Consecuencia si se viola:* el Informe de Salud pierde su estatuto como fuente oficial primaria; sus afirmaciones se mezclan en el pipeline analítico con evidencia de distinto rango, escala y metodología. La trazabilidad y la autoridad institucional del informe quedan comprometidas.
 
@@ -722,17 +721,17 @@ Las limitaciones diagnósticas —cautelas metodológicas, vacíos de informaci�
 
 *Consecuencia si se viola:* el Perfil propone la priorización de huecos de información como si fueran problemas de salud del territorio; el Grupo Motor delibera sobre limitaciones metodológicas en lugar de sobre prioridades sanitarias.
 
-*Fuente:* CODE (TerritorialInterpretationEngine — campo `limitacionesDiagnosticas`; OITEngine — campo `isAnalyticalGap`); Arts. 7 ter, 7 quater.
+*Fuente:* Arts. 7 ter y 7 quater.
 
 ---
 
-**I-LHPM-6 — Inmutabilidad del artefacto compilado**
+**I-LHPM-6 — Inmutabilidad de la revisión validada**
 
-El Perfil compilado como documento institucional es inmutable desde el momento de su compilación. Todo cambio en el diagnóstico requiere una nueva compilación con nueva versión y nueva validación. El artefacto anterior no se elimina.
+Una revisión validada del Perfil es inmutable. Todo cambio en el diagnóstico requiere una revisión nueva, con nueva elección y nueva validación. La revisión anterior no se elimina.
 
 *Consecuencia si se viola:* la trazabilidad institucional se pierde; no es posible saber qué diagnóstico sirvió de base para el plan aprobado por la corporación municipal.
 
-*Fuente:* CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER §8; CONTRACT-PSL-COMPAS PSL-I4.
+*Fuente:* Art. 17; CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY.
 
 ---
 
@@ -750,7 +749,7 @@ El Informe de Salud por sí solo no constituye un Perfil de Salud Local. El Perf
 
 Pantalla, visor, impresión, DOCX y PDF son representaciones del mismo documento canónico. Ninguna representación puede producir una lectura diagnóstica diferente.
 
-*Consecuencia si se viola:* COMPÁS NG genera perfiles paralelos y pierde la condición de fuente institucional trazable.
+*Consecuencia si se viola:* COMPÁS genera perfiles paralelos y pierde la condición de fuente institucional trazable.
 
 *Fuente:* Art. 17 bis.
 
@@ -768,9 +767,9 @@ El Perfil concluye y recomienda; no decide. Sus recomendaciones no llevan respon
 
 **I-LHPM-10 — Una sola salida**
 
-El Perfil de Salud Local se entrega como un único documento canónico, que se abre con las cuatro páginas de datos comparables del Art. 17 ter. Ninguna otra representación tiene estatuto propio mientras este contrato no la autorice.
+El Perfil de Salud Local se entrega como un único documento canónico, que se abre con las seis páginas de datos comparables del Art. 17 ter. Ninguna otra representación tiene estatuto propio mientras este contrato no la autorice.
 
-*Consecuencia si se viola:* COMPÁS NG vuelve a producir perfiles paralelos, con riesgo de contradicción entre lo que el diagnóstico interpreta y lo que otra representación sugiere.
+*Consecuencia si se viola:* COMPÁS vuelve a producir perfiles paralelos, con riesgo de contradicción entre lo que el diagnóstico interpreta y lo que otra representación sugiere.
 
 *Fuente:* Arts. 17 bis y 17 ter.
 
@@ -808,13 +807,13 @@ La conexión entre un activo y un determinante la declara una persona del equipo
 
 Toda recomendación del Perfil tiene autoría humana validada, cita las conclusiones o lagunas de las que deriva, es de un tipo del Art. 8 quater y no fija responsable, plazo ni recurso (Art. 8, 16).
 
-*Consecuencia si se viola:* el sistema emite como recomendación del Perfil un texto que nadie ha validado, o el Perfil invade el Plan de Acción o las agendas de implantación.
+*Consecuencia si se viola:* COMPÁS presenta como recomendación del Perfil un texto que nadie ha validado, o el Perfil invade el Plan de Acción o las agendas de implantación.
 
 **I-LHPM-16 — Menú elegible, sin elección por defecto**
 
-Toda conclusión y recomendación del cuerpo del Perfil ha sido elegida por una persona del equipo técnico, con autoría y fecha. Ninguna propuesta se considera elegida por omisión y las descartadas se conservan en el registro (Art. 16 ter).
+Toda conclusión y recomendación de la versión institucional del Perfil ha sido elegida por una persona del equipo técnico, con autoría y fecha, en el menú que COMPÁS presenta sobre el Perfil cargado. Ninguna propuesta se considera elegida por omisión y las descartadas se conservan en el registro (Art. 16 ter).
 
-*Consecuencia si se viola:* el sistema publica como conclusión del Perfil lo que nadie ha asumido, o se pierde la traza de lo descartado.
+*Consecuencia si se viola:* COMPÁS publica como conclusión del Perfil lo que nadie ha asumido, o se pierde la traza de lo descartado.
 
 **I-LHPM-17 — Afirmación tipada y con evidencia**
 
@@ -830,7 +829,7 @@ Las conclusiones y las recomendaciones cierran el cuerpo del Perfil y no se pres
 
 **I-LHPM-19 — La conclusión como unidad del cuerpo**
 
-El cuerpo del Perfil se compone de los apartados del Art. 16 quater. La evidencia completa consta solo en el anexo compilado y una cuestión de salud figura en el cuerpo solo si sostiene una conclusión o condiciona una laguna.
+El cuerpo del Perfil se compone de los apartados del Art. 16 quater. La evidencia completa consta solo en el anexo y una cuestión de salud figura en el cuerpo solo si sostiene una conclusión o condiciona una laguna.
 
 *Consecuencia si se viola:* el cuerpo vuelve a crecer por acumulación de bloques y la lectura pierde su argumento.
 
@@ -860,19 +859,37 @@ El panel de salud usa el núcleo común de indicadores, declara sus comparadores
 
 *Fuente:* Arts. 17 ter y 17 quater. Decisiones del autor del 2026-11-02.
 
+**I-LHPM-23 — Solo el Perfil vigente alimenta los pasos posteriores**
+
+La priorización y el Plan de Acción leen solo la revisión vigente del Perfil y sus conclusiones y recomendaciones elegidas; nunca borradores, revisiones históricas, propuestas descartadas ni piezas intermedias.
+
+*Consecuencia si se viola:* el Plan se apoya en un diagnóstico que nadie ha validado o que ya fue sustituido.
+
+*Fuente:* Art. 16 bis. Regla procedente del antiguo CONTRACT-MIT-PSL, incorporada en la v3.0.0.
+
+**I-LHPM-24 — Clasificación única de las afirmaciones**
+
+El estatuto de una afirmación se rige solo por los tipos del Art. 8 y los grados del Art. 8 bis.
+
+*Consecuencia si se viola:* una misma afirmación recibe estatutos distintos según el documento que se consulte.
+
+*Fuente:* Art. 8. Decisión del responsable del 2026-11-23.
+
 ---
 
 ## Relaciones con otros contratos
 
-| Contrato | Tipo de relación |
+| Documento | Relación |
 |---|---|
-| `CONTRACT-MIT-PSL` | Este contrato establece los principios que el MIT debe respetar al producir la interpretación territorial. Los Arts. 5, 6 y 14 condicionan el diseño del motor. |
-| `CONTRACT-PSL-COMPAS` | Define el producto institucional resultante de aplicar este contrato. Debe ser coherente en todos sus artículos con este contrato. |
-| `CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER` | Los gates del compilador (G-LHC-1 a G-LHC-7) son la implementación técnica de los Arts. 16, 17 e I-LHPM-3. |
-| `CONTRACT-SOURCE-CAPABILITY-MATRIX` | Define el estatuto operativo de cada fuente admisible: ruta de entrada, escala, atomización, madurez y efecto sobre el Perfil. |
-| `CONTRACT-INTERPRETATION` | Define qué significa interpretar dentro de COMPÁS NG. Este contrato es complementario: define qué tipos de afirmación son admisibles y cuáles no (Art. 8). |
-| `CONTRACT-STRATEGIC-REPOSITORY` | Las líneas estratégicas de los marcos institucionales son referencia para el capítulo de marco estratégico del Perfil (Arts. 15.1 y 15.4). La articulación con esos marcos es posterior al Perfil. |
-| `METHODOLOGICAL-FOUNDATIONS-LOCAL-HEALTH-PLANNING` | Documento fundacional del que derivan los principios PM-1 a PM-24. Los invariantes de este contrato son aplicación normativa directa de esos principios. |
+| `CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY` | Desarrolla la ruta real del Perfil: encargo, entrega, carga, custodia, cotejo, menú de elección, validación y publicación. |
+| `CONTRACT-PROFILE-UPDATER` | Aplica a cualquier expediente un cambio de modelo o de datos sin reescribir revisiones anteriores. |
+| `docs/guides/GUIA-ESCRITURA-PERFIL.md` | Cómo se escribe el Perfil. Subordinada a este contrato. |
+| `CONTRACT-SOURCE-CAPABILITY-MATRIX` | Estatuto operativo de cada fuente admisible: ruta de entrada, escala, atomización y efecto sobre el Perfil. |
+| `CONTRACT-TERRITORIAL-STATISTICS` | Obtención de los indicadores de determinantes sociales y desigualdad (Art. 17 quater). |
+| `CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT`, `CONTRACT-AGENDA-ACTUATIONS` | Productos posteriores al Perfil (Art. 16 bis). |
+| `CONTRACT-AUTHORIAL-STYLE` | Estilo transversal de los textos de COMPÁS. |
+
+Pasaron a `docs/historico/contratos-perfil/` el 2026-11-23, como historial y sin vigencia: CONTRACT-PSL-COMPAS (Producto 3), CONTRACT-MIT-PSL, CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER, PROFILE-VISUAL-CONTRACT, PROFILE-SCIENTIFIC-FRAMEWORK, PROFILE-WRITING-CONTRACT (sus §2 a §5 bis; el §0 pasó a la guía de escritura), CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION, ENTREGA-PERFIL-EXTERNO, EXTERNAL-PROFILE y CONTRACT-PROFILE-VALIDATION-QUALITY (estos cuatro, integrados en el contrato de elaboración, entrega y conservación).
 
 ---
 
@@ -880,29 +897,28 @@ El panel de salud usa el núcleo común de indicadores, declara sus comparadores
 
 | Fecha | Versión | Cambio | Responsable |
 |---|---|---|---|
-| 2026-07-03 | 1.0 | Creación inicial | COMPÁS NG Sprint 2 |
-| 2026-07-14 | 1.1 | Saneamiento de gobernanza: regla N+1, priorización ciudadana como evidencia, cadena del conocimiento, modelo canónico único y autoría humana acotada | COMPÁS NG gobernanza |
-| 2026-09-24 | 1.2 | Localiza Salud queda fijada como fuente principal/preferente para activos del Perfil, con otras fuentes como apoyo contextual o pendiente de reconciliación | COMPÁS NG |
-| 2026-10-21 | 1.3 | Unidades de lectura derivadas del expediente (Art. 4 bis), estatuto de activos candidatos frente a Localiza y patrones de cruce (Art. 9 bis); invariantes I-LHPM-11 e I-LHPM-12. Decisión del autor | COMPÁS NG |
-| 2026-10-21 | 1.4 | El Perfil concluye y orienta; no decide (Art. 3, 7 quater, 16, 16 bis, I-LHPM-9). Nuevo tipo de afirmación «Orientación técnica» (Art. 8). Relaciones determinante-problema con sustento y grados (Art. 8 bis). Conexión determinante-activo declarada y transición déficit-salutogénesis (Art. 9 ter). Invariantes I-LHPM-13 a 15. Decisión del autor | COMPÁS NG |
-| 2026-10-21 | 1.5 | Conclusiones y orientaciones como menú elegible por el equipo técnico: propuesta, elección o descarte con autoría y fecha, solo las elegidas entran en el cuerpo; sin elección por defecto (Art. 16 ter, I-LHPM-16). Decisión del autor | COMPÁS NG |
-| 2026-10-22 | 1.6 | Propuestas redactadas por el equipo técnico en el cierre interpretativo, con evidencia citada, sin elección por defecto (Art. 16 ter 1 bis). Decisión del autor | COMPÁS NG |
-| 2026-10-22 | 1.7 | La afirmación como unidad y la cadena de lectura en cinco pasos (Art. 8 ter); ejes de lectura declarados (Art. 4 ter); interpretaciones e hipótesis en el menú, ubicación final de conclusiones y orientaciones y modo de revisión sobre el mismo documento (Art. 16 ter, 7 y 8). Invariantes I-LHPM-17 e I-LHPM-18. Decisión del autor | COMPÁS NG |
-| 2026-10-22 | 1.7.1 | Corrección de la tabla del Art. 8 ter: «conclusión» no es un tipo del Art. 8 sino un paso; se fijan los tipos que admite cada paso, tal como los implementa el modelo de afirmación | COMPÁS NG |
-| 2026-10-22 | 1.7.2 | Art. 8 ter 3: las reglas de generación solo producen conclusiones de tipo hecho desde relaciones validadas de grado 1 o 2; interpretaciones, hipótesis y orientaciones siguen siendo de autoría humana (Art. 8), con borrador opcional para la orientación. Resuelve la contradicción entre el Art. 8 y el texto de la v1.7 | COMPÁS NG |
-| 2026-10-23 | 1.8.0 | Se deroga la salida comparativa breve tipo OHID/Fingertips y su vínculo con CONTRACT-NHS-HEALTH-PROFILE (retirado): el Art. 17 ter pasa a «Una sola salida» y el invariante I-LHPM-10 a «Una sola salida». Decisión del autor: se trabaja solo con el Perfil general | COMPÁS NG |
+| 2026-07-03 | 1.0 | Creación inicial | COMPÁS Sprint 2 |
+| 2026-07-14 | 1.1 | Saneamiento de gobernanza: regla N+1, priorización ciudadana como evidencia, cadena del conocimiento, modelo canónico único y autoría humana acotada | COMPÁS gobernanza |
+| 2026-09-24 | 1.2 | Localiza Salud queda fijada como fuente principal/preferente para activos del Perfil, con otras fuentes como apoyo contextual o pendiente de reconciliación | COMPÁS |
+| 2026-10-21 | 1.3 | Unidades de lectura derivadas del expediente (Art. 4 bis), estatuto de activos candidatos frente a Localiza y patrones de cruce (Art. 9 bis); invariantes I-LHPM-11 e I-LHPM-12. Decisión del autor | COMPÁS |
+| 2026-10-21 | 1.4 | El Perfil concluye y orienta; no decide (Art. 3, 7 quater, 16, 16 bis, I-LHPM-9). Nuevo tipo de afirmación «Orientación técnica» (Art. 8). Relaciones determinante-problema con sustento y grados (Art. 8 bis). Conexión determinante-activo declarada y transición déficit-salutogénesis (Art. 9 ter). Invariantes I-LHPM-13 a 15. Decisión del autor | COMPÁS |
+| 2026-10-21 | 1.5 | Conclusiones y orientaciones como menú elegible por el equipo técnico: propuesta, elección o descarte con autoría y fecha, solo las elegidas entran en el cuerpo; sin elección por defecto (Art. 16 ter, I-LHPM-16). Decisión del autor | COMPÁS |
+| 2026-10-22 | 1.6 | Propuestas redactadas por el equipo técnico en el cierre interpretativo, con evidencia citada, sin elección por defecto (Art. 16 ter 1 bis). Decisión del autor | COMPÁS |
+| 2026-10-22 | 1.7 | La afirmación como unidad y la cadena de lectura en cinco pasos (Art. 8 ter); ejes de lectura declarados (Art. 4 ter); interpretaciones e hipótesis en el menú, ubicación final de conclusiones y orientaciones y modo de revisión sobre el mismo documento (Art. 16 ter, 7 y 8). Invariantes I-LHPM-17 e I-LHPM-18. Decisión del autor | COMPÁS |
+| 2026-10-22 | 1.7.1 | Corrección de la tabla del Art. 8 ter: «conclusión» no es un tipo del Art. 8 sino un paso; se fijan los tipos que admite cada paso, tal como los implementa el modelo de afirmación | COMPÁS |
+| 2026-10-22 | 1.7.2 | Art. 8 ter 3: las reglas de generación solo producen conclusiones de tipo hecho desde relaciones validadas de grado 1 o 2; interpretaciones, hipótesis y orientaciones siguen siendo de autoría humana (Art. 8), con borrador opcional para la orientación. Resuelve la contradicción entre el Art. 8 y el texto de la v1.7 | COMPÁS |
+| 2026-10-23 | 1.8.0 | Se deroga la salida comparativa breve tipo OHID/Fingertips y su vínculo con CONTRACT-NHS-HEALTH-PROFILE (retirado): el Art. 17 ter pasa a «Una sola salida» y el invariante I-LHPM-10 a «Una sola salida». Decisión del autor: se trabaja solo con el Perfil general | COMPÁS |
+| 2026-10-23 | 2.0.0 | Nueva estructura del Perfil (Art. 16 quater): la conclusión como unidad, cuerpo de siete apartados y anexo compilado. La «orientación técnica» pasa a llamarse «recomendación del Perfil» y se tipifica en Conocer, Contrastar y Abordar (Art. 8 quater); «Abordar» exige relación de grado 1 o 2. Nuevos invariantes I-LHPM-19 e I-LHPM-20, criterio «Estructura breve» (Art. 19) y cuestión abierta H-LHPM-7 (tope de conclusiones). Las unidades de lectura (Art. 4 bis) pasan al anexo. Decisiones del autor del 2026-10-23 | COMPÁS |
+| 2026-10-24 | 2.1.0 | Distinción entre recurso y activo (Art. 9 bis, I-LHPM-12): un registro de Localiza Salud es un recurso; es activo para la salud cuando consta su validación con los criterios de registro y validación de activos para la salud en Andalucía, que incluyen la identificación comunitaria. Los patrones de cruce se nombran con «recurso registrado». Decisión del autor del 2026-10-24, contrastada con Loja (162 recursos, 5 activos identificados comunitariamente) | COMPÁS |
+| 2026-11-01 | 2.2.0 | Conclusiones narradas y lectura de conjunto (Art. 16 quater, apartado 2): el apartado se abre con una lectura que relaciona las conclusiones; cada conclusión se escribe en prosa con las cifras citadas dentro del texto, y el tipo, las evidencias, el grado, el límite y las recomendaciones pasan a una tabla de trazabilidad del anexo. Nuevo Art. 13 bis e invariante I-LHPM-21: los datos epidemiológicos oficiales se reproducen como los publica su fuente, sin cautelas añadidas, conservando año, escala y ausencia de datos posteriores. Criterios del Art. 19 «Incertidumbre visible» (ajustado) y «Lectura de conjunto» (nuevo). Decisiones del autor del 2026-11-01, a partir del Perfil de Zagra v0.1 | COMPÁS |
+| 2026-11-02 | 2.3.0 | Reforma del Art. 17 ter («Una sola salida, con páginas de datos comparables»): el único Perfil se abre con cuatro páginas de plantilla común (portada, población, panel de salud y desigualdad), sin salida aparte. Nuevo Art. 17 quater: núcleo cerrado de unos treinta indicadores en siete dominios, comparadores (Distrito, provincia y Andalucía cuando la fuente los publica), colores solo con intervalos o significación de la fuente, renta por sección censal del INE como eje de desigualdad interna y tendencia entre ciclos comparables. I-LHPM-10 ajustado y nuevo I-LHPM-22. Decisiones del autor del 2026-11-02, a partir de los Local Authority Health Profiles de Public Health England | COMPÁS |
+| 2026-11-17 | 2.3.1 | Coherencia con CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT §3.1 bis (2026-10-19): el Plan de Acción comprende líneas estratégicas, objetivos e indicadores; las actuaciones, con responsables, recursos y plazos, pertenecen a las agendas anuales de implantación, instrumento separado. Se ajustan Art. 3, 7 quater, 8 quater (reglas 2, 5 y 6), 16 bis, 16 quater (apartado 6, con redacción de referencia), I-LHPM-9 e I-LHPM-15. Motivo: las revisiones externas del 16/11/2026 de Alfacar, Atarfe, Loja y Zagra atribuían al Plan de Acción actuaciones, responsables, recursos y plazos. Decisión del autor | COMPÁS |
+| 2026-11-17 | 2.3.1 (aclaración) | Se incorpora la aclaración de aplicación a producción externa redactada el 12-11-2026 (procedente de la PR #120, no fusionada): contenido, cautelas, estructura y modelo canónico rigen también para el Perfil elaborado fuera de COMPÁS; la importación conserva y representa, no produce diagnóstico nuevo | COMPÁS |
+| 2026-11-17 | 2.4.0 | Art. 17 quater: desarrollo del dominio de determinantes sociales y del eje de desigualdad mediante `CONTRACT-TERRITORIAL-STATISTICS` (catálogo de 37 indicadores con ficha y tabla por provincia; descarga del INE y del IECA conservada como material para la revisión, sin modificar la vigente). Motivo: los cuatro Perfiles vigentes usan una parte pequeña de la estadística oficial disponible (sin Gini, P80/P20 ni fuentes de ingreso). Encargo del autor del 2026-11-17 | COMPÁS |
+| 2026-11-18 | 2.5.0 | Nuevo Art. 4 quater: el Perfil es un informe de salud basado en los determinantes sociales, con el marco de la Comisión sobre Determinantes Sociales de la Salud de la OMS (Solar e Irwin, 2010) adaptado por la Comisión para Reducir las Desigualdades Sociales en Salud en España (2010). Art. 17 ter: seis páginas de datos en el orden del marco (portada; contexto y población; ejes de desigualdad; condiciones de vida; servicios; salud y bienestar), con compatibilidad para los Perfiles anteriores. Decisión del autor del 2026-11-18: «que el perfil de salud local sea verdaderamente un informe de salud basado en los determinantes sociales de la salud» | COMPÁS |
+| 2026-11-21 | 2.5.1 | Retirada de Granada-Zaidín de COMPÁS (decisión del responsable, 2026-11-21): deja de ser caso de referencia. La disposición transitoria del Art. 16 quater (incluida la nota sobre `chosenClosing.ts`) y la hipótesis abierta sobre el número de conclusiones se refieren a los expedientes de prueba Zagra, Atarfe y Loja. Sin cambios de doctrina. | COMPÁS |
+| 2026-11-23 | 3.0.0 | Reforma de la gobernanza del Perfil: cuatro documentos en lugar de doce (este contrato, el de elaboración, entrega y conservación, el del actualizador y la guía de escritura); los demás pasan a histórico. Alcance: el Perfil de COMPÁS lo redacte quien lo redacte; quien redacta propone, el equipo técnico elige y COMPÁS conserva, muestra y comprueba (Alcance, Art. 16). El menú de conclusiones y recomendaciones lo presenta COMPÁS sobre el Perfil cargado, antes de validarlo (Art. 16 ter). Localiza Salud, fuente exclusiva de la lectura de activos (Art. 9). Clasificación única de las afirmaciones por los tipos del Art. 8 y los grados del Art. 8 bis (Art. 8, I-LHPM-24). Regla nueva: la priorización y el Plan leen solo el Perfil vigente (Art. 16 bis, I-LHPM-23). Se retiran los artículos escritos para el generador (Art. 8 ter, regla 3; disposición transitoria del Art. 16 quater). Seis páginas en I-LHPM-10; H-LHPM-1 y H-LHPM-6 cerradas; ESA 2030 y PESMAA en los marcos (Art. 7); «COMPÁS» sin «NG»; registro ordenado. Decisiones del responsable del 2026-11-23 | COMPÁS |
 
 ---
 
-*Este contrato es el documento normativo que antecede y condiciona a CONTRACT-MIT-PSL,*
-*CONTRACT-PSL-COMPAS y CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER.*
-*Todo contrato de producto que afecte al Perfil de Salud Local debe ser coherente con este contrato.*
-| 2026-10-23 | 2.0.0 | Nueva estructura del Perfil (Art. 16 quater): la conclusión como unidad, cuerpo de siete apartados y anexo compilado. La «orientación técnica» pasa a llamarse «recomendación del Perfil» y se tipifica en Conocer, Contrastar y Abordar (Art. 8 quater); «Abordar» exige relación de grado 1 o 2. Nuevos invariantes I-LHPM-19 e I-LHPM-20, criterio «Estructura breve» (Art. 19) y cuestión abierta H-LHPM-7 (tope de conclusiones). Las unidades de lectura (Art. 4 bis) pasan al anexo. Decisiones del autor del 2026-10-23 | COMPÁS NG |
-| 2026-11-02 | 2.3.0 | Reforma del Art. 17 ter («Una sola salida, con páginas de datos comparables»): el único Perfil se abre con cuatro páginas de plantilla común (portada, población, panel de salud y desigualdad), sin salida aparte. Nuevo Art. 17 quater: núcleo cerrado de unos treinta indicadores en siete dominios, comparadores (Distrito, provincia y Andalucía cuando la fuente los publica), colores solo con intervalos o significación de la fuente, renta por sección censal del INE como eje de desigualdad interna y tendencia entre ciclos comparables. I-LHPM-10 ajustado y nuevo I-LHPM-22. Decisiones del autor del 2026-11-02, a partir de los Local Authority Health Profiles de Public Health England | COMPÁS NG |
-| 2026-11-01 | 2.2.0 | Conclusiones narradas y lectura de conjunto (Art. 16 quater, apartado 2): el apartado se abre con una lectura que relaciona las conclusiones; cada conclusión se escribe en prosa con las cifras citadas dentro del texto, y el tipo, las evidencias, el grado, el límite y las recomendaciones pasan a una tabla de trazabilidad del anexo. Nuevo Art. 13 bis e invariante I-LHPM-21: los datos epidemiológicos oficiales se reproducen como los publica su fuente, sin cautelas añadidas, conservando año, escala y ausencia de datos posteriores. Criterios del Art. 19 «Incertidumbre visible» (ajustado) y «Lectura de conjunto» (nuevo). Decisiones del autor del 2026-11-01, a partir del Perfil de Zagra v0.1 | COMPÁS NG |
-| 2026-10-24 | 2.1.0 | Distinción entre recurso y activo (Art. 9 bis, I-LHPM-12): un registro de Localiza Salud es un recurso; es activo para la salud cuando consta su validación con los criterios de registro y validación de activos para la salud en Andalucía, que incluyen la identificación comunitaria. Los patrones de cruce se nombran con «recurso registrado». Decisión del autor del 2026-10-24, contrastada con Loja (162 recursos, 5 activos identificados comunitariamente) | COMPÁS NG |
-| 2026-11-17 | 2.3.1 | Coherencia con CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT §3.1 bis (2026-10-19): el Plan de Acción comprende líneas estratégicas, objetivos e indicadores; las actuaciones, con responsables, recursos y plazos, pertenecen a las agendas anuales de implantación, instrumento separado. Se ajustan Art. 3, 7 quater, 8 quater (reglas 2, 5 y 6), 16 bis, 16 quater (apartado 6, con redacción de referencia), I-LHPM-9 e I-LHPM-15. Motivo: las revisiones externas del 16/11/2026 de Alfacar, Atarfe, Loja y Zagra atribuían al Plan de Acción actuaciones, responsables, recursos y plazos. Decisión del autor | COMPÁS NG |
-| 2026-11-17 | 2.3.1 (aclaración) | Se incorpora la aclaración de aplicación a producción externa redactada el 12-11-2026 (procedente de la PR #120, no fusionada): contenido, cautelas, estructura y modelo canónico rigen también para el Perfil elaborado fuera de COMPÁS; la importación conserva y representa, no produce diagnóstico nuevo | COMPÁS NG |
-| 2026-11-17 | 2.4.0 | Art. 17 quater: desarrollo del dominio de determinantes sociales y del eje de desigualdad mediante `CONTRACT-TERRITORIAL-STATISTICS` (catálogo de 37 indicadores con ficha y tabla por provincia; descarga del INE y del IECA conservada como material para la revisión, sin modificar la vigente). Motivo: los cuatro Perfiles vigentes usan una parte pequeña de la estadística oficial disponible (sin Gini, P80/P20 ni fuentes de ingreso). Encargo del autor del 2026-11-17 | COMPÁS NG |
-| 2026-11-18 | 2.5.0 | Nuevo Art. 4 quater: el Perfil es un informe de salud basado en los determinantes sociales, con el marco de la Comisión sobre Determinantes Sociales de la Salud de la OMS (Solar e Irwin, 2010) adaptado por la Comisión para Reducir las Desigualdades Sociales en Salud en España (2010). Art. 17 ter: seis páginas de datos en el orden del marco (portada; contexto y población; ejes de desigualdad; condiciones de vida; servicios; salud y bienestar), con compatibilidad para los Perfiles anteriores. Decisión del autor del 2026-11-18: «que el perfil de salud local sea verdaderamente un informe de salud basado en los determinantes sociales de la salud» | COMPÁS NG |
-| 2026-11-21 | 2.5.1 | Retirada de Granada-Zaidín de COMPÁS (decisión del responsable, 2026-11-21): deja de ser caso de referencia. La disposición transitoria del Art. 16 quater (incluida la nota sobre `chosenClosing.ts`) y la hipótesis abierta sobre el número de conclusiones se refieren a los expedientes de prueba Zagra, Atarfe y Loja. Sin cambios de doctrina. | COMPÁS NG |
+*Contrato rector del Perfil de Salud Local. Todo documento que afecte al Perfil debe ser coherente con este contrato.*

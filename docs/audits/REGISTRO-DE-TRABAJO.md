@@ -22,6 +22,54 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-23 · Reforma de los contratos del Perfil y contrato de evaluación
+
+Pages al empezar: `e410372`.
+
+- **Decisiones del responsable (2026-11-23).** Reforma «tal cual»: cuatro
+  documentos en lugar de doce, conclusiones en prosa con trazabilidad en el
+  anexo y clasificación única por los tipos del Art. 8 y los grados del
+  Art. 8 bis. El menú de conclusiones y recomendaciones lo ofrece COMPÁS sobre
+  el Perfil cargado. Localiza Salud, fuente exclusiva. Evaluación: cinco
+  estados, un dato de implantación por objetivo, impacto solo en la final,
+  recomendaciones como menú.
+- **Cambio.**
+  - Contrato metodológico 3.0.0: alcance «lo redacte quien lo redacte»;
+    papeles (quien redacta propone, el equipo técnico elige, COMPÁS conserva,
+    muestra y comprueba); Art. 16 y 16 ter reescritos; fuera los artículos del
+    generador (Art. 8 ter regla 3, disposición transitoria del 16 quater);
+    regla nueva del Perfil vigente (I-LHPM-23) y clasificación única
+    (I-LHPM-24); seis páginas en I-LHPM-10; H-LHPM-1 y H-LHPM-6 cerradas; ESA
+    2030 y PESMAA en los marcos; sin «NG»; registro ordenado.
+  - Nuevo `CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY` 1.0, vigente: integra el
+    contrato externo, la guía de entrega, EXTERNAL-PROFILE y el criterio
+    «Perfil validado».
+  - Nueva `docs/guides/GUIA-ESCRITURA-PERFIL.md`: §0 del contrato de escritura,
+    sin los campos fijos del antiguo §0.4, y bibliografía del marco
+    científico. Siete referencias se completaron sin cotejo con el original y
+    así se declara.
+  - Diez documentos a `docs/historico/contratos-perfil/`. Índice, matriz de
+    fuentes (Localiza exclusiva, v1.3) y `CLAUDE.md` al día.
+  - Nuevo `CONTRACT-EVALUATION` 1.0, doctrina vigente.
+- **Comprobación estructural de los cuatro Perfiles vigentes** contra la
+  v3.0.0, leída de Firestore: [PSL-V3-CONFORMIDAD-2026-11-23](PSL-V3-CONFORMIDAD-2026-11-23.md).
+  Cumplen estructura, páginas, lectura de conjunto y frontera con las agendas;
+  no declaran el grado de sustento de las recomendaciones «Abordar», no
+  tienen tabla de trazabilidad y rotulan distinto tres apartados. No es una
+  lectura completa.
+- **Pendiente.** Implementar el menú de elección sobre el Perfil cargado y la
+  evaluación; lectura completa y cotejo de los cuatro Perfiles.
+- **Verificación.** Suite, ya con las PR #219 y #220: 2948 pasan, 2 omitidas.
+
+## 2026-11-23 · Guardados en Firebase en serie (PR #219)
+
+- **Hecho observado.** Al limpiar Atarfe, el guardado de la limpieza chocó con
+  el autoguardado que sigue a la recuperación del expediente: los dos partían
+  de la misma revisión.
+- **Cambio.** Los guardados remotos van en cola (`serialQueue.ts`); cada uno
+  lee la revisión que confirmó el anterior. Prueba nueva:
+  `tests/serial-queue.test.ts`.
+
 ## 2026-11-23 · Retirada de los seeds públicos
 
 Pages al empezar: `e410372`.

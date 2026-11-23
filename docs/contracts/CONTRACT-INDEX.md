@@ -1,7 +1,7 @@
 # CONTRACT-INDEX — Índice maestro de contratos arquitectónicos
 
 > COMPÁS NG — Referencia de arquitectura contractual
-> Última actualización: 2026-11-17 — estadística territorial oficial (INE, IECA) para la revisión del Perfil
+> Última actualización: 2026-11-23 — reforma de los contratos del Perfil: cuatro documentos vigentes; los demás, a `docs/historico/contratos-perfil/`
 
 Este documento es la puerta de entrada a la arquitectura contractual de COMPÁS NG.
 No duplica contenido de los contratos. Cada entrada contiene: propósito, alcance, estado y relaciones.
@@ -50,7 +50,7 @@ Contrato de persistencia y rehidratación del workspace municipal en localStorag
 
 Actualizador de perfiles: aplica cambios declarados (rótulos del modelo, páginas de datos compiladas desde la estadística territorial, indicadores de la descarga, cifras enlazadas y condiciones, paquetes de texto redactados fuera de COMPÁS) al Perfil vigente de cualquier expediente y crea en cada uno una revisión en revisión. Mantiene el resumen, las conclusiones y las recomendaciones del paquete derivados del texto; una corrección sin cambio de texto sube solo el número de corrección. No redacta conclusiones.
 
-**Relacionado con:** CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY (Art. 4 quater, 17 ter), CONTRACT-TERRITORIAL-STATISTICS, CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION.
+**Relacionado con:** CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY (Art. 4 quater, 17 ter), CONTRACT-TERRITORIAL-STATISTICS, CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION (histórico).
 
 ---
 
@@ -61,7 +61,7 @@ Búsqueda, descarga, conservación e integración de la estadística territorial
 
 **Productores:** panel «Estadística territorial» del expediente.
 **Consumidores:** equipo redactor de la revisión del Perfil.
-**Relacionado con:** CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY (Art. 17 quater), CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION, CONTRACT-SOURCE-CAPABILITY-MATRIX.
+**Relacionado con:** CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY (Art. 17 quater), CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION (histórico), CONTRACT-SOURCE-CAPABILITY-MATRIX.
 
 ---
 
@@ -74,7 +74,7 @@ Contrato de `EvidenceAtom`, `EvidenceStore` y `EvidenceStoreIntegrityGuard`. Def
 
 **Productores:** Parsers de estudios complementarios, cargadores del selector documental.
 **Consumidores:** MIT, PSL.
-**Relacionado con:** CONTRACT-COMPLEMENTARY-STUDIES, CONTRACT-EVIDENCE-QUALITY, CONTRACT-MIT-PSL, CONTRACT-EVIDENCE-GROUPING.
+**Relacionado con:** CONTRACT-COMPLEMENTARY-STUDIES, CONTRACT-EVIDENCE-QUALITY, CONTRACT-MIT-PSL (histórico), CONTRACT-EVIDENCE-GROUPING.
 
 ---
 
@@ -132,15 +132,6 @@ Vista de presentación que agrupa los átomos en ocho dimensiones rotuladas «ma
 **Relacionado con:** CONTRACT-EVIDENCE, CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.
 
 ---
-
-### CONTRACT-PROFILE-VALIDATION-QUALITY
-**Estado:** CONCEPTUAL — creado 2026-10-19
-
-La validación del Perfil pasa de restricción a criterio de calidad. Informa y se declara en las salidas; solo un Perfil sustituido o archivado deja de alimentar pasos posteriores. El ciclo de vida interno del Perfil no cambia.
-
-**Productores:** `assessProfileValidation`, `profileCanFeedDownstream`.
-**Consumidores:** MTE (G-MTE-1), runtime del municipio, compilación inicial del PLS, validación formal (FVAL-01), vistas de lectura y plan.
-**Relacionado con:** CONTRACT-MTE, CONTRACT-INSTITUTIONAL-LIFECYCLE, CONTRACT-LOCAL-HEALTH-PLAN-COMPILER, CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT, CONTRACT-MIT-PSL.
 
 ---
 
@@ -205,44 +196,40 @@ Contrato de qué significa "interpretar" dentro de COMPÁS NG. Define los límit
 
 **Productores:** No tiene productor de código directo (es un contrato normativo).
 **Consumidores:** MIT, PSL, equipo técnico como referencia.
-**Relacionado con:** CONTRACT-MIT-PSL.
-
----
-
-### CONTRACT-MIT-PSL
-**Estado:** VIGENTE
-
-Contrato del Motor de Interpretación Territorial (MIT) y del Perfil de Salud Local (PSL). Define LT1, OIT, Reconciliación Interpretativa, la lectura **única y adaptativa** del PSL (cobertura conceptual sin recuento obligatorio de capítulos, §6.1.1 bis), los 6 estados del PSL y la regla PSL-C1 (el Nivel 3 solo consume PSL, nunca EvidenceStore directamente).
-
-**Productores:** `TerritorialInterpretationEngine`, `buildLocalHealthProfile`.
-**Consumidores:** Priorización temática, Motor de Traducción Estratégica, Plan de Acción.
-**Relacionado con:** CONTRACT-EVIDENCE, CONTRACT-MTE, CONTRACT-DELIBERATIVE-PRIORITISATION, CONTRACT-ACTION-PLAN-CATALOG.
+**Relacionado con:** CONTRACT-MIT-PSL (histórico).
 
 ---
 
 ## Metodología del Perfil de Salud Local
 
 ### CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY
-**Estado:** VIGENTE
+**Estado:** VIGENTE — versión 3.0.0 (2026-11-23). Contrato rector del Perfil.
 
-Contrato metodológico canónico del Perfil de Salud Local (PSL). Define qué debe ser metodológicamente un Perfil, qué puede afirmar y qué no puede afirmar, cómo se construye su evidencia y qué condiciones debe cumplir para ser aceptable como documento institucional. Establece los 19 artículos normativos del Perfil: naturaleza, finalidad, separación de etapas, singularidad territorial, explicación territorial, razonamiento multidisciplinar, familias de evidencia admisibles, siete tipos de afirmación, activos con rango equivalente a déficits, participación como evidencia, desigualdades, comparación territorial y temporal, incertidumbre situada, convergencia y divergencia de evidencias, compatibilidad con la ESCA (Art. 15: ESCA como marco SSPA, separación de responsabilidades, no tratar ESCA como instrumento de evaluación, no convertir líneas ESCA en objetivos municipales), no automatización de decisiones, autoría y responsabilidad técnica, flexibilidad metodológica, y criterios de aceptación del Perfil. Incluye 20 invariantes (I-LHPM-1 a I-LHPM-20) y 7 hipótesis metodológicas abiertas (H-LHPM-1 a H-LHPM-7). Versión 2.5.1 (2026-11-21): los expedientes de prueba de la disposición transitoria pasan a ser Zagra, Atarfe y Loja, tras la retirada de Granada-Zaidín. Versión 2.1.0 (2026-10-24): distinción entre recurso de Localiza y activo validado (Art. 9 bis). Versión 2.0.0 (2026-10-23): estructura del Perfil con la conclusión como unidad y anexo compilado (Art. 16 quater) y recomendaciones del Perfil de tipo Conocer, Contrastar y Abordar (Art. 8 quater).
+Qué es el Perfil de Salud Local, qué puede afirmar, cómo se estructura y cuándo es aceptable. Rige el Perfil de COMPÁS lo redacte quien lo redacte: quien redacta propone, el equipo técnico elige y COMPÁS conserva, muestra y comprueba. Estructura de seis páginas de datos y cuerpo de siete apartados (Art. 16 quater, 17 ter); recomendaciones Conocer, Contrastar y Abordar (Art. 8 quater); menú de elección presentado por COMPÁS sobre el Perfil cargado (Art. 16 ter); clasificación única de las afirmaciones por los tipos del Art. 8 y los grados del Art. 8 bis; Localiza Salud, fuente exclusiva de activos (Art. 9); la priorización y el Plan leen solo el Perfil vigente (Art. 16 bis).
 
-**Productores:** No tiene productor de código directo. Es un contrato normativo que condiciona todos los contratos y motores relacionados con el Perfil.
-**Consumidores:** CONTRACT-MIT-PSL, CONTRACT-PSL-COMPAS, CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER.
-**Relacionado con:** CONTRACT-INTERPRETATION, CONTRACT-STRATEGIC-REPOSITORY, METHODOLOGICAL-FOUNDATIONS-LOCAL-HEALTH-PLANNING.
+**Relacionado con:** CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY, CONTRACT-PROFILE-UPDATER, guía de escritura, CONTRACT-SOURCE-CAPABILITY-MATRIX, CONTRACT-TERRITORIAL-STATISTICS, CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT.
 
 ---
 
-## Producto 3 — Perfil de Salud Local COMPÁS (PSL-C)
+### CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY
+**Estado:** VIGENTE — versión 1.0 (2026-11-23), aprobado por el responsable.
 
-### CONTRACT-PSL-COMPAS
-**Estado:** VIGENTE
+Cómo llega un Perfil a COMPÁS y qué ocurre con él: encargo, paquete de entrega (PDF, JSON `compas-profile-package/v1` y acta), carga y custodia del original, cotejo entre representaciones, menú de elección, validación como criterio de calidad y publicación. Integra el antiguo contrato externo, la guía de entrega, EXTERNAL-PROFILE y el criterio «Perfil validado».
 
-Contrato canónico del Producto 3. Define el PSL-C como producto analítico territorial en el catálogo de COMPÁS NG: naturaleza, fuentes consumibles (incluyendo Productos 1 y 2), separación arquitectónica estricta, cobertura conceptual **adaptativa** (sin recuento obligatorio de capítulos), relación con SAM y Estudios Complementarios, y deuda registrada (D3-01 a D3-04).
+**Relacionado con:** CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY, CONTRACT-PROFILE-UPDATER, CONTRACT-REPOSITORY, CONTRACT-PERSISTENCE.
 
-**Productores:** `buildLocalHealthProfile` + `LocalHealthProfileCompiler`.
-**Consumidores:** Equipo técnico (diagnóstico), Nivel 3 (vía PSL-C1), compiladores superiores.
-**Relacionado con:** CONTRACT-MIT-PSL, CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER, CONTRACT-COMPLEMENTARY-STUDIES, CONTRACT-DYNAMIC-TRIPYRAMID.
+---
+
+### Guía de escritura del Perfil (`docs/guides/GUIA-ESCRITURA-PERFIL.md`)
+**Estado:** VIGENTE — versión 1.0 (2026-11-23).
+
+Cómo se escribe el Perfil: lector, voz, prosa, citas, qué va al anexo y comprobación antes de entregar. Procede del §0 del antiguo contrato de escritura y de las referencias del antiguo marco científico.
+
+---
+
+### Contratos del Perfil pasados a histórico (2026-11-23)
+
+En `docs/historico/contratos-perfil/`, como historial y sin vigencia: CONTRACT-PSL-COMPAS (Producto 3), CONTRACT-MIT-PSL, CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER, CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION, CONTRACT-PROFILE-VALIDATION-QUALITY, PROFILE-WRITING-CONTRACT, PROFILE-VISUAL-CONTRACT, PROFILE-SCIENTIFIC-FRAMEWORK, EXTERNAL-PROFILE y ENTREGA-PERFIL-EXTERNO. Describían el Perfil que COMPÁS generaba antes del 29/10/2026 o se han integrado en los contratos vigentes. El código que los cita (generador, compilador, verificador de escritura) se conserva como herramienta de pruebas, no como producto.
 
 ---
 
@@ -254,19 +241,6 @@ Contrato canónico del Producto 3. Define el PSL-C como producto analítico terr
 
 ## Nivel 2 tardío — Compiladores de diagnóstico
 
-### CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER
-**Estado:** VIGENTE
-
-Contrato del compilador del Perfil de Salud Local COMPÁS (PSL-C). Define la distinción entre `LocalHealthProfile` (objeto vivo) y `LocalHealthProfileArtifact` (documento institucional exportable e inmutable). Establece los 7 gates de compilación (G-LHC-1 a G-LHC-7), la estructura de secciones del PSL-C, los invariantes de trazabilidad (`sourcePSLId`, `sourceHash`, `evidenceAtomIds`), las reglas de congelación y el modelo de persistencia acumulativa en `workspace.compiledProfiles`.
-
-**Productores:** `LocalHealthProfileCompiler` (`src/application/health-profile-compiler/`).
-**Consumidores:** Equipo técnico (exportación del diagnóstico), `LocalHealthPlanCompiler` (futuro: el PSL-C es el capítulo diagnóstico del PLS).
-**Tipos:** `src/domain/health-profile-artifact/LocalHealthProfileArtifact.ts`.
-**Tests:** `tests/local-health-profile-compiler.test.ts` (43 tests).
-**Relacionado con:** CONTRACT-MIT-PSL, CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT, CONTRACT-LOCAL-HEALTH-PLAN-COMPILER.
-
----
-
 ## Nivel de compilación — Documentos institucionales exportables
 
 ### CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT
@@ -276,7 +250,7 @@ Contrato del Plan Local de Salud (PLS) como documento institucional definitivo. 
 
 **Productores:** `LocalHealthPlanCompiler` (tipos de dominio en Sprint 2.3; implementación del compilador pendiente).
 **Consumidores:** Equipo técnico, corporación municipal, Distrito Sanitario, Junta de Andalucía.
-**Relacionado con:** CONTRACT-MIT-PSL, CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER, CONTRACT-DELIBERATIVE-PRIORITISATION, CONTRACT-ACTION-PLAN-CATALOG, CONTRACT-AGENDA-ACTUATIONS, CONTRACT-PROFILE-VALIDATION-QUALITY, CONTRACT-MTE, CONTRACT-COMPILER (reserva histórica), CONTRACT-LOCAL-HEALTH-PLAN-COMPILER.
+**Relacionado con:** CONTRACT-MIT-PSL (histórico), CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER (histórico), CONTRACT-DELIBERATIVE-PRIORITISATION, CONTRACT-ACTION-PLAN-CATALOG, CONTRACT-AGENDA-ACTUATIONS, CONTRACT-PROFILE-VALIDATION-QUALITY (histórico), CONTRACT-MTE, CONTRACT-COMPILER (reserva histórica), CONTRACT-LOCAL-HEALTH-PLAN-COMPILER.
 
 ---
 
@@ -288,7 +262,7 @@ Contrato del `LocalHealthPlanCompiler`. Define cómo se produce el `LocalHealthP
 **Productores:** `LocalHealthPlanCompiler` (pendiente de implementar; tipos de dominio en Sprint 2.3).
 **Consumidores:** Equipo técnico, UI (exportación futura DOCX/PDF/HTML).
 **Tipos:** `src/domain/health-plan/LocalHealthPlanDocument.ts`, `src/domain/compilation/CompilationManifest.ts`.
-**Relacionado con:** CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT, CONTRACT-MIT-PSL, CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER, CONTRACT-DELIBERATIVE-PRIORITISATION, CONTRACT-ACTION-PLAN-CATALOG, CONTRACT-PROFILE-VALIDATION-QUALITY, CONTRACT-MTE, CONTRACT-COMPILER (reserva histórica), CONTRACT-INSTITUTIONAL-LIFECYCLE.
+**Relacionado con:** CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT, CONTRACT-MIT-PSL (histórico), CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER (histórico), CONTRACT-DELIBERATIVE-PRIORITISATION, CONTRACT-ACTION-PLAN-CATALOG, CONTRACT-PROFILE-VALIDATION-QUALITY (histórico), CONTRACT-MTE, CONTRACT-COMPILER (reserva histórica), CONTRACT-INSTITUTIONAL-LIFECYCLE.
 **Prerequisitos satisfechos (Sprint 2):** actor model `approved` implementado (CONTRACT-INSTITUTIONAL-LIFECYCLE); validación formal del Nivel 3 implementada (`FormalValidationRecord`, `createFormalValidation.ts`).
 **Prerequisitos pendientes:** implementación completa del `LocalHealthPlanCompiler`. El soporte de dominio, captura UI y transporte documental para G-PLS-7 y G-PLS-10 existe desde 2026-09-24 (`PlanPreparationPanel` → `PlanPreparationDraft` → `PlanDocument`). Ver §16 de este contrato.
 
@@ -303,7 +277,7 @@ Contrato del modelo canónico de ciclos de vida institucional de los objetos de 
 
 **Productores:** `src/application/institutional-lifecycle/approvePSL.ts`, `createFormalValidation.ts`.
 **Consumidores:** `handleApprovePSL` y `handleFormalValidation` en `src/App.tsx`; paneles `PSLApproveAction` y `FormalValidationForm`; `LocalHealthPlanCompiler` (futuro: gates G-PLS-1, G-PLS-5, G-PLS-6).
-**Relacionado con:** CONTRACT-MIT-PSL (PSL y sus 6 estados), CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER (gate G-LHC-1), CONTRACT-LOCAL-HEALTH-PLAN-COMPILER (gates G-PLS-1, G-PLS-5, G-PLS-6), CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT (aprobación institucional del PLS), CONTRACT-AGENDA-ACTUATIONS, CONTRACT-PROFILE-VALIDATION-QUALITY (FVAL-01).
+**Relacionado con:** CONTRACT-MIT-PSL (histórico) (PSL y sus 6 estados), CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER (histórico) (gate G-LHC-1), CONTRACT-LOCAL-HEALTH-PLAN-COMPILER (gates G-PLS-1, G-PLS-5, G-PLS-6), CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT (aprobación institucional del PLS), CONTRACT-AGENDA-ACTUATIONS, CONTRACT-PROFILE-VALIDATION-QUALITY (histórico) (FVAL-01).
 
 ---
 
@@ -338,7 +312,7 @@ Contrato histórico del bloque de Nivel 3: Priorización temática, EPVSATransla
 
 **Productores:** Motores históricos de Nivel 3.
 **Consumidores:** Compatibilidad, material de transición, CONTRACT-COMPILER como reserva histórica.
-**Relacionado con:** CONTRACT-MIT-PSL, CONTRACT-COMPILER, CONTRACT-DELIBERATIVE-PRIORITISATION, CONTRACT-ACTION-PLAN-CATALOG.
+**Relacionado con:** CONTRACT-MIT-PSL (histórico), CONTRACT-COMPILER, CONTRACT-DELIBERATIVE-PRIORITISATION, CONTRACT-ACTION-PLAN-CATALOG.
 
 ---
 
@@ -349,7 +323,7 @@ Contrato del Compilador del Plan Local de Salud. Define los gates obligatorios (
 
 **Productores:** Sin implementación activa.
 **Consumidores:** Equipo técnico (exportación documental futura).
-**Relacionado con:** CONTRACT-MIT-PSL, CONTRACT-ACTION-PLAN.
+**Relacionado con:** CONTRACT-MIT-PSL (histórico), CONTRACT-ACTION-PLAN.
 
 ---
 
@@ -384,7 +358,7 @@ Contrato canónico del Motor de Traducción Estratégica. Supersede `CONTRACT-ST
 
 **Productores:** Motor de Traducción Estratégica (`MTE`), `FrameworkProvider`.
 **Consumidores:** Selección deliberativa, Producto 6/Plan de Acción, futuro compilador del PLS.
-**Relacionado con:** CONTRACT-MIT-PSL, CONTRACT-STRATEGIC-SCENARIO, CONTRACT-DELIBERATIVE-PRIORITISATION, CONTRACT-ACTION-PLAN-CATALOG, CONTRACT-PROFILE-VALIDATION-QUALITY (G-MTE-1), CONTRACT-STRATEGIC-TRANSLATION (archivado).
+**Relacionado con:** CONTRACT-MIT-PSL (histórico), CONTRACT-STRATEGIC-SCENARIO, CONTRACT-DELIBERATIVE-PRIORITISATION, CONTRACT-ACTION-PLAN-CATALOG, CONTRACT-PROFILE-VALIDATION-QUALITY (histórico) (G-MTE-1), CONTRACT-STRATEGIC-TRANSLATION (archivado).
 
 ---
 
@@ -395,7 +369,7 @@ Diseño conceptual previo del Motor de Traducción Estratégica. Se conserva com
 
 **Productores:** Ninguno nuevo.
 **Consumidores:** Consulta histórica.
-**Relacionado con:** CONTRACT-MTE, CONTRACT-STRATEGIC-REPOSITORY, CONTRACT-MIT-PSL.
+**Relacionado con:** CONTRACT-MTE, CONTRACT-STRATEGIC-REPOSITORY, CONTRACT-MIT-PSL (histórico).
 
 ---
 
@@ -424,7 +398,7 @@ Investiga la posibilidad de construir hipótesis estructurales sobre determinant
 
 **Productores futuros:** Investigación metodológica pendiente.
 **Consumidores futuros:** MIT (extensión futura).
-**Relacionado con:** CONTRACT-INTERPRETATION, CONTRACT-MIT-PSL.
+**Relacionado con:** CONTRACT-INTERPRETATION, CONTRACT-MIT-PSL (histórico).
 
 ---
 
@@ -455,7 +429,7 @@ Contrato de navegación e identidad semántica de la interfaz de COMPÁS NG. Cub
 
 **Productores:** Equipo responsable de la interfaz (governa la UI, no un componente de código).
 **Consumidores:** Todo el código React (`src/App.tsx`, `src/ui/components/`), cualquier nueva vista o componente.
-**Relacionado con:** `VISUAL-CONTRACT`, `INSTITUTIONAL-PRODUCTS-ARCHITECTURE`, `FOUNDATIONS §2`, `OPERATING-CONSTITUTION` Bloque F, `CONTRACT-PSL-COMPAS`, `CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT`.
+**Relacionado con:** `VISUAL-CONTRACT`, `INSTITUTIONAL-PRODUCTS-ARCHITECTURE`, `FOUNDATIONS §2`, `OPERATING-CONSTITUTION` Bloque F, CONTRACT-PSL-COMPAS (histórico), `CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT`.
 
 ---
 
@@ -477,6 +451,17 @@ del proyecto. Instrumento agnóstico de proveedor y de modelo.
 
 ---
 
+## Evaluación
+
+### CONTRACT-EVALUATION
+**Estado:** VIGENTE como doctrina — versión 1.0 (2026-11-23); implementación pendiente.
+
+Evaluación del Plan Local de Salud: valora objetivos a través de sus indicadores, sin atribuir el cambio a actuaciones. Cinco estados elegidos por el equipo técnico, un dato de implantación por objetivo como contexto, indicadores de impacto valorados solo en la evaluación final, conclusiones y recomendaciones como menú elegible y un Informe de Evaluación como documento único.
+
+**Relacionado con:** CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT, CONTRACT-AGENDA-ACTUATIONS, CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY, CONTRACT-SAM-ANY-SAMPLE.
+
+---
+
 ## Mapa de dependencias
 
 ```
@@ -489,10 +474,8 @@ CONTRACT-COMPLEMENTARY-STUDIES → CONTRACT-SCALE-PANELS
                                  CONTRACT-EVIDENCE-QUALITY
     ↓
 CONTRACT-INTERPRETATION
-CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY  ← contrato normativo transversal
-CONTRACT-MIT-PSL
-    ↓
-CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER → LocalHealthProfileArtifact (PSL-C)
+CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY  ← contrato rector del Perfil
+CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY → Perfil cargado, elegido y validado
     ↓
 CONTRACT-MTE → CONTRACT-DELIBERATIVE-PRIORITISATION
     ↓                         ↓
@@ -561,14 +544,18 @@ contractual.
    territorial**. No se introduce un umbral numérico de menciones como criterio de
    solidez (ver `CONTRACT-MIT-PSL` §6.1.2).
 
+   *Superado (2026-11-23).* El contrato metodológico v3.0.0 fija una clasificación
+   única del estatuto de las afirmaciones: los tipos del Art. 8 y los grados del
+   Art. 8 bis. Estas clases de conocimiento quedan como historial.
+
 ## Deudas de gobernanza vigentes
 
 Estas entradas registran decisiones o divergencias vivas que afectan a la gobernanza del Perfil y no deben resolverse por inferencia libre en auditorías futuras.
 
 | ID | Deuda | Evidencia | Estado |
 |---|---|---|---|
-| GOV-PSL-01 | Estructura documental del Perfil: **rigidez numérica derogada** por los Fundamentos del Perfil único (2026-07-17). La lectura canónica es única y adaptativa; su extensión depende del expediente. Queda pendiente la *implementación* de la arquitectura adaptativa en código. | `CONTRACT-MIT-PSL` §6, `CONTRACT-PSL-COMPAS` §4, `narrativeChapters.ts`, `ProfileIntegratedEditorialPreview` | Doctrina resuelta; implementación pendiente |
-| GOV-PSL-02 | Vista editorial integrada del Perfil generado por COMPÁS. Retirada del código el 2026-11-23 (`LocalHealthProfileView`, `ProfileIntegratedEditorialPreview`): no se mostraba en la aplicación; el Perfil se elabora fuera y se carga (`EXTERNAL-PROFILE`). | Registro de trabajo, 2026-11-23 | Retirado |
+| GOV-PSL-01 | Estructura documental del Perfil: **rigidez numérica derogada** por los Fundamentos del Perfil único (2026-07-17). La lectura canónica es única y adaptativa; su extensión depende del expediente. Queda pendiente la *implementación* de la arquitectura adaptativa en código. | `docs/historico/contratos-perfil/` (MIT-PSL §6, PSL-COMPAS §4) | Resuelta: el Perfil se elabora fuera y la estructura la fija el Art. 16 quater del contrato metodológico v3.0.0 |
+| GOV-PSL-02 | Vista editorial integrada del Perfil generado por COMPÁS. Retirada del código el 2026-11-23 (`LocalHealthProfileView`, `ProfileIntegratedEditorialPreview`): no se mostraba en la aplicación; el Perfil se elabora fuera y se carga (`CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY`). | Registro de trabajo, 2026-11-23 | Retirado |
 | GOV-PSL-03 | `PerfilFuentesPanel` y `PerfilLocalDeSaludPanel` (espacio interpretativo del Perfil generado). Retirados del código el 2026-11-23: no se mostraban en la aplicación. | Registro de trabajo, 2026-11-23 | Retirado |
 | GOV-P4-01 | El PSL-NHS deja de ser producto autónomo/segunda fuente de verdad (Fundamentos del Perfil único, 2026-07-17). La representación derivada que quedó se retira el 2026-10-23 (decisión del autor: solo Perfil general); `computePosition` sigue **descartada**. | Contrato NHS retirado; `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY` Art. 17 ter | Retirado |
 | GOV-SALIDA-01 | Pantalla e impresión derivan de `editorialView`; DOCX/PDF/visor reconstruyen desde `provenance + conclusiones.content` (dos composiciones). Los Fundamentos (2026-07-17) obligan a equivalencia **semántica** entre salidas; la unificación de código queda pendiente. | `pslcCanonicalDocument.ts`, `pslcDocumentModel.ts`, `pslcDocx.ts`, `pslcPdf.ts` | Doctrina fijada; implementación pendiente |
@@ -596,12 +583,10 @@ el [Registro de trabajo](../audits/REGISTRO-DE-TRABAJO.md).
 *Este índice es el punto de entrada obligatorio antes de crear o modificar cualquier contrato en COMPÁS.*
 
 
-## Producción externa del Perfil de Salud Local
+## Producción del Perfil de Salud Local
 
-- **Norma metodológica vigente:** [CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY](CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md), v2.3.0 y desarrollo de renta del 06-11-2026; aclaración de la ruta externa del 12-11-2026.
-- **Propuesta pendiente de aprobación técnica:** [CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION](CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION.md), revisión v1.1, 12-11-2026. Define entrega, custodia, cotejo, publicación y dependencias. No acredita aprobación científica de los casos.
-- **Implementación de carga y conservación:** [EXTERNAL-PROFILE](../architecture/EXTERNAL-PROFILE.md).
-- **Instrucción para el equipo redactor:** [Guía de entrega y aceptación](../guides/ENTREGA-PERFIL-EXTERNO.md).
-- **Contraste actual:** [Alfacar, Atarfe, Loja y Zagra, 12-11-2026](../audits/PSL-EXTERNAL-BASELINE-2026-11-12.md).
-
-Los contratos del compilador y de escritura automática son históricos para esta ruta. No pueden prohibir las recomendaciones permitidas por el contrato metodológico ni completar perfiles externos automáticamente. La identidad semántica se conserva entre pantalla, documento y exportaciones; no se exige identidad de paginación. Las nuevas fuentes y la promoción de vigente se revisan expresamente.
+- **Qué es el Perfil:** [CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY](CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md), v3.0.0.
+- **Cómo llega y qué pasa con él:** [CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY](CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY.md), v1.0.
+- **Cambios de modelo o de datos:** [CONTRACT-PROFILE-UPDATER](CONTRACT-PROFILE-UPDATER.md).
+- **Cómo se escribe:** [Guía de escritura](../guides/GUIA-ESCRITURA-PERFIL.md).
+- **Contraste anterior:** [Alfacar, Atarfe, Loja y Zagra, 12-11-2026](../audits/PSL-EXTERNAL-BASELINE-2026-11-12.md).

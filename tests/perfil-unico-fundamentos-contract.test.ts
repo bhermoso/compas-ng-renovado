@@ -47,9 +47,9 @@ describe("Fundamentos del Perfil único — CONTRACT-INDEX", () => {
     expect(idx).toContain("no se exige identidad de píxeles, CSS");
   });
 
-  it("declara las clases de conocimiento sin umbral numérico de menciones", () => {
+  it("declara las clases de conocimiento como historial, superadas por la clasificación única", () => {
     expect(idx).toContain("síntesis automática derivada");
-    expect(idx).toContain("no eleva por sí sola una presencia textual a evidencia");
+    expect(idx).toContain("Estas clases de conocimiento quedan como historial");
   });
 
   it("registra las deudas resueltas por doctrina y las migraciones pendientes", () => {
@@ -80,35 +80,41 @@ describe("Retirada del PSL-NHS (2026-10-23)", () => {
   });
 });
 
-describe("Fundamentos del Perfil único — arquitectura adaptativa y salida canónica", () => {
-  it("CONTRACT-MIT-PSL deroga la rigidez de capítulos y fija clases de conocimiento", () => {
-    const raw = readRaw("contracts/CONTRACT-MIT-PSL.md");
-    const mit = flatten(raw);
-    expect(mit).toContain("Arquitectura adaptativa de la lectura canónica");
-    expect(mit).toContain("derogada toda rigidez numérica");
-    expect(mit).toContain("Clases de conocimiento");
-    expect(mit).toContain("no eleva por sí sola una presencia textual a evidencia territorial");
-    expect(mit).toContain("Cobertura conceptual");
-    // Se retira el encabezado que fijaba el recuento obligatorio.
-    expect(raw).not.toContain("### 6.2 Estructura: siete capítulos");
+describe("Reforma de los contratos del Perfil (2026-11-23)", () => {
+  const HISTORIC = [
+    "contracts/CONTRACT-PSL-COMPAS.md",
+    "contracts/CONTRACT-MIT-PSL.md",
+    "contracts/CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER.md",
+    "contracts/CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION.md",
+    "contracts/CONTRACT-PROFILE-VALIDATION-QUALITY.md",
+    "architecture/PROFILE-VISUAL-CONTRACT.md",
+    "architecture/PROFILE-SCIENTIFIC-FRAMEWORK.md",
+    "architecture/PROFILE-WRITING-CONTRACT.md",
+    "architecture/EXTERNAL-PROFILE.md",
+    "guides/ENTREGA-PERFIL-EXTERNO.md",
+  ];
+
+  it("los documentos sustituidos están en histórico y no en las carpetas vigentes", () => {
+    for (const rel of HISTORIC) {
+      expect(existsSync(resolve(DOCS, rel)), rel).toBe(false);
+      expect(existsSync(resolve(DOCS, "historico/contratos-perfil", rel.split("/").pop()!)), rel).toBe(true);
+    }
   });
 
-  it("CONTRACT-PSL-COMPAS deroga la estructura congelada de siete capítulos", () => {
-    const raw = readRaw("contracts/CONTRACT-PSL-COMPAS.md");
-    expect(raw).not.toContain("La estructura de siete capítulos está implementada y congelada");
-    expect(raw).not.toMatch(/siete cap[ií]tulos/);
-    expect(flatten(raw)).toContain("No hay recuento obligatorio de capítulos");
-  });
-
-  it("PROFILE-VISUAL-CONTRACT fija salida canónica única y espacio técnico separado", () => {
-    const vis = flatten(readRaw("architecture/PROFILE-VISUAL-CONTRACT.md"));
-    expect(vis).toContain("Salida canónica única");
-    expect(vis).toContain("mismo modelo semántico");
-    expect(vis).toContain("Sin lectura larga alternativa");
-    expect(vis).toContain("Espacio técnico después del documento");
-    expect(vis).toContain("no se exige identidad de píxeles");
-    expect(vis).toContain("Una sola salida");
-    expect(vis).not.toContain("salida comparativa breve");
+  it("el Perfil se rige por cuatro documentos vigentes", () => {
+    const rector = flatten(readRaw("contracts/CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md"));
+    expect(rector).toContain("Versión 3.0.0");
+    expect(rector).toContain("Quien redacta propone.");
+    expect(rector).toContain("COMPÁS presenta ese menú sobre el Perfil cargado, antes de validarlo");
+    expect(rector).toContain("Localiza Salud es la fuente exclusiva de la lectura de activos");
+    expect(rector).toContain("**Clasificación única.**");
+    expect(rector).toContain("I-LHPM-23");
+    expect(rector).not.toContain("COMPÁS NG");
+    const custody = flatten(readRaw("contracts/CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY.md"));
+    expect(custody).toContain("Estado: VIGENTE");
+    expect(custody).toContain("Seis páginas de datos");
+    expect(existsSync(resolve(DOCS, "contracts/CONTRACT-PROFILE-UPDATER.md"))).toBe(true);
+    expect(existsSync(resolve(DOCS, "guides/GUIA-ESCRITURA-PERFIL.md"))).toBe(true);
   });
 });
 
