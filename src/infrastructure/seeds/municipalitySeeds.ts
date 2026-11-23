@@ -59,7 +59,7 @@ export function hasMunicipalitySeed(municipalityId: string): boolean {
 
 /**
  * URL absoluta del seed bajo el `base` de despliegue. En GitHub Pages
- * `import.meta.env.BASE_URL` es `/COMPAS_NG/`; en dev/test es `/`. Vite garantiza
+ * `import.meta.env.BASE_URL` es `/compas-ng-renovado/`; en dev/test es `/`. Vite garantiza
  * que BASE_URL termina en `/`, de modo que no se duplica la barra.
  */
 export function municipalitySeedUrl(

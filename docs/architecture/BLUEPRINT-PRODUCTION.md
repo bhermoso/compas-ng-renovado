@@ -4,7 +4,7 @@
 > este blueprint conserva decisiones y tensiones históricas. El MTE v1 ya está
 > implementado y documentado; el acceso autenticado territorial queda en reserva;
 > y la edición directa del Plan de Acción no depende de revisión formal
-> intermedia. Para la foto viva, ver `docs/ESTADO-ACTUAL-COMPAS-NG.md`.
+> intermedia. Para el estado vigente, ver `docs/audits/REGISTRO-DE-TRABAJO.md`.
 
 > Plano maestro de la arquitectura. No es un roadmap ni una lista de tareas.
 > Es la respuesta a una única pregunta:

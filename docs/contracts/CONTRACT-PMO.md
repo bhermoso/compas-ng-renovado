@@ -143,7 +143,7 @@ canónico de COMPÁS NG.
 | 1 | Constitución Arquitectónica | `ARCHITECTURE-CONSTITUTION.md` |
 | 2 | Constitución Operativa | `docs/architecture/OPERATING-CONSTITUTION.md` |
 | 3 | Blueprint de Producción | `docs/architecture/BLUEPRINT-PRODUCTION.md` |
-| 4 | Expediente de Certificación | `docs/certification/CERTIFICATION-SPRINT-0-1.md` |
+| 4 | Expediente de Certificación | `docs/historico/certification/CERTIFICATION-SPRINT-0-1.md` |
 | 5 | Contratos de dominio | `docs/contracts/CONTRACT-*.md` |
 | 6 | Fundamentos metodológicos | `docs/methodology/METHODOLOGICAL-FOUNDATIONS-LOCAL-HEALTH-PLANNING.md` |
 | 7 | Registro de gaps | `docs/architecture/ARCHITECTURAL-GAP-REGISTER.md` |
