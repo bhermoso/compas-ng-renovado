@@ -53,19 +53,14 @@ import {
 import {
   loadOrCreateMunicipalityWorkspace,
   shouldSkipPersistence,
-  shouldReplaceWithSeed,
   shouldRestoreIndexedDbWorkspace,
   withCarriedDocumentOriginals,
-  applySeedDocumentMigration,
-  backfillSeedMigrationMarker,
-  resolveSeedMigration,
   readActiveMunicipalityId,
   saveActiveMunicipalityId,
   ACTIVE_MUNICIPALITY_STORAGE_KEY,
   sanitizeCustomMunicipalities,
   mergeMunicipalityCatalog,
   type WorkspaceLoadResult,
-  type SeedDocumentMigration,
 } from "./appWorkspaceHydration";
 import { createMunicipalityRuntime } from "./application/runtime";
 import { ingestManualDocument, extractDocxText, removeEquivalentStrategicFramework } from "./application/document-ingestion";
@@ -137,7 +132,6 @@ import {
   saveWorkspaceToIndexedDB,
   clearWorkspaceFromIndexedDB,
 } from "./infrastructure/persistence/indexed-db-workspace";
-import { loadMunicipalitySeed } from "./infrastructure/seeds";
 import { createBrowserRelasClient } from "./infrastructure/relas/BrowserRelasClient";
 import {
   clearRemoteTombstone,
@@ -520,35 +514,10 @@ export default function App() {
       initialMunicipality
     );
   });
-  const [workspace, setWorkspace] = useState<MunicipalityWorkspace>(() =>
-    // `backfill-marker` es local y determinista: se aplica de forma síncrona en la
-    // carga, sin descargar el seed. `download-and-merge` viaja en `pendingMigration`.
-    initialWorkspaceLoad.seedMigration.kind === "backfill-marker"
-      ? backfillSeedMigrationMarker(
-          initialWorkspaceLoad.workspace,
-          initialWorkspaceLoad.seedMigration.migration
-        )
-      : initialWorkspaceLoad.workspace
-  );
+  const [workspace, setWorkspace] = useState<MunicipalityWorkspace>(() => initialWorkspaceLoad.workspace);
   useLayoutEffect(() => { displayedWorkspaceRef.current = workspace; }, [workspace]);
-  // Migración incremental pendiente de descarga+fusión para el municipio actual
-  // (p. ej. añadir doc-localiza-atarfe y sus 5 átomos a un Atarfe ya persistido).
-  // Fecha que debe llevar la próxima migración (copia remota recuperada); null = la del expediente.
-  const migrationStampRef = useRef<string | null>(null);
-  const [pendingMigration, setPendingMigration] = useState<SeedDocumentMigration | null>(
-    initialWorkspaceLoad.seedMigration.kind === "download-and-merge"
-      ? initialWorkspaceLoad.seedMigration.migration
-      : null
-  );
   const protectedEmptyWorkspaceIdRef = useRef<string | null>(
     initialWorkspaceLoad.protectExistingStorage
-      ? initialWorkspaceLoad.workspace.municipality.identity.id
-      : null
-  );
-  // Municipio cuyo expediente se está hidratando de forma asíncrona desde su seed
-  // canónico. Mientras esté fijado, el placeholder vacío NO se persiste.
-  const [pendingSeedId, setPendingSeedId] = useState<string | null>(
-    initialWorkspaceLoad.seedPending
       ? initialWorkspaceLoad.workspace.municipality.identity.id
       : null
   );
@@ -559,9 +528,9 @@ export default function App() {
   const locallyDeletedWorkspaceIdsRef = useRef<Set<string>>(new Set(readDeletedMunicipalityIds()));
 
   useEffect(() => {
-    if (pendingSeedId || protectedEmptyWorkspaceIdRef.current === workspace.municipality.identity.id) return;
+    if (protectedEmptyWorkspaceIdRef.current === workspace.municipality.identity.id) return;
     setWorkspace(previous => regroupZagraActionPlan(previous));
-  }, [workspace, pendingSeedId]);
+  }, [workspace]);
 
   const [title, setTitle] = useState("");
   const [declaresOpenAnswers, setDeclaresOpenAnswers] = useState(false);
@@ -645,7 +614,7 @@ export default function App() {
   useEffect(() => {
     const municipalityId = workspace.municipality.identity.id;
     const signedIn = remoteClient.auth.currentUser !== null;
-    if (pendingSeedId === municipalityId || pendingIndexedDbHydrationId === municipalityId) return;
+    if (pendingIndexedDbHydrationId === municipalityId) return;
     if (signedIn && remoteHydratedMunicipalityId !== municipalityId) return;
     let cancelled = false;
     const stored = workspace.documentOriginals ?? [];
@@ -698,7 +667,7 @@ export default function App() {
       });
     })();
     return () => { cancelled = true; };
-  }, [workspace.repository.documents, workspace.documentOriginals, workspace.documentDerivedFiles, workspace.externalProfileLibrary, workspace.municipality.identity.id, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+  }, [workspace.repository.documents, workspace.documentOriginals, workspace.documentDerivedFiles, workspace.externalProfileLibrary, workspace.municipality.identity.id, remoteClient, remoteHydratedMunicipalityId, pendingIndexedDbHydrationId, setWorkspace]);
 
   const [lastProcessedDocument, setLastProcessedDocument] =
     useState<MunicipalDocument | null>(null);
@@ -750,15 +719,10 @@ export default function App() {
   const [newMuniError, setNewMuniError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Carrera de hidratación: mientras se carga el seed del municipio, NO se
-    // persiste el placeholder vacío. Si se guardara, la comprobación "no hay
-    // expediente local" fallaría y el seed nunca se cargaría, dejando el
-    // expediente vacío de forma permanente.
     if (locallyDeletedWorkspaceIdsRef.current.has(workspace.municipality.identity.id)) return;
     if (
       shouldSkipPersistence({
         workspaceMunicipalityId: workspace.municipality.identity.id,
-        pendingSeedId,
         protectedEmptyWorkspaceId: protectedEmptyWorkspaceIdRef.current,
         isEmpty: isEmptyWorkspaceForPersistenceGuard(workspace),
       })
@@ -784,7 +748,7 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, [workspace, pendingSeedId, pendingIndexedDbHydrationId]);
+  }, [workspace, pendingIndexedDbHydrationId]);
 
   useEffect(() => {
     if (pendingIndexedDbHydrationId === null) return;
@@ -1020,13 +984,6 @@ export default function App() {
           lastExplicitProfileWorkspaceRef.current = remoteWorkspace;
           setWorkspace(() => withCarriedDocumentOriginals(remoteWorkspace, workspace));
           setPendingTopics([...(remoteWorkspace.thematicPrioritisation?.selectedTopicIds ?? [])]);
-          // La copia compartida puede ser anterior a una migración del seed: se le
-          // aplica también, con fecha actual, para que el autoguardado la publique.
-          const remoteMigration = resolveSeedMigration(remoteWorkspace);
-          if (remoteMigration.kind === "download-and-merge") {
-            migrationStampRef.current = new Date().toISOString();
-            setPendingMigration(remoteMigration.migration);
-          }
         }
         reviewedRemoteRevisions.current.set(municipalityId, reviewed?.revision ?? null);
         setRemoteHydratedMunicipalityId(municipalityId);
@@ -1052,8 +1009,7 @@ export default function App() {
       !remoteClient.auth.currentUser ||
       remoteHydratedMunicipalityId !== municipalityId ||
       pendingIndexedDbHydrationId === municipalityId ||
-      pendingSeedId === municipalityId ||
-      lastExplicitProfileWorkspaceRef.current === workspace
+            lastExplicitProfileWorkspaceRef.current === workspace
     ) {
       return;
     }
@@ -1084,98 +1040,10 @@ export default function App() {
     };
   }, [
     pendingIndexedDbHydrationId,
-    pendingSeedId,
     remoteClient, saveReviewedWorkspace,
     remoteHydratedMunicipalityId,
     workspace,
   ]);
-
-  // Hidratación asíncrona del expediente municipal desde su seed canónico. Solo se
-  // activa cuando `pendingSeedId` está fijado (no había expediente local y existe
-  // seed). Nunca sobreescribe trabajo del usuario ni un expediente local existente.
-  useEffect(() => {
-    if (pendingSeedId === null) return;
-    const seedMunicipalityId = pendingSeedId;
-    let cancelled = false;
-    void loadMunicipalitySeed(seedMunicipalityId, {
-      baseUrl: import.meta.env.BASE_URL,
-    }).then((seedWorkspace) => {
-      if (cancelled) return;
-      if (seedWorkspace !== null) {
-        // No sobreescribir contenido real: solo sustituir un placeholder VACÍO del
-        // mismo municipio. Cubre tanto el placeholder recién creado en memoria como
-        // el placeholder de la versión anterior ya persistido en localStorage
-        // (migración): en ambos casos el workspace en memoria está vacío.
-        setWorkspace((current) => {
-          if (shouldReplaceWithSeed(current, seedMunicipalityId)) {
-            return seedWorkspace;
-          }
-          if (current.municipality.identity.id !== seedMunicipalityId) {
-            return current;
-          }
-          const migration = resolveSeedMigration(current);
-          if (
-            migration.kind === "download-and-merge" &&
-            migration.migration.municipalityId === seedMunicipalityId
-          ) {
-            return applySeedDocumentMigration(
-              current,
-              seedWorkspace,
-              migration.migration
-            );
-          }
-          if (
-            migration.kind === "backfill-marker" &&
-            migration.migration.municipalityId === seedMunicipalityId
-          ) {
-            return backfillSeedMigrationMarker(current, migration.migration);
-          }
-          return current;
-        });
-      }
-      // Éxito o fallo, la hidratación termina: se libera el guard de persistencia.
-      // Si falló (municipio sin seed real), el placeholder vacío pasará a guardarse.
-      setPendingSeedId((currentPending) =>
-        currentPending === seedMunicipalityId ? null : currentPending
-      );
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [pendingSeedId]);
-
-  // Migración incremental (`download-and-merge`): descarga el seed del municipio y
-  // añade ÚNICAMENTE el documento de la migración y sus átomos derivados, con la
-  // marca versionada, sin reemplazar el expediente ni tocar el trabajo del usuario.
-  // Se activa solo cuando `pendingMigration` está fijado. Si la descarga falla, NO
-  // se estampa la marca: se reintentará en la próxima carga del municipio.
-  useEffect(() => {
-    if (pendingMigration === null) return;
-    const migration = pendingMigration;
-    let cancelled = false;
-    void loadMunicipalitySeed(migration.municipalityId, {
-      baseUrl: import.meta.env.BASE_URL,
-    }).then((seedWorkspace) => {
-      if (cancelled) return;
-      if (seedWorkspace !== null) {
-        const stamp = migrationStampRef.current ?? undefined;
-        migrationStampRef.current = null;
-        setWorkspace((current) =>
-          current.municipality.identity.id === migration.municipalityId
-            ? applySeedDocumentMigration(current, seedWorkspace, migration, { stamp })
-            : current
-        );
-      }
-      // Éxito o fallo, la migración termina. Si falló (seed inaccesible), la marca
-      // no se estampó y `resolveSeedMigration` volverá a proponerla más adelante.
-      setPendingMigration((currentPending) =>
-        currentPending === migration ? null : currentPending
-      );
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [pendingMigration]);
 
   const runtime = useMemo(
     () => createMunicipalityRuntime({ workspace }),
@@ -1210,7 +1078,7 @@ export default function App() {
   const handleStoreDocumentOriginal = useCallback(async (documentId: string, file: File): Promise<void> => {
     const municipalityId = workspace.municipality.identity.id;
     if (!remoteClient.auth.currentUser) throw new Error("Inicia sesión para conservar el original en Firebase.");
-    if (remoteHydratedMunicipalityId !== municipalityId || pendingSeedId || pendingIndexedDbHydrationId) {
+    if (remoteHydratedMunicipalityId !== municipalityId || pendingIndexedDbHydrationId) {
       throw new Error("Recupera primero el expediente compartido para evitar sobrescribir información.");
     }
     const doc = workspace.repository.documents.find(d => d.id === documentId);
@@ -1263,7 +1131,7 @@ export default function App() {
     } finally {
       profileSaveInFlightRef.current = false;
     }
-  }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+  }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingIndexedDbHydrationId, setWorkspace]);
 
   /** Los derivados son copias vinculadas: nunca se hacen pasar por el original. */
   const handleStoreDocumentDerivative = useCallback(async (
@@ -1272,7 +1140,7 @@ export default function App() {
     provenance: StoredDocumentDerivative["provenance"],
   ): Promise<void> => {
     const municipalityId = workspace.municipality.identity.id;
-    if (!remoteClient.auth.currentUser || remoteHydratedMunicipalityId !== municipalityId || pendingSeedId || pendingIndexedDbHydrationId) {
+    if (!remoteClient.auth.currentUser || remoteHydratedMunicipalityId !== municipalityId || pendingIndexedDbHydrationId) {
       throw new Error("Inicia sesión y recupera el expediente compartido antes de añadir la copia.");
     }
     if (profileSaveInFlightRef.current) throw new Error("Ya hay otra operación documental en curso.");
@@ -1317,11 +1185,11 @@ export default function App() {
     } finally {
       profileSaveInFlightRef.current = false;
     }
-  }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+  }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingIndexedDbHydrationId, setWorkspace]);
 
   const handleCreateDocumentRevision = useCallback(async (documentId: string, file: File) => {
     const municipalityId = workspace.municipality.identity.id;
-    if (!remoteClient.auth.currentUser || remoteHydratedMunicipalityId !== municipalityId || pendingSeedId || pendingIndexedDbHydrationId) {
+    if (!remoteClient.auth.currentUser || remoteHydratedMunicipalityId !== municipalityId || pendingIndexedDbHydrationId) {
       throw new Error("Inicia sesión y recupera el expediente de Firebase antes de añadir una revisión.");
     }
     if (profileSaveInFlightRef.current) throw new Error("Otra operación documental está en curso.");
@@ -1345,11 +1213,11 @@ export default function App() {
     } finally {
       profileSaveInFlightRef.current = false;
     }
-  }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+  }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingIndexedDbHydrationId, setWorkspace]);
 
   const handleArchiveDocument = useCallback(async (documentId: string) => {
     const municipalityId = workspace.municipality.identity.id;
-    if (!remoteClient.auth.currentUser || remoteHydratedMunicipalityId !== municipalityId || pendingSeedId || pendingIndexedDbHydrationId) {
+    if (!remoteClient.auth.currentUser || remoteHydratedMunicipalityId !== municipalityId || pendingIndexedDbHydrationId) {
       throw new Error("Inicia sesión y recupera el expediente de Firebase antes de archivar.");
     }
     if (profileSaveInFlightRef.current) throw new Error("Otra operación documental está en curso.");
@@ -1379,12 +1247,12 @@ export default function App() {
     } finally {
       profileSaveInFlightRef.current = false;
     }
-  }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+  }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingIndexedDbHydrationId, setWorkspace]);
 
   const handleSaveExternalProfiles = useCallback(async (library: ExternalProfileLibrary, onProgress?: (message: string) => void) => {
     const municipalityId = workspace.municipality.identity.id;
     if (!remoteClient.auth.currentUser) throw new Error("Inicia sesión para guardar el perfil y sus archivos en Firebase.");
-    if (pendingSeedId || pendingIndexedDbHydrationId || remoteHydratedMunicipalityId !== municipalityId) throw new Error("Espera a que termine la recuperación del expediente compartido.");
+    if (pendingIndexedDbHydrationId || remoteHydratedMunicipalityId !== municipalityId) throw new Error("Espera a que termine la recuperación del expediente compartido.");
     const nextLibrary = { ...library, profiles: library.profiles.map(p => workspace.externalProfileLibrary?.profiles.some(old => old.id === p.id)
       ? p : { ...p, evidenceVersion: workspace.evidenceStore.updatedAt }) };
     if (!isExternalProfileLibrary(nextLibrary, municipalityId)) throw new Error("La versión del perfil no supera la comprobación de integridad.");
@@ -1413,13 +1281,13 @@ export default function App() {
       return prev === workspace ? next : { ...prev, externalProfileLibrary: nextLibrary, updatedAt: now };
     });
     setRemotePersistenceMessage("Perfil completo guardado y confirmado por Firebase.");
-  }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+  }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingIndexedDbHydrationId, setWorkspace]);
 
   /** Guarda las descargas de estadística territorial (CONTRACT-TERRITORIAL-STATISTICS). */
   const handleSaveTerritorialStatistics = useCallback(async (snapshots: TerritorialStatisticsSnapshot[], onProgress?: (message: string) => void) => {
     const municipalityId = workspace.municipality.identity.id;
     if (!remoteClient.auth.currentUser) throw new Error("Inicia sesión para guardar la descarga en el expediente compartido.");
-    if (pendingSeedId || pendingIndexedDbHydrationId || remoteHydratedMunicipalityId !== municipalityId) throw new Error("Espera a que termine la recuperación del expediente compartido.");
+    if (pendingIndexedDbHydrationId || remoteHydratedMunicipalityId !== municipalityId) throw new Error("Espera a que termine la recuperación del expediente compartido.");
     if (!snapshots.every(s => isTerritorialStatisticsSnapshot(s, municipalityId))) throw new Error("La descarga no supera la comprobación de integridad.");
     if (profileSaveInFlightRef.current) throw new Error("Ya hay un guardado del perfil en curso.");
     const now = new Date().toISOString();
@@ -1441,7 +1309,7 @@ export default function App() {
       return prev === workspace ? next : { ...prev, territorialStatistics: snapshots, updatedAt: now };
     });
     setRemotePersistenceMessage("Estadística territorial guardada y confirmada por Firebase.");
-  }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+  }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingIndexedDbHydrationId, setWorkspace]);
 
   const handleSaveDeliberativePrioritySelection = useCallback((input: {
     selectedScenarioIds: string[];
@@ -1476,7 +1344,7 @@ export default function App() {
     const municipalityId = workspace.municipality.identity.id;
     if (!remoteClient.auth.currentUser || !documentWriteAllowed ||
         remoteHydratedMunicipalityId !== municipalityId ||
-        pendingSeedId === municipalityId || pendingIndexedDbHydrationId === municipalityId) {
+        pendingIndexedDbHydrationId === municipalityId) {
       throw new Error("Inicia sesión con permisos de edición y recupera el expediente compartido antes de eliminar versiones.");
     }
     if (profileSaveInFlightRef.current) {
@@ -1503,7 +1371,7 @@ export default function App() {
       profileSaveInFlightRef.current = false;
     }
   }, [workspace, documentWriteAllowed, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId,
-      pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+      pendingIndexedDbHydrationId, setWorkspace]);
 
   const handlePlanPreparationChange = useCallback((draft: PlanPreparationDraft) => {
     setWorkspace(prev => {
@@ -1775,7 +1643,7 @@ export default function App() {
     const municipalityId = workspace.municipality.identity.id;
     if (!documentWriteAllowed || !remoteClient.auth.currentUser ||
       remoteHydratedMunicipalityId !== municipalityId ||
-      pendingSeedId || pendingIndexedDbHydrationId || profileSaveInFlightRef.current) {
+      pendingIndexedDbHydrationId || profileSaveInFlightRef.current) {
       setRemotePersistenceMessage("No se puede retirar la validación: inicia sesión con permiso de edición y recupera el expediente de Firebase.");
       return;
     }
@@ -1950,14 +1818,14 @@ export default function App() {
   // when encountered; never replace later reports or validated snapshots.
   useEffect(() => {
     const report = workspace.healthReport;
-    if (!report || report.body.charCount || report.pdfExtraction || isLoadingHealthReport || pendingSeedId) return;
+    if (!report || report.body.charCount || report.pdfExtraction || isLoadingHealthReport) return;
     const source = workspace.repository.documents.find(d => d.id === report.linkedDocumentId)?.source.url;
     if (!source || !Object.hasOwn(bundledDocuments, source) || !/\.pdf$/i.test(report.sourceFileName)) return;
     const key = workspace.municipality.identity.id + ':' + report.id;
     if (reportProcessingAttempts.current.has(key)) return;
     reportProcessingAttempts.current.add(key);
     void handleProcessExistingHealthReport();
-  }, [workspace.healthReport, workspace.municipality.identity.id, workspace.repository.documents, pendingSeedId, isLoadingHealthReport, handleProcessExistingHealthReport]);
+  }, [workspace.healthReport, workspace.municipality.identity.id, workspace.repository.documents, isLoadingHealthReport, handleProcessExistingHealthReport]);
 
   // ── Carga de archivo para tipos documentales con extracción de texto ─────────
   // Aplica a: strategic-framework, territorial-documentation, qualitative-material.
@@ -3227,7 +3095,7 @@ export default function App() {
       window.alert("Inicia sesión: la eliminación debe confirmarse primero en Firebase.");
       return false;
     }
-    if (remoteHydratedMunicipalityId !== municipalityId || pendingSeedId || pendingIndexedDbHydrationId || profileSaveInFlightRef.current) {
+    if (remoteHydratedMunicipalityId !== municipalityId || pendingIndexedDbHydrationId || profileSaveInFlightRef.current) {
       window.alert("El expediente compartido no está listo o existe otra operación pendiente.");
       return false;
     }
@@ -3347,29 +3215,13 @@ export default function App() {
   ) {
     if (!discardConfirmed && !canLeavePreparation()) return;
     const nextWorkspaceLoad = loadOrCreateMunicipalityWorkspace(municipalityId, input);
-    // `backfill-marker` se aplica de forma síncrona (local); `download-and-merge`
-    // viaja en `pendingMigration` y lo resuelve el efecto asíncrono.
-    const nextWorkspace =
-      nextWorkspaceLoad.seedMigration.kind === "backfill-marker"
-        ? backfillSeedMigrationMarker(
-            nextWorkspaceLoad.workspace,
-            nextWorkspaceLoad.seedMigration.migration
-          )
-        : nextWorkspaceLoad.workspace;
+    const nextWorkspace = nextWorkspaceLoad.workspace;
     protectedEmptyWorkspaceIdRef.current = nextWorkspaceLoad.protectExistingStorage
       ? municipalityId
       : null;
     // IndexedDB puede contener una copia más reciente cuando localStorage agotó
     // su cuota. Se consulta siempre antes de persistir el workspace cargado.
     setPendingIndexedDbHydrationId(municipalityId);
-    // Activa (o limpia) la hidratación asíncrona del seed para el nuevo municipio.
-    setPendingSeedId(nextWorkspaceLoad.seedPending ? municipalityId : null);
-    // Activa (o limpia) la migración incremental pendiente del nuevo municipio.
-    setPendingMigration(
-      nextWorkspaceLoad.seedMigration.kind === "download-and-merge"
-        ? nextWorkspaceLoad.seedMigration.migration
-        : null
-    );
     saveActiveMunicipalityId(municipalityId);
 
     setWorkspace(nextWorkspace);
@@ -4367,11 +4219,11 @@ export default function App() {
           remoteMessage={remotePersistenceMessage}
           signedIn={remoteClient.auth.currentUser !== null}
         >
-          <BackupPanel workspace={workspace} ready={pendingSeedId === null && pendingMigration === null} />
+          <BackupPanel workspace={workspace} ready />
           <CurrentSourcesPanel
             plan={currentSourcesPlan}
             municipalityName={municipality.name}
-            disabled={pendingSeedId !== null || pendingMigration !== null || remoteHydratedMunicipalityId !== workspace.municipality.identity.id}
+            disabled={remoteHydratedMunicipalityId !== workspace.municipality.identity.id}
             onApply={() => {
               const now = new Date().toISOString();
               setWorkspace(prev => prev.municipality.identity.id !== workspace.municipality.identity.id

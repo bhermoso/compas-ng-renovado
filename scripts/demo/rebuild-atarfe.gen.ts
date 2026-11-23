@@ -7,7 +7,7 @@
  *
  * Escribe, byte a byte idénticos y en la misma ejecución:
  *   - municipalities/atarfe/exports/compas-ng-workspace-atarfe.json  (export canónico)
- *   - public/seeds/compas-ng-workspace-atarfe.json                    (seed desplegable)
+ *   - fixtures/seeds/compas-ng-workspace-atarfe.json                    (expediente de prueba)
  *
  * La serialización se obtiene con el servicio real saveWorkspaceToLocalStorage
  * sobre una simulación de localStorage, de modo que el fichero es byte a byte lo
@@ -48,7 +48,7 @@ import { toAsciiSafeJson } from "./asciiSafeJson";
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const EXPORT_DIR = resolve(repoRoot, "municipalities/atarfe/exports");
 const EXPORT_FILE = resolve(EXPORT_DIR, "compas-ng-workspace-atarfe.json");
-const SEED_DIR = resolve(repoRoot, "public/seeds");
+const SEED_DIR = resolve(repoRoot, "fixtures/seeds");
 const SEED_FILE = resolve(SEED_DIR, "compas-ng-workspace-atarfe.json");
 
 describe("Generador — expediente canónico de Atarfe", () => {

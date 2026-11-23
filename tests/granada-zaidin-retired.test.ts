@@ -1,6 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { MUNICIPALITY_SEEDS } from "../src/infrastructure/seeds/municipalitySeeds";
 
 // Granada-Zaidín se retiró de COMPÁS el 21/11/2026: no se ofrece, no se abre por
 // defecto y su expediente de partida no se carga. No hay ámbito por defecto.
@@ -10,7 +9,6 @@ describe("Retirada de Granada-Zaidín y ausencia de ámbito por defecto", () => 
 
   it("no figura entre los ámbitos ni entre los expedientes de partida", () => {
     expect(catalog).not.toContain("granada-zaidin");
-    expect(Object.keys(MUNICIPALITY_SEEDS)).not.toContain("granada-zaidin");
     expect(app).toContain('const RETIRED_MUNICIPALITY_IDS: readonly string[] = ["granada-zaidin"];');
   });
 
@@ -26,7 +24,7 @@ describe("Retirada de Granada-Zaidín y ausencia de ámbito por defecto", () => 
 
   it("sus datos, originales y código propio ya no están en el repositorio", () => {
     for (const path of [
-      "public/seeds/compas-ng-workspace-granada-zaidin.json",
+      "fixtures/seeds/compas-ng-workspace-granada-zaidin.json",
       "municipalities/granada-zaidin",
       "docs/source-material/health-reports/informe-salud-zaidin-abril-2023.pdf",
       "fixtures/workspaces/granada-zaidin-synthetic-test.json",

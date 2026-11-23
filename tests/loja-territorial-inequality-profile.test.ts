@@ -15,7 +15,7 @@ import { createMunicipalityRuntime } from './helpers/legacyProfileRuntime';
 import { buildDiagnosticAnswers } from "../src/application/health-profile/diagnosticAnswers";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const LOJA_SEED_PATH = resolve(ROOT, "public/seeds/compas-ng-workspace-loja.json");
+const LOJA_SEED_PATH = resolve(ROOT, "fixtures/seeds/compas-ng-workspace-loja.json");
 
 function loadLojaWorkspace(): MunicipalityWorkspace {
   return JSON.parse(readFileSync(LOJA_SEED_PATH, "utf8")) as MunicipalityWorkspace;

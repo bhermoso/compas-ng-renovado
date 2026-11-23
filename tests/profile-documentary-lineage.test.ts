@@ -7,7 +7,7 @@ import { createMunicipalityRuntime } from './helpers/legacyProfileRuntime';
 import { projectCanonicalToDocumentModel } from "../src/application/psl-c-export/pslcCanonicalProjector";
 import { buildPSLCPdf } from "../src/application/psl-c-export/pslcPdf";
 
-const seed = () => JSON.parse(readFileSync(new URL("../public/seeds/compas-ng-workspace-loja.json", import.meta.url), "utf8")) as MunicipalityWorkspace;
+const seed = () => JSON.parse(readFileSync(new URL("../fixtures/seeds/compas-ng-workspace-loja.json", import.meta.url), "utf8")) as MunicipalityWorkspace;
 
 describe("Perfil completo: documentación → lectura → sello → exportación", () => {
   it("conserva las cuatro fuentes de Loja y pasajes localizables sin fabricar validación", () => {
