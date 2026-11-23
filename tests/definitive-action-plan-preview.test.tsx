@@ -1,12 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { renderToStaticMarkup } from "react-dom/server";
 import {
   cleanActionPlanProposalText,
   AGING_FOUR_BLOCKS_BASE,
   type PlanPreparationDraft,
 } from "../src/domain/action-plan-catalog/PlanPreparationDraft";
 import { buildDefinitiveActionPlanProjection } from "../src/domain/action-plan-catalog/DefinitiveActionPlanProjection";
-import { DefinitiveActionPlanPreview } from "../src/ui/components/DefinitiveActionPlanPreview";
 
 describe("Plan de Acción resultante", () => {
   const forbidden = [

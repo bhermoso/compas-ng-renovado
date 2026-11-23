@@ -97,7 +97,7 @@ export function computeHamiltonAllocation(
 
   // Cuántas unidades quedan por repartir tras asignar las cuotas base.
   const assigned = semis.reduce((s, sc) => s + sc.quota, 0);
-  let remaining = nTheoretical - assigned;
+  const remaining = nTheoretical - assigned;
 
   // Repartir los restos en orden decreciente de resto entero (largest remainder).
   // Empate: orden de aparición (estable).

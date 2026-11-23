@@ -19,7 +19,10 @@ export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable
  // eslint-disable-next-line react-hooks/set-state-in-effect
  useEffect(()=>{let active=true;setFile(undefined);setLoading(true);setMessage('');
  (remoteOriginal ? decodeDocumentOriginal(remoteOriginal) : loadOriginalFile(doc.municipalityId,doc.id)).then(f=>{if(active)setFile(f);}).catch(e=>{if(active)setMessage(e.message);}).finally(()=>{if(active)setLoading(false);});
- return ()=>{active=false;};},[doc.id,doc.municipalityId,remoteOriginal?.sha256]);
+ return ()=>{active=false;};
+  // El original remoto se identifica por su huella: el objeto cambia en cada lectura del expediente.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[doc.id,doc.municipalityId,remoteOriginal?.sha256]);
  // The stored original is authoritative. An external URL may point to an
  // older revision and must not be presented as this file's original.
  const url=remoteOriginal ? undefined : documentAccessUrl(doc.source.url);

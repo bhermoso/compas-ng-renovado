@@ -18,5 +18,14 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      // Convención del repositorio: el prefijo _ marca un argumento que se
+      // recibe y no se usa, y la desestructuración con resto sirve para quitar
+      // campos de un objeto.
+      '@typescript-eslint/no-unused-vars': ['error', {
+        argsIgnorePattern: '^_',
+        ignoreRestSiblings: true,
+      }],
+    },
   },
 ])

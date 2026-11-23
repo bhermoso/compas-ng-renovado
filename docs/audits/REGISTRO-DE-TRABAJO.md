@@ -22,6 +22,37 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-23 · Lint sin errores ni avisos
+
+Pages al empezar: no verificado (`version.json` no responde desde la sesión). Master: `f4c93a5`.
+
+- **Encargo del responsable.** Dejar el lint a cero en una rama con su PR.
+- **Hechos observados.** `npm run lint` daba 24 problemas (21 errores y 3 avisos);
+  el README decía 23 y CLAUDE.md, 21.
+- **Cambios sin efecto en el comportamiento.**
+  - Importaciones y variables sin uso retiradas en cinco pruebas; `const` en el
+    reparto de Hamilton de SAM; tipo explícito en lugar de `any` en la prueba del
+    PLIZD de Fuente Vaqueros.
+  - `eslint.config.js`: `no-unused-vars` admite argumentos con prefijo `_` y la
+    desestructuración con resto, convenciones que el código ya usaba.
+  - `classifyPersistenceMessage` y `persistenceSummary` pasan a
+    `workspacePersistenceSignals.ts`; `ASSET_CRITERIA` deja de exportarse (no lo
+    usaba ningún otro archivo).
+  - El error del guardado del Perfil conserva la causa original (`cause`); el
+    mensaje no cambia.
+- **Desactivaciones justificadas (10).** Los avisos de hooks de React en `App.tsx`,
+  `ExternalProfileDashboard.tsx` y `DocumentAccess.tsx` no se corrigen añadiendo
+  dependencias: con `workspace` entero se releerían Firebase e IndexedDB en cada
+  edición. Cada desactivación lleva su motivo en la línea anterior, como ya hacía
+  `DocumentAccess.tsx`. `tests/fixtures/external-profile.tsx` es una página de
+  comprobación manual que no exporta nada; ningún HTML del repositorio la carga
+  (inferencia: está sin uso).
+- **Verificación.** Lint: 0 problemas. Compilación correcta. Suite: 2952 pasan,
+  2 omitidas. Datos: solo la suite; sin expedientes reales.
+- **Pendiente.** La rama `docs/readme-lint` queda superada por esta PR.
+  Reescribir esos efectos sin desactivaciones exige un cambio de diseño de la
+  recuperación desde Firebase; no se ha hecho.
+
 ## 2026-11-23 · Archivo del expediente
 
 Pages al empezar: `acf6cb9`.

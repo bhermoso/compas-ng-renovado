@@ -2,11 +2,11 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { WorkspacePersistenceIndicator } from "../src/ui/components/WorkspacePersistenceIndicator";
 import {
   classifyPersistenceMessage,
   persistenceSummary,
-  WorkspacePersistenceIndicator,
-} from "../src/ui/components/WorkspacePersistenceIndicator";
+} from "../src/ui/components/workspacePersistenceSignals";
 
 const css = (path: string) => readFileSync(new URL("../src/" + path, import.meta.url), "utf8");
 const targetStyles = [

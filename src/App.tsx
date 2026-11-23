@@ -557,6 +557,8 @@ export default function App() {
   useEffect(() => {
     let active = true;
     const id = workspace.municipality.identity.id;
+    // El permiso de escritura se retira mientras se comprueba el del nuevo expediente.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDocumentWriteAllowed(false);
     if (!remoteClient.auth.currentUser || remoteHydratedMunicipalityId !== id) return;
     void readMembership(remoteClient, id)
@@ -668,6 +670,9 @@ export default function App() {
       });
     })();
     return () => { cancelled = true; };
+  // Las dependencias son las partes del expediente que cuentan para el presupuesto
+  // de originales. Con `workspace` entero se recorrería IndexedDB en cada edición.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workspace.repository.documents, workspace.documentOriginals, workspace.documentDerivedFiles, workspace.externalProfileLibrary, workspace.municipality.identity.id, remoteClient, remoteHydratedMunicipalityId, pendingIndexedDbHydrationId, setWorkspace]);
 
   const [lastProcessedDocument, setLastProcessedDocument] =
@@ -961,6 +966,8 @@ export default function App() {
     }
     const user = remoteClient.auth.currentUser;
     if (!user) {
+      // Sin sesión no hay copia remota que esperar: el expediente queda listo.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRemoteHydratedMunicipalityId(municipalityId);
       setRemotePersistenceMessage(null);
       return;
@@ -1002,6 +1009,10 @@ export default function App() {
     return () => {
       cancelled = true;
     };
+  // Solo se recupera Firebase al cambiar de expediente o de cliente. Con `workspace`
+  // en las dependencias se releería Firebase en cada edición; la comparación de
+  // fechas usa el expediente vigente en el momento del cambio.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remoteClient, workspace.municipality.identity.id]);
 
   useEffect(() => {
@@ -1275,7 +1286,7 @@ export default function App() {
     } catch (error) {
       const message = profileSaveErrorMessage(error);
       setRemotePersistenceMessage(message);
-      throw new Error(message);
+      throw new Error(message, { cause: error });
     } finally { profileSaveInFlightRef.current = false; }
     setWorkspace(prev => {
       if (prev.municipality.identity.id !== municipalityId) return prev;
@@ -1536,6 +1547,8 @@ export default function App() {
   );
 
   useEffect(() => {
+    // Al cambiar de expediente se borra el aviso de la biblioteca del anterior.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDocumentLibraryMessage(null);
   }, [workspace.municipality.identity.id]);
 

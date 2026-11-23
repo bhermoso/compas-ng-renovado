@@ -12,7 +12,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import type { PopulationReference, AgeSexCell } from "../src/domain/sam/PopulationReference";
+import type { PopulationReference } from "../src/domain/sam/PopulationReference";
 import { ATARFE_POPULATION_2022 } from "../fixtures/population/atarfe-population-2022";
 import { ATARFE_UNDER16_POPULATION_2025 } from "../fixtures/population/atarfe-under16-population-2025";
 
