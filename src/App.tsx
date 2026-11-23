@@ -71,6 +71,7 @@ import { createMunicipalityRuntime } from "./application/runtime";
 import { ingestManualDocument, extractDocxText, removeEquivalentStrategicFramework } from "./application/document-ingestion";
 import { registerHealthReport } from "./application/health-report/registerHealthReport";
 import { activeStudyDocuments, replaceComplementaryStudy, STUDY_DOCUMENT_TAGS } from "./application/document-ingestion/studyDocuments";
+import { createSerialQueue } from "./infrastructure/relas/serialQueue";
 import { applyCurrentSourcesConsolidation, planCurrentSourcesConsolidation, retireCurrentPredecessors } from "./application/workspace/currentSources";
 import { confirmsDocumentDeletion, deleteWorkspaceDocument } from "./application/document-files/deleteWorkspaceDocument";
 import type { ComplementaryStudyKey } from "./domain/workspace/MunicipalityWorkspace";
@@ -415,6 +416,8 @@ export default function App() {
   const remoteClient = useMemo(() => createBrowserRelasClient(), []);
   const reviewedRemoteRevisions = useRef(new Map<string, RemoteWorkspaceRevision>());
   const displayedWorkspaceRef = useRef<MunicipalityWorkspace | null>(null);
+  // Los guardados en Firebase van en serie: cada uno lee la revisión que dejó el anterior.
+  const remoteSaveQueue = useMemo(() => createSerialQueue(), []);
   const saveReviewedWorkspace = useCallback(async (
     next: MunicipalityWorkspace,
     onProgress: RemoteSaveProgressListener | undefined,
@@ -422,14 +425,16 @@ export default function App() {
   ) => {
     if (displayedWorkspaceRef.current !== base) throw new Error("El expediente cambió durante la operación. Revisa los cambios antes de volver a guardar.");
     const id = next.municipality.identity.id;
-    const reviewed = reviewedRemoteRevisions.current.get(id);
-    if (reviewed === undefined) throw new Error("Recupera el expediente compartido antes de guardarlo.");
-    const saved = await saveRemoteWorkspace(remoteClient, next, onProgress, reviewed);
-    if (reviewedRemoteRevisions.current.get(id) === reviewed) {
-      reviewedRemoteRevisions.current.set(id, saved);
-      lastExplicitProfileWorkspaceRef.current = next;
-    }
-  }, [remoteClient]);
+    await remoteSaveQueue(async () => {
+      const reviewed = reviewedRemoteRevisions.current.get(id);
+      if (reviewed === undefined) throw new Error("Recupera el expediente compartido antes de guardarlo.");
+      const saved = await saveRemoteWorkspace(remoteClient, next, onProgress, reviewed);
+      if (reviewedRemoteRevisions.current.get(id) === reviewed) {
+        reviewedRemoteRevisions.current.set(id, saved);
+        lastExplicitProfileWorkspaceRef.current = next;
+      }
+    });
+  }, [remoteClient, remoteSaveQueue]);
   const [remoteHydratedMunicipalityId, setRemoteHydratedMunicipalityId] =
     useState<string | null>(null);
   const [remotePersistenceMessage, setRemotePersistenceMessage] =
