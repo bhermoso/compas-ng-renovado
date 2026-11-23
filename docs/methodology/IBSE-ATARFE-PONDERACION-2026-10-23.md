@@ -1,5 +1,7 @@
 # IBSE de Atarfe: procedencia y condiciones para la ponderación
 
+> **Nota del 23/11/2026 (revisión de la auditoría).** Desde el commit `887d459` (09/11/2026), `fixtures/ibse-atarfe.csv` es el export de 910 registros **con edad y sexo**, y COMPÁS recalcula factores e índice desde los ocho ítems en la **escala común 0–100**. Ese es el cálculo válido: 811 respuestas válidas, índice total **62,2/100**; Vínculo 72,4, Situación 60,3, Control 51,1 y Persona 65,0. El valor 63,2 que aparece abajo es la media del total de REDCap, cuyas fórmulas no comparten escala (Vínculo 0–75; Situación y Control 25–100; Persona 0–100), y no debe usarse. Un registro trae el año de nacimiento (1993) en el campo de edad; el parser lo convierte. Lo que sigue se conserva como historial.
+
 Fecha: 23 de octubre de 2026.
 Estado actualizado a 2026-10-24: método autorizado e integración optativa de importación IBSE implementada. El expediente de Atarfe disponible sigue sin ser ponderable por ausencia de edad y sexo; no se ha certificado ni incorporado el candidato externo de procedencia dudosa.
 

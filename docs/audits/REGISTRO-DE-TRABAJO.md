@@ -22,6 +22,47 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-23 · IBSE de Atarfe en escala 0–100, referencias EAS y evaluación
+
+Pages al empezar: `c0cb1d8`.
+
+- **Decisión del responsable (2026-11-23).** Los microdatos se quedan en el
+  repositorio. El fichero IBSE válido es el normalizado sobre 100; pide
+  comprobarlo. Pide reconectar la evaluación y las referencias EAS.
+- **IBSE, hechos observados.** `fixtures/ibse-atarfe.csv` (desde `887d459`,
+  09/11/2026) tiene 910 registros con edad y sexo; 898 completos y 811 con
+  los ocho ítems válidos. Recalculado desde los ítems con la escala común
+  0–100 del parser: índice 62,2; Vínculo 72,4; Situación 60,3; Control 51,1;
+  Persona 65,0. Coincide con el expediente inicial de Atarfe
+  (`public/seeds`) y con las pruebas. La media del total de REDCap (63,2)
+  mezcla escalas y no es válida. Un registro trae el año de nacimiento (1993)
+  como edad; el parser lo convierte. 162 de los 910 registros declaran menos de 16 años.
+- **IBSE, inconsistencia corregida.** Los dos documentos metodológicos del IBSE
+  de Atarfe (23/10 y 20/11) daban 63,2 y afirmaban que el fixture no tenía
+  edad ni sexo, o que esos microdatos estaban fuera de GitHub. Se les añade una
+  nota que lo corrige y conserva el texto como historial.
+- **No comprobado.** El estudio IBSE del expediente real de Atarfe en
+  Firestore.
+- **Referencias EAS, hechos.** Ya llegan a la aplicación: los valores de
+  Andalucía por `andalusiaReferenceContract` y los de Granada y Andalucía de la
+  EAS 2023 por `eas2023References`, en Estudios complementarios y en el Perfil.
+  `EASComparativeReferences` es la calculadora que comprueba esos valores
+  contra los microdatos en las pruebas; no hay nada que reconectar. Se corrige
+  su cautela, que citaba Granada-Zaidín.
+- **Evaluación, hechos.** La vista Evaluación es un marcador. Lo conservado no
+  sirve para reconectarla sin contradecir decisiones vigentes:
+  `AgendaResultSummary` se quitó de Evaluación por decisión del responsable
+  (20/10/2026, commit `c623411`); `MonitoringPanel` lista actuaciones que
+  genera automáticamente la agenda heredada del motor anterior y duplica el
+  marco de evaluación (responsable, preguntas, momentos, línea base), que ya
+  se edita en el Plan de Acción. El sistema de evaluación que el responsable
+  quiere incorporar es el del repositorio histórico, que no está disponible
+  en GitHub.
+- **Pendiente (decisión del responsable).** Diseño de la evaluación: aportar
+  el histórico o definir su contenido.
+
+---
+
 ## 2026-11-23 · Retirada del código sin uso y de las fotografías de Zagra
 
 Pages al empezar: `c4d020f`.

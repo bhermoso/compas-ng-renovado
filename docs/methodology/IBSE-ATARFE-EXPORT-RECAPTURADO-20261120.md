@@ -1,5 +1,7 @@
 # IBSE Atarfe — contraste del CSV recibido el 20/11/2026
 
+> **Nota del 23/11/2026 (revisión de la auditoría).** Desde el commit `887d459` (09/11/2026), `fixtures/ibse-atarfe.csv` es el export de 910 registros **con edad y sexo**, y COMPÁS recalcula factores e índice desde los ocho ítems en la **escala común 0–100**. Ese es el cálculo válido: 811 respuestas válidas, índice total **62,2/100**; Vínculo 72,4, Situación 60,3, Control 51,1 y Persona 65,0. El valor 63,2 que aparece abajo es la media del total de REDCap, cuyas fórmulas no comparten escala (Vínculo 0–75; Situación y Control 25–100; Persona 0–100), y no debe usarse. Un registro trae el año de nacimiento (1993) en el campo de edad; el parser lo convierte. Lo que sigue se conserva como historial.
+
 ## Naturaleza de la comprobación
 
 Se inspeccionó localmente el fichero aportado por el responsable, `MonitorIBSEATARFE202_DATA_2026-11-19_2343.csv`, sin incorporarlo al repositorio público ni a Firestore. Contiene registros de respuestas con edad, sexo e identificadores de REDCap; esos microdatos se mantienen fuera de GitHub.
