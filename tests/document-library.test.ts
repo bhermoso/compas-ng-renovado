@@ -115,14 +115,13 @@ describe("Biblioteca documental COMPAS", () => {
   });
 
   it("no copia marcos estrategicos procedentes de expedientes municipales concretos", () => {
-    let source = makeWorkspace("granada-centro", "Granada-Centro");
+    const source = makeWorkspace("granada-centro", "Granada-Centro");
     const added = addDocument(source, {
       id: "plan-mayores",
       kind: "strategic-framework",
       title: "Plan estrategico de mayores",
       sourceText: "Prioridad: envejecimiento activo y cuidados comunitarios.",
     });
-    source = added.workspace;
     const target = makeWorkspace("alfacar", "Alfacar");
 
     const result = assignLibraryDocumentToWorkspace({

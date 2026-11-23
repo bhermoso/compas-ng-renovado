@@ -1,3 +1,5 @@
+// Punto de entrada de una página de comprobación manual: monta el panel y no exporta nada.
+/* eslint-disable react-refresh/only-export-components */
 import {useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import {ExternalProfileDashboard} from '../../src/ui/components/ExternalProfileDashboard';

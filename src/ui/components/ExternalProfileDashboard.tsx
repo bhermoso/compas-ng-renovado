@@ -63,6 +63,8 @@ export function ExternalProfileDashboard({compact=false,municipalityId,municipal
    if (!incomingTerritorialRevision || incomingTerritorialRevision.municipalityId !== municipalityId) return;
    const current = library.profiles.find(p => p.id === library.activeId);
    if (!current) { onIncomingTerritorialRevisionConsumed?.(); return; }
+   // La revisión que llega del Diagnóstico se convierte en borrador una sola vez y se consume.
+   // eslint-disable-next-line react-hooks/set-state-in-effect
    setDraft({
      ...structuredClone(current),
      id: crypto.randomUUID(),
@@ -90,7 +92,10 @@ export function ExternalProfileDashboard({compact=false,municipalityId,municipal
   return()=>window.removeEventListener('beforeunload',warn);
  },[draft]);
  useEffect(()=>{
-  let active=true;const urls:string[]=[];setFileUrls({});
+  let active=true;const urls:string[]=[];
+  // Se vacían los enlaces del Perfil anterior antes de preparar los del seleccionado.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  setFileUrls({});
   void (async()=>{
    const map:Record<string,string>={};
    for(const id of selected?.attachmentIds ?? []){

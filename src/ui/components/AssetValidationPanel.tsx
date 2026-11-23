@@ -5,7 +5,7 @@ import type {
 } from "../../domain/repository";
 
 /** Documento de criterios aplicado por la persona validadora. */
-export const ASSET_CRITERIA = {
+const ASSET_CRITERIA = {
   title: "Criterios para el registro y validación de activos para la salud en Andalucía",
   version: "Versión 9 de junio de 2026",
 } as const;

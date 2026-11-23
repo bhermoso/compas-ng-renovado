@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { linkFuenteVaquerosPlizdOriginal, FV_PLIZD_DOCUMENT_ID, FV_PLIZD_PDF_SOURCE } from '../src/application/workspace/linkFuenteVaquerosPlizdOriginal';
 import { bundledDocuments } from '../src/ui/components/documentAccessUtils';
 
-const ws = (id: string, url?: string): any => ({
+type Workspace = Parameters<typeof linkFuenteVaquerosPlizdOriginal>[0];
+
+const ws = (id: string, url?: string): Workspace => ({
   municipality: { identity: { id } },
   repository: { documents: [{ id: FV_PLIZD_DOCUMENT_ID, title: 't', source: { organization: 'Diputación de Granada', url } }] },
 });
