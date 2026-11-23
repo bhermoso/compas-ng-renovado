@@ -68,7 +68,7 @@ import { ingestManualDocument, extractDocxText, removeEquivalentStrategicFramewo
 import { registerHealthReport } from "./application/health-report/registerHealthReport";
 import { activeStudyDocuments, replaceComplementaryStudy, STUDY_DOCUMENT_TAGS } from "./application/document-ingestion/studyDocuments";
 import { createSerialQueue } from "./infrastructure/relas/serialQueue";
-import { applyCurrentSourcesConsolidation, planCurrentSourcesConsolidation, retireCurrentPredecessors } from "./application/workspace/currentSources";
+import { applyCurrentSourcesConsolidation, currentPredecessors, planCurrentSourcesConsolidation, retireCurrentPredecessors } from "./application/workspace/currentSources";
 import { confirmsDocumentDeletion, deleteWorkspaceDocument } from "./application/document-files/deleteWorkspaceDocument";
 import type { ComplementaryStudyKey } from "./domain/workspace/MunicipalityWorkspace";
 import { assetEntriesOfDocument } from "./application/evidence-pipeline";
@@ -1493,45 +1493,53 @@ export default function App() {
    */
   const handleProfileUpdates = useCallback(async (ids: string[], kinds: ProfileUpdateKind[], apply: boolean, onProgress: (message: string) => void, textPackage?: ProfileTextPackage, expectedBaselines?: Record<string,string>): Promise<ProfileUpdateOutcome[]> => {
     if (!remoteClient.auth.currentUser) throw new Error("Inicia sesión para leer y guardar los expedientes compartidos.");
-    const out: ProfileUpdateOutcome[] = [];
-    const currentId = workspace.municipality.identity.id;
-    for (const id of ids) {
-      const name = allMunicipalities.find(m => m.id === id)?.name ?? id;
-      try {
-        onProgress(`${name}: leyendo el expediente compartido…`);
-        const reviewed = id === currentId ? undefined : await readRemoteWorkspaceVersion(remoteClient, id);
-        const ws = id === currentId ? workspace : reviewed?.workspace;
-        if (!ws) { out.push({ id, name, changes: [], blocked: "No hay expediente compartido en Firebase." }); continue; }
-        const library = ws.externalProfileLibrary ?? { profiles: [], attachments: [] };
-        const r = buildProfileUpdate({ library, snapshots: ws.territorialStatistics, kinds, textPackage, author: remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || "", now: new Date(), newId: () => crypto.randomUUID() });
-        if (!r.profile) { out.push({ id, name, changes: r.changes, blocked: r.blocked }); continue; }
-        const baseline = r.base ? profileUpdateBaseline(r.base,ws.territorialStatistics) : undefined;
-        if (apply && (!baseline || !canApplyProfilePreview(expectedBaselines?.[id],baseline))) {
-          out.push({id,name,changes:[],blocked:"El Perfil cambió desde la vista previa o no existe una comparación previa válida. Vuelve a consultar la vista previa antes de guardar."});
-          continue;
-        }
-        const outcome: ProfileUpdateOutcome = { id, name, changes: r.changes, from: r.base?.title, title: r.profile.title, profile: r.profile, delta: r.base ? compareProfileUpdate(r.base,r.profile) : undefined, baseline };
-        if (apply) {
-          onProgress(`${name}: guardando la revisión…`);
-          const nextLibrary = appendExternalProfile(library, r.profile, [], id);
-          const now = new Date().toISOString();
-          const next = { ...ws, externalProfileLibrary: nextLibrary, updatedAt: now };
-          const progress: RemoteSaveProgressListener = event => onProgress(name + ": " + profileSaveProgressMessage(event));
-          if (reviewed) await saveRemoteWorkspace(remoteClient, next, progress, reviewed.revision);
-          else await saveReviewedWorkspace(next, progress, ws);
-          if (id === currentId) {
-            setWorkspace(prev => prev.municipality.identity.id !== id ? prev :
-              prev === ws ? next : { ...prev, externalProfileLibrary: nextLibrary, updatedAt: now });
+    // Al aplicar, el guardado cuenta como operación en curso: así el autoguardado no
+    // lanza detrás una copia anterior que Firebase rechazaría con un aviso de error.
+    if (apply && profileSaveInFlightRef.current) throw new Error("Hay otra operación documental en curso.");
+    if (apply) profileSaveInFlightRef.current = true;
+    try {
+      const out: ProfileUpdateOutcome[] = [];
+      const currentId = workspace.municipality.identity.id;
+      for (const id of ids) {
+        const name = allMunicipalities.find(m => m.id === id)?.name ?? id;
+        try {
+          onProgress(`${name}: leyendo el expediente compartido…`);
+          const reviewed = id === currentId ? undefined : await readRemoteWorkspaceVersion(remoteClient, id);
+          const ws = id === currentId ? workspace : reviewed?.workspace;
+          if (!ws) { out.push({ id, name, changes: [], blocked: "No hay expediente compartido en Firebase." }); continue; }
+          const library = ws.externalProfileLibrary ?? { profiles: [], attachments: [] };
+          const r = buildProfileUpdate({ library, snapshots: ws.territorialStatistics, kinds, textPackage, author: remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || "", now: new Date(), newId: () => crypto.randomUUID() });
+          if (!r.profile) { out.push({ id, name, changes: r.changes, blocked: r.blocked }); continue; }
+          const baseline = r.base ? profileUpdateBaseline(r.base,ws.territorialStatistics) : undefined;
+          if (apply && (!baseline || !canApplyProfilePreview(expectedBaselines?.[id],baseline))) {
+            out.push({id,name,changes:[],blocked:"El Perfil cambió desde la vista previa o no existe una comparación previa válida. Vuelve a consultar la vista previa antes de guardar."});
+            continue;
           }
-          outcome.saved = true;
+          const outcome: ProfileUpdateOutcome = { id, name, changes: r.changes, from: r.base?.title, title: r.profile.title, profile: r.profile, delta: r.base ? compareProfileUpdate(r.base,r.profile) : undefined, baseline };
+          if (apply) {
+            onProgress(`${name}: guardando la revisión…`);
+            const nextLibrary = appendExternalProfile(library, r.profile, [], id);
+            const now = new Date().toISOString();
+            const next = { ...ws, externalProfileLibrary: nextLibrary, updatedAt: now };
+            const progress: RemoteSaveProgressListener = event => onProgress(name + ": " + profileSaveProgressMessage(event));
+            if (reviewed) await saveRemoteWorkspace(remoteClient, next, progress, reviewed.revision);
+            else await saveReviewedWorkspace(next, progress, ws);
+            if (id === currentId) {
+              setWorkspace(prev => prev.municipality.identity.id !== id ? prev :
+                prev === ws ? next : { ...prev, externalProfileLibrary: nextLibrary, updatedAt: now });
+            }
+            outcome.saved = true;
+          }
+          out.push(outcome);
+        } catch (error) {
+          out.push({ id, name, changes: [], blocked: error instanceof Error ? error.message : String(error) });
         }
-        out.push(outcome);
-      } catch (error) {
-        out.push({ id, name, changes: [], blocked: error instanceof Error ? error.message : String(error) });
       }
+      onProgress(apply ? "Actualización terminada." : "Vista previa terminada.");
+      return out;
+    } finally {
+      if (apply) profileSaveInFlightRef.current = false;
     }
-    onProgress(apply ? "Actualización terminada." : "Vista previa terminada.");
-    return out;
   }, [workspace, remoteClient, allMunicipalities, saveReviewedWorkspace, setWorkspace]);
 
   catalogIdsRef.current = new Set(allMunicipalities.map((m) => m.id));
@@ -1554,8 +1562,9 @@ export default function App() {
 
   function handleProcessDocument() {
     const isLocaliza = kind === "localiza-salud";
-    const oldLocaliza = workspace.repository.documents.filter(d => d.kind === "localiza-salud" && d.status !== "archived" && d.status !== "rejected");
     // Una sola versión vigente de Localiza Salud: la nueva carga sustituye a la anterior (currentSources).
+    // El aviso cuenta los mismos listados que se eliminan después, archivados incluidos.
+    const oldLocaliza = isLocaliza ? currentPredecessors(workspace, { kind: "localiza-salud" }, undefined) : [];
     if (isLocaliza && oldLocaliza.length) {
       if (!window.confirm(
         "Ya hay un listado de Localiza Salud en este expediente.\n" +
