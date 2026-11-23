@@ -51,8 +51,14 @@ Pages al empezar: `e410372`.
   - Diez documentos a `docs/historico/contratos-perfil/`. Índice, matriz de
     fuentes (Localiza exclusiva, v1.3) y `CLAUDE.md` al día.
   - Nuevo `CONTRACT-EVALUATION` 1.0, doctrina vigente.
+- **Comprobación estructural de los cuatro Perfiles vigentes** contra la
+  v3.0.0, leída de Firestore: [PSL-V3-CONFORMIDAD-2026-11-23](PSL-V3-CONFORMIDAD-2026-11-23.md).
+  Cumplen estructura, páginas, lectura de conjunto y frontera con las agendas;
+  no declaran el grado de sustento de las recomendaciones «Abordar», no
+  tienen tabla de trazabilidad y rotulan distinto tres apartados. No es una
+  lectura completa.
 - **Pendiente.** Implementar el menú de elección sobre el Perfil cargado y la
-  evaluación; comprobar los cuatro Perfiles vigentes contra la v3.0.0.
+  evaluación; lectura completa y cotejo de los cuatro Perfiles.
 - **Verificación.** Suite: 2977 pasan, 2 omitidas (sin cambios de código).
 
 ## 2026-11-23 · Granada-Zaidín eliminado de Firebase; reglas desplegadas comprobadas
