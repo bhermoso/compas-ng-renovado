@@ -22,6 +22,49 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-23 · Una sola fuente escrita: documentos de arranque y referencias al repositorio anterior
+
+Pages al empezar: `033304a`.
+
+- **Decisión del responsable (2026-11-23).** Se trabaja solo con
+  `compas-ng-renovado`; `COMPAS_NG` queda fuera del trabajo.
+- **Hechos observados (auditoría del 23/11).** `CLAUDE.md`,
+  `docs/REPOSITORIO-CANONICO.md` y otros tres puntos de entrada designaban
+  `COMPAS_NG` como repositorio único o describían el estado de septiembre. El
+  panel de Administración enlazaba como reglas «que deben estar publicadas» el
+  `firestore.rules` de `COMPAS_NG`, que no contempla las marcas de borrado y
+  prohíbe borrar. Siete pruebas abrían o construían rutas bajo `/COMPAS_NG/`.
+  El lint tenía 26 errores y 3 avisos, no 13.
+- **Cambio.**
+  - `CLAUDE.md`: repositorio, web, punto de entrada, custodia de expedientes y
+    reglas vigentes; recuentos de pruebas y lint actualizados; referencias a
+    carpetas del escritorio sustituidas. La doctrina vigente no cambia.
+  - `README.md` reescrito con el estado actual.
+  - A `docs/historico/`: `ROADMAP.md`, `docs/certification/`,
+    `docs/planning/` y los documentos de estado y continuidad anteriores
+    (`ESTADO-ACTUAL-COMPAS-NG`, `REPOSITORIO-CANONICO`,
+    `CONTINUIDAD-COMPAS-NG`, `CONTINUAR-AQUI`, `RECUPERACION-Y-CONSOLIDACION`,
+    `PLAN-PASO-4`, `PLAN-DOCUMENTO-VALIDADO`, `ESTADO-INTERVENCION-2`,
+    `HANDOFF-GOV-SALIDA-01`, `RELAS-FIREBASE-ACTIVACION`,
+    `PERFIL-PROCESAMIENTO-PDF-Y-RELAS`, `DOCUMENTOS-CONSULTA-Y-ORIGINALES`).
+    Se actualizan los enlaces que apuntaban a ellos.
+  - Panel de Administración: el enlace de reglas apunta a este repositorio.
+  - Pruebas y scripts de navegador: ruta base `/compas-ng-renovado/`.
+  - Flujo de publicación: «Deploy COMPAS to GitHub Pages».
+  - Se retira `tmp-noop.txt`.
+- **Comprobado (hechos).** Suite completa: 3108 pruebas correctas, 2 omitidas.
+  Compilación correcta.
+- **No comprobado.** Los scripts de navegador fuera de la CI
+  (`collection-preparation`, `delete-workspace`, `original-files`,
+  `load-atarfe-complete` y `test:smoke`): el entorno no pudo instalar el
+  navegador de Playwright.
+- **Pendiente (decisiones del responsable).** Contratos del Perfil (externo sin
+  aprobar; `CONTRACT-PSL-COMPAS` y `CONTRACT-MIT-PSL` declarados vigentes);
+  código sin uso (67 módulos); ramas; datos personales en el repositorio
+  público; auditoría de Firestore.
+
+---
+
 ## 2026-11-22 · Localiza Salud: una recarga no duplica fichas
 
 Pages al empezar: `90188cc`.

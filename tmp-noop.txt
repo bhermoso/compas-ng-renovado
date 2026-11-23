@@ -1,1 +1,0 @@
-Temporary repository marker created accidentally during navigation repair; safe to remove in a later cleanup commit.

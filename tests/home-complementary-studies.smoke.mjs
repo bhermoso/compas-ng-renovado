@@ -4,7 +4,7 @@ import { chromium } from "playwright";
 
 const HOST = "127.0.0.1";
 const PORT = "5173";
-const APP_URL = `http://${HOST}:${PORT}/COMPAS_NG/`;
+const APP_URL = `http://${HOST}:${PORT}/compas-ng-renovado/`;
 const REPO_ROOT = fileURLToPath(new URL("..", import.meta.url));
 const VITE_BIN = fileURLToPath(
   new URL("../node_modules/vite/bin/vite.js", import.meta.url)

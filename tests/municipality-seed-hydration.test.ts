@@ -231,18 +231,18 @@ describe("hidratación de expedientes municipales desde seed", () => {
 
   it("7. la URL del seed funciona con el BASE_URL de GitHub Pages", async () => {
     const seed = MUNICIPALITY_SEEDS["atarfe"];
-    expect(municipalitySeedUrl(seed, "/COMPAS_NG/")).toBe(
-      "/COMPAS_NG/seeds/compas-ng-workspace-atarfe.json"
+    expect(municipalitySeedUrl(seed, "/compas-ng-renovado/")).toBe(
+      "/compas-ng-renovado/seeds/compas-ng-workspace-atarfe.json"
     );
     // El loader pide EXACTAMENTE esa URL bajo el base de Pages.
     let requested = "";
     await loadMunicipalitySeed("atarfe", {
-      baseUrl: "/COMPAS_NG/",
+      baseUrl: "/compas-ng-renovado/",
       fetchImpl: okFetch(SEED_RAW, (u) => {
         requested = u;
       }),
     });
-    expect(requested).toBe("/COMPAS_NG/seeds/compas-ng-workspace-atarfe.json");
+    expect(requested).toBe("/compas-ng-renovado/seeds/compas-ng-workspace-atarfe.json");
   });
 
   it("8. el seed desplegable existe en public/ (Vite lo copia a dist) y es válido", () => {
@@ -580,7 +580,7 @@ describe("expediente canónico de Fuente Vaqueros", () => {
 
     await expect(
       loadMunicipalitySeed("fuente-vaqueros", {
-        baseUrl: "/COMPAS_NG/",
+        baseUrl: "/compas-ng-renovado/",
         fetchImpl: okFetch(raw),
       })
     ).resolves.toMatchObject({
@@ -605,7 +605,7 @@ describe("Fuente Vaqueros en navegadores sin descarga de JSON", () => {
       throw new Error("ERR_BLOCKED_BY_CLIENT");
     }) as typeof fetch;
     const seed = await loadMunicipalitySeed(input.id, {
-      baseUrl: "/COMPAS_NG/", fetchImpl: blockedFetch,
+      baseUrl: "/compas-ng-renovado/", fetchImpl: blockedFetch,
     });
     expect(requests).toBe(0);
     expect(seed).not.toBeNull();
@@ -621,10 +621,10 @@ describe("Fuente Vaqueros en navegadores sin descarga de JSON", () => {
   it("la copia incluida coincide con el seed público y cada carga es independiente", async () => {
     const raw = readFileSync(resolve(dirname(fileURLToPath(import.meta.url)),
       "../public/seeds/compas-ng-workspace-fuente-vaqueros.json"), "utf8");
-    const first = await loadMunicipalitySeed(input.id, { baseUrl: "/COMPAS_NG/" });
+    const first = await loadMunicipalitySeed(input.id, { baseUrl: "/compas-ng-renovado/" });
     expect(first).toEqual(parseWorkspaceJSON(raw));
     first!.repository.documents.length = 0;
-    const second = await loadMunicipalitySeed(input.id, { baseUrl: "/COMPAS_NG/" });
+    const second = await loadMunicipalitySeed(input.id, { baseUrl: "/compas-ng-renovado/" });
     expect(second!.repository.documents).toHaveLength(1);
   });
   it("conserva trabajo local del usuario sin sustituirlo por el expediente inicial", () => {

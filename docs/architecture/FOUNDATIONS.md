@@ -180,7 +180,7 @@ La siguiente matriz define el papel de cada uno dentro del sistema.
 | Contratos | `docs/contracts/*` | Especificaciones verificables de implementación | Alto |
 | Metodología | `docs/methodology/*` | Marco metodológico y científico | Alto |
 | Gobernanza evolutiva | `docs/architecture/ARCHITECTURAL-GAP-REGISTER.md` | Gestión auditada de huecos y reservas | Alto |
-| Planificación | `ROADMAP.md` | Secuencia temporal de evolución | Medio |
+| Planificación | `docs/historico/ROADMAP.md` (histórico) | Secuencia temporal de evolución | Medio |
 
 ### Jerarquía documental
 
@@ -193,7 +193,7 @@ En caso de discrepancia entre documentos, prevalecerá el documento situado en e
 5. Arquitectura (`docs/architecture`)
 6. Metodología (`docs/methodology`)
 7. `ARCHITECTURAL-GAP-REGISTER.md`
-8. `ROADMAP.md`
+8. `docs/historico/ROADMAP.md` (histórico)
 
 El Roadmap nunca modifica la arquitectura.
 El Architectural Gap Register nunca redefine contratos.

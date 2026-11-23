@@ -579,21 +579,21 @@ Estas entradas registran decisiones o divergencias vivas que afectan a la gobern
 
 | Expediente | Fecha | Estado |
 |---|---|---|
-| `docs/certification/CERTIFICATION-SPRINT-0-1.md` | 2026-06-28 | Sprints 0–1: pipeline E2E, 309 tests |
-| `docs/certification/PRODUCT-1-CERTIFICATION.md` | 2026-06-29 | Producto 1 — Sistema de Estudios Complementarios: 6 instrumentos, 481 tests |
-| `docs/certification/PRODUCT-2-SAM-CERTIFICATION.md` | 2026-06-30 | Producto 2 — SAM NG: motor + integración + samAssessmentToEvidenceAtom, 573 tests |
-| `docs/certification/PRODUCT-3-PSL-CERTIFICATION.md` | 2026-06-30 | Producto 3 — PSL-C: certificación histórica fechada; estado posterior superado en catálogo de 13 estudios, DOCX/PDF y estructura documental pendiente de unificación |
+| `docs/historico/certification/CERTIFICATION-SPRINT-0-1.md` | 2026-06-28 | Sprints 0–1: pipeline E2E, 309 tests |
+| `docs/historico/certification/PRODUCT-1-CERTIFICATION.md` | 2026-06-29 | Producto 1 — Sistema de Estudios Complementarios: 6 instrumentos, 481 tests |
+| `docs/historico/certification/PRODUCT-2-SAM-CERTIFICATION.md` | 2026-06-30 | Producto 2 — SAM NG: motor + integración + samAssessmentToEvidenceAtom, 573 tests |
+| `docs/historico/certification/PRODUCT-3-PSL-CERTIFICATION.md` | 2026-06-30 | Producto 3 — PSL-C: certificación histórica fechada; estado posterior superado en catálogo de 13 estudios, DOCX/PDF y estructura documental pendiente de unificación |
 
 El plano arquitectónico completo que responde a la pregunta
 "¿qué debe existir para producir un Perfil de Salud Local, un Plan Local de Salud y una
 Encuesta Municipal?" está en `docs/architecture/BLUEPRINT-PRODUCTION.md`.
 Ese blueprint conserva decisiones y tensiones históricas; para determinar si una
 deuda sigue viva, prevalecen este índice, los contratos específicos vigentes y
-`docs/ESTADO-ACTUAL-COMPAS-NG.md`.
+el [Registro de trabajo](../audits/REGISTRO-DE-TRABAJO.md).
 
 ---
 
-*Este índice es el punto de entrada obligatorio antes de crear o modificar cualquier contrato en COMPÁS NG.*
+*Este índice es el punto de entrada obligatorio antes de crear o modificar cualquier contrato en COMPÁS.*
 
 
 ## Producción externa del Perfil de Salud Local
