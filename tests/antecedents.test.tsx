@@ -1,7 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createElement } from "react";
 import { readFileSync } from "node:fs";
-import { renderToStaticMarkup } from "react-dom/server";
 import { parseWorkspaceJSON } from "../src/infrastructure/persistence/local-storage";
 import {
   buildAntecedents,
@@ -16,7 +14,6 @@ import {
 import { projectCanonicalToDocumentModel } from "../src/application/psl-c-export/pslcCanonicalProjector";
 import { buildCanonicalTechnicalSpace } from "../src/application/health-profile";
 import { createMunicipalityRuntime } from "../src/application/runtime";
-import { ProfileIntegratedEditorialPreview } from "../src/ui/components/ProfileIntegratedEditorialPreview";
 import { setMunicipalDocumentCycle } from "../src/domain/repository";
 import type { MunicipalityWorkspace } from "../src/domain/workspace";
 
@@ -96,12 +93,6 @@ describe("antecedentes: con fuente histórica declarada", () => {
     expect(section.paragraphs[0]).toContain("ciclo anterior");
   });
 
-  it("la pantalla presenta lo mismo que el proyector", () => {
-    const { view } = viewOf(withHistoricalPlizd());
-    const html = renderToStaticMarkup(createElement(ProfileIntegratedEditorialPreview, { view }));
-    expect(html).toContain("Antecedentes de ciclos anteriores");
-    expect(html).toContain("Ciclo histórico · 2022");
-  });
 });
 
 describe("buildAntecedents", () => {

@@ -62,6 +62,6 @@ export default function AdministrationPanel({client,onOpenApp,onOpenScope}:{clie
   </section>
   <ProfileRemoteAuditPanel client={client}/>
   <section className="admin-section"><h2>Trabajo de COMPAS</h2><button onClick={onOpenApp}>Abrir COMPAS completo</button><div className="admin-scope"><button disabled={!spaces.some(s=>s.id===selectedScope)} onClick={()=>onOpenScope(selectedScope)}>Abrir plan seleccionado</button></div></section>
-  <details className="admin-section"><summary>Configuración y recuperación de cuentas</summary><p>Las cuentas anteriores y los cambios de contraseña se pueden gestionar desde la consola propietaria.</p><p><a href={`${project}/authentication/users`} target="_blank" rel="noopener noreferrer">Gestionar cuentas en Firebase</a></p><p><a href="https://github.com/bhermoso/COMPAS_NG/blob/master/firebase/firestore.rules" target="_blank" rel="noopener noreferrer">Reglas de gestión de accesos que deben estar publicadas en Firestore</a></p></details>
+  <details className="admin-section"><summary>Configuración y recuperación de cuentas</summary><p>Las cuentas anteriores y los cambios de contraseña se pueden gestionar desde la consola propietaria.</p><p><a href={`${project}/authentication/users`} target="_blank" rel="noopener noreferrer">Gestionar cuentas en Firebase</a></p><p><a href="https://github.com/bhermoso/compas-ng-renovado/blob/master/firebase/firestore.rules" target="_blank" rel="noopener noreferrer">Reglas de gestión de accesos que deben estar publicadas en Firestore</a></p></details>
  </>;
 }

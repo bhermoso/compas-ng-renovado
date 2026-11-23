@@ -35,7 +35,8 @@ Documentación institucional y técnica. Solo Markdown.
 |---|---|
 | `architecture/` | Constituciones, blueprints, modelos de dominio, gap register, este fichero |
 | `contracts/` | Contratos canónicos de cada componente |
-| `certification/` | Evidencia de certificación de productos |
+| `audits/` | Registro de trabajo (punto de entrada) y auditorías |
+| `historico/` | Documentos de estado, continuidad, planificación y certificación anteriores al 23/11/2026; se conservan como historial |
 | `methodology/` | Fundamentos metodológicos, taxonomía de instrumentos, metamodelo |
 | `research/` | Benchmarks y referencias externas |
 | `visual/` | Contratos visuales y referencias de diseño |
@@ -52,7 +53,7 @@ Assets estáticos servidos por Vite. Branding institucional.
 Solo deben estar en raíz:
 - Ficheros de configuración: `package.json`, `tsconfig*.json`, `vite.config.ts`, `eslint.config.js`, `.gitignore`
 - `index.html` (entry point Vite)
-- `README.md`, `ROADMAP.md`
+- `README.md`, `CLAUDE.md`
 - Microdatos EAS locales (gitignoreados): `EAS_COMPLETO.csv`, `EAS_microdatos_adulto_READY.csv`
 
 No deben estar en raíz: documentos municipales, PDFs de referencia, XLSXs de datos, logos, scripts temporales.

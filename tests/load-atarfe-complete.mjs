@@ -7,7 +7,7 @@ const repo = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const fixtures = resolve(repo, "fixtures");
 const atarfe = resolve(repo, "Atarfe");
 const viteBin = resolve(repo, "node_modules/vite/bin/vite.js");
-const appUrl = "http://127.0.0.1:5173/COMPAS_NG/";
+const appUrl = "http://127.0.0.1:5173/compas-ng-renovado/";
 const storageKey = "compas-ng:workspace:atarfe";
 
 const studies = [

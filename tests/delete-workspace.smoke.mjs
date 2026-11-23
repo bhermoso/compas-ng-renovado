@@ -8,7 +8,7 @@ let browser;
 try {
   browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
-  await page.goto(`http://127.0.0.1:${server.httpServer.address().port}/COMPAS_NG/`);
+  await page.goto(`http://127.0.0.1:${server.httpServer.address().port}/compas-ng-renovado/`);
   await page.evaluate(() => localStorage.setItem('compas-ng:custom-municipalities', JSON.stringify([
     { id: 'fuente-vaqueros', name: 'Fuente Vaqueros', province: 'Granada' },
     { id: 'prueba-borrado', name: 'Prueba borrado', province: 'Granada' },
@@ -21,7 +21,7 @@ try {
   await page.locator('.municipality-selector__option-main').filter({ hasText: 'Prueba borrado' }).click();
   await page.waitForFunction(() => !!localStorage.getItem('compas-ng:workspace:prueba-borrado'));
   await page.evaluate(async () => {
-    const files = await import('/COMPAS_NG/src/infrastructure/document-files/originalFiles.ts');
+    const files = await import('/compas-ng-renovado/src/infrastructure/document-files/originalFiles.ts');
     await files.saveOriginalFile('prueba-borrado', 'original', new File(['prueba'], 'original.txt'));
   });
   // Native confirmations are unavailable in some embedded browsers.
@@ -38,8 +38,8 @@ try {
   await openSelector();
   assert.equal(await page.locator('.municipality-selector__option-name').filter({ hasText: 'Prueba borrado' }).count(), 0);
   const saved = await page.evaluate(async () => {
-    const files = await import('/COMPAS_NG/src/infrastructure/document-files/originalFiles.ts');
-    const storage = await import('/COMPAS_NG/src/infrastructure/persistence/indexed-db-workspace.ts');
+    const files = await import('/compas-ng-renovado/src/infrastructure/document-files/originalFiles.ts');
+    const storage = await import('/compas-ng-renovado/src/infrastructure/persistence/indexed-db-workspace.ts');
     return { local: localStorage.getItem('compas-ng:workspace:prueba-borrado'),
       indexed: await storage.loadWorkspaceFromIndexedDB('prueba-borrado'),
       originals: (await files.listOriginalFiles()).filter(file => file.municipalityId === 'prueba-borrado').length };

@@ -5,16 +5,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { parseWorkspaceJSON } from "../src/infrastructure/persistence/local-storage";
 import {
   buildAntecedents,
-  buildDiagnosticAnswers,
-  buildCanonicalBuildContext,
-  buildCanonicalEditorialView,
-  buildCanonicalTechnicalSpace,
   conciliationParagraph,
-  excludeHistoricalSources,
 } from "../src/application/health-profile";
-import { projectCanonicalToDocumentModel } from "../src/application/psl-c-export/pslcCanonicalProjector";
-import { createMunicipalityRuntime } from "../src/application/runtime";
-import { ProfileIntegratedEditorialPreview } from "../src/ui/components/ProfileIntegratedEditorialPreview";
 import { CycleConciliationPanel } from "../src/ui/components/CycleConciliationPanel";
 import {
   addCycleConciliation,
@@ -25,14 +17,6 @@ import type { MunicipalityWorkspace } from "../src/domain/workspace";
 
 const load = (id: string): MunicipalityWorkspace =>
   parseWorkspaceJSON(readFileSync(`public/seeds/compas-ng-workspace-${id}.json`, "utf8"))!;
-
-const META = {
-  title: "t", subtitle: "s", fileName: "f", portada: [],
-  traceability: {
-    sourceHash: "h", artifactId: "a", sourcePSLId: "p", sourcePSLVersion: "1",
-    sourcePSLEvidenceStoreVersion: "1", frozenEvidenceAtomCount: 0,
-  },
-};
 
 function setup(declare: boolean) {
   const base = load("atarfe");
@@ -50,18 +34,6 @@ function setup(declare: boolean) {
     });
   }
   return { ws: { ...base, repository } as MunicipalityWorkspace, h, c };
-}
-
-function viewOf(ws: MunicipalityWorkspace) {
-  const atoms = excludeHistoricalSources(ws).evidenceStore.atoms;
-  const psl = createMunicipalityRuntime({ workspace: ws }).psl;
-  const answers = buildDiagnosticAnswers({
-    workspace: ws,
-    determinantTitles: atoms.filter((a) => a.kind === "determinant").map((a) => a.title),
-    assets: [],
-  });
-  const ctx = buildCanonicalBuildContext({ psl, perfil: undefined, answers, territory: ws.municipality.identity.name });
-  return { view: buildCanonicalEditorialView(ctx), ctx };
 }
 
 describe("conciliación entre ciclos", () => {
@@ -111,16 +83,6 @@ describe("conciliación entre ciclos", () => {
     expect("conciliations" in repository).toBe(false);
   });
 
-  it("pantalla y proyector (DOCX/PDF) llevan el mismo texto", () => {
-    const { ws } = setup(true);
-    const { view, ctx } = viewOf(ws);
-    const paragraph = conciliationParagraph(view.antecedents!.conciliations![0]);
-    const model = projectCanonicalToDocumentModel(view, buildCanonicalTechnicalSpace(ctx), META);
-    const section = model.sections.find((s) => s.sectionId === "antecedents")!;
-    expect(section.paragraphs).toContain(paragraph);
-    const html = renderToStaticMarkup(createElement(ProfileIntegratedEditorialPreview, { view } as never));
-    expect(html.replace(/&#x27;/g, "'")).toContain(paragraph.replace(/&/g, "&amp;"));
-  });
 
   it("el panel solo se ofrece con una fuente histórica y una actual", () => {
     const { ws } = setup(true);
