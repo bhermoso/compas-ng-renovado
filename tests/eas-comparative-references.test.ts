@@ -53,7 +53,7 @@ describe("EAS comparative references", () => {
       expect(ref.andalucia.sourceLabel).toContain("andalucia");
       expect(ref.method).toContain("microdatos EAS");
       expect(ref.caution).toBe(EAS_COMPARATIVE_REFERENCE_CAUTION);
-      expect(ref.caution).toContain("no debe redactarse como dato específico del distrito");
+      expect(ref.caution).toContain("no debe redactarse como dato del municipio o del distrito");
     }
   });
 
