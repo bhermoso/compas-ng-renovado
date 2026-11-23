@@ -22,6 +22,27 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-23 · Granada-Zaidín eliminado de Firebase; reglas desplegadas comprobadas
+
+Pages: `5765e6a`.
+
+- **Decisión del responsable (2026-11-23):** «Granada-Zaidín lo vamos a
+  eliminar completamente».
+- **Hecho.** En Firestore se han eliminado el expediente (manifiesto y
+  fragmentos), el registro del ámbito `relas_scopes/granada-zaidin` con sus
+  colecciones anidadas (`reviews`, `workspace_versions`), la pertenencia y la
+  cuenta de acceso de coordinación asociadas solo a ese ámbito. Queda la
+  lápida `compas_deleted_scopes/granada-zaidin`, que impide que un navegador
+  con una copia local lo vuelva a subir. La copia previa del expediente está en
+  `compas-copia-firebase-20261123` (panel de navegador de la aplicación de
+  escritorio). Comprobado después: el ámbito responde 404 y no figura en
+  `relas_scopes`.
+- **Reglas de Firestore.** Las desplegadas (versión del 20/11/2026) coinciden
+  línea a línea con `firebase/firestore.rules`.
+- **Pendiente de decisión.** La plantilla de envejecimiento en cuatro bloques
+  que usan otros expedientes procede del Plan de Acción del Distrito Zaidín
+  (`ZAIDIN_AGING_PROPOSAL` y derivados). No se ha tocado.
+
 ## 2026-11-23 · Limpieza de los expedientes de Firebase: una versión vigente por fuente
 
 Pages al empezar y al terminar: `2b0fb2a`.
