@@ -1,4 +1,5 @@
 export type { BuildLocalHealthProfileInput } from "./buildLocalHealthProfile";
+export { buildLocalHealthProfile, hasPSLHumanContent } from "./buildLocalHealthProfile";
 export {
   ANTECEDENTS_TITLE,
   buildAntecedents,
@@ -7,9 +8,7 @@ export {
   isHistoricalDocument,
 } from "./antecedents";
 export type { AntecedentConciliation, AntecedentSource, CanonicalAntecedents } from "./antecedents";
-export { buildLocalHealthProfile, hasPSLHumanContent } from "./buildLocalHealthProfile";
 
-export { populatePSLFromPerfil } from "./populatePSLFromPerfil";
 
 export type {
   AddInterpretationInput,
@@ -54,16 +53,6 @@ export {
 } from "./narrativeChapters";
 export { parseNarrativeChapters } from "./narrativeChapters";
 export type {
-  InstitutionalProfileViewModel,
-  ContrastTopic,
-} from "./institutionalProfileModel";
-export {
-  buildInstitutionalProfileViewModel,
-  INSTITUTIONAL_NAV,
-  CONTRAST_TOPICS_LABEL,
-  PENDING_CONTRAST_LABEL,
-} from "./institutionalProfileModel";
-export type {
   DiagnosticAnswers,
   DiagnosticDeterminantReading,
   DeterminantReadingKind,
@@ -77,14 +66,6 @@ export {
   inferSocialEpidemiologyDeterminants,
   buildSalutogenicReading,
 } from "./diagnosticAnswers";
-export {
-  serializeValidatedAnswers,
-  parseValidatedAnswersSnapshot,
-} from "./validatedAnswersSnapshot";
-export {
-  selectDocumentPreviewContext,
-  type DocumentPreviewContext,
-} from "./documentPreviewContext";
 export type {
   HealthReportSanitaryReading,
   HealthReportSanitarySignal,

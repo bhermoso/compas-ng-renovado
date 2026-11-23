@@ -34,8 +34,8 @@ Producto prioritario: el Perfil de Salud Local — documento científico, editor
 - Las instrucciones actuales del usuario prevalecen sobre estas reglas. Dentro del trabajo autorizado, se permiten commits, push y actualizaciones de la PR necesarios para completarlo, sin pedir confirmación adicional por cada paso.
 - Antes de publicar cambios, comprobar la rama y el estado remoto, conservar el trabajo existente y ejecutar las comprobaciones pertinentes. No usar force push, fusionar ni desplegar fuera del alcance autorizado.
 - Cambios quirúrgicos: solo lo pedido. Si algo exige tocar lo no autorizado, parar y preguntar.
-- Suite: npm.cmd run test (3108 pruebas el 23/11/2026). Si falla con EPERM en node_modules/.vite-temp, hay un Vite vivo en el puerto 5173: matarlo y reintentar.
-- npm run lint tiene 26 errores y 3 avisos preexistentes (23/11/2026): no tocarlos sin encargo y no añadir otros.
+- Suite: npm.cmd run test (2954 pruebas el 23/11/2026, tras retirar el código sin uso). Si falla con EPERM en node_modules/.vite-temp, hay un Vite vivo en el puerto 5173: matarlo y reintentar.
+- npm run lint tiene 23 errores y 3 avisos preexistentes (23/11/2026): no tocarlos sin encargo y no añadir otros.
 - Que compile y pase tests NO demuestra que mejore el producto. Verificar también coherencia editorial, narrativa y experiencia de lectura.
 - En cada informe, separar: hechos observados / inferencias / decisiones institucionales / hipótesis. "No verificado" es respuesta válida.
 

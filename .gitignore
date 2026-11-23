@@ -66,3 +66,8 @@ audit.mjs
 
 # Temporary preview and screenshots
 tmp/
+# Fotografías de personas: no se versionan en el repositorio público
+municipalities/**/*.jpg
+municipalities/**/*.jpeg
+municipalities/**/*.JPG
+municipalities/**/*.JPEG

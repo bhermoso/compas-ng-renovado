@@ -14,7 +14,6 @@ import { describe, it, expect, beforeAll } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { renderToStaticMarkup } from "react-dom/server";
 import { compileLocalHealthProfile } from "../src/application/health-profile-compiler";
 import { readSealedCanonicalDocument } from "../src/application/psl-c-canonical";
 import { buildPSLCDocumentModel } from "../src/application/psl-c-export";
@@ -23,7 +22,6 @@ import {
   institutionalHealthReportTitle,
 } from "../src/application/health-profile";
 import type { DiagnosticAnswers } from "../src/application/health-profile";
-import { ProfileIntegratedEditorialPreview } from "../src/ui/components/ProfileIntegratedEditorialPreview";
 import { loadWorkspaceFromLocalStorage } from "../src/infrastructure/persistence/local-storage";
 import { createMunicipalityRuntime } from './helpers/legacyProfileRuntime';
 import type { MunicipalityWorkspace } from "../src/domain/workspace";
@@ -166,17 +164,6 @@ describe("PASO 3 — C. el export es inmune a la mutación del workspace", () =>
 });
 
 describe("PASO 3 — A. la pantalla del artefacto lee el sello", () => {
-  it("ProfileIntegratedEditorialPreview renderiza la editorialView sellada", () => {
-    const doc = readSealedCanonicalDocument(artifactCanonical.canonicalDocument!);
-    const html = renderToStaticMarkup(
-      <ProfileIntegratedEditorialPreview view={doc!.editorialView} />
-    );
-    // La lectura canónica del artefacto sale del sello: territorio, título del
-    // Perfil e Informe institucional en la cabecera.
-    expect(html).toContain(ws.municipality.identity.name);
-    expect(html).toContain("Perfil de Salud Local");
-    expect(html).toContain(institutional);
-  });
 
   it("un artefacto legacy no tiene editorialView sellada (fallback al document model)", () => {
     expect(artifactLegacy.canonicalDocument).toBeUndefined();
