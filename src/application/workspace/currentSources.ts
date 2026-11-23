@@ -24,6 +24,7 @@ export type SourceSlot =
   | { kind: "health-report" }
   | { kind: "localiza-salud" }
   | { kind: "prioritisation" }
+  | { kind: "longitudinal" }
   | { kind: "study"; key: ComplementaryStudyKey };
 
 export function slotLabel(slot: SourceSlot): string {
@@ -31,6 +32,7 @@ export function slotLabel(slot: SourceSlot): string {
     case "health-report": return "Informe de salud";
     case "localiza-salud": return "Localiza Salud";
     case "prioritisation": return "Priorización temática";
+    case "longitudinal": return "Series comparadas entre ciclos";
     case "study": return `Estudio complementario (${STUDY_DOCUMENT_TAGS[slot.key]})`;
   }
 }
@@ -42,9 +44,12 @@ export function isHistoricalDocument(document: MunicipalDocument): boolean {
 /** ¿Pertenece el documento a esta fuente? No considera el ciclo. */
 export function belongsToSlot(document: MunicipalDocument, slot: SourceSlot): boolean {
   switch (slot.kind) {
-    case "health-report": return document.kind === "health-report";
+    // Los informes cargados antes de existir el tipo propio quedaron como «other»
+    // con la etiqueta health-report: son el mismo informe y cuentan como copia.
+    case "health-report": return document.kind === "health-report" || document.tags.includes("health-report");
     case "localiza-salud": return document.kind === "localiza-salud";
     case "prioritisation": return document.tags.includes(THEMATIC_PRIORITISATION_TAG);
+    case "longitudinal": return document.kind === "longitudinal-evidence";
     case "study": {
       const tag = STUDY_DOCUMENT_TAGS[slot.key];
       if (document.tags.includes(tag)) return true;
@@ -228,12 +233,25 @@ function activeDocumentFor(workspace: MunicipalityWorkspace, slot: SourceSlot): 
   }
 }
 
+/**
+ * Copias del informe de salud guardadas como «anteriores» que no remiten a un
+ * documento histórico del expediente: son versiones sustituidas del informe
+ * actual, no informes de otro ciclo.
+ */
+function staleHealthReportCopies(workspace: MunicipalityWorkspace) {
+  const historicalIds = new Set(workspace.repository.documents.filter(isHistoricalDocument).map(document => document.id));
+  return (workspace.previousHealthReports ?? []).filter(report =>
+    !report.linkedDocumentId || !historicalIds.has(report.linkedDocumentId)
+  );
+}
+
 /** Qué se conservaría y qué se eliminaría al dejar un solo ejemplar de cada fuente. No modifica nada. */
 export function planCurrentSourcesConsolidation(workspace: MunicipalityWorkspace): ConsolidationPlan {
   const slots: SourceSlot[] = [
     { kind: "health-report" },
     { kind: "localiza-salud" },
     { kind: "prioritisation" },
+    { kind: "longitudinal" },
     ...(Object.keys(STUDY_DOCUMENT_TAGS) as ComplementaryStudyKey[]).map(key => ({ kind: "study" as const, key })),
   ];
   const entries: ConsolidationEntry[] = [];
@@ -243,6 +261,7 @@ export function planCurrentSourcesConsolidation(workspace: MunicipalityWorkspace
     if (remove.length > 0) entries.push({ slot, label: slotLabel(slot), keep, remove });
   }
   const replacedCopies =
+    staleHealthReportCopies(workspace).length +
     (workspace.ibseStudyHistory ?? []).filter(entry => entry.documents.every(document => !isHistoricalDocument(document))).length +
     (workspace.complementaryStudyHistory ?? []).filter(entry => entry.documents.every(document => !isHistoricalDocument(document))).length +
     (workspace.archivedAssetEvidence?.length ? 1 : 0);
@@ -266,6 +285,9 @@ export function applyCurrentSourcesConsolidation(
       ? { complementaryStudyHistory: cleaned.complementaryStudyHistory.filter(entry => entry.documents.some(isHistoricalDocument)) }
       : {}),
     ...(cleaned.archivedAssetEvidence ? { archivedAssetEvidence: [] } : {}),
+    ...(cleaned.previousHealthReports
+      ? { previousHealthReports: cleaned.previousHealthReports.filter(report => !staleHealthReportCopies(cleaned).includes(report)) }
+      : {}),
     updatedAt: now,
   };
 }
