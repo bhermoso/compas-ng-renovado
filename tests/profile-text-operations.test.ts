@@ -36,12 +36,43 @@ describe("capa 2: cifras enlazadas y condiciones", () => {
   });
   it("marca la conclusión y sus recomendaciones si la condición deja de cumplirse", () => {
     const flags = evaluateConditions(conditions, snap(33.1, 31.5));
-    expect(flags).toEqual([{ target: "C14", reason: "Ya no se cumple que el Gini municipal es inferior al provincial (33.1 frente a 31.5)." }]);
-    expect(dependentRecommendations(text, ["C14"])).toEqual([{ target: "R7", reason: "Se apoya en C14, marcada para revisar." }]);
+    expect(flags).toMatchObject([{ target: "C14", reason: "Ya no se cumple que el Gini municipal es inferior al provincial (33.1 frente a 31.5).", check: { kind: "condition" } }]);
+    expect(dependentRecommendations(text, ["C14"])).toMatchObject([{ target: "R7", reason: "Se apoya en C14, marcada para revisar.", check: { kind: "recommendation" } }]);
   });
   it("marca la cifra si el texto ya no la contiene", () => {
-    const r = refreshBindings(text.replace("28,3", "veintiocho"), bindings.slice(0, 1), snap(27.9, 31.5));
+    const changedText = text.replace("28,3", "veintiocho");
+    const r = refreshBindings(changedText, bindings.slice(0, 1), snap(28.3, 31.5));
+    expect(r.text).toBe(changedText);
     expect(r.flags[0].reason).toMatch(/No se encuentra «28,3» en C14/);
+  });
+  it("resuelve cada literal sobre el texto anterior aunque otra sustitución escriba el mismo número", () => {
+    const s = snap(32, 30);
+    s.observations[0].literal = "32,0";
+    s.observations[1].literal = "30,0";
+    const provincial = { ...bindings[0], ref: { ...bindings[0].ref, level: "provincia" as const, territoryCode: "18" }, literal: "32,0" };
+    const r = refreshBindings(text, [bindings[0], provincial], s);
+    expect(r.text).toContain("el índice de Gini es 32,0, frente a 30,0 en la provincia");
+    expect(r.bindings.map(b => b.literal)).toEqual(["32,0", "30,0"]);
+    expect(r.flags).toEqual([]);
+  });
+  it("exige una aparición inequívoca dentro de la lectura de conjunto", () => {
+    const lecture = text.replace("La renta es más baja, pero menos concentrada.", "Primera cifra, 28,3.\n\nSegunda cifra, 28,3.");
+    const binding = { ...bindings[0], target: "LECTURA" };
+    const ambiguous = refreshBindings(lecture, [binding], snap(27.9, 31.5));
+    expect(ambiguous.text).toBe(lecture);
+    expect(ambiguous.flags[0].reason).toMatch(/inequívoca/);
+    const resolved = refreshBindings(lecture, [{ ...binding, occurrence: 2 }], snap(27.9, 31.5));
+    expect(resolved.text).toContain("Primera cifra, 28,3.\n\nSegunda cifra, 27,9.");
+    expect(resolved.text).toContain("En 2024 el índice de Gini es 28,3");
+    expect(resolved.flags).toEqual([]);
+  });
+  it("un valor bajo secreto estadístico conserva su última cifra y su año juntos", () => {
+    const s = snap(28.3, 31.5);
+    s.observations[0] = { ...s.observations[0], literal: "Secreto estadístico", value: null, secret: true };
+    const r = refreshBindings(text, bindings, s);
+    expect(r.text).toBe(text);
+    expect(r.bindings).toEqual(bindings);
+    expect(r.flags.map(f => f.check?.kind)).toEqual(["binding", "binding"]);
   });
 });
 
@@ -68,6 +99,20 @@ describe("capa 3: paquete de texto", () => {
     expect(ps.indexOf("B120971. IECA. Desempleo.")).toBeLessThan(ps.indexOf("Anexo A. Fuentes"));
     expect(r.bindings).toHaveLength(2);
   });
+  it("rechaza todo el paquete cuando R1 carece de fundamento, aunque R7 tenga uno", () => {
+    const base = { text: text.replace("\n\nFundamento: C1.", ""), bindings, conditions };
+    const r = applyTextPackage(base, { ...entry, operations: [
+      { op: "upsert-conclusion", id: "C1", text: "C1. Una sustitución válida." },
+      { op: "set-fundamento", recommendation: "R1", conclusions: ["C1", "C14"] },
+    ] });
+    expect(r).toEqual({ ...base, changes: [], problems: ["No se encuentra un fundamento único en R1."] });
+  });
+  it("rechaza una conclusión repetida como destino", () => {
+    const base = { text: text.replace("C1. Primera conclusión.", "C1. Primera conclusión.\n\nC1. Otra conclusión.") };
+    const r = applyTextPackage(base, { ...entry, operations: [{ op: "upsert-conclusion", id: "C1", text: "C1. Sustitución." }] });
+    expect(r.text).toBe(base.text);
+    expect(r.problems).toEqual(["La conclusión C1 aparece más de una vez."]);
+  });
   it("el actualizador aplica el paquete, refresca cifras y marca lo que ya no se sostiene", () => {
     const base: ExternalHealthProfile = { schema: "compas-external-profile/v1", id: "v090", municipalityId: "alfacar", title: "Perfil · revisión 0.9.0 · 18/11/2026", period: "", author: "", createdAt: "2026-11-18T00:00:00Z", status: "validated", validatedBy: "B", validatedAt: "2026-11-18T01:00:00Z", summary: "", text, results: [], findings: [], limitations: [], areas: [], attachmentIds: [] };
     const library = { profiles: [base], attachments: [], activeId: "v090" };
@@ -79,5 +124,29 @@ describe("capa 3: paquete de texto", () => {
     expect(r.profile!.title).toBe("Perfil · revisión 0.10.0 · 18/11/2027");
     const other = buildProfileUpdate({ library: { ...library, profiles: [{ ...base, title: "Perfil · revisión 0.8.2 · 17/11/2026" }] }, kinds: ["paquete-texto"], textPackage: pkg, author: "B", now: new Date(), newId: () => "n" });
     expect(other.blocked).toMatch(/se redactó sobre/);
+  });
+  it("conserva las marcas sin comprobar y resuelve las que vuelven a cumplir su condición", () => {
+    const legacy = { target: "C1", reason: "Verificar la fuente." };
+    const base: ExternalHealthProfile = {
+      schema: "compas-external-profile/v1", id: "v090", municipalityId: "alfacar", title: entry.baseTitle,
+      period: "", author: "", createdAt: "2026-11-18T00:00:00Z", status: "validated",
+      summary: "", text, results: [], findings: [], limitations: [], areas: [], attachmentIds: [],
+      conditions, reviewFlags: [legacy],
+    };
+    const update = (profile: ExternalHealthProfile, snapshot: TerritorialStatisticsSnapshot) =>
+      buildProfileUpdate({
+        library: { profiles: [{ ...profile, status: "validated" }], attachments: [], activeId: profile.id },
+        snapshots: [snapshot], kinds: ["cifras-conclusiones"], author: "B",
+        now: new Date("2027-11-18T10:00:00Z"), newId: () => "siguiente",
+      });
+    const failed = update(base, snap(33.1, 31.5)).profile!;
+    expect(failed.reviewFlags).toMatchObject([
+      legacy, { target: "C14", check: { kind: "condition" } },
+      { target: "R1", check: { kind: "recommendation" } }, { target: "R7", check: { kind: "recommendation" } },
+    ]);
+    expect(update(failed, snap(33.1, 31.5)).blocked).toBe("Los cambios elegidos no modifican este Perfil.");
+    const resolved = update(failed, snap(27.9, 31.5)).profile!;
+    expect(resolved.reviewFlags?.map(f => f.target)).toEqual(["C1", "R1", "R7"]);
+    expect(resolved.reviewFlags!.find(f => f.target === "R7")?.reason).toBe("Se apoya en C1, marcada para revisar.");
   });
 });

@@ -13,7 +13,7 @@
  * posición; la estructura procede de los registros de prueba del repositorio).
  */
 
-import type { EvidenceAtom } from "../../domain/evidence";
+import { evidenceHasDocument, type EvidenceAtom } from "../../domain/evidence";
 import type { AssetValidationDeclaration } from "../../domain/repository/MunicipalDocumentRepository";
 
 export const LOCALIZA_ASSET_FIELD_COUNT = 8;
@@ -97,7 +97,7 @@ export function readLocalizaAssets(
     if (isRecord(parsed)) {
       const v = validations.find(
         (d) =>
-          d.documentId === atom.provenance?.documentId &&
+          evidenceHasDocument(atom, d.documentId) &&
           (d.atomIds === undefined || d.atomIds.includes(atom.id))
       );
       records.push(

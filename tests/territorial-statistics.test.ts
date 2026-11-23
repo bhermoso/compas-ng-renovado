@@ -270,6 +270,52 @@ describe("búsqueda del código INE por nombre", () => {
 
 describe("revisión del Perfil con los datos descargados", () => {
   const base = { source: "INE", page: "", caution: "" };
+  const municipalRent = { ...base, id: "r1", title: "Renta neta media por persona", value: "12.924", unit: "euros", period: "2024", scale: "Municipio" };
+  const rentCatalog = pick("adrh-renta-neta-persona");
+
+  it("añade el dato municipal sin sustituir una fila provincial aunque compartan título e identificador reservado", async () => {
+    const s = await snapshotAlfacar();
+    const provincial = { ...municipalRent, id: "ts-adrh-renta-neta-persona", scale: "Provincia", value: "13.100", period: "2023" };
+    expect(profileCoverage(s, { results: [provincial] }, rentCatalog)[0]).toMatchObject({ status: "ausente" });
+    const first = mergeTerritorialResults(s, [provincial], rentCatalog).results;
+    expect(first[0]).toBe(provincial);
+    expect(first.find(r => r.scale === "Municipio")).toMatchObject({ value: "12.924", period: "2024" });
+    expect(mergeTerritorialResults(s, first, rentCatalog).results).toEqual(first);
+  });
+
+  it("señala varias filas municipales compatibles sin sustituirlas ni crear otra", async () => {
+    const s = await snapshotAlfacar();
+    const originals = [municipalRent, { ...municipalRent, id: "r2", value: "12.300", period: "2023" }];
+    expect(profileCoverage(s, { results: originals }, rentCatalog)[0]).toMatchObject({ status: "ambiguo" });
+    const r = mergeTerritorialResults(s, originals, rentCatalog);
+    expect(r.results.filter(row => row.scale === "Municipio")).toEqual(originals);
+    expect(r.changes.find(c => c.scale === "Municipio")).toMatchObject({ kind: "por revisar", issue: "ambiguo" });
+  });
+
+  it("coteja el nuevo periodo bajo secreto y conserva el valor publicado con su año", async () => {
+    const s = await snapshotAlfacar();
+    s.observations = s.observations.map(o => o.indicatorId === rentCatalog[0].id && o.level === "municipio"
+      ? { ...o, period: "2025", value: null, literal: "Secreto estadístico", secret: true }
+      : o);
+    expect(profileCoverage(s, { results: [municipalRent] }, rentCatalog)[0]).toMatchObject({
+      status: "sin-dato", inProfile: { value: "12.924", period: "2024" },
+      downloaded: { literal: "Secreto estadístico", period: "2025" },
+    });
+    const r = mergeTerritorialResults(s, [municipalRent], rentCatalog);
+    expect(r.results[0]).toBe(municipalRent);
+    expect(r.changes.find(c => c.scale === "Municipio")).toMatchObject({
+      kind: "conservado", value: "12.924", period: "2024", previous: { reason: "sin-dato" },
+    });
+  });
+
+  it("excluye las comparaciones provinciales de otro periodo", async () => {
+    const s = await snapshotAlfacar();
+    s.observations = s.observations.map(o => o.level === "provincia" ? { ...o, period: "2023" } : o);
+    const municipal = mergeTerritorialResults(s, [], rentCatalog).results.find(row => row.scale === "Municipio");
+    expect(municipal?.comparisons).toEqual([{ label: "Andalucía", value: 13342 }]);
+    expect(revisionResults(s, rentCatalog)[0].comparisons).toEqual(municipal?.comparisons);
+  });
+
   it("reconoce la sección por su código completo o por distrito y sección", () => {
     expect(sectionCodeOf({ title: "Renta neta media por persona, sección censal 01004", scale: "Sección censal" }, "18022")).toBe("1802201004");
     expect(sectionCodeOf({ title: "Renta", scale: "Sección censal 1801101001" }, "18011")).toBe("1801101001");

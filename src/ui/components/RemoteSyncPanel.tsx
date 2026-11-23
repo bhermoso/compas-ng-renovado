@@ -56,8 +56,8 @@ export function RemoteSyncPanel({ client }: { client: RelasClient }) {
     <details className="app-persistence-warning">
       <summary>Expedientes de este navegador y Firebase</summary>
       <p>
-        Sube a Firebase todos los expedientes guardados en este navegador. No
-        sustituye una copia de Firebase más reciente.
+        Sube los expedientes de este navegador que aún no existen en Firebase.
+        Si ya existe una copia compartida, concilia los cambios en el ámbito.
       </p>
       <button type="button" disabled={busy} onClick={() => { void upload(); }}>
         {busy ? "Subiendo…" : "Subir a Firebase los expedientes de este navegador"}

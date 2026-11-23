@@ -26,7 +26,10 @@ const MAX_BATCH_WRITES = 8;
 // Three bounded requests in parallel reduce the latency of large workspaces
 // while preserving the manifest-last, all-fragments-first integrity protocol.
 const MAX_CONCURRENT_BATCHES = 3;
-const saveQueues = new WeakMap<RelasClient, Map<string, Promise<void>>>();
+const saveQueues = new WeakMap<RelasClient, Map<string, Promise<RemoteWorkspaceRevision>>>();
+
+/** El ID del manifiesto leído identifica la revisión, incluso con fechas iguales. */
+export type RemoteWorkspaceRevision = { snapshotId: string } | null;
 
 export interface RemoteSaveProgress {
   phase: "waiting" | "writing" | "confirming" | "saved";
@@ -61,6 +64,13 @@ export async function readRemoteWorkspace(
   client: RelasClient,
   municipalityId: string
 ): Promise<MunicipalityWorkspace | null> {
+  return (await readRemoteWorkspaceVersion(client, municipalityId))?.workspace ?? null;
+}
+
+export async function readRemoteWorkspaceVersion(
+  client: RelasClient,
+  municipalityId: string,
+): Promise<{ workspace: MunicipalityWorkspace; revision: NonNullable<RemoteWorkspaceRevision> } | null> {
   if (!client.auth.currentUser) return null;
   await readMembership(client, municipalityId);
   const manifestRef = doc(
@@ -119,32 +129,32 @@ export async function readRemoteWorkspace(
   ) {
     throw new Error("El expediente remoto no pertenece al ámbito solicitado.");
   }
-  return workspace;
+  return { workspace, revision: { snapshotId: manifest.snapshotId } };
 }
 
 export async function saveRemoteWorkspace(
   client: RelasClient,
   workspace: MunicipalityWorkspace,
   onProgress?: RemoteSaveProgressListener,
-  expectedPreviousUpdatedAt?: string
-): Promise<void> {
+  expectedRevision?: RemoteWorkspaceRevision | string,
+): Promise<NonNullable<RemoteWorkspaceRevision>> {
   let queue = saveQueues.get(client);
   if (!queue) { queue = new Map(); saveQueues.set(client, queue); }
   const key = workspace.municipality.identity.id;
   const pending = queue.get(key);
   if (pending) onProgress?.({ phase: "waiting", completedChunks: 0, totalChunks: 0 });
   const previous = pending ?? Promise.resolve();
-  const next = previous.catch(() => undefined).then(() => persistRemoteWorkspace(client, workspace, onProgress, expectedPreviousUpdatedAt));
+  const next = previous.catch(() => undefined).then(() => persistRemoteWorkspace(client, workspace, onProgress, expectedRevision));
   queue.set(key, next);
-  try { await next; } finally { if (queue.get(key) === next) queue.delete(key); }
+  try { return await next; } finally { if (queue.get(key) === next) queue.delete(key); }
 }
 
 async function persistRemoteWorkspace(
   client: RelasClient,
   workspace: MunicipalityWorkspace,
   onProgress?: RemoteSaveProgressListener,
-  expectedPreviousUpdatedAt?: string
-): Promise<void> {
+  expectedRevision?: RemoteWorkspaceRevision | string,
+): Promise<NonNullable<RemoteWorkspaceRevision>> {
   const raw = JSON.stringify(workspace);
   const chunks = splitText(raw);
   if (chunks.length > 400) throw new Error('El expediente supera la capacidad de 400 fragmentos de Firebase. Conserva la versión anterior y reduce el tamaño de los archivos.');
@@ -157,11 +167,11 @@ async function persistRemoteWorkspace(
   await ensureRemoteScope(client, workspace).catch(() => undefined);
   const id = snapshotId();
   const previous = await readManifest(client, workspace.municipality.identity.id);
-  // Destructive edits must start from the exact remote revision the user
-  // inspected. A refreshed updatedAt is not sufficient to rule out a stale UI.
-  if (expectedPreviousUpdatedAt !== undefined &&
-      previous?.workspaceUpdatedAt !== expectedPreviousUpdatedAt) {
-    throw new Error("Firebase contiene una revisión diferente del expediente. Recupérala antes de eliminar la versión; no se ha modificado nada.");
+  const matches = typeof expectedRevision === "string"
+    ? previous?.workspaceUpdatedAt === expectedRevision
+    : (previous?.snapshotId ?? null) === (expectedRevision?.snapshotId ?? null);
+  if (expectedRevision !== undefined && !matches) {
+    throw new Error("Firebase contiene una revisión diferente del expediente. Conserva la copia local y concilia los cambios antes de guardar.");
   }
   if (previous && previous.workspaceUpdatedAt > workspace.updatedAt) {
     throw new Error("Firebase tiene una versión más reciente del expediente. Recupérala y concilia los cambios antes de guardar.");
@@ -252,6 +262,7 @@ async function persistRemoteWorkspace(
       previous
     ).catch(() => undefined);
   }
+  return { snapshotId: id };
 }
 
 async function readManifest(
@@ -412,13 +423,15 @@ export async function uploadLocalWorkspaces(
     let outcome: RemoteUploadOutcome;
     let detail: string | undefined;
     try {
-      const remote = await readRemoteWorkspace(client, id);
-      if (remote !== null && remote.updatedAt > workspace.updatedAt) {
+      const reviewed = await readRemoteWorkspaceVersion(client, id);
+      const remote = reviewed?.workspace;
+      if (remote && remote.updatedAt > workspace.updatedAt) {
         outcome = "remoto-mas-reciente";
-      } else if (remote !== null && remote.updatedAt === workspace.updatedAt) {
+      } else if (remote && remote.updatedAt === workspace.updatedAt) {
         outcome = "ya-actualizado";
       } else {
-        await saveRemoteWorkspace(client, workspace);
+        if (reviewed) throw new Error("El expediente ya existe en Firebase. Concilia los cambios en el ámbito antes de sustituirlo.");
+        await saveRemoteWorkspace(client, workspace, undefined, null);
         outcome = "subido";
       }
     } catch (error) {

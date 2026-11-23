@@ -1,5 +1,7 @@
 import { createContext, useContext, useRef, useState, type ReactNode } from 'react';
 import type { MunicipalityWorkspace } from '../../domain/workspace/MunicipalityWorkspace';
+import { evidenceHasDocument } from '../../domain/evidence';
+import { PENDING_DOCUMENT_REVIEW } from '../../application/document-files/documentRevisions';
 import type { DocumentKind, MunicipalDocument } from '../../domain/repository';
 import { DocumentAccess } from './DocumentAccess.tsx';
 import { documentCustodyMetadata } from './documentCustody';
@@ -54,7 +56,7 @@ export function DocumentReference({ children, documentId, fileName }: Reference 
   return <button type="button" className="document-reference" onClick={() => open({ documentId, fileName })}>{children}</button>;
 }
 
-export function DocumentationProvider({ workspace, children, canWrite = false, onStoreOriginal, onStoreDerivative, onCreateRevision, onArchiveDocument, onDeleteDocument }: { workspace: MunicipalityWorkspace; children: ReactNode; canWrite?: boolean; onStoreOriginal?: (documentId: string, file: File) => Promise<void>; onStoreDerivative?: (documentId: string, file: File, provenance: StoredDocumentDerivative['provenance']) => Promise<void>; onCreateRevision?: (documentId: string, file: File) => Promise<void>; onArchiveDocument?: (documentId: string) => Promise<void>; onDeleteDocument?: (documentId: string) => Promise<boolean> }) {
+export function DocumentationProvider({ workspace, children, canWrite = false, onStoreOriginal, onStoreDerivative, onCreateRevision, onUseHealthReportRevision, onArchiveDocument, onDeleteDocument }: { workspace: MunicipalityWorkspace; children: ReactNode; canWrite?: boolean; onStoreOriginal?: (documentId: string, file: File) => Promise<void>; onStoreDerivative?: (documentId: string, file: File, provenance: StoredDocumentDerivative['provenance']) => Promise<void>; onCreateRevision?: (documentId: string, file: File) => Promise<void>; onUseHealthReportRevision?: (documentId: string) => Promise<void>; onArchiveDocument?: (documentId: string) => Promise<void>; onDeleteDocument?: (documentId: string) => Promise<boolean> }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [reference, setReference] = useState<Reference | null>(null);
   const [query, setQuery] = useState('');
@@ -84,7 +86,7 @@ export function DocumentationProvider({ workspace, children, canWrite = false, o
     };
     return lineage(d) === lineage(selected);
   }).sort((a,b) => (a.revisionNumber ?? 1) - (b.revisionNumber ?? 1)) : [];
-  const dependencyCount = selected ? workspace.evidenceStore.atoms.filter(atom => atom.provenance.documentId === selected.id).length : 0;
+  const dependencyCount = selected ? workspace.evidenceStore.atoms.filter(atom => evidenceHasDocument(atom, selected.id)).length : 0;
   const original = selected && workspace.documentOriginals?.find(o => o.documentId === selected.id);
   const custody = selected ? documentCustodyMetadata(selected, original || undefined) : undefined;
   const historical = selected && (
@@ -135,6 +137,7 @@ export function DocumentationProvider({ workspace, children, canWrite = false, o
           <details className="docp__common"><summary>Marco estratégico común · {STRATEGIC_REFERENCES.length} documentos</summary><CommonStrategicFramework /></details>
         </nav>
         <section className="docp__detail" aria-label={selected ? 'Ficha del documento' : 'Resumen del expediente documental'}>
+        {operationMessage && <p role="status">{operationMessage}</p>}
         {selected ? <>
           <p className="docp__back"><button type="button" onClick={() => setReference(null)}>← Índice documental</button></p>
           <section className="documentation-overview" aria-label="Resumen documental">
@@ -170,19 +173,27 @@ export function DocumentationProvider({ workspace, children, canWrite = false, o
                 catch(error) { setOperationMessage((error as Error).message); }
               }}/>
             </label>
+            {selected.kind === 'health-report' && selected.status !== 'archived' && selected.status !== 'rejected' &&
+              selected.tags.includes(PENDING_DOCUMENT_REVIEW) && onUseHealthReportRevision && <button type="button" onClick={async () => {
+                if (!window.confirm('¿Usar esta revisión en Diagnóstico? El Informe anterior se conservará archivado.')) return;
+                try {
+                  setOperationMessage('Procesando la revisión del Informe…');
+                  await onUseHealthReportRevision(selected.id);
+                  setOperationMessage('Revisión utilizada en Diagnóstico y guardada en Firebase.');
+                } catch (error) { setOperationMessage((error as Error).message); }
+              }}>Usar esta revisión del Informe</button>}
             {selected.status !== 'archived' && <button type="button" onClick={async()=>{
-              if(!onArchiveDocument || !window.confirm('¿Archivar este documento conservando su original y sus evidencias?')) return;
+              if(!onArchiveDocument || !window.confirm('¿Archivar esta fuente y retirarla del diagnóstico vigente? Se conservarán su original y sus evidencias históricas.')) return;
               try { setOperationMessage('Archivando en Firebase…'); await onArchiveDocument(selected.id); setOperationMessage('Documento archivado.'); }
               catch(error) { setOperationMessage((error as Error).message); }
             }}>Archivar</button>}
             <button type="button" onClick={async()=>{
-              if(!onDeleteDocument || !window.confirm(`¿Eliminar «${selected.title}» de Firebase y del navegador, incluyendo sus ${dependencyCount} evidencias directas? Los perfiles ya generados pueden requerir revisión.`)) return;
+              const copies = (workspace.documentDerivedFiles ?? []).filter(file => file.derivedFromDocumentId === selected.id).length;
+              if(!onDeleteDocument || !window.confirm(`¿Eliminar «${selected.title}» de Firebase y del navegador? Original compartido: ${original ? 'sí' : 'no'}. Derivados: ${copies}. Evidencias vinculadas: ${dependencyCount}. Las evidencias respaldadas por otra ficha se conservarán cuando corresponda. Los perfiles pueden requerir revisión.`)) return;
               try {setOperationMessage('Eliminando en Firebase…'); const deleted=await onDeleteDocument(selected.id); if(deleted) {setReference(null); setOperationMessage('Documento eliminado.');} else setOperationMessage('No se ha confirmado la eliminación en Firebase.');}
               catch(error) {setOperationMessage((error as Error).message);}
             }}>Eliminar documento</button>
           </div></details>}
-          {operationMessage && <p role="status">{operationMessage}</p>}
-
           <DocumentAccess key={selected.id} document={selected} retainedTextAvailable={!!historical?.body.originalText} showManagementActions={false} showText={false} />
           {(selected.sourceText?.trim() || historical?.body.originalText) && <details className="documentation-transcript"><summary>Leer transcripción conservada</summary><p className="documentation-text">{selected.sourceText?.trim() || historical?.body.originalText}</p></details>}
         </> : <>

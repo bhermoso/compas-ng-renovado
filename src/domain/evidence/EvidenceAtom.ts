@@ -55,7 +55,12 @@ export interface EvidenceAtomProvenance {
   field?: string;
   page?: number;
   extractedAt: string;
+  /** Otras fichas de Localiza que contienen el mismo registro íntegro. */
+  additionalDocuments?: EvidenceDocumentSource[];
 }
+
+export type EvidenceDocumentSource = Required<Pick<EvidenceAtomProvenance, "documentId">>
+  & Pick<EvidenceAtomProvenance, "sourceLabel" | "extractedAt">;
 
 export interface EvidenceAtom {
   id: EvidenceAtomId;
@@ -81,6 +86,11 @@ export interface CreateEvidenceAtomInput {
   provenance: EvidenceAtomProvenance;
   methodology?: Partial<EvidenceMethodology>;
   tags?: string[];
+}
+
+export function evidenceHasDocument(atom: Pick<EvidenceAtom, "provenance">, documentId: DocumentId): boolean {
+  return atom.provenance.documentId === documentId
+    || (atom.provenance.additionalDocuments?.some(source => source.documentId === documentId) ?? false);
 }
 
 export function createEvidenceAtom(input: CreateEvidenceAtomInput): EvidenceAtom {

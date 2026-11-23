@@ -1,7 +1,7 @@
 import { useEffect,useState } from 'react';
 import type { MunicipalDocument } from '../../domain/repository';
 import { loadOriginalFile } from '../../infrastructure/document-files/originalFiles';
-import { decodeDocumentOriginal } from '../../application/document-files/documentOriginals';
+import { decodeDocumentOriginal, isDocumentFileName } from '../../application/document-files/documentOriginals';
 import { useDocumentOriginalManagement } from './DocumentOriginalManagement';
 import { documentAccessUrl, documentDownloadFileName, isPdfDocumentAccess } from './documentAccessUtils';
 
@@ -62,7 +62,7 @@ export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable
     <label>Vincular PDF o DOCX como copia derivada (sin cambiar el original ni las evidencias)
       <input type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label={`Adjuntar copia derivada PDF o DOCX: ${doc.title}`} onChange={async e=>{
         const input=e.currentTarget;const next=input.files?.[0];input.value='';if(!next)return;
-        if(!/\\.(pdf|docx)$/i.test(next.name)){setMessage('Formato no admitido: utiliza PDF o DOCX.');return;}
+        if(!isDocumentFileName(next.name)){setMessage('Formato no admitido: utiliza PDF o DOCX.');return;}
         if(!window.confirm(`¿Guardar «${next.name}» como copia derivada de «${doc.title}», sin atribuirle carácter de original?`))return;
         try{setMessage('Guardando la copia derivada en Firebase…');await management.storeDerivative?.(doc.id,next,derivedKind);setMessage('Copia derivada registrada en el expediente compartido.');}
         catch(error){setMessage('No se ha guardado la copia derivada: '+(error as Error).message);}
@@ -73,7 +73,7 @@ export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable
   {management && <details className="document-access__actions"><summary>Adjuntar original auténtico</summary><label className="document-access__attach">{file ? 'Verificar o reponer original (PDF o DOCX)' : 'Adjuntar el archivo original (PDF o DOCX)'}
    <input type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-label={`Adjuntar original PDF o DOCX: ${doc.title}`} onChange={async e=>{
     const input=e.currentTarget;const next=input.files?.[0];if(!next)return;
-    if(!/\.(pdf|docx)$/i.test(next.name)) { setMessage('Solo se admiten archivos PDF o DOCX.'); input.value=''; return; }
+    if(!isDocumentFileName(next.name)) { setMessage('Solo se admiten archivos PDF o DOCX.'); input.value=''; return; }
     if(/(?:reconstruid[oa]|reconstrucci[oó]n)/i.test(next.name)) { setMessage('Este fichero indica que es una reconstrucción. No lo adjuntes como original verificado: conserva el texto y regístralo como copia reconstruida.'); input.value=''; return; }
     if(!window.confirm(`¿Vincular «${next.name}» a «${doc.title}»? Comprueba que corresponde a este documento. Si el contenido difiere del original existente debes importar una versión nueva; no se alterarán en silencio las evidencias.`)){input.value='';return;}
     try {
@@ -99,7 +99,7 @@ export function DocumentAccess({document:doc,documentLabel,retainedTextAvailable
       }}/>
     </label>
     {doc.status!=='archived'&&<button type="button" onClick={async()=>{
-      if(!window.confirm(`¿Archivar «${doc.title}» sin eliminar su archivo ni sus evidencias?`))return;
+      if(!window.confirm(`¿Archivar «${doc.title}» y retirarlo del diagnóstico vigente? Se conservarán su archivo y sus evidencias históricas.`))return;
       try{setMessage('Archivando en Firebase…');await management.archiveDocument?.(doc.id);setMessage('Documento archivado y conservado en Firebase.');}
       catch(error){setMessage('No se ha podido archivar: '+(error as Error).message);}
     }}>Archivar documento</button>}

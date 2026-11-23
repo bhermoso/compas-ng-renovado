@@ -24,8 +24,8 @@ import { DiagnosisControlRoom, DiagnosisModuleSection } from "./ui/components/Di
 import { DuplicateDocumentsPanel } from "./ui/components/DuplicateDocumentsPanel";
 import { findDuplicateGroups, findExistingCopy, retireDuplicateDocument } from "./application/document-ingestion/documentDuplicates";
 import { sha256Hex } from "./application/document-ingestion/sha256";
-import { canDeleteDocumentVersion, createDocumentRevision } from "./application/document-files/documentRevisions";
-import { MAX_WORKSPACE_ORIGINALS_BYTES, decideOriginalUpload, decodeDocumentOriginal, documentOriginalsBytes, documentDerivativesBytes, encodeDocumentOriginal, formatMegabytes, mergeDocumentOriginals, mergeDocumentDerivatives, profileOriginalsBytes, pruneDocumentOriginals, type StoredDocumentOriginal, type StoredDocumentDerivative } from "./application/document-files/documentOriginals";
+import { canDeleteDocumentVersion, createDocumentRevision, PENDING_DOCUMENT_REVIEW } from "./application/document-files/documentRevisions";
+import { MAX_WORKSPACE_ORIGINALS_BYTES, decideOriginalUpload, decodeDocumentOriginal, encodeDocumentOriginal, formatMegabytes, isDocumentFileName, mergeDocumentOriginals, mergeDocumentDerivatives, workspaceDocumentBytes, type StoredDocumentOriginal, type StoredDocumentDerivative } from "./application/document-files/documentOriginals";
 import { buildDiagnosisControlSummary } from "./application/diagnosis/diagnosisControlSummary";
 import { regroupZagraActionPlan } from "./application/workspace/regroupZagraActionPlan";
 import { processPdfHealthReport } from './application/health-report/ProcessPdfHealthReport';
@@ -41,8 +41,8 @@ import { BackupPanel } from './ui/components/BackupPanel';
 import { DocumentationProvider } from "./ui/components/Documentation";
 import type { PlanPreparationDraft } from "./domain/action-plan-catalog/PlanPreparationDraft";
 import { worksheetKey, type IndicatorWorksheet } from "./domain/action-plan-catalog/IndicatorWorksheet";
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { type CycleConciliation, type AssetValidationDeclaration, type DocumentCycle, type DocumentKind, type DocumentTemporalMetadata, type MunicipalDocument, type MunicipalDocumentRepository, addMunicipalDocument, setMunicipalDocumentCycle, addCycleConciliation, addAssetValidation, removeAssetValidation, renameMunicipalDocument, removeCycleConciliation, replaceMunicipalDocumentByKind, removeMunicipalDocument, setMunicipalDocumentTemporalMetadata } from "./domain/repository";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { type CycleConciliation, type AssetValidationDeclaration, type DocumentCycle, type DocumentKind, type DocumentTemporalMetadata, type MunicipalDocument, type MunicipalDocumentRepository, addMunicipalDocument, setMunicipalDocumentCycle, addCycleConciliation, addAssetValidation, removeAssetValidation, renameMunicipalDocument, removeCycleConciliation, setMunicipalDocumentTemporalMetadata } from "./domain/repository";
 import { type MunicipalityWorkspace } from "./domain/workspace";
 import { type QuestionnaireProject } from "./domain/questionnaire";
 import { importProjectDataset } from "./application/questionnaire";
@@ -69,6 +69,10 @@ import {
 } from "./appWorkspaceHydration";
 import { createMunicipalityRuntime } from "./application/runtime";
 import { ingestManualDocument, extractDocxText, removeEquivalentStrategicFramework } from "./application/document-ingestion";
+import { registerHealthReport } from "./application/health-report/registerHealthReport";
+import { activeStudyDocumentId, activeStudyDocuments, replaceComplementaryStudy, STUDY_DOCUMENT_TAGS } from "./application/document-ingestion/studyDocuments";
+import { confirmsDocumentDeletion, deleteWorkspaceDocument } from "./application/document-files/deleteWorkspaceDocument";
+import type { ComplementaryStudyKey } from "./domain/workspace/MunicipalityWorkspace";
 import { assetEntriesOfDocument } from "./application/evidence-pipeline";
 import {
   assignLibraryDocumentToWorkspace,
@@ -110,7 +114,7 @@ import { parseFagerstromCSV, fagerstromStudyToEvidenceAtoms } from "./applicatio
 import { createFagerstromStudy } from "./domain/fagerstrom";
 import { parseSBQCSV, sbqStudyToEvidenceAtoms } from "./application/sbq";
 import { createSBQStudy } from "./domain/sbq";
-import { stableAssetKey, upsertEvidenceAtom, type EvidenceAtom } from "./domain/evidence";
+import { stableAssetKey, upsertEvidenceAtom, evidenceHasDocument, type EvidenceAtom } from "./domain/evidence";
 import {
   THEMATIC_TOPICS,
   MAX_SELECTED_TOPICS,
@@ -139,7 +143,10 @@ import {
   hasRemoteWorkspace,
   readRemoteTombstones,
   readRemoteWorkspace,
+  readRemoteWorkspaceVersion,
   saveRemoteWorkspace,
+  type RemoteSaveProgressListener,
+  type RemoteWorkspaceRevision,
 } from "./infrastructure/relas/RemoteWorkspace";
 import { RemoteSyncPanel } from "./ui/components/RemoteSyncPanel";
 import { WorkspacePersistenceIndicator } from "./ui/components/WorkspacePersistenceIndicator";
@@ -298,6 +305,7 @@ type LoaderOptions = {
   temporal?: DocumentTemporalMetadata;
   /** Huella SHA-256 ya calculada por la bandeja; si falta, el cargador la calcula. */
   contentSha256?: string;
+  activateHealthReportRevisionId?: string;
 };
 
 const DOCUMENT_KINDS: { value: DocumentKind; label: string }[] = [
@@ -327,58 +335,6 @@ const THEMATIC_PRIORITISATION_DOCUMENT_TAG = "thematic-prioritisation";
 
 function hasDocumentTag(document: MunicipalDocument | undefined, tag: string): boolean {
   return document?.tags.includes(tag) === true;
-}
-
-function isIBSEDocument(document: MunicipalDocument | undefined): boolean {
-  return hasDocumentTag(document, IBSE_DOCUMENT_TAG);
-}
-
-function isDUKEDocument(document: MunicipalDocument | undefined): boolean {
-  return hasDocumentTag(document, DUKE_DOCUMENT_TAG);
-}
-
-function isPREDIMEDDocument(document: MunicipalDocument | undefined): boolean {
-  return hasDocumentTag(document, PREDIMED_DOCUMENT_TAG);
-}
-
-function isSF12Document(document: MunicipalDocument | undefined): boolean {
-  return hasDocumentTag(document, SF12_DOCUMENT_TAG);
-}
-
-function isSuenoDocument(document: MunicipalDocument | undefined): boolean {
-  return hasDocumentTag(document, SUENO_DOCUMENT_TAG);
-}
-
-function isCAGEDocument(document: MunicipalDocument | undefined): boolean {
-  return hasDocumentTag(document, CAGE_DOCUMENT_TAG);
-}
-
-function isAUDITCDocument(document: MunicipalDocument | undefined): boolean {
-  return hasDocumentTag(document, AUDITC_DOCUMENT_TAG);
-}
-
-function isIPAQDocument(document: MunicipalDocument | undefined): boolean {
-  return hasDocumentTag(document, IPAQ_DOCUMENT_TAG);
-}
-
-function isGHQ12Document(document: MunicipalDocument | undefined): boolean {
-  return hasDocumentTag(document, GHQ12_DOCUMENT_TAG);
-}
-
-function isPHQ9Document(document: MunicipalDocument | undefined): boolean {
-  return hasDocumentTag(document, PHQ9_DOCUMENT_TAG);
-}
-
-function isPSQIDocument(document: MunicipalDocument | undefined): boolean {
-  return hasDocumentTag(document, PSQI_DOCUMENT_TAG);
-}
-
-function isFagerstromDocument(document: MunicipalDocument | undefined): boolean {
-  return hasDocumentTag(document, FAGERSTROM_DOCUMENT_TAG);
-}
-
-function isSBQDocument(document: MunicipalDocument | undefined): boolean {
-  return hasDocumentTag(document, SBQ_DOCUMENT_TAG);
 }
 
 function isThematicPrioritisationDocument(
@@ -467,6 +423,23 @@ export default function App() {
     setViewState(next);
   }
   const remoteClient = useMemo(() => createBrowserRelasClient(), []);
+  const reviewedRemoteRevisions = useRef(new Map<string, RemoteWorkspaceRevision>());
+  const displayedWorkspaceRef = useRef<MunicipalityWorkspace | null>(null);
+  const saveReviewedWorkspace = useCallback(async (
+    next: MunicipalityWorkspace,
+    onProgress: RemoteSaveProgressListener | undefined,
+    base: MunicipalityWorkspace,
+  ) => {
+    if (displayedWorkspaceRef.current !== base) throw new Error("El expediente cambió durante la operación. Revisa los cambios antes de volver a guardar.");
+    const id = next.municipality.identity.id;
+    const reviewed = reviewedRemoteRevisions.current.get(id);
+    if (reviewed === undefined) throw new Error("Recupera el expediente compartido antes de guardarlo.");
+    const saved = await saveRemoteWorkspace(remoteClient, next, onProgress, reviewed);
+    if (reviewedRemoteRevisions.current.get(id) === reviewed) {
+      reviewedRemoteRevisions.current.set(id, saved);
+      lastExplicitProfileWorkspaceRef.current = next;
+    }
+  }, [remoteClient]);
   const [remoteHydratedMunicipalityId, setRemoteHydratedMunicipalityId] =
     useState<string | null>(null);
   const [remotePersistenceMessage, setRemotePersistenceMessage] =
@@ -562,6 +535,7 @@ export default function App() {
         )
       : initialWorkspaceLoad.workspace
   );
+  useLayoutEffect(() => { displayedWorkspaceRef.current = workspace; }, [workspace]);
   // Migración incremental pendiente de descarga+fusión para el municipio actual
   // (p. ej. añadir doc-localiza-atarfe y sus 5 átomos a un Atarfe ya persistido).
   // Fecha que debe llevar la próxima migración (copia remota recuperada); null = la del expediente.
@@ -672,7 +646,7 @@ export default function App() {
   // espera a que el expediente compartido esté recuperado, para no añadir
   // originales a una versión que luego se sustituye.
   const originalSyncSkip = useRef(new Set<string>());
-  const [localOnlyOriginals, setLocalOnlyOriginals] = useState<Array<{ documentId: string; reason: "too-large" | "over-budget" }>>([]);
+  const [localOnlyOriginals, setLocalOnlyOriginals] = useState<Array<{ documentId: string; reason: "too-large" | "over-budget" | "different-hash" }>>([]);
   useEffect(() => {
     const municipalityId = workspace.municipality.identity.id;
     const signedIn = remoteClient.auth.currentUser !== null;
@@ -699,9 +673,9 @@ export default function App() {
         originalSyncSkip.current.add(key);
       }
       const storedIds = new Set(stored.map((o) => o.documentId));
-      let used = documentOriginalsBytes(stored) + documentDerivativesBytes(workspace.documentDerivedFiles) + profileOriginalsBytes(workspace.externalProfileLibrary);
+      let used = workspaceDocumentBytes(workspace);
       const additions: StoredDocumentOriginal[] = [];
-      const localOnly: Array<{ documentId: string; reason: "too-large" | "over-budget" }> = [];
+      const localOnly: typeof localOnlyOriginals = [];
       for (const d of documents) {
         if (storedIds.has(d.id) || d.status === "rejected") continue;
         const key = `up:${municipalityId}:${d.id}`;
@@ -711,21 +685,25 @@ export default function App() {
         if (!local) { originalSyncSkip.current.add(key); continue; }
         const decision = decideOriginalUpload(local.size, used);
         if (decision !== "fits") { localOnly.push({ documentId: d.id, reason: decision }); continue; }
-        additions.push(await encodeDocumentOriginal(d.id, local));
+        const original = await encodeDocumentOriginal(d.id, local);
+        if (d.contentSha256 && original.sha256 !== d.contentSha256) {
+          localOnly.push({ documentId: d.id, reason: "different-hash" });
+          continue;
+        }
+        additions.push(original);
         used += local.size;
         if (cancelled) return;
       }
       setLocalOnlyOriginals((previous) => (JSON.stringify(previous) === JSON.stringify(localOnly) ? previous : localOnly));
-      const prunedCount = stored.length - pruneDocumentOriginals(stored, documents).length;
-      if (additions.length === 0 && prunedCount === 0) return;
+      if (additions.length === 0) return;
       setWorkspace((prev) => {
         if (prev.municipality.identity.id !== municipalityId) return prev;
-        const next = mergeDocumentOriginals(pruneDocumentOriginals(prev.documentOriginals ?? [], prev.repository.documents), additions.filter((a) => prev.repository.documents.some((d) => d.id === a.documentId)));
+        const next = mergeDocumentOriginals(prev.documentOriginals ?? [], additions.filter((a) => prev.repository.documents.some((d) => d.id === a.documentId)));
         return { ...prev, documentOriginals: next, updatedAt: new Date().toISOString() };
       });
     })();
     return () => { cancelled = true; };
-  }, [workspace.repository.documents, workspace.documentOriginals, workspace.externalProfileLibrary, workspace.municipality.identity.id, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+  }, [workspace.repository.documents, workspace.documentOriginals, workspace.documentDerivedFiles, workspace.externalProfileLibrary, workspace.municipality.identity.id, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
 
   const [lastProcessedDocument, setLastProcessedDocument] =
     useState<MunicipalDocument | null>(null);
@@ -950,8 +928,9 @@ export default function App() {
             createdBy: remote.municipality.metadata.createdBy,
           };
         },
-        uploadWorkspace: (ws) => saveRemoteWorkspace(remoteClient, ws),
-        localWorkspaces: loadLocalWorkspaces,
+        uploadWorkspace: async ws => { await saveRemoteWorkspace(remoteClient, ws, undefined, null); },
+        localWorkspaces: async () => (await loadLocalWorkspaces())
+          .filter(ws => ws.municipality.identity.id !== activeIdRef.current),
         localCatalogIds: () => catalogIdsRef.current,
         isEmptyWorkspace: isEmptyWorkspaceForPersistenceGuard,
         discardLocal: async (id) => {
@@ -1027,11 +1006,13 @@ export default function App() {
       return;
     }
     let cancelled = false;
+    reviewedRemoteRevisions.current.delete(municipalityId);
     setRemoteHydratedMunicipalityId(null);
     setRemotePersistenceMessage("Comprobando el expediente compartido…");
-    void readRemoteWorkspace(remoteClient, municipalityId)
-      .then((remoteWorkspace) => {
+    void readRemoteWorkspaceVersion(remoteClient, municipalityId)
+      .then((reviewed) => {
         if (cancelled) return;
+        const remoteWorkspace = reviewed?.workspace ?? null;
         if (remoteWorkspace !== null) {
           // Nunca publicar silenciosamente un trabajo local que pueda
           // sobrescribir la versión compartida. El conflicto requiere recuperación
@@ -1041,6 +1022,7 @@ export default function App() {
             setRemotePersistenceMessage("Conflicto de versiones: el expediente local es posterior a Firebase. Se ha bloqueado el autoguardado remoto. Conserva una copia del navegador y concilia antes de continuar.");
             return;
           }
+          lastExplicitProfileWorkspaceRef.current = remoteWorkspace;
           setWorkspace(() => withCarriedDocumentOriginals(remoteWorkspace, workspace));
           setPendingTopics([...(remoteWorkspace.thematicPrioritisation?.selectedTopicIds ?? [])]);
           // La copia compartida puede ser anterior a una migración del seed: se le
@@ -1051,6 +1033,7 @@ export default function App() {
             setPendingMigration(remoteMigration.migration);
           }
         }
+        reviewedRemoteRevisions.current.set(municipalityId, reviewed?.revision ?? null);
         setRemoteHydratedMunicipalityId(municipalityId);
         setRemotePersistenceMessage(remoteWorkspace === null
           ? "No existe todavía una copia compartida; se creará con este expediente."
@@ -1083,7 +1066,7 @@ export default function App() {
     const timer = window.setTimeout(() => {
       if (profileSaveInFlightRef.current) return;
       setRemotePersistenceMessage("Guardando el expediente compartido…");
-      void saveRemoteWorkspace(remoteClient, workspace)
+      void saveReviewedWorkspace(workspace, undefined, workspace)
         .then(() => {
           if (!cancelled) {
             setRemotePersistenceMessage(
@@ -1107,7 +1090,7 @@ export default function App() {
   }, [
     pendingIndexedDbHydrationId,
     pendingSeedId,
-    remoteClient,
+    remoteClient, saveReviewedWorkspace,
     remoteHydratedMunicipalityId,
     workspace,
   ]);
@@ -1253,7 +1236,7 @@ export default function App() {
       await saveOriginalFile(municipalityId, documentId, file);
       return;
     }
-    const used = documentOriginalsBytes(workspace.documentOriginals) + documentDerivativesBytes(workspace.documentDerivedFiles) + profileOriginalsBytes(workspace.externalProfileLibrary);
+    const used = workspaceDocumentBytes(workspace);
     const decision = decideOriginalUpload(file.size, used);
     if (decision !== "fits") {
       throw new Error(decision === "too-large" ? "El original supera el límite de 20 MB por archivo." : "Se supera el límite compartido de 40 MB de originales y perfiles.");
@@ -1268,8 +1251,8 @@ export default function App() {
     profileSaveInFlightRef.current = true;
     setRemotePersistenceMessage("Guardando el archivo original en Firebase…");
     try {
-      await saveRemoteWorkspace(remoteClient, next);
-      setWorkspace(current => current.municipality.identity.id === municipalityId ? ({
+      await saveReviewedWorkspace(next, undefined, workspace);
+      setWorkspace(current => current.municipality.identity.id === municipalityId ? (current === workspace ? next : {
         ...current,
         documentOriginals: mergeDocumentOriginals(current.documentOriginals ?? [], [original]),
         updatedAt: next.updatedAt,
@@ -1285,7 +1268,7 @@ export default function App() {
     } finally {
       profileSaveInFlightRef.current = false;
     }
-  }, [workspace, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+  }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
 
   /** Los derivados son copias vinculadas: nunca se hacen pasar por el original. */
   const handleStoreDocumentDerivative = useCallback(async (
@@ -1299,7 +1282,7 @@ export default function App() {
     }
     if (profileSaveInFlightRef.current) throw new Error("Ya hay otra operación documental en curso.");
     if (!workspace.repository.documents.some(d => d.id === documentId)) throw new Error("La ficha documental no existe en este municipio.");
-    if (!/\\.(pdf|docx)$/i.test(file.name)) throw new Error("Solo se admiten derivados PDF o DOCX.");
+    if (!isDocumentFileName(file.name)) throw new Error("Solo se admiten derivados PDF o DOCX.");
     if (provenance !== "transcription-reconstruction" && provenance !== "format-conversion") throw new Error("Indica la procedencia de la copia.");
     const original = await encodeDocumentOriginal(documentId, file);
     const existing = (workspace.documentDerivedFiles ?? []).filter(d => d.derivedFromDocumentId === documentId);
@@ -1308,7 +1291,7 @@ export default function App() {
     if (existing.some(d => d.name.toLowerCase().endsWith(extension))) {
       throw new Error("Ya existe un derivado de este formato. Conserva la copia anterior: cualquier sustitución necesita una revisión documental.");
     }
-    const used = documentOriginalsBytes(workspace.documentOriginals) + documentDerivativesBytes(workspace.documentDerivedFiles) + profileOriginalsBytes(workspace.externalProfileLibrary);
+    const used = workspaceDocumentBytes(workspace);
     const decision = decideOriginalUpload(file.size, used);
     if (decision !== "fits") throw new Error(decision === "too-large" ? "El fichero supera 20 MB." : "El expediente superaría el límite conjunto de 40 MB.");
     const derivative: StoredDocumentDerivative = {
@@ -1326,8 +1309,8 @@ export default function App() {
     profileSaveInFlightRef.current = true;
     setRemotePersistenceMessage("Guardando copia derivada en Firebase…");
     try {
-      await saveRemoteWorkspace(remoteClient, next);
-      setWorkspace(current => current.municipality.identity.id === municipalityId ? ({
+      await saveReviewedWorkspace(next, undefined, workspace);
+      setWorkspace(current => current.municipality.identity.id === municipalityId ? (current === workspace ? next : {
         ...current,
         documentDerivedFiles: mergeDocumentDerivatives(current.documentDerivedFiles ?? [], [derivative]),
         updatedAt: next.updatedAt,
@@ -1339,7 +1322,7 @@ export default function App() {
     } finally {
       profileSaveInFlightRef.current = false;
     }
-  }, [workspace, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+  }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
 
   const handleCreateDocumentRevision = useCallback(async (documentId: string, file: File) => {
     const municipalityId = workspace.municipality.identity.id;
@@ -1349,17 +1332,25 @@ export default function App() {
     if (profileSaveInFlightRef.current) throw new Error("Otra operación documental está en curso.");
     const newId = crypto.randomUUID();
     const original = await encodeDocumentOriginal(newId, file);
+    if (profileSaveInFlightRef.current) throw new Error("Otra operación documental está en curso.");
     const next = createDocumentRevision(workspace, documentId, original);
     profileSaveInFlightRef.current = true;
     try {
-      await saveRemoteWorkspace(remoteClient, next);
-      setWorkspace(current => current.municipality.identity.id === municipalityId ? next : current);
+      await saveReviewedWorkspace(next, undefined, workspace);
+      const revision = next.repository.documents.at(-1)!;
+      setWorkspace(current => current.municipality.identity.id !== municipalityId ? current :
+        current === workspace ? next : {
+          ...current,
+          repository: { ...current.repository, documents: [...current.repository.documents, revision], updatedAt: next.updatedAt },
+          documentOriginals: mergeDocumentOriginals(current.documentOriginals ?? [], [original]),
+          updatedAt: next.updatedAt,
+        });
       setRemotePersistenceMessage("Nueva versión documental guardada. Sus evidencias están pendientes de revisión.");
       await saveOriginalFile(municipalityId, newId, file).catch(error => console.warn("[revision-cache]", error));
     } finally {
       profileSaveInFlightRef.current = false;
     }
-  }, [workspace, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+  }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
 
   const handleArchiveDocument = useCallback(async (documentId: string) => {
     const municipalityId = workspace.municipality.identity.id;
@@ -1369,23 +1360,31 @@ export default function App() {
     if (profileSaveInFlightRef.current) throw new Error("Otra operación documental está en curso.");
     const exists = workspace.repository.documents.some(d => d.id === documentId);
     if (!exists) throw new Error("El documento ya no existe.");
+    if (workspace.healthReport?.linkedDocumentId === documentId || Object.values(activeStudyDocuments(workspace)).includes(documentId)) {
+      throw new Error("Incorpora primero la fuente que sustituirá al Informe o estudio activo.");
+    }
     const now = new Date().toISOString();
-    const next = {
-      ...workspace,
-      repository: { ...workspace.repository, documents: workspace.repository.documents.map(d =>
+    const archive = (current: MunicipalityWorkspace): MunicipalityWorkspace => ({
+      ...current,
+      repository: { ...current.repository, documents: current.repository.documents.map(d =>
         d.id === documentId ? { ...d, status: "archived" as const, updatedAt: now } : d
       ), updatedAt: now },
+      evidenceStore: current.evidenceStore.atoms.some(atom => evidenceHasDocument(atom, documentId))
+        ? { ...current.evidenceStore, updatedAt: now }
+        : current.evidenceStore,
       updatedAt: now,
-    };
+    });
+    const next = archive(workspace);
     profileSaveInFlightRef.current = true;
     try {
-      await saveRemoteWorkspace(remoteClient, next);
-      setWorkspace(current => current.municipality.identity.id === municipalityId ? next : current);
-      setRemotePersistenceMessage("Documento archivado en Firebase, conservando original y evidencias.");
+      await saveReviewedWorkspace(next, undefined, workspace);
+      setWorkspace(current => current.municipality.identity.id === municipalityId
+        ? (current === workspace ? next : archive(current)) : current);
+      setRemotePersistenceMessage("Documento archivado en Firebase. Se conservan el original y sus evidencias históricas.");
     } finally {
       profileSaveInFlightRef.current = false;
     }
-  }, [workspace, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+  }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
 
   const handleSaveExternalProfiles = useCallback(async (library: ExternalProfileLibrary, onProgress?: (message: string) => void) => {
     const municipalityId = workspace.municipality.identity.id;
@@ -1394,21 +1393,21 @@ export default function App() {
     const nextLibrary = { ...library, profiles: library.profiles.map(p => workspace.externalProfileLibrary?.profiles.some(old => old.id === p.id)
       ? p : { ...p, evidenceVersion: workspace.evidenceStore.updatedAt }) };
     if (!isExternalProfileLibrary(nextLibrary, municipalityId)) throw new Error("La versión del perfil no supera la comprobación de integridad.");
-    // Un borrado de versiones debe partir de exactamente el expediente remoto
-    // que el usuario revisó. No pisar cambios hechos desde otro navegador.
-    const isRemovingVersion = (workspace.externalProfileLibrary?.profiles ?? [])
-      .some(old => !nextLibrary.profiles.some(current => current.id === old.id));
-    const expectedRemoteRevision = isRemovingVersion ? workspace.updatedAt : undefined;
+    const nextBytes = workspaceDocumentBytes({ ...workspace, externalProfileLibrary: nextLibrary });
+    if (nextBytes > MAX_WORKSPACE_ORIGINALS_BYTES && nextBytes > workspaceDocumentBytes(workspace)) {
+      throw new Error("Los originales y derivados superan el límite compartido de 40 MB.");
+    }
     const now = new Date().toISOString();
+    const next = { ...workspace, externalProfileLibrary: nextLibrary, updatedAt: now };
     setRemotePersistenceMessage("Guardando el perfil completo y sus archivos en Firebase…");
     if (profileSaveInFlightRef.current) throw new Error("Ya hay un perfil guardándose en Firebase.");
     profileSaveInFlightRef.current = true;
     try {
-      await saveRemoteWorkspace(remoteClient, { ...workspace, externalProfileLibrary: nextLibrary, updatedAt: now }, progress => {
+      await saveReviewedWorkspace(next, progress => {
         const message = profileSaveProgressMessage(progress);
         setRemotePersistenceMessage(message);
         onProgress?.(message);
-      }, expectedRemoteRevision);
+      }, workspace);
     } catch (error) {
       const message = profileSaveErrorMessage(error);
       setRemotePersistenceMessage(message);
@@ -1416,12 +1415,10 @@ export default function App() {
     } finally { profileSaveInFlightRef.current = false; }
     setWorkspace(prev => {
       if (prev.municipality.identity.id !== municipalityId) return prev;
-      const saved = { ...prev, externalProfileLibrary: nextLibrary, updatedAt: now };
-      lastExplicitProfileWorkspaceRef.current = saved;
-      return saved;
+      return prev === workspace ? next : { ...prev, externalProfileLibrary: nextLibrary, updatedAt: now };
     });
     setRemotePersistenceMessage("Perfil completo guardado y confirmado por Firebase.");
-  }, [workspace, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+  }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
 
   /** Guarda las descargas de estadística territorial (CONTRACT-TERRITORIAL-STATISTICS). */
   const handleSaveTerritorialStatistics = useCallback(async (snapshots: TerritorialStatisticsSnapshot[], onProgress?: (message: string) => void) => {
@@ -1431,13 +1428,14 @@ export default function App() {
     if (!snapshots.every(s => isTerritorialStatisticsSnapshot(s, municipalityId))) throw new Error("La descarga no supera la comprobación de integridad.");
     if (profileSaveInFlightRef.current) throw new Error("Ya hay un guardado del perfil en curso.");
     const now = new Date().toISOString();
+    const next = { ...workspace, territorialStatistics: snapshots, updatedAt: now };
     profileSaveInFlightRef.current = true;
     try {
-      await saveRemoteWorkspace(remoteClient, { ...workspace, territorialStatistics: snapshots, updatedAt: now }, progress => {
+      await saveReviewedWorkspace(next, progress => {
         const message = profileSaveProgressMessage(progress);
         setRemotePersistenceMessage(message);
         onProgress?.(message);
-      });
+      }, workspace);
     } catch (error) {
       const message = profileSaveErrorMessage(error);
       setRemotePersistenceMessage(message);
@@ -1445,12 +1443,10 @@ export default function App() {
     } finally { profileSaveInFlightRef.current = false; }
     setWorkspace(prev => {
       if (prev.municipality.identity.id !== municipalityId) return prev;
-      const saved = { ...prev, territorialStatistics: snapshots, updatedAt: now };
-      lastExplicitProfileWorkspaceRef.current = saved;
-      return saved;
+      return prev === workspace ? next : { ...prev, territorialStatistics: snapshots, updatedAt: now };
     });
     setRemotePersistenceMessage("Estadística territorial guardada y confirmada por Firebase.");
-  }, [workspace, remoteClient, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
+  }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
 
   const handleSaveDeliberativePrioritySelection = useCallback((input: {
     selectedScenarioIds: string[];
@@ -1500,7 +1496,7 @@ export default function App() {
     profileSaveInFlightRef.current = true;
     setRemotePersistenceMessage("Eliminando versión antigua del Plan en Firebase…");
     try {
-      await saveRemoteWorkspace(remoteClient, next, undefined, workspace.updatedAt);
+      await saveReviewedWorkspace(next, undefined, workspace);
       lastExplicitProfileWorkspaceRef.current = next;
       setWorkspace(prev => prev.municipality.identity.id === municipalityId ? next : prev);
       setRemotePersistenceMessage("Versión del Plan eliminada y confirmada en Firebase.");
@@ -1511,7 +1507,7 @@ export default function App() {
     } finally {
       profileSaveInFlightRef.current = false;
     }
-  }, [workspace, documentWriteAllowed, remoteClient, remoteHydratedMunicipalityId,
+  }, [workspace, documentWriteAllowed, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId,
       pendingSeedId, pendingIndexedDbHydrationId, setWorkspace]);
 
   const handlePlanPreparationChange = useCallback((draft: PlanPreparationDraft) => {
@@ -1621,7 +1617,8 @@ export default function App() {
       const name = allMunicipalities.find(m => m.id === id)?.name ?? id;
       try {
         onProgress(`${name}: leyendo el expediente compartido…`);
-        const ws = id === currentId ? workspace : await readRemoteWorkspace(remoteClient, id);
+        const reviewed = id === currentId ? undefined : await readRemoteWorkspaceVersion(remoteClient, id);
+        const ws = id === currentId ? workspace : reviewed?.workspace;
         if (!ws) { out.push({ id, name, changes: [], blocked: "No hay expediente compartido en Firebase." }); continue; }
         const library = ws.externalProfileLibrary ?? { profiles: [], attachments: [] };
         const r = buildProfileUpdate({ library, snapshots: ws.territorialStatistics, kinds, textPackage, author: remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || "", now: new Date(), newId: () => crypto.randomUUID() });
@@ -1637,8 +1634,13 @@ export default function App() {
           const nextLibrary = appendExternalProfile(library, r.profile, [], id);
           const now = new Date().toISOString();
           const next = { ...ws, externalProfileLibrary: nextLibrary, updatedAt: now };
-          await saveRemoteWorkspace(remoteClient, next, progress => onProgress(`${name}: ${profileSaveProgressMessage(progress)}`), ws.updatedAt);
-          if (id === currentId) setWorkspace(prev => { if (prev.municipality.identity.id !== id) return prev; const saved = { ...prev, externalProfileLibrary: nextLibrary, updatedAt: now }; lastExplicitProfileWorkspaceRef.current = saved; return saved; });
+          const progress: RemoteSaveProgressListener = event => onProgress(name + ": " + profileSaveProgressMessage(event));
+          if (reviewed) await saveRemoteWorkspace(remoteClient, next, progress, reviewed.revision);
+          else await saveReviewedWorkspace(next, progress, ws);
+          if (id === currentId) {
+            setWorkspace(prev => prev.municipality.identity.id !== id ? prev :
+              prev === ws ? next : { ...prev, externalProfileLibrary: nextLibrary, updatedAt: now });
+          }
           outcome.saved = true;
         }
         out.push(outcome);
@@ -1648,7 +1650,7 @@ export default function App() {
     }
     onProgress(apply ? "Actualización terminada." : "Vista previa terminada.");
     return out;
-  }, [workspace, remoteClient, allMunicipalities, setWorkspace]);
+  }, [workspace, remoteClient, allMunicipalities, saveReviewedWorkspace, setWorkspace]);
 
   catalogIdsRef.current = new Set(allMunicipalities.map((m) => m.id));
   activeIdRef.current = municipality.id;
@@ -1696,9 +1698,8 @@ export default function App() {
         ? {...d,status:"archived" as const,updatedAt:now} : d),
       updatedAt:now,
     } : workspace.repository;
-    const oldDocumentIds = new Set(oldLocaliza.map(d => d.id));
     const retiredAtoms = decision === "archive" && isLocaliza
-      ? workspace.evidenceStore.atoms.filter(a => a.provenance.documentId !== undefined && oldDocumentIds.has(a.provenance.documentId))
+      ? workspace.evidenceStore.atoms.filter(a => oldLocaliza.some(document => evidenceHasDocument(a, document.id)))
       : [];
     const baseEvidence = retiredAtoms.length ? {
       ...workspace.evidenceStore,
@@ -1721,7 +1722,7 @@ export default function App() {
           id: crypto.randomUUID(),
           documentId: result.document.id,
           atomIds: result.evidenceStore.atoms
-            .filter(a => a.provenance.documentId === result.document.id && a.kind === "asset")
+            .filter(a => evidenceHasDocument(a, result.document.id) && a.kind === "asset")
             .map(a => a.id),
           criteria: { title: "Selección expresa del inventario Activos Localiza Salud", version: "1" },
           declaredBy: remoteClient.auth.currentUser?.email || "Responsable del expediente",
@@ -1822,7 +1823,7 @@ export default function App() {
     profileSaveInFlightRef.current = true;
     setRemotePersistenceMessage("Retirando declaración de validación en Firebase…");
     try {
-      await saveRemoteWorkspace(remoteClient, next, undefined, workspace.updatedAt);
+      await saveReviewedWorkspace(next, undefined, workspace);
       setWorkspace(prev => prev.municipality.identity.id === municipalityId ? next : prev);
       let verified = false;
       try {
@@ -1859,17 +1860,23 @@ export default function App() {
       const arrayBuffer = await file.arrayBuffer();
       const contentSha256 = options.contentSha256 ?? await sha256Hex(arrayBuffer);
       const existingCopy = findExistingCopy(workspace.repository, { sha256: contentSha256, name: file.name }, knownOriginalHashes);
-      if (existingCopy?.reason === "same-file") {
+      const pending = options.activateHealthReportRevisionId
+        ? workspace.repository.documents.find(document => document.id === options.activateHealthReportRevisionId
+          && document.kind === "health-report" && document.status !== "archived" && document.status !== "rejected"
+          && document.tags.includes(PENDING_DOCUMENT_REVIEW) && document.contentSha256 === contentSha256)
+        : undefined;
+      if (options.activateHealthReportRevisionId && !pending) throw new Error("La revisión pendiente no coincide con este archivo.");
+      if (!pending && existingCopy?.reason === "same-file") {
         setLastHealthReportMessage(`Este archivo ya está en el expediente como «${existingCopy.document.title}». Es el mismo archivo y no se incorpora de nuevo.`);
         return false;
       }
-      const documentId = crypto.randomUUID();
-      await saveOriginalFile(workspace.municipality.identity.id, documentId, file);
+      const documentId = pending?.id ?? crypto.randomUUID();
+      if (!pending) await saveOriginalFile(workspace.municipality.identity.id, documentId, file);
       // Normalizar título: quitar extensión y convertir guiones/subrayados a espacios
       const rawName = file.name
         .replace(/\.(docx?|pdf)$/i, "")
         .replace(/[-_]/g, " ");
-      const docTitle = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+      const docTitle = pending?.title ?? (rawName.charAt(0).toUpperCase() + rawName.slice(1));
       const municipalityId = workspace.municipality.identity.id;
 
       const newDocInput = {
@@ -1904,28 +1911,30 @@ export default function App() {
             authors: [],
           });
 
-      // D-HR-01: health-report nunca genera EvidenceAtom, ni DOCX ni PDF.
-      // El EvidenceStore se limpia de átomos residuales de versiones anteriores.
-      setWorkspace((prev) => prev.municipality.identity.id !== municipalityId ? prev : ({
-        ...prev,
-        previousHealthReports: prev.healthReport ? [...(prev.previousHealthReports ?? []),prev.healthReport] : prev.previousHealthReports,
-        repository: replaceMunicipalDocumentByKind({...prev.repository, documents: prev.repository.documents.map(d => d.kind === "health-report" ? {...d,kind:"other" as const,status:"archived" as const} : d)}, newDocInput),
-        healthReport,
-        evidenceStore: {
-          ...prev.evidenceStore,
-          atoms: prev.evidenceStore.atoms.filter(
-            (a) => a.provenance.origin !== "health-report"
-          ),
-          updatedAt: new Date().toISOString(),
-        },
-        updatedAt: new Date().toISOString(),
-      }));
+      const now = new Date().toISOString();
+      if (pending) {
+        if (profileSaveInFlightRef.current) throw new Error("Hay otra operación documental en curso.");
+        const next = registerHealthReport(workspace, healthReport, newDocInput, now);
+        profileSaveInFlightRef.current = true;
+        try {
+          await saveReviewedWorkspace(next, undefined, workspace);
+          setWorkspace(prev => prev.municipality.identity.id !== municipalityId ? prev :
+            prev === workspace ? next : registerHealthReport(prev, healthReport, newDocInput, now));
+          setRemotePersistenceMessage("Revisión del Informe guardada en Firebase. Se ha conservado el Informe anterior.");
+        } finally {
+          profileSaveInFlightRef.current = false;
+        }
+      } else {
+        setWorkspace(prev => prev.municipality.identity.id !== municipalityId ? prev :
+          registerHealthReport(prev, healthReport, newDocInput, now));
+      }
       setLastHealthReportMessage(
         (healthReport.body.charCount > 0 ? `Informe procesado: ${healthReport.body.charCount.toLocaleString("es-ES")} caracteres disponibles para la lectura del Perfil. ` : "Sin texto extraíble; requiere transcripción u OCR. ") +
         storageSummary()
       );
       return true;
     } catch (err) {
+      if (options.activateHealthReportRevisionId) throw err;
       console.error("[health-report-load-error]", err);
       setLastHealthReportMessage(
         isPdf
@@ -1984,6 +1993,16 @@ export default function App() {
   // DOCX → extrae texto vía mammoth → genera EvidenceAtoms del tipo correspondiente.
   // PDF → extrae texto; si no lo hay, conserva la referencia e informa de la limitación.
   // D-HR-01 no aplica aquí: estos tipos SÍ pueden generar EvidenceAtoms.
+  async function handleUseHealthReportRevision(documentId: string): Promise<void> {
+    if (!documentWriteAllowed) throw new Error("Necesitas permiso de edición sobre este expediente.");
+    const original = workspace.documentOriginals?.find(file => file.documentId === documentId);
+    if (!original) throw new Error("No se ha recuperado el original de la revisión.");
+    const file = await decodeDocumentOriginal(original);
+    if (!await handleLoadHealthReport(file, { activateHealthReportRevisionId: documentId })) {
+      throw new Error("No se ha podido procesar la revisión del Informe.");
+    }
+  }
+
   async function handleLoadDocumentFile(file: File, options: LoaderOptions = {}): Promise<boolean> {
     // La bandeja de revisión fija el tipo de forma explícita: no depende del
     // selector del bloque «Añadir o sustituir fuentes» ni de su estado previo.
@@ -2319,9 +2338,7 @@ export default function App() {
         setIbseMessage("Importación cancelada. El IBSE anterior permanece intacto.");
         return false;
       }
-      const existingBytes = documentOriginalsBytes(workspace.documentOriginals)
-        + documentDerivativesBytes(workspace.documentDerivedFiles)
-        + profileOriginalsBytes(workspace.externalProfileLibrary);
+      const existingBytes = workspaceDocumentBytes(workspace);
       const fits = decideOriginalUpload(file.size, existingBytes);
       if (fits !== "fits") throw new Error(fits === "too-large"
         ? "El CSV supera el límite de 20 MB por archivo."
@@ -2353,7 +2370,9 @@ export default function App() {
       );
       setWorkspace((prev) => {
         const now = new Date().toISOString();
-        const priorDocuments = prev.repository.documents.filter(d => d.tags.includes(IBSE_DOCUMENT_TAG));
+        if (prev.municipality.identity.id !== study.municipalityId) return prev;
+        const priorId = activeStudyDocumentId(prev, "ibseStudy", IBSE_DOCUMENT_TAG);
+        const priorDocuments = prev.repository.documents.filter(d => d.id === priorId);
         const oldEvidence = prev.evidenceStore.atoms.filter(
           atom => atom.municipalityId === prev.municipality.identity.id && atom.provenance.origin === "ibse"
         );
@@ -2362,8 +2381,8 @@ export default function App() {
           ...prev.repository,
           updatedAt: now,
           documents: prev.repository.documents.map(d =>
-            d.tags.includes(IBSE_DOCUMENT_TAG)
-              ? { ...d, status: "archived" as const, tags: [...d.tags.filter(tag => tag !== IBSE_DOCUMENT_TAG), "ibse-history"] }
+            d.id === priorId
+              ? { ...d, status: "archived" as const, updatedAt: now, tags: [...d.tags.filter(tag => tag !== IBSE_DOCUMENT_TAG), "ibse-history"] }
               : d
           ),
         };
@@ -2377,6 +2396,7 @@ export default function App() {
           },
           sourceFileName: file.name,
           tags: ["redcap-export", IBSE_DOCUMENT_TAG],
+          ...(priorDocuments[0] ? { revisionOf: priorDocuments[0].id, revisionNumber: (priorDocuments[0].revisionNumber ?? 1) + 1 } : {}),
         });
         let nextStore = {
           ...prev.evidenceStore,
@@ -2395,6 +2415,7 @@ export default function App() {
           ...prev,
           repository: nextRepository,
           ibseStudy: study,
+          studySourceDocumentIds: { ...prev.studySourceDocumentIds, ibseStudy: documentId },
           ibseStudyHistory: prev.ibseStudy
             ? [...(prev.ibseStudyHistory ?? []), { replacedAt: now, previousStudy: prev.ibseStudy, documents: priorDocuments, evidence: oldEvidence }]
             : prev.ibseStudyHistory,
@@ -2436,13 +2457,9 @@ export default function App() {
         dukeStudyToEvidenceAtoms(study),
         documentId
       );
-      setWorkspace((prev) => {
-        const now = new Date().toISOString();
-        const repositoryWithoutPrior = removeDocumentsByTag(
-          prev.repository,
-          DUKE_DOCUMENT_TAG
-        );
-        const nextRepository = addMunicipalDocument(repositoryWithoutPrior, {
+      setWorkspace(prev => prev.municipality.identity.id !== study.municipalityId ? prev : replaceComplementaryStudy(
+        prev, "dukeStudy", DUKE_DOCUMENT_TAG, study,
+        {
           id: documentId,
           kind: "complementary-study",
           title: `DUKE-EAS - ${file.name}`,
@@ -2452,31 +2469,8 @@ export default function App() {
           },
           sourceFileName: file.name,
           tags: ["complementary-study", DUKE_DOCUMENT_TAG, "eas"],
-        });
-        let nextStore = {
-          ...prev.evidenceStore,
-          atoms: prev.evidenceStore.atoms.filter(
-            (atom) =>
-              atom.municipalityId !== prev.municipality.identity.id ||
-              !(
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(DUKE_DOCUMENT_TAG)
-              )
-          ),
-          updatedAt: now,
-        };
-        for (const atom of dukeAtoms) {
-          const key = stableAssetKey(atom.municipalityId, atom.provenance.origin, atom.title);
-          nextStore = upsertEvidenceAtom(nextStore, atom, key);
-        }
-        return {
-          ...prev,
-          repository: nextRepository,
-          dukeStudy: study,
-          evidenceStore: nextStore,
-          updatedAt: now,
-        };
-      });
+        }, dukeAtoms, new Date().toISOString(),
+      ));
       const warn = warnings.length > 0 ? ` Avisos: ${warnings.join(" ")}` : "";
       setDukeMessage(
         aggregates.nValidGlobal > 0
@@ -2510,13 +2504,9 @@ export default function App() {
         predimedStudyToEvidenceAtoms(study),
         documentId
       );
-      setWorkspace((prev) => {
-        const now = new Date().toISOString();
-        const repositoryWithoutPrior = removeDocumentsByTag(
-          prev.repository,
-          PREDIMED_DOCUMENT_TAG
-        );
-        const nextRepository = addMunicipalDocument(repositoryWithoutPrior, {
+      setWorkspace(prev => prev.municipality.identity.id !== study.municipalityId ? prev : replaceComplementaryStudy(
+        prev, "predimedStudy", PREDIMED_DOCUMENT_TAG, study,
+        {
           id: documentId,
           kind: "complementary-study",
           title: `PREDIMED-EAS - ${file.name}`,
@@ -2526,31 +2516,8 @@ export default function App() {
           },
           sourceFileName: file.name,
           tags: ["complementary-study", PREDIMED_DOCUMENT_TAG, "eas"],
-        });
-        let nextStore = {
-          ...prev.evidenceStore,
-          atoms: prev.evidenceStore.atoms.filter(
-            (atom) =>
-              atom.municipalityId !== prev.municipality.identity.id ||
-              !(
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(PREDIMED_DOCUMENT_TAG)
-              )
-          ),
-          updatedAt: now,
-        };
-        for (const atom of predimedAtoms) {
-          const key = stableAssetKey(atom.municipalityId, atom.provenance.origin, atom.title);
-          nextStore = upsertEvidenceAtom(nextStore, atom, key);
-        }
-        return {
-          ...prev,
-          repository: nextRepository,
-          predimedStudy: study,
-          evidenceStore: nextStore,
-          updatedAt: now,
-        };
-      });
+        }, predimedAtoms, new Date().toISOString(),
+      ));
       const warn = warnings.length > 0 ? ` Avisos: ${warnings.join(" ")}` : "";
       setPredimedMessage(
         aggregates.nValid > 0
@@ -2584,13 +2551,9 @@ export default function App() {
         sf12StudyToEvidenceAtoms(study),
         documentId
       );
-      setWorkspace((prev) => {
-        const now = new Date().toISOString();
-        const repositoryWithoutPrior = removeDocumentsByTag(
-          prev.repository,
-          SF12_DOCUMENT_TAG
-        );
-        const nextRepository = addMunicipalDocument(repositoryWithoutPrior, {
+      setWorkspace(prev => prev.municipality.identity.id !== study.municipalityId ? prev : replaceComplementaryStudy(
+        prev, "sf12Study", SF12_DOCUMENT_TAG, study,
+        {
           id: documentId,
           kind: "complementary-study",
           title: `SF-12 EAS - ${file.name}`,
@@ -2600,31 +2563,8 @@ export default function App() {
           },
           sourceFileName: file.name,
           tags: ["complementary-study", SF12_DOCUMENT_TAG, "eas"],
-        });
-        let nextStore = {
-          ...prev.evidenceStore,
-          atoms: prev.evidenceStore.atoms.filter(
-            (atom) =>
-              atom.municipalityId !== prev.municipality.identity.id ||
-              !(
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(SF12_DOCUMENT_TAG)
-              )
-          ),
-          updatedAt: now,
-        };
-        for (const atom of sf12Atoms) {
-          const key = stableAssetKey(atom.municipalityId, atom.provenance.origin, atom.title);
-          nextStore = upsertEvidenceAtom(nextStore, atom, key);
-        }
-        return {
-          ...prev,
-          repository: nextRepository,
-          sf12Study: study,
-          evidenceStore: nextStore,
-          updatedAt: now,
-        };
-      });
+        }, sf12Atoms, new Date().toISOString(),
+      ));
       const warn = warnings.length > 0 ? ` Avisos: ${warnings.join(" ")}` : "";
       setSf12Message(
         aggregates.nValidPCS > 0
@@ -2658,13 +2598,9 @@ export default function App() {
         suenoStudyToEvidenceAtoms(study),
         documentId
       );
-      setWorkspace((prev) => {
-        const now = new Date().toISOString();
-        const repositoryWithoutPrior = removeDocumentsByTag(
-          prev.repository,
-          SUENO_DOCUMENT_TAG
-        );
-        const nextRepository = addMunicipalDocument(repositoryWithoutPrior, {
+      setWorkspace(prev => prev.municipality.identity.id !== study.municipalityId ? prev : replaceComplementaryStudy(
+        prev, "suenoStudy", SUENO_DOCUMENT_TAG, study,
+        {
           id: documentId,
           kind: "complementary-study",
           title: `Sueño EAS - ${file.name}`,
@@ -2674,31 +2610,8 @@ export default function App() {
           },
           sourceFileName: file.name,
           tags: ["complementary-study", SUENO_DOCUMENT_TAG, "eas"],
-        });
-        let nextStore = {
-          ...prev.evidenceStore,
-          atoms: prev.evidenceStore.atoms.filter(
-            (atom) =>
-              atom.municipalityId !== prev.municipality.identity.id ||
-              !(
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(SUENO_DOCUMENT_TAG)
-              )
-          ),
-          updatedAt: now,
-        };
-        for (const atom of suenoAtoms) {
-          const key = stableAssetKey(atom.municipalityId, atom.provenance.origin, atom.title);
-          nextStore = upsertEvidenceAtom(nextStore, atom, key);
-        }
-        return {
-          ...prev,
-          repository: nextRepository,
-          suenoStudy: study,
-          evidenceStore: nextStore,
-          updatedAt: now,
-        };
-      });
+        }, suenoAtoms, new Date().toISOString(),
+      ));
       const warn = warnings.length > 0 ? ` Avisos: ${warnings.join(" ")}` : "";
       setSuenoMessage(
         aggregates.nValidP33R > 0
@@ -2732,13 +2645,9 @@ export default function App() {
         cageStudyToEvidenceAtoms(study),
         documentId
       );
-      setWorkspace((prev) => {
-        const now = new Date().toISOString();
-        const repositoryWithoutPrior = removeDocumentsByTag(
-          prev.repository,
-          CAGE_DOCUMENT_TAG
-        );
-        const nextRepository = addMunicipalDocument(repositoryWithoutPrior, {
+      setWorkspace(prev => prev.municipality.identity.id !== study.municipalityId ? prev : replaceComplementaryStudy(
+        prev, "cageStudy", CAGE_DOCUMENT_TAG, study,
+        {
           id: documentId,
           kind: "complementary-study",
           title: `CAGE-EAS - ${file.name}`,
@@ -2748,31 +2657,8 @@ export default function App() {
           },
           sourceFileName: file.name,
           tags: ["complementary-study", CAGE_DOCUMENT_TAG, "eas"],
-        });
-        let nextStore = {
-          ...prev.evidenceStore,
-          atoms: prev.evidenceStore.atoms.filter(
-            (atom) =>
-              atom.municipalityId !== prev.municipality.identity.id ||
-              !(
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(CAGE_DOCUMENT_TAG)
-              )
-          ),
-          updatedAt: now,
-        };
-        for (const atom of cageAtoms) {
-          const key = stableAssetKey(atom.municipalityId, atom.provenance.origin, atom.title);
-          nextStore = upsertEvidenceAtom(nextStore, atom, key);
-        }
-        return {
-          ...prev,
-          repository: nextRepository,
-          cageStudy: study,
-          evidenceStore: nextStore,
-          updatedAt: now,
-        };
-      });
+        }, cageAtoms, new Date().toISOString(),
+      ));
       const warn = warnings.length > 0 ? ` Avisos: ${warnings.join(" ")}` : "";
       setCageMessage(
         aggregates.nValidCAGER > 0
@@ -2806,13 +2692,9 @@ export default function App() {
         auditcStudyToEvidenceAtoms(study),
         documentId
       );
-      setWorkspace((prev) => {
-        const now = new Date().toISOString();
-        const repositoryWithoutPrior = removeDocumentsByTag(
-          prev.repository,
-          AUDITC_DOCUMENT_TAG
-        );
-        const nextRepository = addMunicipalDocument(repositoryWithoutPrior, {
+      setWorkspace(prev => prev.municipality.identity.id !== study.municipalityId ? prev : replaceComplementaryStudy(
+        prev, "auditcStudy", AUDITC_DOCUMENT_TAG, study,
+        {
           id: documentId,
           kind: "redcap-export",
           title: `AUDIT-C - ${file.name}`,
@@ -2822,31 +2704,8 @@ export default function App() {
           },
           sourceFileName: file.name,
           tags: ["complementary-study", AUDITC_DOCUMENT_TAG],
-        });
-        let nextStore = {
-          ...prev.evidenceStore,
-          atoms: prev.evidenceStore.atoms.filter(
-            (atom) =>
-              atom.municipalityId !== prev.municipality.identity.id ||
-              !(
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(AUDITC_DOCUMENT_TAG)
-              )
-          ),
-          updatedAt: now,
-        };
-        for (const atom of auditcAtoms) {
-          const key = stableAssetKey(atom.municipalityId, atom.provenance.origin, atom.title);
-          nextStore = upsertEvidenceAtom(nextStore, atom, key);
-        }
-        return {
-          ...prev,
-          repository: nextRepository,
-          auditcStudy: study,
-          evidenceStore: nextStore,
-          updatedAt: now,
-        };
-      });
+        }, auditcAtoms, new Date().toISOString(),
+      ));
       const warn = warnings.length > 0 ? ` Avisos: ${warnings.join(" ")}` : "";
       setAuditcMessage(
         aggregates.nValid > 0
@@ -2880,13 +2739,9 @@ export default function App() {
         ipaqStudyToEvidenceAtoms(study),
         documentId
       );
-      setWorkspace((prev) => {
-        const now = new Date().toISOString();
-        const repositoryWithoutPrior = removeDocumentsByTag(
-          prev.repository,
-          IPAQ_DOCUMENT_TAG
-        );
-        const nextRepository = addMunicipalDocument(repositoryWithoutPrior, {
+      setWorkspace(prev => prev.municipality.identity.id !== study.municipalityId ? prev : replaceComplementaryStudy(
+        prev, "ipaqStudy", IPAQ_DOCUMENT_TAG, study,
+        {
           id: documentId,
           kind: "complementary-study",
           title: `IPAQ-EAS - ${file.name}`,
@@ -2896,31 +2751,8 @@ export default function App() {
           },
           sourceFileName: file.name,
           tags: ["complementary-study", IPAQ_DOCUMENT_TAG],
-        });
-        let nextStore = {
-          ...prev.evidenceStore,
-          atoms: prev.evidenceStore.atoms.filter(
-            (atom) =>
-              atom.municipalityId !== prev.municipality.identity.id ||
-              !(
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(IPAQ_DOCUMENT_TAG)
-              )
-          ),
-          updatedAt: now,
-        };
-        for (const atom of ipaqAtoms) {
-          const key = stableAssetKey(atom.municipalityId, atom.provenance.origin, atom.title);
-          nextStore = upsertEvidenceAtom(nextStore, atom, key);
-        }
-        return {
-          ...prev,
-          repository: nextRepository,
-          ipaqStudy: study,
-          evidenceStore: nextStore,
-          updatedAt: now,
-        };
-      });
+        }, ipaqAtoms, new Date().toISOString(),
+      ));
       const warn = warnings.length > 0 ? ` Avisos: ${warnings.join(" ")}` : "";
       setIpaqMessage(
         aggregates.nValidIPAQ > 0 || aggregates.nValidP34AR > 0
@@ -2959,13 +2791,9 @@ export default function App() {
         ghq12StudyToEvidenceAtoms(study),
         documentId
       );
-      setWorkspace((prev) => {
-        const now = new Date().toISOString();
-        const repositoryWithoutPrior = removeDocumentsByTag(
-          prev.repository,
-          GHQ12_DOCUMENT_TAG
-        );
-        const nextRepository = addMunicipalDocument(repositoryWithoutPrior, {
+      setWorkspace(prev => prev.municipality.identity.id !== study.municipalityId ? prev : replaceComplementaryStudy(
+        prev, "ghq12Study", GHQ12_DOCUMENT_TAG, study,
+        {
           id: documentId,
           kind: "redcap-export",
           title: `GHQ-12 - ${file.name}`,
@@ -2975,31 +2803,8 @@ export default function App() {
           },
           sourceFileName: file.name,
           tags: ["complementary-study", GHQ12_DOCUMENT_TAG],
-        });
-        let nextStore = {
-          ...prev.evidenceStore,
-          atoms: prev.evidenceStore.atoms.filter(
-            (atom) =>
-              atom.municipalityId !== prev.municipality.identity.id ||
-              !(
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(GHQ12_DOCUMENT_TAG)
-              )
-          ),
-          updatedAt: now,
-        };
-        for (const atom of ghq12Atoms) {
-          const key = stableAssetKey(atom.municipalityId, atom.provenance.origin, atom.title);
-          nextStore = upsertEvidenceAtom(nextStore, atom, key);
-        }
-        return {
-          ...prev,
-          repository: nextRepository,
-          ghq12Study: study,
-          evidenceStore: nextStore,
-          updatedAt: now,
-        };
-      });
+        }, ghq12Atoms, new Date().toISOString(),
+      ));
       setGhq12Message(
         `GHQ-12 cargado: ${aggregates.nValid} registros válidos de ${aggregates.n}. Probable malestar (≥3): ${aggregates.pctPositive.toFixed(1)} % (n=${aggregates.nPositive}). ${ghq12Atoms.length} evidencias incorporadas.${warn}`
       );
@@ -3032,30 +2837,16 @@ export default function App() {
         warnings,
       });
       const phq9Atoms = attachDocumentIdToAtoms(phq9StudyToEvidenceAtoms(study), documentId);
-      setWorkspace((prev) => {
-        const now = new Date().toISOString();
-        const repositoryWithoutPrior = removeDocumentsByTag(prev.repository, PHQ9_DOCUMENT_TAG);
-        const nextRepository = addMunicipalDocument(repositoryWithoutPrior, {
+      setWorkspace(prev => prev.municipality.identity.id !== study.municipalityId ? prev : replaceComplementaryStudy(
+        prev, "phq9Study", PHQ9_DOCUMENT_TAG, study,
+        {
           id: documentId, kind: "redcap-export",
           title: `PHQ-9 - ${file.name}`,
           source: { system: "Encuesta municipal propia — exportación REDCap", collectedAt: study.createdAt },
           sourceFileName: file.name,
           tags: ["complementary-study", PHQ9_DOCUMENT_TAG],
-        });
-        let nextStore = {
-          ...prev.evidenceStore,
-          atoms: prev.evidenceStore.atoms.filter(
-            (atom) => atom.municipalityId !== prev.municipality.identity.id ||
-              !(atom.provenance.origin === "complementary-study" && atom.tags.includes(PHQ9_DOCUMENT_TAG))
-          ),
-          updatedAt: now,
-        };
-        for (const atom of phq9Atoms) {
-          const key = stableAssetKey(atom.municipalityId, atom.provenance.origin, atom.title);
-          nextStore = upsertEvidenceAtom(nextStore, atom, key);
-        }
-        return { ...prev, repository: nextRepository, phq9Study: study, evidenceStore: nextStore, updatedAt: now };
-      });
+        }, phq9Atoms, new Date().toISOString(),
+      ));
       setPhq9Message(
         `PHQ-9 cargado: ${aggregates.nValid} registros válidos de ${aggregates.n}. Síntomas mod.+ (≥10): ${aggregates.pctPositive.toFixed(1)} % (n=${aggregates.nPositive}). ${phq9Atoms.length} evidencias incorporadas.${warn}`
       );
@@ -3088,30 +2879,16 @@ export default function App() {
         warnings,
       });
       const psqiAtoms = attachDocumentIdToAtoms(psqiStudyToEvidenceAtoms(study), documentId);
-      setWorkspace((prev) => {
-        const now = new Date().toISOString();
-        const repositoryWithoutPrior = removeDocumentsByTag(prev.repository, PSQI_DOCUMENT_TAG);
-        const nextRepository = addMunicipalDocument(repositoryWithoutPrior, {
+      setWorkspace(prev => prev.municipality.identity.id !== study.municipalityId ? prev : replaceComplementaryStudy(
+        prev, "psqiStudy", PSQI_DOCUMENT_TAG, study,
+        {
           id: documentId, kind: "redcap-export",
           title: `PSQI - ${file.name}`,
           source: { system: "Encuesta municipal propia — exportación REDCap", collectedAt: study.createdAt },
           sourceFileName: file.name,
           tags: ["complementary-study", PSQI_DOCUMENT_TAG],
-        });
-        let nextStore = {
-          ...prev.evidenceStore,
-          atoms: prev.evidenceStore.atoms.filter(
-            (atom) => atom.municipalityId !== prev.municipality.identity.id ||
-              !(atom.provenance.origin === "complementary-study" && atom.tags.includes(PSQI_DOCUMENT_TAG))
-          ),
-          updatedAt: now,
-        };
-        for (const atom of psqiAtoms) {
-          const key = stableAssetKey(atom.municipalityId, atom.provenance.origin, atom.title);
-          nextStore = upsertEvidenceAtom(nextStore, atom, key);
-        }
-        return { ...prev, repository: nextRepository, psqiStudy: study, evidenceStore: nextStore, updatedAt: now };
-      });
+        }, psqiAtoms, new Date().toISOString(),
+      ));
       setPsqiMessage(
         `PSQI cargado: ${aggregates.nValid} registros válidos de ${aggregates.n}. Mal dormidor (&gt;5): ${aggregates.pctPositive.toFixed(1)} % (n=${aggregates.nPositive}). ${psqiAtoms.length} evidencias incorporadas.${warn}`
       );
@@ -3144,30 +2921,16 @@ export default function App() {
         warnings,
       });
       const fagerstromAtoms = attachDocumentIdToAtoms(fagerstromStudyToEvidenceAtoms(study), documentId);
-      setWorkspace((prev) => {
-        const now = new Date().toISOString();
-        const repositoryWithoutPrior = removeDocumentsByTag(prev.repository, FAGERSTROM_DOCUMENT_TAG);
-        const nextRepository = addMunicipalDocument(repositoryWithoutPrior, {
+      setWorkspace(prev => prev.municipality.identity.id !== study.municipalityId ? prev : replaceComplementaryStudy(
+        prev, "fagerstromStudy", FAGERSTROM_DOCUMENT_TAG, study,
+        {
           id: documentId, kind: "redcap-export",
           title: `Fagerström - ${file.name}`,
           source: { system: "Encuesta municipal propia — exportación REDCap", collectedAt: study.createdAt },
           sourceFileName: file.name,
           tags: ["complementary-study", FAGERSTROM_DOCUMENT_TAG],
-        });
-        let nextStore = {
-          ...prev.evidenceStore,
-          atoms: prev.evidenceStore.atoms.filter(
-            (atom) => atom.municipalityId !== prev.municipality.identity.id ||
-              !(atom.provenance.origin === "complementary-study" && atom.tags.includes(FAGERSTROM_DOCUMENT_TAG))
-          ),
-          updatedAt: now,
-        };
-        for (const atom of fagerstromAtoms) {
-          const key = stableAssetKey(atom.municipalityId, atom.provenance.origin, atom.title);
-          nextStore = upsertEvidenceAtom(nextStore, atom, key);
-        }
-        return { ...prev, repository: nextRepository, fagerstromStudy: study, evidenceStore: nextStore, updatedAt: now };
-      });
+        }, fagerstromAtoms, new Date().toISOString(),
+      ));
       setFagerstromMessage(
         `Fagerström cargado: ${aggregates.nValid} fumadores activos de ${aggregates.n}. Dep. mod.+ (≥5): ${aggregates.pctPositive.toFixed(1)} % (n=${aggregates.nPositive}). ${fagerstromAtoms.length} evidencias incorporadas.${warn}`
       );
@@ -3200,30 +2963,16 @@ export default function App() {
         warnings,
       });
       const sbqAtoms = attachDocumentIdToAtoms(sbqStudyToEvidenceAtoms(study), documentId);
-      setWorkspace((prev) => {
-        const now = new Date().toISOString();
-        const repositoryWithoutPrior = removeDocumentsByTag(prev.repository, SBQ_DOCUMENT_TAG);
-        const nextRepository = addMunicipalDocument(repositoryWithoutPrior, {
+      setWorkspace(prev => prev.municipality.identity.id !== study.municipalityId ? prev : replaceComplementaryStudy(
+        prev, "sbqStudy", SBQ_DOCUMENT_TAG, study,
+        {
           id: documentId, kind: "redcap-export",
           title: `SBQ - ${file.name}`,
           source: { system: "Encuesta municipal propia — exportación REDCap", collectedAt: study.createdAt },
           sourceFileName: file.name,
           tags: ["complementary-study", SBQ_DOCUMENT_TAG],
-        });
-        let nextStore = {
-          ...prev.evidenceStore,
-          atoms: prev.evidenceStore.atoms.filter(
-            (atom) => atom.municipalityId !== prev.municipality.identity.id ||
-              !(atom.provenance.origin === "complementary-study" && atom.tags.includes(SBQ_DOCUMENT_TAG))
-          ),
-          updatedAt: now,
-        };
-        for (const atom of sbqAtoms) {
-          const key = stableAssetKey(atom.municipalityId, atom.provenance.origin, atom.title);
-          nextStore = upsertEvidenceAtom(nextStore, atom, key);
-        }
-        return { ...prev, repository: nextRepository, sbqStudy: study, evidenceStore: nextStore, updatedAt: now };
-      });
+        }, sbqAtoms, new Date().toISOString(),
+      ));
       setSbqMessage(
         `SBQ cargado: ${aggregates.nValid} registros válidos de ${aggregates.n}. Alt. sedentario (&gt;8h): ${aggregates.pctPositive.toFixed(1)} % (n=${aggregates.nPositive}). Media: ${aggregates.meanHours.toFixed(2)} h/día. ${sbqAtoms.length} evidencias incorporadas.${warn}`
       );
@@ -3528,179 +3277,26 @@ export default function App() {
       window.alert("El expediente compartido no está listo o existe otra operación pendiente.");
       return false;
     }
-    const nextWorkspace = ((prev: MunicipalityWorkspace) => {
-      const doc = prev.repository.documents.find((d) => d.id === documentId);
-      const municipalityId = prev.municipality.identity.id;
-      const deletesHealthReport = doc?.kind === "health-report" && prev.healthReport?.linkedDocumentId === documentId;
-      const deletesIBSE = isIBSEDocument(doc);
-      const deletesDUKE = isDUKEDocument(doc);
-      const deletesPREDIMED = isPREDIMEDDocument(doc);
-      const deletesSF12 = isSF12Document(doc);
-      const deletesSueno = isSuenoDocument(doc);
-      const deletesCAGE = isCAGEDocument(doc);
-      const deletesAUDITC = isAUDITCDocument(doc);
-      const deletesIPAQ = isIPAQDocument(doc);
-      const deletesGHQ12 = isGHQ12Document(doc);
-      const deletesPHQ9 = isPHQ9Document(doc);
-      const deletesPSQI = isPSQIDocument(doc);
-      const deletesFagerstrom = isFagerstromDocument(doc);
-      const deletesSBQ = isSBQDocument(doc);
-      const deletesThematicPrioritisation = isThematicPrioritisationDocument(doc);
-
-      return {
-        ...prev,
-        deletedDocuments: [
-          ...(prev.deletedDocuments ?? []).filter(row => row.documentId !== documentId),
-          { documentId, title: doc?.title ?? documentId, deletedAt: new Date().toISOString() },
-        ],
-        documentOriginals: (prev.documentOriginals ?? []).filter(o => o.documentId !== documentId),
-        documentDerivedFiles: (prev.documentDerivedFiles ?? []).filter(o => o.derivedFromDocumentId !== documentId),
-        repository: removeMunicipalDocument(prev.repository, documentId),
-        evidenceStore: {
-          ...prev.evidenceStore,
-          atoms: prev.evidenceStore.atoms.filter(
-            (atom) => {
-              if (atom.municipalityId !== municipalityId) return true;
-              if (atom.provenance.documentId === documentId) return false;
-              if (deletesHealthReport && atom.provenance.origin === "health-report") return false;
-              if (deletesIBSE && atom.provenance.origin === "ibse") return false;
-              if (
-                deletesDUKE &&
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(DUKE_DOCUMENT_TAG)
-              ) {
-                return false;
-              }
-              if (
-                deletesPREDIMED &&
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(PREDIMED_DOCUMENT_TAG)
-              ) {
-                return false;
-              }
-              if (
-                deletesSF12 &&
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(SF12_DOCUMENT_TAG)
-              ) {
-                return false;
-              }
-              if (
-                deletesSueno &&
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(SUENO_DOCUMENT_TAG)
-              ) {
-                return false;
-              }
-              if (
-                deletesCAGE &&
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(CAGE_DOCUMENT_TAG)
-              ) {
-                return false;
-              }
-              if (
-                deletesAUDITC &&
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(AUDITC_DOCUMENT_TAG)
-              ) {
-                return false;
-              }
-              if (
-                deletesIPAQ &&
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(IPAQ_DOCUMENT_TAG)
-              ) {
-                return false;
-              }
-              if (
-                deletesGHQ12 &&
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(GHQ12_DOCUMENT_TAG)
-              ) {
-                return false;
-              }
-              if (
-                deletesPHQ9 &&
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(PHQ9_DOCUMENT_TAG)
-              ) {
-                return false;
-              }
-              if (
-                deletesPSQI &&
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(PSQI_DOCUMENT_TAG)
-              ) {
-                return false;
-              }
-              if (
-                deletesFagerstrom &&
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(FAGERSTROM_DOCUMENT_TAG)
-              ) {
-                return false;
-              }
-              if (
-                deletesSBQ &&
-                atom.provenance.origin === "complementary-study" &&
-                atom.tags.includes(SBQ_DOCUMENT_TAG)
-              ) {
-                return false;
-              }
-              if (
-                deletesThematicPrioritisation &&
-                atom.provenance.origin === "citizen-participation"
-              ) {
-                return false;
-              }
-              return true;
-            }
-          ),
-          updatedAt: new Date().toISOString(),
-        },
-        healthReport: deletesHealthReport ? undefined : prev.healthReport,
-        ibseStudy: deletesIBSE ? undefined : prev.ibseStudy,
-        dukeStudy: deletesDUKE ? undefined : prev.dukeStudy,
-        predimedStudy: deletesPREDIMED ? undefined : prev.predimedStudy,
-        sf12Study: deletesSF12 ? undefined : prev.sf12Study,
-        suenoStudy: deletesSueno ? undefined : prev.suenoStudy,
-        cageStudy: deletesCAGE ? undefined : prev.cageStudy,
-        auditcStudy: deletesAUDITC ? undefined : prev.auditcStudy,
-        ipaqStudy: deletesIPAQ ? undefined : prev.ipaqStudy,
-        ghq12Study: deletesGHQ12 ? undefined : prev.ghq12Study,
-        phq9Study: deletesPHQ9 ? undefined : prev.phq9Study,
-        psqiStudy: deletesPSQI ? undefined : prev.psqiStudy,
-        fagerstromStudy: deletesFagerstrom ? undefined : prev.fagerstromStudy,
-        sbqStudy: deletesSBQ ? undefined : prev.sbqStudy,
-        thematicPrioritisation: deletesThematicPrioritisation
-          ? undefined
-          : prev.thematicPrioritisation,
-        thematicPrioritisationStudy: deletesThematicPrioritisation
-          ? undefined
-          : prev.thematicPrioritisationStudy,
-        updatedAt: new Date().toISOString(),
-      };
-    })(workspace);
+    const now = new Date().toISOString();
+    const { next: nextWorkspace, deletedStudyKey, deletesHealthReport, deletesThematicPrioritisation } =
+      deleteWorkspaceDocument(workspace, documentId, now);
 
     profileSaveInFlightRef.current = true;
     setRemotePersistenceMessage("Eliminando documento y evidencias en Firebase…");
     try {
       // Retirar siempre desde la revisión exacta consultada, sin sobrescribir
       // cambios de otra sesión o equipo.
-      await saveRemoteWorkspace(remoteClient, nextWorkspace, undefined, workspace.updatedAt);
-      setWorkspace(current => current.municipality.identity.id === municipalityId ? nextWorkspace : current);
+      await saveReviewedWorkspace(nextWorkspace, undefined, workspace);
+      setWorkspace(current => {
+        if (current.municipality.identity.id !== municipalityId || !current.repository.documents.some(doc => doc.id === documentId)) return current;
+        return current === workspace ? nextWorkspace : deleteWorkspaceDocument(current, documentId, now).next;
+      });
       // Un commit de Firebase no basta para declarar cerrado el ciclo:
       // leer de nuevo desde el servidor y comprobar ficha, originales y validaciones.
       let verified = false;
       try {
         const remote = await readRemoteWorkspace(remoteClient, municipalityId);
-        verified = Boolean(remote &&
-          !remote.repository.documents.some(d => d.id === documentId) &&
-          !(remote.documentOriginals ?? []).some(o => o.documentId === documentId) &&
-          !(remote.repository.assetValidations ?? []).some(v => v.documentId === documentId) &&
-          !(remote.repository.conciliations ?? []).some(c => c.current.documentId === documentId || c.historical.documentId === documentId) &&
-          !remote.evidenceStore.atoms.some(atom => atom.provenance.documentId === documentId));
+        verified = remote !== null && confirmsDocumentDeletion(remote, documentId);
       } catch (verificationError) {
         console.warn("[document-delete-remote-verification]", verificationError);
       }
@@ -3713,69 +3309,68 @@ export default function App() {
         console.warn("[original-cache-delete-error]", error);
         setRemotePersistenceMessage("Documento eliminado en Firebase; no se pudo limpiar su caché local.");
       });
-    const deletedDocument = workspace.repository.documents.find((d) => d.id === documentId);
 
     setLastProcessedDocument((prev) => (prev?.id === documentId ? null : prev));
     if (lastProcessedDocument?.id === documentId) {
       setLastAtomCount(0);
     }
-    if (deletedDocument?.kind === "health-report") {
+    if (deletesHealthReport) {
       setLastHealthReportMessage(null);
       setIsLoadingHealthReport(false);
     }
-    if (isIBSEDocument(deletedDocument)) {
+    if (deletedStudyKey === "ibseStudy") {
       setIbseMessage(null);
       setIsLoadingIBSE(false);
     }
-    if (isDUKEDocument(deletedDocument)) {
+    if (deletedStudyKey === "dukeStudy") {
       setDukeMessage(null);
       setIsLoadingDUKE(false);
     }
-    if (isPREDIMEDDocument(deletedDocument)) {
+    if (deletedStudyKey === "predimedStudy") {
       setPredimedMessage(null);
       setIsLoadingPREDIMED(false);
     }
-    if (isSF12Document(deletedDocument)) {
+    if (deletedStudyKey === "sf12Study") {
       setSf12Message(null);
       setIsLoadingSF12(false);
     }
-    if (isSuenoDocument(deletedDocument)) {
+    if (deletedStudyKey === "suenoStudy") {
       setSuenoMessage(null);
       setIsLoadingSueno(false);
     }
-    if (isCAGEDocument(deletedDocument)) {
+    if (deletedStudyKey === "cageStudy") {
       setCageMessage(null);
       setIsLoadingCAGE(false);
     }
-    if (isAUDITCDocument(deletedDocument)) {
+    if (deletedStudyKey === "auditcStudy") {
       setAuditcMessage(null);
       setIsLoadingAUDITC(false);
     }
-    if (isIPAQDocument(deletedDocument)) {
+    if (deletedStudyKey === "ipaqStudy") {
       setIpaqMessage(null);
       setIsLoadingIPAQ(false);
     }
-    if (isGHQ12Document(deletedDocument)) {
+    if (deletedStudyKey === "ghq12Study") {
       setGhq12Message(null);
       setIsLoadingGHQ12(false);
     }
-    if (isPHQ9Document(deletedDocument)) {
+    if (deletedStudyKey === "phq9Study") {
       setPhq9Message(null);
       setIsLoadingPHQ9(false);
     }
-    if (isPSQIDocument(deletedDocument)) {
+    if (deletedStudyKey === "psqiStudy") {
       setPsqiMessage(null);
       setIsLoadingPSQI(false);
     }
-    if (isFagerstromDocument(deletedDocument)) {
+    if (deletedStudyKey === "fagerstromStudy") {
       setFagerstromMessage(null);
       setIsLoadingFagerstrom(false);
     }
-    if (isSBQDocument(deletedDocument)) {
+    if (deletedStudyKey === "sbqStudy") {
       setSbqMessage(null);
       setIsLoadingSBQ(false);
     }
-    if (isThematicPrioritisationDocument(deletedDocument)) {
+    if (deletesThematicPrioritisation) {
       setTpImportMessage(null);
       setPendingTopics([]);
     }
@@ -3970,7 +3565,7 @@ export default function App() {
   // ── Render ──────────────────────────────────────────────────
 
   return (
-    <DocumentationProvider key={municipality.id} workspace={workspace} canWrite={documentWriteAllowed} onStoreOriginal={handleStoreDocumentOriginal} onStoreDerivative={handleStoreDocumentDerivative} onCreateRevision={handleCreateDocumentRevision} onArchiveDocument={handleArchiveDocument} onDeleteDocument={documentWriteAllowed ? handleDeleteDocument : undefined}>
+    <DocumentationProvider key={municipality.id} workspace={workspace} canWrite={documentWriteAllowed} onStoreOriginal={handleStoreDocumentOriginal} onStoreDerivative={handleStoreDocumentDerivative} onCreateRevision={handleCreateDocumentRevision} onUseHealthReportRevision={handleUseHealthReportRevision} onArchiveDocument={handleArchiveDocument} onDeleteDocument={documentWriteAllowed ? handleDeleteDocument : undefined}>
       {municipalityToDelete && <DeleteWorkspaceDialog
         name={municipalityToDelete.name}
         discardDraft={preparationDirtyRef.current && municipalityToDelete.id === municipality.id}
@@ -4256,7 +3851,7 @@ export default function App() {
               onSetDocumentCycle={documentWriteAllowed ? handleSetDocumentCycle : undefined}
               evidence={runtime.workspace.evidenceStore.atoms}
               originalIds={(runtime.workspace.documentOriginals ?? []).map(o => o.documentId)}
-              originalCapacity={`${formatMegabytes(documentOriginalsBytes(runtime.workspace.documentOriginals) + documentDerivativesBytes(runtime.workspace.documentDerivedFiles) + profileOriginalsBytes(runtime.workspace.externalProfileLibrary))} / ${formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)}`}
+              originalCapacity={`${formatMegabytes(workspaceDocumentBytes(runtime.workspace))} / ${formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)}`}
               canWrite={documentWriteAllowed}
               persistence={remotePersistenceMessage ?? ""}
               onOpenUploader={() => { openDiagnosisToolbox(); requestAnimationFrame(() => document.getElementById("document-review-title")?.scrollIntoView({behavior:"smooth",block:"start"})); }}
@@ -4300,11 +3895,20 @@ export default function App() {
               workspace={workspace}
               onNormalizeLojaRemote={documentWriteAllowed && remoteHydratedMunicipalityId === "loja" && remoteClient.auth.currentUser
                 ? async expectedWorkspace => {
+                    let reviewedRevision: RemoteWorkspaceRevision = null;
                     const result = await normalizeLojaMetadataRemotely({
-                      read: id => readRemoteWorkspace(remoteClient,id),
-                      save: (updated,expected) => saveRemoteWorkspace(remoteClient,updated,undefined,expected),
+                      read: async id => {
+                        const reviewed = await readRemoteWorkspaceVersion(remoteClient, id);
+                        reviewedRevision = reviewed?.revision ?? null;
+                        return reviewed?.workspace ?? null;
+                      },
+                      save: async updated => {
+                        const revision = await saveRemoteWorkspace(remoteClient, updated, undefined, reviewedRevision);
+                        reviewedRemoteRevisions.current.set(updated.municipality.identity.id, revision);
+                      },
                     },expectedWorkspace);
                     if (result.status === "updated") {
+                      lastExplicitProfileWorkspaceRef.current = result.workspace;
                       setWorkspace(current => current.municipality.identity.id === "loja" && JSON.stringify(current) === JSON.stringify(expectedWorkspace) ? result.workspace : current);
                       setRemotePersistenceMessage("Corrección documental de Loja guardada y comprobada en Firebase.");
                     }
@@ -4316,7 +3920,7 @@ export default function App() {
             {/* ── Originales en el expediente compartido ── */}
             {(() => {
               const stored = runtime.workspace.documentOriginals ?? [];
-              const used = documentOriginalsBytes(stored) + profileOriginalsBytes(runtime.workspace.externalProfileLibrary);
+              const used = workspaceDocumentBytes(runtime.workspace);
               const titleOf = (id: string) => runtime.workspace.repository.documents.find((d) => d.id === id)?.title ?? id;
               return (
                 <section className="workspace-panel originals-status" aria-label="Originales en el expediente compartido">
@@ -4329,7 +3933,7 @@ export default function App() {
                       <strong>Solo en este navegador:</strong>
                       <ul>
                         {localOnlyOriginals.map((o) => (
-                          <li key={o.documentId}>{titleOf(o.documentId)} · {o.reason === "too-large" ? "supera los 20 MB por archivo" : "no cabe en el límite del expediente"}</li>
+                          <li key={o.documentId}>{titleOf(o.documentId)} · {o.reason === "too-large" ? "supera los 20 MB por archivo" : o.reason === "different-hash" ? "no coincide con la huella de la ficha" : "no cabe en el límite del expediente"}</li>
                         ))}
                       </ul>
                     </div>
@@ -4342,15 +3946,13 @@ export default function App() {
             {(() => {
               const atomCountByDocument: Record<string, number> = {};
               for (const atom of runtime.workspace.evidenceStore.atoms) {
-                const id = atom.provenance.documentId;
-                if (id) atomCountByDocument[id] = (atomCountByDocument[id] ?? 0) + 1;
+                const ids = [atom.provenance.documentId, ...(atom.provenance.additionalDocuments ?? []).map(source => source.documentId)];
+                for (const id of ids) if (id) atomCountByDocument[id] = (atomCountByDocument[id] ?? 0) + 1;
               }
-              const studyTags = ["ibse", "duke-eas", "predimed-eas", "sf12-eas", "sueno-eas", "cage-eas", "auditc", "ipaq-eas", "ghq12", "phq9", "psqi", "fagerstrom", "sbq"];
-              const protectedIds = new Set(
-                runtime.workspace.repository.documents
-                  .filter((d) => d.id === runtime.workspace.healthReport?.linkedDocumentId || d.tags.some((t) => studyTags.includes(t)))
-                  .map((d) => d.id)
-              );
+              const protectedIds = new Set([
+                ...Object.values(activeStudyDocuments(runtime.workspace)),
+                ...(runtime.workspace.healthReport ? [runtime.workspace.healthReport.linkedDocumentId] : []),
+              ]);
               const groups = findDuplicateGroups(runtime.workspace.repository, { localHashes: knownOriginalHashes, protectedIds, atomCountByDocument });
               return (
                 <DuplicateDocumentsPanel
@@ -4452,6 +4054,10 @@ export default function App() {
                 sbqMessage={sbqMessage}
                 onLoadSBQCSV={handleLoadSBQCSV}
                 repository={runtime.workspace.repository}
+                activeStudySourceIds={Object.fromEntries(
+                  Object.entries(activeStudyDocuments(runtime.workspace))
+                    .map(([key, id]) => [STUDY_DOCUMENT_TAGS[key as ComplementaryStudyKey], id])
+                )}
                 onDeleteDocument={handleDeleteDocument}
               />
             </DiagnosisModuleSection>

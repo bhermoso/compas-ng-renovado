@@ -8,6 +8,8 @@
  */
 
 import type { EvidenceAtom } from "../../domain/evidence";
+import { removeDocumentEvidence } from "../evidence-pipeline/removeDocumentEvidence";
+import { PENDING_DOCUMENT_REVIEW } from "../document-files/documentRevisions";
 import {
   describeDocumentCycle,
   type ConciliationRelation,
@@ -111,6 +113,11 @@ export function isHistoricalDocument(document: MunicipalDocument): boolean {
   return document.cycle?.status === "historical";
 }
 
+export function isDocumentExcludedFromDiagnosis(document: MunicipalDocument): boolean {
+  return isHistoricalDocument(document) || document.status === "archived" ||
+    document.status === "rejected" || document.tags?.includes(PENDING_DOCUMENT_REVIEW) === true;
+}
+
 /**
  * Copia del expediente sin las fuentes históricas ni los átomos que derivan de
  * ellas. Si no hay ninguna, devuelve el mismo objeto: el comportamiento sin ciclo
@@ -119,24 +126,28 @@ export function isHistoricalDocument(document: MunicipalDocument): boolean {
 export function excludeHistoricalSources(
   workspace: MunicipalityWorkspace
 ): MunicipalityWorkspace {
-  const historicalIds = new Set(
-    workspace.repository.documents.filter(isHistoricalDocument).map((d) => d.id)
-  );
-  if (historicalIds.size === 0) return workspace;
+  const excluded = workspace.repository.documents.filter(isDocumentExcludedFromDiagnosis);
+  const excludedIds = new Set(excluded.map(document => document.id));
+  if (excludedIds.size === 0) return workspace;
+  const documents = workspace.repository.documents.filter(document => !excludedIds.has(document.id));
+  let atoms = workspace.evidenceStore.atoms;
+  for (const document of excluded) {
+    atoms = removeDocumentEvidence(atoms, document.id, documents, workspace.municipality.identity.id,
+      document.kind === "localiza-salud");
+  }
   return {
     ...workspace,
-    healthReport: workspace.healthReport && historicalIds.has(workspace.healthReport.linkedDocumentId)
+    healthReport: workspace.healthReport && excludedIds.has(workspace.healthReport.linkedDocumentId)
       ? undefined
       : workspace.healthReport,
     repository: {
       ...workspace.repository,
-      documents: workspace.repository.documents.filter((d) => !historicalIds.has(d.id)),
+      documents,
+      assetValidations: workspace.repository.assetValidations?.filter(validation => !excludedIds.has(validation.documentId)),
     },
     evidenceStore: {
       ...workspace.evidenceStore,
-      atoms: workspace.evidenceStore.atoms.filter(
-        (a) => a.provenance.documentId === undefined || !historicalIds.has(a.provenance.documentId)
-      ),
+      atoms,
     },
   };
 }

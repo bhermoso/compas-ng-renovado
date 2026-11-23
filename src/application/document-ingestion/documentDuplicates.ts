@@ -1,5 +1,6 @@
 import type { EvidenceStore } from "../../domain/evidence";
 import type { DocumentId, MunicipalDocument, MunicipalDocumentRepository } from "../../domain/repository";
+import { removeDocumentEvidence } from "../evidence-pipeline/removeDocumentEvidence";
 
 /**
  * Documentos repetidos en el expediente.
@@ -122,8 +123,10 @@ export function retireDuplicateDocument(
 ): { repository: MunicipalDocumentRepository; evidenceStore: EvidenceStore; removedAtoms: number } | null {
   if (documentId === keptId) return null;
   const target = repository.documents.find((d) => d.id === documentId);
-  if (!target || !isActive(target) || !repository.documents.some((d) => d.id === keptId)) return null;
-  const atoms = evidenceStore.atoms.filter((a) => a.provenance.documentId !== documentId);
+  if (!target || !isActive(target) || !repository.documents.some(d => d.id === keptId && isActive(d))) return null;
+  const atoms = removeDocumentEvidence(
+    evidenceStore.atoms, documentId, repository.documents, repository.municipalityId, target.kind === "localiza-salud",
+  );
   return {
     repository: {
       ...repository,

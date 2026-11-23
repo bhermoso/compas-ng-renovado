@@ -69,6 +69,7 @@ vi.mock("../src/infrastructure/relas/RelasClient", () => ({
 import {
   deleteRemoteWorkspace,
   readRemoteWorkspace,
+  readRemoteWorkspaceVersion,
   saveRemoteWorkspace,
   uploadLocalWorkspaces,
 } from "../src/infrastructure/relas/RemoteWorkspace";
@@ -155,6 +156,25 @@ describe("expediente remoto: ciclo de vida", () => {
     expect((await readRemoteWorkspace(client, "loja"))?.updatedAt).toBe(otherUser.updatedAt);
     await saveRemoteWorkspace(client, destructive, undefined, otherUser.updatedAt);
     expect((await readRemoteWorkspace(client, "loja"))?.updatedAt).toBe(destructive.updatedAt);
+  });
+
+  it("evita sobrescribir los cambios de otro cliente incluso con la misma fecha", async () => {
+    const other = { auth: { currentUser: { uid: "u2" } }, db: {} } as unknown as RelasClient;
+    const initial = workspace("fv", "2026-11-22T10:00:00.000Z");
+    await saveRemoteWorkspace(client, initial, undefined, null);
+    const viewA = (await readRemoteWorkspaceVersion(client, "fv"))!;
+    const viewB = (await readRemoteWorkspaceVersion(other, "fv"))!;
+    const fromA = { ...viewA.workspace, deletedDocuments: [{ documentId: "a", title: "A", deletedAt: initial.updatedAt }] };
+    const fromB = { ...viewB.workspace, deletedDocuments: [{ documentId: "b", title: "B", deletedAt: initial.updatedAt }] };
+    await saveRemoteWorkspace(client, fromA, undefined, viewA.revision);
+    await expect(saveRemoteWorkspace(other, fromB, undefined, viewB.revision)).rejects.toThrow(/revisión diferente/);
+    const reviewed = (await readRemoteWorkspaceVersion(other, "fv"))!;
+    expect(reviewed.workspace.deletedDocuments).toEqual(fromA.deletedDocuments);
+    await saveRemoteWorkspace(other, {
+      ...reviewed.workspace, deletedDocuments: [...reviewed.workspace.deletedDocuments!, ...fromB.deletedDocuments],
+    }, undefined, reviewed.revision);
+    expect((await readRemoteWorkspace(client, "fv"))?.deletedDocuments?.map(row => row.documentId)).toEqual(["a", "b"]);
+    await expect(saveRemoteWorkspace(other, fromB, undefined, null)).rejects.toThrow(/revisión diferente/);
   });
 
   it("eliminar retira fragmentos y manifiesto", async () => {

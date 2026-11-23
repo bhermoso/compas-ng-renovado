@@ -22,6 +22,36 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-23 · Integridad de la custodia documental y del Actualizador del Perfil (PR #209 consolidada)
+
+Pages al empezar: `b8b3149`.
+
+- **Decisión del responsable (2026-11-23).** Consolidar en esta sesión el trabajo
+  de la PR #209, preparado con Codex en otro equipo, y no continuarlo allí.
+- **Cambio (procedente de la #209, commits `24a5439` y `99d22b9`).**
+  - Guardado en Firebase con control de revisión: antes de escribir se
+    comprueba que el manifiesto remoto es el que se leyó (`snapshotId`); si
+    otro equipo lo cambió, no se guarda y se pide conciliar.
+  - Historial de estudios complementarios e informes anteriores: al sustituir
+    uno, el anterior se conserva con sus documentos y evidencias.
+  - La normalización de documentos repetidos ya no elimina revisiones
+    encadenadas ni el informe vinculado.
+  - Localiza: una ficha idéntica en dos cargas conserva ambas procedencias.
+  - Actualizador del Perfil: marcas de revisión sustituibles por su causa,
+    sin cruces de escala y con el último valor publicado ante secreto
+    estadístico.
+- **Integración.** Se incorporan los cambios de master del 23/11 sin
+  conflictos.
+- **Comprobado (hechos).** Compilación correcta. Suite completa: 2973 pruebas
+  correctas, 2 omitidas. Lint: 23 errores y 3 avisos (sin cambios).
+- **No comprobado.** Comportamiento con expedientes reales de Firestore y con
+  dos equipos guardando a la vez.
+- **Cierre.** La PR #209 se cierra como sustituida por esta. Las PR #169 y #161
+  se cierran por desfase con master; la comparación del archivo con Firebase
+  (#161) se retomará en la auditoría de Firestore.
+
+---
+
 ## 2026-11-23 · IBSE de Atarfe en escala 0–100, referencias EAS y evaluación
 
 Pages al empezar: `c0cb1d8`.

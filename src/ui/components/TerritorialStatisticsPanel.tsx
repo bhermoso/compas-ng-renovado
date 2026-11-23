@@ -32,6 +32,7 @@ const STATUS_LABEL: Record<CoverageStatus, string> = {
   'revisar-valor': 'Mismo periodo, valor distinto',
   'otro-periodo': 'El Perfil usa un periodo posterior',
   'otra-medida': 'El Perfil usa otra medida',
+  ambiguo: 'Hay varias filas compatibles en el Perfil',
   'sin-dato': 'Sin dato descargado',
 };
 
@@ -149,7 +150,7 @@ export function TerritorialStatisticsPanel({ municipalityId, municipalityName, i
         <details><summary>Ver los cambios uno a uno ({merge.changes.length})</summary>
           <div className="tsp-scroll"><table className="tsp-table">
             <thead><tr><th>Cambio</th><th>Indicador</th><th>Escala</th><th>Valor</th><th>En el Perfil vigente</th></tr></thead>
-            <tbody>{merge.changes.map((c, i) => <tr key={i}><td>{c.kind}</td><td>{c.title}</td><td>{c.scale}</td><td className="tsp-num">{c.value} <span>({c.period})</span></td><td>{c.previous ? `${c.previous.value} (${c.previous.period || '—'}) · ${STATUS_LABEL[c.previous.reason]}` : '—'}</td></tr>)}</tbody>
+            <tbody>{merge.changes.map((c, i) => <tr key={i}><td>{c.kind}</td><td>{c.title}</td><td>{c.scale}</td><td className="tsp-num">{c.value} <span>({c.period})</span></td><td>{c.previous ? `${c.previous.value} (${c.previous.period || '—'}) · ${STATUS_LABEL[c.previous.reason]}` : c.issue ? STATUS_LABEL[c.issue] : '—'}</td></tr>)}</tbody>
           </table></div>
         </details>
         {onPrepareRevision && <div className="tsp-run">

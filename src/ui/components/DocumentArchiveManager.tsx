@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { MunicipalDocumentRepository, MunicipalDocument, DocumentCycle } from "../../domain/repository";
-import type { EvidenceAtom } from "../../domain/evidence";
+import { evidenceHasDocument, type EvidenceAtom } from "../../domain/evidence";
+import { isDocumentExcludedFromDiagnosis } from "../../application/health-profile/antecedents";
 import { DocumentReference } from "./Documentation";
 import { DocumentCycleControl } from "./DocumentCycleControl";
 import { KIND_LABEL } from "./documentRepositoryCategorization";
@@ -88,7 +89,7 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
     ].filter(Boolean).join(" ");
     return normalizeSearch(searchableValues).includes(normalizeSearch(query).trim());
   }), [archive, query, scope]);
-  const countOf = (id: string) => evidence.filter(a => a.provenance.documentId === id).length;
+  const countOf = (id: string) => evidence.filter(atom => evidenceHasDocument(atom, id)).length;
   const validationCount = (id: string) => (repository.assetValidations ?? []).filter(v => v.documentId === id).length;
   const originalCount = archive.filter(d => originals.has(d.id)).length;
   const sections = useMemo(() => organizeMunicipalDocuments(archive), [archive]);
@@ -144,7 +145,7 @@ export function DocumentArchiveManager({ repository, evidence, originalIds, canW
           <tbody>{visibleSections.flatMap(section => [<tr key={`section-${section.id}`} className="dam__section-row"><th colSpan={7} scope="colgroup">{section.label}<small>{section.detail} · {section.documents.length} documentos</small></th></tr>, ...section.documents.map(d => <tr key={d.id}>
             <th scope="row"><strong>{d.title}</strong><small>{d.sourceFileName || "Sin nombre de archivo"}</small></th>
             <td>{municipalDocumentSection(d) === "plans" ? "Plan de Acción municipal" : municipalDocumentSection(d) === "prioritization" ? "Priorización municipal" : KIND_LABEL[d.kind] ?? d.kind}</td>
-            <td>{d.status === "archived" ? "Archivado" : d.status === "validated" ? "Validado" : d.status === "rejected" ? "Rechazado" : "Registrado"}</td>
+            <td>{d.status === "archived" ? "Archivado" : d.status === "validated" ? "Validado" : d.status === "rejected" ? "Rechazado" : "Registrado"}{isDocumentExcludedFromDiagnosis(d) && <small>Fuera del diagnóstico vigente</small>}</td>
             <td>{originals.has(d.id) ? "Original registrado en el expediente (pendiente de cotejo remoto)" : "Original no acreditado en el expediente"}{d.sourceText?.trim() ? " · Texto conservado (no es el original)" : " · Sin texto conservado"}</td>
             <td className="dam__provenance"><strong>{d.revisionNumber ? `v${d.revisionNumber}` : "Sin número de versión"}</strong>{d.revisionOf ? archive.some(candidate => candidate.id === d.revisionOf) ? <small>Revisión de <DocumentReference documentId={d.revisionOf}>{archive.find(candidate => candidate.id === d.revisionOf)?.title ?? d.revisionOf}</DocumentReference></small> : <small>Predecesora no localizada: {d.revisionOf}</small> : <small>Sin predecesora declarada</small>}<small>{d.contentSha256 ? `Huella declarada SHA-256: ${d.contentSha256.slice(0, 12)}…` : "Sin huella registrada"}</small><small>{d.source.organization || d.source.system || "Origen no declarado"}</small>{documentTemporalDetails(d).map((detail, index) => <small key={`${d.id}-temporal-${index}`}>{detail}</small>)}</td>
             <td>{countOf(d.id)} evidencias{validationCount(d.id) ? ` · ${validationCount(d.id)} validaciones de activos` : ""}{d.revisionOf ? " · revisión" : ""}</td>
