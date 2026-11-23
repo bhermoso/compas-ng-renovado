@@ -18,7 +18,7 @@ function collect(node: unknown, out: Array<{ id: string; kind: string; title: st
   return out;
 }
 
-const zaidinAssets = readLocalizaAssets(collect(JSON.parse(readFileSync(FIXTURE, "utf8")))).records;
+const centroAssets = readLocalizaAssets(collect(JSON.parse(readFileSync(FIXTURE, "utf8")))).records;
 
 function asset(atomId: string, nombre: string, tematicas: string[]): LocalizaAssetRecord {
   return { atomId, nombre, descripcion: "", acceso: "Cualquiera", poblacionDestinataria: [], tematicas, municipio: "X", localidad: "X", estado: "registrado-en-localiza" };
@@ -68,9 +68,9 @@ describe("derivación de unidades de lectura", () => {
   });
 
   it("expediente de ensayo: cada activo con correspondencia aparece en sus temas; el resto queda aparte", () => {
-    const d = deriveReadingUnits({ assets: zaidinAssets });
-    const conCorrespondencia = zaidinAssets.length - d.assetsWithoutValidatedCorrespondence.length;
-    expect(zaidinAssets).toHaveLength(10);
+    const d = deriveReadingUnits({ assets: centroAssets });
+    const conCorrespondencia = centroAssets.length - d.assetsWithoutValidatedCorrespondence.length;
+    expect(centroAssets).toHaveLength(10);
     expect(conCorrespondencia).toBeGreaterThan(0);
     expect(d.units.find((u) => u.topicId === "bienestar-emocional")?.capacity.assets.length).toBeGreaterThanOrEqual(6);
     expect(d.topicsWithoutSource).toContain("violencia-genero");

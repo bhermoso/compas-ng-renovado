@@ -39,9 +39,30 @@ Pages: `5765e6a`.
   `relas_scopes`.
 - **Reglas de Firestore.** Las desplegadas (versión del 20/11/2026) coinciden
   línea a línea con `firebase/firestore.rules`.
-- **Pendiente de decisión.** La plantilla de envejecimiento en cuatro bloques
-  que usan otros expedientes procede del Plan de Acción del Distrito Zaidín
-  (`ZAIDIN_AGING_PROPOSAL` y derivados). No se ha tocado.
+- **Decisión del responsable (2026-11-23):** la plantilla del Plan de Acción
+  «no es solo del Zaidín, aunque se creara originalmente para ella, hay que
+  conservar como estructural, para todos los expedientes».
+- **Cambio en el código.**
+  - `ZAIDIN_AGING_PROPOSAL` pasa a `AGING_FOUR_BLOCKS_BASE`, «Plantilla
+    estructural de envejecimiento saludable en cuatro bloques», redactada para
+    «el territorio». La plantilla común y la de Zagra salen de ella con los
+    mismos textos que antes (comprobado campo a campo); solo cambian sus
+    rótulos de procedencia. Los catálogos de envejecimiento y adicciones se
+    rotulan «Catálogo estructural de COMPÁS».
+  - Se retiran el comportamiento exclusivo de la redacción final del Zaidín en
+    la preparación del Plan, la lectura de unidades geográficas del Zaidín en
+    los informes, el contexto BADEA del distrito y las menciones en
+    comentarios, scripts, fixtures y pruebas.
+  - Las copias del navegador ya no incluyen el expediente de Granada-Zaidín ni
+    el borrador de la antigua demostración de coordinación; si llegan en una
+    copia anterior, se ignoran.
+  - Se conservan como guarda `RETIRED_MUNICIPALITY_IDS` y su prueba, y el texto
+    literal del Perfil de Loja que menciona el Centro de Salud Zaidín-Sur.
+  - El flujo `plan-document.yml` citaba una prueba inexistente
+    (`zaidin-final-replacement.test.ts`); se quita de la lista.
+- **Verificación.** Suite: 2978 pasan, 2 omitidas; build correcto; lint sin
+  cambios. La prueba de humo de recuperación del navegador
+  (`browser-recovery.smoke.mjs`) se ha ajustado y no se ha ejecutado aquí.
 
 ## 2026-11-23 · Limpieza de los expedientes de Firebase: una versión vigente por fuente
 

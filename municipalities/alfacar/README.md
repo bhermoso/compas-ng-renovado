@@ -28,5 +28,4 @@ estaba cargado localmente pero no existia como seed versionado.
 El fichero procede del workspace `compas-ng:workspace:alfacar` conservado por la
 instancia local de COMPAS NG. No fabrica contenido: materializa en el repo lo
 que ya habia sido cargado, validado y compilado en la sesion local, para que el
-expediente pueda rehidratarse desde el despliegue igual que Granada-Zaidin y
-Atarfe.
+expediente pueda rehidratarse desde el despliegue igual que Atarfe.

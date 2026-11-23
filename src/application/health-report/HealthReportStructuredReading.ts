@@ -203,12 +203,6 @@ function buildStructuredTables(report: HealthReportDocument): HealthReportStruct
 
 function geographyFromLabel(label: string): HealthReportFindingGeography {
   const n = normalize(label);
-  if (/^d\.?\s*zaidin|distrito zaidin|zaidin vergeles/.test(n)) {
-    return { level: "district", label, isProxyForTargetTerritory: false };
-  }
-  if (/u\.?\s*a\.?\s*zaidin|ua zaidin|zaidin centro|zaidin sur/.test(n)) {
-    return { level: "health-care-unit", label, isProxyForTargetTerritory: true };
-  }
   if (/distrito sanitario granada metropolitano|distrito granada metropolitano|ds granada/.test(n)) {
     return { level: "health-district", label, isProxyForTargetTerritory: true };
   }

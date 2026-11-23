@@ -7,7 +7,7 @@
  *        cambia: su IBSE no entra como señal principal y conserva sus 6 fuentes.
  *   F2 — Jerarquía trazador/indicadores con concordancia gramatical («1 indicador
  *        trazador», no «1 indicadores»); etiquetas demo/proxy derivadas de la
- *        condición real de las filas (Atarfe local, Zaidín proxy).
+ *        condición real de las filas (Atarfe local, Centro proxy).
  *   F3 — El contador «Cuestiones para contraste» cuenta la agenda del Grupo Motor
  *        (groupMotorAgenda), no areasDeIntervencion (OIT): 2 para Atarfe.
  *   F7 — El fallback OIT nombra el déficit real (determinantes + participación) y
@@ -56,9 +56,9 @@ function viewOf(ws: MunicipalityWorkspace, informe: string) {
 }
 
 const atarfe = seed("atarfe");
-const zaidin = seed("municipio-ensayo");
+const centro = seed("municipio-ensayo");
 const ATARFE_INFORME = "Informe de la situación de salud en el municipio de Atarfe";
-const ZAIDIN_INFORME = "Informe de salud Municipio de ensayo";
+const CENTRO_INFORME = "Informe de salud Municipio de ensayo";
 
 describe("Lote B · F1 — cabecera y atribuciones de fuentes", () => {
   it("F1.1 Atarfe: la cabecera enumera Informe, IBSE y Localiza Salud", () => {
@@ -77,8 +77,8 @@ describe("Lote B · F1 — cabecera y atribuciones de fuentes", () => {
   });
 
   it("F1.3 REGRESIÓN Municipio de ensayo: su IBSE provincial NO entra como fuente principal y conserva Localiza", () => {
-    const view = viewOf(zaidin, ZAIDIN_INFORME);
-    // El IBSE de Zaidín es proxy provincial (Lote A): no figura como fuente suelta.
+    const view = viewOf(centro, CENTRO_INFORME);
+    // El IBSE de Centro es proxy provincial (Lote A): no figura como fuente suelta.
     expect(view.header.sources).not.toContain("IBSE");
     expect(view.header.sources).toContain("Localiza Salud");
     // La cabecera conserva sus 6 fuentes (no se expulsa ninguna).
@@ -98,7 +98,7 @@ describe("Lote B · F2 — jerarquía trazador/indicadores y etiquetas demo/prox
   });
 
   it("F2.2 REGRESIÓN Municipio de ensayo: concordancia plural intacta", () => {
-    const view = viewOf(zaidin, ZAIDIN_INFORME);
+    const view = viewOf(centro, CENTRO_INFORME);
     const estudios = view.sourceBlocks.find((b) => b.id === "estudios");
     expect(estudios).toBeDefined();
     expect(estudios!.whatItAdds).toContain("13 estudios y 8 indicadores trazadores destacados");
@@ -116,7 +116,7 @@ describe("Lote B · F2 — jerarquía trazador/indicadores y etiquetas demo/prox
   });
 
   it("F2.4 REGRESIÓN Municipio de ensayo: sí tiene comparador provincial y filas demo/proxy", () => {
-    const refs = buildIndicatorComparisonReferences({ workspace: zaidin }).references;
+    const refs = buildIndicatorComparisonReferences({ workspace: centro }).references;
     expect(refs.some((r) => r.provinceReference !== undefined)).toBe(true);
     expect(refs.some((r) => r.demoProxy === true)).toBe(true);
   });
@@ -132,7 +132,7 @@ describe("Lote B · F3 — contador «Cuestiones para contraste» = agenda Grupo
   });
 
   it("F3.2 REGRESIÓN Municipio de ensayo: groupMotorAgenda = 6 (contador y tarjetas del mismo origen)", () => {
-    const view = viewOf(zaidin, ZAIDIN_INFORME);
+    const view = viewOf(centro, CENTRO_INFORME);
     expect(view.groupMotorAgenda.length).toBe(6);
   });
 });

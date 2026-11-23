@@ -13,10 +13,9 @@
  * UI, sincronizado por test contra el fixture. Ningún valor es inventado.
  *
  * DOCTRINA DE ESCALA (BADEA-IECA-TERRITORIAL-SCOPE-MAPPING.md):
- *   - BADEA no tiene ámbito de distrito. Granada-Zaidín NO es un municipio
- *     BADEA: todo dato BADEA asociado al distrito es contexto municipal de
- *     referencia del municipio matriz (Granada capital, 18087), etiquetado
- *     como proxy, nunca estimación distrital.
+ *   - BADEA no tiene ámbito de distrito: un distrito municipal solo podría
+ *     recibir el dato de su municipio matriz, etiquetado como proxy, nunca
+ *     como estimación distrital.
  *   - Capa NO evidencial: no crea documentos ni EvidenceAtoms (el expediente
  *     56/92 no cambia). La ingesta evidencial (cmi-indicator, pipeline del
  *     piloto) es un paso posterior con decisión expresa del responsable y
@@ -77,32 +76,6 @@ const CAUTELAS_BASE: string[] = [
   "No aporta desagregación interna por sexo, edad ni condición socioeconómica.",
 ];
 
-function indicadoresGranada(): BadeaIndicadorContexto[] {
-  const base = {
-    fuente: "BADEA/IECA" as const,
-    consulta: BADEA_CONSULTA_19824.consulta,
-    actividad: BADEA_CONSULTA_19824.actividad,
-    anio: "2024",
-    territorio: "Granada (capital)",
-    codigoINE: "18087",
-    escala: "municipio" as const,
-    dimension: "contexto-sociodemografico" as const,
-    cautelas: CAUTELAS_BASE,
-  };
-  return [
-    {
-      ...base,
-      indicador: "Grado de urbanización según tipología de celda",
-      valor: "Ciudades",
-    },
-    {
-      ...base,
-      indicador: "Porcentaje de población en centros urbanos",
-      valor: 96.6,
-      unidad: "%",
-    },
-  ];
-}
 
 function indicadoresAtarfe(): BadeaIndicadorContexto[] {
   const base = {
@@ -183,22 +156,12 @@ function indicadoresLoja(): BadeaIndicadorContexto[] {
 }
 
 // ── Resolución por ámbito COMPÁS ──────────────────────────────────────────────
-// Asociación EXPLÍCITA por id de municipio COMPÁS. Granada-Zaidín no es
-// municipio BADEA: recibe el contexto de su municipio matriz como proxy.
+// Asociación EXPLÍCITA por id de municipio COMPÁS.
 
 export function getBadeaMunicipalContext(
   municipalityId: string
 ): BadeaMunicipalContext | undefined {
   switch (municipalityId) {
-    case "granada-zaidin":
-      return {
-        territorio: "Granada (capital)",
-        codigoINE: "18087",
-        anio: "2024",
-        esProxyMunicipioMatriz: true,
-        indicadores: indicadoresGranada(),
-        accessedAt: BADEA_CONSULTA_19824.accessedAt,
-      };
     case "atarfe":
       return {
         territorio: "Atarfe",

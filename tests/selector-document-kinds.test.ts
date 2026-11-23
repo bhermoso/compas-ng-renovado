@@ -38,7 +38,7 @@ describe("territorial-documentation — documentación de contexto territorial",
       repository: makeRepository(),
       evidenceStore: makeStore(),
       kind: "territorial-documentation",
-      title: "Informe Vigía Zaidín Centro Este 2023",
+      title: "Informe Vigía Centro Centro Este 2023",
       plainText: SAMPLE,
     });
     expect(result).not.toBeNull();
@@ -89,7 +89,7 @@ describe("qualitative-material — material cualitativo y participativo", () => 
       repository: makeRepository(),
       evidenceStore: makeStore(),
       kind: "qualitative-material",
-      title: "Acta 1 Grupo Motor Granada-Zaidín",
+      title: "Acta 1 Grupo Motor Granada-Centro",
       plainText: text,
     });
     expect(result).not.toBeNull();
@@ -103,7 +103,7 @@ describe("qualitative-material — material cualitativo y participativo", () => 
       repository: makeRepository(),
       evidenceStore: makeStore(),
       kind: "qualitative-material",
-      title: "Necesidades sentidas Zaidín",
+      title: "Necesidades sentidas Centro",
       plainText: "La comunidad percibe falta de espacios verdes y de transporte accesible.",
     });
     expect(result!.atomsCreated).toBeGreaterThan(0);
@@ -136,7 +136,7 @@ describe("longitudinal-evidence — evidencia comparativa entre ciclos", () => {
       repository: makeRepository(),
       evidenceStore: makeStore(),
       kind: "longitudinal-evidence",
-      title: "Evolución mortalidad Zaidín 2018–2023",
+      title: "Evolución mortalidad Centro 2018–2023",
       plainText: "Tasa de mortalidad evitable 2018: 12 %. 2023: 9 %. Descenso del 3 pp.",
     });
     expect(result).not.toBeNull();
@@ -246,7 +246,7 @@ describe("contrato del selector — kinds visibles e invisibles", () => {
       repository: makeRepository(),
       evidenceStore: makeStore(),
       kind: "health-report",
-      title: "Informe de Salud Granada-Zaidín",
+      title: "Informe de Salud Granada-Centro",
       plainText: "Contenido del informe que no debe atomizarse bajo ninguna circunstancia.",
     });
     expect(result).not.toBeNull();
@@ -299,14 +299,14 @@ describe("carga de archivo DOCX — vía documental con sourceFileName", () => {
       repository: makeRepository(),
       evidenceStore: makeStore(),
       kind: "territorial-documentation",
-      title: "Informe Vigía Zaidín Centro Este 2023",
+      title: "Informe Vigía Centro Centro Este 2023",
       plainText: "Tasa de envejecimiento zona básica: 22 %. Superior a la media provincial del 19 %.",
-      sourceFileName: "Informe Vigia Zaidin Centro Este.docx",
+      sourceFileName: "Informe Vigia Centro Centro Este.docx",
       sourceSystem: "Archivo DOCX cargado",
     });
     expect(result).not.toBeNull();
     const doc = result!.repository.documents.find((d) => d.kind === "territorial-documentation");
-    expect(doc!.sourceFileName).toBe("Informe Vigia Zaidin Centro Este.docx");
+    expect(doc!.sourceFileName).toBe("Informe Vigia Centro Centro Este.docx");
     expect(doc!.canGenerateEvidence).toBe(true);
     expect(result!.atomsCreated).toBeGreaterThan(0);
     for (const atom of result!.evidenceStore.atoms) {
@@ -319,14 +319,14 @@ describe("carga de archivo DOCX — vía documental con sourceFileName", () => {
       repository: makeRepository(),
       evidenceStore: makeStore(),
       kind: "qualitative-material",
-      title: "Acta 1 Grupo Motor Granada-Zaidín",
+      title: "Acta 1 Grupo Motor Granada-Centro",
       plainText: "El grupo identificó el aislamiento de personas mayores como problema principal.",
-      sourceFileName: "Acta_1_Grupo_Motor_Zaidin.docx",
+      sourceFileName: "Acta_1_Grupo_Motor_Centro.docx",
       sourceSystem: "Archivo DOCX cargado",
     });
     expect(result).not.toBeNull();
     const doc = result!.repository.documents.find((d) => d.kind === "qualitative-material");
-    expect(doc!.sourceFileName).toBe("Acta_1_Grupo_Motor_Zaidin.docx");
+    expect(doc!.sourceFileName).toBe("Acta_1_Grupo_Motor_Centro.docx");
     expect(doc!.canGenerateEvidence).toBe(true);
     expect(result!.atomsCreated).toBeGreaterThan(0);
   });
@@ -359,16 +359,16 @@ describe("carga de archivo PDF — referencia documental sin EvidenceAtoms", () 
     const nextRepo = addMunicipalDocument(repo, {
       id: documentId,
       kind: "territorial-documentation",
-      title: "Informe Vigía Zaidín Sur 2023",
+      title: "Informe Vigía Centro Sur 2023",
       source: { system: "Archivo PDF — referencia documental", collectedAt: new Date().toISOString() },
-      sourceFileName: "Informe_Vigia_Zaidin_Sur.pdf",
+      sourceFileName: "Informe_Vigia_Centro_Sur.pdf",
       canGenerateEvidence: false,
       tags: ["territorial-documentation"],
     });
     const doc = nextRepo.documents.find((d) => d.id === documentId);
     expect(doc!.kind).toBe("territorial-documentation");
     expect(doc!.canGenerateEvidence).toBe(false);
-    expect(doc!.sourceFileName).toBe("Informe_Vigia_Zaidin_Sur.pdf");
+    expect(doc!.sourceFileName).toBe("Informe_Vigia_Centro_Sur.pdf");
   });
 
   it("health-report sigue siendo la única vía que usa createHealthReportDocumentFromDocx y D-HR-01 — no afectada", () => {
@@ -429,9 +429,9 @@ describe("cargas consecutivas — el actualizador funcional no pisa la carga ant
       repository: first!.repository,
       evidenceStore: first!.evidenceStore,
       kind: "territorial-documentation",
-      title: "Informe Vigía Zaidín 2023",
+      title: "Informe Vigía Centro 2023",
       plainText: "Tasa de envejecimiento zona básica: 22 %.",
-      sourceFileName: "vigia-zaidin.docx",
+      sourceFileName: "vigia-centro.docx",
       sourceSystem: "Archivo DOCX cargado",
     });
     expect(second).not.toBeNull();
@@ -439,7 +439,7 @@ describe("cargas consecutivas — el actualizador funcional no pisa la carga ant
     // Ambos documentos presentes, con su sourceFileName
     const fileNames = second!.repository.documents.map((d) => d.sourceFileName);
     expect(fileNames).toContain("epvsa.docx");
-    expect(fileNames).toContain("vigia-zaidin.docx");
+    expect(fileNames).toContain("vigia-centro.docx");
 
     // Los átomos de la primera carga sobreviven a la segunda
     const firstAtomIds = first!.evidenceStore.atoms.map((a) => a.id);

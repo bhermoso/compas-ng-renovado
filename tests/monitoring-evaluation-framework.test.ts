@@ -6,7 +6,7 @@ import {
 import type { PLSEvaluationFramework } from "../src/domain/health-plan";
 
 const completeFramework: PLSEvaluationFramework = {
-  evaluationQuestions: ["¿Se redujo la soledad no deseada entre las personas mayores del Zaidín?"],
+  evaluationQuestions: ["¿Se redujo la soledad no deseada entre las personas mayores del Centro?"],
   evaluationMoments: ["Año 2 del plan", "Cierre del período"],
   evaluationResponsible: "Técnica de Salud Pública del Distrito Sanitario Granada-Metropolitano",
   baselineNote: "Línea base: encuesta de soledad no deseada 2026.",

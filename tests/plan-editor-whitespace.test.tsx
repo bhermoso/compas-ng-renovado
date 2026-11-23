@@ -2,7 +2,7 @@ import { actionPlanElementCode } from "../src/domain/action-plan-catalog/ActionP
 import { isValidElement, type ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import { PlanPreparationPanel } from "../src/ui/components/PlanPreparationPanel";
-import { ZAIDIN_AGING_PROPOSAL as module, type PlanPreparationDraft } from "../src/domain/action-plan-catalog/PlanPreparationDraft";
+import { AGING_FOUR_BLOCKS_BASE as module, type PlanPreparationDraft } from "../src/domain/action-plan-catalog/PlanPreparationDraft";
 import { buildDefinitiveActionPlanProjection } from "../src/domain/action-plan-catalog/DefinitiveActionPlanProjection";
 
 type Control = { "aria-label"?: string; value?: string; children?: ReactNode; onChange?: (e: {target: {value: string}}) => void; onClick?: () => void };
@@ -22,9 +22,9 @@ describe("Plan editor preserves typed whitespace", () => {
   it(`preserves spaces character by character, save and reopen: ${id}`, () => {
    const visibleId = actionPlanElementCode(module,id);
    let draft: PlanPreparationDraft | undefined;
-   const render = () => PlanPreparationPanel({ module, municipalityId: "granada-zaidin", draft, onChange: next => { draft = next; }, renderWorksheet: () => null });
+   const render = () => PlanPreparationPanel({ module, municipalityId: "municipio-ensayo", draft, onChange: next => { draft = next; }, renderWorksheet: () => null });
    find(render(), `Estado del Plan ${visibleId}`)!.onChange!({target:{value:"modified"}});
-   const label = id.startsWith("ENV-B-")
+   const label = id === general.code
     ? `Redacción del objetivo general · ${visibleId}`
     : `Redacción vigente · ${visibleId}`;
    find(render(), label)!.onChange!({target:{value:""}});
@@ -43,11 +43,11 @@ describe("Plan editor preserves typed whitespace", () => {
   });
  }
  it("still normalizes the generated document without mutating the editor", () => {
-  const draft: PlanPreparationDraft = {municipalityId:"granada-zaidin",moduleId:module.id,version:module.version,updatedAt:"2026-09-16",decisions:{
+  const draft: PlanPreparationDraft = {municipalityId:"municipio-ensayo",moduleId:module.id,version:module.version,updatedAt:"2026-09-16",decisions:{
    [objective.code]:{status:"modified",sourceText:objective.title,text:"Mejorar  la salud\ny la participación "}
   }};
   const before = JSON.stringify(draft);
-  const result = buildDefinitiveActionPlanProjection("granada-zaidin",[module],[draft]);
+  const result = buildDefinitiveActionPlanProjection("municipio-ensayo",[module],[draft]);
   expect(result[0].rows[0].objectiveDecision!.text).toBe("Mejorar la salud\ny la participación");
   expect(JSON.stringify(draft)).toBe(before);
  });

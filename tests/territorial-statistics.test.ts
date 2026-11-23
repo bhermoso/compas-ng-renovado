@@ -264,7 +264,7 @@ describe("búsqueda del código INE por nombre", () => {
   it("encuentra el municipio en su provincia, sin tildes ni artículo pospuesto", async () => {
     expect(await findAndalusianIneCodes("ALFACAR", "Granada", fetchJson)).toEqual([{ code: "18011", name: "Alfacar" }]);
     expect(await findAndalusianIneCodes("La Zubia", "Granada", fetchJson)).toEqual([{ code: "18193", name: "Zubia, La" }]);
-    expect(await findAndalusianIneCodes("Granada-Zaidín", "Granada", fetchJson)).toEqual([]);
+    expect(await findAndalusianIneCodes("Granada-Centro", "Granada", fetchJson)).toEqual([]);
   });
 });
 

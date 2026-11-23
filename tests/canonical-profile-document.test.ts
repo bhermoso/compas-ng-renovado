@@ -111,11 +111,11 @@ function cargarCaso(muni: string, file: string): Caso {
   };
 }
 
-let zaidin: Caso;
+let centro: Caso;
 let atarfe: Caso;
 
 beforeAll(() => {
-  zaidin = cargarCaso("municipio-ensayo", "compas-ng-workspace-municipio-ensayo.json");
+  centro = cargarCaso("municipio-ensayo", "compas-ng-workspace-municipio-ensayo.json");
   atarfe = cargarCaso("atarfe", "compas-ng-workspace-atarfe.json");
 });
 
@@ -143,7 +143,7 @@ function compilarSellado(caso: Caso) {
 }
 
 const CASOS = (): Array<[string, () => Caso]> => [
-  ["Municipio de ensayo", () => zaidin],
+  ["Municipio de ensayo", () => centro],
   ["Atarfe", () => atarfe],
 ];
 
@@ -253,7 +253,7 @@ describe("Cierre humano una sola vez", () => {
   });
 
   it("humanClosing es null cuando el cierre está vacío", () => {
-    const caso = zaidin;
+    const caso = centro;
     const doc = buildCanonicalProfileDocumentFromPSL({
       psl: {
         ...caso.psl,
@@ -276,11 +276,11 @@ describe("readingStatus coherente — integrated y prioritization-pending", () =
   });
 
   it("prioritization-pending → 0 hilos y declaración presente (no se fabrica lectura)", () => {
-    // Mismos answers de Zaidín pero contexto sin evidencia portadora (0 átomos):
+    // Mismos answers de Centro pero contexto sin evidencia portadora (0 átomos):
     // la copia canónica declara la pendencia y vacía los hilos.
     const pendingDoc = buildPSLCCanonicalDocument({
-      answers: zaidin.answers,
-      territory: zaidin.territory,
+      answers: centro.answers,
+      territory: centro.territory,
       status: "validated",
       generatedAtISO: "2026-07-01T09:30:00.000Z",
       pslContext: {
@@ -288,7 +288,7 @@ describe("readingStatus coherente — integrated y prioritization-pending", () =
         complementaryStudyCount: 0,
         assetCount: 0,
         hasParticipatoryPrioritisation: true,
-        prioritizacion: zaidin.psl.priorizacion,
+        prioritizacion: centro.psl.priorizacion,
       },
     });
     expect(pendingDoc.editorialView.readingStatus).toBe("prioritization-pending");
@@ -312,27 +312,27 @@ describe("Estado del conocimiento — sin perfil ⇒ null", () => {
 
 describe("Inmunidad del sello frente a mutaciones posteriores", () => {
   it("mutar los answers tras construir no altera el documento ni su sello", () => {
-    const doc = previewDoc(zaidin);
+    const doc = previewDoc(centro);
     const antes = sealCanonicalProfileDocument(doc);
     // Mutación del objeto vivo posterior a la construcción.
-    zaidin.answers.senalesPresentes.push("SEÑAL-MUTANTE-PR1");
+    centro.answers.senalesPresentes.push("SEÑAL-MUTANTE-PR1");
     const despues = sealCanonicalProfileDocument(doc);
     expect(despues.payload).toBe(antes.payload);
     expect(despues.payload).not.toContain("SEÑAL-MUTANTE-PR1");
-    zaidin.answers.senalesPresentes.pop();
+    centro.answers.senalesPresentes.pop();
   });
 });
 
 describe("Normalización y fallback legacy", () => {
   it("un sello v2 completo normaliza a lectura + espacio técnico", () => {
-    const sealed = sealCanonicalProfileDocument(previewDoc(zaidin));
+    const sealed = sealCanonicalProfileDocument(previewDoc(centro));
     const norm = normalizeSealedCanonicalProfileDocument(sealed);
     expect(norm).not.toBeNull();
     expect(isLegacyEditorialView(norm!)).toBe(false);
   });
 
   it("un sello v2 sin technicalSpace cae a legacy sin fabricar contenido", () => {
-    const sealed = sealCanonicalProfileDocument(previewDoc(zaidin));
+    const sealed = sealCanonicalProfileDocument(previewDoc(centro));
     const parsed = JSON.parse(sealed.payload) as Record<string, unknown>;
     delete parsed.technicalSpace;
     const mutilado = { ...sealed, payload: JSON.stringify(parsed) };
@@ -344,7 +344,7 @@ describe("Normalización y fallback legacy", () => {
 
 describe("G-LHC-9 migrado — lee editorialView.readingStatus", () => {
   it("prioritization-pending con hilos fabricados → viola G-LHC-9", () => {
-    const doc = previewDoc(zaidin);
+    const doc = previewDoc(centro);
     const incoherente = {
       ...doc,
       editorialView: {
@@ -354,13 +354,13 @@ describe("G-LHC-9 migrado — lee editorialView.readingStatus", () => {
       },
     };
     expect(incoherente.editorialView.territorialReadings.length).toBeGreaterThan(0);
-    const v = validateCompiledBody(incoherente, zaidin.psl);
+    const v = validateCompiledBody(incoherente, centro.psl);
     expect(v.some((x) => x.gate === "G-LHC-9")).toBe(true);
   });
 
   it("documento canónico coherente → sin violación G-LHC-9", () => {
-    const doc = previewDoc(zaidin);
-    const v = validateCompiledBody(doc, zaidin.psl);
+    const doc = previewDoc(centro);
+    const v = validateCompiledBody(doc, centro.psl);
     expect(v).toHaveLength(0);
   });
 });

@@ -87,7 +87,7 @@ Verificado en la suite (caso 13): si una fuente cambia, la validación falla.
 Veinte recursos comunitarios publicados en el portal **Localiza Salud** del
 Ministerio de Sanidad para Atarfe (los cinco iniciales y quince añadidos con las tablas
 aportadas el 05/11/2026 y el 09/11/2026; tres sin identificador del portal). Se ingieren por la **misma ruta documental**
-que Granada-Zaidín (`kind: "localiza-salud"` → un `EvidenceAtom` `asset` por
+que el resto de expedientes (`kind: "localiza-salud"` → un `EvidenceAtom` `asset` por
 línea, origen `localiza-salud`), sin ampliar `EvidenceAtom` ni ningún contrato
 compartido y sin crear un modelo paralelo.
 

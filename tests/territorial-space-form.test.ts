@@ -27,8 +27,8 @@ describe("alta de espacios sin escribir identificadores", () => {
     expect(buildSpace({ kind: "municipio", ineCode: "18079" })?.id).toBe("fuente-vaqueros");
   });
   it("el distrito conserva la convención existente «Municipio · Distrito»", () => {
-    expect(buildSpace({ kind: "distrito-municipal", ineCode: "18087", districtName: "Zaidín" }))
-      .toEqual({ id: "granada-zaidin", name: "Granada · Zaidín", type: "distrito-municipal" });
+    expect(buildSpace({ kind: "distrito-municipal", ineCode: "18087", districtName: "Centro" }))
+      .toEqual({ id: "granada-centro", name: "Granada · Centro", type: "distrito-municipal" });
     expect(buildSpace({ kind: "distrito-municipal", ineCode: "18087", districtName: "  " })).toBeUndefined();
   });
   it("rechaza código fuera del catálogo y mancomunidad sin nombre", () => {
@@ -41,7 +41,7 @@ describe("alta de espacios sin escribir identificadores", () => {
 describe("desplegables que se actualizan con cada alta", () => {
   const base = [
     { id: "atarfe", name: "Atarfe", type: "municipio" as const },
-    { id: "granada-zaidin", name: "Granada · Zaidín", type: "distrito-municipal" as const },
+    { id: "granada-centro", name: "Granada · Centro", type: "distrito-municipal" as const },
   ];
   it("un municipio con espacio deja de ofrecerse y reaparece al faltar", () => {
     expect(availableMunicipalities([]).length).toBe(174);
@@ -55,7 +55,7 @@ describe("desplegables que se actualizan con cada alta", () => {
     expect(spaceAlreadyExists([{ id: "otro-id", name: "Atarfe", type: "municipio" }], buildSpace({ kind: "municipio", ineCode: "18022" })!)).toBe(true);
   });
   it("los distritos de un municipio y la agrupación salen de los espacios existentes", () => {
-    expect(districtsOf(base, "18087").map((s) => s.id)).toEqual(["granada-zaidin"]);
+    expect(districtsOf(base, "18087").map((s) => s.id)).toEqual(["granada-centro"]);
     expect(districtsOf(base, "18022")).toEqual([]);
     expect(groupSpaces(base).map((g) => g.label)).toEqual(["Municipios", "Distritos municipales"]);
   });

@@ -47,10 +47,10 @@ function study(votes: Record<string, number>): ThematicPrioritisationStudy {
   return { municipalityId: "t", sourceFileName: "t.csv", importedAt: "2026-10-21", totalRecords: 40, completeRecords: 40, ranking, topFiveTopicIds: ranking.slice(0, 5).map((r) => r.topicId), methodologicalCautions: [] };
 }
 
-const zaidinAssets = readLocalizaAssets(collect(JSON.parse(readFileSync(FIXTURE, "utf8")))).records;
+const centroAssets = readLocalizaAssets(collect(JSON.parse(readFileSync(FIXTURE, "utf8")))).records;
 
 const cases = {
-  zaidin: deriveReadingUnits({ assets: zaidinAssets, informeSignals: [{ dimension: "actividad física y sedentarismo", menciones: 4 }] }),
+  centro: deriveReadingUnits({ assets: centroAssets, informeSignals: [{ dimension: "actividad física y sedentarismo", menciones: 4 }] }),
   zagraForma: deriveReadingUnits({
     assets: [],
     study: study({ "actividad-fisica": 12, "sueno-descanso": 9, accidentes: 6 }),
@@ -68,14 +68,14 @@ const proposalIds = (d: ReturnType<typeof deriveReadingUnits>) =>
 
 describe("singularidad de los expedientes", () => {
   it("los tres expedientes dan conjuntos de unidades distintos", () => {
-    const [a, b, c] = [shape(cases.zaidin), shape(cases.zagraForma), shape(cases.atarfeForma)];
+    const [a, b, c] = [shape(cases.centro), shape(cases.zagraForma), shape(cases.atarfeForma)];
     expect(a).not.toEqual(b);
     expect(a).not.toEqual(c);
     expect(b).not.toEqual(c);
   });
 
   it("y propuestas distintas: ninguna decisión sobre un expediente se aplica a otro por coincidir el texto", () => {
-    const [a, b, c] = [proposalIds(cases.zaidin), proposalIds(cases.zagraForma), proposalIds(cases.atarfeForma)];
+    const [a, b, c] = [proposalIds(cases.centro), proposalIds(cases.zagraForma), proposalIds(cases.atarfeForma)];
     // Pueden coincidir en un patrón (misma unidad y mismo cruce), pero nunca ser el mismo conjunto.
     expect(a).not.toEqual(b);
     expect(a).not.toEqual(c);
@@ -88,9 +88,9 @@ describe("singularidad de los expedientes", () => {
   });
 
   it("expediente de ensayo: sus unidades y sus lagunas no cambian sin justificación", () => {
-    expect(zaidinAssets).toHaveLength(10);
-    expect(cases.zaidin.units.length).toBe(shape(cases.zaidin).length);
-    expect(shape(cases.zaidin)).toMatchInlineSnapshot(`
+    expect(centroAssets).toHaveLength(10);
+    expect(cases.centro.units.length).toBe(shape(cases.centro).length);
+    expect(shape(cases.centro)).toMatchInlineSnapshot(`
       [
         "actividad-fisica:activo-registrado-sin-voz",
         "alimentacion:activo-registrado-sin-voz",
@@ -99,7 +99,7 @@ describe("singularidad de los expedientes", () => {
         "sexualidad-salud:activo-registrado-sin-voz",
       ]
     `);
-    expect(cases.zaidin.topicsWithoutSource).toMatchInlineSnapshot(`
+    expect(cases.centro.topicsWithoutSource).toMatchInlineSnapshot(`
       [
         "pantallas-redes",
         "sueno-descanso",

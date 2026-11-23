@@ -1,9 +1,9 @@
 import { actionPlanElementCode } from "../../domain/action-plan-catalog/ActionPlanNotation";
-import { ZAIDIN_AGING_PROPOSAL } from "../../domain/action-plan-catalog/PlanPreparationDraft";
+import { AGING_FOUR_BLOCKS_BASE } from "../../domain/action-plan-catalog/PlanPreparationDraft";
 import type { ActionPlanCatalogModule } from "../../domain/action-plan-catalog/ActionPlanCatalog";
 import { useState } from 'react';
 import { COLLECTION_USES, PLANNING_INSTRUMENTS, type PlanningInstrument } from '../../domain/action-plan-catalog/PlanningInstruments';
-export function PlanningInstrumentCatalog({indicatorCode,indicatorDisplayCode,notationModule=ZAIDIN_AGING_PROPOSAL,onSelect,selectionLabel="Añadir como opción pendiente a la ficha"}:{notationModule?:ActionPlanCatalogModule;indicatorCode?:string;indicatorDisplayCode?:string;selectionLabel?:string;onSelect?:(instrument:PlanningInstrument,use:string)=>void}) {
+export function PlanningInstrumentCatalog({indicatorCode,indicatorDisplayCode,notationModule=AGING_FOUR_BLOCKS_BASE,onSelect,selectionLabel="Añadir como opción pendiente a la ficha"}:{notationModule?:ActionPlanCatalogModule;indicatorCode?:string;indicatorDisplayCode?:string;selectionLabel?:string;onSelect?:(instrument:PlanningInstrument,use:string)=>void}) {
  const [axis,setAxis]=useState(''); const [query,setQuery]=useState(''); const [use,setUse]=useState<string>(COLLECTION_USES[0]);
  // Cada línea solo ofrece los instrumentos preparados para sus propios objetivos:
  // el catálogo actual pertenece a Envejecimiento saludable (prefijo ENV).
@@ -19,7 +19,7 @@ export function PlanningInstrumentCatalog({indicatorCode,indicatorDisplayCode,no
  const entries=lineInstruments.filter(i=>(!objective || i.objectives.includes(objective)) && (!axis || i.axis===axis) && `${i.name} ${i.population} ${i.objectives.map(code=>actionPlanElementCode(notationModule,code)).join(' ')}`.toLocaleLowerCase('es').includes(query.toLocaleLowerCase('es')));
  return <details className="planning-instruments"><summary>Instrumentos para preparar la recogida{label}</summary>
  <p><strong>Catálogo de preparación.</strong> Selecciona solo los módulos adecuados a la población y al objetivo. Las opciones siguientes aún no generan cuestionarios ni calculan resultados.</p>
- <p>Antes de administrarlos deben comprobarse <strong>versión, población, permisos de uso, preguntas y puntuación</strong>.{prefix==='ENV' ? ' No se han registrado mediciones del Zaidín.' : ' Los instrumentos de la estrategia citan la fuente y el valor de referencia andaluz; un dato municipal no es comparable sin la misma muestra y método.'}</p>
+ <p>Antes de administrarlos deben comprobarse <strong>versión, población, permisos de uso, preguntas y puntuación</strong>.{prefix==='ENV' ? ' No se han registrado mediciones en el territorio.' : ' Los instrumentos de la estrategia citan la fuente y el valor de referencia andaluz; un dato municipal no es comparable sin la misma muestra y método.'}</p>
  <div className="planning-instruments__filters"><label>Eje<select value={axis} onChange={e=>setAxis(e.target.value)}><option value="">Todos los ejes</option>{axes.map(x=><option key={x}>{x}</option>)}</select></label>
  <label>Buscar instrumento, población u objetivo<input value={query} onChange={e=>setQuery(e.target.value)}/></label>
  <label>Uso previsto<select value={use} onChange={e=>setUse(e.target.value)}>{COLLECTION_USES.map(x=><option key={x}>{x}</option>)}</select></label></div>

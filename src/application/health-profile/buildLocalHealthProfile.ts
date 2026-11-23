@@ -375,7 +375,7 @@ function normalizeForScopeMatch(value: string): string {
 }
 
 // Token distintivo del ámbito: el fragmento más largo de su nombre que no sea
-// el nombre de la provincia (para "Granada-Zaidín" → "zaidin").
+// el nombre de la provincia (para "Granada-Centro" → "centro").
 function distinctiveScopeToken(
   scopeName: string,
   province: string | undefined
@@ -430,7 +430,7 @@ function buildConclusionesScaffold(
     .map((o) => o.title);
 
   // Activos que se identifican expresamente con el ámbito: su título o
-  // contenido contiene el nombre distintivo del territorio (p. ej., "Zaidín").
+  // contenido contiene el nombre distintivo del territorio (p. ej., "Centro").
   const scopeToken = distinctiveScopeToken(extras.scopeName, extras.province);
   const scopeMatchedAssetTitles =
     scopeToken === undefined

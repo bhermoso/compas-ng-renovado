@@ -1,6 +1,6 @@
 import { describe,it,expect } from "vitest";
 import { Packer } from "docx";
-import { ZAIDIN_AGING_PROPOSAL as module, thematicBlockNameFor, type PlanPreparationDraft } from "../src/domain/action-plan-catalog/PlanPreparationDraft";
+import { AGING_FOUR_BLOCKS_BASE as module, thematicBlockNameFor, type PlanPreparationDraft } from "../src/domain/action-plan-catalog/PlanPreparationDraft";
 import { buildDefinitiveActionPlanProjection } from "../src/domain/action-plan-catalog/DefinitiveActionPlanProjection";
 import {
   validatePlanDocument,
@@ -13,7 +13,7 @@ import {
 import { createIndicatorWorksheet } from "../src/domain/action-plan-catalog/IndicatorWorksheet";
 import { buildPlanWord,buildPlanPdf,planDocumentParagraphs,planActionParagraphs,planActuationParagraphs } from "../src/application/action-plan/exportPlanDocument";
 function fixture(){
- const draft:PlanPreparationDraft={municipalityId:"granada-zaidin",moduleId:module.id,version:module.version,updatedAt:"2026-09-16",decisions:{}};
+ const draft:PlanPreparationDraft={municipalityId:"municipio-ensayo",moduleId:module.id,version:module.version,updatedAt:"2026-09-16",decisions:{}};
  const put=(id:string,text:string)=>{draft.decisions[id]={status:"included",sourceText:text};};
  put(module.id,module.strategicObjective);
  for(const g of module.generalObjectives){put(g.code,g.title);for(const s of g.specificObjectives){put(s.code,s.title);put(s.indicator.code,s.indicator.title);}}

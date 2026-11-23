@@ -21,15 +21,12 @@ try {
    // El PLIZD de Fuente Vaqueros se distribuye con la aplicación: la copia debe incluir el PDF, no solo su referencia.
    for(const d of w.repository.documents)if(d.id==='doc-territorial-fuente-vaqueros-plizd-2024')d.source={...d.source,url:PLIZD};
    localStorage.setItem('compas-ng:workspace:'+w.municipality.identity.id,JSON.stringify(w));}
-  // Borrador de la antigua demostración de coordinación: las copias anteriores a la retirada de Granada-Zaidín pueden contenerlo y deben seguir recuperándose.
-  const {ZAIDIN_AGING_PROPOSAL}=await import('/compas-ng-renovado/src/domain/action-plan-catalog/PlanPreparationDraft.ts');
-  localStorage.setItem('compas-ng:demo:coordinacion-zaidin:v1',JSON.stringify({municipalityId:'demo-coordinacion-zaidin',moduleId:ZAIDIN_AGING_PROPOSAL.id,updatedAt:'2026-09-10T00:00:00Z',decisions:{},version:'coordinacion-zaidin-propuesta-v1'}));
   const {saveOriginalFile}=await import('/compas-ng-renovado/src/infrastructure/document-files/originalFiles.ts');
   for(const id of scopes)await saveOriginalFile(id,'orphan-test',new File(['Prueba de conservación '+id],'prueba.txt',{type:'text/plain',lastModified:12345}));
  },{seeds,PLIZD,scopes:SCOPES});
  const [download]=await Promise.all([source.waitForEvent('download'),source.getByRole('button',{name:'Descargar copia con originales'}).click()]);
  const path=join(dir,'copy.compas.json');await download.saveAs(path);const text=await readFile(path,'utf8');const backup=JSON.parse(text);
- assert.equal(backup.format,'compas-ng-browser-backup');assert.equal(backup.payload.storage.length,3);
+ assert.equal(backup.format,'compas-ng-browser-backup');assert.equal(backup.payload.storage.length,2);
  assert.ok(backup.payload.files.some(f=>f.name==='PLIZD_FUENTE_VAQUEROS_2024.pdf' && f.sha256===PLIZD_SHA256));
  assert.ok(backup.payload.notices.some(n=>n.includes('original no conservado')));
  const target=await createPage();
@@ -56,8 +53,8 @@ try {
  },text);
  assert.match(quotaResult,/quota-test/);assert.equal(await quota.evaluate(()=>localStorage.length),0,'Storage writes must roll back on quota failure');
  await quota.evaluate(async text=>{await (await import('/compas-ng-renovado/src/infrastructure/recovery/browserRecovery.ts')).restoreBackup(text);},text);
- assert.equal(await quota.evaluate(()=>localStorage.length),3,'Recovery can be retried after quota failure');
+ assert.equal(await quota.evaluate(()=>localStorage.length),2,'Recovery can be retried after quota failure');
  const malformed=JSON.parse(text);malformed.payload.storage[0].key='unrelated:setting';
  assert.match(await target.evaluate(async b=>{const m=await import('/compas-ng-renovado/src/infrastructure/recovery/browserRecovery.ts');b.sha256=await m.digest(new TextEncoder().encode(JSON.stringify(b.payload)));try{await m.restoreBackup(JSON.stringify(b));return 'UNEXPECTED';}catch(e){return e.message;}},malformed),/clave/);
- console.log('PASS: empty recovery entry, UI export/import, 2 scopes, separate draft, original PDF hash, unreferenced originals, exact raw state, idempotence, envelope/file corruption, conflicts, foreign keys and quota rollback/retry.');
+ console.log('PASS: empty recovery entry, UI export/import, 2 scopes, original PDF hash, unreferenced originals, exact raw state, idempotence, envelope/file corruption, conflicts, foreign keys and quota rollback/retry.');
 }finally{await browser?.close();await server.close();await rm(dir,{recursive:true,force:true});}

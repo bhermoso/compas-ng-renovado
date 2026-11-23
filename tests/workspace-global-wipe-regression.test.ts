@@ -113,15 +113,15 @@ function makeHealthReport(municipalityId: string): MunicipalityWorkspace["health
 }
 
 /**
- * Workspace de Granada-Zaidín con el estado esperado previo al incidente:
+ * Workspace de Granada-Centro con el estado esperado previo al incidente:
  * informe de salud, 13/13 estudios, 36 evidencias de estudios complementarios,
  * 56 activos Localiza Salud (92 evidencias derivadas totales), distrito sin INE.
  */
-function buildGranadaZaidinWorkspace(): MunicipalityWorkspace {
-  const municipalityId = "granada-zaidin";
+function buildGranadaCentroWorkspace(): MunicipalityWorkspace {
+  const municipalityId = "granada-centro";
   const base = createCompleteMunicipalityWorkspace({
     id: municipalityId,
-    name: "Granada-Zaidín",
+    name: "Granada-Centro",
     province: "Granada",
     territorialType: "distrito",
   });
@@ -130,7 +130,7 @@ function buildGranadaZaidinWorkspace(): MunicipalityWorkspace {
   repository = addMunicipalDocument(repository, {
     id: "doc-hr",
     kind: "health-report",
-    title: "Informe de Salud — Granada-Zaidín",
+    title: "Informe de Salud — Granada-Centro",
     canGenerateEvidence: false,
     tags: ["health-report"],
   });
@@ -145,7 +145,7 @@ function buildGranadaZaidinWorkspace(): MunicipalityWorkspace {
   repository = addMunicipalDocument(repository, {
     id: "doc-localiza",
     kind: "localiza-salud",
-    title: "Activos Localiza Salud — Granada-Zaidín",
+    title: "Activos Localiza Salud — Granada-Centro",
     tags: ["localiza-salud"],
   });
 
@@ -255,13 +255,13 @@ function countByOrigin(ws: MunicipalityWorkspace, origin: string): number {
 // ══════════════════════════════════════════════════════════════════════════════
 
 describe("persistencia global — los 5 ámbitos demo no pueden vaciarse", () => {
-  it("save → load conserva íntegros los 5 workspaces (4 municipios + Granada-Zaidín)", () => {
+  it("save → load conserva íntegros los 5 workspaces (4 municipios + Granada-Centro)", () => {
     const workspaces = [
       buildPopulatedMunicipalWorkspace("atarfe", "Atarfe"),
       buildPopulatedMunicipalWorkspace("alfacar", "Alfacar"),
       buildPopulatedMunicipalWorkspace("churriana", "Churriana de la Vega"),
       buildPopulatedMunicipalWorkspace("zagra", "Zagra"),
-      buildGranadaZaidinWorkspace(),
+      buildGranadaCentroWorkspace(),
     ];
 
     for (const ws of workspaces) {
@@ -288,28 +288,28 @@ describe("persistencia global — los 5 ámbitos demo no pueden vaciarse", () =>
   });
 
   it("cargar un ámbito no altera las claves persistidas de los demás", () => {
-    const zaidin = buildGranadaZaidinWorkspace();
+    const centro = buildGranadaCentroWorkspace();
     const atarfe = buildPopulatedMunicipalWorkspace("atarfe", "Atarfe");
-    saveWorkspaceToLocalStorage(zaidin);
+    saveWorkspaceToLocalStorage(centro);
     saveWorkspaceToLocalStorage(atarfe);
 
-    const rawZaidinBefore = store.get(buildWorkspaceStorageKey("granada-zaidin"));
+    const rawCentroBefore = store.get(buildWorkspaceStorageKey("granada-centro"));
     loadWorkspaceFromLocalStorage("atarfe");
-    loadWorkspaceFromLocalStorage("granada-zaidin");
-    const rawZaidinAfter = store.get(buildWorkspaceStorageKey("granada-zaidin"));
+    loadWorkspaceFromLocalStorage("granada-centro");
+    const rawCentroAfter = store.get(buildWorkspaceStorageKey("granada-centro"));
 
     // La carga es de solo lectura: nunca escribe.
-    expect(rawZaidinAfter).toBe(rawZaidinBefore);
+    expect(rawCentroAfter).toBe(rawCentroBefore);
   });
 });
 
 // ══════════════════════════════════════════════════════════════════════════════
-// 2. Test específico Granada-Zaidín: estado esperado previo al incidente
+// 2. Test específico Granada-Centro: estado esperado previo al incidente
 // ══════════════════════════════════════════════════════════════════════════════
 
-describe("Granada-Zaidín — el expediente completo sobrevive a la persistencia", () => {
+describe("Granada-Centro — el expediente completo sobrevive a la persistencia", () => {
   it("informe + 13 estudios + 36 evidencias de estudios + 56 activos (92 totales) intactos tras save → load", () => {
-    const ws = buildGranadaZaidinWorkspace();
+    const ws = buildGranadaCentroWorkspace();
 
     // Precondiciones del expediente reconstruido
     expect(ws.evidenceStore.atoms.length).toBe(92);
@@ -317,7 +317,7 @@ describe("Granada-Zaidín — el expediente completo sobrevive a la persistencia
     expect(countByOrigin(ws, "localiza-salud")).toBe(56);
 
     expect(saveWorkspaceToLocalStorage(ws)).toBe(true);
-    const loaded = loadWorkspaceFromLocalStorage("granada-zaidin");
+    const loaded = loadWorkspaceFromLocalStorage("granada-centro");
 
     expect(loaded).not.toBeNull();
     const l = loaded!;
@@ -340,7 +340,7 @@ describe("Granada-Zaidín — el expediente completo sobrevive a la persistencia
     expect(l.repository.documents.length).toBe(15);
 
     // Identidad territorial: distrito sin INE propio
-    expect(l.municipality.identity.id).toBe("granada-zaidin");
+    expect(l.municipality.identity.id).toBe("granada-centro");
     expect(l.municipality.identity.territorialType).toBe("distrito");
     expect(l.municipality.identity.ineCode).toBeUndefined();
 
@@ -355,27 +355,27 @@ describe("Granada-Zaidín — el expediente completo sobrevive a la persistencia
 
 describe("arranque — un workspace fresco jamás pisa datos persistidos ilegibles", () => {
   it("load con schemaVersion desconocida devuelve null SIN escribir, y el guard bloquea el workspace fresco", () => {
-    const ws = buildGranadaZaidinWorkspace();
+    const ws = buildGranadaCentroWorkspace();
     saveWorkspaceToLocalStorage(ws);
 
     // Simular datos de un esquema distinto (ilegibles para esta versión)
-    const key = buildWorkspaceStorageKey("granada-zaidin");
+    const key = buildWorkspaceStorageKey("granada-centro");
     const raw = store.get(key)!;
     const tampered = raw.replace('"schemaVersion":"1.0.0"', '"schemaVersion":"0.9.9"');
     store.set(key, tampered);
 
     // Secuencia de arranque de App.tsx (loadOrCreateMunicipalityWorkspace)
-    const loaded = loadWorkspaceFromLocalStorage("granada-zaidin");
+    const loaded = loadWorkspaceFromLocalStorage("granada-centro");
     expect(loaded).toBeNull();
-    expect(hasWorkspaceInLocalStorage("granada-zaidin")).toBe(true);
+    expect(hasWorkspaceInLocalStorage("granada-centro")).toBe(true);
 
     // La carga fallida NO ha modificado el almacenamiento
     expect(store.get(key)).toBe(tampered);
 
     // El workspace fresco que crearía la app está vacío → el guard impide guardarlo
     const fresh = createCompleteMunicipalityWorkspace({
-      id: "granada-zaidin",
-      name: "Granada-Zaidín",
+      id: "granada-centro",
+      name: "Granada-Centro",
       province: "Granada",
       territorialType: "distrito",
     });
@@ -446,7 +446,7 @@ describe("carga documental — strategic-framework / territorial-documentation /
 
   for (const kind of textKinds) {
     it(`ingestar ${kind} (texto o DOCX extraído) no borra informe, estudios, activos ni átomos previos`, () => {
-      const full = buildGranadaZaidinWorkspace();
+      const full = buildGranadaCentroWorkspace();
       const atomIdsBefore = new Set(full.evidenceStore.atoms.map((a) => a.id));
 
       const result = ingestManualDocument({
@@ -485,7 +485,7 @@ describe("carga documental — strategic-framework / territorial-documentation /
 
       // Y el resultado sobrevive a la persistencia
       expect(saveWorkspaceToLocalStorage(next)).toBe(true);
-      const reloaded = loadWorkspaceFromLocalStorage("granada-zaidin");
+      const reloaded = loadWorkspaceFromLocalStorage("granada-centro");
       expect(reloaded).not.toBeNull();
       expect(reloaded!.evidenceStore.atoms.length).toBe(next.evidenceStore.atoms.length);
       expect(reloaded!.healthReport).toBeDefined();
@@ -493,7 +493,7 @@ describe("carga documental — strategic-framework / territorial-documentation /
   }
 
   it("registrar un PDF de referencia (sin extracción) solo añade el documento, sin tocar nada más", () => {
-    const full = buildGranadaZaidinWorkspace();
+    const full = buildGranadaCentroWorkspace();
 
     // Réplica de la rama PDF de handleLoadDocumentFile
     const nextRepository = addMunicipalDocument(full.repository, {
@@ -518,7 +518,7 @@ describe("carga documental — strategic-framework / territorial-documentation /
     }
 
     expect(saveWorkspaceToLocalStorage(next)).toBe(true);
-    const reloaded = loadWorkspaceFromLocalStorage("granada-zaidin");
+    const reloaded = loadWorkspaceFromLocalStorage("granada-centro");
     expect(reloaded).not.toBeNull();
     expect(reloaded!.evidenceStore.atoms.length).toBe(92);
     expect(reloaded!.repository.documents.length).toBe(16);

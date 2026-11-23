@@ -15,8 +15,6 @@ import {
   proposalObjectiveTexts,
   proposalStrategicText,
   proposedTextFor,
-  ZAIDIN_PROPOSAL_VERSION,
-  ZAIDIN_FINAL_ACTION_PLAN_VERSION,
   type PlanPreparationDecision,
   type PlanPreparationDraft,
   type PlanPreparationReview,
@@ -84,9 +82,7 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
    <SavedDraftReadOnly draft={draft} />
   </section>;
  }
- const revised = module.version === ZAIDIN_PROPOSAL_VERSION;
  const fourBlocks = module.generalObjectives.length === 4 && module.generalObjectives.every(general => Boolean(general.thematicBlockName));
- const finalApprovedText = module.version === ZAIDIN_FINAL_ACTION_PLAN_VERSION;
  const directTerritorialEdit = canEditProposal && !canReview;
  const emphasized = (text: string) => cleanActionPlanProposalText([proposalStrategicText, ...Object.values(proposalObjectiveTexts), ...proposalBlocks.map(b => b.text)].find(candidate => plainProposalText(candidate) === cleanActionPlanProposalText(text)) ?? text);
  const territorialText = (id: string, text: string) => draft?.decisions[id]?.status === "modified" ? cleanActionPlanProposalText(draft.decisions[id].text ?? text) : emphasized(text);
@@ -301,30 +297,29 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
   </details>
   <section className="pcm-strategic" aria-label="Objetivo estratégico vigente">
    <h3>{directTerritorialEdit ? "Objetivo estratégico vigente" : "Objetivo estratégico propuesto"}</h3>
-   <p><ProposalText text={canReview ? consolidatedText(module.id, revised ? plainProposalText(proposalStrategicText) : module.strategicObjective) : territorialText(module.id, revised ? proposalStrategicText : module.strategicObjective)}/></p>
+   <p><ProposalText text={canReview ? consolidatedText(module.id, module.strategicObjective) : territorialText(module.id, module.strategicObjective)}/></p>
    <ElementProvenance p={module.strategicObjectiveProvenance}/>
   </section>
   {canEditProposal && <div className="pcm-bulk-actions" role="group" aria-label={`Incorporación de propuestas de ${module.title}`}>
    <button type="button" onClick={() => applyModuleSelection("included")}>Incorporar módulo completo al borrador</button>
    <button type="button" onClick={() => applyModuleSelection("excluded")}>Excluir módulo del borrador</button>
-   <p className="panel-note">Se guardan únicamente decisiones de preparación para {municipalityId}. Se respetan las redacciones locales modificadas al incorporar. No se copian datos de seguimiento ni acuerdos del Plan Local de Salud del Distrito Zaidín, del que procede el catálogo, y no se aprueba el Plan.</p>
+   <p className="panel-note">Se guardan únicamente decisiones de preparación para {municipalityId}. Se respetan las redacciones locales modificadas al incorporar. El catálogo es común a todos los expedientes: no trae datos de seguimiento ni acuerdos de ningún territorio, y no aprueba el Plan.</p>
   </div>}
   {control(module.id, module.strategicObjective, [])}
   {module.generalObjectives.map(general => {
-   const block = proposalBlocks.find(b => b.name === general.thematicBlockName);
    const sourceGeneral = general.title;
-   const visibleGeneral = canReview ? consolidatedText(general.code, sourceGeneral) : territorialText(general.code, (revised ? block?.text : undefined) ?? sourceGeneral);
+   const visibleGeneral = canReview ? consolidatedText(general.code, sourceGeneral) : territorialText(general.code, sourceGeneral);
    return <details className="pcm-general" key={general.code}>
     <summary>{(fourBlocks ? general.thematicBlockName : undefined) ?? `${general.code} · ${visibleGeneral}`}</summary>
     {draft?.decisions[general.code]?.status === "pending" && <p className="panel-note">Bloque pendiente de revisión.</p>}
     <p><strong>Objetivo general · {actionPlanElementCode(module,general.code)}:</strong> <ProposalText text={visibleGeneral}/></p>
     <ElementProvenance p={general.provenance}/>
-    {control(general.code, sourceGeneral, [module.id], !finalApprovedText)}
+    {control(general.code, sourceGeneral, [module.id], true)}
     {general.specificObjectives.map(specific => {
      const indicator = specific.indicator;
      const sourceSpecific = specific.title;
      const sourceIndicator = indicator.title;
-     const visibleSpecific = canReview ? consolidatedText(specific.code, sourceSpecific) : territorialText(specific.code, revised ? proposalObjectiveTexts[specific.code] : sourceSpecific);
+     const visibleSpecific = canReview ? consolidatedText(specific.code, sourceSpecific) : territorialText(specific.code, sourceSpecific);
      const visibleIndicator = canReview ? consolidatedText(indicator.code, sourceIndicator) : territorialText(indicator.code, sourceIndicator);
      const draftModule = {...module, strategicObjective: plainProposalText(canReview ? consolidatedText(module.id,module.strategicObjective) : territorialText(module.id,module.strategicObjective))};
      const draftGeneral = {...general, title: plainProposalText(visibleGeneral)};

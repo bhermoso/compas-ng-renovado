@@ -10,7 +10,7 @@
  *  - Zagra:                sin código          → 18913 (añadido)
  *  - Atarfe:               18022 (correcto, sin cambio)
  *  - Granada capital:      no añadida (decisión posterior expresa requerida)
- *  - Granada-Zaidín:       distrito inframunicipal, sin INE propio (añadido 2026-07-07)
+ *  - Granada-Centro:       distrito inframunicipal, sin INE propio (añadido 2026-07-07)
  */
 
 import { describe, it, expect } from "vitest";
@@ -22,7 +22,7 @@ const DEMO: { id: string; name: string; province: string; ineCode?: string; terr
   { id: "alfacar",        name: "Alfacar",              province: "Granada", ineCode: "18011" },
   { id: "churriana",      name: "Churriana de la Vega", province: "Granada", ineCode: "18062" },
   { id: "zagra",          name: "Zagra",               province: "Granada", ineCode: "18913" },
-  { id: "granada-zaidin", name: "Granada-Zaidín",       province: "Granada", territorialType: "distrito" },
+  { id: "granada-centro", name: "Granada-Centro",       province: "Granada", territorialType: "distrito" },
 ];
 
 const DEMO_WITH_INE = DEMO.filter((m) => m.ineCode !== undefined);
@@ -73,37 +73,37 @@ describe("Municipios demo — códigos INE verificados con BADEA/IECA", () => {
   });
 });
 
-describe("Granada-Zaidín — distrito inframunicipal", () => {
+describe("Granada-Centro — distrito inframunicipal", () => {
   it("aparece en la lista de ámbitos demo", () => {
     const ids = DEMO.map((m) => m.id);
-    expect(ids).toContain("granada-zaidin");
+    expect(ids).toContain("granada-centro");
   });
 
   it("queda tipificado como distrito", () => {
-    const entry = DEMO.find((m) => m.id === "granada-zaidin");
+    const entry = DEMO.find((m) => m.id === "granada-centro");
     expect(entry).toBeDefined();
     expect(entry!.territorialType).toBe("distrito");
   });
 
   it("no tiene código INE municipal propio", () => {
-    const entry = DEMO.find((m) => m.id === "granada-zaidin");
+    const entry = DEMO.find((m) => m.id === "granada-centro");
     expect(entry!.ineCode).toBeUndefined();
   });
 
   it("no usa el INE 18087 (Granada capital) como código propio", () => {
-    const entry = DEMO.find((m) => m.id === "granada-zaidin");
+    const entry = DEMO.find((m) => m.id === "granada-centro");
     expect(entry!.ineCode).not.toBe("18087");
   });
 
   it("puede crear workspace sin ineCode", () => {
     const ws = createCompleteMunicipalityWorkspace({
-      id: "granada-zaidin",
-      name: "Granada-Zaidín",
+      id: "granada-centro",
+      name: "Granada-Centro",
       province: "Granada",
       territorialType: "distrito",
     });
-    expect(ws.municipality.identity.id).toBe("granada-zaidin");
-    expect(ws.municipality.identity.name).toBe("Granada-Zaidín");
+    expect(ws.municipality.identity.id).toBe("granada-centro");
+    expect(ws.municipality.identity.name).toBe("Granada-Centro");
     expect(ws.municipality.identity.territorialType).toBe("distrito");
     expect(ws.municipality.identity.ineCode).toBeUndefined();
   });

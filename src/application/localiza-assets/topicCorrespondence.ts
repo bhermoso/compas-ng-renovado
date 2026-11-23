@@ -55,7 +55,7 @@ const validada = (
   ...(note ? { note } : {}),
 });
 
-/** Temáticas observadas en los registros de prueba de Granada-Zaidín (15). */
+/** Temáticas observadas en los registros de prueba de Localiza Salud (15). */
 export const TOPIC_CORRESPONDENCE: readonly TopicCorrespondenceEntry[] = [
   validada("Alimentación saludable", ["alimentacion"]),
   validada("Actividad física", ["actividad-fisica"]),

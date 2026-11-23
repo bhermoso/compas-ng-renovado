@@ -24,7 +24,7 @@ import {
 import type { PerfilLocalDeSalud } from "../src/domain/health-profile";
 
 function perfilTrabajado(): PerfilLocalDeSalud {
-  let perfil = createPerfilLocalDeSalud("granada-zaidin");
+  let perfil = createPerfilLocalDeSalud("granada-centro");
   perfil = addInterpretation(perfil, {
     espacio: "determinantes",
     enunciado: "El envejecimiento condiciona las redes de cuidado del distrito.",

@@ -107,11 +107,11 @@ function cargar(muni: string, file: string): Caso {
   return { ws, psl, answers, territory, province, v2: v2.artifact, legacy: legacy.artifact };
 }
 
-let zaidin: Caso;
+let centro: Caso;
 let atarfe: Caso;
 
 beforeAll(() => {
-  zaidin = cargar("municipio-ensayo", "compas-ng-workspace-municipio-ensayo.json");
+  centro = cargar("municipio-ensayo", "compas-ng-workspace-municipio-ensayo.json");
   atarfe = cargar("atarfe", "compas-ng-workspace-atarfe.json");
 });
 
@@ -132,7 +132,7 @@ function workspace(): MunicipalityWorkspace {
   traceabilityLinks: [{
    moduleId: "env-2027-2030",
    moduleTitle: "Envejecimiento saludable",
-   moduleVersion: "zaidin-plan-accion-final-2026-09-25",
+   moduleVersion: "centro-plan-accion-final-2026-09-25",
    strategicObjective: "Favorecer el envejecimiento saludable.",
    thematicBlockCode: "ENV-OG1",
    thematicBlock: "Edadismo",
@@ -164,7 +164,7 @@ function workspace(): MunicipalityWorkspace {
    pendingSummary: [],
   }]
  };
- return structuredClone({...zaidin.ws, validatedPSL: zaidin.psl, compiledProfiles: [atarfe.v2, zaidin.v2],
+ return structuredClone({...centro.ws, validatedPSL: centro.psl, compiledProfiles: [atarfe.v2, centro.v2],
   validatedActionPlans: [
    {...current, generatedAt: "2026-09-20T09:00:00Z", paragraphs: [{text: "OBJETIVO ANTIGUO"}]},
    current,
@@ -176,7 +176,7 @@ function workspace(): MunicipalityWorkspace {
 const evalFramework: import("../src/domain/health-plan").PLSEvaluationFramework = {
  evaluationQuestions: ["¿Se redujo la soledad no deseada entre las personas mayores?"],
  evaluationMoments: ["Año 2 del plan"],
- evaluationResponsible: "Técnica de Salud Pública del Distrito Zaidín",
+ evaluationResponsible: "Técnica de Salud Pública del Distrito Centro",
  baselineNote: "Línea base: encuesta de soledad 2026",
 };
 
@@ -193,7 +193,7 @@ describe("Compilación inicial del Plan Local de Salud", () => {
   const result = compileInitialLocalHealthPlan(ws, false, "2026-09-28T10:00:00Z");
   expect(result.ok).toBe(true);
   if (!result.ok) return;
-  const profile = buildPSLCDocumentModel(zaidin.v2);
+  const profile = buildPSLCDocumentModel(centro.v2);
   for (const section of profile.sections) expect(result.document.sections).toContainEqual(section);
   const text = JSON.stringify(result.document);
   expect(text).toContain("intervenciones comunitarias");
@@ -211,7 +211,7 @@ describe("Compilación inicial del Plan Local de Salud", () => {
   // Sin Plan de Acción validado no hay documento.
   expect(compileInitialLocalHealthPlan({...ws, validatedActionPlans: []}, false).ok).toBe(false);
   // Un Perfil compilado sin documento sellado es un fallo de integridad y bloquea.
-  expect(compileInitialLocalHealthPlan({...ws, compiledProfiles: [{...zaidin.v2, canonicalDocument: undefined}]}, false).ok).toBe(false);
+  expect(compileInitialLocalHealthPlan({...ws, compiledProfiles: [{...centro.v2, canonicalDocument: undefined}]}, false).ok).toBe(false);
  });
  it("la validación del Perfil es criterio de calidad, no requisito", () => {
   const ws = workspace();
@@ -232,7 +232,7 @@ describe("Compilación inicial del Plan Local de Salud", () => {
   // Perfil compilado de otra versión o modificado después: no se usa y se declara sin compilar.
   for (const changed of [
    {...ws, compiledProfiles: [atarfe.v2]},
-   {...ws, compiledProfiles: [{...zaidin.v2, sourcePSLVersion: "anterior"}]},
+   {...ws, compiledProfiles: [{...centro.v2, sourcePSLVersion: "anterior"}]},
   ]) {
    const r = compileInitialLocalHealthPlan(changed, false);
    expect(r.ok).toBe(true);

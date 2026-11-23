@@ -40,9 +40,9 @@ describe('Mortality extraction preserves the source rather than supplying defaul
     expect(rate.geography.level).toBe('unknown');
     expect(rate.numerator).toBeUndefined();
   });
-  it('preserves literal cause percentages for Zaidin without supplying missing ones', () => {
+  it('preserves literal cause percentages for Centro without supplying missing ones', () => {
     const text = '4.3 Análisis de la mortalidad\nLas principales causas de defunción en 2024 fueron tumores 19%.\n5. Análisis Encuesta Andaluza de Salud';
-    const cause = buildHealthReportStructuredReading(syntheticReport(text, 'granada-zaidin')).findings[0];
+    const cause = buildHealthReportStructuredReading(syntheticReport(text, 'granada-centro')).findings[0];
     expect(cause.value).toContain('19%');
     expect(cause.value).not.toContain('27%');
     expect(cause.period).toBe('2024');

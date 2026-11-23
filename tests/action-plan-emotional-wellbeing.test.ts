@@ -84,12 +84,12 @@ describe("Procedencia del catálogo y documentación de apoyo", () => {
     }
   });
 
-  it("envejecimiento y adicciones conservan su versión; el Plan Local del Zaidín figura en la línea, no en cada elemento", () => {
+  it("envejecimiento y adicciones conservan su versión y son estructurales: ningún texto nombra un territorio", () => {
     expect(HEALTHY_AGING_MODULE.version).toBe("3.1");
     expect(ADDICTIONS_MODULE.version).toBe("3.1");
-    expect(HEALTHY_AGING_MODULE.sourceLabel).toMatch(/Zaidín/);
-    expect(ADDICTIONS_MODULE.sourceLabel).toMatch(/Zaidín/);
-    expect(JSON.stringify([...all(HEALTHY_AGING_MODULE), ...all(ADDICTIONS_MODULE)])).not.toMatch(/Zaidín/);
+    expect(HEALTHY_AGING_MODULE.sourceLabel).toMatch(/Catálogo estructural de COMPÁS/);
+    expect(ADDICTIONS_MODULE.sourceLabel).toMatch(/Catálogo estructural de COMPÁS/);
+    expect(JSON.stringify([...all(HEALTHY_AGING_MODULE), ...all(ADDICTIONS_MODULE)])).not.toMatch(/Centro/);
   });
 
   it("cada documento citado existe en el repositorio común, y los adaptados citan al menos uno", () => {

@@ -11,7 +11,7 @@ describe("Instrumentos de recogida por línea del Plan de Acción", () => {
     it(`${module.title} no ofrece ejes ni notas de Envejecimiento`, () => {
       const html = renderToStaticMarkup(<PlanningInstrumentCatalog notationModule={module} indicatorCode={code} indicatorDisplayCode={code} />);
       for (const axis of AGING_AXES) expect(html).not.toContain(`<option>${axis}</option>`);
-      expect(html).not.toContain("mediciones del Zaidín");
+      expect(html).not.toContain("mediciones del Centro");
     });
   }
   it("Bienestar emocional ofrece los instrumentos que usan el PESMAA y la EPVSA", () => {

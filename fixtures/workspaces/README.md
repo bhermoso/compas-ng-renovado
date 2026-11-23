@@ -13,8 +13,7 @@ los trece instrumentos metodológicos. No representa a ningún municipio real:
 - Los 10 activos de Localiza son de ensayo, con el formato y el vocabulario de
   temáticas de Localiza Salud.
 
-Se genera con `scripts/demo/build-municipio-ensayo.gen.ts`. Sustituye desde el
-21/11/2026 al antiguo expediente sintético de Granada-Zaidín, retirado de COMPÁS.
+Se genera con `scripts/demo/build-municipio-ensayo.gen.ts`.
 
 No es un expediente municipal, no acredita aplicaciones realizadas y no puede
 copiarse a `municipalities/`, `public/seeds/` ni a ninguna salida institucional.

@@ -40,7 +40,7 @@ function loadSeed(id: string): MunicipalityWorkspace {
 }
 
 const atarfe = loadSeed("atarfe");
-const zaidin = loadSeed("municipio-ensayo");
+const centro = loadSeed("municipio-ensayo");
 
 const CONFLICTO_ESCALA = "conflicto-escala-individual-poblacional";
 const CONFLICTO_TEMPORAL = "conflicto-temporal-cambio-volumen";
@@ -58,7 +58,7 @@ describe("Lote A · F4 — escala real del IBSE cargado", () => {
   });
 
   it("F4.2 REGRESIÓN Municipio de ensayo: el IBSE provincial conserva su tratamiento proxy", () => {
-    const refs = buildIndicatorComparisonReferences({ workspace: zaidin }).references;
+    const refs = buildIndicatorComparisonReferences({ workspace: centro }).references;
     const ibse = refs.filter((r) => r.instrument === "IBSE");
     expect(ibse.length).toBeGreaterThan(0);
     for (const r of ibse) {
@@ -74,7 +74,7 @@ describe("Lote A · F4 — escala real del IBSE cargado", () => {
     // documento de Municipio de ensayo lo declara, ninguna fuente provincial (IBSE ni
     // EAS) puede volverse local por este cambio.
     expect(
-      zaidin.repository.documents.every((d) => d.territorialScale !== "municipio")
+      centro.repository.documents.every((d) => d.territorialScale !== "municipio")
     ).toBe(true);
   });
 });
@@ -91,7 +91,7 @@ describe("Lote A · F5 — conflicto multiescala solo con indicadores no-IBSE", 
   });
 
   it("F5.2 REGRESIÓN Municipio de ensayo: conserva el conflicto de escala legítimo (IBSE + indicadores EAS)", () => {
-    const runtime = createMunicipalityRuntime({ workspace: zaidin });
+    const runtime = createMunicipalityRuntime({ workspace: centro });
     const indicadoresNoIbse = runtime.mit.dimensionDiagnostica.indicators.filter(
       (a) => a.provenance.origin !== "ibse"
     );

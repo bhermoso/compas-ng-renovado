@@ -28,7 +28,7 @@ export interface MunicipalitySeed {
  * Estado (2026-11-21): expedientes canonicos cargables = Atarfe, Alfacar, Fuente Vaqueros y Loja. Churriana de la Vega y Zagra NO
  * tienen export real: se abren vacios hasta que exista uno. No se inventa
  * contenido; las fixtures sinteticas o provinciales NO se promueven a datos de
- * produccion. Granada-Zaidin se retiro de COMPAS el 2026-11-21.
+ * produccion.
  */
 export const MUNICIPALITY_SEEDS: Readonly<Record<string, MunicipalitySeed>> = {
   atarfe: {

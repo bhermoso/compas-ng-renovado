@@ -1,14 +1,18 @@
 import { HEALTHY_AGING_MODULE, type ActionPlanCatalogModule } from "./ActionPlanCatalog";
 import type { PLSEvaluationFramework, UnaddressedNeed } from "../health-plan";
-export const ZAIDIN_FINAL_ACTION_PLAN_VERSION = "zaidin-plan-accion-final-2026-09-25";
-/** Alias conservado para compatibilidad con expedientes y consumidores anteriores. */
-export const ZAIDIN_PROPOSAL_VERSION = ZAIDIN_FINAL_ACTION_PLAN_VERSION;
+/**
+ * Plantilla estructural de envejecimiento saludable en cuatro bloques
+ * (edadismo, soledad no deseada, autonomía y participación). Es común a todos
+ * los expedientes: cada territorio la selecciona, adapta y valida con sus
+ * fuentes. Sus textos se redactan para «el territorio» y no nombran ninguno.
+ */
+export const AGING_FOUR_BLOCKS_BASE_VERSION = "envejecimiento-cuatro-bloques-base-2026-09-25";
 
 export function cleanObsoleteActionPlanProgramLabels(text: string): string {
- const obsoleteProgramLabel = /\s*\([^)]*(?:MANY AGES|MAY AGES|ONE LIFE|ZAID[IÍ]N SENIOR FEST)[^)]*\)\.?/giu;
+ const obsoleteProgramLabel = /\s*\([^)]*(?:MANY AGES|MAY AGES|ONE LIFE|[A-ZÁÉÍÓÚ]+ SENIOR FEST)[^)]*\)\.?/giu;
  if (!obsoleteProgramLabel.test(text)) return text;
  return text
-  .replace(/\s*\([^)]*(?:MANY AGES|MAY AGES|ONE LIFE|ZAID[IÍ]N SENIOR FEST)[^)]*\)\.?/giu, ".")
+  .replace(/\s*\([^)]*(?:MANY AGES|MAY AGES|ONE LIFE|[A-ZÁÉÍÓÚ]+ SENIOR FEST)[^)]*\)\.?/giu, ".")
   .replace(/\s+\./g, ".")
   .replace(/\.{2,}/g, ".")
   .trim();
@@ -21,7 +25,7 @@ export function cleanActionPlanProposalText(text: string): string {
 }
 
 export const plainProposalText = (text: string) => cleanActionPlanProposalText(text.replaceAll("**", ""));
-export const proposalStrategicText = "**Favorecer** el **envejecimiento saludable** de las personas mayores del Zaidín mediante la **reducción del edadismo**, la **prevención y el abordaje de la soledad no deseada**, el **mantenimiento de la autonomía** y el **fortalecimiento de la participación comunitaria**.";
+export const proposalStrategicText = "**Favorecer** el **envejecimiento saludable** de las personas mayores del territorio mediante la **reducción del edadismo**, la **prevención y el abordaje de la soledad no deseada**, el **mantenimiento de la autonomía** y el **fortalecimiento de la participación comunitaria**.";
 export const proposalObjectiveTexts: Record<string, string> = {
   "ENV-OE5.1": "Reducir las actitudes edadistas entre las personas participantes en intervenciones comunitarias.",
   "ENV-OE5.2": "Incrementar la visibilidad de las personas mayores como personas capaces, diversas y socialmente activas en las iniciativas comunitarias.",
@@ -29,7 +33,7 @@ export const proposalObjectiveTexts: Record<string, string> = {
   "ENV-OE2.2": "Reducir la soledad percibida entre las personas mayores incorporadas a una intervención por situación de soledad.",
   "ENV-OE3.1": "Mejorar los contactos sociales de las personas mayores.",
   "ENV-OE3.2": "Mejorar el apoyo social percibido por las personas mayores.",
-  "ENV-OE6.1": "Aumentar la capacidad de las personas agentes del distrito Zaidín para identificar y canalizar situaciones de soledad o riesgo de aislamiento social.",
+  "ENV-OE6.1": "Aumentar la capacidad de las personas agentes del territorio para identificar y canalizar situaciones de soledad o riesgo de aislamiento social.",
   "ENV-OE6.2": "Incrementar el aprovechamiento de los activos comunitarios en actuaciones orientadas a favorecer relaciones sociales y prevenir la soledad.",
   "ENV-OE7.2": "Mejorar la continuidad entre la detección comunitaria, la valoración y la respuesta ante situaciones de soledad o aislamiento.",
   "ENV-OE1.1": "Mantener y fortalecer la autonomía de las personas mayores que participan en actuaciones de promoción de la salud.",
@@ -37,9 +41,9 @@ export const proposalObjectiveTexts: Record<string, string> = {
   "ENV-OE9.1": "Mejorar las competencias digitales funcionales de las personas mayores con dificultades para utilizar servicios digitales.",
   "ENV-OE9.2": "Aumentar la autonomía de las personas mayores para realizar gestiones digitales esenciales.",
   "ENV-OE4.1": "Aumentar la participación de las personas mayores en actividades comunitarias significativas para ellas.",
-  "ENV-OE4.2": "Incrementar el protagonismo y la influencia de la población mayor del distrito.",
+  "ENV-OE4.2": "Incrementar el protagonismo y la influencia de la población mayor del territorio.",
   "ENV-OE8.1": "Reducir las barreras de accesibilidad identificadas como prioritarias en los espacios y equipamientos comunitarios.",
-  "ENV-OE8.2": "Mejorar la accesibilidad a los recursos y actividades comunitarias que se dirigen a las personas mayores del distrito Zaidín.",
+  "ENV-OE8.2": "Mejorar la accesibilidad a los recursos y actividades comunitarias que se dirigen a las personas mayores del territorio.",
   "ENV-OE7.1": "Consolidar la participación estable de los recursos sanitarios, sociales, municipales y comunitarios en la coordinación de la línea de envejecimiento saludable."
 };
 export const proposalBlocks = [
@@ -66,9 +70,9 @@ export function compareActionPlanNotation(left: string, right: string): number {
  return typeDiff !== 0 ? typeDiff : left.localeCompare(right, "es");
 }
 
-export const ZAIDIN_AGING_PROPOSAL: ActionPlanCatalogModule = {
- ...HEALTHY_AGING_MODULE, version: ZAIDIN_PROPOSAL_VERSION,
- sourceLabel: "Redacción final del Plan de Acción del Distrito Zaidín", sourceDate: "2026-09-25",
+export const AGING_FOUR_BLOCKS_BASE: ActionPlanCatalogModule = {
+ ...HEALTHY_AGING_MODULE, version: AGING_FOUR_BLOCKS_BASE_VERSION,
+ sourceLabel: "Plantilla estructural de envejecimiento saludable en cuatro bloques", sourceDate: "2026-09-25",
  strategicObjective: plainProposalText(proposalStrategicText),
  strategicObjectiveDisplayCode: "ENV-OEST",
  generalObjectives: proposalBlocks.map((block, blockIndex) => ({code: block.code, displayCode: `ENV-OG${blockIndex + 1}`, thematicBlockName: block.name, title: plainProposalText(block.text),
@@ -80,14 +84,17 @@ export const ZAIDIN_AGING_PROPOSAL: ActionPlanCatalogModule = {
  })}))
 };
 
-export function createZaidinFinalActionPlanDraft(
+/** Borrador con todos los elementos del módulo incluidos con su redacción de origen. */
+export function createIncludedActionPlanDraft(
+ module: ActionPlanCatalogModule,
+ municipalityId: string,
  previous?: PlanPreparationDraft,
  updatedAt = new Date().toISOString()
 ): PlanPreparationDraft {
  const decisions: Record<string, PlanPreparationDecision> = {
-  [ZAIDIN_AGING_PROPOSAL.id]: {status:"included",sourceText:ZAIDIN_AGING_PROPOSAL.strategicObjective},
+  [module.id]: {status:"included",sourceText:module.strategicObjective},
  };
- for (const general of ZAIDIN_AGING_PROPOSAL.generalObjectives) {
+ for (const general of module.generalObjectives) {
   decisions[general.code] = {status:"included",sourceText:general.title};
   for (const specific of general.specificObjectives) {
    decisions[specific.code] = {status:"included",sourceText:specific.title};
@@ -95,9 +102,9 @@ export function createZaidinFinalActionPlanDraft(
   }
  }
  return {
-  municipalityId: "granada-zaidin",
-  moduleId: ZAIDIN_AGING_PROPOSAL.id,
-  version: ZAIDIN_AGING_PROPOSAL.version,
+  municipalityId,
+  moduleId: module.id,
+  version: module.version,
   updatedAt,
   decisions,
   unaddressedNeeds: previous?.unaddressedNeeds,
