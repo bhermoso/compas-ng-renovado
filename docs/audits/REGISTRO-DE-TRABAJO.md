@@ -22,6 +22,35 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-23 · Retirada de archivos sin uso
+
+Master: `c04625b`.
+
+- **Encargo del responsable.** «borra lo innecesario».
+- **Método.** Se recorren las importaciones desde las páginas de entrada
+  (`index.html`, `verificar-perfiles.html`), las pruebas, los scripts y las
+  configuraciones. Cada archivo de `src/` que no alcanza ninguna se busca por
+  nombre en todo el repositorio antes de retirarlo.
+- **Retirados (6).**
+  - `src/config/samWeights.js`: coeficientes de ponderación sin procedencia
+    acreditada y sin uso (ver `docs/methodology/IBSE-ATARFE-PONDERACION-2026-10-23.md`).
+  - `src/domain/methodology/adapters/EASSavAdapter.ts` y
+    `EASHouseholdDomainModel.ts`: andamiaje de septiembre que devolvía textos fijos.
+  - `src/domain/agenda/index.ts` y `src/domain/statements/index.ts`: índices de
+    reexportación que nadie importa; los módulos se importan directamente.
+  - `tests/fixtures/external-profile.tsx`: página de comprobación que ninguna
+    página carga.
+- **Se conservan.** `src/contracts/workspace/` e
+  `InMemoryWorkspacePersistence` tampoco se usan, pero los describe el §9 de
+  `CONTRACT-PERSISTENCE.md`: retirarlos exige revisar ese contrato y queda como
+  decisión del responsable. `src/types/mammoth.d.ts` declara tipos y lo usa el
+  compilador.
+- **Dependencias.** Todas las de `package.json` están en uso.
+- **Ramas.** Las ramas fusionadas `archivo/expediente`, `docs/readme-lint` y
+  `fix/lint-a-cero` no se han podido borrar desde la sesión (el proxy de GitHub
+  rechaza la escritura de referencias); quedan para borrar a mano.
+- **Verificación.** Lint: 0. Compilación correcta. Suite: 2952 pasan, 2 omitidas.
+
 ## 2026-11-23 · Lint sin errores ni avisos
 
 Pages al empezar: no verificado (`version.json` no responde desde la sesión). Master: `f4c93a5`.

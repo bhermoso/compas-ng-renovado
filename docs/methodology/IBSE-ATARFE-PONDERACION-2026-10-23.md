@@ -9,6 +9,8 @@ Estado actualizado a 2026-10-24: método autorizado e integración optativa de i
 
 La matriz de `src/config/samWeights.js`, incorporada en el commit 6d87e32, contiene 32 coeficientes para 16 bandas entre 15-19 y 90-94 años. No incluye identificador de muestra, recuentos muestrales por celda, fórmula de derivación ni vínculo verificable con un export concreto. Su nombre no acredita por sí mismo la procedencia INE 2025. `getSamWeight` no recibe municipio y devuelve 1 ante una banda o sexo desconocidos; además, no reconoce los códigos REDCap 1/2. No se utiliza desde el parser IBSE.
 
+Nota del 23/11/2026: el archivo se retiró del repositorio porque nada lo usaba; sigue disponible en el historial de Git (commit 6d87e32).
+
 Existe una referencia poblacional distinta y documentada en `fixtures/population/atarfe-population-2025.ts`: tabla INE 68535, Atarfe 18022, periodo 2025, 20.952 personas, 21 bandas de todas las edades. Esta revisión comprueba su contenido en el repositorio, no vuelve a certificar la descarga original del INE. Disponer de esa referencia no valida los coeficientes añadidos.
 
 `fixtures/ibse-atarfe.csv` contiene puntuaciones y estado de cumplimentación, pero no edad ni sexo: 909 registros, 811 válidos y media total 63,2. El expediente semilla declara muestra mixta de menores de 16 y personas de 16 o más, sin desglose disponible. No se pueden reconstruir los pesos individuales ni sus medias ponderadas desde ese archivo. Tampoco puede dividirse exactamente la banda poblacional 15-19 en menores de 16 y mayores sin datos adicionales.
