@@ -49,7 +49,7 @@ describe("findDuplicateGroups", () => {
 });
 
 describe("retireDuplicateDocument", () => {
-  const store = (ids: string[]): EvidenceStore => ({ municipalityId: "zagra", createdAt: "", updatedAt: "", atoms: ids.map((d, i) => ({ id: `e${i}`, provenance: { documentId: d } })) as never });
+  const store = (ids: string[]): EvidenceStore => ({ municipalityId: "zagra", createdAt: "", updatedAt: "", atoms: ids.map((d, i) => ({ id: `e${i}`, municipalityId: "zagra", provenance: { documentId: d } })) as never });
   it("archiva la copia sin borrarla y quita solo sus evidencias", () => {
     let repo = add(empty, { id: "keep", contentSha256: SHA });
     repo = add(repo, { id: "copy", contentSha256: SHA });

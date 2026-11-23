@@ -38,26 +38,36 @@ function hasCoreWorkspaceCollections(value: unknown): value is MunicipalityWorks
   );
 }
 
-// Elimina duplicados de tipos canónicos conservando el documento con
-// createdAt más reciente (lexicográfico ISO 8601). En caso de empate,
-// prevalece el último del array. Tipos acumulables no se modifican.
+// Deduplica únicamente altas antiguas sin linaje ni historia declarada.
 function normalizeCanonicalDocuments(
   workspace: MunicipalityWorkspace
 ): MunicipalityWorkspace {
   if (!hasCoreWorkspaceCollections(workspace)) return workspace;
 
   const docs = workspace.repository.documents;
+  const versionedIds = new Set([
+    ...docs.flatMap(document => document.revisionOf ? [document.id, document.revisionOf] : []),
+    ...(Array.isArray(workspace.previousHealthReports)
+      ? workspace.previousHealthReports.map(report => report?.linkedDocumentId)
+      : []),
+  ]);
   let deduped = [...docs];
   let changed = false;
 
   for (const kind of CANONICAL_SINGLE_KINDS) {
-    const ofKind = deduped.filter((d) => d.kind === kind);
-    if (ofKind.length <= 1) continue;
-
-    const toKeep = ofKind.reduce((best, curr) =>
+    const unversioned = deduped.filter(d =>
+      d.kind === kind && d.status !== "archived" && d.status !== "rejected" &&
+      !versionedIds.has(d.id)
+    );
+    if (unversioned.length === 0) continue;
+    const linkedId = kind === "health-report" ? workspace.healthReport?.linkedDocumentId : undefined;
+    const linked = deduped.find(d => d.id === linkedId && d.kind === kind);
+    const toKeep = linked ?? unversioned.reduce((best, curr) =>
       curr.createdAt >= best.createdAt ? curr : best
     );
-    deduped = deduped.filter((d) => d.kind !== kind || d.id === toKeep.id);
+    const duplicates = new Set(unversioned.filter(d => d.id !== toKeep.id).map(d => d.id));
+    if (duplicates.size === 0) continue;
+    deduped = deduped.filter(d => !duplicates.has(d.id));
     changed = true;
   }
 

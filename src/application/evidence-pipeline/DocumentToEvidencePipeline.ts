@@ -6,6 +6,7 @@ import {
   type EvidenceStore,
   createEvidenceAtom,
   type EvidenceAtom,
+  evidenceHasDocument,
   type EvidenceAtomKind,
 } from "../../domain/evidence";
 import { extractNumberedOpenAnswers } from "./numberedOpenAnswers";
@@ -280,7 +281,7 @@ function transformOpenAnswers(
 }
 
 /** Clave de una ficha de Localiza: el registro completo, sin diferencias de espacios ni mayúsculas. */
-function localizaRecordKey(content: string): string {
+export function localizaRecordKey(content: string): string {
   return content.normalize("NFC").replace(/\s+/g, " ").trim().toLocaleLowerCase("es");
 }
 
@@ -315,15 +316,36 @@ export function transformDocumentToEvidence(
   // idéntica, columna a columna, a otra ya incorporada al expediente es la misma
   // ficha cargada de nuevo y no se vuelve a crear. Fichas distintas con el mismo
   // título siguen separadas (véase la nota de abajo).
-  const alreadyLoaded = input.document.kind === "localiza-salud"
-    ? new Set(input.store.atoms
-        .filter((atom) => atom.provenance.origin === "localiza-salud")
-        .map((atom) => localizaRecordKey(atom.content)))
-    : new Set<string>();
+  const isLocaliza = input.document.kind === "localiza-salud";
+  const alreadyLoaded = new Map<string, EvidenceAtom>();
+  if (isLocaliza) {
+    for (const atom of input.store.atoms) {
+      if (atom.provenance.origin === "localiza-salud" && atom.municipalityId === input.store.municipalityId) {
+        alreadyLoaded.set(localizaRecordKey(atom.content), atom);
+      }
+    }
+  }
+  const updated = new Map<string, EvidenceAtom>();
+  const extractedAt = new Date().toISOString();
 
   for (let index = 0; index < lines.length; index++) {
     const content = lines[index];
-    if (alreadyLoaded.has(localizaRecordKey(content))) continue;
+    const existing = isLocaliza ? alreadyLoaded.get(localizaRecordKey(content)) : undefined;
+    if (existing) {
+      if (!evidenceHasDocument(existing, input.document.id) && !updated.has(existing.id)) {
+        updated.set(existing.id, {
+          ...existing,
+          provenance: {
+            ...existing.provenance,
+            additionalDocuments: [
+              ...(existing.provenance.additionalDocuments ?? []),
+              { documentId: input.document.id, sourceLabel: input.document.title, extractedAt },
+            ],
+          },
+        });
+      }
+      continue;
+    }
     const kind = classifyEvidenceKind(content, input.document.kind);
 
     const atom = createEvidenceAtom({
@@ -336,7 +358,7 @@ export function transformDocumentToEvidence(
         origin: mapDocumentKindToEvidenceOrigin(input.document.kind),
         documentId: input.document.id,
         sourceLabel: input.document.title,
-        extractedAt: new Date().toISOString(),
+        extractedAt,
       },
       methodology: {
         description:
@@ -361,7 +383,9 @@ export function transformDocumentToEvidence(
   }
 
   return {
-    store,
+    store: updated.size
+      ? { ...store, atoms: store.atoms.map(atom => updated.get(atom.id) ?? atom), updatedAt: extractedAt }
+      : store,
     atomsCreated,
   };
 }

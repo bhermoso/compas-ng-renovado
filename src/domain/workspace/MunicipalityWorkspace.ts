@@ -28,6 +28,11 @@ import type { SBQStudy } from "../sbq";
 import type { DeliberativePrioritySelection } from "../deliberative-prioritisation";
 import type { MunicipalActionPlanModuleReview } from "../action-plan-catalog";
 
+export type ComplementaryStudyKey =
+  | "ibseStudy" | "dukeStudy" | "predimedStudy" | "sf12Study" | "suenoStudy"
+  | "cageStudy" | "auditcStudy" | "ipaqStudy" | "ghq12Study" | "phq9Study"
+  | "psqiStudy" | "fagerstromStudy" | "sbqStudy";
+
 /**
  * Snapshot compacto del Estado Territorial Evolutivo.
  * Almacena sólo datos escalares — sin arrays de EvidenceAtom —
@@ -82,6 +87,15 @@ export interface MunicipalityWorkspace {
   evidenceStore: EvidenceStore;
   healthReport?: HealthReportDocument;
   previousHealthReports?: HealthReportDocument[];
+  /** Ficha fuente de cada estudio activo. Los expedientes antiguos pueden carecer del vínculo. */
+  studySourceDocumentIds?: Partial<Record<ComplementaryStudyKey, string>>;
+  complementaryStudyHistory?: Array<{
+    studyKey: Exclude<ComplementaryStudyKey, "ibseStudy">;
+    replacedAt: string;
+    previousStudy: NonNullable<MunicipalityWorkspace[Exclude<ComplementaryStudyKey, "ibseStudy">]>;
+    documents: import("../repository").MunicipalDocument[];
+    evidence: import("../evidence").EvidenceAtom[];
+  }>;
   ibseStudy?: IBSEStudy;
   /** Revisiones del estudio IBSE anteriores a una nueva importación confirmada.
    * Contiene agregados, ficha y evidencias previas, nunca microdatos individuales.

@@ -244,6 +244,7 @@ interface EstudiosComplementariosPanelProps {
   // Repositorio y callback de borrado para el botón Eliminar
   repository?: MunicipalDocumentRepository;
   onDeleteDocument?: (documentId: string) => void;
+  activeStudySourceIds?: Readonly<Record<string, string | undefined>>;
 }
 
 // ── Componente principal ──────────────────────────────────────────────────────
@@ -304,6 +305,7 @@ export function EstudiosComplementariosPanel({
   onLoadSBQCSV,
   repository,
   onDeleteDocument,
+  activeStudySourceIds,
 }: EstudiosComplementariosPanelProps) {
   const studySlots = [ibseStudy, dukeStudy, predimedStudy, sf12Study, suenoStudy, cageStudy, auditcStudy, ipaqStudy, ghq12Study, phq9Study, psqiStudy, fagerstromStudy, sbqStudy];
   const loadedCount = studySlots.filter(Boolean).length;
@@ -409,9 +411,12 @@ export function EstudiosComplementariosPanel({
     ),
   };
 
-  // Busca el documentId de un estudio por su tag en el repositorio
   function docIdByTag(tag: string): string | undefined {
-    return repository?.documents.find((d) => d.tags.includes(tag))?.id;
+    if (activeStudySourceIds) return activeStudySourceIds[tag];
+    return repository?.documents.find(d =>
+      d.tags.includes(tag) && !d.tags.includes("pending-evidence-review") &&
+      d.status !== "archived" && d.status !== "rejected"
+    )?.id;
   }
 
   function makeDeleteHandler(tag: string) {

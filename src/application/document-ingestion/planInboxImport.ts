@@ -10,6 +10,7 @@ import { removeEquivalentStrategicFramework } from "./strategicFrameworkReplace"
 import type { InspectedFormat } from "./preliminaryDocumentAnalyzer";
 import type { MethodologicalMatch } from "./identifyMethodologicalHeaders";
 import { findExistingCopy } from "./documentDuplicates";
+import { PENDING_DOCUMENT_REVIEW } from "../document-files/documentRevisions";
 
 /** Cargador existente de COMPÁS al que la bandeja entrega el archivo revisado. */
 export type InboxImportRoute = "health-report" | "document-file" | "study-csv";
@@ -67,7 +68,8 @@ function deriveTitle(fileName: string): string {
 }
 
 function activeDocuments(repository: MunicipalDocumentRepository): MunicipalDocument[] {
-  return repository.documents.filter((d) => d.status !== "archived" && d.status !== "rejected");
+  return repository.documents.filter(d => d.status !== "archived" && d.status !== "rejected" &&
+    !d.tags.includes(PENDING_DOCUMENT_REVIEW));
 }
 
 /**

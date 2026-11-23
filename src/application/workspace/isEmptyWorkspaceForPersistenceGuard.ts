@@ -27,6 +27,10 @@ export function isEmptyWorkspaceForPersistenceGuard(
     (workspace.externalProfileLibrary?.attachments.length ?? 0) === 0 &&
     (workspace.documentOriginals?.length ?? 0) === 0 &&
     (workspace.documentDerivedFiles?.length ?? 0) === 0 &&
+    (workspace.complementaryStudyHistory?.length ?? 0) === 0 &&
+    (workspace.ibseStudyHistory?.length ?? 0) === 0 &&
+    (workspace.previousHealthReports?.length ?? 0) === 0 &&
+    (workspace.archivedAssetEvidence?.length ?? 0) === 0 &&
     workspace.repository.documents.length === 0 &&
     workspace.evidenceStore.atoms.length === 0 &&
     workspace.healthReport === undefined &&

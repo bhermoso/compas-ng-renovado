@@ -1,5 +1,6 @@
 import type { ProfileAttachment, ExternalProfileLibrary } from "../../domain/health-profile/ExternalHealthProfile";
 import type { MunicipalDocument } from "../../domain/repository";
+import type { MunicipalityWorkspace } from "../../domain/workspace";
 import { MAX_PROFILE_FILE_BYTES, MAX_PROFILE_LIBRARY_BYTES, profileAttachmentBlob } from "../health-profile/externalProfiles";
 
 /**
@@ -54,6 +55,16 @@ export function profileOriginalsBytes(library: ExternalProfileLibrary | undefine
 
 export function documentOriginalsBytes(originals: readonly StoredDocumentOriginal[] | undefined): number {
   return (originals ?? []).reduce((sum, o) => sum + o.size, 0);
+}
+
+export function workspaceDocumentBytes(workspace: Pick<MunicipalityWorkspace, "documentOriginals" | "documentDerivedFiles" | "externalProfileLibrary">): number {
+  return documentOriginalsBytes(workspace.documentOriginals)
+    + documentDerivativesBytes(workspace.documentDerivedFiles)
+    + profileOriginalsBytes(workspace.externalProfileLibrary);
+}
+
+export function isDocumentFileName(name: string): boolean {
+  return /\.(pdf|docx)$/i.test(name);
 }
 
 export async function encodeDocumentOriginal(documentId: string, file: Blob & { name?: string }): Promise<StoredDocumentOriginal> {
