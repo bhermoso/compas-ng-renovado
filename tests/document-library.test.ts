@@ -64,7 +64,7 @@ function addDocument(
 
 describe("Biblioteca documental COMPAS", () => {
   it("no expone documentos locales de otros expedientes como marcos reutilizables", () => {
-    let source = makeWorkspace("granada-zaidin", "Granada-Zaidín");
+    let source = makeWorkspace("granada-centro", "Granada-Centro");
     const strategic = addDocument(source, {
       id: "epvsa",
       kind: "strategic-framework",
@@ -75,24 +75,24 @@ describe("Biblioteca documental COMPAS", () => {
     const healthReport = addDocument(source, {
       id: "health-report",
       kind: "health-report",
-      title: "Informe de Salud Granada-Zaidín",
+      title: "Informe de Salud Granada-Centro",
       sourceText: "Texto no reutilizable como extra intermunicipal.",
       canGenerateEvidence: false,
       tags: ["health-report"],
     });
     source = healthReport.workspace;
     const localAssets = addDocument(source, {
-      id: "localiza-zaidin",
+      id: "localiza-centro",
       kind: "localiza-salud",
-      title: "Activos Localiza Salud Granada-Zaidín",
+      title: "Activos Localiza Salud Granada-Centro",
       sourceText: "Activos concretos de un territorio concreto.",
       tags: ["localiza-salud", "asset"],
     });
     source = localAssets.workspace;
     const territorial = addDocument(source, {
-      id: "diagnostico-zaidin",
+      id: "diagnostico-centro",
       kind: "territorial-documentation",
-      title: "Diagnostico territorial Granada-Zaidín",
+      title: "Diagnostico territorial Granada-Centro",
       sourceText: "Diagnostico local no reutilizable como extra intermunicipal.",
     });
     source = territorial.workspace;
@@ -106,16 +106,16 @@ describe("Biblioteca documental COMPAS", () => {
     expect(library.some((item) => item.document.id === "health-report")).toBe(
       false
     );
-    expect(library.some((item) => item.document.id === "localiza-zaidin")).toBe(
+    expect(library.some((item) => item.document.id === "localiza-centro")).toBe(
       false
     );
     expect(
-      library.some((item) => item.document.id === "diagnostico-zaidin")
+      library.some((item) => item.document.id === "diagnostico-centro")
     ).toBe(false);
   });
 
   it("no copia marcos estrategicos procedentes de expedientes municipales concretos", () => {
-    let source = makeWorkspace("granada-zaidin", "Granada-Zaidín");
+    let source = makeWorkspace("granada-centro", "Granada-Centro");
     const added = addDocument(source, {
       id: "plan-mayores",
       kind: "strategic-framework",
@@ -127,8 +127,8 @@ describe("Biblioteca documental COMPAS", () => {
 
     const result = assignLibraryDocumentToWorkspace({
       workspace: target,
-      sourceMunicipalityId: "granada-zaidin",
-      sourceMunicipalityName: "Granada-Zaidín",
+      sourceMunicipalityId: "granada-centro",
+      sourceMunicipalityName: "Granada-Centro",
       document: added.document,
       atoms: [],
     });
@@ -139,11 +139,11 @@ describe("Biblioteca documental COMPAS", () => {
   });
 
   it("no expone ni copia automaticamente tipos no reutilizables como health-report", () => {
-    let source = makeWorkspace("granada-zaidin", "Granada-Zaidín");
+    let source = makeWorkspace("granada-centro", "Granada-Centro");
     const added = addDocument(source, {
       id: "health-report",
       kind: "health-report",
-      title: "Informe de Salud Granada-Zaidín",
+      title: "Informe de Salud Granada-Centro",
       sourceText: "Contenido sanitario local.",
       canGenerateEvidence: false,
       tags: ["health-report"],
@@ -156,8 +156,8 @@ describe("Biblioteca documental COMPAS", () => {
 
     const result = assignLibraryDocumentToWorkspace({
       workspace: target,
-      sourceMunicipalityId: "granada-zaidin",
-      sourceMunicipalityName: "Granada-Zaidín",
+      sourceMunicipalityId: "granada-centro",
+      sourceMunicipalityName: "Granada-Centro",
       document: added.document,
       atoms: [],
     });

@@ -11,9 +11,9 @@
  *     las referencias comparativas de Granada/provincia y Andalucía NO forman
  *     parte de esos estudios: proceden de cálculos derivados de microdatos EAS
  *     (o de un monitor provincial equivalente, en el caso del IBSE).
- *   - En la demostración Granada-Zaidín los valores territoriales de los
- *     instrumentos EAS coinciden con la referencia provincial de Granada
- *     porque proceden de los mismos ficheros: eso es comportamiento demo/proxy
+ *   - Cuando los valores territoriales de los instrumentos EAS coinciden con
+ *     la referencia provincial porque proceden de los mismos ficheros, el
+ *     comportamiento es demo/proxy
  *     (demoProxy = true) y NO constituye estimación específica del distrito.
  *   - La referencia autonómica de Andalucía se incorpora para los instrumentos
  *     EAS con fixture autonómico ya calculado; cuando no existe referencia
@@ -620,7 +620,7 @@ export interface BuildIndicatorComparisonReferencesInput {
  * no por una etiqueta estática del instrumento ni por `sampleScope` (que codifica el
  * universo etario de la muestra, no el territorial). Así se distingue el IBSE
  * municipal de Atarfe (documento con `territorialScale: "municipio"`) del monitor
- * IBSE provincial de Granada-Zaidín (documento sin escala municipal declarada), que
+ * IBSE provincial (documento sin escala municipal declarada), que
  * conserva su tratamiento proxy.
  */
 function studyDocumentIsMunicipal(
@@ -638,7 +638,7 @@ export function buildIndicatorComparisonReferences(
 ): ComplementaryIndicatorReferencesReading {
   const { workspace } = input;
   // Léxico territorial de la identidad del ámbito (Lote D): un municipio (Atarfe)
-  // no describe su muestra como «del distrito». Zaidín (distrito) lo reproduce.
+  // no describe su muestra como «del distrito»; un distrito sí.
   const lex: TerritorialLexicon = territorialLexicon(
     workspace.municipality.identity
   );
@@ -670,7 +670,7 @@ export function buildIndicatorComparisonReferences(
     // demoProxy SOLO cuando el valor NO es una medición local del ámbito: un estudio
     // municipal (p. ej. el IBSE de Atarfe) nunca es proxy provincial ni fabrica una
     // referencia provincial a partir de su propio valor. Un monitor/EAS provincial
-    // (p. ej. el IBSE de Granada-Zaidín) conserva su tratamiento demo/proxy.
+    // conserva su tratamiento demo/proxy.
     const demoProxy =
       spec.provincial !== "ninguna" &&
       typeof territorialValue === "number" &&

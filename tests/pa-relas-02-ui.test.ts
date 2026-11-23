@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { ActionPlanCatalogPanel } from "../src/ui/components/ActionPlanCatalogPanel";
 import { getEligibleActionPlanModules } from "../src/domain/action-plan-catalog";
-import { ZAIDIN_AGING_PROPOSAL } from "../src/domain/action-plan-catalog/PlanPreparationDraft";
+import { AGING_FOUR_BLOCKS_BASE } from "../src/domain/action-plan-catalog/PlanPreparationDraft";
 import { createIndicatorWorksheet } from "../src/domain/action-plan-catalog/IndicatorWorksheet";
 import type { DeliberativePrioritySelection } from "../src/domain/deliberative-prioritisation";
 import type { LecturaEstrategicaLocal } from "../src/domain/strategic-scenario";
@@ -79,7 +79,7 @@ describe("PA-RELAS-02 — representación editorial", () => {
 
   it("cuando hay edición directa no muestra la revisión formal legacy", () => {
     const html = renderToStaticMarkup(createElement(ActionPlanCatalogPanel, {
-      municipalityId: "granada-zaidin",
+      municipalityId: "municipio-ensayo",
       lectura,
       selection,
       eligibleModules: getEligibleActionPlanModules(lectura, selection),

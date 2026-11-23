@@ -485,13 +485,13 @@ describe("localiza-salud — formato pipe, idempotencia y contrato de selector",
       repository: makeRepository(),
       evidenceStore: makeStore(),
       kind: "localiza-salud",
-      title: "Localiza Salud — Granada-Zaidín 2023",
-      plainText: "Centro Participación Activa Mayores Zaidín | Talleres deportivos y socioculturales",
+      title: "Localiza Salud — Granada-Centro 2023",
+      plainText: "Centro Participación Activa Mayores Centro | Talleres deportivos y socioculturales",
     });
     expect(result).not.toBeNull();
     expect(result!.atomsCreated).toBe(1);
     expect(result!.evidenceStore.atoms[0].title).toBe(
-      "Centro Participación Activa Mayores Zaidín"
+      "Centro Participación Activa Mayores Centro"
     );
   });
 
@@ -500,11 +500,11 @@ describe("localiza-salud — formato pipe, idempotencia y contrato de selector",
       repository: makeRepository(),
       evidenceStore: makeStore(),
       kind: "localiza-salud",
-      title: "Localiza Salud — Zaidín multi",
+      title: "Localiza Salud — Centro multi",
       plainText: [
         "Cruz Roja Granada | Voluntariado y atención social",
         "Fundación Albihar | Salud mental comunitaria",
-        "Unidad Salud Mental Comunitaria Zaidín | SAS — atención comunitaria",
+        "Unidad Salud Mental Comunitaria Centro | SAS — atención comunitaria",
       ].join("\n"),
     });
     expect(result).not.toBeNull();
@@ -592,10 +592,10 @@ describe("localiza-salud — formato pipe, idempotencia y contrato de selector",
 // puede recibir directamente: documento registrado, átomos trazables, metadatos correctos.
 
 describe("localiza-salud — integración de persistencia (capa de datos)", () => {
-  const ZAIDIN_TEXT = [
-    "Centro de Salud Zaidín Sur | SAS — Atención primaria · Distrito AP Granada-Metropolitano",
-    "Centro Participación Activa Mayores Zaidín | Talleres deportivos y socioculturales para mayores",
-    "Unidad Salud Mental Comunitaria Zaidín | SAS — atención comunitaria en salud mental",
+  const CENTRO_TEXT = [
+    "Centro de Salud Centro Sur | SAS — Atención primaria · Distrito AP Granada-Metropolitano",
+    "Centro Participación Activa Mayores Centro | Talleres deportivos y socioculturales para mayores",
+    "Unidad Salud Mental Comunitaria Centro | SAS — atención comunitaria en salud mental",
   ].join("\n");
 
   it("el documento localiza-salud aparece en repository.documents tras la ingesta", () => {
@@ -603,14 +603,14 @@ describe("localiza-salud — integración de persistencia (capa de datos)", () =
       repository: makeRepository(),
       evidenceStore: makeStore(),
       kind: "localiza-salud",
-      title: "Localiza Salud — Granada-Zaidín 2023",
-      plainText: ZAIDIN_TEXT,
+      title: "Localiza Salud — Granada-Centro 2023",
+      plainText: CENTRO_TEXT,
     });
 
     expect(result).not.toBeNull();
     const doc = result!.repository.documents.find((d) => d.kind === "localiza-salud");
     expect(doc).toBeDefined();
-    expect(doc!.title).toBe("Localiza Salud — Granada-Zaidín 2023");
+    expect(doc!.title).toBe("Localiza Salud — Granada-Centro 2023");
     expect(doc!.kind).toBe("localiza-salud");
   });
 
@@ -619,8 +619,8 @@ describe("localiza-salud — integración de persistencia (capa de datos)", () =
       repository: makeRepository(),
       evidenceStore: makeStore(),
       kind: "localiza-salud",
-      title: "Localiza Salud — Zaidín",
-      plainText: "Centro de Salud Zaidín Sur | SAS — Atención primaria",
+      title: "Localiza Salud — Centro",
+      plainText: "Centro de Salud Centro Sur | SAS — Atención primaria",
     });
 
     expect(result).not.toBeNull();
@@ -633,13 +633,13 @@ describe("localiza-salud — integración de persistencia (capa de datos)", () =
       repository: makeRepository(),
       evidenceStore: makeStore(),
       kind: "localiza-salud",
-      title: "Localiza Salud — Zaidín",
-      plainText: ZAIDIN_TEXT,
+      title: "Localiza Salud — Centro",
+      plainText: CENTRO_TEXT,
     });
 
     expect(result).not.toBeNull();
     const doc = result!.repository.documents.find((d) => d.kind === "localiza-salud");
-    expect(doc!.sourceText).toBe(ZAIDIN_TEXT);
+    expect(doc!.sourceText).toBe(CENTRO_TEXT);
   });
 
   it("los átomos aparecen en evidenceStore.atoms con origin localiza-salud y documentId correcto", () => {
@@ -647,8 +647,8 @@ describe("localiza-salud — integración de persistencia (capa de datos)", () =
       repository: makeRepository(),
       evidenceStore: makeStore(),
       kind: "localiza-salud",
-      title: "Localiza Salud — Zaidín",
-      plainText: ZAIDIN_TEXT,
+      title: "Localiza Salud — Centro",
+      plainText: CENTRO_TEXT,
     });
 
     expect(result).not.toBeNull();
@@ -691,8 +691,8 @@ describe("localiza-salud — integración de persistencia (capa de datos)", () =
       repository: repoForIngestion,
       evidenceStore: makeStore(),
       kind: "localiza-salud",
-      title: "Localiza Salud — Zaidín",
-      plainText: ZAIDIN_TEXT,
+      title: "Localiza Salud — Centro",
+      plainText: CENTRO_TEXT,
     });
 
     expect(result).not.toBeNull();
@@ -753,7 +753,7 @@ describe("localiza-salud — integración de persistencia (capa de datos)", () =
 describe("localiza-salud — copia-pega real: formatos, cabeceras y carga bruta", () => {
   // Simula una línea real de exportación tabulada de Localiza Salud (Orden como primer campo)
   const TAB_ROW_WITH_ORDER =
-    "5\tCENTRO PARTICIPACIÓN ACTIVA MAYORES ZAIDIN\tGRANADA\tGRANADA\t2\tANDRÉS SEGOVIA Nº 60\t18007\tCPA ZAIDÍN\t958130985\tMAYORES DE 60 AÑOS\tTalleres deportivos y socioculturales";
+    "5\tCENTRO PARTICIPACIÓN ACTIVA MAYORES CENTRO\tGRANADA\tGRANADA\t2\tANDRÉS SEGOVIA Nº 60\t18007\tCPA CENTRO\t958130985\tMAYORES DE 60 AÑOS\tTalleres deportivos y socioculturales";
 
   const TAB_HEADER =
     "Orden\tnombre\tmunicipio\tlocalidad\ttipo_de_v_a\tdirección\tcódigo_postal\ttitular\tteléfono\trequisito_uso\tdescripción";
@@ -763,12 +763,12 @@ describe("localiza-salud — copia-pega real: formatos, cabeceras y carga bruta"
       repository: makeRepository(),
       evidenceStore: makeStore(),
       kind: "localiza-salud",
-      title: "Localiza Salud — Zaidín tabulado",
+      title: "Localiza Salud — Centro tabulado",
       plainText: TAB_ROW_WITH_ORDER,
     });
     expect(result).not.toBeNull();
     expect(result!.atomsCreated).toBe(1);
-    expect(result!.evidenceStore.atoms[0].title).toBe("CENTRO PARTICIPACIÓN ACTIVA MAYORES ZAIDIN");
+    expect(result!.evidenceStore.atoms[0].title).toBe("CENTRO PARTICIPACIÓN ACTIVA MAYORES CENTRO");
   });
 
   it("línea de cabecera tabulada (Orden, nombre...) no genera átomo", () => {
@@ -783,7 +783,7 @@ describe("localiza-salud — copia-pega real: formatos, cabeceras y carga bruta"
     expect(result).not.toBeNull();
     // Solo la fila de datos, no la cabecera
     expect(result!.atomsCreated).toBe(1);
-    expect(result!.evidenceStore.atoms[0].title).toBe("CENTRO PARTICIPACIÓN ACTIVA MAYORES ZAIDIN");
+    expect(result!.evidenceStore.atoms[0].title).toBe("CENTRO PARTICIPACIÓN ACTIVA MAYORES CENTRO");
   });
 
   it("línea de cabecera pipe (nombre | municipio...) no genera átomo", () => {
@@ -833,8 +833,8 @@ describe("localiza-salud — copia-pega real: formatos, cabeceras y carga bruta"
 
   it("línea larga con múltiples tabuladores genera un solo átomo (no fragmenta)", () => {
     const longLine =
-      "5\tCENTRO PARTICIPACIÓN ACTIVA MAYORES ZAIDIN\tGRANADA\tGRANADA\t2\t" +
-      "ANDRÉS SEGOVIA Nº 60\t18007\tCPA ZAIDÍN\t958130985\tMAYORES DE 60 AÑOS\t" +
+      "5\tCENTRO PARTICIPACIÓN ACTIVA MAYORES CENTRO\tGRANADA\tGRANADA\t2\t" +
+      "ANDRÉS SEGOVIA Nº 60\t18007\tCPA CENTRO\t958130985\tMAYORES DE 60 AÑOS\t" +
       "Actividades/talleres deportivos y socioculturales. Salidas culturales. Viajes. " +
       "Fiestas emblemáticas. Salas para juegos de mesa.";
     const result = ingestManualDocument({
@@ -850,7 +850,7 @@ describe("localiza-salud — copia-pega real: formatos, cabeceras y carga bruta"
 
   it("recarga del mismo bloque no duplica átomos (upsertEvidenceAtom idempotente)", () => {
     const TEXT = [
-      "Centro de Salud Zaidín Sur | SAS — Atención primaria",
+      "Centro de Salud Centro Sur | SAS — Atención primaria",
       "Fundación Albihar | Salud mental comunitaria",
     ].join("\n");
 
@@ -886,7 +886,7 @@ describe("localiza-salud — copia-pega real: formatos, cabeceras y carga bruta"
       repository: makeRepository(),
       evidenceStore: makeStore(),
       kind: "health-report",
-      title: "Informe de Salud Granada Zaidín",
+      title: "Informe de Salud Granada Centro",
       plainText: "Contenido extenso del informe de salud que no debe atomizarse.",
     });
     expect(result).not.toBeNull();

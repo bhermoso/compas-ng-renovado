@@ -10,7 +10,7 @@ it("captures deterministic runtime outputs for the SAM before/after audit", () =
   vi.setSystemTime(new Date("2026-10-28T12:00:00.000Z"));
   vi.spyOn(crypto, "randomUUID").mockReturnValue("00000000-0000-4000-8000-000000000000");
   const output: Record<string, unknown> = {};
-  for (const name of ["atarfe", "granada-zaidin"]) {
+  for (const name of ["atarfe"]) {
     const w = JSON.parse(readFileSync(`public/seeds/compas-ng-workspace-${name}.json`, "utf8")) as MunicipalityWorkspace;
     const before = structuredClone(w);
     const runtime = createMunicipalityRuntime({ workspace: w });

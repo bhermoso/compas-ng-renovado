@@ -28,7 +28,7 @@ const store = new Map<string, string>();
 
 const municipalities = [
   { id: "atarfe" },
-  { id: "granada-zaidin" },
+  { id: "granada-centro" },
 ];
 
 beforeEach(() => {
@@ -37,19 +37,19 @@ beforeEach(() => {
 
 describe("ámbito activo del expediente", () => {
   it("restaura el último ámbito elegido y no vuelve siempre a Atarfe", () => {
-    expect(readActiveMunicipalityId(municipalities, "granada-zaidin")).toBe(
-      "granada-zaidin"
+    expect(readActiveMunicipalityId(municipalities, "granada-centro")).toBe(
+      "granada-centro"
     );
 
-    expect(saveActiveMunicipalityId("granada-zaidin")).toBe(true);
-    expect(store.get(ACTIVE_MUNICIPALITY_STORAGE_KEY)).toBe("granada-zaidin");
+    expect(saveActiveMunicipalityId("granada-centro")).toBe(true);
+    expect(store.get(ACTIVE_MUNICIPALITY_STORAGE_KEY)).toBe("granada-centro");
     expect(readActiveMunicipalityId(municipalities, "atarfe")).toBe(
-      "granada-zaidin"
+      "granada-centro"
     );
 
     store.set(ACTIVE_MUNICIPALITY_STORAGE_KEY, "ambito-inexistente");
-    expect(readActiveMunicipalityId(municipalities, "granada-zaidin")).toBe(
-      "granada-zaidin"
+    expect(readActiveMunicipalityId(municipalities, "granada-centro")).toBe(
+      "granada-centro"
     );
   });
 

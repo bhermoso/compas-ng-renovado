@@ -92,7 +92,7 @@
   ],
   "cautelas": [
     "Dato de escala municipal: para ámbitos inframunicipales (distritos) solo puede usarse como contexto municipal de referencia del municipio matriz, nunca como estimación específica del distrito.",
-    "BADEA no tiene ámbito de distrito: Granada-Zaidín no es un municipio BADEA.",
+    "BADEA no tiene ámbito de distrito.",
     "El dato describe contexto poblacional/territorial; no es un indicador de salud ni permite inferencia causal.",
     "No aporta desagregación interna por sexo, edad ni condición socioeconómica: no resuelve la incertidumbre de desigualdades."
   ]

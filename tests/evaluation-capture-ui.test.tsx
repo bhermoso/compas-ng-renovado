@@ -11,8 +11,8 @@ import { generateMonitoringDraft } from "../src/application/monitoring/Monitorin
 import { generateAgendaDraft } from "../src/application/agenda/AgendaEngine";
 import type { MonitoringDraft } from "../src/application/monitoring/MonitoringEngine";
 import {
-  ZAIDIN_AGING_PROPOSAL,
-  createZaidinFinalActionPlanDraft,
+  AGING_FOUR_BLOCKS_BASE,
+  createIncludedActionPlanDraft,
 } from "../src/domain/action-plan-catalog/PlanPreparationDraft";
 
 const emptyDraft = (): MonitoringDraft => ({
@@ -105,15 +105,15 @@ describe("MonitoringPanel — evaluationFramework editor (Pieza 3a)", () => {
 
 // ── DefinitiveActionPlanPreview — unaddressedNeeds ────────────────────────
 
-const zaidinDraft = createZaidinFinalActionPlanDraft();
+const centroDraft = createIncludedActionPlanDraft(AGING_FOUR_BLOCKS_BASE, "municipio-ensayo");
 
 describe("DefinitiveActionPlanPreview — unaddressedNeeds editor (Pieza 3b)", () => {
   it("no muestra el editor cuando no se pasa onDraftChange", () => {
     const html = renderToStaticMarkup(
       <DefinitiveActionPlanPreview
-        municipalityId="granada-zaidin"
-        modules={[ZAIDIN_AGING_PROPOSAL]}
-        drafts={[zaidinDraft]}
+        municipalityId="municipio-ensayo"
+        modules={[AGING_FOUR_BLOCKS_BASE]}
+        drafts={[centroDraft]}
       />
     );
     expect(html).not.toContain("G-PLS-7");
@@ -123,9 +123,9 @@ describe("DefinitiveActionPlanPreview — unaddressedNeeds editor (Pieza 3b)", (
   it("muestra el editor cuando se pasa onDraftChange y hay un draft activo", () => {
     const html = renderToStaticMarkup(
       <DefinitiveActionPlanPreview
-        municipalityId="granada-zaidin"
-        modules={[ZAIDIN_AGING_PROPOSAL]}
-        drafts={[zaidinDraft]}
+        municipalityId="municipio-ensayo"
+        modules={[AGING_FOUR_BLOCKS_BASE]}
+        drafts={[centroDraft]}
         onDraftChange={noop}
       />
     );
@@ -136,11 +136,11 @@ describe("DefinitiveActionPlanPreview — unaddressedNeeds editor (Pieza 3b)", (
   });
 
   it("muestra estado 'pendiente de documentar' cuando unaddressedNeeds es undefined", () => {
-    const draftWithoutNeeds = { ...zaidinDraft, unaddressedNeeds: undefined };
+    const draftWithoutNeeds = { ...centroDraft, unaddressedNeeds: undefined };
     const html = renderToStaticMarkup(
       <DefinitiveActionPlanPreview
-        municipalityId="granada-zaidin"
-        modules={[ZAIDIN_AGING_PROPOSAL]}
+        municipalityId="municipio-ensayo"
+        modules={[AGING_FOUR_BLOCKS_BASE]}
         drafts={[draftWithoutNeeds]}
         onDraftChange={noop}
       />
@@ -149,11 +149,11 @@ describe("DefinitiveActionPlanPreview — unaddressedNeeds editor (Pieza 3b)", (
   });
 
   it("muestra 'ninguna quedó fuera' cuando unaddressedNeeds es []", () => {
-    const draftNoneLeft = { ...zaidinDraft, unaddressedNeeds: [] };
+    const draftNoneLeft = { ...centroDraft, unaddressedNeeds: [] };
     const html = renderToStaticMarkup(
       <DefinitiveActionPlanPreview
-        municipalityId="granada-zaidin"
-        modules={[ZAIDIN_AGING_PROPOSAL]}
+        municipalityId="municipio-ensayo"
+        modules={[AGING_FOUR_BLOCKS_BASE]}
         drafts={[draftNoneLeft]}
         onDraftChange={noop}
       />
@@ -163,7 +163,7 @@ describe("DefinitiveActionPlanPreview — unaddressedNeeds editor (Pieza 3b)", (
 
   it("muestra la lista cuando hay necesidades registradas", () => {
     const draftWithNeed = {
-      ...zaidinDraft,
+      ...centroDraft,
       unaddressedNeeds: [{
         id: "n-test",
         title: "Salud mental en jóvenes",
@@ -172,8 +172,8 @@ describe("DefinitiveActionPlanPreview — unaddressedNeeds editor (Pieza 3b)", (
     };
     const html = renderToStaticMarkup(
       <DefinitiveActionPlanPreview
-        municipalityId="granada-zaidin"
-        modules={[ZAIDIN_AGING_PROPOSAL]}
+        municipalityId="municipio-ensayo"
+        modules={[AGING_FOUR_BLOCKS_BASE]}
         drafts={[draftWithNeed]}
         onDraftChange={noop}
       />
@@ -186,8 +186,8 @@ describe("DefinitiveActionPlanPreview — unaddressedNeeds editor (Pieza 3b)", (
   it("no muestra el editor cuando no hay drafts activos", () => {
     const html = renderToStaticMarkup(
       <DefinitiveActionPlanPreview
-        municipalityId="granada-zaidin"
-        modules={[ZAIDIN_AGING_PROPOSAL]}
+        municipalityId="municipio-ensayo"
+        modules={[AGING_FOUR_BLOCKS_BASE]}
         drafts={[]}
         onDraftChange={noop}
       />
@@ -198,9 +198,9 @@ describe("DefinitiveActionPlanPreview — unaddressedNeeds editor (Pieza 3b)", (
   it("los campos del formulario de añadir necesidad aparecen vacíos", () => {
     const html = renderToStaticMarkup(
       <DefinitiveActionPlanPreview
-        municipalityId="granada-zaidin"
-        modules={[ZAIDIN_AGING_PROPOSAL]}
-        drafts={[zaidinDraft]}
+        municipalityId="municipio-ensayo"
+        modules={[AGING_FOUR_BLOCKS_BASE]}
+        drafts={[centroDraft]}
         onDraftChange={noop}
       />
     );

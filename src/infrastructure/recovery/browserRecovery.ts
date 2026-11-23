@@ -1,4 +1,3 @@
-import { ZAIDIN_AGING_PROPOSAL } from '../../domain/action-plan-catalog/PlanPreparationDraft';
 import type { MunicipalityWorkspace } from '../../domain/workspace';
 import { buildWorkspaceStorageKey, parseWorkspaceJSON } from '../persistence/local-storage';
 import { listOriginalFiles, addOriginalFiles, type OriginalEntry } from '../document-files/originalFiles';
@@ -10,7 +9,10 @@ export interface BackupPayload { createdAt: string; storage: StoredValue[]; pres
 export interface BrowserBackup { format: 'compas-ng-browser-backup'; version: 1; sha256: string; payload: BackupPayload }
 export interface CheckedBackup { backup: BrowserBackup; originals: OriginalEntry[]; conflicts: string[]; workspaces: string[] }
 export interface CheckedWorkspaceImport { workspace: MunicipalityWorkspace; name: string; conflict?: string }
-const allowedKey = (key: string) => key.startsWith('compas-ng:workspace:') || key === 'compas-ng:custom-municipalities' || key === 'compas-ng:demo:coordinacion-zaidin:v1';
+/** Claves de expedientes retirados de COMPÁS: no se copian y, si llegan en una copia antigua, se ignoran. */
+const RETIRED_STORAGE_KEYS = new Set(['compas-ng:workspace:granada-zaidin', 'compas-ng:demo:coordinacion-zaidin:v1']);
+const isRetiredKey = (key: string) => RETIRED_STORAGE_KEYS.has(key);
+const allowedKey = (key: string) => !isRetiredKey(key) && (key.startsWith('compas-ng:workspace:') || key === 'compas-ng:custom-municipalities');
 const idOf = (entry: {municipalityId: string; documentId: string}) => JSON.stringify([entry.municipalityId, entry.documentId]);
 export async function digest(bytes: BufferSource) { return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)), b => b.toString(16).padStart(2, '0')).join(''); }
 const textDigest = (text: string) => digest(new TextEncoder().encode(text));
@@ -49,6 +51,7 @@ export async function createBackup(current?: MunicipalityWorkspace, bundled: Rec
   return {format:'compas-ng-browser-backup', version:1, sha256:await textDigest(JSON.stringify(payload)), payload};
 }
 function validateStorage(entry: StoredValue): string | undefined {
+  if (entry && typeof entry.key === 'string' && isRetiredKey(entry.key)) return undefined;
   if (!entry || typeof entry.key !== 'string' || !allowedKey(entry.key) || typeof entry.value !== 'string') throw new Error('La copia contiene una clave de almacenamiento no admitida.');
   const raw = JSON.parse(entry.value);
   if (entry.key.startsWith('compas-ng:workspace:')) {
@@ -58,13 +61,6 @@ function validateStorage(entry: StoredValue): string | undefined {
   }
   if (entry.key === 'compas-ng:custom-municipalities') {
     if (!Array.isArray(raw) || raw.some(m => !m || typeof m.id !== 'string' || typeof m.name !== 'string' || typeof m.province !== 'string')) throw new Error('Lista de ámbitos no válida.');
-  } else {
-    if (!raw || raw.municipalityId !== 'demo-coordinacion-zaidin' || raw.moduleId !== ZAIDIN_AGING_PROPOSAL.id || raw.version !== 'coordinacion-zaidin-propuesta-v1' || typeof raw.updatedAt !== 'string' || !raw.decisions || typeof raw.decisions !== 'object' || Array.isArray(raw.decisions)) throw new Error('Borrador de coordinación no válido.');
-    const ids = new Set([ZAIDIN_AGING_PROPOSAL.id, ...ZAIDIN_AGING_PROPOSAL.generalObjectives.flatMap(g => [g.code, ...g.specificObjectives.flatMap(o => [o.code,o.indicator.code])])]);
-    for (const [id, decision] of Object.entries(raw.decisions)) {
-      const d = decision as {status?: string; sourceText?: string; text?: string} | null;
-      if (!ids.has(id) || !d || !['pending','included','excluded','modified'].includes(d.status ?? '') || typeof d.sourceText !== 'string' || (d.text !== undefined && typeof d.text !== 'string')) throw new Error('Decisión de coordinación no válida.');
-    }
   }
 }
 export async function inspectBackup(text: string): Promise<CheckedBackup> {
@@ -73,9 +69,10 @@ export async function inspectBackup(text: string): Promise<CheckedBackup> {
   const p = backup.payload;
   if (!p || !Array.isArray(p.storage) || !Array.isArray(p.preservedStorage) || !Array.isArray(p.files) || !Array.isArray(p.notices) || p.notices.some(n => typeof n !== 'string') || typeof p.createdAt !== 'string' || !Number.isFinite(Date.parse(p.createdAt))) throw new Error('Copia incompleta.');
   if (await textDigest(JSON.stringify(p)) !== backup.sha256) throw new Error('La huella de la copia no coincide: el archivo está alterado o incompleto.');
-  for (const entry of p.preservedStorage) if (!entry || typeof entry.key !== 'string' || !allowedKey(entry.key) || typeof entry.value !== 'string') throw new Error('Copia del almacenamiento previo no válida.');
+  for (const entry of p.preservedStorage) if (!entry || typeof entry.key !== 'string' || !(allowedKey(entry.key) || isRetiredKey(entry.key)) || typeof entry.value !== 'string') throw new Error('Copia del almacenamiento previo no válida.');
   const keys = new Set<string>(); const workspaces: string[] = []; const conflicts: string[] = [];
   for (const entry of p.storage) {
+    if (entry && typeof entry.key === 'string' && isRetiredKey(entry.key)) continue;
     const name = validateStorage(entry); if (name) workspaces.push(name);
     if (keys.has(entry.key)) throw new Error('Clave duplicada en la copia.'); keys.add(entry.key);
     const local = localStorage.getItem(entry.key); if (local !== null && local !== entry.value) conflicts.push(entry.key);
@@ -102,6 +99,7 @@ export async function restoreBackup(text: string): Promise<CheckedBackup> {
   const written: StoredValue[] = [];
   try {
     for (const entry of checked.backup.payload.storage) {
+      if (isRetiredKey(entry.key)) continue;
       const old = localStorage.getItem(entry.key);
       if (old !== null && old !== entry.value) throw new Error('El expediente ha cambiado durante la recuperación.');
       if (old === null) { localStorage.setItem(entry.key, entry.value); written.push(entry); }
@@ -115,7 +113,7 @@ export async function restoreBackup(text: string): Promise<CheckedBackup> {
 
 
 const CUSTOM_MUNICIPALITIES_KEY = 'compas-ng:custom-municipalities';
-const BUILT_IN_MUNICIPALITY_IDS = new Set(['atarfe','alfacar','churriana','zagra','granada-zaidin']);
+const BUILT_IN_MUNICIPALITY_IDS = new Set(['atarfe','alfacar','churriana','zagra']);
 
 function readCustomMunicipalitiesForImport(): Array<{id:string; name:string; province:string; ineCode?:string; territorialType?:string; createdBy?:string}> {
   const text = localStorage.getItem(CUSTOM_MUNICIPALITIES_KEY);

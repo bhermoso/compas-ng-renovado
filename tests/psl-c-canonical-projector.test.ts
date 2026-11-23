@@ -111,16 +111,16 @@ function cargar(muni: string, file: string): Caso {
   return { ws, psl, answers, territory, province, v2: v2.artifact, legacy: legacy.artifact };
 }
 
-let zaidin: Caso;
+let centro: Caso;
 let atarfe: Caso;
 
 beforeAll(() => {
-  zaidin = cargar("municipio-ensayo", "compas-ng-workspace-municipio-ensayo.json");
+  centro = cargar("municipio-ensayo", "compas-ng-workspace-municipio-ensayo.json");
   atarfe = cargar("atarfe", "compas-ng-workspace-atarfe.json");
 });
 
 const CASOS = (): Array<[string, () => Caso]> => [
-  ["Municipio de ensayo", () => zaidin],
+  ["Municipio de ensayo", () => centro],
   ["Atarfe", () => atarfe],
 ];
 

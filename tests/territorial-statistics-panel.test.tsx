@@ -31,7 +31,7 @@ describe("panel de estadística territorial", () => {
     expect(html).toContain("Comparado con «Perfil 0.8.2»");
   });
   it("sin código INE ofrece buscarlo por el nombre", () => {
-    const html = renderToStaticMarkup(<TerritorialStatisticsPanel municipalityId="zaidin" municipalityName="Granada-Zaidín"/>);
-    expect(html).toContain("Buscar el código de «Granada-Zaidín»");
+    const html = renderToStaticMarkup(<TerritorialStatisticsPanel municipalityId="centro" municipalityName="Granada-Centro"/>);
+    expect(html).toContain("Buscar el código de «Granada-Centro»");
   });
 });

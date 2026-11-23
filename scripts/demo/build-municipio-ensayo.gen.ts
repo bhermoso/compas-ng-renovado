@@ -1,10 +1,8 @@
 /**
  * Generador del expediente de ensayo neutro («Municipio de ensayo»).
  *
- * Sustituye al expediente sintético de Granada-Zaidín, retirado de COMPÁS el
- * 21/11/2026. No representa a ningún municipio real:
- *  - Los 13 estudios complementarios conservan los agregados de ensayo del
- *    expediente anterior: los de la Encuesta Andaluza de Salud son agregados
+ * No representa a ningún municipio real:
+ *  - Los 13 estudios complementarios conservan sus agregados de ensayo: los de la Encuesta Andaluza de Salud son agregados
  *    provinciales públicos de Granada («proxy piloto») y los demás proceden de
  *    las fixtures municipales sintéticas de `fixtures/*.csv`. No se atribuyen a
  *    ningún municipio.
@@ -15,10 +13,9 @@
  *
  * Uso (al cambiar el texto de ensayo o los activos):
  *   npx vitest run --config vitest.rebuild.config.ts scripts/demo/build-municipio-ensayo.gen.ts
- * El expediente de Granada-Zaidín de origen (SOURCE) se retiró tras la primera
- * generación; desde entonces los estudios se toman del propio expediente de ensayo.
+ * Los estudios se toman del propio expediente de ensayo.
  */
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { it } from "vitest";
 import { parseHealthReportSections } from "../../src/application/health-report/HealthReportSectionParser";
@@ -26,7 +23,6 @@ import { ingestManualDocument } from "../../src/application/document-ingestion/M
 import type { MunicipalityWorkspace } from "../../src/domain/workspace";
 
 const ROOT = resolve(__dirname, "../..");
-const SOURCE = resolve(ROOT, "fixtures/workspaces/granada-zaidin-synthetic-test.json");
 const TARGET = resolve(ROOT, "fixtures/workspaces/municipio-ensayo-synthetic-test.json");
 const ID = "municipio-ensayo";
 const NAME = "Municipio de ensayo";
@@ -95,14 +91,12 @@ export const LOCALIZA_DE_ENSAYO = [
 /** Retira la identidad del expediente anterior; las cifras de los estudios no cambian. */
 function replaceIdentity<T>(value: T, fromId: string): T {
   const text = JSON.stringify(value)
-    .split(fromId).join(ID)
-    .split("del piloto Granada-Zaidín").join("del expediente de ensayo")
-    .split("Granada-Zaidín").join(NAME);
+    .split(fromId).join(ID);
   return JSON.parse(text) as T;
 }
 
 it("genera el expediente de ensayo neutro", () => {
-  const source = JSON.parse(readFileSync(existsSync(SOURCE) ? SOURCE : TARGET, "utf8")) as MunicipalityWorkspace & Record<string, unknown>;
+  const source = JSON.parse(readFileSync(TARGET, "utf8")) as MunicipalityWorkspace & Record<string, unknown>;
   const fromId = source.municipality.identity.id;
   const studyDocs = source.repository.documents.filter((d) => /proxy piloto/.test(d.title));
   // Al regenerar desde el propio expediente de ensayo, los documentos de ensayo se vuelven a crear.
@@ -176,6 +170,6 @@ it("genera el expediente de ensayo neutro", () => {
   };
   const text = JSON.stringify(workspace, null, 2);
   const leaks = [...text.matchAll(/.{0,60}(zaid|ugc).{0,40}/gi)].map((m) => m[0]);
-  if (leaks.length) throw new Error(`El expediente de ensayo conserva referencias a Granada-Zaidín:\n${leaks.slice(0, 12).join("\n")}`);
+  if (leaks.length) throw new Error(`El expediente de ensayo conserva referencias a un territorio real:\n${leaks.slice(0, 12).join("\n")}`);
   writeFileSync(TARGET, text + "\n", "utf8");
 });

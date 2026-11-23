@@ -4,7 +4,7 @@ import {renderToStaticMarkup} from 'react-dom/server';
 import {Packer} from 'docx';
 import mammoth from 'mammoth';
 import {HEALTHY_AGING_MODULE,ADDICTIONS_MODULE} from '../src/domain/action-plan-catalog/ActionPlanCatalog';
-import {ZAIDIN_AGING_PROPOSAL,type PlanPreparationDraft} from '../src/domain/action-plan-catalog/PlanPreparationDraft';
+import {AGING_FOUR_BLOCKS_BASE,type PlanPreparationDraft} from '../src/domain/action-plan-catalog/PlanPreparationDraft';
 import {ZAGRA_AGING_PROPOSAL,municipalActionPlanModule} from '../src/domain/action-plan-catalog/MunicipalActionPlanModule';
 import {actionPlanElementCode} from '../src/domain/action-plan-catalog/ActionPlanNotation';
 import {buildDefinitiveActionPlanProjection as project} from '../src/domain/action-plan-catalog/DefinitiveActionPlanProjection';
@@ -33,7 +33,7 @@ function control(node:ReactNode,label:string):Control|undefined{
 }
 
 describe('Notación jerárquica de los cuatro bloques de envejecimiento saludable',()=>{
- it.each([['zagra',ZAGRA_AGING_PROPOSAL],['granada-zaidin',ZAIDIN_AGING_PROPOSAL]] as const)('aplica las 18 correspondencias exactas en %s sin cambiar identificadores',(_id,module)=>{
+ it.each([['zagra',ZAGRA_AGING_PROPOSAL],['municipio-ensayo',AGING_FOUR_BLOCKS_BASE]] as const)('aplica las 18 correspondencias exactas en %s sin cambiar identificadores',(_id,module)=>{
   const objectives=module.generalObjectives.flatMap(g=>g.specificObjectives);
   expect(module.generalObjectives.map(g=>actionPlanElementCode(module,g.code))).toEqual(['ENV-OG1','ENV-OG2','ENV-OG3','ENV-OG4']);
   expect(actionPlanElementCode(module,module.id)).toBe('ENV-OEST');

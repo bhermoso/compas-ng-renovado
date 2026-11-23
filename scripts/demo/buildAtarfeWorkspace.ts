@@ -140,7 +140,7 @@ export const ATARFE_IBSE_SAMPLE_CAUTIONS: readonly string[] = [
 // Cinco recursos comunitarios publicados en el portal Localiza Salud del
 // Ministerio de Sanidad para el municipio de Atarfe. Se ingieren por la ruta
 // documental `localiza-salud` (un EvidenceAtom `asset` por línea, origen
-// "localiza-salud"), IDÉNTICA a la de Granada-Zaidín: NO amplía EvidenceAtom ni
+// "localiza-salud"), la común de COMPÁS: NO amplía EvidenceAtom ni
 // ningún contrato compartido y NO crea un modelo paralelo.
 //
 // FIDELIDAD (Opción B autorizada): el texto fuente TSV conserva verbatim en

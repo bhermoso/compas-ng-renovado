@@ -22,6 +22,48 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-23 · Granada-Zaidín eliminado de Firebase; reglas desplegadas comprobadas
+
+Pages: `5765e6a`.
+
+- **Decisión del responsable (2026-11-23):** «Granada-Zaidín lo vamos a
+  eliminar completamente».
+- **Hecho.** En Firestore se han eliminado el expediente (manifiesto y
+  fragmentos), el registro del ámbito `relas_scopes/granada-zaidin` con sus
+  colecciones anidadas (`reviews`, `workspace_versions`), la pertenencia y la
+  cuenta de acceso de coordinación asociadas solo a ese ámbito. Queda la
+  lápida `compas_deleted_scopes/granada-zaidin`, que impide que un navegador
+  con una copia local lo vuelva a subir. La copia previa del expediente está en
+  `compas-copia-firebase-20261123` (panel de navegador de la aplicación de
+  escritorio). Comprobado después: el ámbito responde 404 y no figura en
+  `relas_scopes`.
+- **Reglas de Firestore.** Las desplegadas (versión del 20/11/2026) coinciden
+  línea a línea con `firebase/firestore.rules`.
+- **Decisión del responsable (2026-11-23):** la plantilla del Plan de Acción
+  «no es solo del Zaidín, aunque se creara originalmente para ella, hay que
+  conservar como estructural, para todos los expedientes».
+- **Cambio en el código.**
+  - `ZAIDIN_AGING_PROPOSAL` pasa a `AGING_FOUR_BLOCKS_BASE`, «Plantilla
+    estructural de envejecimiento saludable en cuatro bloques», redactada para
+    «el territorio». La plantilla común y la de Zagra salen de ella con los
+    mismos textos que antes (comprobado campo a campo); solo cambian sus
+    rótulos de procedencia. Los catálogos de envejecimiento y adicciones se
+    rotulan «Catálogo estructural de COMPÁS».
+  - Se retiran el comportamiento exclusivo de la redacción final del Zaidín en
+    la preparación del Plan, la lectura de unidades geográficas del Zaidín en
+    los informes, el contexto BADEA del distrito y las menciones en
+    comentarios, scripts, fixtures y pruebas.
+  - Las copias del navegador ya no incluyen el expediente de Granada-Zaidín ni
+    el borrador de la antigua demostración de coordinación; si llegan en una
+    copia anterior, se ignoran.
+  - Se conservan como guarda `RETIRED_MUNICIPALITY_IDS` y su prueba, y el texto
+    literal del Perfil de Loja que menciona el Centro de Salud Zaidín-Sur.
+  - El flujo `plan-document.yml` citaba una prueba inexistente
+    (`zaidin-final-replacement.test.ts`); se quita de la lista.
+- **Verificación.** Suite: 2978 pasan, 2 omitidas; build correcto; lint sin
+  cambios. La prueba de humo de recuperación del navegador
+  (`browser-recovery.smoke.mjs`) se ha ajustado y no se ha ejecutado aquí.
+
 ## 2026-11-23 · Limpieza de los expedientes de Firebase: una versión vigente por fuente
 
 Pages al empezar y al terminar: `2b0fb2a`.

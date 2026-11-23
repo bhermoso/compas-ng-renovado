@@ -45,12 +45,12 @@ const store = new Map<string, string>();
   },
 };
 
-const SCOPE_ID = "granada-zaidin";
+const SCOPE_ID = "granada-centro";
 
 function makeWorkspace(): MunicipalityWorkspace {
   return createCompleteMunicipalityWorkspace({
     id: SCOPE_ID,
-    name: "Granada-Zaidín",
+    name: "Granada-Centro",
     province: "Granada",
     territorialType: "distrito",
   });
@@ -201,7 +201,7 @@ describe("cargador de marco estratégico — persistencia documental garantizada
 
 describe("cargadores documentales visibles — todo registro sobrevive a save/load", () => {
   const textualKinds = [
-    { kind: "territorial-documentation", title: "Informe Vigía Zaidín Sur", esperaAtomos: true },
+    { kind: "territorial-documentation", title: "Informe Vigía Centro Sur", esperaAtomos: true },
     { kind: "qualitative-material", title: "Acta Grupo Motor", esperaAtomos: true },
     { kind: "localiza-salud", title: "Activos Localiza", esperaAtomos: true },
     { kind: "longitudinal-evidence", title: "Serie longitudinal", esperaAtomos: true },

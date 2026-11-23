@@ -4,7 +4,7 @@
  * Afirma que:
  *  1. Los tipos DocumentKind y EvidenceAtomKind tienen reservados
  *     "longitudinal-evidence" y "longitudinal-snapshot" (reserva formal).
- *  2. Ninguno de los workspaces de prueba canonizados (Atarfe, Zaidín)
+ *  2. Ninguno de los workspaces de prueba canonizados (Atarfe, Centro)
  *     contiene átomos de tipo longitudinal-snapshot.
  *  3. El compilador PSL (LocalHealthProfileCompiler) no incluye el texto
  *     "longitudinal-snapshot" en las secciones de contenido del artefacto.

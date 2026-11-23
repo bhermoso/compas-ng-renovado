@@ -46,7 +46,7 @@ export interface ProfileSynthesis {
 }
 
 export interface BuildProfileSynthesisOptions {
-  /** Denominación institucional del Informe (p. ej. «Informe de salud de El Zaidín»). */
+  /** Denominación institucional del Informe (p. ej. «Informe de salud de Atarfe»). */
   informeTitulo?: string;
   /** Sustantivo del ámbito; por defecto, «territorio». */
   scopeNoun?: string;

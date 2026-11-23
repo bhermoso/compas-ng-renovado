@@ -23,8 +23,7 @@ import { buildHealthReportStructuredReading } from "../health-report";
 
 // ── Denominación institucional del Informe ────────────────────────────────────
 
-// Denominaciones institucionales registradas por ámbito. Granada-Zaidín, el único
-// caso registrado, se retiró de COMPÁS el 21/11/2026.
+// Denominaciones institucionales registradas por ámbito. No hay ninguna registrada.
 const TITULOS_INSTITUCIONALES: Record<string, string> = {};
 
 /**

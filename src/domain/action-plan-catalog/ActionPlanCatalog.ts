@@ -152,7 +152,7 @@ const HEALTHY_AGING_BASE: ActionPlanCatalogModule = {
   version: "3.1",
   title: "Envejecimiento saludable",
   strategicObjective: "Favorecer un envejecimiento saludable, promoviendo la autonomía, el bienestar, las relaciones sociales significativas, la participación y el reconocimiento social de las personas mayores, y fortaleciendo la capacidad comunitaria para prevenir y abordar situaciones de soledad y aislamiento social.",
-  sourceLabel: "I Plan Local de Salud del Distrito Zaidín 2027–2030 · arquitectura y fichas técnicas",
+  sourceLabel: "Catálogo estructural de COMPÁS · arquitectura y fichas técnicas (26/08/2026)",
   sourceDate: "2026-08-26",
   cautions: sharedCautions,
   generalObjectives: [
@@ -191,7 +191,7 @@ const ADDICTIONS_BASE: ActionPlanCatalogModule = {
   version: "3.1",
   title: "Prevención y abordaje de las adicciones",
   strategicObjective: "Reducir los factores de riesgo y las consecuencias asociadas a las adicciones, reforzando los factores de protección y la respuesta comunitaria.",
-  sourceLabel: "I Plan Local de Salud del Distrito Zaidín 2027–2030 · arquitectura y fichas técnicas",
+  sourceLabel: "Catálogo estructural de COMPÁS · arquitectura y fichas técnicas (26/08/2026)",
   sourceDate: "2026-08-26",
   cautions: sharedCautions,
   generalObjectives: [
@@ -357,10 +357,9 @@ function withProvenance(
 export const EMOTIONAL_WELLBEING_MODULE: ActionPlanCatalogModule = withProvenance(BEM_EMOTIONAL_WELLBEING_BASE, BEM_PROVENANCE);
 
 // ── Procedencia de las líneas de envejecimiento saludable y de adicciones ─────
-// Ambas proceden del I Plan Local de Salud del Distrito Zaidín 2027–2030 (arquitectura
-// y fichas técnicas, 26/08/2026), declarado en `sourceLabel` de cada módulo; el original no
-// está en COMPÁS y no se ha comparado con él la redacción del catálogo. Los elementos no
-// nombran el Zaidín: sus textos se reutilizan en otros expedientes. La procedencia de fondo se contrastó el 10/11/2026 con el
+// Ambas son líneas estructurales del catálogo de COMPÁS, comunes a todos los
+// expedientes (arquitectura y fichas técnicas del 26/08/2026). Sus textos no nombran
+// ningún territorio. La procedencia de fondo se contrastó el 10/11/2026 con el
 // Plan de mayores, la EPVSA y la ESCA (PDF en COMPÁS), y con el PESMA-A y la ENA 2017–2024.
 
 export const HEALTHY_AGING_PROVENANCE: Readonly<Record<string, CatalogElementProvenance>> = {

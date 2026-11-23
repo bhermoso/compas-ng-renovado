@@ -13,7 +13,7 @@
  *   3. Si nada permite resolverlo → "ámbito territorial".
  *
  * Para `distrito`, los primitivos reproducen EXACTAMENTE el texto inframunicipal
- * previo (barrios, distrital…): el caso canónico Granada-Zaidín no cambia.
+ * previo (barrios, distrital…).
  */
 
 export type TerritorialScope = "municipio" | "distrito" | "ambito";
@@ -85,7 +85,7 @@ export function territorialLexicon(
   const scopeNoun = territorialScopeNoun(identity);
 
   if (scope === "distrito") {
-    // Reproduce el texto inframunicipal previo (Granada-Zaidín, sin cambios).
+    // Reproduce el texto inframunicipal previo, sin cambios.
     return {
       scope,
       scopeNoun,

@@ -47,8 +47,9 @@ describe("Plan de Acción común para cualquier expediente", () => {
       expect(aging.generalObjectives.flatMap(g=>g.specificObjectives)).toHaveLength(18);
       expect(addictions).toBe(ADDICTIONS_MODULE);
       expect(addictions.generalObjectives).toHaveLength(6);
-      expect(JSON.stringify(aging.generalObjectives)).not.toMatch(/Zaidín|del distrito|SENIOR FEST/);
-      expect(aging.sourceLabel).toContain("Granada-Zaidín");
+      expect(JSON.stringify(aging.generalObjectives)).not.toMatch(/Centro|del distrito|SENIOR FEST/);
+      expect(aging.sourceLabel).toContain("Plantilla estructural");
+      expect(aging.sourceLabel).not.toMatch(/Centro/);
       expect(aging.cautions.join(" ")).toContain("no diagnóstico");
     }
     expect(HEALTHY_AGING_MODULE.generalObjectives).toHaveLength(9);

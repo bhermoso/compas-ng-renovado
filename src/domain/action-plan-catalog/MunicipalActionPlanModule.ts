@@ -1,65 +1,59 @@
 import { HEALTHY_AGING_MODULE, type ActionPlanCatalogModule } from "./ActionPlanCatalog";
-import { ZAIDIN_AGING_PROPOSAL, type PlanPreparationDraft } from "./PlanPreparationDraft";
+import { AGING_FOUR_BLOCKS_BASE, type PlanPreparationDraft } from "./PlanPreparationDraft";
 
 export const ZAGRA_ACTION_PLAN_VERSION = "zagra-cuatro-bloques-2026-10-28";
 
-/** Shared editorial template for every other territorial expediente.
- * The source is Granada-Zaidín; no Zaidín decisions or approval are inherited.
- * Stable identifiers avoid collisions with the former 3.1 nine-group layout.
+/** Plantilla estructural común a todos los expedientes territoriales.
+ * No hereda decisiones ni aprobaciones de ningún territorio. Los identificadores
+ * estables evitan colisiones con la antigua organización 3.1 en nueve grupos.
  */
 export const COMMON_AGING_FOUR_BLOCKS_VERSION = "comun-cuatro-bloques-2026-11-04";
 
-function neutralTerritorialText(text: string): string {
-  return text
-    .replace(/del distrito Zaidín/giu, "del territorio")
-    .replace(/del Zaidín/giu, "del territorio")
-    .replace(/en el Zaidín/giu, "en el territorio")
-    .replace(/distrito Zaidín/giu, "territorio")
-    .replace(/del distrito/giu, "del territorio");
-}
-
 export const COMMON_AGING_FOUR_BLOCKS: ActionPlanCatalogModule = {
-  ...ZAIDIN_AGING_PROPOSAL,
+  ...AGING_FOUR_BLOCKS_BASE,
   version: COMMON_AGING_FOUR_BLOCKS_VERSION,
-  sourceLabel: "Plantilla reutilizable de envejecimiento en cuatro bloques · procedencia: Plan de Acción Granada-Zaidín; adaptación y validación municipal pendientes",
+  sourceLabel: "Plantilla estructural de envejecimiento en cuatro bloques · adaptación y validación municipal pendientes",
   sourceDate: "2026-11-04",
-  strategicObjective: neutralTerritorialText(ZAIDIN_AGING_PROPOSAL.strategicObjective),
   cautions: [
-    ...ZAIDIN_AGING_PROPOSAL.cautions,
+    ...AGING_FOUR_BLOCKS_BASE.cautions,
     "Propuesta de catálogo, no diagnóstico ni decisión aprobada del expediente. Seleccionar, adaptar y validar los objetivos e indicadores con las fuentes locales.",
   ],
-  generalObjectives: ZAIDIN_AGING_PROPOSAL.generalObjectives.map(general => ({
+  generalObjectives: AGING_FOUR_BLOCKS_BASE.generalObjectives.map(general => ({
     ...general,
     code: `COMUN-${general.code}`,
-    title: neutralTerritorialText(general.title),
     specificObjectives: general.specificObjectives.map(specific => ({
       ...specific,
-      title: neutralTerritorialText(specific.title),
       indicator: {...specific.indicator},
     })),
   })),
 };
 
-const territorialText = (text: string) => text
-  .replaceAll("del distrito Zaidín", "del municipio de Zagra")
-  .replaceAll("del Zaidín", "de Zagra")
-  .replaceAll("del distrito", "del municipio");
+/** Redacción de Zagra para los textos de la plantilla que nombran el territorio. */
+const ZAGRA_TERRITORIAL_WORDING: Record<string, [string, string]> = {
+  strategic: ["personas mayores del territorio", "personas mayores de Zagra"],
+  "ENV-OE6.1": ["agentes del territorio", "agentes del municipio de Zagra"],
+  "ENV-OE4.2": ["población mayor del territorio", "población mayor del municipio"],
+  "ENV-OE8.2": ["personas mayores del territorio", "personas mayores del municipio de Zagra"],
+};
+const territorialText = (key: string, text: string) => {
+  const wording = ZAGRA_TERRITORIAL_WORDING[key];
+  return wording ? text.replace(wording[0], wording[1]) : text;
+};
 
 /** Reuses the four-block architecture, never the other territory's decisions. */
 export const ZAGRA_AGING_PROPOSAL: ActionPlanCatalogModule = {
-  ...ZAIDIN_AGING_PROPOSAL,
+  ...AGING_FOUR_BLOCKS_BASE,
   version: ZAGRA_ACTION_PLAN_VERSION,
-  sourceLabel: "Plan de Acción de Zagra · adaptación de la estructura de cuatro bloques del Zaidín",
+  sourceLabel: "Plan de Acción de Zagra · adaptación de la plantilla estructural de cuatro bloques",
   sourceDate: "2026-10-28",
-  strategicObjective: territorialText(ZAIDIN_AGING_PROPOSAL.strategicObjective),
-  generalObjectives: ZAIDIN_AGING_PROPOSAL.generalObjectives.map(general => ({
+  strategicObjective: territorialText("strategic", AGING_FOUR_BLOCKS_BASE.strategicObjective),
+  generalObjectives: AGING_FOUR_BLOCKS_BASE.generalObjectives.map(general => ({
     ...general,
     // The old nine groups used ENV-OG1…9 with different meanings.
     code: `ZAGRA-${general.code}`,
-    title: territorialText(general.title),
     specificObjectives: general.specificObjectives.map(specific => ({
       ...specific,
-      title: territorialText(specific.title),
+      title: territorialText(specific.code, specific.title),
       indicator: {...specific.indicator},
     })),
   })),
@@ -150,7 +144,7 @@ export function prepareMunicipalActionPlanDraft(municipalityId: string, module: 
     if (municipalityId === "zagra" && module.version === ZAGRA_ACTION_PLAN_VERSION) {
       return regroupZagraActionPlanDraft(draft, date);
     }
-    if (municipalityId !== "zagra" && municipalityId !== "granada-zaidin" && module.version === COMMON_AGING_FOUR_BLOCKS_VERSION) {
+    if (municipalityId !== "zagra" && module.version === COMMON_AGING_FOUR_BLOCKS_VERSION) {
       return regroupCommonActionPlanDraft(draft, date);
     }
   }

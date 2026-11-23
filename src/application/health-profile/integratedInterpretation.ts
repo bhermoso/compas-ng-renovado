@@ -199,8 +199,7 @@ interface InterpretationTheme {
   /**
    * Variantes inframunicipales (Lote D). El texto base se redacta en clave
    * neutra (municipio/ámbito, «territorio», «zonas»); cuando la identidad es un
-   * distrito, se usan estas formas —léxico de barrios/distrito— que reproducen
-   * exactamente la redacción canónica de Granada-Zaidín. Municipio nunca cae al
+   * distrito, se usan estas formas —léxico de barrios/distrito—. Municipio nunca cae al
    * vocabulario inframunicipal.
    */
   questionDistrito?: string;

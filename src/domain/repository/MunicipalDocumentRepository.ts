@@ -259,7 +259,7 @@ export interface MunicipalDocument {
   // Metadatos documentales finos (Incremento 5A) — opcionales, retrocompatibles.
   documentNature?: DocumentNature;
   territorialScale?: DocumentTerritorialScale;
-  /** Unidad de Gestión Clínica de origen, cuando aplica (p. ej. "Zaidín Sur"). */
+  /** Unidad de Gestión Clínica de origen, cuando aplica (p. ej. "Atarfe"). */
   ugc?: string;
   contentMode?: DocumentContentMode;
   cycle?: DocumentCycle;

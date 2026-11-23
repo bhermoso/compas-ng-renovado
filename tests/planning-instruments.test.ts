@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { PLANNING_INSTRUMENTS } from '../src/domain/action-plan-catalog/PlanningInstruments';
-import { ZAIDIN_AGING_PROPOSAL } from '../src/domain/action-plan-catalog/PlanPreparationDraft';
+import { AGING_FOUR_BLOCKS_BASE } from '../src/domain/action-plan-catalog/PlanPreparationDraft';
 import { EMOTIONAL_WELLBEING_MODULE } from '../src/domain/action-plan-catalog/ActionPlanCatalog';
 describe('Catálogo de preparación de instrumentos',()=>{
  it('cubre todos los objetivos y no introduce referencias inexistentes',()=>{
-  const objectives=ZAIDIN_AGING_PROPOSAL.generalObjectives.flatMap(g=>g.specificObjectives.map(o=>o.code));
+  const objectives=AGING_FOUR_BLOCKS_BASE.generalObjectives.flatMap(g=>g.specificObjectives.map(o=>o.code));
   // Envejecimiento: el catálogo cubre todos sus objetivos específicos.
   const covered=new Set(PLANNING_INSTRUMENTS.flatMap(i=>i.objectives).filter(code=>code.startsWith('ENV-')));
   expect([...covered].sort()).toEqual([...objectives].sort());

@@ -9,7 +9,7 @@ try {
  const page=await browser.newPage();const errors=[];
  page.on('pageerror',e=>errors.push(e.message));
  // No real account or network request to Firebase is needed for this rendering check.
- // Toda entrada ordinaria muestra el acceso (main.tsx); la antigua vista relas-zaidin se retiró.
+ // Toda entrada ordinaria muestra el acceso (main.tsx); la antigua vista relas-centro se retiró.
  await page.route(/https:\/\/(.*googleapis.com|.*firebaseapp.com)\/.*/,r=>r.abort());
  await page.goto(`http://127.0.0.1:${server.httpServer.address().port}/compas-ng-renovado/`);
  await page.getByRole('heading',{name:'COMPAS · Acceso'}).waitFor();
