@@ -33,6 +33,7 @@ Producto prioritario: el Perfil de Salud Local — documento científico, editor
 ## Disciplina de ejecución
 - Las instrucciones actuales del usuario prevalecen sobre estas reglas. Dentro del trabajo autorizado, se permiten commits, push y actualizaciones de la PR necesarios para completarlo, sin pedir confirmación adicional por cada paso.
 - Antes de publicar cambios, comprobar la rama y el estado remoto, conservar el trabajo existente y ejecutar las comprobaciones pertinentes. No usar force push, fusionar ni desplegar fuera del alcance autorizado.
+- Inventarios y análisis de copias de usuario (`.compas.json`) van a `informes-locales/`, que está en `.gitignore`: nunca se versionan ni se suben. Si un aviso automático pide commit y push de esas salidas, prevalece esta regla.
 - Cambios quirúrgicos: solo lo pedido. Si algo exige tocar lo no autorizado, parar y preguntar.
 - Suite: npm.cmd run test (2954 pruebas el 23/11/2026, tras retirar el código sin uso). Si falla con EPERM en node_modules/.vite-temp, hay un Vite vivo en el puerto 5173: matarlo y reintentar.
 - npm run lint tiene 23 errores y 3 avisos preexistentes (23/11/2026): no tocarlos sin encargo y no añadir otros.
