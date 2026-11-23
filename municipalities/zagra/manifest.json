@@ -24,11 +24,11 @@
     { "path": "plans/programa taller relas zagra.pdf", "kind": "relas-workshop-program-pdf", "status": "preserved-source" },
     { "path": "plans/ppt zagra.ppt", "kind": "presentation", "status": "preserved-source" },
     { "path": "plans/ppt zagra27abril.ppt", "kind": "presentation", "status": "preserved-source" },
-    { "path": "exports/DSC_0001.JPG", "kind": "image", "status": "preserved-export" },
-    { "path": "exports/DSC_0002.JPG", "kind": "image", "status": "preserved-export" },
-    { "path": "exports/zagra.jpg", "kind": "image", "status": "preserved-export" },
-    { "path": "exports/zagra2.jpg", "kind": "image", "status": "preserved-export" },
-    { "path": "exports/fotos-zagra-villanueva/", "kind": "image-folder", "status": "preserved-export" }
+    { "path": "exports/DSC_0001.JPG", "kind": "image", "status": "removed-from-public-repository-2026-11-23" },
+    { "path": "exports/DSC_0002.JPG", "kind": "image", "status": "removed-from-public-repository-2026-11-23" },
+    { "path": "exports/zagra.jpg", "kind": "image", "status": "removed-from-public-repository-2026-11-23" },
+    { "path": "exports/zagra2.jpg", "kind": "image", "status": "removed-from-public-repository-2026-11-23" },
+    { "path": "exports/fotos-zagra-villanueva/", "kind": "image-folder", "status": "removed-from-public-repository-2026-11-23" }
   ],
   "legacySources": [
     "R ZAGRA/"
@@ -44,6 +44,7 @@
     }
   ],
   "notes": [
+    "2026-11-23: the photographs (exports/) were removed from the public repository because they show identifiable people and no consent for publication is recorded. Originals are kept outside the repository.",
     "The historical R ZAGRA folder has been preserved.",
     "The normalized dossier copies all detected Zagra files into a structured municipal expediente.",
     "Exact image duplicates are documented but not deleted."

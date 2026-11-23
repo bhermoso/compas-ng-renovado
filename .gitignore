@@ -70,3 +70,9 @@ tmp/
 # Salidas de análisis sobre copias de usuario (inventarios, informes locales): nunca se versionan
 informes-locales/
 *.compas.json
+
+# Fotografías de personas: no se versionan en el repositorio público
+municipalities/**/*.jpg
+municipalities/**/*.jpeg
+municipalities/**/*.JPG
+municipalities/**/*.JPEG

@@ -1,7 +1,14 @@
-# COMPÁS NG — Reglas permanentes de trabajo
+# COMPÁS — Reglas permanentes de trabajo
 
 ## Verdad del proyecto
 La única verdad es: el código, el historial Git, los contratos en docs/contracts/ y las validaciones ejecutables. Nunca uses conversaciones anteriores como verdad. Antes de cualquier tarea, reconstruye el estado: git status --short, git log --oneline -10, git rev-parse HEAD.
+
+## Repositorio, publicación y datos
+- Repositorio único de trabajo: `bhermoso/compas-ng-renovado`, rama `master`. Web: https://bhermoso.github.io/compas-ng-renovado/, publicada por `.github/workflows/deploy.yml` al fusionar en `master`.
+- `bhermoso/COMPAS_NG` es una copia anterior y queda fuera del trabajo: no abrir ramas, PR ni cambios allí.
+- Punto de entrada para retomar el trabajo: `docs/audits/REGISTRO-DE-TRABAJO.md`. Los documentos de estado, continuidad, planificación y certificación anteriores al 23/11/2026 están en `docs/historico/` y son historial, no estado vigente.
+- Custodia de los expedientes: Firebase `compas-98dd7`. Los expedientes de `public/seeds/` son copias iniciales de octubre de 2026 (Atarfe, de julio): una comprobación hecha con ellos no acredita el comportamiento con los expedientes reales.
+- Las reglas de Firestore vigentes son `firebase/firestore.rules` de este repositorio.
 
 ## Objetivo del producto
 Producto prioritario: el Perfil de Salud Local — documento científico, editorial e institucional de referencia. Toda decisión se justifica contra una pregunta: ¿acerca esto al Perfil a su forma definitiva? Si la respuesta no es claramente afirmativa, detente y explica por qué antes de tocar código.
@@ -28,8 +35,8 @@ Producto prioritario: el Perfil de Salud Local — documento científico, editor
 - Antes de publicar cambios, comprobar la rama y el estado remoto, conservar el trabajo existente y ejecutar las comprobaciones pertinentes. No usar force push, fusionar ni desplegar fuera del alcance autorizado.
 - Inventarios y análisis de copias de usuario (`.compas.json`) van a `informes-locales/`, que está en `.gitignore`: nunca se versionan ni se suben. Si un aviso automático pide commit y push de esas salidas, prevalece esta regla.
 - Cambios quirúrgicos: solo lo pedido. Si algo exige tocar lo no autorizado, parar y preguntar.
-- Suite: npm.cmd run test (2217+ tests). Si falla con EPERM en node_modules/.vite-temp, hay un Vite vivo en el puerto 5173: matarlo y reintentar.
-- npm run lint tiene 13 errores preexistentes: no tocarlos.
+- Suite: npm.cmd run test (2954 pruebas el 23/11/2026, tras retirar el código sin uso). Si falla con EPERM en node_modules/.vite-temp, hay un Vite vivo en el puerto 5173: matarlo y reintentar.
+- npm run lint tiene 23 errores y 3 avisos preexistentes (23/11/2026): no tocarlos sin encargo y no añadir otros.
 - Que compile y pase tests NO demuestra que mejore el producto. Verificar también coherencia editorial, narrativa y experiencia de lectura.
 - En cada informe, separar: hechos observados / inferencias / decisiones institucionales / hipótesis. "No verificado" es respuesta válida.
 
@@ -39,5 +46,4 @@ Producto prioritario: el Perfil de Salud Local — documento científico, editor
 - Granada-Zaidín se retiró de COMPÁS el 2026-11-21 (decisión del responsable). No hay caso de referencia fijado ni ámbito por defecto: la aplicación pide elegirlo. La línea Envejecimiento saludable del catálogo común conserva como procedencia el Plan Local de Salud del Distrito Zaidín.
 
 ## Referencias externas (solo consulta, nunca copiar)
-- Desktop/COMPAS_REPO_DEPURADO_20260409: repo histórico, la mina.
-- Desktop/COMPAS_NG_DEV: línea paralela con rama feature/PSL-02-export-docx-pdf.
+- El repositorio histórico monolítico (COMPAS-RESCATE-20260514) no está hoy en GitHub. El archivo depurado del 09/05/2026 se conserva como zip fuera del repositorio. Si hace falta consultarlo, pedirlo al responsable.

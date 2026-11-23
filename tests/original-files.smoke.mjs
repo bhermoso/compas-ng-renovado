@@ -6,22 +6,22 @@ try{
  browser=await chromium.launch({executablePath:process.env.COMPAS_TEST_CHROMIUM,headless:true,args:['--no-sandbox']});
  const page=await browser.newPage();
  const origin='http://127.0.0.1:'+server.httpServer.address().port;
- await page.goto(origin+'/COMPAS_NG/');
+ await page.goto(origin+'/compas-ng-renovado/');
  await page.evaluate(async()=>{
-  const {saveOriginalFile}=await import('/COMPAS_NG/src/infrastructure/document-files/originalFiles.ts');
+  const {saveOriginalFile}=await import('/compas-ng-renovado/src/infrastructure/document-files/originalFiles.ts');
   await saveOriginalFile('test-a','document-1',new File(['original intacto'],'original.txt',{type:'text/plain'}));
  });
  await page.reload();
  const result=await page.evaluate(async()=>{
-  const {loadOriginalFile}=await import('/COMPAS_NG/src/infrastructure/document-files/originalFiles.ts');
+  const {loadOriginalFile}=await import('/compas-ng-renovado/src/infrastructure/document-files/originalFiles.ts');
   const file=await loadOriginalFile('test-a','document-1');
   return {name:file.name,text:await file.text(),other:await loadOriginalFile('test-b','document-1')};
  });
  assert.equal(result.name,'original.txt');assert.equal(result.text,'original intacto');assert.equal(result.other,undefined);
  await page.evaluate(async()=>{
-  const React=await import('/COMPAS_NG/node_modules/.vite/deps/react.js');
-  const client=await import('/COMPAS_NG/node_modules/.vite/deps/react-dom_client.js');
-  const {DocumentAccess}=await import('/COMPAS_NG/src/ui/components/DocumentAccess.tsx');
+  const React=await import('/compas-ng-renovado/node_modules/.vite/deps/react.js');
+  const client=await import('/compas-ng-renovado/node_modules/.vite/deps/react-dom_client.js');
+  const {DocumentAccess}=await import('/compas-ng-renovado/src/ui/components/DocumentAccess.tsx');
   const container=document.createElement('div');container.id='access-test';document.body.append(container);
   client.default.createRoot(container).render(React.default.createElement(DocumentAccess,{document:{id:'document-1',municipalityId:'test-a',title:'Prueba',source:{},tags:[]}}));
  });

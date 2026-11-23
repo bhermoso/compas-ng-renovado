@@ -3,7 +3,7 @@ const server=await createServer({server:{host:'127.0.0.1',port:0}});await server
 try{
  browser=await chromium.launch({executablePath:process.env.COMPAS_TEST_CHROMIUM,headless:true,args:['--no-sandbox']});
  const page=await browser.newPage({viewport:{width:1440,height:1000}});const errors=[];page.on('pageerror',e=>errors.push(e.message));
- await page.goto(`http://127.0.0.1:${server.httpServer.address().port}/COMPAS_NG/`);
+ await page.goto(`http://127.0.0.1:${server.httpServer.address().port}/compas-ng-renovado/`);
  const ges=()=>page.locator('.app-nav__tab').filter({hasText:'Gestor de Encuestas'}).click();
  await ges();
  const editor=page.locator('details.planning-instruments').first();

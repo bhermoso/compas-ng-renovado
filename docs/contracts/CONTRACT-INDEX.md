@@ -568,8 +568,8 @@ Estas entradas registran decisiones o divergencias vivas que afectan a la gobern
 | ID | Deuda | Evidencia | Estado |
 |---|---|---|---|
 | GOV-PSL-01 | Estructura documental del Perfil: **rigidez numérica derogada** por los Fundamentos del Perfil único (2026-07-17). La lectura canónica es única y adaptativa; su extensión depende del expediente. Queda pendiente la *implementación* de la arquitectura adaptativa en código. | `CONTRACT-MIT-PSL` §6, `CONTRACT-PSL-COMPAS` §4, `narrativeChapters.ts`, `ProfileIntegratedEditorialPreview` | Doctrina resuelta; implementación pendiente |
-| GOV-PSL-02 | Vista editorial integrada implementada como lectura canónica sin contrato propio de producto. | `LocalHealthProfileView.tsx`, `tests/perfil-vista-editorial-integrada.test.tsx` | Pendiente de contrato/unificación |
-| GOV-PSL-03 | `PerfilFuentesPanel` y `PerfilLocalDeSaludPanel` se renderizan tras el Perfil, fuera de la lectura canónica y fuera del espacio técnico del Perfil. | `src/App.tsx:2978-2979` | Pendiente de decisión funcional |
+| GOV-PSL-02 | Vista editorial integrada del Perfil generado por COMPÁS. Retirada del código el 2026-11-23 (`LocalHealthProfileView`, `ProfileIntegratedEditorialPreview`): no se mostraba en la aplicación; el Perfil se elabora fuera y se carga (`EXTERNAL-PROFILE`). | Registro de trabajo, 2026-11-23 | Retirado |
+| GOV-PSL-03 | `PerfilFuentesPanel` y `PerfilLocalDeSaludPanel` (espacio interpretativo del Perfil generado). Retirados del código el 2026-11-23: no se mostraban en la aplicación. | Registro de trabajo, 2026-11-23 | Retirado |
 | GOV-P4-01 | El PSL-NHS deja de ser producto autónomo/segunda fuente de verdad (Fundamentos del Perfil único, 2026-07-17). La representación derivada que quedó se retira el 2026-10-23 (decisión del autor: solo Perfil general); `computePosition` sigue **descartada**. | Contrato NHS retirado; `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY` Art. 17 ter | Retirado |
 | GOV-SALIDA-01 | Pantalla e impresión derivan de `editorialView`; DOCX/PDF/visor reconstruyen desde `provenance + conclusiones.content` (dos composiciones). Los Fundamentos (2026-07-17) obligan a equivalencia **semántica** entre salidas; la unificación de código queda pendiente. | `pslcCanonicalDocument.ts`, `pslcDocumentModel.ts`, `pslcDocx.ts`, `pslcPdf.ts` | Doctrina fijada; implementación pendiente |
 | GOV-VIS-01 | Identidad visual sin autoridad operacional única: `VISUAL-CONTRACT` existe como doctrina, pero `src/App.css` concentra 10.255 líneas, 1.795 colores hexadecimales, 132 colores únicos y dos escalas de grises conviviendo (`#64748b` y familia; `#526070` y familia). | `docs/visual/VISUAL-CONTRACT.md`, `src/App.css` | Deuda de gobernanza visual |
@@ -579,21 +579,21 @@ Estas entradas registran decisiones o divergencias vivas que afectan a la gobern
 
 | Expediente | Fecha | Estado |
 |---|---|---|
-| `docs/certification/CERTIFICATION-SPRINT-0-1.md` | 2026-06-28 | Sprints 0–1: pipeline E2E, 309 tests |
-| `docs/certification/PRODUCT-1-CERTIFICATION.md` | 2026-06-29 | Producto 1 — Sistema de Estudios Complementarios: 6 instrumentos, 481 tests |
-| `docs/certification/PRODUCT-2-SAM-CERTIFICATION.md` | 2026-06-30 | Producto 2 — SAM NG: motor + integración + samAssessmentToEvidenceAtom, 573 tests |
-| `docs/certification/PRODUCT-3-PSL-CERTIFICATION.md` | 2026-06-30 | Producto 3 — PSL-C: certificación histórica fechada; estado posterior superado en catálogo de 13 estudios, DOCX/PDF y estructura documental pendiente de unificación |
+| `docs/historico/certification/CERTIFICATION-SPRINT-0-1.md` | 2026-06-28 | Sprints 0–1: pipeline E2E, 309 tests |
+| `docs/historico/certification/PRODUCT-1-CERTIFICATION.md` | 2026-06-29 | Producto 1 — Sistema de Estudios Complementarios: 6 instrumentos, 481 tests |
+| `docs/historico/certification/PRODUCT-2-SAM-CERTIFICATION.md` | 2026-06-30 | Producto 2 — SAM NG: motor + integración + samAssessmentToEvidenceAtom, 573 tests |
+| `docs/historico/certification/PRODUCT-3-PSL-CERTIFICATION.md` | 2026-06-30 | Producto 3 — PSL-C: certificación histórica fechada; estado posterior superado en catálogo de 13 estudios, DOCX/PDF y estructura documental pendiente de unificación |
 
 El plano arquitectónico completo que responde a la pregunta
 "¿qué debe existir para producir un Perfil de Salud Local, un Plan Local de Salud y una
 Encuesta Municipal?" está en `docs/architecture/BLUEPRINT-PRODUCTION.md`.
 Ese blueprint conserva decisiones y tensiones históricas; para determinar si una
 deuda sigue viva, prevalecen este índice, los contratos específicos vigentes y
-`docs/ESTADO-ACTUAL-COMPAS-NG.md`.
+el [Registro de trabajo](../audits/REGISTRO-DE-TRABAJO.md).
 
 ---
 
-*Este índice es el punto de entrada obligatorio antes de crear o modificar cualquier contrato en COMPÁS NG.*
+*Este índice es el punto de entrada obligatorio antes de crear o modificar cualquier contrato en COMPÁS.*
 
 
 ## Producción externa del Perfil de Salud Local

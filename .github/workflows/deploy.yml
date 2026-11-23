@@ -1,4 +1,4 @@
-name: Deploy COMPAS NG to GitHub Pages
+name: Deploy COMPAS to GitHub Pages
 
 on:
   push:

@@ -22,6 +22,135 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-23 · IBSE de Atarfe en escala 0–100, referencias EAS y evaluación
+
+Pages al empezar: `c0cb1d8`.
+
+- **Decisión del responsable (2026-11-23).** Los microdatos se quedan en el
+  repositorio. El fichero IBSE válido es el normalizado sobre 100; pide
+  comprobarlo. Pide reconectar la evaluación y las referencias EAS.
+- **IBSE, hechos observados.** `fixtures/ibse-atarfe.csv` (desde `887d459`,
+  09/11/2026) tiene 910 registros con edad y sexo; 898 completos y 811 con
+  los ocho ítems válidos. Recalculado desde los ítems con la escala común
+  0–100 del parser: índice 62,2; Vínculo 72,4; Situación 60,3; Control 51,1;
+  Persona 65,0. Coincide con el expediente inicial de Atarfe
+  (`public/seeds`) y con las pruebas. La media del total de REDCap (63,2)
+  mezcla escalas y no es válida. Un registro trae el año de nacimiento (1993)
+  como edad; el parser lo convierte. 162 de los 910 registros declaran menos de 16 años.
+- **IBSE, inconsistencia corregida.** Los dos documentos metodológicos del IBSE
+  de Atarfe (23/10 y 20/11) daban 63,2 y afirmaban que el fixture no tenía
+  edad ni sexo, o que esos microdatos estaban fuera de GitHub. Se les añade una
+  nota que lo corrige y conserva el texto como historial.
+- **No comprobado.** El estudio IBSE del expediente real de Atarfe en
+  Firestore.
+- **Referencias EAS, hechos.** Ya llegan a la aplicación: los valores de
+  Andalucía por `andalusiaReferenceContract` y los de Granada y Andalucía de la
+  EAS 2023 por `eas2023References`, en Estudios complementarios y en el Perfil.
+  `EASComparativeReferences` es la calculadora que comprueba esos valores
+  contra los microdatos en las pruebas; no hay nada que reconectar. Se corrige
+  su cautela, que citaba Granada-Zaidín.
+- **Evaluación, hechos.** La vista Evaluación es un marcador. Lo conservado no
+  sirve para reconectarla sin contradecir decisiones vigentes:
+  `AgendaResultSummary` se quitó de Evaluación por decisión del responsable
+  (20/10/2026, commit `c623411`); `MonitoringPanel` lista actuaciones que
+  genera automáticamente la agenda heredada del motor anterior y duplica el
+  marco de evaluación (responsable, preguntas, momentos, línea base), que ya
+  se edita en el Plan de Acción. El sistema de evaluación que el responsable
+  quiere incorporar es el del repositorio histórico, que no está disponible
+  en GitHub.
+- **Pendiente (decisión del responsable).** Diseño de la evaluación: aportar
+  el histórico o definir su contenido.
+
+---
+
+## 2026-11-23 · Retirada del código sin uso y de las fotografías de Zagra
+
+Pages al empezar: `c4d020f`.
+
+- **Decisión del responsable (2026-11-23).** Retirar el código del Perfil que
+  generaba COMPÁS y el resto del código sin uso; quitar las fotografías del
+  repositorio. La reconexión de la evaluación y de las referencias EAS queda
+  pendiente de decisión.
+- **Método.** Mapa de importaciones desde `src/main.tsx`, resolviendo los
+  archivos índice nombre a nombre. Se retira lo que no alcanza ningún camino
+  de la aplicación.
+- **Cambio.**
+  - 52 archivos de `src` (48 módulos y 4 índices que quedaban vacíos; 7265 líneas): la vista del Perfil generado
+    (`LocalHealthProfileView`, `ProfileIntegratedEditorialPreview`), su espacio
+    interpretativo (`ui/components/health-profile`), la validación
+    institucional del Perfil generado (`approvePSL`, `invalidatePSL`,
+    `createFormalValidation`, `FormalValidationForm`), los paneles anteriores
+    de Plan de Acción, propuestas y agenda (`ActionPlanPanel`,
+    `CanonicalActionPlanPanel`, `AuthoredProposalPanel`, `ProposalMenuPanel`,
+    `ProposalReviewMode`, `AgendaPanel`) y otros módulos sin uso.
+  - Se conservan, aunque hoy no se usan en la aplicación: las referencias EAS
+    (`EASComparativeReferences` y adaptadores), `Esa2030.ts`,
+    `MonitoringPanel`, `AgendaResultSummary`, `QuestionnaireBuilderPanel`,
+    `EPVSAPanel`, los módulos SAM y SFA, y `buildLocalHealthProfile`,
+    `createMunicipalInventory`, `municipality-context` y
+    `HealthReportToEvidencePipeline`, que las pruebas de código vivo usan
+    para construir expedientes de prueba.
+  - 14 archivos de prueba dedicados solo al código retirado se eliminan; en
+    otros 6 se retiran los casos que lo usaban.
+  - `municipalities/zagra/exports`: se retiran 18 fotografías con personas
+    reconocibles (14 de 2017 y 4 de grupo); el manifiesto lo registra y
+    `.gitignore` excluye imágenes en `municipalities/`. Siguen en el historial
+    de Git.
+  - Índice de contratos: GOV-PSL-02 y GOV-PSL-03, retirados.
+- **Comprobado (hechos).** Compilación correcta. Suite completa: 2954 pruebas
+  correctas, 2 omitidas (antes 3108; la diferencia son las pruebas del código
+  retirado). Lint: 23 errores y 3 avisos (antes 26 errores; ninguno nuevo).
+- **Pendiente.** Los contratos que describen el Perfil generado
+  (`CONTRACT-PSL-COMPAS`, `CONTRACT-MIT-PSL`, `CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER`)
+  siguen sin reformar. Microdatos individuales en `fixtures/` (IBSE Atarfe,
+  EAS): sin decisión. Ramas integradas: el borrado no fue posible desde la
+  sesión de trabajo en la nube.
+
+---
+
+## 2026-11-23 · Una sola fuente escrita: documentos de arranque y referencias al repositorio anterior
+
+Pages al empezar: `033304a`.
+
+- **Decisión del responsable (2026-11-23).** Se trabaja solo con
+  `compas-ng-renovado`; `COMPAS_NG` queda fuera del trabajo.
+- **Hechos observados (auditoría del 23/11).** `CLAUDE.md`,
+  `docs/REPOSITORIO-CANONICO.md` y otros tres puntos de entrada designaban
+  `COMPAS_NG` como repositorio único o describían el estado de septiembre. El
+  panel de Administración enlazaba como reglas «que deben estar publicadas» el
+  `firestore.rules` de `COMPAS_NG`, que no contempla las marcas de borrado y
+  prohíbe borrar. Siete pruebas abrían o construían rutas bajo `/COMPAS_NG/`.
+  El lint tenía 26 errores y 3 avisos, no 13.
+- **Cambio.**
+  - `CLAUDE.md`: repositorio, web, punto de entrada, custodia de expedientes y
+    reglas vigentes; recuentos de pruebas y lint actualizados; referencias a
+    carpetas del escritorio sustituidas. La doctrina vigente no cambia.
+  - `README.md` reescrito con el estado actual.
+  - A `docs/historico/`: `ROADMAP.md`, `docs/certification/`,
+    `docs/planning/` y los documentos de estado y continuidad anteriores
+    (`ESTADO-ACTUAL-COMPAS-NG`, `REPOSITORIO-CANONICO`,
+    `CONTINUIDAD-COMPAS-NG`, `CONTINUAR-AQUI`, `RECUPERACION-Y-CONSOLIDACION`,
+    `PLAN-PASO-4`, `PLAN-DOCUMENTO-VALIDADO`, `ESTADO-INTERVENCION-2`,
+    `HANDOFF-GOV-SALIDA-01`, `RELAS-FIREBASE-ACTIVACION`,
+    `PERFIL-PROCESAMIENTO-PDF-Y-RELAS`, `DOCUMENTOS-CONSULTA-Y-ORIGINALES`).
+    Se actualizan los enlaces que apuntaban a ellos.
+  - Panel de Administración: el enlace de reglas apunta a este repositorio.
+  - Pruebas y scripts de navegador: ruta base `/compas-ng-renovado/`.
+  - Flujo de publicación: «Deploy COMPAS to GitHub Pages».
+  - Se retira `tmp-noop.txt`.
+- **Comprobado (hechos).** Suite completa: 3108 pruebas correctas, 2 omitidas.
+  Compilación correcta.
+- **No comprobado.** Los scripts de navegador fuera de la CI
+  (`collection-preparation`, `delete-workspace`, `original-files`,
+  `load-atarfe-complete` y `test:smoke`): el entorno no pudo instalar el
+  navegador de Playwright.
+- **Pendiente (decisiones del responsable).** Contratos del Perfil (externo sin
+  aprobar; `CONTRACT-PSL-COMPAS` y `CONTRACT-MIT-PSL` declarados vigentes);
+  código sin uso (67 módulos); ramas; datos personales en el repositorio
+  público; auditoría de Firestore.
+
+---
+
 ## 2026-11-22 · Localiza Salud: una recarga no duplica fichas
 
 Pages al empezar: `90188cc`.

@@ -236,19 +236,19 @@ describe("expediente canónico de Atarfe", () => {
     expect(ws.evidenceStore.atoms.every((a) => a.provenance.documentId !== undefined)).toBe(true);
   });
 
-  it("11. la carga funciona bajo el BASE_URL de GitHub Pages /COMPAS_NG/", async () => {
+  it("11. la carga funciona bajo el BASE_URL de GitHub Pages /compas-ng-renovado/", async () => {
     expect(hasMunicipalitySeed("atarfe")).toBe(true);
-    expect(municipalitySeedUrl(MUNICIPALITY_SEEDS["atarfe"], "/COMPAS_NG/")).toBe(
-      "/COMPAS_NG/seeds/compas-ng-workspace-atarfe.json"
+    expect(municipalitySeedUrl(MUNICIPALITY_SEEDS["atarfe"], "/compas-ng-renovado/")).toBe(
+      "/compas-ng-renovado/seeds/compas-ng-workspace-atarfe.json"
     );
     let requested = "";
     const ws = await loadMunicipalitySeed("atarfe", {
-      baseUrl: "/COMPAS_NG/",
+      baseUrl: "/compas-ng-renovado/",
       fetchImpl: okFetch(SEED_RAW, (u) => {
         requested = u;
       }),
     });
-    expect(requested).toBe("/COMPAS_NG/seeds/compas-ng-workspace-atarfe.json");
+    expect(requested).toBe("/compas-ng-renovado/seeds/compas-ng-workspace-atarfe.json");
     expect(ws?.municipality.identity.id).toBe("atarfe");
     expect(ws?.evidenceStore.atoms).toHaveLength(26);
   });

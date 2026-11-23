@@ -1,31 +1,26 @@
-# COMPÁS NG
+# COMPÁS
 
-COMPÁS NG es un prototipo metodológico y técnico para apoyar la elaboración de
-Planes Locales de Salud municipales o inframunicipales. Integra repositorio
-documental, expediente territorial en navegador, Perfil de Salud Local, lectura
-estratégica y preparación del Plan de Acción.
+COMPÁS acompaña la elaboración, la implantación y la evaluación de Planes
+Locales de Salud municipales, mancomunados y de distrito municipal. Organiza el
+expediente documental de cada ámbito, el Perfil de Salud Local, la priorización,
+el Plan de Acción y las agendas anuales de implantación.
 
-## Estado actual
+- Repositorio de trabajo: `bhermoso/compas-ng-renovado`, rama `master`.
+- Web publicada: https://bhermoso.github.io/compas-ng-renovado/ (se publica al
+  fusionar en `master`; `version.json` indica el commit servido).
+- Expedientes: custodia en Firebase (`compas-98dd7`). Los de `public/seeds/`
+  son copias iniciales de octubre de 2026 y solo sirven de ensayo.
 
-Referencia de esta rama: 13 de septiembre de 2026.
+## Dónde empezar
 
-- La aplicación principal es React + TypeScript + Vite y funciona como
-  expediente local en navegador.
-- El ámbito Granada-Zaidín dispone de un seed público observado con Informe de
-  Salud, marcos estratégicos, documentación territorial y activos Localiza Salud.
-- El Perfil de Salud Local se genera de forma trazable y prudente: interpreta
-  señales documentales, determinantes plausibles y activos, pero mantiene
-  validación humana obligatoria.
-- El Motor de Traducción Estratégica (MTE) v1 está implementado y documentado.
-- El Plan de Acción permite edición directa: al elegir `Modificar`, la nueva
-  redacción queda guardada inmediatamente en el expediente del ámbito.
-- La compilación completa del Plan Local de Salud y el sistema de evaluación
-  siguen siendo líneas pendientes.
-- El acceso autenticado para responsables territoriales queda fuera del flujo
-  visible principal hasta una decisión posterior.
+1. [Registro de trabajo](docs/audits/REGISTRO-DE-TRABAJO.md): versión
+   publicada, comprobaciones, cambios y pendientes, por fecha.
+2. [CLAUDE.md](CLAUDE.md): reglas permanentes y doctrina vigente.
+3. [Índice de contratos](docs/contracts/CONTRACT-INDEX.md).
 
-La foto de producto viva está en
-[`docs/ESTADO-ACTUAL-COMPAS-NG.md`](docs/ESTADO-ACTUAL-COMPAS-NG.md).
+Los documentos de estado, continuidad, planificación y certificación anteriores
+al 23 de noviembre de 2026 están en [`docs/historico/`](docs/historico/). Son
+historial, no describen el estado actual.
 
 ## Cómo ejecutar
 
@@ -34,25 +29,19 @@ npm install
 npm run dev
 ```
 
-El servidor local de Vite sirve la aplicación en el puerto configurado por el
-proyecto.
-
-## Comprobaciones útiles
+## Comprobaciones
 
 ```bash
 npm run build
-npm run lint
-npm test
-npx vitest run tests/plan-preparation.test.tsx tests/pa-relas-02-ui.test.ts tests/definitive-action-plan-preview.test.tsx tests/active-municipality.test.ts
+npm test          # suite ordinaria
+npm run lint      # 23 errores y 3 avisos preexistentes a 23/11/2026
 ```
 
-El `npm test` ordinario excluye suites que requieren condiciones especiales:
+Suites con condiciones especiales:
 
-- `npm run test:relas`: Firebase Auth/Firestore con emuladores.
-- `npm run test:reconstruction`: reconstrucción con DOCX privados no incluidos
-  en el repositorio público.
-- `npm run test:profile-fixture`: suite metodológica histórica sobre el fixture
-  sintético Granada-Zaidín 56/92, pendiente de realinear con Perfil 2.0.
+- `npm run test:relas`: reglas de Firestore y administración con los
+  emuladores de Firebase.
+- `npm run test:smoke`: prueba de navegador de Inicio con Vite y Playwright.
 
 ## Estructura
 
@@ -60,13 +49,14 @@ El `npm test` ordinario excluye suites que requieren condiciones especiales:
   planificación.
 - `src/application`: motores, compiladores y servicios puros.
 - `src/ui/components`: paneles de la aplicación.
-- `public/seeds`: expedientes iniciales distribuidos con la app.
-- `municipalities`: exports municipales y artefactos reproducibles.
-- `docs/contracts`: contratos metodológicos y técnicos vigentes o legacy.
-- `docs/architecture`: arquitectura, huecos y decisiones abiertas.
-- `tests`: pruebas unitarias, de integración y smokes.
+- `src/infrastructure`: persistencia local, Firebase y expedientes iniciales.
+- `public/seeds`: expedientes iniciales distribuidos con la aplicación.
+- `firebase/firestore.rules`: reglas de Firestore vigentes.
+- `docs/contracts`: contratos metodológicos y técnicos.
+- `docs/audits`: registro de trabajo y auditorías.
+- `tests`: pruebas unitarias, de integración y de navegador.
 
 ## Principio de uso
 
-COMPÁS NG propone, estructura y hace trazable el trabajo técnico. No sustituye la
+COMPÁS propone, estructura y hace trazable el trabajo técnico. No sustituye la
 validación profesional ni acredita por sí solo una decisión institucional.

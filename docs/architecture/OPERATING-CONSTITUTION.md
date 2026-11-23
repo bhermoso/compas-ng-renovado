@@ -136,7 +136,7 @@ no es opcional ni puede eliminarse.
 fueron superados sin excepción. El desarrollo de motores está autorizado desde el cierre
 de este sprint.**
 
-Ver expediente de certificación completo: `docs/certification/CERTIFICATION-SPRINT-0-1.md`.
+Ver expediente de certificación completo: `docs/historico/certification/CERTIFICATION-SPRINT-0-1.md`.
 
 El Sprint 0 cerró la deuda técnica acumulada y garantizó que la plataforma
 existente funciona de forma completamente determinista, habilitando la incorporación del
@@ -390,7 +390,7 @@ complementarios son:
 | **Contrato de Interpretación** | `docs/contracts/CONTRACT-INTERPRETATION.md` | Naturaleza y límites de la interpretación territorial, capas del conocimiento, papel de la IA |
 | Contrato de Inferencia Estructural | `docs/contracts/CONTRACT-TERRITORIAL-STRUCTURAL-INFERENCE.md` | Marco para investigación futura; bloquea implementación durante Sprint 0 |
 | Contrato del Prompt Maestro Operativo | `docs/contracts/CONTRACT-PMO.md` | Inicialización de sesiones de trabajo con asistentes de IA; política de modelos; protocolo de invocación |
-| Hoja de Ruta | `ROADMAP.md` | Hitos pasados y próximos |
+| Hoja de Ruta (histórica) | `docs/historico/ROADMAP.md` | Hitos pasados y próximos |
 
 ---
 
