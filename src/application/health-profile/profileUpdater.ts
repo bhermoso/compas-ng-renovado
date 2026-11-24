@@ -163,7 +163,9 @@ function appendAuthorship(text: string, line: string): string {
   const at = paras.findIndex(p => /^\d{1,2}\.\s+Autoría/i.test(p.trim()));
   if (at < 0) return text;
   let end = at + 1;
-  while (end < paras.length && !/^(\d{1,2}\.\s|Anexo [A-Z]\.|Referencias$)/i.test(paras[end].trim())) end++;
+  // El apartado 7 termina en el siguiente apartado, en «Anexos» o «Anexo A.», en el primer anexo
+  // rotulado «A. …» o en «Referencias».
+  while (end < paras.length && !/^(\d{1,2}\.\s|Anexos?(?:\s+[A-Z]\.|$)|[A-H]\.\s+[A-ZÁÉÍÓÚ]|Referencias$)/.test(paras[end].trim())) end++;
   paras.splice(end, 0, line);
   return paras.join("\n\n");
 }

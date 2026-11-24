@@ -36,7 +36,8 @@ function SectionBody({ section, structure, discarded }: { section: ProfileSectio
     );
   }
   if (/recomendaciones/i.test(section.title) && !PAGE_CONTINUATION.test(section.title) && structure.recommendations.length > 0) {
-    const intro = section.paragraphs.filter((p) => !/^(R\d+|Tipo\s|C\d+|Deriva de|(?:[A-Z] ){2,}|CONOCER|CONTRASTAR|ABORDAR)/.test(p)).slice(0, 2);
+    // El cuerpo de cada recomendación («Abordar. …») y su fundamento pertenecen a la recomendación, no a la introducción.
+    const intro = section.paragraphs.filter((p) => !/^(R\d+|Tipo\s|C\d+|Deriva de|Fundamento:|(?:Conocer|Contrastar|Abordar)[.:]|(?:[A-Z] ){2,}|CONOCER|CONTRASTAR|ABORDAR)/.test(p)).slice(0, 2);
     const groups = RECO_ORDER.map((type) => ({ type, items: structure.recommendations.filter((r) => r.type === type) })).filter((g) => g.items.length);
     const untyped = structure.recommendations.filter((r) => !r.type);
     return (

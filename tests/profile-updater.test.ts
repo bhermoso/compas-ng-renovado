@@ -177,6 +177,17 @@ describe("campos del paquete derivados del texto (CONTRACT-PROFILE-UPDATER §8)"
     areas: [{ id: "R1", title: "R1. Cuidados. Valorar apoyos.", rationale: "Abordar · Deriva de C1" }] };
   const fix = () => buildProfileUpdate({ library: { profiles: [stale], attachments: [], activeId: "v040" }, kinds: ["campos-derivados"], author: "B", now: new Date("2026-11-18T15:00:00Z"), newId: () => "corr" });
 
+  it("la nota de la revisión se inserta en el apartado 7, antes de «Anexos» o del primer anexo", () => {
+    for (const annex of [["Anexos", "A. Territorio y secciones censales"], ["A. Territorio y secciones censales"], ["Anexo A. Las cuatro secciones censales"]]) {
+      const withAnnex = body.replace("Referencias", [...annex, "Tabla del anexo.", "Referencias"].join("\n\n"));
+      const r = buildProfileUpdate({ library: { profiles: [{ ...stale, text: withAnnex }], attachments: [], activeId: "v040" }, kinds: ["campos-derivados"], author: "B", now: new Date("2026-11-18T15:00:00Z"), newId: () => "corr" });
+      const paras = r.profile!.text.split("\n\n");
+      const note = paras.findIndex(p => p.startsWith("Revisión 0.4.1, 18/11/2026"));
+      expect(note).toBe(paras.indexOf("Perfil elaborado por el equipo.") + 1);
+      expect(paras[note + 1]).toBe(annex[0]);
+    }
+  });
+
   it("una corrección sin cambio de texto sube solo el número de corrección", () => {
     expect(nextRevisionNumber("Perfil · revisión 0.9.0 · 18/11/2026", true)).toEqual({ from: "0.9.0", to: "0.9.1" });
     const r = fix();

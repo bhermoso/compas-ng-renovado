@@ -293,3 +293,20 @@ describe("Recomendaciones numeradas con punto («R1. …»)", () => {
     expect(s.recommendations[0]).toMatchObject({ id: "R1", type: "Conocer", derivesFrom: "C1", text: "Incorporar la renta por sección censal." });
   });
 });
+
+describe("Introducción del apartado de recomendaciones en el lector", () => {
+  it("no repite como introducción el cuerpo de la primera recomendación", () => {
+    const structure = parseProfileStructure([
+      "5. Recomendaciones",
+      "Las recomendaciones presentan asuntos y criterios para la priorización.",
+      "R1. Bienestar emocional", "Abordar. Considerar el bienestar emocional como asunto.", "Fundamento: C3, C4.",
+      "R2. Voces menos representadas", "Contrastar. Incorporar a la deliberación a grupos poco representados.", "Fundamento: C6.",
+      "6. Paso al Plan de Acción", "Texto fijo.",
+    ].join("\n\n"));
+    const html = renderToStaticMarkup(createElement(ProfileReader, { structure, title: "Prueba" }));
+    expect(html).toContain("Las recomendaciones presentan asuntos y criterios para la priorización.");
+    // Antes, el lector repetía «Abordar. …» de R1 como segundo párrafo de introducción.
+    expect(html).not.toMatch(/<p>Abordar\. Considerar/);
+    expect(html).toContain("Considerar el bienestar emocional como asunto.");
+  });
+});
