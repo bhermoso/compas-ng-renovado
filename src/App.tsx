@@ -4,6 +4,7 @@ import { compareProfileUpdate, profileUpdateBaseline, canApplyProfilePreview } f
 import type { ProfileTextPackage } from "./application/health-profile/profileTextOperations";
 import type { ProfileUpdateOutcome } from "./ui/components/ProfileUpdaterPanel";
 import { appendExternalProfile, deleteExternalProfileVersion } from "./application/health-profile/externalProfiles";
+import { activeExternalProfile } from "./application/health-profile/selectExternalProfile";
 import { isTerritorialStatisticsSnapshot } from "./application/territorial-statistics/snapshots";
 import { parseDeclaredDate, withDocumentDate } from "./application/document-files/documentDate";
 import type { TerritorialStatisticsSnapshot } from "./domain/territorial-statistics/TerritorialStatistics";
@@ -1268,8 +1269,13 @@ export default function App() {
     const municipalityId = workspace.municipality.identity.id;
     if (!remoteClient.auth.currentUser) throw new Error("Inicia sesión para guardar el perfil y sus archivos en Firebase.");
     if (pendingIndexedDbHydrationId || remoteHydratedMunicipalityId !== municipalityId) throw new Error("Espera a que termine la recuperación del expediente compartido.");
-    const nextLibrary = { ...library, profiles: library.profiles.map(p => workspace.externalProfileLibrary?.profiles.some(old => old.id === p.id)
-      ? p : { ...p, evidenceVersion: workspace.evidenceStore.updatedAt }) };
+    // Una versión nueva, o una que se valida ahora, queda ligada a la evidencia
+    // del expediente en ese momento: quien valida lo hace con la evidencia vigente.
+    const nextLibrary = { ...library, profiles: library.profiles.map(p => {
+      const previous = workspace.externalProfileLibrary?.profiles.find(old => old.id === p.id);
+      const validatedNow = previous !== undefined && previous.status !== "validated" && p.status === "validated";
+      return previous && !validatedNow ? p : { ...p, evidenceVersion: workspace.evidenceStore.updatedAt };
+    }) };
     if (!isExternalProfileLibrary(nextLibrary, municipalityId)) throw new Error("La versión del perfil no supera la comprobación de integridad.");
     const nextBytes = workspaceDocumentBytes({ ...workspace, externalProfileLibrary: nextLibrary });
     if (nextBytes > MAX_WORKSPACE_ORIGINALS_BYTES && nextBytes > workspaceDocumentBytes(workspace)) {
@@ -4170,7 +4176,7 @@ export default function App() {
               })()}
               pslStatus={runtime.psl.status}
               pslIsStale={runtime.pslIsStale}
-              hasInsufficientEvidence={pipelineIsEmpty}
+              hasInsufficientEvidence={pipelineIsEmpty && !activeExternalProfile(workspace)}
             />
             </WorkspaceDisclosure>
             <WorkspaceDisclosure title="Participación ciudadana">
