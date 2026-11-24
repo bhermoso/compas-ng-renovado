@@ -244,7 +244,7 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
   expect(html).toContain('Ya existe un perfil anterior de COMPÁS');
   expect(html).toContain('Perfil histórico de Zagra conservado en el expediente.');
   expect(html).toContain('ep-legacy');
-  expect(html).toContain('open=""');
+  expect(html).not.toContain('open=""');
   expect(html).toContain('Seleccionar el perfil');
  });
  it('permite cotejar un PDF original sin añadir archivos o modificar el expediente',()=>{

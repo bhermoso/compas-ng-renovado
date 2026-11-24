@@ -48,7 +48,7 @@ interface EvidenceStorePanelProps {
   defaultOpen?: boolean;
 }
 
-export function EvidenceStorePanel({ evidenceStore, defaultOpen = true }: EvidenceStorePanelProps) {
+export function EvidenceStorePanel({ evidenceStore, defaultOpen = false }: EvidenceStorePanelProps) {
   const [open, setOpen] = useState(defaultOpen);
   const atoms = evidenceStore.atoms;
   const byOrigin = new Map<string, number>();

@@ -143,7 +143,7 @@ export function ActuationFicha({ actuation, worksheets, onSave, onClose, onSaveA
         ))}
       </div>
 
-      <details open>
+      <details>
         <summary>Identificación</summary>
         {linked ? (
           <>

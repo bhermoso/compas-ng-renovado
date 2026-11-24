@@ -89,7 +89,7 @@ export function IndicatorWorksheetEditor({ context, sheet, reviewNotice, onChang
         })}
       </section>}
       {draft.actions.length === 0 && <p className="panel-note">Todavía no hay actuaciones vinculadas.</p>}
-      {draft.actions.map((action, index) => <details className="indicator-worksheet__action" key={action.id} open>
+      {draft.actions.map((action, index) => <details className="indicator-worksheet__action" key={action.id}>
         <summary>Ficha de actuación {index + 1} · {action.values.name || "Sin nombre"}</summary>
         <p className="pcm-source">Código de enlace: {action.id}</p>
         <Fields fields={actionFields} values={action.values} onChange={(values) => update({ ...draft,

@@ -163,7 +163,7 @@ export function ExpedienteArchive(props: Props) {
   </table></div>;
 
   return <section className="ea hp-phase hp-phase--2" aria-labelledby="ea-title">
-    <details className="dam__disclosure ea-disclosure" open>
+    <details className="dam__disclosure ea-disclosure">
       <summary className="dam__disclosure-summary">
         <strong id="ea-title">Archivo del expediente</strong>
         <span>{rows.filter(r => r.active).length} documentos{withoutFile ? ` · ${withoutFile} sin archivo` : ""} · {snapshots.length} descargas estadísticas · {profiles.length} Perfil{profiles.length === 1 ? "" : "es"}</span>
