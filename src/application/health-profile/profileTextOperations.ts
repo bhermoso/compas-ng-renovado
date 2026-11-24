@@ -20,7 +20,8 @@ const LECTURA = /^Una lectura de conjunto$/i;
 /** Rótulos que cierran una sección: apartados numerados, páginas de datos, lectura, conclusiones, referencias y anexos. */
 const isHeading = (p: string) => {
   const t = p.trim();
-  return /^\d{1,2}\.\s+\S/.test(t) || /^Anexo [A-Z]\./.test(t) || /^Referencias$/i.test(t) || LECTURA.test(t) ||
+  // «Anexos» y los anexos rotulados «A. …» cierran el apartado 7 igual que «Anexo A.».
+  return /^\d{1,2}\.\s+\S/.test(t) || /^Anexo [A-Z]\./.test(t) || /^Anexos$/i.test(t) || /^[A-H]\.\s+[A-ZÁÉÍÓÚ]/.test(t) || /^Referencias$/i.test(t) || LECTURA.test(t) ||
     /^(Contexto y población|Ejes de desigualdad|Condiciones de vida|Servicios|Salud y bienestar|Quién vive aquí|Panel de salud|Desigualdad)$/i.test(t) || /^[A-ZÁÉÍÓÚÑ][^.\n]{1,40} en datos$/.test(t);
 };
 const isConclusion = (p: string, id?: string) => {

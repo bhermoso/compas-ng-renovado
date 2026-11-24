@@ -154,3 +154,12 @@ describe("capa 3: paquete de texto", () => {
     expect(resolved.reviewFlags!.find(f => f.target === "R7")?.reason).toBe("Se apoya en C1, marcada para revisar.");
   });
 });
+
+describe("replace-section respeta los anexos", () => {
+  it("sustituir el apartado 7 no alcanza «Anexos» ni los anexos rotulados «A. …»", () => {
+    const text = ["7. Autoría y revisión", "Texto anterior.", "Anexos", "A. Territorio y secciones censales", "Tabla.", "B. Comparaciones municipales", "Desigualdad", "Fila.", "Referencias", "1. Fuente."].join("\n\n");
+    const r = applyTextPackage({ text }, { municipalityId: "m", baseTitle: "t", operations: [{ op: "replace-section", heading: "7. Autoría y revisión", paragraphs: ["Texto nuevo."] }] });
+    expect(r.problems).toEqual([]);
+    expect(r.text).toBe(text.replace("Texto anterior.", "Texto nuevo."));
+  });
+});
