@@ -104,8 +104,7 @@ export function deleteExternalProfileVersion(
  const referenced=new Set(profiles.flatMap(p=>p.attachmentIds));
  const activeId=library.activeId===profileId
   ? (profiles.find(p=>p.id===profile.revisionOf && !p.archivedAt)?.id
-    ?? [...profiles].reverse().find(p=>!p.archivedAt)?.id
-    ?? profiles.at(-1)?.id)
+    ?? [...profiles].reverse().find(p=>!p.archivedAt)?.id)
   : library.activeId;
  return {...library,profiles,attachments:library.attachments.filter(a=>referenced.has(a.id)),activeId};
 }

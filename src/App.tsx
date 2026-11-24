@@ -3,9 +3,8 @@ import { buildProfileUpdate, type ProfileUpdateKind } from "./application/health
 import { compareProfileUpdate, profileUpdateBaseline, canApplyProfilePreview } from "./application/health-profile/profileUpdateDelta";
 import type { ProfileTextPackage } from "./application/health-profile/profileTextOperations";
 import type { ProfileUpdateOutcome } from "./ui/components/ProfileUpdaterPanel";
-import { appendExternalProfile } from "./application/health-profile/externalProfiles";
+import { appendExternalProfile, deleteExternalProfileVersion } from "./application/health-profile/externalProfiles";
 import { isTerritorialStatisticsSnapshot } from "./application/territorial-statistics/snapshots";
-import { territorialSnapshotDeletionBlock } from "./application/document-files/expedienteArchive";
 import { parseDeclaredDate, withDocumentDate } from "./application/document-files/documentDate";
 import type { TerritorialStatisticsSnapshot } from "./domain/territorial-statistics/TerritorialStatistics";
 import { ExternalProfileDashboard } from "./ui/components/ExternalProfileDashboard";
@@ -26,7 +25,7 @@ import { DiagnosisControlRoom, DiagnosisModuleSection } from "./ui/components/Di
 import { DuplicateDocumentsPanel } from "./ui/components/DuplicateDocumentsPanel";
 import { findDuplicateGroups, findExistingCopy, retireDuplicateDocument } from "./application/document-ingestion/documentDuplicates";
 import { sha256Hex } from "./application/document-ingestion/sha256";
-import { canDeleteDocumentVersion, createDocumentRevision, PENDING_DOCUMENT_REVIEW } from "./application/document-files/documentRevisions";
+import { createDocumentRevision, PENDING_DOCUMENT_REVIEW } from "./application/document-files/documentRevisions";
 import { MAX_WORKSPACE_ORIGINALS_BYTES, decideOriginalUpload, decodeDocumentOriginal, encodeDocumentOriginal, formatMegabytes, isDocumentFileName, mergeDocumentOriginals, mergeDocumentDerivatives, workspaceDocumentBytes, type StoredDocumentOriginal, type StoredDocumentDerivative } from "./application/document-files/documentOriginals";
 import { buildDiagnosisControlSummary } from "./application/diagnosis/diagnosisControlSummary";
 import { regroupZagraActionPlan } from "./application/workspace/regroupZagraActionPlan";
@@ -394,6 +393,7 @@ export default function App() {
   });
   const [agendaFocusId, setAgendaFocusId] = useState<string | undefined>(undefined);
   const [planTab, setPlanTab] = useState<PlanSection | null>(null);
+  const [profileArchiveRequest, setProfileArchiveRequest] = useState<{ municipalityId: string; profileId?: string }>();
   const profileSaveInFlightRef = useRef(false);
   // Evita volver a escribir automáticamente el mismo expediente ya confirmado
   // por el guardado manual (incluidos todos los originales en base64).
@@ -407,6 +407,7 @@ export default function App() {
   }
   function setView(next: AppView) {
     if (next === view || !canLeavePreparation()) return;
+    if (next !== "psl") setProfileArchiveRequest(undefined);
     setViewState(next);
   }
   const remoteClient = useMemo(() => createBrowserRelasClient(), []);
@@ -1324,13 +1325,6 @@ export default function App() {
     setRemotePersistenceMessage("Estadística territorial guardada y confirmada por Firebase.");
   }, [workspace, remoteClient, saveReviewedWorkspace, remoteHydratedMunicipalityId, pendingIndexedDbHydrationId, setWorkspace]);
 
-  /** Retira una descarga de estadística territorial del expediente compartido. */
-  const handleDeleteTerritorialSnapshot = useCallback(async (snapshotId: string) => {
-    const block = territorialSnapshotDeletionBlock(workspace, snapshotId);
-    if (block) throw new Error(block);
-    await handleSaveTerritorialStatistics((workspace.territorialStatistics ?? []).filter(s => s.id !== snapshotId));
-  }, [workspace, handleSaveTerritorialStatistics]);
-
   const handleSaveDeliberativePrioritySelection = useCallback((input: {
     selectedScenarioIds: string[];
     catalogModuleLinks: Array<{ scenarioId: string; moduleId: string }>;
@@ -1355,6 +1349,28 @@ export default function App() {
     }));
     return [];
   }, [runtime.lectura, setWorkspace, workspace.thematicPrioritisation]);
+
+  async function handleDeleteDocumentCopy(copyId: string) {
+    const municipalityId = workspace.municipality.identity.id;
+    if (!documentWriteAllowed || !remoteClient.auth.currentUser || remoteHydratedMunicipalityId !== municipalityId || pendingIndexedDbHydrationId) {
+      throw new Error("Recupera el expediente compartido con permiso de edición.");
+    }
+    if (profileSaveInFlightRef.current) throw new Error("Espera a que termine el guardado en curso.");
+    const updatedAt = new Date().toISOString();
+    function remove(current: MunicipalityWorkspace): MunicipalityWorkspace {
+      return { ...current, updatedAt, documentDerivedFiles: (current.documentDerivedFiles ?? []).filter(file => file.id !== copyId) };
+    }
+    if (!workspace.documentDerivedFiles?.some(file => file.id === copyId)) throw new Error("La copia ya no está disponible.");
+    const next = remove(workspace);
+    profileSaveInFlightRef.current = true;
+    try {
+      await saveReviewedWorkspace(next, undefined, workspace);
+      setWorkspace(current => current.municipality.identity.id === municipalityId
+        ? current === workspace ? next : remove(current) : current);
+    } finally {
+      profileSaveInFlightRef.current = false;
+    }
+  }
 
   /**
    * A historical Plan may be retired only when Firebase confirms an updated
@@ -3132,12 +3148,8 @@ export default function App() {
   async function handleDeleteDocument(documentId: string): Promise<boolean> {
     const municipalityId = workspace.municipality.identity.id;
     if (!workspace.repository.documents.some(d => d.id === documentId)) return false;
-    if (!canDeleteDocumentVersion(workspace.repository.documents, documentId)) {
-      window.alert("Este documento tiene versiones posteriores. No puede eliminarse sin romper la trazabilidad; puedes archivarlo o consultar sus revisiones.");
-      return false;
-    }
-    if (!remoteClient.auth.currentUser) {
-      window.alert("Inicia sesión: la eliminación debe confirmarse primero en Firebase.");
+    if (!documentWriteAllowed || !remoteClient.auth.currentUser) {
+      window.alert("Necesitas permiso de edición para eliminar un documento de Firebase.");
       return false;
     }
     if (remoteHydratedMunicipalityId !== municipalityId || pendingIndexedDbHydrationId || profileSaveInFlightRef.current) {
@@ -3704,12 +3716,29 @@ export default function App() {
               localOnly={localOnlyOriginals}
               onStoreOriginal={handleStoreDocumentOriginal}
               onCreateRevision={handleCreateDocumentRevision}
+              onDeleteCopy={handleDeleteDocumentCopy}
               onArchiveDocument={handleArchiveDocument}
               onDeleteDocument={handleDeleteDocument}
               onSetDocumentCycle={documentWriteAllowed ? handleSetDocumentCycle : undefined}
               onSetDocumentDate={documentWriteAllowed ? handleSetDocumentDate : undefined}
-              onDeleteTerritorialSnapshot={handleDeleteTerritorialSnapshot}
-              onOpenProfile={() => { setView("psl"); window.scrollTo({ top: 0, behavior: "auto" }); }}
+              onOpenProfile={profileId => {
+                setProfileArchiveRequest({ municipalityId: municipality.id, profileId });
+                setView("psl");
+                window.scrollTo({ top: 0, behavior: "auto" });
+              }}
+              onDeleteProfile={async profileId => {
+                const library = workspace.externalProfileLibrary;
+                if (!documentWriteAllowed || !library?.profiles.some(p => p.id === profileId)) {
+                  throw new Error("Recupera la revisión y comprueba el permiso de edición.");
+                }
+                await handleSaveExternalProfiles(deleteExternalProfileVersion(library, profileId));
+              }}
+              onReplaceAssets={() => {
+                setKind("localiza-salud");
+                openDiagnosisToolbox();
+                toggleDiagnosisModule("manual", true);
+                requestAnimationFrame(() => document.getElementById("diag-mod-manual")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+              }}
               onOpenTerritorialStatistics={() => {
                 const panel = document.querySelector('[data-testid="diagnosis-territorial-statistics"]');
                 if (panel instanceof HTMLDetailsElement) { panel.open = true; requestAnimationFrame(() => panel.scrollIntoView({ behavior: "smooth", block: "start" })); }
@@ -4070,6 +4099,7 @@ export default function App() {
                 municipalityId={workspace.municipality.identity.id}
                 municipalityName={municipality.name}
                 library={workspace.externalProfileLibrary ?? EMPTY_PROFILE_LIBRARY}
+                archiveRequest={profileArchiveRequest?.municipalityId === municipality.id ? profileArchiveRequest : undefined}
                 authorName={remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || ""}
                 legacyProfiles={workspace.compiledProfiles}
                 legacyText={workspace.validatedPSL?.conclusiones.content}

@@ -5,12 +5,11 @@ import { decideOriginalUpload, isDocumentFileName, mergeDocumentOriginals, works
 
 export const PENDING_DOCUMENT_REVIEW = "pending-evidence-review";
 
-/** Prevent breaking documentary lineage when deleting a parent file. */
-export function canDeleteDocumentVersion(
+export function hasDocumentSuccessors(
  documents: readonly { id: string; revisionOf?: string }[],
  documentId: string
 ): boolean {
- return !documents.some(document=>document.revisionOf===documentId);
+ return documents.some(document=>document.revisionOf===documentId);
 }
 
 /**

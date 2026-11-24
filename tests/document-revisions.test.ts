@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { createCompleteMunicipalityWorkspace } from "../src/application/workspace";
 import { addMunicipalDocument } from "../src/domain/repository";
 import { encodeDocumentOriginal } from "../src/application/document-files/documentOriginals";
-import { canDeleteDocumentVersion, createDocumentRevision } from "../src/application/document-files/documentRevisions";
+import { hasDocumentSuccessors, createDocumentRevision } from "../src/application/document-files/documentRevisions";
 
 describe("revisiones documentales sin duplicidad", () => {
   const original = (value: string) => new File([value], "INFORME SALUD.pdf", { type: "application/pdf" });
@@ -44,8 +44,8 @@ describe("revisiones documentales sin duplicidad", () => {
     const ws = await fixture();
     const r2 = await encodeDocumentOriginal("revision-2", original("actualización"));
     const updated = createDocumentRevision(ws, "informe", r2);
-    expect(canDeleteDocumentVersion(updated.repository.documents, "informe")).toBe(false);
-    expect(canDeleteDocumentVersion(updated.repository.documents, "revision-2")).toBe(true);
+    expect(hasDocumentSuccessors(updated.repository.documents, "informe")).toBe(true);
+    expect(hasDocumentSuccessors(updated.repository.documents, "revision-2")).toBe(false);
   });
 
   it("bloquea contenidos idénticos aunque cambie el nombre", async () => {
