@@ -90,7 +90,7 @@ La validación formal es un `FormalValidationRecord` almacenado en `workspace.fo
 
 Un borrador del Nivel 3 está formalmente validado cuando el Grupo Motor lo ha revisado, deliberado y adoptado explícitamente como base para la planificación formal del municipio.
 
-Criterio FVAL-01 (modificado 2026-10-19, `CONTRACT-PROFILE-VALIDATION-QUALITY`): la validación formal ya no exige un Perfil validado. Se rechaza solo cuando el Perfil está sustituido o archivado. El registro guarda el nivel del criterio «Perfil validado» en `profileValidationAtValidation` (opcional).
+Criterio FVAL-01 (modificado 2026-10-19, antiguo `CONTRACT-PROFILE-VALIDATION-QUALITY`, hoy integrado en `CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY`): la validación formal ya no exige un Perfil validado. Se rechaza solo cuando el Perfil está sustituido o archivado. El registro guarda el nivel del criterio «Perfil validado» en `profileValidationAtValidation` (opcional).
 
 La validación formal NO implica:
 - Que el borrador queda congelado (sigue siendo efímero).
@@ -218,8 +218,8 @@ El compilador puede producir el `LocalHealthPlanDocument`. La aprobación por la
 
 ## 9. Relaciones
 
-- **CONTRACT-MIT-PSL** — define el PSL y sus 6 estados. Este contrato define quién puede moverlos y con qué evidencia.
-- **CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER** — el gate G-LHC-1 requiere `psl.status === "validated"`.
+- **CONTRACT-MIT-PSL** (histórico; doctrina vigente del Perfil: `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`) — definía el PSL y sus 6 estados. Este contrato define quién puede moverlos y con qué evidencia.
+- **CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER** (histórico) — el gate G-LHC-1 requiere `psl.status === "validated"`.
 - **CONTRACT-LOCAL-HEALTH-PLAN-COMPILER** — el gate G-PLS-1 requiere `psl.status === "approved"`. Los gates G-PLS-5 y G-PLS-6 requieren `FormalValidationRecord` para el plan y la agenda.
 - **CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT** — define la aprobación institucional del PLS (`InstitutionalApproval`), que es distinta de la aprobación del PSL.
 

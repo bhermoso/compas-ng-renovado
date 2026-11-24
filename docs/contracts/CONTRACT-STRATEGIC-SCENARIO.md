@@ -161,7 +161,7 @@ El `EscenarioEstratégico` **nunca** puede contener:
 |---|---|
 | `CONTRACT-MTE.md` | Define el motor que explicita `EscenarioEstratégico` |
 | `CONTRACT-INTERPRETATION.md` | Capas de conocimiento; el escenario opera en la frontera entre interpretación territorial (Nivel 2) y planificación (Nivel 3) |
-| `CONTRACT-MIT-PSL.md` | Define el `LocalHealthProfile` como única fuente de información territorial para el Nivel 3 |
+| `CONTRACT-MIT-PSL.md` (histórico; doctrina vigente del Perfil: `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`) | Definía el `LocalHealthProfile` como única fuente de información territorial para el Nivel 3 |
 | `CONTRACT-ACTION-PLAN.md` | Define el consumidor primario (Producto 6) y la regla PSL-C1 que el MTE respeta |
 
 ---

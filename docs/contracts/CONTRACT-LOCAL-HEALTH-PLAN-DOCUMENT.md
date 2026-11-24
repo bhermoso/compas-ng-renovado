@@ -195,7 +195,7 @@ El sistema **nunca puede generar automáticamente** los siguientes elementos:
 | **Recursos asignados** (presupuesto, personal, equipamiento) | La asignación de recursos es una decisión política del Ayuntamiento y de los socios institucionales. |
 | **Justificación de necesidades no priorizadas** | La transparencia sobre lo que no se aborda es parte de la rendición de cuentas. La justificación es un acto deliberativo. |
 | **Deliberación y consenso del Grupo Motor** (Cap. V del PSL, Cap. V del PLS) | La deliberación no puede simularse ni sustituirse. |
-| **Texto de conclusiones y recomendaciones** (Caps. V y VI del PSL, que forman parte del PLS vía PSL-C) | Ya garantizado por CONTRACT-MIT-PSL y CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER. |
+| **Texto de conclusiones y recomendaciones** (Caps. V y VI del PSL, que forman parte del PLS vía PSL-C) | Lo garantizaban CONTRACT-MIT-PSL y CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER, históricos desde el 2026-11-23; doctrina vigente: CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY. |
 | **Memoria del proceso participativo** | Registro narrativo de quién participó, qué se discutió y cómo se alcanzaron los acuerdos. |
 | **Preguntas de evaluación** | Las preguntas de evaluación deben formularlas los actores del proceso, no el sistema, para que reflejen lo que el municipio quiere saber. |
 
@@ -414,8 +414,8 @@ Las siguientes cuestiones no quedan resueltas por este contrato y deben abordars
 
 | Contrato | Relación |
 |---|---|
-| `CONTRACT-MIT-PSL` | El PSL aprobado (gate G-PLS-1) es la entrada principal del compilador del PLS. |
-| `CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER` | El PSL-C (sprint 2.1) es el capítulo diagnóstico del PLS (gate G-PLS-2). El PLS no puede compilarse sin un PSL-C coherente con el PSL aprobado. |
+| `CONTRACT-MIT-PSL` (histórico; doctrina vigente del Perfil: `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`) | El PSL aprobado (gate G-PLS-1) es la entrada principal del compilador del PLS. |
+| `CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER` (histórico) | El PSL-C (sprint 2.1) es el capítulo diagnóstico del PLS (gate G-PLS-2). El PLS no puede compilarse sin un PSL-C coherente con el PSL aprobado. |
 | `CONTRACT-INSTITUTIONAL-LIFECYCLE` | Define aprobación del PSL y validaciones formales del Nivel 3 (`FormalValidationRecord`) que habilitan gates G-PLS-1, G-PLS-5 y G-PLS-6. |
 | `CONTRACT-DELIBERATIVE-PRIORITISATION` y `CONTRACT-ACTION-PLAN-CATALOG` | Definen la ruta vigente para selección/edición del Plan de Acción. El contrato legacy `CONTRACT-ACTION-PLAN` queda como reserva histórica y compatibilidad. |
 | `CONTRACT-COMPILER` | Este contrato amplía y reemplaza funcionalmente al CONTRACT-COMPILER como especificación estructural del PLS. El CONTRACT-COMPILER queda como reserva arquitectónica histórica; los gates que define (G-C1 a G-C7) son precursores de los gates G-PLS-1 a G-PLS-10 de este contrato. |

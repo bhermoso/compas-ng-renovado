@@ -566,7 +566,7 @@ Este contrato regula exclusivamente los Estudios Complementarios como familia
 documental. Los siguientes aspectos quedan fuera de su alcance:
 
 - **MIT y PSL**: el sistema consume la evidencia generada por los estudios;
-  sus contratos están en `CONTRACT-MIT-PSL.md`.
+  sus contratos estaban en `CONTRACT-MIT-PSL.md` (histórico; doctrina vigente del Perfil: `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`).
 - **Repositorio Documental**: el ciclo de vida de los documentos, la
   canonicidad por tag y las operaciones de sustitución y borrado están en
   `CONTRACT-REPOSITORY.md`.

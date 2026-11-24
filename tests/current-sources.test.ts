@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createCompleteMunicipalityWorkspace } from "../src/application/workspace";
 import {
   applyCurrentSourcesConsolidation,
+  currentPredecessors,
   planCurrentSourcesConsolidation,
   retireCurrentPredecessors,
 } from "../src/application/workspace/currentSources";
@@ -83,6 +84,18 @@ describe("una sola versión vigente de cada fuente del proceso actual", () => {
     expect(next.repository.documents.map(d => d.id)).toContain("informe-2018");
     expect(next.repository.documents.map(d => d.id)).toContain("localiza-1");
     expect(next.ibseStudyHistory).toHaveLength(1);
+  });
+
+  it("el aviso previo a cargar Localiza cuenta los mismos listados que se eliminan, archivados incluidos", () => {
+    const state = base();
+    state.repository.documents = state.repository.documents
+      .filter(d => d.id !== "localiza-2")
+      .map(d => d.id === "localiza-1" ? { ...d, status: "archived" as const } : d);
+    const warned = currentPredecessors(state, { kind: "localiza-salud" }, undefined).map(d => d.id);
+    expect(warned).toEqual(["localiza-1"]);
+    state.repository = addMunicipalDocument(state.repository, { id: "localiza-3", kind: "localiza-salud", title: "localiza-3", tags: [] });
+    const next = retireCurrentPredecessors(state, { kind: "localiza-salud" }, "localiza-3", now);
+    expect(next.repository.documents.map(d => d.id)).not.toContain("localiza-1");
   });
 
   it("casos hallados en Firebase: informe antiguo con otro tipo, series duplicadas y copias del informe sustituido", () => {

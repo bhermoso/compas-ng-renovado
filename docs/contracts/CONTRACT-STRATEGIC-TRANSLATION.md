@@ -170,7 +170,7 @@ Toda propuesta sin trazabilidad completa es inválida.
 ## Referencia cruzada
 
 - Repositorio Estratégico → CONTRACT-STRATEGIC-REPOSITORY.md
-- PSL → CONTRACT-MIT-PSL.md
+- PSL → CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md (antes CONTRACT-MIT-PSL.md, histórico)
 - Plan de Acción → CONTRACT-ACTION-PLAN.md
 - EvidenceStore → CONTRACT-EVIDENCE.md
 

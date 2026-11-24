@@ -420,7 +420,7 @@ migración del workspace. Los siguientes aspectos quedan fuera de su alcance:
 - **Generación de EvidenceAtom**: pipelines de evidencia. Véase
   `CONTRACT-EVIDENCE.md`.
 - **Motor de Interpretación Territorial (MIT) y PSL**: análisis territorial
-  y ciclo de vida del PSL. Véase `CONTRACT-MIT-PSL.md`.
+  y ciclo de vida del PSL. Véase `CONTRACT-MIT-PSL.md` (histórico; doctrina vigente del Perfil: `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`).
 - **Repositorio Documental**: ciclo de vida de documentos, canonicidad por
   `kind` o `tag`, operaciones de sustitución y borrado. Véase
   `CONTRACT-REPOSITORY.md`.

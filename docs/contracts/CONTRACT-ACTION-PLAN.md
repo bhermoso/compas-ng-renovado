@@ -676,7 +676,7 @@ aspectos quedan fuera de su alcance:
 - **EvidenceStore, IntegrityGuard, pipelines de evidencia**: véase
   `CONTRACT-EVIDENCE.md`.
 - **Repositorio Documental Municipal**: véase `CONTRACT-REPOSITORY.md`.
-- **MIT, Reconciliación y PSL**: véase `CONTRACT-MIT-PSL.md`.
+- **MIT, Reconciliación y PSL**: véase `CONTRACT-MIT-PSL.md` (histórico; doctrina vigente del Perfil: `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`).
 - **Estudios Complementarios y Biblioteca Metodológica**: véase
   `CONTRACT-COMPLEMENTARY-STUDIES.md`.
 - **Persistencia y rehidratación del workspace**: véase

@@ -354,9 +354,9 @@ El compilador devuelve `CompilationResult` tipado. Nunca lanza. Los errores espe
 
 ## 15. Relaciones
 
-- **Upstream (inputs):** CONTRACT-MIT-PSL (PSL aprobado), CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER (PSL-C), CONTRACT-MTE (Lectura Estratégica Local), CONTRACT-DELIBERATIVE-PRIORITISATION y CONTRACT-ACTION-PLAN-CATALOG (Plan de Acción vigente), CONTRACT-INSTITUTIONAL-LIFECYCLE (actor model de `approved` y validaciones formales).
+- **Upstream (inputs):** CONTRACT-MIT-PSL (PSL aprobado) y CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER (PSL-C), ambos históricos desde el 2026-11-23 (doctrina vigente del Perfil: CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY); CONTRACT-MTE (Lectura Estratégica Local), CONTRACT-DELIBERATIVE-PRIORITISATION y CONTRACT-ACTION-PLAN-CATALOG (Plan de Acción vigente), CONTRACT-INSTITUTIONAL-LIFECYCLE (actor model de `approved` y validaciones formales).
 - **Upstream (contrato estructural):** CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT (qué contiene el PLS).
-- **Paralelo:** CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER (patrón de compilación análogo para el PSL-C).
+- **Paralelo:** CONTRACT-LOCAL-HEALTH-PROFILE-COMPILER (histórico; patrón de compilación análogo para el PSL-C).
 - **Downstream:** Exportación DOCX/PDF/HTML (futura capa Renderer + Exporter).
 - **Relacionado:** CONTRACT-COMPILER (reserva arquitectónica histórica; este contrato es su especificación operativa para el PLS).
 

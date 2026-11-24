@@ -351,7 +351,7 @@ la estructura del artefacto.
 |---|---|
 | `CONTRACT-REPOSITORY.md` | Los documentos del repositorio son fuente trazable del Plan compilado. El compilador los referencia; no los modifica |
 | `CONTRACT-EVIDENCE.md` | Los `EvidenceAtom` son la base de trazabilidad del diagnóstico que el compilador incluye. El compilador no genera ni modifica átomos |
-| `CONTRACT-MIT-PSL.md` | El PSL en estado `"approved"` es la entrada principal del compilador. PSL-I1 (el PSL referencia el Informe de Salud; no lo contiene) aplica también al documento compilado |
+| `CONTRACT-MIT-PSL.md` (histórico; doctrina vigente del Perfil: `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`) | El PSL en estado `"approved"` es la entrada principal del compilador. PSL-I1 (el PSL referencia el Informe de Salud; no lo contiene) aplica también al documento compilado |
 | `CONTRACT-COMPLEMENTARY-STUDIES.md` | Los estudios complementarios contribuyen evidencia al PSL. El documento compilado debe referenciar qué estudios estuvieron presentes en el diagnóstico |
 | `CONTRACT-PERSISTENCE.md` | El compilador no debe persistir el artefacto compilado en localStorage. La exportación es una operación de lectura del workspace seguida de descarga directa |
 | `CONTRACT-ACTION-PLAN.md` | El Plan de Acción, la Agenda y el Seguimiento del Nivel 3 son capítulos del Plan Local de Salud compilado. El compilador toma como entrada el PSL aprobado y los objetos validados del Nivel 3 derivados de ese PSL |

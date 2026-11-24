@@ -22,6 +22,49 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-23 · Avisos de Localiza y del Actualizador; referencias a contratos retirados
+
+Master: `58e7781` (tras la PR #225).
+
+- **Encargo del responsable.** Corregir los hallazgos de la revisión de las PR
+  del día y poner al día las referencias a contratos retirados.
+- **Hechos observados y cambios.**
+  - Al cargar un Localiza nuevo, el aviso solo contaba los listados no
+    archivados, pero se eliminaban también los archivados que no son de ciclo
+    histórico. El aviso usa ahora la misma regla que la eliminación
+    (`currentPredecessors`). Prueba nueva en `tests/current-sources.test.ts`.
+  - El Actualizador de perfiles no marcaba su guardado como operación en curso,
+    así que el autoguardado podía lanzar detrás una copia anterior que Firebase
+    rechaza con un aviso de error. Ahora la marca mientras aplica.
+  - 28 citas de contratos del Perfil pasados a histórico en 17 contratos
+    vigentes. Las que remiten a contenido integrado apuntan a su destino
+    (`CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY`, guía de escritura); las demás se
+    marcan como históricas con remisión a `CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`.
+    Cuatro comentarios de código con rutas que ya no existían, corregidos.
+- **Sin tocar.** El ejemplo de manifiesto de `CONTRACT-LOCAL-HEALTH-PLAN-COMPILER`
+  §11 y su comentario en `CompilationManifest.ts` siguen nombrando los contratos
+  antiguos: es la especificación de una salida, no una remisión.
+- **Decisión pendiente del responsable.**
+  - `CONTRACT-LOCAL-HEALTH-PLAN-COMPILER` y `CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT`
+    exigen un PSL aprobado y un PSL-C (gates G-PLS-1 y G-PLS-2), objetos de la
+    doctrina retirada. Marcar la cita no resuelve esa dependencia: hay que decidir
+    de qué Perfil parte el Plan Local de Salud con la v3.0.0.
+  - Retirada del generador interno del Perfil (unas 4.650 líneas en
+    `src/application/health-profile/`). No se ha hecho. Hecho observado
+    (24/11/2026, rastreo de importaciones símbolo a símbolo desde `index.html`):
+    la aplicación sí lo alcanza, por tres caminos. (1) `ExternalProfileDashboard`
+    muestra con `PSLCArtifactViewer` los «Perfiles anteriores de COMPÁS · legado
+    conservado». (2) `compileInitialLocalHealthPlan` usa el Perfil generado si no
+    hay Perfil externo, y toma las temáticas priorizadas del objeto PSL antiguo.
+    (3) El modelo de documento y la exportación DOCX y PDF de `psl-c-export`
+    sirven también al Perfil externo vigente. Retirarlo exige decidir antes qué
+    pasa con el legado y de qué Perfil parte el Plan.
+- **Alcance (v3.0.1, 24/11/2026).** Decisión del responsable: «el perfil se
+  genera fuera, pero se actualiza dentro». El Alcance del contrato metodológico
+  nombra el Actualizador de perfiles como única excepción regulada a la regla de
+  que COMPÁS no reescribe el Perfil.
+- **Verificación.** Lint: 0. Compilación correcta. Suite: 2953 pasan, 2 omitidas (una prueba nueva).
+
 ## 2026-11-23 · Retirada de archivos sin uso
 
 Master: `c04625b`.

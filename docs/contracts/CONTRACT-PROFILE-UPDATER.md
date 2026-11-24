@@ -22,7 +22,7 @@ expediente de forma reproducible.
 
 1. El actualizador produce, en cada expediente elegido, una **revisión nueva en
    revisión** del Perfil vigente. La vigente no cambia hasta que el usuario valida
-   la nueva (`CONTRACT-EXTERNAL-PSL-FIDELITY-AND-PUBLICATION`).
+   la nueva (`CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY`).
 2. Es una transformación declarada: cada tipo de cambio tiene reglas fijas, iguales
    en todos los expedientes, y la revisión registra los cambios aplicados en
    «Autoría y revisión» y en sus limitaciones.

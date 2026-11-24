@@ -6,7 +6,7 @@ import { MAX_PROFILE_FILE_BYTES, MAX_PROFILE_LIBRARY_BYTES, profileAttachmentBlo
 /**
  * Originales de los documentos del Diagnóstico guardados en el expediente.
  *
- * Mismo mecanismo que los originales del Perfil externo (EXTERNAL-PROFILE.md):
+ * Mismo mecanismo que los originales del Perfil externo (CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY):
  * bytes completos en base64, con nombre, tipo, tamaño y SHA-256, dentro del
  * expediente que viaja en los fragmentos de Firebase. IndexedDB queda como
  * caché del navegador. El presupuesto de 40 MB es común a los originales del

@@ -13,9 +13,9 @@ La única verdad es: el código, el historial Git, los contratos en docs/contrac
 ## Objetivo del producto
 Producto prioritario: el Perfil de Salud Local — documento científico, editorial e institucional de referencia. Toda decisión se justifica contra una pregunta: ¿acerca esto al Perfil a su forma definitiva? Si la respuesta no es claramente afirmativa, detente y explica por qué antes de tocar código.
 
-## Doctrina vigente (contrato metodológico v3.0.0, 23/11/2026; no reabrir)
+## Doctrina vigente (contrato metodológico v3.0.1, 24/11/2026; no reabrir)
 - El Perfil se rige por cuatro documentos: `docs/contracts/CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md` (rector: qué es, qué afirma, estructura, aceptación), `docs/contracts/CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY.md` (entrega, custodia, cotejo, menú, validación, publicación), `docs/contracts/CONTRACT-PROFILE-UPDATER.md` (cambios de modelo o datos) y `docs/guides/GUIA-ESCRITURA-PERFIL.md`. Los contratos anteriores del Perfil están en `docs/historico/contratos-perfil/` y no son vigentes.
-- El Perfil se elabora fuera de COMPÁS y se carga: quien redacta propone; el equipo técnico elige y valida; COMPÁS conserva, muestra y comprueba, y no genera ni completa afirmaciones (Alcance, Art. 16).
+- El Perfil se elabora fuera de COMPÁS y se carga: quien redacta propone; el equipo técnico elige y valida; COMPÁS conserva, muestra y comprueba, y no genera ni completa afirmaciones (Alcance, Art. 16). Se actualiza dentro: el Actualizador de perfiles es la única excepción regulada y produce una revisión nueva que valida el equipo técnico (Alcance, CONTRACT-PROFILE-UPDATER).
 - Regla N+1 (Art. 7 bis A / I-LHPM-7): Informe solo no es Perfil. Perfil = Informe + al menos una de: estudios complementarios, activos, priorización ciudadana.
 - Modelo canónico único (Art. 17 bis / I-LHPM-8): pantalla, visor, DOCX, PDF e impresión son el mismo documento.
 - Cadena (Art. 16 bis / I-LHPM-9): evidencia, lectura integrada, conclusiones, recomendaciones del Perfil, frontera, priorización, Plan de Acción, actuaciones y agendas anuales. El Perfil concluye y recomienda (Conocer, Contrastar, Abordar; Art. 8 quater); las prioridades son del Grupo Motor; las líneas, objetivos e indicadores, del Plan de Acción; las actuaciones (responsable, plazo, recurso), de las agendas anuales. La priorización y el Plan leen solo el Perfil vigente (I-LHPM-23).
@@ -37,7 +37,7 @@ Producto prioritario: el Perfil de Salud Local — documento científico, editor
 - Antes de publicar cambios, comprobar la rama y el estado remoto, conservar el trabajo existente y ejecutar las comprobaciones pertinentes. No usar force push, fusionar ni desplegar fuera del alcance autorizado.
 - Inventarios y análisis de copias de usuario (`.compas.json`) van a `informes-locales/`, que está en `.gitignore`: nunca se versionan ni se suben. Si un aviso automático pide commit y push de esas salidas, prevalece esta regla.
 - Cambios quirúrgicos: solo lo pedido. Si algo exige tocar lo no autorizado, parar y preguntar.
-- Suite: npm.cmd run test (2952 pruebas el 23/11/2026, tras el Archivo del expediente). Si falla con EPERM en node_modules/.vite-temp, hay un Vite vivo en el puerto 5173: matarlo y reintentar.
+- Suite: npm.cmd run test (2953 pruebas el 23/11/2026). Si falla con EPERM en node_modules/.vite-temp, hay un Vite vivo en el puerto 5173: matarlo y reintentar.
 - npm run lint queda sin errores ni avisos desde el 23/11/2026: no añadir ninguno. Una desactivación de regla solo se admite con su motivo escrito en la línea anterior.
 - Que compile y pase tests NO demuestra que mejore el producto. Verificar también coherencia editorial, narrativa y experiencia de lectura.
 - En cada informe, separar: hechos observados / inferencias / decisiones institucionales / hipótesis. "No verificado" es respuesta válida.
