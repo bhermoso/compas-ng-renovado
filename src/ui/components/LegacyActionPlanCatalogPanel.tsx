@@ -18,6 +18,7 @@ import { ACTION_PLAN_CATALOG, type ActionPlanCatalogModule } from "../../domain/
 import { SUPPORT_DOCUMENTS } from "../../domain/strategy/SupportDocuments";
 import type { DeliberativePrioritySelection } from "../../domain/deliberative-prioritisation";
 import type { LecturaEstrategicaLocal } from "../../domain/strategic-scenario";
+import type { ProfilePlanTraceContext } from "./ProfilePlanTracePanel";
 
 export interface LegacyActionPlanCatalogPanelProps {
   /** Qué parte del panel se muestra: "lineas" (edición), "resultante" (Plan resultante) o "todo". */
@@ -32,6 +33,7 @@ export interface LegacyActionPlanCatalogPanelProps {
   onDraftChange?: (draft: PlanPreparationDraft) => void;
   lectura?: LecturaEstrategicaLocal;
   selection?: DeliberativePrioritySelection;
+  profileTrace?: ProfilePlanTraceContext;
   eligibleModules: EligibleActionPlanModule[];
   reviews: MunicipalActionPlanModuleReview[];
   worksheets: IndicatorWorksheet[];

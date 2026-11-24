@@ -50,6 +50,7 @@ export function isEmptyWorkspaceForPersistenceGuard(
     workspace.thematicPrioritisation === undefined &&
     workspace.thematicPrioritisationStudy === undefined &&
     workspace.deliberativePrioritySelection === undefined &&
+    (workspace.profilePlanLinks?.length ?? 0) === 0 &&
     (workspace.actionPlanModuleReviews?.length ?? 0) === 0 &&
     (workspace.planPreparationDrafts?.length ?? 0) === 0 &&
     (workspace.indicatorWorksheets?.length ?? 0) === 0 &&

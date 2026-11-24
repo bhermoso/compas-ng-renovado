@@ -14,6 +14,8 @@ import { compareActionPlanNotation, thematicBlockNameFor } from "../../domain/ac
 import type { ActionPlanTraceabilityLink } from "../../domain/action-plan-catalog/ActionPlanTraceability";
 import { validateActionPlanUnaddressedNeeds } from "../../application/action-plan/ActionPlanEngine";
 import type { UnaddressedNeed } from "../../domain/health-plan";
+import { describeProfilePlanLink, profilePlanLinkKey, profilePlanOptions, type ProfilePlanLink } from "../../application/action-plan/profilePlanLinks";
+import { ProfilePlanTracePanel, type ProfilePlanLinkInput, type ProfilePlanTraceContext } from "./ProfilePlanTracePanel";
 
 /** Abre la ficha del indicador (y los desplegables que la contienen) y la muestra. */
 function openIndicatorFicha(indicatorCode: string) {
@@ -221,7 +223,7 @@ function groupTraceabilityByBlock(links: ActionPlanTraceabilityLink[]): Array<{
   return Array.from(byBlock.values());
 }
 
-export function DefinitiveActionPlanPreview({municipalityId, municipalityName: visibleName, modules, drafts, worksheets = [], validatedActionPlans, onValidatePlan, onDeletePlanVersion, onDraftChange}: {
+export function DefinitiveActionPlanPreview({municipalityId, municipalityName: visibleName, modules, drafts, worksheets = [], validatedActionPlans, onValidatePlan, onDeletePlanVersion, onDraftChange, profileTrace}: {
   validatedActionPlans?: import("../../domain/action-plan-catalog/PlanDocument").PlanDocument[];
   onValidatePlan?: (document: import("../../domain/action-plan-catalog/PlanDocument").PlanDocument) => boolean;
   onDeletePlanVersion?: (document: import("../../domain/action-plan-catalog/PlanDocument").PlanDocument) => Promise<boolean>;
@@ -231,10 +233,35 @@ export function DefinitiveActionPlanPreview({municipalityId, municipalityName: v
   modules: ActionPlanCatalogModule[];
   drafts?: PlanPreparationDraft[];
   worksheets?: IndicatorWorksheet[];
+  profileTrace?: ProfilePlanTraceContext;
 }) {
   const municipalityName = visibleName ?? municipalityId;
   const active = useMemo(() => buildDefinitiveActionPlanProjection(municipalityId, modules, drafts), [municipalityId, modules, drafts]);
   const traceability = useMemo(() => buildActionPlanTraceability(municipalityId, active, worksheets), [municipalityId, active, worksheets]);
+  const sources = profileTrace && profilePlanOptions(profileTrace.workspace, profileTrace.lectura, traceability);
+  const links = profileTrace?.workspace.profilePlanLinks ?? [];
+  const linked = sources ? links.flatMap(link => {
+    const detail = describeProfilePlanLink(sources, link);
+    return detail ? [detail] : [];
+  }) : [];
+
+  async function saveLink(input: ProfilePlanLinkInput) {
+    if (!sources?.profile || !sources.selection || !profileTrace?.onChange || !profileTrace.authorName.trim()) {
+      throw new Error("Recupera el Perfil y la prioridad del expediente antes de guardar el vínculo.");
+    }
+    const link: ProfilePlanLink = {
+      ...input, profileId: sources.profile.id, selectionId: sources.selection.id,
+      recordedBy: profileTrace.authorName, recordedAt: new Date().toISOString(),
+    };
+    if (!describeProfilePlanLink(sources, link)) throw new Error("El Perfil, la prioridad o el indicador han cambiado. Revisa el vínculo.");
+    const otherLinks = links.filter(item => profilePlanLinkKey(item) !== profilePlanLinkKey(link));
+    if (link.baselineResultId && linked.some(item =>
+      profilePlanLinkKey(item) !== profilePlanLinkKey(link) && item.worksheetKey === link.worksheetKey &&
+      item.baselineResultId && item.baselineResultId !== link.baselineResultId)) {
+      throw new Error("El indicador ya tiene otra línea de base vinculada. Revisa sus vínculos antes de cambiarla.");
+    }
+    await profileTrace.onChange([...otherLinks, link]);
+  }
 
   const incompatibleDrafts = drafts?.filter(draft => draft.municipalityId === municipalityId && modules.some(module => module.id === draft.moduleId && module.version !== draft.version)) ?? [];
   const pending = active.reduce((total, item) => total + pendingPreparationDecisionCount(item.module, item.draft), 0);
@@ -271,7 +298,10 @@ export function DefinitiveActionPlanPreview({municipalityId, municipalityName: v
 
   return <section className="workspace-panel pcm-definitive-plan" aria-label={`Plan de Acción resultante · ${municipalityName}`}>
     {incompatibleDrafts.length > 0 && <p role="alert">Hay borradores con una versión pendiente de compatibilidad. Se conservan y no se incorporan a esta proyección ni a su exportación.</p>}
-    <PlanDocumentActions key={municipalityId} municipalityId={municipalityId} active={active} versions={validatedActionPlans} worksheets={worksheets} onValidate={onValidatePlan} onDeleteVersion={onDeletePlanVersion}/>
+    <PlanDocumentActions key={municipalityId} municipalityId={municipalityId} active={active} versions={validatedActionPlans} worksheets={worksheets} profilePlanLinks={linked} onValidate={onValidatePlan} onDeleteVersion={onDeletePlanVersion}/>
+    {sources && <ProfilePlanTracePanel key={municipalityId} options={sources} links={links}
+      onSave={profileTrace?.onChange ? saveLink : undefined}
+      onRemove={profileTrace?.onChange && (link => profileTrace.onChange!(links.filter(item => profilePlanLinkKey(item) !== profilePlanLinkKey(link))))} />}
     {onDraftChange && active.some((item) => item.draft) && (
       <UnaddressedNeedsEditor active={active} onDraftChange={onDraftChange} />
     )}

@@ -119,6 +119,7 @@ export interface MunicipalityWorkspace {
    * Es la compuerta canónica entre MTE y PAI; nunca se deriva automáticamente.
    */
   deliberativePrioritySelection?: DeliberativePrioritySelection;
+  profilePlanLinks?: import("../../application/action-plan/profilePlanLinks").ProfilePlanLink[];
   /**
    * Revisiones humanas de módulos temáticos propuestos para el Plan de Acción.
    * Conservan la plantilla original, la versión y la decisión municipal por elemento.

@@ -1,6 +1,7 @@
 import { Document, HeadingLevel, Packer, Paragraph, TextRun } from "docx";
 import { jsPDF } from "jspdf";
 import type { PlanDocument } from "../../domain/action-plan-catalog/PlanDocument";
+import { profilePlanBaselineText } from "./profilePlanLinks";
 type PlanParagraph = { text: string; heading?: boolean };
 
 const fichaStatusText = (status: string) =>
@@ -44,6 +45,16 @@ export function planActionParagraphs(plan: PlanDocument): PlanParagraph[] {
      `Ficha del indicador: ${fichaStatusText(link.indicatorFichaStatus)}.`,
     ].join("\n"),
    });
+  }
+ }
+ if (plan.profilePlanLinks?.length) {
+  paragraphs.push({ text: "Del Perfil al indicador", heading: true });
+  for (const link of plan.profilePlanLinks) {
+   paragraphs.push({ text: [
+    `${link.recommendationId} · ${link.recommendation}`,
+    `${link.profileTitle} · ${link.priority} → ${link.line} → ${link.objective} → ${link.indicator}`,
+    `Línea de base · ${profilePlanBaselineText(link.baseline)}`,
+   ].join("\n") });
   }
  }
  return paragraphs;

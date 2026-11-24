@@ -10,11 +10,13 @@ import {
 } from "./PlanPreparationDraft";
 import { buildActionPlanTraceability, type ActionPlanTraceabilityLink } from "./ActionPlanTraceability";
 import type { IndicatorWorksheet } from "./IndicatorWorksheet";
+import type { ProfilePlanLinkDetail } from "../../application/action-plan/profilePlanLinks";
 
 export interface PlanDocumentOptions {
  unaddressedNeeds?: UnaddressedNeed[];
  evaluationFramework?: PLSEvaluationFramework;
  worksheets?: IndicatorWorksheet[];
+ profilePlanLinks?: ProfilePlanLinkDetail[];
 }
 
 export interface PlanDocument {
@@ -27,6 +29,7 @@ export interface PlanDocument {
  unaddressedNeeds?: UnaddressedNeed[];
  evaluationFramework?: PLSEvaluationFramework;
  traceabilityLinks?: ActionPlanTraceabilityLink[];
+ profilePlanLinks?: ProfilePlanLinkDetail[];
  paragraphs: { text: string; heading?: boolean }[];
 }
 
@@ -94,6 +97,7 @@ export function buildPlanDocument(
   ...(unaddressedNeeds !== undefined ? { unaddressedNeeds } : {}),
   ...(evaluationFramework !== undefined ? { evaluationFramework } : {}),
   ...(traceabilityLinks.length > 0 ? { traceabilityLinks } : {}),
+  ...(options.profilePlanLinks?.length ? { profilePlanLinks: options.profilePlanLinks } : {}),
   paragraphs,
  };
 }

@@ -2,13 +2,15 @@ import { useState } from "react";
 import type { DefinitiveActionPlanModuleProjection } from "../../domain/action-plan-catalog/DefinitiveActionPlanProjection";
 import { buildPlanDocument, canRemoveValidatedPlan, latestValidatedPlan, validatePlanDocument, type PlanDocument } from "../../domain/action-plan-catalog/PlanDocument";
 import type { IndicatorWorksheet } from "../../domain/action-plan-catalog/IndicatorWorksheet";
+import type { ProfilePlanLinkDetail } from "../../application/action-plan/profilePlanLinks";
 
 /** Versions stored in the complete municipal expediente, not Firestore's immutable RELAS audit. */
-export function PlanDocumentActions({municipalityId,active,versions=[],worksheets=[],onValidate,onDeleteVersion}:{
+export function PlanDocumentActions({municipalityId,active,versions=[],worksheets=[],profilePlanLinks,onValidate,onDeleteVersion}:{
  municipalityId:string;
  active:DefinitiveActionPlanModuleProjection[];
  versions?:PlanDocument[];
  worksheets?:IndicatorWorksheet[];
+ profilePlanLinks?:ProfilePlanLinkDetail[];
  onValidate?:(document:PlanDocument)=>boolean;
  onDeleteVersion?:(document:PlanDocument)=>Promise<boolean>;
 }){
@@ -23,14 +25,14 @@ export function PlanDocumentActions({municipalityId,active,versions=[],worksheet
   setBusy(true);setMessage("");
   try{
    const {downloadPlanDocument}=await import("../../application/action-plan/exportPlanDocument");
-   await downloadPlanDocument(document ?? buildPlanDocument(municipalityId,active,new Date().toISOString(),{worksheets}),format);
+   await downloadPlanDocument(document ?? buildPlanDocument(municipalityId,active,new Date().toISOString(),{worksheets,profilePlanLinks}),format);
   }catch{setMessage("No se pudo descargar el documento. Inténtalo de nuevo.");}
   finally{setBusy(false);}
  }
 
  function validate(){
   try{
-   const version=validatePlanDocument(municipalityId,active,name,new Date().toISOString(),{worksheets});
+   const version=validatePlanDocument(municipalityId,active,name,new Date().toISOString(),{worksheets,profilePlanLinks});
    if(!onValidate?.(version))throw new Error("No se pudo guardar la versión validada. Conserva una copia del expediente y vuelve a intentarlo.");
    setMessage("Versión validada añadida al expediente. Comprueba la confirmación de Firebase en la barra de sincronización.");
   }catch(e){setMessage((e as Error).message);}

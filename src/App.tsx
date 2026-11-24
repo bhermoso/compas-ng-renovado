@@ -162,6 +162,7 @@ import {
 import { LocalHealthPlanningCycle, DocumentIngestionPanel, DocumentRepositoryPanel, EvidenceStorePanel, HealthReportViewer, EstudiosComplementariosPanel, ActivosSaludPanel, ThematicPrioritisationPanel, CitizenParticipationSummary, ThematicPrioritisationModal, PipelineTracePanel, LT1Panel, OITPanel, ReconciliacionPanel, PrioritizationPanel, LecturaEstrategicaView, PAIView, DeliberativePrioritySelectionPanel, ActionPlanCatalogPanel, GESPanel, LocalHealthPlanOutline, AgendaBoard } from "./ui/components";
 import type { AgendaActuation } from "./domain/agenda/AgendaActuation";
 import { removeSupersededValidatedPlan, type PlanDocument } from "./domain/action-plan-catalog/PlanDocument";
+import type { ProfilePlanLink } from "./application/action-plan/profilePlanLinks";
 import "./App.css";
 
 // ── Tipos de ámbito territorial ──────────────────────────────
@@ -1349,6 +1350,25 @@ export default function App() {
     }));
     return [];
   }, [runtime.lectura, setWorkspace, workspace.thematicPrioritisation]);
+
+  async function handleProfilePlanLinksChange(profilePlanLinks: ProfilePlanLink[]) {
+    const municipalityId = workspace.municipality.identity.id;
+    if (!documentWriteAllowed || !remoteClient.auth.currentUser || remoteHydratedMunicipalityId !== municipalityId) {
+      throw new Error("Recupera el expediente compartido con permiso de edición.");
+    }
+    if (profileSaveInFlightRef.current) throw new Error("Espera a que termine el guardado en curso.");
+    const updatedAt = new Date().toISOString();
+    const next = { ...workspace, profilePlanLinks, updatedAt };
+    profileSaveInFlightRef.current = true;
+    try {
+      await saveReviewedWorkspace(next, undefined, workspace);
+      setWorkspace(current => current.municipality.identity.id === municipalityId
+        ? current === workspace ? next : { ...current, profilePlanLinks, updatedAt }
+        : current);
+    } finally {
+      profileSaveInFlightRef.current = false;
+    }
+  }
 
   async function handleDeleteDocumentCopy(copyId: string) {
     const municipalityId = workspace.municipality.identity.id;
@@ -3996,6 +4016,12 @@ export default function App() {
               municipalityName={municipality.name}
               lectura={runtime.lectura ?? undefined}
               selection={runtime.lectura ? workspace.deliberativePrioritySelection : undefined}
+              profileTrace={{
+                workspace,
+                lectura: runtime.lectura,
+                authorName: remoteClient.auth.currentUser?.email || remoteClient.auth.currentUser?.displayName || "",
+                onChange: documentWriteAllowed ? handleProfilePlanLinksChange : undefined,
+              }}
               eligibleModules={runtime.lectura ? runtime.eligibleActionPlanModules : []}
               reviews={workspace.actionPlanModuleReviews ?? []}
               validatedActionPlans={workspace.validatedActionPlans ?? []}
