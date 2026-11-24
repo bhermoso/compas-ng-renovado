@@ -55,7 +55,8 @@ export function isExternalProfileLibrary(value: unknown, municipalityId: string)
   (p.evidenceVersion === undefined || string(p.evidenceVersion)) && (p.revisionOf === undefined || string(p.revisionOf)) && (p.validatedBy === undefined || string(p.validatedBy)) && (p.validatedAt === undefined || string(p.validatedAt)) &&
   (p.archivedAt === undefined || (string(p.archivedAt) && Number.isFinite(Date.parse(p.archivedAt)))) &&
   (p.archivedBy === undefined || string(p.archivedBy)) &&
-  (p.choices === undefined || isProfileChoices(p.choices)))) return false;
+  (p.choices === undefined || isProfileChoices(p.choices)) &&
+  (p.revisionLog === undefined || (Array.isArray(p.revisionLog) && p.revisionLog.every(string))))) return false;
  const ids = new Set(profiles.map(p => p.id));
  return ids.size === profiles.length && profiles.every(p => !p.revisionOf || (p.revisionOf !== p.id && ids.has(p.revisionOf))) &&
   (value.activeId === undefined || (string(value.activeId) && ids.has(value.activeId)));

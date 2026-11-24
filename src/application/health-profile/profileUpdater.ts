@@ -158,16 +158,17 @@ function bumpCoverRevision(text: string, from: string | undefined, to: string | 
   return text.replace(re, `Revisión ${to} · ${date}`);
 }
 
-function appendAuthorship(text: string, line: string): string {
+/** Nota que versiones anteriores del actualizador escribían dentro del texto del Perfil. */
+const UPDATER_NOTE = /^Revisión\s+[\d.]+,\s+\d{2}\/\d{2}\/\d{4},\s+generada con el Actualizador de perfiles de COMPÁS\b/;
+
+/**
+ * Retira del texto las notas del actualizador y las devuelve en orden. El historial de
+ * cambios se conserva en la revisión, fuera del texto (CONTRACT-PROFILE-UPDATER §2.2).
+ */
+export function extractUpdaterNotes(text: string): { text: string; notes: string[] } {
   const paras = text.split("\n\n");
-  const at = paras.findIndex(p => /^\d{1,2}\.\s+Autoría/i.test(p.trim()));
-  if (at < 0) return text;
-  let end = at + 1;
-  // El apartado 7 termina en el siguiente apartado, en «Anexos» o «Anexo A.», en el primer anexo
-  // rotulado «A. …» o en «Referencias».
-  while (end < paras.length && !/^(\d{1,2}\.\s|Anexos?(?:\s+[A-Z]\.|$)|[A-H]\.\s+[A-ZÁÉÍÓÚ]|Referencias$)/.test(paras[end].trim())) end++;
-  paras.splice(end, 0, line);
-  return paras.join("\n\n");
+  const notes = paras.filter(p => UPDATER_NOTE.test(p.trim())).map(p => p.trim());
+  return notes.length ? { text: paras.filter(p => !UPDATER_NOTE.test(p.trim())).join("\n\n"), notes } : { text, notes };
 }
 
 export function buildProfileUpdate(input: ProfileUpdateInput): ProfileUpdateResult {
@@ -179,7 +180,9 @@ export function buildProfileUpdate(input: ProfileUpdateInput): ProfileUpdateResu
   if ((kinds.includes("paginas-datos") || kinds.includes("indicadores") || kinds.includes("cifras-conclusiones")) && !snapshot) return { base, changes: [], blocked: "El expediente no tiene ninguna descarga de estadística territorial guardada." };
   const changes: string[] = [];
   const indicatorIssues: string[] = [];
-  let text = base.text;
+  // Las notas que el actualizador dejaba en el texto pasan al historial de la revisión.
+  const previousNotes = extractUpdaterNotes(base.text);
+  let text = previousNotes.text;
   let results = base.results;
   let bindings: ProfileBinding[] | undefined = base.bindings;
   let conditions: ProfileCondition[] | undefined = base.conditions;
@@ -282,7 +285,8 @@ export function buildProfileUpdate(input: ProfileUpdateInput): ProfileUpdateResu
   const { from, to } = nextRevisionNumber(base.title, text === base.text && !resultsChanged && !linksChanged);
   const title = to ? base.title.replace(/revisión\s+\d+\.\d+(?:\.\d+)?\s*·\s*\d{2}\/\d{2}\/\d{4}/i, `revisión ${to} · ${date}`) : `${base.title} · actualización ${date}`;
   text = bumpCoverRevision(text, from, to, date);
-  text = appendAuthorship(text, `Revisión ${to ?? "actualizada"}, ${date}, generada con el Actualizador de perfiles de COMPÁS a partir de la revisión ${from ?? "anterior"}: ${changes.join(" ")} El resto del texto no cambia. Pendiente de revisión técnica.`);
+  if (previousNotes.notes.length) changes.push(`${previousNotes.notes.length === 1 ? "La nota de la revisión anterior pasa" : `Las ${previousNotes.notes.length} notas de revisiones anteriores pasan`} del texto al historial de la revisión.`);
+  const logEntry = `Revisión ${to ?? "actualizada"}, ${date}, generada con el Actualizador de perfiles de COMPÁS a partir de la revisión ${from ?? "anterior"}: ${changes.join(" ")} El resto del texto no cambia. Pendiente de revisión técnica.`;
   const usesStatistics = kinds.some(k => k === "paginas-datos" || k === "indicadores" || k === "cifras-conclusiones");
   const note = (snapshot && usesStatistics
     ? `Revisión ${to ?? ""} generada por el Actualizador de perfiles el ${date} con la estadística territorial descargada el ${snapshot.retrievedAt.slice(0, 10)}. ${filesSentence}`
@@ -308,6 +312,7 @@ export function buildProfileUpdate(input: ProfileUpdateInput): ProfileUpdateResu
     ...(bindings ? { bindings } : {}),
     ...(conditions ? { conditions } : {}),
     reviewFlags: flags,
+    revisionLog: [...(base.revisionLog ?? []), ...previousNotes.notes, logEntry],
   };
   return { base, profile, changes };
 }

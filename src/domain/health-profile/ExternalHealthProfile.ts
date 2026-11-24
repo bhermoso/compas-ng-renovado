@@ -67,6 +67,11 @@ export interface ExternalHealthProfile {
   * revisión nueva no hereda las elecciones de la anterior.
   */
  choices?: ProfileChoice[];
+ /**
+  * Historial de cambios que COMPÁS aplicó al generar esta revisión y las anteriores
+  * (CONTRACT-PROFILE-UPDATER §2.2). No forma parte del texto del Perfil.
+  */
+ revisionLog?: string[];
 }
 
 /** Decisión registrada sobre una conclusión («C3») o una recomendación («R2»). */

@@ -53,11 +53,11 @@ Las seis páginas de datos siguen el orden del marco de determinantes (Art. 17 t
 - El lector repetía el cuerpo de R1 («Abordar. …») como segundo párrafo de la introducción de las recomendaciones, en los cuatro Perfiles. No está en el texto; lo producía el lector. Corregido.
 - El Actualizador escribe su nota de revisión al final del apartado 7, pero no reconocía «Anexos» ni un anexo rotulado «A. …» como fin del apartado. En Atarfe, Loja y Zagra la nota quedó detrás de los anexos, antes de las referencias. Corregido para las revisiones futuras; las notas ya escritas se recolocan con el paquete del paso 3.
 
-## 6. Decisiones del responsable
+## 6. Decisiones del responsable (24/11/2026)
 
-1. *Zagra.* Si un Informe de Salud de 2017 vale como Informe base para validar el Perfil, o si la validación espera a la actualización municipal.
-2. *Notas del Actualizador.* Si deben figurar en el texto del Perfil, como hoy prevé `CONTRACT-PROFILE-UPDATER`, o solo en el historial de revisiones de COMPÁS. Dentro del texto hacen el documento autorreferente («generada con el Actualizador de perfiles de COMPÁS…»).
-3. *Alfacar, referencia [12].* Si la selección del Grupo Motor de 1/10/2026 existe y debe constar en el punto de partida, o si la referencia es un resto.
+1. *Zagra.* No hay Informe de Salud actualizado. Se trabaja con el de 2017 hasta nueva orden; vale como Informe base del Perfil. El responsable añade que en Zagra ya tienen claro que priorizarán Envejecimiento saludable y Prevención y abordaje de las adicciones: es una decisión del Grupo Motor, posterior al Perfil, y el Perfil no la anticipa (Art. 19, separación de etapas), pero su punto de partida puede recoger el estado del proceso.
+2. *Notas del Actualizador.* Salen del texto del Perfil y pasan al historial de la revisión en COMPÁS (`CONTRACT-PROFILE-UPDATER` 1.3.0, §2.2). Las notas ya escritas se trasladan en la siguiente revisión generada.
+3. *Alfacar.* Existe una priorización: la selección deliberativa del Grupo Motor de 1/10/2026. El punto de partida debe recogerla como hecho del proceso, con su fecha, sin convertirla en conclusión ni anticiparla en las recomendaciones.
 
 ## 7. Qué tendría que resolver el paquete de texto de cada Perfil (paso 3)
 

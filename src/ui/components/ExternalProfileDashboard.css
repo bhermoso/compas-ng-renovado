@@ -482,3 +482,6 @@
 .epr-discarded__label{display:block;font-size:12px;font-weight:600;color:var(--ep-muted);letter-spacing:.02em}
 @media(max-width:680px){.ep-choice{padding:20px}.ep-choice__item{grid-template-columns:1fr}}
 @media print{.ep-choice{display:none}}
+.ep-revision-log{margin-top:6px;font-size:13px;color:var(--ep-muted)}
+.ep-revision-log summary{cursor:pointer}
+.ep-revision-log ol{margin:6px 0 0;padding-left:20px}

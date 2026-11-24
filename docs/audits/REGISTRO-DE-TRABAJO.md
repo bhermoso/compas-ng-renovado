@@ -40,7 +40,13 @@ Master: `6aa5160`.
   - El Actualizador no reconocía «Anexos» ni «A. …» como fin del apartado 7 y
     dejaba su nota detrás de los anexos (Atarfe, Loja, Zagra). Corregido en
     `appendAuthorship`; las notas ya escritas se recolocan con el paquete.
-- **Verificación.** Lint: 0. Suite: 2967 pasan, 2 omitidas (2 pruebas nuevas).
+- **Decisiones del responsable (24/11).** Zagra trabaja con el Informe de 2017
+  hasta nueva orden; las notas del Actualizador salen del texto y pasan al
+  historial de la revisión (`revisionLog`, contrato del Actualizador 1.3.0, con la
+  nota antigua trasladada en la siguiente revisión); en Alfacar existe la
+  priorización del Grupo Motor de 1/10/2026 y debe constar en el punto de partida.
+  Detalle en el §6 del informe.
+- **Verificación.** Lint: 0. Suite: 2967 pasan, 2 omitidas.
 
 ## 2026-11-24 · Menú de elección del equipo técnico
 
