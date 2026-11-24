@@ -438,7 +438,7 @@ export function ProfileDataPages({ pages, results, municipalityName, title, peri
                 <h3>De los indicadores a las conclusiones</h3>
                 <p>Texto procedente del perfil guardado, no generado a partir de los gráficos. Las conclusiones se muestran como lectura global; no se atribuyen automáticamente a un dominio concreto.</p>
               </div>
-              {interpretation.overallReading.length > 0 && <details open className="pdp-interpretation__reading">
+              {interpretation.overallReading.length > 0 && <details className="pdp-interpretation__reading">
                 <summary>Lectura de conjunto</summary>
                 {interpretation.overallReading.map((paragraph,i)=><p key={i}>{paragraph}</p>)}
               </details>}

@@ -307,7 +307,7 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
         ))}
       </div>
 
-      <details className="agenda-timeline" open>
+      <details className="agenda-timeline">
         <summary>Vista cronológica</summary>
         {(() => {
           const rows = COLUMNS.flatMap((c) => items(c.key));

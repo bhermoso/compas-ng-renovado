@@ -53,7 +53,7 @@ const SAVED_STATUS_LABEL: Record<PlanPreparationDecision["status"], string> = {
 function SavedDraftReadOnly({draft}: {draft: PlanPreparationDraft}) {
  const entries = Object.entries(draft.decisions);
  if (!entries.length) return <p className="panel-note">El borrador guardado no contiene decisiones.</p>;
- return <details className="pcm-legacy-draft__saved" open>
+ return <details className="pcm-legacy-draft__saved">
   <summary>Redacción guardada · versión {draft.version} · {draft.updatedAt.slice(0, 10)} · solo lectura</summary>
   <p className="panel-note">Códigos y textos tal como se guardaron. Para volver a editarlo hace falta revisar su compatibilidad con la versión vigente del catálogo.</p>
   <dl>{entries.map(([code, decision]) => <div key={code}>

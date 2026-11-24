@@ -214,7 +214,7 @@ export function ReconciliacionPanel({ reconciliacion }: ReconciliacionPanelProps
         title="Tensiones escaladas a área de intervención"
         count={tensionesEscaladas.length}
         variant="escalada"
-        defaultOpen={tensionesEscaladas.length > 0}
+        defaultOpen={false}
       >
         <p className="reco-section__desc">
           Estas tensiones superaron los criterios de relevancia y de escalado.
