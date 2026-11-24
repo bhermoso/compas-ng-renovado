@@ -293,6 +293,8 @@ export function buildProfileUpdate(input: ProfileUpdateInput): ProfileUpdateResu
     createdAt: input.now.toISOString(),
     status: "review",
     validatedBy: undefined, validatedAt: undefined, archivedAt: undefined, archivedBy: undefined,
+    // La revisión nueva se presenta como menú sin elegir (CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY §7.1).
+    choices: undefined,
     title,
     period: base.period.replace(/Revisión\s+\d+\.\d+(?:\.\d+)?\s*·\s*\d{2}\/\d{2}\/\d{4}/i, `Revisión ${to ?? ""} · ${date}`),
     text,

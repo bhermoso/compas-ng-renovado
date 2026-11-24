@@ -1,5 +1,6 @@
 import type { MunicipalityWorkspace } from '../../domain/workspace';
 import type { LocalHealthProfile } from '../../domain/health-profile';
+import { discardedProposals } from './profileChoices';
 
 /** Compatibility projection for planning. No diagnosis, narrative or profile generation. */
 export function selectExternalProfile(workspace: MunicipalityWorkspace): LocalHealthProfile {
@@ -9,7 +10,10 @@ export function selectExternalProfile(workspace: MunicipalityWorkspace): LocalHe
  // La recomendación externa solo conserva su identidad y texto. El paquete
  // no contiene enlaces a EvidenceAtom: no fabricar un recuento cero ni
  // convertir las limitaciones generales en cautelas de cada recomendación.
- const areas = profile?.areas.map(a => ({...a,relatedEvidenceIds:[],cautions:[]})) ?? [];
+ // Lo que el equipo técnico descartó no pasa a la planificación (custodia §8.4).
+ const discarded = profile ? discardedProposals(profile) : new Set<string>();
+ const areas = profile?.areas.filter(a => !discarded.has(a.id)).map(a => ({...a,relatedEvidenceIds:[],cautions:[]})) ?? [];
+ const findings = profile?.findings.filter(f => !discarded.has(/^(C\d+)\./.exec(f.trim())?.[1] ?? '')) ?? [];
  return {
   id:profile?.id ?? `no-profile:${workspace.municipality.identity.id}`,municipalityId:workspace.municipality.identity.id,
   status:profile?.status ?? 'archived',version:profile?.id ?? 'none',evidenceStoreVersion:profile?.evidenceVersion ?? '',strategicFrameworkSectionIds:[],
@@ -17,7 +21,7 @@ export function selectExternalProfile(workspace: MunicipalityWorkspace): LocalHe
   atomsByOrigin:{},atomsByKind:{},evidenceAtomIds:[],originsSummary:[],ibsePresent:false,dukePresent:false,
   predimedPresent:false,sf12Present:false,suenoPresent:false,cagePresent:false,thematicPrioritisationPresent:false,complementaryStudyCount:0,
   territorialSummary:profile?.summary ?? '',determinantCount:0,assetCount:0,indicatorCount:profile?.results.length ?? 0,
-  qualitativeFindingCount:profile?.findings.length ?? 0,methodologicalCautionCount:profile?.limitations.length ?? 0,
+  qualitativeFindingCount:findings.length,methodologicalCautionCount:profile?.limitations.length ?? 0,
   preliminaryOpportunities:[],longitudinalActive:false,longitudinalNote:'',longitudinalEvidenceCount:0,marcosAplicados:[],
   tensionesEstructurales:[],limitacionesDiagnosticas:profile?.limitations ?? [],conflictos:[],tensionesEscaladas:[],
   tensionesNoEscaladas:[],ruidoEstructural:[],areasDeIntervencion:areas,

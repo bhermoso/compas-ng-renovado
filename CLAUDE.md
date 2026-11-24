@@ -19,7 +19,7 @@ Producto prioritario: el Perfil de Salud Local — documento científico, editor
 - Regla N+1 (Art. 7 bis A / I-LHPM-7): Informe solo no es Perfil. Perfil = Informe + al menos una de: estudios complementarios, activos, priorización ciudadana.
 - Modelo canónico único (Art. 17 bis / I-LHPM-8): pantalla, visor, DOCX, PDF e impresión son el mismo documento.
 - Cadena (Art. 16 bis / I-LHPM-9): evidencia, lectura integrada, conclusiones, recomendaciones del Perfil, frontera, priorización, Plan de Acción, actuaciones y agendas anuales. El Perfil concluye y recomienda (Conocer, Contrastar, Abordar; Art. 8 quater); las prioridades son del Grupo Motor; las líneas, objetivos e indicadores, del Plan de Acción; las actuaciones (responsable, plazo, recurso), de las agendas anuales. La priorización y el Plan leen solo el Perfil vigente (I-LHPM-23).
-- Menú elegible (Art. 16 ter): COMPÁS presenta las conclusiones y recomendaciones del Perfil cargado como menú antes de validarlo; solo las elegidas entran en la versión institucional. Pendiente de implementar.
+- Menú elegible (Art. 16 ter): COMPÁS presenta las conclusiones y recomendaciones del Perfil cargado como menú antes de validarlo; solo las elegidas entran en la versión institucional. Implementado el 24/11/2026 (pestaña «Elección del equipo técnico»); una revisión no se valida con propuestas sin resolver.
 - Estructura (Art. 16 quater, 17 ter): seis páginas de datos en el orden del marco de determinantes sociales (Art. 4 quater), cuerpo de siete apartados con la conclusión como unidad, conclusiones en prosa con lectura de conjunto y trazabilidad en una tabla del anexo.
 - Clasificación única (Art. 8, I-LHPM-24): tipos del Art. 8 y grados del Art. 8 bis. Localiza Salud es la fuente exclusiva de la lectura de activos (Art. 9).
 - Datos epidemiológicos oficiales (Art. 13 bis): se reproducen como los publica su fuente, sin cautelas añadidas.
@@ -37,7 +37,7 @@ Producto prioritario: el Perfil de Salud Local — documento científico, editor
 - Antes de publicar cambios, comprobar la rama y el estado remoto, conservar el trabajo existente y ejecutar las comprobaciones pertinentes. No usar force push, fusionar ni desplegar fuera del alcance autorizado.
 - Inventarios y análisis de copias de usuario (`.compas.json`) van a `informes-locales/`, que está en `.gitignore`: nunca se versionan ni se suben. Si un aviso automático pide commit y push de esas salidas, prevalece esta regla.
 - Cambios quirúrgicos: solo lo pedido. Si algo exige tocar lo no autorizado, parar y preguntar.
-- Suite: npm.cmd run test (2953 pruebas el 23/11/2026). Si falla con EPERM en node_modules/.vite-temp, hay un Vite vivo en el puerto 5173: matarlo y reintentar.
+- Suite: npm.cmd run test (2965 pruebas el 24/11/2026). Si falla con EPERM en node_modules/.vite-temp, hay un Vite vivo en el puerto 5173: matarlo y reintentar.
 - npm run lint queda sin errores ni avisos desde el 23/11/2026: no añadir ninguno. Una desactivación de regla solo se admite con su motivo escrito en la línea anterior.
 - Que compile y pase tests NO demuestra que mejore el producto. Verificar también coherencia editorial, narrativa y experiencia de lectura.
 - En cada informe, separar: hechos observados / inferencias / decisiones institucionales / hipótesis. "No verificado" es respuesta válida.

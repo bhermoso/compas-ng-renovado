@@ -22,6 +22,47 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-24 · Menú de elección del equipo técnico
+
+Master: `91006d2`.
+
+- **Encargo del responsable.** Secuencia aceptada: (1) menú de elección,
+  (2) lectura completa y cotejo de los cuatro Perfiles, (3) paquetes de texto
+  conformes a la v3.0.1 aplicados con el Actualizador, (4) elección y validación.
+  Esta entrada cubre el paso 1.
+- **Hecho de partida.** El §7.4 del contrato de custodia impide validar una
+  revisión con propuestas sin resolver, y el menú no existía: ningún Perfil podía
+  validarse conforme a la doctrina.
+- **Cambio.**
+  - Modelo: `choices` en cada revisión (propuesta, decisión, cuenta, fecha y,
+    en el descarte, motivo opcional). La biblioteca rechaza elecciones mal
+    formadas o repetidas.
+  - `profileChoices.ts`: propuestas de la revisión (C y R del texto; si el texto
+    no las estructura, las identificadas del paquete), registro de decisiones,
+    pendientes y descartadas.
+  - Pestaña «Elección del equipo técnico», con recuento de resueltas. Las
+    decisiones se preparan y se guardan juntas en Firebase; se cierran al validar
+    o archivar.
+  - La validación queda bloqueada mientras haya propuestas pendientes y lo dice.
+  - Lo descartado se rotula, sin suprimir texto, en el Perfil, en la lectura del
+    documento, en la impresión y en la exportación a Word.
+  - Una revisión nueva (carga, edición o Actualizador) no hereda elecciones; un
+    archivo cargado no puede traerlas.
+  - La planificación (`selectExternalProfile`) no recibe las conclusiones ni las
+    recomendaciones descartadas.
+  - Contrato de custodia 1.1: §7.6 y nota de implementación; el menú sale de
+    pendientes.
+- **Decisión pendiente del responsable.** El §8.4 dice que la vigente alimenta
+  los pasos posteriores «con sus propuestas elegidas». Hoy pasan las elegidas y
+  las aún sin resolver; solo se excluyen las descartadas. Excluir también las
+  pendientes dejaría sin candidaturas técnicas a los cuatro Perfiles vigentes
+  mientras no se elija, en tensión con el §8.3 (criterio de calidad, no candado).
+- **Verificación.** Lint: 0. Compilación correcta. Suite: 2965 pasan, 2
+  omitidas (12 pruebas nuevas). Pantalla recorrida en Chrome sin interfaz con
+  una página de prueba temporal y un Perfil ficticio: elegir, descartar con
+  motivo, guardar, validación bloqueada con su aviso y rótulo en el Perfil.
+  Sin expedientes reales ni Firebase.
+
 ## 2026-11-23 · Avisos de Localiza y del Actualizador; referencias a contratos retirados
 
 Master: `58e7781` (tras la PR #225).
