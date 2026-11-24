@@ -22,6 +22,30 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-24 (tarde) · Elección explícita, archivo, trazabilidad Perfil–Plan y Actualizador
+
+Master de partida: `0bccef5`.
+
+- **#231 (fusionada).** Junto al Perfil vigente se muestran las propuestas pendientes de
+  elegir. Solo las conclusiones y recomendaciones elegidas expresamente alimentan la
+  planificación (`chosenProposals`); antes bastaba con no estar descartadas.
+- **#232 (fusionada).** El Archivo permite eliminar una versión intermedia y reenlaza las
+  sucesoras, abre la carga de Localiza Salud, gestiona revisiones del Perfil y retira
+  copias derivadas. La estadística territorial deja de borrarse desde el Archivo
+  (CONTRACT-TERRITORIAL-STATISTICS 1.3.1).
+- **#233 (fusionada).** El Plan resultante vincula recomendación elegida, prioridad
+  adoptada, objetivo, indicador y línea de base tomada de la revisión vigente.
+- **Actualizador (rama `fix/actualizador-claridad`).** El error de lectura del paquete ya
+  no queda oculto tras «Elige el archivo del paquete de texto»; el cargador se ve siempre
+  y, al cargar un paquete, marca el texto y los campos derivados; se avisa si también
+  están marcados cambios de datos; tras crear las revisiones se recuerda que no son las
+  vigentes. Suite: 2979 pruebas, 2 omitidas. Lint sin avisos.
+- **Estado de los expedientes (hechos).** Vigentes: Zagra 0.6.0, Alfacar 0.10.0, Atarfe
+  0.10.0, Loja 0.7.0. Ninguna validada; ninguna propuesta elegida, de modo que la
+  planificación no recibe todavía conclusiones ni recomendaciones de ningún Perfil.
+
+---
+
 ## 2026-11-24 · Revisiones de los cuatro Perfiles y archivo ordenado por fecha
 
 Master: `1e32c20`.

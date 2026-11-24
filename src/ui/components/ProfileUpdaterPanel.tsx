@@ -46,6 +46,7 @@ export function ProfileUpdaterPanel({ municipalities, currentId, onRun }: Props)
   const [kinds, setKinds] = useState<ProfileUpdateKind[]>(DEFAULT_KINDS);
   const [pkg, setPkg] = useState<ProfileTextPackage>();
   const [pkgName, setPkgName] = useState('');
+  const [pkgError, setPkgError] = useState('');
   const [ids, setIds] = useState<string[]>([currentId]);
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState('');
@@ -57,7 +58,7 @@ export function ProfileUpdaterPanel({ municipalities, currentId, onRun }: Props)
   async function run(apply: boolean) {
     setBusy(true); setError(''); setApplied(false);
     try {
-      if (kinds.includes('paquete-texto') && !pkg) throw new Error('Elige el archivo del paquete de texto.');
+      if (kinds.includes('paquete-texto') && !pkg) throw new Error(pkgError ? `El paquete de texto no se puede aplicar: ${pkgError}` : 'Elige el archivo del paquete de texto.');
       const expectedBaselines = apply ? Object.fromEntries((preview ?? []).filter(o=>o.profile&&o.baseline).map(o=>[o.id,o.baseline!])) : undefined;
       const out = await onRun(ids, kinds, apply, setProgress, kinds.includes('paquete-texto') ? pkg : undefined, expectedBaselines);
       setPreview(out); setApplied(apply && out.some(o=>o.saved));
@@ -74,12 +75,18 @@ export function ProfileUpdaterPanel({ municipalities, currentId, onRun }: Props)
       <fieldset className="pu-fieldset"><legend>Cambios</legend>
         {KINDS.map(k => <label key={k}><input type="checkbox" checked={kinds.includes(k)} disabled={busy} onChange={() => { setKinds(toggle(kinds, k)); setPreview(undefined); }}/> {PROFILE_UPDATE_LABEL[k]}</label>)}
       </fieldset>
-      {kinds.includes('paquete-texto') && <p className="ep-help"><label>Paquete de texto (compas-profile-text-package/v1): <input type="file" accept="application/json,.json" disabled={busy} onChange={async e => {
-        const f = e.target.files?.[0]; setPkg(undefined); setPkgName(''); setPreview(undefined);
+      <p className="ep-help"><label>Paquete de texto (compas-profile-text-package/v1): <input type="file" accept="application/json,.json" disabled={busy} onChange={async e => {
+        const f = e.target.files?.[0]; setPkg(undefined); setPkgName(''); setPkgError(''); setError(''); setPreview(undefined);
         if (!f) return;
-        try { const p = parseTextPackage(JSON.parse(await f.text())); setPkg(p); setPkgName(`${f.name} · ${p.entries.length} expedientes · ${p.note}`); }
-        catch (err) { setError(err instanceof Error ? err.message : String(err)); }
-      }}/></label>{pkgName && <small> {pkgName}</small>}</p>}
+        try {
+          const p = parseTextPackage(JSON.parse(await f.text()));
+          setPkg(p); setPkgName(`${f.name} · ${p.entries.length} expedientes · ${p.note}`);
+          // Cargar un paquete es pedir que se aplique: se marcan el texto y los campos que se derivan de él.
+          setKinds(current => [...new Set<ProfileUpdateKind>([...current, 'paquete-texto', 'campos-derivados'])]);
+        }
+        catch (err) { const message = err instanceof Error ? err.message : String(err); setPkgError(message); setError(`El paquete de texto no se puede aplicar: ${message}`); }
+      }}/></label>{pkgName && <small> {pkgName}</small>}
+      {pkg && kinds.some(k => k === 'paginas-datos' || k === 'indicadores') && <small className="pu-note"> También están marcados cambios de datos: la revisión recompilará las páginas de datos o los indicadores con la última descarga. Desmárcalos si solo quieres aplicar el paquete.</small>}</p>
       <fieldset className="pu-fieldset"><legend>Expedientes</legend>
         <label><input type="checkbox" checked={ids.length === municipalities.length} disabled={busy} onChange={() => { setIds(ids.length === municipalities.length ? [currentId] : municipalities.map(m => m.id)); setPreview(undefined); }}/> Todos</label>
         {municipalities.map(m => <label key={m.id}><input type="checkbox" checked={ids.includes(m.id)} disabled={busy} onChange={() => { setIds(toggle(ids, m.id)); setPreview(undefined); }}/> {m.name}</label>)}
@@ -90,7 +97,7 @@ export function ProfileUpdaterPanel({ municipalities, currentId, onRun }: Props)
       </div>
       {busy && <p className="ep-help" role="status">{progress}</p>}
       {error && <p className="ep-error" role="alert">{error}</p>}
-      {applied && <p className="ep-message" role="status">Revisiones creadas y confirmadas por Firebase. Revísalas y valídalas en cada expediente; después exporta su PDF desde la pestaña Perfil.</p>}
+      {applied && <p className="ep-message" role="status">Revisiones creadas y confirmadas por Firebase. No son todavía las vigentes: para revisarlas, elegir sus propuestas y validarlas, o para aplicarles otro paquete, establécelas como vigentes en «Gestión y versiones» de cada expediente.</p>}
     </header>
 
     {preview && <section className="tsp-block">
@@ -99,7 +106,7 @@ export function ProfileUpdaterPanel({ municipalities, currentId, onRun }: Props)
         <thead><tr><th>Expediente</th><th>Revisión</th><th>Cambios</th><th>Paquete</th></tr></thead>
         <tbody>{preview.map(o => <tr key={o.id}>
           <td>{o.name}</td>
-          <td>{o.blocked ? <em>{o.blocked}</em> : <>{o.title}<small>a partir de «{o.from}»{o.saved ? ' · guardada' : ''}</small></>}</td>
+          <td>{o.blocked ? <><em>{o.blocked}</em>{/revisión vigente es/.test(o.blocked) && <small>El Actualizador trabaja sobre la revisión vigente. Si el paquete se redactó sobre una revisión posterior, establécela como vigente en «Gestión y versiones».</small>}</> : <>{o.title}<small>a partir de «{o.from}»{o.saved ? ' · guardada' : ''}</small></>}</td>
           <td>{o.delta && <details className="pu-delta"><summary>Ver comparación de campos editoriales (antes → después)</summary><p>Texto del cuerpo: {o.delta.textChanged?"modificado":"sin cambios"}. Resumen: {o.delta.summaryChanged?"modificado":"sin cambios"}. Conclusiones: {o.delta.findingsChanged?"modificadas":"sin cambios"}. Recomendaciones: {o.delta.areasChanged?"modificadas":"sin cambios"}.</p>{o.delta.summaryChanged&&<section><h4>Resumen anterior</h4><pre>{o.delta.before.summary}</pre><h4>Resumen propuesto</h4><pre>{o.delta.after.summary}</pre></section>}{o.delta.findingsChanged&&<section><h4>Conclusiones anteriores</h4><pre>{o.delta.before.findings.join("\n\n")}</pre><h4>Conclusiones propuestas</h4><pre>{o.delta.after.findings.join("\n\n")}</pre></section>}{o.delta.areasChanged&&<section><h4>Recomendaciones anteriores</h4><pre>{o.delta.before.areas.map(a=>`${a.id} · ${a.title}\n${a.rationale}`).join("\n\n")}</pre><h4>Recomendaciones propuestas</h4><pre>{o.delta.after.areas.map(a=>`${a.id} · ${a.title}\n${a.rationale}`).join("\n\n")}</pre></section>}{o.delta.textChanged&&<p>El texto completo se puede examinar en el JSON de la vista previa; no se reemplaza el original adjunto.</p>}</details>}{o.changes.length ? <ul className="pu-changes">{o.changes.map((c, i) => <li key={i}>{c}</li>)}</ul> : '—'}{o.profile?.reviewFlags?.length ? <ul className="pu-changes pu-flags">{o.profile.reviewFlags.map((f, i) => <li key={i}><strong>{f.target}</strong>: {f.reason}</li>)}</ul> : null}</td>
           <td>{o.profile ? <button type="button" onClick={() => downloadPackage(o)}>↓ JSON</button> : '—'}</td>
         </tr>)}</tbody>
