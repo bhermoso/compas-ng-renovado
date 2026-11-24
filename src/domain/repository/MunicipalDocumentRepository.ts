@@ -485,9 +485,16 @@ export function removeMunicipalDocument(
   documentId: DocumentId
 ): MunicipalDocumentRepository {
   const now = new Date().toISOString();
+  const retained = repository.documents.filter(d => d.id !== documentId);
+  const parentId = repository.documents.find(d => d.id === documentId)?.revisionOf;
   return {
     ...repository,
-    documents: repository.documents.filter((d) => d.id !== documentId),
+    documents: retained.map(document => {
+      if (document.revisionOf !== documentId) return document;
+      const revisionOf = retained.some(parent => parent.id === parentId && parent.id !== document.id) ? parentId : undefined;
+      const tags = document.tags.filter(tag => !tag.startsWith("revision-of:"));
+      return { ...document, revisionOf, tags: revisionOf ? [...tags, `revision-of:${revisionOf}`] : tags };
+    }),
     // Una carga retirada no puede conservar validaciones ni conciliaciones
     // que la señalen como fuente disponible. Las demás declaraciones perduran.
     ...(repository.assetValidations !== undefined

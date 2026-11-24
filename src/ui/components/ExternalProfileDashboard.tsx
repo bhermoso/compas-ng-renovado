@@ -24,6 +24,7 @@ interface Props {
  municipalityId: string;
  municipalityName: string;
  library: ExternalProfileLibrary;
+ archiveRequest?: { profileId?: string };
  legacyProfiles?: LocalHealthProfileArtifact[];
  legacyText?: string;
  authorName: string;
@@ -45,9 +46,9 @@ function emptyProfile(municipalityId: string): ExternalHealthProfile {
  return {schema:'compas-external-profile/v1',id:crypto.randomUUID(),municipalityId,title:'',period:'',author:'',createdAt:new Date().toISOString(),
   status:'review',summary:'',text:'',results:[],findings:[],limitations:[],areas:[],attachmentIds:[]};
 }
-export function ExternalProfileDashboard({compact=false,municipalityId,municipalityName,library,legacyProfiles=[],legacyText,authorName,onSave,onDirtyChange,incomingTerritorialRevision,onIncomingTerritorialRevisionConsumed,updaterMunicipalities,onRunProfileUpdates}: Props) {
- const [selectedId,setSelectedId]=useState(library.activeId);
- const [tab,setTab]=useState<'results'|'document'|'choice'|'versions'|'laboratory'|'updater'|null>(compact ? null : 'results');
+export function ExternalProfileDashboard({compact=false,municipalityId,municipalityName,library,archiveRequest,legacyProfiles=[],legacyText,authorName,onSave,onDirtyChange,incomingTerritorialRevision,onIncomingTerritorialRevisionConsumed,updaterMunicipalities,onRunProfileUpdates}: Props) {
+ const [selectedId,setSelectedId]=useState(archiveRequest?.profileId ?? library.activeId);
+ const [tab,setTab]=useState<'results'|'document'|'choice'|'versions'|'laboratory'|'updater'|null>(archiveRequest ? 'versions' : compact ? null : 'results');
  const [draft,setDraft]=useState<ExternalHealthProfile>();
  const [newFiles,setNewFiles]=useState<ProfileAttachment[]>([]);
  const [busy,setBusy]=useState(false); const [message,setMessage]=useState(''); const [error,setError]=useState('');

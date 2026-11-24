@@ -7,7 +7,7 @@ import { evidenceHasDocument } from "../../domain/evidence";
 import type { MunicipalDocument } from "../../domain/repository";
 import type { MunicipalityWorkspace } from "../../domain/workspace/MunicipalityWorkspace";
 import type { TerritorialStatisticsSnapshot } from "../../domain/territorial-statistics/TerritorialStatistics";
-import { canDeleteDocumentVersion } from "./documentRevisions";
+import { hasDocumentSuccessors } from "./documentRevisions";
 
 export type ArchiveFileState = "stored" | "local-only" | "none";
 
@@ -17,7 +17,6 @@ export interface ArchiveDocumentRow {
   fileName?: string;
   fileSize?: number;
   evidenceCount: number;
-  /** Tiene versiones posteriores: no se elimina sin romper la cadena de versiones. */
   hasLaterVersions: boolean;
   active: boolean;
 }
@@ -38,7 +37,7 @@ export function archiveDocumentRows(
       fileName: original?.name ?? document.sourceFileName,
       fileSize: original?.size,
       evidenceCount: workspace.evidenceStore.atoms.filter(atom => evidenceHasDocument(atom, document.id)).length,
-      hasLaterVersions: !canDeleteDocumentVersion(documents, document.id),
+      hasLaterVersions: hasDocumentSuccessors(documents, document.id),
       active: isActiveDocument(document),
     };
   });
@@ -60,7 +59,7 @@ export function documentChangeWarnings(
 ): string[] {
   const warnings: string[] = [];
   const touchesEvidence = row.evidenceCount > 0 || workspace.healthReport?.linkedDocumentId === row.document.id;
-  if (row.evidenceCount > 0) warnings.push(`Se retiran sus ${row.evidenceCount} evidencias del diagnóstico.`);
+  if (row.evidenceCount > 0) warnings.push(`Se revisan ${row.evidenceCount} evidencias. Se retiran las que dependan solo de esta ficha.`);
   if (workspace.healthReport?.linkedDocumentId === row.document.id) warnings.push("Es el Informe de Salud en uso: el diagnóstico se queda sin Informe hasta que cargues otro.");
   const profile = activeProfile(workspace);
   if (touchesEvidence && profile?.status === "validated") {
@@ -72,21 +71,4 @@ export function documentChangeWarnings(
 /** Regla de copia única: al guardar una descarga, sustituye a las anteriores. */
 export function replaceTerritorialSnapshots(snapshot: TerritorialStatisticsSnapshot): TerritorialStatisticsSnapshot[] {
   return [snapshot];
-}
-
-/**
- * Motivo por el que no se debe eliminar una descarga, o undefined si se puede.
- * Las cifras enlazadas y las condiciones del Perfil se comprueban contra la descarga
- * más reciente: sin ninguna, se quedan sin referencia.
- */
-export function territorialSnapshotDeletionBlock(
-  workspace: Pick<MunicipalityWorkspace, "territorialStatistics" | "externalProfileLibrary">,
-  snapshotId: string,
-): string | undefined {
-  const remaining = (workspace.territorialStatistics ?? []).filter(s => s.id !== snapshotId);
-  if (remaining.length > 0) return undefined;
-  const profile = activeProfile(workspace);
-  const links = (profile?.bindings?.length ?? 0) + (profile?.conditions?.length ?? 0);
-  if (!profile || links === 0) return undefined;
-  return `Es la única descarga y el Perfil «${profile.title}» tiene ${links} cifras o condiciones enlazadas a ella. Descarga antes una nueva; al guardarla, sustituye a esta.`;
 }

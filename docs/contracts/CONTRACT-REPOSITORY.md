@@ -295,13 +295,19 @@ descargada del expediente.
 
 ### Eliminar (`removeMunicipalDocument`)
 
-Elimina un documento concreto por su `documentId`. La eliminación activa una
-purga encadenada de la evidencia derivada, garantizando:
+Elimina un documento concreto por su `documentId`.
+
+El Archivo permite eliminar explícitamente una versión aunque tenga sucesoras.
+Las sucesoras conservan sus propios archivos y evidencias. Si existe una
+predecesora conservada, se enlazan a ella. En otro caso quedan como inicio de su
+cadena conservada. El borrado de una copia derivada deja intacta su ficha fuente.
+
+La eliminación del documento actualiza sus evidencias y el estado que depende de él.
 
 1. **Alcance municipal**: solo se purgan átomos cuyo `municipalityId` coincide
    con el municipio activo. Los átomos de otros municipios no se ven afectados.
-2. **Purga por `documentId`**: se eliminan los átomos cuyo `provenance.documentId`
-   coincide con el documento borrado.
+2. **Purga por `documentId`**: se retira el vínculo con el documento borrado.
+   Si un átomo conserva otra fuente, sigue vinculado a ella.
 3. **Purga por `origin` (fallback)**: para átomos generados antes de que
    existiera el campo `documentId`, se aplica un filtro por `origin` asociado
    al tipo del documento eliminado:

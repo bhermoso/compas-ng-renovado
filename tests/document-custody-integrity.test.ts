@@ -94,6 +94,19 @@ describe("integridad documental", () => {
     expect(confirmsDocumentDeletion(reopen(deleted.next), "anexo")).toBe(true);
   });
 
+  it("elimina una versión intermedia y conserva los archivos y el linaje de las sucesoras", async () => {
+    const state = workspace();
+    state.repository = addMunicipalDocument(state.repository, { id: "primera", kind: "other", title: "Fuente" });
+    const middle = createDocumentRevision(state, "primera", await file("intermedia"), now);
+    const final = createDocumentRevision(middle, "intermedia", await file("ultima"), now);
+    const next = reopen(deleteWorkspaceDocument(final, "intermedia", now).next);
+    expect(next.repository.documents.map(d => d.id)).toEqual(["primera", "ultima"]);
+    expect(next.repository.documents[1]).toMatchObject({ revisionOf: "primera", revisionNumber: 3 });
+    expect(next.repository.documents[1].tags).toContain("revision-of:primera");
+    expect(next.documentOriginals?.map(o => o.id)).toEqual(["ultima"]);
+    expect(confirmsDocumentDeletion(next, "intermedia")).toBe(true);
+  });
+
   it("la sustitución de un estudio elimina la ficha, el original y las evidencias anteriores", async () => {
     const state = workspace();
     const oldStudy = { sourceFileName: "previo.csv" } as NonNullable<typeof state.phq9Study>;

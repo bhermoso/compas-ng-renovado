@@ -7,7 +7,7 @@ import type { DocumentCycle, MunicipalDocument } from "../../domain/repository";
 import type { MunicipalityWorkspace } from "../../domain/workspace/MunicipalityWorkspace";
 import type { ProfileAttachment } from "../../domain/health-profile/ExternalHealthProfile";
 import {
-  archiveDocumentRows, documentChangeWarnings, territorialSnapshotDeletionBlock, type ArchiveDocumentRow,
+  archiveDocumentRows, documentChangeWarnings, type ArchiveDocumentRow,
 } from "../../application/document-files/expedienteArchive";
 import { decodeDocumentOriginal, formatMegabytes, workspaceDocumentBytes, MAX_WORKSPACE_ORIGINALS_BYTES } from "../../application/document-files/documentOriginals";
 import { organizeMunicipalDocuments, municipalDocumentSection } from "../../application/municipal-document-organization";
@@ -32,11 +32,13 @@ interface Props {
   onCreateRevision: (documentId: string, file: File) => Promise<void>;
   onArchiveDocument: (documentId: string) => Promise<void>;
   onDeleteDocument: (documentId: string) => Promise<boolean>;
+  onDeleteCopy?: (copyId: string) => Promise<void>;
   onSetDocumentCycle?: (documentId: string, cycle: DocumentCycle | undefined) => void;
   /** Declara la fecha del documento («2019», «2019-05» o «2019-05-12»), o la retira con undefined. */
   onSetDocumentDate?: (documentId: string, value: string | undefined) => void;
-  onDeleteTerritorialSnapshot?: (snapshotId: string) => Promise<void>;
-  onOpenProfile: () => void;
+  onOpenProfile: (profileId?: string) => void;
+  onDeleteProfile?: (profileId: string) => Promise<void>;
+  onReplaceAssets?: () => void;
   onOpenTerritorialStatistics: () => void;
   onOpenAssetValidations: () => void;
 }
@@ -69,9 +71,9 @@ function DocumentDateControl({ value, onChange }: { value?: string; onChange: (v
   </span>;
 }
 
-function FileButton({ label, onFile, disabled }: { label: string; onFile: (file: File) => void; disabled?: boolean }) {
+function FileButton({ label, onFile, disabled, accept = ACCEPT }: { label: string; onFile: (file: File) => void; disabled?: boolean; accept?: string }) {
   return <label className={`ea-act${disabled ? " ea-act--off" : ""}`}>{label}
-    <input type="file" hidden accept={ACCEPT} disabled={disabled} aria-label={label} onChange={e => {
+    <input type="file" hidden accept={accept} disabled={disabled} aria-label={label} onChange={e => {
       const file = e.currentTarget.files?.[0]; e.currentTarget.value = "";
       if (file) onFile(file);
     }} />
@@ -92,7 +94,7 @@ export function ExpedienteArchive(props: Props) {
   const withoutFile = rows.filter(r => r.active && r.file === "none").length;
   const snapshots = [...(workspace.territorialStatistics ?? [])].sort((a, b) => b.retrievedAt.localeCompare(a.retrievedAt));
   const library = workspace.externalProfileLibrary;
-  const profiles = (library?.profiles ?? []).filter(p => !p.archivedAt);
+  const profiles = library?.profiles ?? [];
 
   async function run(label: string, task: () => Promise<unknown>, done: string) {
     setBusy(true); setMessage(label);
@@ -122,6 +124,7 @@ export function ExpedienteArchive(props: Props) {
   const renderRow = (row: ArchiveDocumentRow) => {
     const d = row.document;
     const link = row.file === "none" ? documentAccessUrl(d.source.url) : undefined;
+    const copies = (workspace.documentDerivedFiles ?? []).filter(file => file.derivedFromDocumentId === d.id);
     const date = documentDate(d);
     return <tr key={d.id}>
       <td className="ea-date">{date ? <>{formatDocumentDate(date)}{date.source === "title" && <small>según el título</small>}</> : <span className="ea-none">Sin fecha</span>}</td>
@@ -130,22 +133,35 @@ export function ExpedienteArchive(props: Props) {
         {row.file === "stored" && <>{row.fileName}{row.fileSize !== undefined && <small>{formatMegabytes(row.fileSize)}</small>}</>}
         {row.file === "local-only" && <>{row.fileName ?? "Archivo"}<small className="ea-warn">Solo en este navegador: {LOCAL_ONLY_REASON[localReason.get(d.id)!]}</small></>}
         {row.file === "none" && <span className="ea-none">Sin archivo</span>}
+        {copies.length > 0 && <details><summary>Copias · {copies.length}</summary>
+          <ul>{copies.map(copy => <li key={copy.id}>
+            {copy.name}{" "}<button type="button" className="ea-act" onClick={() => void downloadAttachment(copy)}>Descargar</button>
+            {canWrite && props.onDeleteCopy && <button type="button" className="ea-act ea-act--danger" disabled={busy} onClick={() => {
+              if (window.confirm(`¿Eliminar la copia «${copy.name}»? Se conservan la ficha y su original.`)) {
+                void run("Eliminando copia…", () => props.onDeleteCopy!(copy.id), "Copia eliminada en Firebase.");
+              }
+            }}>Eliminar copia</button>}
+          </li>)}</ul>
+        </details>}
       </td>
       <td className="ea-actions">
         <DocumentReference documentId={d.id}>Ver</DocumentReference>
         {row.file !== "none" && <button type="button" className="ea-act" onClick={() => void download(row)}>Descargar</button>}
         {link && <a className="ea-act" href={link} target="_blank" rel="noopener noreferrer">Abrir fuente</a>}
         {canWrite && row.file === "none" && <FileButton label="Adjuntar archivo" disabled={busy} onFile={file => void run(`Guardando «${file.name}» en Firebase…`, () => props.onStoreOriginal(d.id, file), `Archivo adjuntado a «${d.title}».`)} />}
-        {canWrite && row.active && <FileButton label="Nueva versión" disabled={busy} onFile={file => {
+        {canWrite && row.active && d.kind === "localiza-salud" && props.onReplaceAssets &&
+          <button type="button" className="ea-act" disabled={busy} onClick={props.onReplaceAssets}>Cargar o reemplazar listado</button>}
+        {canWrite && row.active && d.kind !== "localiza-salud" && <FileButton label="Nueva versión" accept=".pdf,.docx" disabled={busy} onFile={file => {
           if (!confirmChange(row, `¿Cargar «${file.name}» como nueva versión de «${d.title}»? La versión actual se conserva hasta que revises la nueva.`)) return;
           void run("Guardando la nueva versión en Firebase…", () => props.onCreateRevision(d.id, file), "Nueva versión guardada; queda pendiente de revisión.");
         }} />}
-        {canWrite && !row.hasLaterVersions && <button type="button" className="ea-act ea-act--danger" disabled={busy} onClick={() => {
-          if (!confirmChange(row, `¿Eliminar «${d.title}»${row.file === "stored" ? " y su archivo" : ""} del expediente? No se puede deshacer.`)) return;
+        {canWrite && <button type="button" className="ea-act ea-act--danger" disabled={busy} onClick={() => {
+          const retained = row.hasLaterVersions ? " Las versiones posteriores se conservan." : "";
+          if (!confirmChange(row, `¿Eliminar «${d.title}»${row.file === "stored" ? " y su archivo" : ""} del expediente?${retained} No se puede deshacer.`)) return;
           void run("Eliminando en Firebase…", () => props.onDeleteDocument(d.id), `«${d.title}» eliminado.`);
         }}>Eliminar</button>}
         {canWrite && row.hasLaterVersions && row.active && <button type="button" className="ea-act" disabled={busy} onClick={() => {
-          if (!confirmChange(row, `«${d.title}» tiene versiones posteriores y no se puede eliminar. ¿Archivarlo? Se conserva con su archivo y deja de usarse en el diagnóstico.`)) return;
+          if (!confirmChange(row, `¿Archivar «${d.title}»? Se conserva con su archivo y deja de usarse en el diagnóstico.`)) return;
           void run("Archivando en Firebase…", () => props.onArchiveDocument(d.id), `«${d.title}» archivado.`);
         }}>Archivar</button>}
         {canWrite && row.active && props.onSetDocumentDate && <details className="ea-cycle"><summary>Fecha</summary><DocumentDateControl value={d.temporal?.documentDate?.value} onChange={value => props.onSetDocumentDate!(d.id, value)} /></details>}
@@ -171,6 +187,7 @@ export function ExpedienteArchive(props: Props) {
       <div className="ea-body">
         <div className="ea-bar">
           {canWrite && <button type="button" className="ep-primary" aria-expanded={showUploader} onClick={() => setShowUploader(v => !v)}>{showUploader ? "Cerrar la carga" : "Cargar archivos"}</button>}
+          {canWrite && props.onReplaceAssets && <button type="button" className="ea-act" onClick={props.onReplaceAssets}>Cargar Localiza Salud</button>}
           <label className="ea-search">Buscar<input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Título, archivo o tipo" /></label>
           <span className="ea-capacity">Archivos guardados: {formatMegabytes(workspaceDocumentBytes(workspace))} de {formatMegabytes(MAX_WORKSPACE_ORIGINALS_BYTES)}</span>
         </div>
@@ -185,35 +202,34 @@ export function ExpedienteArchive(props: Props) {
         <h3 className="ea-h">Estadística territorial</h3>
         {snapshots.length === 0 ? <p className="ea-note">No hay ninguna descarga guardada. <button type="button" className="ea-act" onClick={props.onOpenTerritorialStatistics}>Descargar del INE y el IECA</button></p> : <>
           <div className="ea-scroll"><table className="ea-table"><thead><tr><th>Descarga</th><th>Contenido</th><th>Acciones</th></tr></thead><tbody>
-            {snapshots.map((s, i) => {
-              const block = territorialSnapshotDeletionBlock(workspace, s.id);
-              return <tr key={s.id}>
+            {snapshots.map((s, i) => <tr key={s.id}>
                 <th scope="row"><strong>{when(s.retrievedAt)}</strong><small>{i === 0 ? "En uso" : "Anterior: se retira al guardar la próxima"}{s.retrievedBy ? ` · ${s.retrievedBy}` : ""}</small></th>
                 <td className="ea-file">{s.observations.length} valores de {s.sources.length} tablas<small>INE {s.ineCode} · catálogo {s.catalogVersion}</small></td>
                 <td className="ea-actions">
                   <button type="button" className="ea-act" onClick={props.onOpenTerritorialStatistics}>Ver</button>
                   <button type="button" className="ea-act" onClick={() => saveBlob(new Blob([provenanceCsv(s)], { type: "text/csv;charset=utf-8" }), `estadistica-territorial-${s.ineCode}-${s.retrievedAt.slice(0, 10)}.csv`)}>Descargar CSV</button>
-                  {canWrite && props.onDeleteTerritorialSnapshot && <button type="button" className="ea-act ea-act--danger" disabled={busy || !!block} title={block} onClick={() => {
-                    if (!window.confirm(`¿Eliminar la descarga del ${when(s.retrievedAt)}? No se puede deshacer.`)) return;
-                    void run("Eliminando la descarga en Firebase…", () => props.onDeleteTerritorialSnapshot!(s.id), "Descarga eliminada.");
-                  }}>Eliminar</button>}
                 </td>
-              </tr>;
-            })}
+              </tr>)}
           </tbody></table></div>
-          {snapshots.some(s => territorialSnapshotDeletionBlock(workspace, s.id)) && <p className="ea-note">{territorialSnapshotDeletionBlock(workspace, snapshots[0].id)}</p>}
         </>}
 
         <h3 className="ea-h">Perfil de Salud Local</h3>
-        {profiles.length === 0 ? <p className="ea-note">No hay ningún Perfil cargado. <button type="button" className="ea-act" onClick={props.onOpenProfile}>Cargar el Perfil</button></p> :
+        {canWrite && <button type="button" className="ea-act" onClick={() => props.onOpenProfile()}>Cargar o sustituir el Perfil</button>}
+        {profiles.length === 0 ? <p className="ea-note">No hay ningún Perfil cargado.</p> :
           <div className="ea-scroll"><table className="ea-table"><thead><tr><th>Perfil</th><th>Archivos</th><th>Acciones</th></tr></thead><tbody>
             {profiles.map(p => <tr key={p.id}>
-              <th scope="row"><strong>{p.title}</strong><small>{p.id === library?.activeId ? "Vigente" : "Otra revisión"} · {p.status === "validated" ? "validado" : "en revisión"}{p.period ? ` · ${p.period}` : ""}</small></th>
+              <th scope="row"><strong>{p.title}</strong><small>{p.id === library?.activeId ? "Vigente" : p.archivedAt ? "Archivada" : "Otra revisión"} · {p.status === "validated" ? "validado" : "en revisión"}{p.period ? ` · ${p.period}` : ""}</small></th>
               <td className="ea-file">{p.attachmentIds.length ? (library?.attachments ?? []).filter(a => p.attachmentIds.includes(a.id)).map(a => <span key={a.id} className="ea-attachment">{a.name} <button type="button" className="ea-act" onClick={() => void downloadAttachment(a)}>Descargar</button></span>) : <span className="ea-none">Sin archivo</span>}</td>
-              <td className="ea-actions"><button type="button" className="ea-act" onClick={props.onOpenProfile}>Ver</button></td>
+              <td className="ea-actions">
+                <button type="button" className="ea-act" onClick={() => props.onOpenProfile(p.id)}>Gestionar versión</button>
+                {canWrite && props.onDeleteProfile && <button type="button" className="ea-act ea-act--danger" disabled={busy} onClick={() => {
+                  const consequence = p.id === library?.activeId ? " Es la revisión vigente y cambiará la referencia de la planificación." : "";
+                  if (!window.confirm(`¿Eliminar «${p.title}» del expediente?${consequence} Se eliminarán los adjuntos que ninguna otra revisión conserve. No se puede deshacer.`)) return;
+                  void run("Eliminando la revisión en Firebase…", () => props.onDeleteProfile!(p.id), "Revisión eliminada.");
+                }}>Eliminar versión</button>}
+              </td>
             </tr>)}
           </tbody></table></div>}
-        <p className="ea-note">Para sustituir o archivar el Perfil, usa su biblioteca: archivar se puede deshacer. Eliminar documentos o cargar otros no cambia el texto del Perfil.</p>
 
         <p className="ea-foot"><button type="button" className="ea-act" onClick={props.onOpenAssetValidations}>Validaciones de activos</button> · {persistence || "Sin guardado reciente"}</p>
       </div>

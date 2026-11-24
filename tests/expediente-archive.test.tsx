@@ -3,8 +3,9 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { removeMunicipalDocument, type MunicipalDocumentRepository } from "../src/domain/repository";
 import type { MunicipalityWorkspace } from "../src/domain/workspace/MunicipalityWorkspace";
 import { ExpedienteArchive } from "../src/ui/components/ExpedienteArchive";
+import { deleteExternalProfileVersion } from "../src/application/health-profile/externalProfiles";
 import {
-  archiveDocumentRows, documentChangeWarnings, replaceTerritorialSnapshots, territorialSnapshotDeletionBlock,
+  archiveDocumentRows, documentChangeWarnings, replaceTerritorialSnapshots,
 } from "../src/application/document-files/expedienteArchive";
 
 const time = "2026-11-19T18:00:00.000Z";
@@ -49,7 +50,7 @@ function workspace(extra: Partial<Record<string, unknown>> = {}) {
 
 const noop = async () => {};
 const render = (ws: MunicipalityWorkspace, canWrite = true) => renderToStaticMarkup(<ExpedienteArchive workspace={ws} canWrite={canWrite} persistence="Firebase · copia confirmada" localOnly={[]} uploader={<p>carga</p>}
-  onStoreOriginal={noop} onCreateRevision={noop} onArchiveDocument={noop} onDeleteDocument={async () => true} onDeleteTerritorialSnapshot={noop}
+  onStoreOriginal={noop} onCreateRevision={noop} onArchiveDocument={noop} onDeleteDocument={async () => true}
   onOpenProfile={() => {}} onOpenTerritorialStatistics={() => {}} onOpenAssetValidations={() => {}} />);
 
 describe("Archivo del expediente", () => {
@@ -79,11 +80,12 @@ describe("Archivo del expediente", () => {
     expect(html).toContain("Descargar");
     expect(html).toContain("Nueva versión");
     expect(html).toContain("Eliminar");
-    // report-1 tiene una versión posterior: se archiva, no se elimina.
+    // report-1 tiene una versión posterior y permite archivar o eliminar.
     expect(html).toContain("Archivar");
     expect(html).toContain("Archivados o rechazados · 1");
     expect(html).toContain("Estadística territorial");
     expect(html).toContain("Descargar CSV");
+    expect(html.slice(html.indexOf('Estadística territorial'), html.indexOf('Perfil de Salud Local'))).not.toContain('>Eliminar<');
     expect(html).toContain("Perfil de Salud de Loja");
     expect(html).toContain("perfil.pdf");
   });
@@ -122,12 +124,12 @@ describe("Archivo del expediente", () => {
     expect(replaceTerritorialSnapshots(fresh)).toEqual([fresh]);
   });
 
-  it("no deja eliminar la única descarga si el Perfil tiene cifras enlazadas", () => {
-    const linked = { profiles: [profile("review", 3)], attachments: [], activeId: "p1" };
-    expect(territorialSnapshotDeletionBlock(workspace({ externalProfileLibrary: linked }), "s1")).toBeUndefined();
-    const single = workspace({ externalProfileLibrary: linked, territorialStatistics: [snapshot("s1", time)] });
-    expect(territorialSnapshotDeletionBlock(single, "s1")).toContain("3 cifras o condiciones enlazadas");
-    expect(territorialSnapshotDeletionBlock(workspace({ territorialStatistics: [snapshot("s1", time)] }), "s1")).toBeUndefined();
+  it("conserva una revisión archivada sin convertirla en vigente al eliminar la activa", () => {
+    const library = workspace().externalProfileLibrary!;
+    const archived = { ...library.profiles[0], id: "archivada", archivedAt: time };
+    const next = deleteExternalProfileVersion({ ...library, profiles: [...library.profiles, archived] }, "p1");
+    expect(next.profiles).toEqual([archived]);
+    expect(next.activeId).toBeUndefined();
   });
 
   it("retirar una fuente elimina solo las validaciones y conciliaciones que la citan", () => {
