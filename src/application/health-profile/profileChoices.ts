@@ -70,6 +70,11 @@ export function discardedProposals(profile: ProposalSource & Pick<ExternalHealth
   return new Set([...choicesByTarget(profile).values()].filter(c => c.decision === "discarded").map(c => c.target));
 }
 
+/** Las propuestas pendientes todavía no constituyen una elección técnica. */
+export function chosenProposals(profile: ProposalSource & Pick<ExternalHealthProfile, "choices">): Set<string> {
+  return new Set([...choicesByTarget(profile).values()].filter(c => c.decision === "chosen").map(c => c.target));
+}
+
 export interface ChoiceInput {
   target: string;
   decision: ProfileChoice["decision"];
