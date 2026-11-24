@@ -11,6 +11,7 @@ import {
 } from "../../application/document-files/expedienteArchive";
 import { decodeDocumentOriginal, formatMegabytes, workspaceDocumentBytes, MAX_WORKSPACE_ORIGINALS_BYTES } from "../../application/document-files/documentOriginals";
 import { organizeMunicipalDocuments, municipalDocumentSection } from "../../application/municipal-document-organization";
+import { compareDocumentsByDateDesc, documentDate, formatDocumentDate, parseDeclaredDate } from "../../application/document-files/documentDate";
 import { profileAttachmentBlob } from "../../application/health-profile/externalProfiles";
 import { provenanceCsv } from "../../application/territorial-statistics";
 import { loadOriginalFile } from "../../infrastructure/document-files/originalFiles";
@@ -32,6 +33,8 @@ interface Props {
   onArchiveDocument: (documentId: string) => Promise<void>;
   onDeleteDocument: (documentId: string) => Promise<boolean>;
   onSetDocumentCycle?: (documentId: string, cycle: DocumentCycle | undefined) => void;
+  /** Declara la fecha del documento («2019», «2019-05» o «2019-05-12»), o la retira con undefined. */
+  onSetDocumentDate?: (documentId: string, value: string | undefined) => void;
   onDeleteTerritorialSnapshot?: (snapshotId: string) => Promise<void>;
   onOpenProfile: () => void;
   onOpenTerritorialStatistics: () => void;
@@ -54,6 +57,16 @@ function typeLabel(d: MunicipalDocument): string {
   if (section === "plans") return "Plan de Acción municipal";
   if (section === "prioritization") return "Priorización";
   return KIND_LABEL[d.kind] ?? d.kind;
+}
+
+function DocumentDateControl({ value, onChange }: { value?: string; onChange: (value: string | undefined) => void }) {
+  const [draft, setDraft] = useState(value ?? "");
+  const parsed = parseDeclaredDate(draft);
+  return <span className="ea-date-edit">
+    <input aria-label="Fecha del documento" value={draft} onChange={e => setDraft(e.target.value)} placeholder="2019, 2019-05 o 2019-05-12" />
+    <button type="button" className="ea-act" disabled={!parsed} onClick={() => parsed && onChange(parsed.value)}>Guardar</button>
+    {value && <button type="button" className="ea-act" onClick={() => { setDraft(""); onChange(undefined); }}>Quitar</button>}
+  </span>;
 }
 
 function FileButton({ label, onFile, disabled }: { label: string; onFile: (file: File) => void; disabled?: boolean }) {
@@ -109,7 +122,9 @@ export function ExpedienteArchive(props: Props) {
   const renderRow = (row: ArchiveDocumentRow) => {
     const d = row.document;
     const link = row.file === "none" ? documentAccessUrl(d.source.url) : undefined;
+    const date = documentDate(d);
     return <tr key={d.id}>
+      <td className="ea-date">{date ? <>{formatDocumentDate(date)}{date.source === "title" && <small>según el título</small>}</> : <span className="ea-none">Sin fecha</span>}</td>
       <th scope="row"><strong>{d.title}</strong><small>{typeLabel(d)}{row.evidenceCount ? ` · ${row.evidenceCount} evidencias` : ""}{d.status === "archived" ? " · archivado" : d.status === "rejected" ? " · rechazado" : ""}</small></th>
       <td className="ea-file">
         {row.file === "stored" && <>{row.fileName}{row.fileSize !== undefined && <small>{formatMegabytes(row.fileSize)}</small>}</>}
@@ -133,16 +148,17 @@ export function ExpedienteArchive(props: Props) {
           if (!confirmChange(row, `«${d.title}» tiene versiones posteriores y no se puede eliminar. ¿Archivarlo? Se conserva con su archivo y deja de usarse en el diagnóstico.`)) return;
           void run("Archivando en Firebase…", () => props.onArchiveDocument(d.id), `«${d.title}» archivado.`);
         }}>Archivar</button>}
+        {canWrite && row.active && props.onSetDocumentDate && <details className="ea-cycle"><summary>Fecha</summary><DocumentDateControl value={d.temporal?.documentDate?.value} onChange={value => props.onSetDocumentDate!(d.id, value)} /></details>}
         {canWrite && row.active && props.onSetDocumentCycle && <details className="ea-cycle"><summary>Ciclo</summary><DocumentCycleControl cycle={d.cycle} onChange={cycle => props.onSetDocumentCycle!(d.id, cycle)} /></details>}
       </td>
     </tr>;
   };
 
   const table = (list: ArchiveDocumentRow[]) => <div className="ea-scroll"><table className="ea-table">
-    <thead><tr><th>Documento</th><th>Archivo</th><th>Acciones</th></tr></thead>
+    <thead><tr><th>Fecha</th><th>Documento</th><th>Archivo</th><th>Acciones</th></tr></thead>
     <tbody>{organizeMunicipalDocuments(list.map(r => r.document)).filter(s => s.documents.length > 0).flatMap(section => [
-      <tr key={`s-${section.id}`} className="ea-section"><th colSpan={3} scope="colgroup">{section.label.replace(/^\d+ · /, "")}</th></tr>,
-      ...section.documents.map(doc => renderRow(list.find(r => r.document.id === doc.id)!)),
+      <tr key={`s-${section.id}`} className="ea-section"><th colSpan={4} scope="colgroup">{section.label.replace(/^\d+ · /, "")}</th></tr>,
+      ...[...section.documents].sort(compareDocumentsByDateDesc).map(doc => renderRow(list.find(r => r.document.id === doc.id)!)),
     ])}</tbody>
   </table></div>;
 

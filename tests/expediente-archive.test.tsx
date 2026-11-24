@@ -53,6 +53,21 @@ const render = (ws: MunicipalityWorkspace, canWrite = true) => renderToStaticMar
   onOpenProfile={() => {}} onOpenTerritorialStatistics={() => {}} onOpenAssetValidations={() => {}} />);
 
 describe("Archivo del expediente", () => {
+  it("ordena los documentos de cada sección del más reciente al más antiguo y muestra su fecha", () => {
+    const docs = [
+      {id:"h-old",municipalityId:"loja",kind:"health-report",title:"Informe de Salud de Loja 2019",status:"uploaded",source:{},tags:[],createdAt:time,updatedAt:time},
+      {id:"h-new",municipalityId:"loja",kind:"health-report",title:"Informe sobre la situación de salud de Loja",status:"uploaded",source:{},tags:[],temporal:{documentDate:{value:"2026-10-05",precision:"day"}},createdAt:time,updatedAt:time},
+      {id:"h-none",municipalityId:"loja",kind:"health-report",title:"Informe sin fecha",status:"uploaded",source:{},tags:[],createdAt:time,updatedAt:time},
+    ];
+    const html = render(workspace({ repository: { ...repository, documents: docs } }));
+    const at = (t: string) => html.indexOf(t);
+    expect(at("Informe sobre la situación de salud de Loja")).toBeLessThan(at("Informe de Salud de Loja 2019"));
+    expect(at("Informe de Salud de Loja 2019")).toBeLessThan(at("Informe sin fecha"));
+    expect(html).toContain("5 oct 2026");
+    expect(html).toContain("2019<small>según el título</small>");
+    expect(html).toContain("Sin fecha");
+  });
+
   it("muestra en una sola pantalla documentos, estadística y Perfil, con sus acciones a la vista", () => {
     const html = render(workspace());
     expect(html).toContain("Archivo del expediente");

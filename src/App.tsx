@@ -6,6 +6,7 @@ import type { ProfileUpdateOutcome } from "./ui/components/ProfileUpdaterPanel";
 import { appendExternalProfile } from "./application/health-profile/externalProfiles";
 import { isTerritorialStatisticsSnapshot } from "./application/territorial-statistics/snapshots";
 import { territorialSnapshotDeletionBlock } from "./application/document-files/expedienteArchive";
+import { parseDeclaredDate, withDocumentDate } from "./application/document-files/documentDate";
 import type { TerritorialStatisticsSnapshot } from "./domain/territorial-statistics/TerritorialStatistics";
 import { ExternalProfileDashboard } from "./ui/components/ExternalProfileDashboard";
 import { TerritorialStatisticsPanel } from "./ui/components/TerritorialStatisticsPanel";
@@ -1641,6 +1642,20 @@ export default function App() {
       repository: setMunicipalDocumentCycle(prev.repository, documentId, cycle),
       updatedAt: new Date().toISOString(),
     }));
+  }
+
+  function handleSetDocumentDate(documentId: string, value: string | undefined) {
+    const date = value === undefined ? undefined : parseDeclaredDate(value);
+    if (value !== undefined && !date) return;
+    setWorkspace((prev) => {
+      const doc = prev.repository.documents.find((d) => d.id === documentId);
+      if (!doc) return prev;
+      return {
+        ...prev,
+        repository: setMunicipalDocumentTemporalMetadata(prev.repository, documentId, withDocumentDate(doc.temporal, date)),
+        updatedAt: new Date().toISOString(),
+      };
+    });
   }
 
   function handleAddConciliation(conciliation: Omit<CycleConciliation, "declaredAt">) {
@@ -3692,6 +3707,7 @@ export default function App() {
               onArchiveDocument={handleArchiveDocument}
               onDeleteDocument={handleDeleteDocument}
               onSetDocumentCycle={documentWriteAllowed ? handleSetDocumentCycle : undefined}
+              onSetDocumentDate={documentWriteAllowed ? handleSetDocumentDate : undefined}
               onDeleteTerritorialSnapshot={handleDeleteTerritorialSnapshot}
               onOpenProfile={() => { setView("psl"); window.scrollTo({ top: 0, behavior: "auto" }); }}
               onOpenTerritorialStatistics={() => {

@@ -34,4 +34,7 @@
 .ea-cycle summary { cursor: pointer; color: var(--texto-secundario); font-size: .8rem; }
 .ea-retired { margin-top: 10px; }
 .ea-retired summary { cursor: pointer; font-size: .85rem; color: var(--texto-secundario); }
-@media (max-width: 650px) { .ea-table { min-width: 640px; } }
+@media (max-width: 650px) { .ea-table { min-width: 720px; } }
+.ea-date { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ea-date-edit { display: inline-flex; gap: 4px; align-items: center; margin-top: 4px; }
+.ea-date-edit input { width: 11em; font: inherit; font-size: .8rem; padding: 2px 4px; }
