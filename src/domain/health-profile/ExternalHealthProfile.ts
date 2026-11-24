@@ -61,6 +61,22 @@ export interface ExternalHealthProfile {
  conditions?: ProfileCondition[];
  /** Conclusiones y recomendaciones marcadas para revisar en esta revisión. No forman parte del texto publicado. */
  reviewFlags?: ProfileReviewFlag[];
+ /**
+  * Elección del equipo técnico sobre las conclusiones y recomendaciones de esta
+  * revisión (Art. 16 ter; CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY §7). Una
+  * revisión nueva no hereda las elecciones de la anterior.
+  */
+ choices?: ProfileChoice[];
+}
+
+/** Decisión registrada sobre una conclusión («C3») o una recomendación («R2»). */
+export interface ProfileChoice {
+ target: string;
+ decision: 'chosen' | 'discarded';
+ by: string;
+ at: string;
+ /** Motivo del descarte, si se da. */
+ reason?: string;
 }
 
 /** Referencia a un valor de la estadística territorial: indicador del catálogo y ámbito. */

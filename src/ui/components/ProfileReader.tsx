@@ -15,7 +15,7 @@ function withCitations(text: string): ReactNode {
 const RECO_ORDER = ["Conocer", "Contrastar", "Abordar"] as const;
 const PAGE_CONTINUATION = /(?:[·•–—-]\s*|\()\s*continuaci[oó]n\b/i;
 
-function SectionBody({ section, structure }: { section: ProfileSection; structure: ProfileStructure }) {
+function SectionBody({ section, structure, discarded }: { section: ProfileSection; structure: ProfileStructure; discarded?: ReadonlySet<string> }) {
   if (/conclusiones/i.test(section.title) && !PAGE_CONTINUATION.test(section.title) && structure.conclusions.length > 0) {
     const firstConclusion = section.paragraphs.findIndex((p) => /^C\d+[.\s]/.test(p));
     const intro = firstConclusion > 0 ? section.paragraphs.slice(0, firstConclusion) : [];
@@ -24,8 +24,9 @@ function SectionBody({ section, structure }: { section: ProfileSection; structur
         {intro.map((p, i) => <p key={`i${i}`}>{withCitations(p)}</p>)}
         <ol className="epr-conclusions">
           {structure.conclusions.map((c) => (
-            <li key={c.id} id={`epr-${c.id}`}>
+            <li key={c.id} id={`epr-${c.id}`} className={discarded?.has(c.id) ? "epr-discarded" : undefined}>
               <h4><span className="epr-badge">{c.id}</span>{c.title}</h4>
+              {discarded?.has(c.id) && <p className="epr-discarded__label">Descartada por el equipo técnico</p>}
               {c.body.map((p, i) => <p key={i}>{withCitations(p)}</p>)}
               {c.leadsTo && <p className="epr-leads">Lleva a {c.leadsTo}</p>}
             </li>
@@ -46,9 +47,9 @@ function SectionBody({ section, structure }: { section: ProfileSection; structur
             <h4>{g.type}</h4>
             <ul>
               {g.items.map((r) => (
-                <li key={r.id} id={`epr-${r.id}`}>
+                <li key={r.id} id={`epr-${r.id}`} className={discarded?.has(r.id) ? "epr-discarded" : undefined}>
                   <span className="epr-badge">{r.id}</span>
-                  <span>{withCitations(r.text)}{r.derivesFrom && <small> · Deriva de {r.derivesFrom}</small>}</span>
+                  <span>{withCitations(r.text)}{r.derivesFrom && <small> · Deriva de {r.derivesFrom}</small>}{discarded?.has(r.id) && <small className="epr-discarded__label"> · Descartada por el equipo técnico</small>}</span>
                 </li>
               ))}
             </ul>
@@ -67,7 +68,7 @@ function SectionBody({ section, structure }: { section: ProfileSection; structur
  * Lector del Perfil: índice navegable y texto con su estructura reconocida.
  * El texto es el del perfil guardado; la estructura solo cambia la presentación.
  */
-export function ProfileReader({ structure, pdfUrl, title }: { structure: ProfileStructure; pdfUrl?: string; title: string }) {
+export function ProfileReader({ structure, pdfUrl, title, discarded }: { structure: ProfileStructure; pdfUrl?: string; title: string; discarded?: ReadonlySet<string> }) {
   const [mode, setMode] = useState<"text" | "pdf">("text");
   const [query, setQuery] = useState("");
   const sections = useMemo(() => structure.sections.filter((s) => s.id !== "inicio" || s.paragraphs.length), [structure]);
@@ -171,7 +172,7 @@ export function ProfileReader({ structure, pdfUrl, title }: { structure: Profile
                 {preliminaries.map((section) => (
                   <section key={section.id} id={`epr-sec-${section.id}`} className="epr-section epr-section--preliminary">
                     {section.title !== "Inicio" && <h3>{section.title}</h3>}
-                    <SectionBody section={section} structure={structure} />
+                    <SectionBody section={section} structure={structure} discarded={discarded} />
                   </section>
                 ))}
               </details>
@@ -193,11 +194,11 @@ export function ProfileReader({ structure, pdfUrl, title }: { structure: Profile
                       {openingSections.map((original) => (
                         <section key={original.id} className="epr-section epr-section--opening-source">
                           {original.title !== "Inicio" && <h3>{original.title}</h3>}
-                          <SectionBody section={original} structure={structure} />
+                          <SectionBody section={original} structure={structure} discarded={discarded} />
                         </section>
                       ))}
                     </>
-                  ) : <SectionBody section={s} structure={structure} />}
+                  ) : <SectionBody section={s} structure={structure} discarded={discarded} />}
                 </section>
               );
             })}

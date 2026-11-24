@@ -122,6 +122,10 @@ describe("capa 3: paquete de texto", () => {
     expect(r.profile!.text).toContain("el índice de Gini es 33,1");
     expect(r.profile!.reviewFlags!.map(f => f.target)).toEqual(["C14", "R7"]);
     expect(r.profile!.title).toBe("Perfil · revisión 0.10.0 · 18/11/2027");
+    const chosen = { ...library, profiles: [{ ...base, choices: [{ target: "C1", decision: "chosen" as const, by: "B", at: "2026-11-18T01:00:00Z" }] }] };
+    const fresh = buildProfileUpdate({ library: chosen, snapshots: [snap(33.1, 31.5)], kinds: ["paquete-texto", "cifras-conclusiones"], textPackage: pkg, author: "B", now: new Date("2027-11-18T10:00:00Z"), newId: () => "n" });
+    // La revisión nueva se presenta como menú sin elegir (custodia §7.1).
+    expect(fresh.profile!.choices).toBeUndefined();
     const other = buildProfileUpdate({ library: { ...library, profiles: [{ ...base, title: "Perfil · revisión 0.8.2 · 17/11/2026" }] }, kinds: ["paquete-texto"], textPackage: pkg, author: "B", now: new Date(), newId: () => "n" });
     expect(other.blocked).toMatch(/se redactó sobre/);
   });

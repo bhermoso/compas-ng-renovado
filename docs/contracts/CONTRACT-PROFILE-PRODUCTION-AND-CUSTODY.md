@@ -1,8 +1,8 @@
 # Contrato de elaboración, entrega y conservación del Perfil de Salud Local
 
-> Versión 1.0 — 2026-11-23. Estado: VIGENTE (aprobado por el responsable el 2026-11-23).
+> Versión 1.1 — 2026-11-24. Estado: VIGENTE (aprobado por el responsable el 2026-11-23).
 >
-> Subordinado a [`CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`](CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md) v3.0.0. Si lo contradice, prevalece el contrato metodológico.
+> Subordinado a [`CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY`](CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md) v3.0.1. Si lo contradice, prevalece el contrato metodológico.
 >
 > Integra y sustituye a la propuesta de contrato externo v1.1 (12-11-2026), la guía de entrega (12-11-2026, ajustada el 17-11-2026), el documento de arquitectura EXTERNAL-PROFILE (29-10-2026) y el criterio de calidad «Perfil validado» (19-10-2026). Esos documentos pasan a `docs/historico/contratos-perfil/`.
 
@@ -112,6 +112,9 @@ COMPÁS distingue cuatro estados: original aportado; texto derivado para consult
 3. COMPÁS no suprime texto del original. Si se descarta alguna propuesta, la versión institucional es una revisión nueva del equipo redactor que solo contiene las elegidas; mientras no exista, la representación de COMPÁS rotula como descartadas las que lo están.
 4. Una revisión no puede validarse con propuestas sin resolver.
 5. Elegir no es priorizar: la priorización es del Grupo Motor.
+6. Una revisión nueva, cargada o generada por el actualizador, no hereda las elecciones de la anterior: vuelve a presentarse como menú.
+
+Implementación: pestaña «Elección del equipo técnico» del Perfil (`src/ui/components/ProfileChoiceMenu.tsx`, `src/application/health-profile/profileChoices.ts`). Las decisiones se guardan juntas en Firebase; la pantalla, la impresión y la exportación a Word rotulan lo descartado, y la planificación no lo recibe.
 
 ## 8. Validación y su efecto
 
@@ -145,9 +148,8 @@ Las revisiones se conservan. Eliminar una es una operación explícita, con conf
 
 ## 11. Pendientes de implementación
 
-- El menú de elección del §7 sobre el Perfil cargado.
 - Campos propios para la versión editorial y la fecha del documento.
-- Cotejo completo de los Perfiles vigentes de Alfacar, Atarfe, Loja y Zagra contra este contrato y el metodológico v3.0.0.
+- Cotejo completo de los Perfiles vigentes de Alfacar, Atarfe, Loja y Zagra contra este contrato y el metodológico v3.0.1.
 
 ## Registro de revisiones
 
@@ -155,4 +157,5 @@ Las revisiones se conservan. Eliminar una es una operación explícita, con conf
 |---|---|---|
 | 2026-11-03 | Propuesta 1.0 | Elaboración externa, custodia y fidelidad de representaciones (contrato externo) |
 | 2026-11-12 | Propuesta 1.1 | Entrega reproducible, distinción entre vigente e histórico, renta, activos, participación, aceptación y dependencias; guía de entrega |
+| 2026-11-24 | 1.1 | §7: menú de elección implementado; regla 6 (una revisión nueva no hereda elecciones). §11 sin el menú. Encargo del responsable del 2026-11-24 («acepto la secuencia propuesta») | COMPÁS |
 | 2026-11-23 | 1.0 | Contrato único de elaboración, entrega y conservación. Integra el contrato externo, la guía de entrega, EXTERNAL-PROFILE y el criterio de calidad «Perfil validado». Seis páginas de datos (metodológico v2.5.0); menú de elección en COMPÁS sobre el Perfil cargado; Localiza Salud, fuente exclusiva de activos. Aprobado por el responsable |

@@ -463,3 +463,22 @@
   .external-profile .epd-row__details { grid-column: 2;grid-row: 2 / 4; }
   .external-profile .epd-row__details[open] { grid-column: 1 / -1; grid-row: 4; }
 }
+
+/* Menú de elección del equipo técnico (Art. 16 ter) */
+.ep-choice{padding:28px;background:white;border:1px solid var(--ep-line)}
+.ep-choice h3{margin:26px 0 8px;font-size:16px}
+.ep-choice__list{list-style:none;padding:0;margin:0}
+.ep-choice__item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 20px;align-items:start;padding:14px 0 14px 12px;border-bottom:1px solid var(--ep-line);border-left:3px solid transparent}
+.ep-choice__text{display:flex;gap:4px;font-size:14px;line-height:1.55}
+.ep-choice__decision{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;border:0;padding:0;margin:0;font-size:13px}
+.ep-choice__decision label{display:inline-flex;gap:6px;align-items:center}
+.ep-choice__reason{flex-basis:100%;flex-direction:column;align-items:stretch!important}
+.ep-choice__reason input{font:inherit;border:1px solid var(--borde);border-radius:3px;padding:6px 8px;min-width:240px}
+.ep-choice__record{grid-column:1/-1;color:var(--ep-muted);font-size:12px}
+.ep-choice__item--chosen{border-left-color:var(--ep-blue)}
+.ep-choice__item--discarded{border-left-color:var(--ep-muted)}
+.ep-choice__item--discarded .ep-choice__text{color:var(--ep-muted)}
+.epr-discarded{color:var(--ep-muted)}
+.epr-discarded__label{display:block;font-size:12px;font-weight:600;color:var(--ep-muted);letter-spacing:.02em}
+@media(max-width:680px){.ep-choice{padding:20px}.ep-choice__item{grid-template-columns:1fr}}
+@media print{.ep-choice{display:none}}

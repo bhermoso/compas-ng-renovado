@@ -4,6 +4,8 @@ import { prepareZagraHistoricalRevision, ZAGRA_HISTORICAL_RESULTS } from '../../
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { parseProfileStructure, prefillFromStructure } from '../../application/health-profile/profileStructure';
 import { ProfileReader } from './ProfileReader';
+import { ProfileChoiceMenu } from './ProfileChoiceMenu';
+import { discardedProposals, pendingProposals, profileProposals } from '../../application/health-profile/profileChoices';
 import type { ExternalHealthProfile, ExternalProfileLibrary, ProfileAttachment, ProfileResult } from '../../domain/health-profile/ExternalHealthProfile';
 import type { LocalHealthProfileArtifact } from '../../domain/health-profile-artifact';
 import { appendExternalProfile, archiveExternalProfileVersion, deleteExternalProfileVersion, importProfileFile, prepareImportedProfileRevision, profileAttachmentBlob } from '../../application/health-profile/externalProfiles';
@@ -45,7 +47,7 @@ function emptyProfile(municipalityId: string): ExternalHealthProfile {
 }
 export function ExternalProfileDashboard({compact=false,municipalityId,municipalityName,library,legacyProfiles=[],legacyText,authorName,onSave,onDirtyChange,incomingTerritorialRevision,onIncomingTerritorialRevisionConsumed,updaterMunicipalities,onRunProfileUpdates}: Props) {
  const [selectedId,setSelectedId]=useState(library.activeId);
- const [tab,setTab]=useState<'results'|'document'|'versions'|'laboratory'|'updater'|null>(compact ? null : 'results');
+ const [tab,setTab]=useState<'results'|'document'|'choice'|'versions'|'laboratory'|'updater'|null>(compact ? null : 'results');
  const [draft,setDraft]=useState<ExternalHealthProfile>();
  const [newFiles,setNewFiles]=useState<ProfileAttachment[]>([]);
  const [busy,setBusy]=useState(false); const [message,setMessage]=useState(''); const [error,setError]=useState('');
@@ -109,6 +111,9 @@ export function ExternalProfileDashboard({compact=false,municipalityId,municipal
  const files=library.attachments.filter(f=>selected?.attachmentIds.includes(f.id));
  const selectedText=selected?.text;
  const structure=useMemo(()=>selectedText ? parseProfileStructure(selectedText) : undefined,[selectedText]);
+ const proposalCount=selected ? profileProposals(selected).length : 0;
+ const pendingChoices=selected ? pendingProposals(selected) : [];
+ const discarded=selected ? discardedProposals(selected) : new Set<string>();
  const [readerAnchor,setReaderAnchor]=useState<string>();
  useEffect(()=>{
   if(tab!=='document'||!readerAnchor)return;
@@ -182,7 +187,7 @@ export function ExternalProfileDashboard({compact=false,municipalityId,municipal
  }
  function edit() {
   if(!selected)return;
-  setDraft({...structuredClone(selected),id:crypto.randomUUID(),revisionOf:selected.id,createdAt:new Date().toISOString(),status:'review',validatedBy:undefined,validatedAt:undefined,archivedAt:undefined,archivedBy:undefined});
+  setDraft({...structuredClone(selected),id:crypto.randomUUID(),revisionOf:selected.id,createdAt:new Date().toISOString(),status:'review',validatedBy:undefined,validatedAt:undefined,archivedAt:undefined,archivedBy:undefined,choices:undefined});
   setNewFiles([]);setResultDraft(undefined);setError('');setMessage('Estás preparando una nueva revisión. La versión anterior y sus originales se conservan.');
  }
  async function archiveVersion(profile:ExternalHealthProfile){
@@ -235,6 +240,7 @@ export function ExternalProfileDashboard({compact=false,municipalityId,municipal
  const spaces = selected ? ([
   ['results','Perfil', `${selected.results.length} indicadores · ${selected.id===library.activeId?'versión vigente':'revisión no vigente'}`],
   ['document','Documento completo', structure ? 'Lectura por apartados' : pdf ? 'PDF original adjunto' : 'Sin texto extraíble'],
+  ['choice','Elección del equipo técnico', proposalCount ? `${proposalCount-pendingChoices.length} de ${proposalCount} resueltas` : 'Sin conclusiones ni recomendaciones reconocibles'],
   ['versions','Gestión y versiones', `${library.profiles.length} ${library.profiles.length===1?'versión':'versiones'} · ${selected.status==='validated'?'validada':'en revisión'}`],
   ...(onRunProfileUpdates ? [['updater','Actualizador de perfiles','Nuevas fuentes, en una revisión aparte'] as const] : []),
   ['laboratory','Laboratorio experimental','Ensayos editoriales sin efecto en el Perfil'],
@@ -352,13 +358,14 @@ export function ExternalProfileDashboard({compact=false,municipalityId,municipal
       <button type="button" className="ep-primary" onClick={()=>printCompleteProfile(fullProfileRef.current,`${selected.title} · ${municipalityName}`)}>↓ Exportar presentación COMPÁS · PDF</button>
       {pdf && fileUrls[pdf.id] ? <a className="ep-original-download" href={fileUrls[pdf.id]} download={pdf.name}>↓ Descargar PDF original · {pdf.name}</a> : <span className="ep-help">PDF original no adjunto a esta versión.</span>}
     </div>
-    <div ref={fullProfileRef}><ProfileResultsDashboard profile={selected} municipalityName={municipalityName} structure={structure} pdfUrl={pdf ? fileUrls[pdf.id] : undefined} pdfName={pdf?.name} onOpenReader={anchor=>{setReaderAnchor(anchor);setTab('document');}}/></div></main>}
+    <div ref={fullProfileRef}><ProfileResultsDashboard profile={selected} municipalityName={municipalityName} structure={structure} discarded={discarded} pdfUrl={pdf ? fileUrls[pdf.id] : undefined} pdfName={pdf?.name} onOpenReader={anchor=>{setReaderAnchor(anchor);setTab('document');}}/></div></main>}
    {tab==='document'&&<main className="ep-main ep-main--document"><section className="ep-document-view"><h2>{selected.title}</h2>
     {selected.revisionOf&&<p className="ep-help">El texto puede contener cambios de esta revisión. Los archivos adjuntos siguen siendo los originales aportados.</p>}
-    {structure ? <ProfileReader structure={structure} title={selected.title} pdfUrl={pdf ? fileUrls[pdf.id] : undefined}/>
+    {structure ? <ProfileReader structure={structure} title={selected.title} pdfUrl={pdf ? fileUrls[pdf.id] : undefined} discarded={discarded}/>
      : pdf&&fileUrls[pdf.id] ? <><p><a href={fileUrls[pdf.id]} target="_blank" rel="noopener noreferrer">Abrir PDF original en otra pestaña</a></p><iframe title="PDF original del Perfil de Salud Local" src={fileUrls[pdf.id]}/></>
      : <p>No hay texto extraíble. Consulta el archivo original o incorpora una transcripción.</p>}
    </section></main>}
+   {tab==='choice'&&<main className="ep-main ep-main--choice"><ProfileChoiceMenu key={selected.id} profile={selected} authorName={authorName} busy={busy} onSave={next=>commit({...library,profiles:library.profiles.map(p=>p.id===next.id?next:p)},'Elección registrada en Firebase.')}/></main>}
    {tab==='updater'&&onRunProfileUpdates&&<main className="ep-main ep-main--statistics"><ProfileUpdaterPanel municipalities={updaterMunicipalities??[]} currentId={municipalityId} onRun={onRunProfileUpdates}/></main>}
    {tab==='laboratory'&&<main className="ep-main ep-main--laboratory"><ProfileEditorialLab key={selected.id} profile={selected}/></main>}
    {tab==='versions'&&<main className="ep-main ep-main--management">
@@ -377,7 +384,7 @@ export function ExternalProfileDashboard({compact=false,municipalityId,municipal
     <section className="ep-versions"><p className="ep-eyebrow">HISTORIAL CONSERVADO EN FIREBASE</p><h2>Versiones del perfil</h2><p className="ep-version-summary" role="status">{library.profiles.length} versiones · {library.activeId?1:0} vigente{library.activeId?'':'s'} · {library.profiles.length} eliminables. <strong>Eliminar</strong> está disponible incluso en la versión vigente; <strong>Archivar</strong> solo en las no vigentes. Ninguna acción se realiza sin confirmación y guardado remoto.</p>{[...library.profiles].reverse().map(p=><article key={p.id}><div><h3>{p.title}</h3><p>{date(p.createdAt)} · {p.author||'Autoría no declarada'} · {p.status==='validated'?'Validada':'En revisión'}{p.id===library.activeId?' · Vigente':''}{p.archivedAt?' · Archivada':''}</p></div><div className="ep-actions"><button onClick={()=>{setSelectedId(p.id);setTab('document');}}>Consultar versión</button>{p.id!==library.activeId&&!p.archivedAt&&<button disabled={busy} onClick={()=>void commit({...library,activeId:p.id},'Versión vigente actualizada en Firebase.')}>Establecer como vigente</button>}
       {p.id!==library.activeId&&!p.archivedAt&&<button disabled={busy} onClick={()=>void archiveVersion(p)}>Archivar versión</button>}
       <button type="button" className="ep-delete-version" aria-label={`Eliminar versión de ${p.title}${p.id===library.activeId?' (vigente)':''}`} title="Eliminar definitivamente esta versión con confirmación" disabled={busy} onClick={()=>void deleteVersion(p)}>Eliminar versión</button></div></article>)}</section></div>
-    {selected.id===library.activeId&&selected.status==='review'&&<section className="ep-validation"><div><h3>Revisión técnica</h3><p>La incorporación no valida el contenido. La validación quedará vinculada a esta versión y a tu cuenta.</p></div><button disabled={busy} onClick={()=>{if(!authorName.trim()){setError('Identifícate para registrar la validación.');return;}if(window.confirm('¿Registrar la validación técnica de esta versión con tu cuenta?'))void commit({...library,profiles:library.profiles.map(p=>p.id===selected.id?{...p,status:'validated',validatedAt:new Date().toISOString(),validatedBy:authorName}:p)},'Validación técnica registrada en Firebase.');}}>Registrar validación técnica</button></section>}
+    {selected.id===library.activeId&&selected.status==='review'&&<section className="ep-validation"><div><h3>Revisión técnica</h3><p>La incorporación no valida el contenido. La validación quedará vinculada a esta versión y a tu cuenta.</p>{pendingChoices.length>0&&<p role="note">Antes de validar, elige o descarta {pendingChoices.length===1?'la propuesta pendiente':`las ${pendingChoices.length} propuestas pendientes`} ({pendingChoices.join(', ')}) en «Elección del equipo técnico».</p>}</div><button disabled={busy||pendingChoices.length>0} onClick={()=>{if(pendingChoices.length){setError('Quedan conclusiones o recomendaciones sin elegir ni descartar.');return;}if(!authorName.trim()){setError('Identifícate para registrar la validación.');return;}if(window.confirm('¿Registrar la validación técnica de esta versión con tu cuenta?'))void commit({...library,profiles:library.profiles.map(p=>p.id===selected.id?{...p,status:'validated',validatedAt:new Date().toISOString(),validatedBy:authorName}:p)},'Validación técnica registrada en Firebase.');}}>Registrar validación técnica</button></section>}
    </main>}
   </>}
   {!draft&&(compact ? <details className={`ep-access hp-phase hp-phase--${selected ? Math.min(spaces.length, 5) + 1 : 2}`}><summary><strong>Comprobar PDF original</strong><span>Cotejar un PDF con los registros, sin guardar</span></summary><div className="ep-access__body"><ProfileOriginalVerifier key={municipalityId} library={library}/></div></details> : <ProfileOriginalVerifier key={municipalityId} library={library}/>)}

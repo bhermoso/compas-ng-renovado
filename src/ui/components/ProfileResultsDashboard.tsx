@@ -78,8 +78,10 @@ const RECO_HINT: Record<string, string> = {
 };
 
 /** Vista «Resultados» del perfil externo: lectura, conclusiones, datos y recomendaciones. */
-export function ProfileResultsDashboard({ profile, municipalityName, onAddResults, structure, onOpenReader, pdfUrl, pdfName }: {
+export function ProfileResultsDashboard({ profile, municipalityName, onAddResults, structure, onOpenReader, pdfUrl, pdfName, discarded }: {
   profile: ExternalHealthProfile;
+  /** Propuestas descartadas por el equipo técnico: se rotulan, no se ocultan. */
+  discarded?: ReadonlySet<string>;
   municipalityName: string;
   onAddResults?: () => void;
   /** Estructura reconocida en el texto del perfil: suple lo que el paquete no trae. */
@@ -214,8 +216,8 @@ export function ProfileResultsDashboard({ profile, municipalityName, onAddResult
             {findings.map((f, i) => {
               const match = /^(C\d+)\.\s*(.*)$/.exec(f);
               const id = match?.[1] ?? `C${i + 1}`;
-              const content = <><span className="epd-findings__id">{id}</span><span>{match?.[2] ?? f}</span></>;
-              return <li key={i}>{onOpenReader && structure?.conclusions.some((c) => c.id === id)
+              const content = <><span className="epd-findings__id">{id}</span><span>{match?.[2] ?? f}{discarded?.has(id) && <small className="epr-discarded__label">Descartada por el equipo técnico</small>}</span></>;
+              return <li key={i} className={discarded?.has(id) ? "epr-discarded" : undefined}>{onOpenReader && structure?.conclusions.some((c) => c.id === id)
                 ? <button type="button" className="epd-findings__open" onClick={() => onOpenReader(`epr-${id}`)} aria-label={`Leer ${id} en el documento`}>{content}</button>
                 : content}</li>;
             })}
@@ -235,10 +237,11 @@ export function ProfileResultsDashboard({ profile, municipalityName, onAddResult
                 <h3>{g.type}<span>{RECO_HINT[g.type]}</span></h3>
                 <ul>
                   {g.items.map((item) => (
-                    <li key={item.id}>
+                    <li key={item.id} className={discarded?.has(item.id) ? "epr-discarded" : undefined}>
                       <strong>{item.id}</strong>
                       <span>{item.text.replace(new RegExp(`^${item.id}\\.\\s*`), "")}</span>
                       {item.derivesFrom && <small>Deriva de {item.derivesFrom}</small>}
+                      {discarded?.has(item.id) && <small className="epr-discarded__label">Descartada por el equipo técnico</small>}
                     </li>
                   ))}
                 </ul>

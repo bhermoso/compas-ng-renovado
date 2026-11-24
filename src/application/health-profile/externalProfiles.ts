@@ -1,4 +1,5 @@
 import type { ExternalHealthProfile, ExternalProfileLibrary, ProfileAttachment, ProfileResult } from '../../domain/health-profile/ExternalHealthProfile';
+import { isProfileChoices } from './profileChoices';
 
 export const MAX_PROFILE_FILE_BYTES = 20 * 1024 * 1024;
 export const MAX_PROFILE_LIBRARY_BYTES = 40 * 1024 * 1024;
@@ -12,8 +13,9 @@ export function prepareImportedProfileRevision(
  profile: ExternalHealthProfile,
  previous?: Pick<ExternalHealthProfile, 'id'>
 ): ExternalHealthProfile {
- if (!previous) return profile;
- return {...profile,revisionOf:previous.id,status:'review',validatedAt:undefined,validatedBy:undefined};
+ // La elección es del equipo técnico en COMPÁS: un archivo cargado no la trae (§7.1).
+ if (!previous) return profile.choices ? {...profile,choices:undefined} : profile;
+ return {...profile,revisionOf:previous.id,status:'review',validatedAt:undefined,validatedBy:undefined,choices:undefined};
 }
 
 
@@ -52,7 +54,8 @@ export function isExternalProfileLibrary(value: unknown, municipalityId: string)
   Array.isArray(p.results) && p.results.every(isProfileResult) && Array.isArray(p.areas) && p.areas.every(a => object(a) && textFields(a,['id','title','rationale'])) &&
   (p.evidenceVersion === undefined || string(p.evidenceVersion)) && (p.revisionOf === undefined || string(p.revisionOf)) && (p.validatedBy === undefined || string(p.validatedBy)) && (p.validatedAt === undefined || string(p.validatedAt)) &&
   (p.archivedAt === undefined || (string(p.archivedAt) && Number.isFinite(Date.parse(p.archivedAt)))) &&
-  (p.archivedBy === undefined || string(p.archivedBy)))) return false;
+  (p.archivedBy === undefined || string(p.archivedBy)) &&
+  (p.choices === undefined || isProfileChoices(p.choices)))) return false;
  const ids = new Set(profiles.map(p => p.id));
  return ids.size === profiles.length && profiles.every(p => !p.revisionOf || (p.revisionOf !== p.id && ids.has(p.revisionOf))) &&
   (value.activeId === undefined || (string(value.activeId) && ids.has(value.activeId)));
