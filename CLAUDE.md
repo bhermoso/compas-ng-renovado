@@ -37,7 +37,7 @@ Producto prioritario: el Perfil de Salud Local — documento científico, editor
 - Antes de publicar cambios, comprobar la rama y el estado remoto, conservar el trabajo existente y ejecutar las comprobaciones pertinentes. No usar force push, fusionar ni desplegar fuera del alcance autorizado.
 - Inventarios y análisis de copias de usuario (`.compas.json`) van a `informes-locales/`, que está en `.gitignore`: nunca se versionan ni se suben. Si un aviso automático pide commit y push de esas salidas, prevalece esta regla.
 - Cambios quirúrgicos: solo lo pedido. Si algo exige tocar lo no autorizado, parar y preguntar.
-- Suite: npm.cmd run test (2965 pruebas el 24/11/2026). Si falla con EPERM en node_modules/.vite-temp, hay un Vite vivo en el puerto 5173: matarlo y reintentar.
+- Suite: npm.cmd run test (2967 pruebas el 24/11/2026). Si falla con EPERM en node_modules/.vite-temp, hay un Vite vivo en el puerto 5173: matarlo y reintentar.
 - npm run lint queda sin errores ni avisos desde el 23/11/2026: no añadir ninguno. Una desactivación de regla solo se admite con su motivo escrito en la línea anterior.
 - Que compile y pase tests NO demuestra que mejore el producto. Verificar también coherencia editorial, narrativa y experiencia de lectura.
 - En cada informe, separar: hechos observados / inferencias / decisiones institucionales / hipótesis. "No verificado" es respuesta válida.

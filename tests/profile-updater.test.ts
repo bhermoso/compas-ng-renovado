@@ -67,7 +67,8 @@ describe("actualizador de perfiles", () => {
   });
 
   it("ordena las seis páginas, compila las de datos y conserva el texto del equipo y los anexos", () => {
-    const t = run(["paginas-datos", "rotulos"]).profile!.text;
+    const r = run(["paginas-datos", "rotulos"]);
+    const t = r.profile!.text;
     const heads = ["Alfacar en datos", "Contexto y población", "Ejes de desigualdad", "Condiciones de vida", "Servicios", "Salud y bienestar", "1. Punto de partida"];
     const at = heads.map(h => t.split("\n\n").indexOf(h));
     expect(at.every((x, i) => x >= 0 && (i === 0 || x > at[i - 1]))).toBe(true);
@@ -82,7 +83,9 @@ describe("actualizador de perfiles", () => {
     expect(t.trim().endsWith("Anexo C. Indicadores y comparaciones\n\nDesigualdad")).toBe(true);
     expect(t.split("\n\n").filter(p => p.startsWith("T31025.")).length).toBe(1);
     expect(t).toContain("B120971. IECA. Tasa municipal de desempleo registrado. Año 2025. Consulta 120971 del BADEA.");
-    expect(t).toMatch(/Revisión 0\.9\.0, 18\/11\/2026, generada con el Actualizador de perfiles/);
+    // La nota de la revisión va al historial de la revisión, no al texto (§2.2).
+    expect(t).not.toMatch(/generada con el Actualizador de perfiles/);
+    expect(r.profile!.revisionLog?.at(-1)).toMatch(/^Revisión 0\.9\.0, 18\/11\/2026, generada con el Actualizador de perfiles/);
     const s = parseProfileStructure(t);
     expect(s.dataPages?.livingConditions.length).toBeGreaterThan(0);
     expect(s.dataPages?.services.length).toBeGreaterThan(0);
@@ -177,12 +180,24 @@ describe("campos del paquete derivados del texto (CONTRACT-PROFILE-UPDATER §8)"
     areas: [{ id: "R1", title: "R1. Cuidados. Valorar apoyos.", rationale: "Abordar · Deriva de C1" }] };
   const fix = () => buildProfileUpdate({ library: { profiles: [stale], attachments: [], activeId: "v040" }, kinds: ["campos-derivados"], author: "B", now: new Date("2026-11-18T15:00:00Z"), newId: () => "corr" });
 
+  it("traslada al historial las notas que revisiones anteriores dejaron en el texto", () => {
+    const old = "Revisión 0.4.0, 18/11/2026, generada con el Actualizador de perfiles de COMPÁS a partir de la revisión 0.3.1: Paquete de texto. El resto del texto no cambia. Pendiente de revisión técnica.";
+    const withNote = body.replace("Referencias", ["Anexos", "A. Territorio y secciones censales", "Tabla del anexo.", old, "Referencias"].join("\n\n"));
+    const r = buildProfileUpdate({ library: { profiles: [{ ...stale, text: withNote, revisionLog: ["Nota más antigua."] }], attachments: [], activeId: "v040" }, kinds: ["campos-derivados"], author: "B", now: new Date("2026-11-18T15:00:00Z"), newId: () => "corr" });
+    expect(r.profile!.text).not.toContain("generada con el Actualizador");
+    expect(r.profile!.text).toContain("Tabla del anexo.\n\nReferencias");
+    expect(r.profile!.revisionLog?.slice(0, 2)).toEqual(["Nota más antigua.", old]);
+    expect(r.profile!.revisionLog).toHaveLength(3);
+    expect(r.changes.join(" ")).toContain("La nota de la revisión anterior pasa del texto al historial de la revisión.");
+  });
+
   it("una corrección sin cambio de texto sube solo el número de corrección", () => {
     expect(nextRevisionNumber("Perfil · revisión 0.9.0 · 18/11/2026", true)).toEqual({ from: "0.9.0", to: "0.9.1" });
     const r = fix();
     expect(r.blocked).toBeUndefined();
     expect(r.profile!.title).toBe("Perfil de Salud Local de Zagra · revisión 0.4.1 · 18/11/2026");
-    expect(r.profile!.text).toContain("Revisión 0.4.1, 18/11/2026");
+    expect(r.profile!.revisionLog?.at(-1)).toMatch(/^Revisión 0\.4\.1, 18\/11\/2026/);
+    expect(r.profile!.text).toBe(stale.text);
   });
 
   it("rehace resumen, conclusiones y recomendaciones desde el texto", () => {

@@ -1,7 +1,7 @@
 # CONTRACT-PROFILE-UPDATER
 
 > Actualizador de perfiles: aplicar un cambio declarado a cualquier expediente
-> Versión 1.2.1 — 2026-11-18
+> Versión 1.3.0 — 2026-11-24
 > Estado: VIGENTE
 >
 > Implementación: `src/application/health-profile/profileUpdater.ts`,
@@ -24,8 +24,12 @@ expediente de forma reproducible.
    revisión** del Perfil vigente. La vigente no cambia hasta que el usuario valida
    la nueva (`CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY`).
 2. Es una transformación declarada: cada tipo de cambio tiene reglas fijas, iguales
-   en todos los expedientes, y la revisión registra los cambios aplicados en
-   «Autoría y revisión» y en sus limitaciones.
+   en todos los expedientes. La revisión registra los cambios aplicados en su
+   historial de revisión, que COMPÁS conserva y muestra en «Gestión y versiones», y
+   en sus limitaciones. El historial no forma parte del texto del Perfil: el
+   documento no habla de cómo se generó. En el texto solo cambian el número y la
+   fecha de la revisión. Las notas que versiones anteriores del actualizador
+   escribieron en el texto pasan al historial en la siguiente revisión generada.
 3. No redacta conclusiones ni recomendaciones. El texto de autoría del equipo
    (cuerpo, recomendaciones, anexos) se conserva literalmente.
 
@@ -111,6 +115,7 @@ expediente de forma reproducible.
 
 | Fecha | Versión | Cambio | Responsable |
 |---|---|---|---|
+| 2026-11-24 | 1.3.0 | §2.2: el registro de cambios sale del texto del Perfil y pasa al historial de la revisión (`revisionLog`); las notas anteriores se trasladan en la siguiente revisión. Decisión del responsable del 2026-11-24, a propuesta de COMPÁS, tras la lectura completa de los cuatro Perfiles vigentes | COMPÁS |
 | 2026-11-18 | 1.2.1 | §8.4 la nota de limitaciones nombra los archivos adjuntos. Origen: las correcciones 0.9.1, 0.8.1, 0.6.1 y 0.4.1 decían que el PDF adjunto correspondía a 0.9.0, 0.8.0, 0.6.0 y 0.4.0, que no tienen PDF propio | COMPÁS NG |
 | 2026-11-18 | 1.2.0 | §8 campos del paquete derivados del texto y revisión de corrección. Origen: las revisiones de Atarfe, Loja y Zagra del 18/11/2026 conservaban el resumen, las conclusiones y las recomendaciones de la revisión anterior | COMPÁS NG |
 | 2026-11-18 | 1.1.0 | §6 cifras enlazadas y condiciones de las conclusiones (capa 2); §7 paquete de texto redactado fuera de COMPÁS (capa 3). Decisión del autor: «de momento capas 2 y 3» | COMPÁS NG |

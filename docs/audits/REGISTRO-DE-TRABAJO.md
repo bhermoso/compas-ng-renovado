@@ -22,6 +22,32 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-24 · Lectura completa de los cuatro Perfiles vigentes
+
+Master: `6aa5160`.
+
+- **Encargo del responsable.** Paso 2 de la secuencia: leer completos y cotejar
+  los Perfiles vigentes de Alfacar, Atarfe, Loja y Zagra.
+- **Fuente.** Documento completo de cada revisión vigente en la web publicada,
+  con la sesión del responsable (Firebase `compas-98dd7`). Sin cotejo con los
+  PDF: las revisiones vigentes no tienen PDF propio.
+- **Resultado.** `docs/audits/COTEJO-PERFILES-2026-11-24.md`: lo que cumplen, lo
+  que falta frente a la v3.0.1 en los cuatro, lo propio de cada uno, tres
+  decisiones del responsable y lo que debe resolver cada paquete de texto.
+- **Correcciones de COMPÁS halladas en la lectura.**
+  - El lector repetía el cuerpo de R1 como introducción del apartado de
+    recomendaciones. Corregido en `ProfileReader`.
+  - El Actualizador no reconocía «Anexos» ni «A. …» como fin del apartado 7 y
+    dejaba su nota detrás de los anexos (Atarfe, Loja, Zagra). Corregido en
+    `appendAuthorship`; las notas ya escritas se recolocan con el paquete.
+- **Decisiones del responsable (24/11).** Zagra trabaja con el Informe de 2017
+  hasta nueva orden; las notas del Actualizador salen del texto y pasan al
+  historial de la revisión (`revisionLog`, contrato del Actualizador 1.3.0, con la
+  nota antigua trasladada en la siguiente revisión); en Alfacar existe la
+  priorización del Grupo Motor de 1/10/2026 y debe constar en el punto de partida.
+  Detalle en el §6 del informe.
+- **Verificación.** Lint: 0. Suite: 2967 pasan, 2 omitidas.
+
 ## 2026-11-24 · Menú de elección del equipo técnico
 
 Master: `91006d2`.
