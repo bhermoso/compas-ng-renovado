@@ -50,8 +50,19 @@ Master: `58e7781` (tras la PR #225).
     doctrina retirada. Marcar la cita no resuelve esa dependencia: hay que decidir
     de qué Perfil parte el Plan Local de Salud con la v3.0.0.
   - Retirada del generador interno del Perfil (unas 4.650 líneas en
-    `src/application/health-profile/`). No se ha hecho: `CONTRACT-INDEX.md`
-    registra hoy la decisión de conservar ese código como herramienta de pruebas.
+    `src/application/health-profile/`). No se ha hecho. Hecho observado
+    (24/11/2026, rastreo de importaciones símbolo a símbolo desde `index.html`):
+    la aplicación sí lo alcanza, por tres caminos. (1) `ExternalProfileDashboard`
+    muestra con `PSLCArtifactViewer` los «Perfiles anteriores de COMPÁS · legado
+    conservado». (2) `compileInitialLocalHealthPlan` usa el Perfil generado si no
+    hay Perfil externo, y toma las temáticas priorizadas del objeto PSL antiguo.
+    (3) El modelo de documento y la exportación DOCX y PDF de `psl-c-export`
+    sirven también al Perfil externo vigente. Retirarlo exige decidir antes qué
+    pasa con el legado y de qué Perfil parte el Plan.
+- **Alcance (v3.0.1, 24/11/2026).** Decisión del responsable: «el perfil se
+  genera fuera, pero se actualiza dentro». El Alcance del contrato metodológico
+  nombra el Actualizador de perfiles como única excepción regulada a la regla de
+  que COMPÁS no reescribe el Perfil.
 - **Verificación.** Lint: 0. Compilación correcta. Suite: 2953 pasan, 2 omitidas (una prueba nueva).
 
 ## 2026-11-23 · Retirada de archivos sin uso

@@ -103,7 +103,8 @@ describe("Reforma de los contratos del Perfil (2026-11-23)", () => {
 
   it("el Perfil se rige por cuatro documentos vigentes", () => {
     const rector = flatten(readRaw("contracts/CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md"));
-    expect(rector).toContain("Versión 3.0.0");
+    expect(rector).toContain("Versión 3.0.1");
+    expect(rector).toContain("**COMPÁS actualiza lo declarado.** La única excepción es el Actualizador de perfiles");
     expect(rector).toContain("Quien redacta propone.");
     expect(rector).toContain("COMPÁS presenta ese menú sobre el Perfil cargado, antes de validarlo");
     expect(rector).toContain("Localiza Salud es la fuente exclusiva de la lectura de activos");

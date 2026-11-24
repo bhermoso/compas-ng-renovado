@@ -203,7 +203,7 @@ Contrato de qué significa "interpretar" dentro de COMPÁS NG. Define los límit
 ## Metodología del Perfil de Salud Local
 
 ### CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY
-**Estado:** VIGENTE — versión 3.0.0 (2026-11-23). Contrato rector del Perfil.
+**Estado:** VIGENTE — versión 3.0.1 (2026-11-24). Contrato rector del Perfil.
 
 Qué es el Perfil de Salud Local, qué puede afirmar, cómo se estructura y cuándo es aceptable. Rige el Perfil de COMPÁS lo redacte quien lo redacte: quien redacta propone, el equipo técnico elige y COMPÁS conserva, muestra y comprueba. Estructura de seis páginas de datos y cuerpo de siete apartados (Art. 16 quater, 17 ter); recomendaciones Conocer, Contrastar y Abordar (Art. 8 quater); menú de elección presentado por COMPÁS sobre el Perfil cargado (Art. 16 ter); clasificación única de las afirmaciones por los tipos del Art. 8 y los grados del Art. 8 bis; Localiza Salud, fuente exclusiva de activos (Art. 9); la priorización y el Plan leen solo el Perfil vigente (Art. 16 bis).
 
@@ -585,7 +585,7 @@ el [Registro de trabajo](../audits/REGISTRO-DE-TRABAJO.md).
 
 ## Producción del Perfil de Salud Local
 
-- **Qué es el Perfil:** [CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY](CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md), v3.0.0.
+- **Qué es el Perfil:** [CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY](CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY.md), v3.0.1.
 - **Cómo llega y qué pasa con él:** [CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY](CONTRACT-PROFILE-PRODUCTION-AND-CUSTODY.md), v1.0.
 - **Cambios de modelo o de datos:** [CONTRACT-PROFILE-UPDATER](CONTRACT-PROFILE-UPDATER.md).
 - **Cómo se escribe:** [Guía de escritura](../guides/GUIA-ESCRITURA-PERFIL.md).
