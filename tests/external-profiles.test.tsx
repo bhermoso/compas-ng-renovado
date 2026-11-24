@@ -114,12 +114,13 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
   expect(runtime.psl.status).toBe('archived');expect(runtime.psl.conclusiones.content).toBe('');
   expect(runtime.psl.areasDeIntervencion).toEqual([]);expect(runtime.lectura).toBeUndefined();
  });
- it('proyecta exclusivamente el perfil aportado, sin cambiar evidencias ni autoría',()=>{
+ it('conserva el Perfil aportado y deja fuera de la planificación sus propuestas pendientes',()=>{
   const w=workspace(),before=JSON.stringify(w.evidenceStore),p=externalProfileFixture(w.municipality.identity.id);
   w.externalProfileLibrary={profiles:[p],attachments:[],activeId:p.id};
   const runtime=createMunicipalityRuntime({workspace:w});
-  expect(runtime.psl.conclusiones.content).toBe(p.text);expect(runtime.psl.territorialSummary).toBe(p.summary);
-  expect(runtime.psl.areasDeIntervencion.map(a=>a.title)).toEqual(p.areas.map(a=>a.title));
+  expect(runtime.psl.conclusiones.content).toBe('');expect(runtime.psl.territorialSummary).toBe(p.summary);
+  expect(runtime.psl.areasDeIntervencion).toEqual([]);
+  expect(w.externalProfileLibrary.profiles[0].text).toBe(p.text);
   expect(JSON.stringify(w.evidenceStore)).toBe(before);expect(w.externalProfileLibrary.profiles[0].status).toBe('review');
  });
  it('conserva un perfil histórico guardado sin recalcularlo',()=>{

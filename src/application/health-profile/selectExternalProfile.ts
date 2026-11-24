@@ -1,19 +1,22 @@
 import type { MunicipalityWorkspace } from '../../domain/workspace';
 import type { LocalHealthProfile } from '../../domain/health-profile';
-import { discardedProposals } from './profileChoices';
+import { chosenProposals } from './profileChoices';
+
+export function activeExternalProfile(workspace: Pick<MunicipalityWorkspace, "municipality" | "externalProfileLibrary">) {
+ const library = workspace.externalProfileLibrary;
+ return library?.profiles.find(p => p.id === library.activeId && !p.archivedAt && p.municipalityId === workspace.municipality.identity.id);
+}
 
 /** Compatibility projection for planning. No diagnosis, narrative or profile generation. */
 export function selectExternalProfile(workspace: MunicipalityWorkspace): LocalHealthProfile {
- const library = workspace.externalProfileLibrary;
- const profile = library?.profiles.find(p => p.id === library.activeId && p.municipalityId === workspace.municipality.identity.id);
+ const profile = activeExternalProfile(workspace);
  if (!profile && workspace.validatedPSL?.municipalityId === workspace.municipality.identity.id) return workspace.validatedPSL;
  // La recomendación externa solo conserva su identidad y texto. El paquete
  // no contiene enlaces a EvidenceAtom: no fabricar un recuento cero ni
  // convertir las limitaciones generales en cautelas de cada recomendación.
- // Lo que el equipo técnico descartó no pasa a la planificación (custodia §8.4).
- const discarded = profile ? discardedProposals(profile) : new Set<string>();
- const areas = profile?.areas.filter(a => !discarded.has(a.id)).map(a => ({...a,relatedEvidenceIds:[],cautions:[]})) ?? [];
- const findings = profile?.findings.filter(f => !discarded.has(/^(C\d+)\./.exec(f.trim())?.[1] ?? '')) ?? [];
+ const chosen = profile ? chosenProposals(profile) : new Set<string>();
+ const areas = profile?.areas.filter(a => chosen.has(a.id)).map(a => ({...a,relatedEvidenceIds:[],cautions:[]})) ?? [];
+ const findings = profile?.findings.filter(f => chosen.has(/^(C\d+)\./.exec(f.trim())?.[1] ?? '')) ?? [];
  return {
   id:profile?.id ?? `no-profile:${workspace.municipality.identity.id}`,municipalityId:workspace.municipality.identity.id,
   status:profile?.status ?? 'archived',version:profile?.id ?? 'none',evidenceStoreVersion:profile?.evidenceVersion ?? '',strategicFrameworkSectionIds:[],
@@ -25,7 +28,7 @@ export function selectExternalProfile(workspace: MunicipalityWorkspace): LocalHe
   preliminaryOpportunities:[],longitudinalActive:false,longitudinalNote:'',longitudinalEvidenceCount:0,marcosAplicados:[],
   tensionesEstructurales:[],limitacionesDiagnosticas:profile?.limitations ?? [],conflictos:[],tensionesEscaladas:[],
   tensionesNoEscaladas:[],ruidoEstructural:[],areasDeIntervencion:areas,
-  conclusiones:{content:profile?.text ?? '',status:profile ? 'authored':'scaffold',authorshipNote:profile?.author ?? ''},
+  conclusiones:{content:findings.join('\n\n'),status:profile ? 'authored':'scaffold',authorshipNote:profile?.author ?? ''},
   cierreInterpretativo:{content:profile?.summary ?? '',status:profile ? 'authored':'scaffold',authorshipNote:profile?.author ?? ''},
   priorizacion:{candidaturasTecnicas:areas.map(a => ({id:a.id,title:a.title,rationale:a.rationale,relatedEvidenceIds:[]})),
    hasTechnicalCandidatures:areas.length>0,tematicasSeleccionadasIds:[],tematicasSeleccionadasLabels:[],hasParticipatorySelection:false,

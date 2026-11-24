@@ -57,7 +57,8 @@ export function ExternalProfileDashboard({compact=false,municipalityId,municipal
  const draftFileInput=useRef<HTMLInputElement>(null);
  const replaceAttachmentId=useRef<string|undefined>(undefined);
  const fullProfileRef=useRef<HTMLDivElement>(null);
- const selected=library.profiles.find(p=>p.id===(selectedId ?? library.activeId)) ?? library.profiles.find(p=>p.id===library.activeId);
+ const active=library.profiles.find(p=>p.id===library.activeId&&!p.archivedAt);
+ const selected=library.profiles.find(p=>p.id===(selectedId ?? library.activeId)) ?? active;
  const custody=selected ? auditProfileCustody(selected,library) : undefined;
  const numericConflicts=selected ? findUnpublishedValueConflicts(selected.text) : [];
  // La descarga nace en Diagnóstico; aquí se prepara una nueva revisión sin alterar la vigente.
@@ -113,6 +114,7 @@ export function ExternalProfileDashboard({compact=false,municipalityId,municipal
  const structure=useMemo(()=>selectedText ? parseProfileStructure(selectedText) : undefined,[selectedText]);
  const proposalCount=selected ? profileProposals(selected).length : 0;
  const pendingChoices=selected ? pendingProposals(selected) : [];
+ const activePending=active?.status==='review' ? (selected===active ? pendingChoices : pendingProposals(active)) : [];
  const discarded=selected ? discardedProposals(selected) : new Set<string>();
  const [readerAnchor,setReaderAnchor]=useState<string>();
  useEffect(()=>{
@@ -326,6 +328,10 @@ export function ExternalProfileDashboard({compact=false,municipalityId,municipal
    <button className="ep-primary" type="button" disabled={busy} onClick={()=>fileInput.current?.click()}>Seleccionar el perfil</button>
    <p className="ep-help">Hasta 20 MB por archivo. Originales, texto, resultados y versiones se guardan en Firebase. El navegador es una caché.</p></div>
   </div></> : <>
+   {active && activePending.length>0 && (tab!=='choice'||selected!==active) && <p className="ep-help">
+     <strong>Conclusiones y recomendaciones pendientes de seleccionar</strong> · {activePending.length} en el Perfil vigente.{' '}
+     <button type="button" className="ea-act" disabled={busy} onClick={()=>{setSelectedId(active.id);setTab('choice');}}>Revisar selección</button>
+   </p>}
    {compact ? <div className="ep-spaces" role="group" aria-label="Espacios del perfil">{spaces.map(([key,label,detail],index)=><button key={key} type="button" className={`ep-space hp-phase hp-phase--${(index % 6) + 1}`} aria-expanded={tab===key} onClick={()=>setTab(current=>current===key?null:key)}><strong>{label}</strong><span>{detail}</span></button>)}</div>
    : <nav className="ep-tabs ep-tabs--primary" aria-label="Espacios del perfil">{spaces.map(([key,label])=><button key={key} type="button" aria-current={tab===key?'page':undefined} onClick={()=>setTab(key)}>{label}</button>)}</nav>}
    {(!compact || tab!==null) && selected.reviewFlags && selected.reviewFlags.length > 0 && <div className="ep-review-flags" role="note"><strong>Para revisar en esta revisión</strong><ul>{selected.reviewFlags.map((f,i)=><li key={i}><b>{f.target}</b>: {f.reason}</li>)}</ul><small>Marcas del Actualizador de perfiles. No forman parte del texto publicado.</small></div>}

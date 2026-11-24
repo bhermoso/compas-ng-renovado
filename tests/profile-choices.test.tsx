@@ -131,17 +131,20 @@ describe("Menú de elección del Perfil cargado (Art. 16 ter; custodia §7)", ()
     expect(empty).toContain("No hay nada que elegir");
   });
 
-  it("lo descartado no pasa a la planificación del Perfil vigente", () => {
-    const p = recordProfileChoices(profile(), [{ target: "R2", decision: "discarded" }, { target: "C2", decision: "discarded" }], "A", AT);
+  it("solo lo elegido pasa a la planificación del Perfil vigente", () => {
+    const p = recordProfileChoices(profile(), [{ target: "R1", decision: "chosen" }, { target: "R2", decision: "discarded" }, { target: "C1", decision: "chosen" }], "A", AT);
     const ws = { municipality: { identity: { id: p.municipalityId } }, createdAt: AT, externalProfileLibrary: { profiles: [p], attachments: [], activeId: p.id } } as unknown as MunicipalityWorkspace;
     const psl = selectExternalProfile(ws);
     expect(psl.priorizacion.candidaturasTecnicas.map(c => c.id)).toEqual(["R1"]);
     expect(psl.qualitativeFindingCount).toBe(1);
+    expect(psl.conclusiones.content).toContain("C1.");
+    expect(psl.conclusiones.content).not.toContain("C2.");
   });
 
   it("la pestaña del Perfil ofrece el espacio de elección con su recuento", () => {
     const p = profile();
     const html = renderToStaticMarkup(createElement(ExternalProfileDashboard, { municipalityId: p.municipalityId, municipalityName: "Municipio de pruebas", library: { profiles: [p], attachments: [], activeId: p.id }, authorName: "Pruebas", onSave: async () => {} }));
     expect(html).toContain("Elección del equipo técnico");
+    expect(html).toContain("Conclusiones y recomendaciones pendientes de seleccionar");
   });
 });

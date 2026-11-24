@@ -60,6 +60,7 @@ describe("Puente Perfil externo → priorización", () => {
         activeId: source.id,
         profiles: [{
           ...source, municipalityId: "loja", areas: [recommendation],
+          choices: [{ target: recommendation.id, decision: "chosen", by: "Técnico", at: "2026-11-18T10:00:00Z" }],
           summary: "", results: [], findings: [], text: "", author: "", createdAt: "2026-11-18",
           evidenceVersion: "e1",
         }],
