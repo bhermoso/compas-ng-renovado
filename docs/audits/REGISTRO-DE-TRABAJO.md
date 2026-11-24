@@ -22,6 +22,29 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-24 · Revisiones de los cuatro Perfiles y archivo ordenado por fecha
+
+Master: `1e32c20`.
+
+- **Revisiones creadas con el Actualizador (hecho, confirmado por Firebase).**
+  Zagra 0.5.0, Alfacar 0.10.0, Atarfe 0.9.0 y Loja 0.7.0, con paquetes de texto
+  conformes a la v3.0.1. Todas en revisión y con el menú de elección sin
+  resolver. Los paquetes se aplicaron desde el navegador; no están en el
+  repositorio.
+- **Pendiente en Zagra (decisión del responsable).** La 0.5.0 fecha en 2025 el
+  23,5 % de 65 o más años de la lectura de conjunto, pero la cifra está enlazada
+  al Atlas de renta de 2024 (`adrh-pob-65`, también 23,5). Hay preparada una
+  revisión que restituye «en 2024»; no se ha creado.
+- **Pendiente en Atarfe.** La cita [13] (validación de 17 recursos de Localiza,
+  5/11/2026) no tiene documento en el expediente; la referencia lo dice así. El
+  documento «Activos Localiza Salud Atarfe» (19/10/2026) tiene 16 filas y 15
+  registros; el listado actual de Localiza tiene 20.
+- **Archivo del expediente (rama `feat/archivo-por-fecha`).** Los documentos de
+  cada sección se ordenan del más reciente al más antiguo y muestran su fecha:
+  la declarada o, si no la hay, la que figura en el título, rotulada «según el
+  título». Ningún documento de los cuatro expedientes tenía fecha declarada; el
+  archivo permite declararla. Suite: 2975 pruebas, 2 omitidas. Lint sin avisos.
+
 ## 2026-11-24 · Lectura completa de los cuatro Perfiles vigentes
 
 Master: `6aa5160`.
