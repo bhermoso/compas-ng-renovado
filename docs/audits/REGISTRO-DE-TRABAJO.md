@@ -40,6 +40,29 @@ Master de partida: `0bccef5`.
   y, al cargar un paquete, marca el texto y los campos derivados; se avisa si también
   están marcados cambios de datos; tras crear las revisiones se recuerda que no son las
   vigentes. Suite: 2979 pruebas, 2 omitidas. Lint sin avisos.
+- **Hoja de ruta acordada el 24/11/2026.** Se avanza fase a fase; cada fase se cierra
+  cuando el responsable certifica que está superada.
+  1. Fusionar la PR del Actualizador (`fix/actualizador-claridad`).
+  2. Elegir las propuestas y validar los cuatro Perfiles (acto del responsable técnico;
+     COMPÁS no lo hace en su nombre).
+  3. Limpieza en GitHub: cerrar la PR #222 (obsoleta) y borrar las ramas fusionadas.
+  4. Cargador de Localiza Salud con CSV o XLSX, versiones y comparación de fichas, sin
+     borrar el listado anterior.
+  5. Retirar o aislar el generador antiguo de Perfiles de COMPÁS (`PSLCArtifactViewer`,
+     respaldo de `compileInitialLocalHealthPlan`, `psl-c-export`), conservando la consulta
+     de los Perfiles antiguos como documentos históricos.
+  6. Implementar `CONTRACT-EVALUATION.md` (v1.0): indicadores con línea de base del Perfil,
+     seguimiento y informe de evaluación.
+  7. Erratas y deudas menores: «9290» en Atarfe, referencias sin citar de Loja, orden de
+     referencias y anexos de Alfacar, borrado y movimiento de párrafos en el Actualizador,
+     portada del PDF del Perfil, comparador del paro de larga duración en Zagra, registro de
+     marcos sin PESMA-A, línea de Bienestar emocional 0.2 «en construcción», copias
+     municipales de marcos en el archivo de Alfacar, paquetes de texto guardados con su
+     revisión.
+  8. Plataforma: agendas anuales e implantación; estudios complementarios lanzados desde
+     las recomendaciones «Conocer»; ámbitos supramunicipales (mancomunidades y distritos
+     municipales); roles y circuitos institucionales con auditoría; publicación del Perfil y
+     del Plan validados; ayuda en contexto por fase.
 - **Estado de los expedientes (hechos).** Vigentes: Zagra 0.6.0, Alfacar 0.10.0, Atarfe
   0.10.0, Loja 0.7.0. Ninguna validada; ninguna propuesta elegida, de modo que la
   planificación no recibe todavía conclusiones ni recomendaciones de ningún Perfil.
