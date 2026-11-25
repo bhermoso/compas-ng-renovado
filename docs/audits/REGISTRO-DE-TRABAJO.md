@@ -22,6 +22,36 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-24 (noche) · Priorización de Atarfe: bloqueo falso y aviso de evidencia
+
+Pages servía `ec75204` al empezar; sirve el mismo hasta fusionar esta rama.
+
+**Hechos observados** (expediente real de Atarfe en Firestore `compas-98dd7`,
+leído en el navegador). La revisión 0.10.0 es vigente y está validada (Blas
+Hermoso, 24/11/2026, 18:43 UTC), con C6, C7 y C11 descartadas y R1 a R8
+elegidas. En Plan de Acción → «Participación y prioridades», la selección del
+Grupo Motor recibe exactamente R1 a R8. En la pestaña Priorización,
+«Candidaturas técnicas» mostraba «Base documental insuficiente»: el bloqueo
+dependía del motor antiguo de interpretación (26 evidencias, pero su única
+oportunidad era «ampliar la base»), no del Perfil vigente, contra I-LHPM-23.
+El Perfil conservaba la versión de evidencia del 10/11, y la recarga de
+Localiza Salud del 24/11 la cambió antes de validar, así que el panel habría
+avisado de un Perfil desactualizado.
+
+**Cambios.** El bloqueo solo se aplica cuando no hay Perfil externo vigente.
+Un Perfil validado después del último cambio de evidencia no se considera
+desactualizado (`externalProfileIsStale`), y al validar una revisión queda
+ligada a la evidencia de ese momento. Suite: 2984 pruebas; lint sin avisos.
+
+**Contexto institucional** (Aula de Salud Comunitaria, leída el 24/11). El Grupo
+Motor se constituye en el taller de impulso, antes del Perfil; la sesión del
+Grupo Motor prioriza y elige líneas, objetivos e indicadores en una misma
+reunión. La de Atarfe es el 26/11/2026. COMPÁS no registra el taller de impulso
+ni la constitución del Grupo Motor: pendiente para la hoja de ruta, a decidir
+por el responsable.
+
+---
+
 ## 2026-11-24 (tarde) · Elección explícita, archivo, trazabilidad Perfil–Plan y Actualizador
 
 Master de partida: `0bccef5`.

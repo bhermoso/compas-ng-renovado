@@ -100,6 +100,18 @@ export interface CreateMunicipalityRuntimeInput {
 
 // ── Factory ────────────────────────────────────────────────────────────────
 
+/**
+ * La evidencia del expediente cambió desde que el Perfil externo quedó ligado a
+ * ella. Validar después del último cambio es validar con la evidencia vigente.
+ */
+export function externalProfileIsStale(
+  profile: { evidenceVersion?: string; status: string; validatedAt?: string },
+  evidenceUpdatedAt: string,
+): boolean {
+  if (profile.evidenceVersion === undefined || profile.evidenceVersion === evidenceUpdatedAt) return false;
+  return !(profile.status === "validated" && profile.validatedAt !== undefined && evidenceUpdatedAt <= profile.validatedAt);
+}
+
 export function createMunicipalityRuntime(
   input: CreateMunicipalityRuntimeInput
 ): MunicipalityRuntime {
@@ -158,7 +170,7 @@ export function createMunicipalityRuntime(
 
   // Detectar si la evidencia cambió desde la validación del PSL.
   const pslIsStale = externalProfile
-    ? externalProfile.evidenceVersion !== undefined && externalProfile.evidenceVersion !== input.workspace.evidenceStore.updatedAt
+    ? externalProfileIsStale(externalProfile, input.workspace.evidenceStore.updatedAt)
     :
     (psl.status === "validated" || psl.status === "approved") &&
     (psl.evidenceStoreVersion !== integrityGuard.sanitizedStore.updatedAt ||
