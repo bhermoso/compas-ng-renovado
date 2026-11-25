@@ -22,6 +22,33 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-25 · Fase 00 «Proceso»: hitos y presentación del Perfil
+
+Pages servía `b68e180` al empezar; sirve el mismo hasta fusionar esta rama.
+
+**Decisiones del responsable (25/11/2026).** El proceso tiene un contenedor propio,
+fase 00 «Proceso», antes del Diagnóstico: hitos con fecha (taller de impulso,
+taller del Perfil, priorización, Plan de Acción) y una presentación visual con el
+estilo de COMPÁS que termina en el ciclo de planificación. En la priorización se
+trabajará solo con lo que COMPÁS proponga a partir del Perfil, dejando abierta la
+opción de priorizar al margen del Perfil por consenso ciudadano (siguiente fase,
+sin implementar). Adicciones no entra para Atarfe: el Perfil no la recomienda.
+
+**Cambios.** `processMilestones` en el expediente (se guarda con él en Firebase);
+`ProcessPanel` registra y elimina hitos con permiso de escritura;
+`buildProcessPresentation` arma la presentación solo con lo que ya está en el
+expediente: hitos, fecha de validación del Perfil, resultados del Perfil vigente
+(epidemiología, comparación con provincia y Andalucía, mujeres y hombres,
+secciones censales), agregados del IBSE y conclusiones y recomendaciones elegidas
+(primera frase y nombre, literales). Los colores distinguen series, nunca valoran.
+Suite: 2990 pruebas; lint sin avisos.
+
+**Comprobado con datos sintéticos** construidos con valores de Atarfe (14
+diapositivas renderizadas a 1600×900). No comprobado aún con el expediente real
+publicado.
+
+---
+
 ## 2026-11-24 (noche) · Priorización de Atarfe: bloqueo falso y aviso de evidencia
 
 Pages servía `ec75204` al empezar; sirve el mismo hasta fusionar esta rama.

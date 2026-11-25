@@ -128,6 +128,8 @@ export interface MunicipalityWorkspace {
   /** Human-authored collection sheets; drafts, never diagnostic evidence or approvals. */
   planPreparationDrafts?: PlanPreparationDraft[];
   indicatorWorksheets?: IndicatorWorksheet[];
+  /** Hitos del proceso local de salud registrados por el equipo (fase 00, Proceso). */
+  processMilestones?: import("../process/ProcessMilestone").ProcessMilestone[];
   /** Agenda de actuaciones por entornos (CONTRACT-AGENDA-ACTUATIONS). Se guarda con el expediente. */
   agendaActuations?: AgendaActuation[];
   /** Actuaciones-tipo propias de este expediente (CONTRACT-ACTUATION-TEMPLATES). */
