@@ -7,7 +7,8 @@ import { InstitutionalLogoBand } from "./InstitutionalLogoBand";
 import "./ProcessPresentation.css";
 
 const LOGOS = ["consejeria", "distrito-sanitario", "relas", "violencia-genero", "rasselh"];
-const nf = new Intl.NumberFormat("es-ES", { maximumFractionDigits: 2 });
+// Separador de miles también en cifras de cuatro dígitos (1.242), como en el Perfil.
+const nf = new Intl.NumberFormat("es-ES", { maximumFractionDigits: 2, useGrouping: "always" });
 /** Medias del IBSE con un decimal, como las publica el estudio. */
 const mean = new Intl.NumberFormat("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 

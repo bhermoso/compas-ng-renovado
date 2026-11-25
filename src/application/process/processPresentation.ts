@@ -219,8 +219,11 @@ export function buildProcessPresentation(workspace: MunicipalityWorkspace, optio
 
     const chosen = chosenProposals(profile);
     const conclusions = profile.findings.map(conclusionHeadline).filter((c) => chosen.has(c.id));
-    for (let i = 0; i < conclusions.length; i += 4) {
-      slides.push({ type: "conclusions", items: conclusions.slice(i, i + 4), total: conclusions.length, profileTitle: profileSource });
+    // Reparto equilibrado, como mucho cuatro por diapositiva: 9 → 3 + 3 + 3, no 4 + 4 + 1.
+    const pages = Math.ceil(conclusions.length / 4);
+    const perPage = Math.ceil(conclusions.length / Math.max(1, pages));
+    for (let i = 0; i < conclusions.length; i += perPage) {
+      slides.push({ type: "conclusions", items: conclusions.slice(i, i + perPage), total: conclusions.length, profileTitle: profileSource });
     }
     const recommendations = profile.areas.filter((a) => chosen.has(a.id)).map(recommendationLabel);
     if (recommendations.length > 0) slides.push({ type: "recommendations", items: recommendations, profileTitle: profileSource });

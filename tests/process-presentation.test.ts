@@ -101,3 +101,14 @@ describe("presentación del proceso", () => {
     expect(sortMilestones([{ ...ok, id: "2", date: "2026-03-01" } as ProcessMilestone, ok as ProcessMilestone]).map((m) => m.id)).toEqual(["1", "2"]);
   });
 });
+
+describe("reparto de conclusiones", () => {
+  it("reparte nueve conclusiones en tres diapositivas de tres", () => {
+    const ws = workspace();
+    const profile = ws.externalProfileLibrary!.profiles[0];
+    profile.findings = Array.from({ length: 9 }, (_, i) => `C${i + 1}. Conclusión ${i + 1}. Texto.`);
+    profile.choices = profile.findings.map((_, i) => ({ target: `C${i + 1}`, decision: "chosen", by: "T", at: "x" })) as typeof profile.choices;
+    const sizes = buildProcessPresentation(ws).filter((s) => s.type === "conclusions").map((s) => s.type === "conclusions" ? s.items.length : 0);
+    expect(sizes).toEqual([3, 3, 3]);
+  });
+});
