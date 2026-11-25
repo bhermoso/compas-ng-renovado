@@ -5,6 +5,8 @@ import type { ProfileTextPackage } from "./application/health-profile/profileTex
 import type { ProfileUpdateOutcome } from "./ui/components/ProfileUpdaterPanel";
 import { appendExternalProfile, deleteExternalProfileVersion } from "./application/health-profile/externalProfiles";
 import { activeExternalProfile } from "./application/health-profile/selectExternalProfile";
+import { buildProcessPresentation } from "./application/process/processPresentation";
+import type { ProcessMilestone } from "./domain/process/ProcessMilestone";
 import { isTerritorialStatisticsSnapshot } from "./application/territorial-statistics/snapshots";
 import { parseDeclaredDate, withDocumentDate } from "./application/document-files/documentDate";
 import type { TerritorialStatisticsSnapshot } from "./domain/territorial-statistics/TerritorialStatistics";
@@ -160,7 +162,7 @@ import {
   isModuleReviewStale,
   type MunicipalActionPlanModuleReview,
 } from "./domain/action-plan-catalog";
-import { LocalHealthPlanningCycle, DocumentIngestionPanel, DocumentRepositoryPanel, EvidenceStorePanel, HealthReportViewer, EstudiosComplementariosPanel, ActivosSaludPanel, ThematicPrioritisationPanel, CitizenParticipationSummary, ThematicPrioritisationModal, PipelineTracePanel, LT1Panel, OITPanel, ReconciliacionPanel, PrioritizationPanel, LecturaEstrategicaView, PAIView, DeliberativePrioritySelectionPanel, ActionPlanCatalogPanel, GESPanel, LocalHealthPlanOutline, AgendaBoard } from "./ui/components";
+import { LocalHealthPlanningCycle, DocumentIngestionPanel, DocumentRepositoryPanel, EvidenceStorePanel, HealthReportViewer, EstudiosComplementariosPanel, ActivosSaludPanel, ThematicPrioritisationPanel, CitizenParticipationSummary, ThematicPrioritisationModal, PipelineTracePanel, LT1Panel, OITPanel, ReconciliacionPanel, PrioritizationPanel, LecturaEstrategicaView, PAIView, DeliberativePrioritySelectionPanel, ActionPlanCatalogPanel, GESPanel, LocalHealthPlanOutline, AgendaBoard, ProcessPanel } from "./ui/components";
 import type { AgendaActuation } from "./domain/agenda/AgendaActuation";
 import { removeSupersededValidatedPlan, type PlanDocument } from "./domain/action-plan-catalog/PlanDocument";
 import type { ProfilePlanLink } from "./application/action-plan/profilePlanLinks";
@@ -257,10 +259,11 @@ function slugifyMunicipalityId(name: string): string {
 
 // ── Tipos y constantes de módulo ─────────────────────────────
 
-type AppView = "inicio" | "repositorio" | "analisis" | "psl" | "priorizacion" | "lectura" | "plan" | "plan-local" | "agenda" | "evaluacion" | "ges";
+type AppView = "inicio" | "proceso" | "repositorio" | "analisis" | "psl" | "priorizacion" | "lectura" | "plan" | "plan-local" | "agenda" | "evaluacion" | "ges";
 
 const NAV_ITEMS: { id: AppView; label: string; phase?: string }[] = [
   { id: "inicio",        label: "Inicio" },
+  { id: "proceso",       label: "Proceso", phase: "00" },
   { id: "repositorio",   label: "Diagnóstico territorial", phase: "01" },
   { id: "psl",           label: "Perfil de Salud Local", phase: "02" },
   { id: "priorizacion",  label: "Priorización", phase: "03" },
@@ -1480,6 +1483,21 @@ export default function App() {
   const handleActuationTemplatesChange = useCallback((next: import("./domain/agenda/ActuationTemplate").ActuationTemplate[]) => {
     setWorkspace((prev) => ({ ...prev, actuationTemplates: next, updatedAt: new Date().toISOString() }));
   }, [setWorkspace]);
+
+  const handleProcessMilestonesChange = useCallback((next: ProcessMilestone[]) => {
+    setWorkspace((prev) => ({ ...prev, processMilestones: next, updatedAt: new Date().toISOString() }));
+  }, [setWorkspace]);
+  const processSlides = useMemo(() => {
+    // El CSV original del IBSE se lee solo en memoria para el análisis por edad; no se guarda nada derivado.
+    const ibseDocId = workspace.studySourceDocumentIds?.ibseStudy;
+    const original = (workspace.documentOriginals ?? []).find((o) => ibseDocId ? o.documentId === ibseDocId : /ibse/i.test(o.name) && /\.csv$/i.test(o.name));
+    let ibseCsvText: string | undefined;
+    if (original && workspace.ibseStudy) {
+      try { ibseCsvText = new TextDecoder("utf-8").decode(Uint8Array.from(atob(original.base64), (c) => c.charCodeAt(0))); } catch { ibseCsvText = undefined; }
+    }
+    const surveyYear = workspace.ibseStudy ? new Date(workspace.ibseStudy.exportedAt ?? workspace.ibseStudy.createdAt).getFullYear() : undefined;
+    return buildProcessPresentation(workspace, { ibseCsvText, surveyYear });
+  }, [workspace]);
 
   const handleAgendaChange = useCallback((next: AgendaActuation[]) => {
     setWorkspace((prev) => ({ ...prev, agendaActuations: next, updatedAt: new Date().toISOString() }));
@@ -4153,6 +4171,18 @@ export default function App() {
               context="COMPÁS · Planificación Local de Salud"
               subtitle={<><strong>{municipality.name}</strong>{municipality.province && ` · ${municipality.province}`}{municipality.ineCode && ` · INE ${municipality.ineCode}`}</>}
             />
+        {/* ── 00 Proceso — hitos del proceso local y presentación del Perfil ── */}
+        {view === "proceso" && (
+          <ProcessPanel
+            key={workspace.municipality.identity.id}
+            municipalityName={municipality.name}
+            milestones={workspace.processMilestones ?? []}
+            slides={processSlides}
+            authorName={remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || ""}
+            onChange={documentWriteAllowed ? handleProcessMilestonesChange : undefined}
+            onGoToCycle={() => setView("inicio")}
+          />
+        )}
         {/* ── ③ Análisis territorial — interpretación territorial (Nivel 2) ── */}
         {/* Orden: resultados (B) → explicabilidad (C) → estado del proceso (A) */}
         {view === "analisis" && (

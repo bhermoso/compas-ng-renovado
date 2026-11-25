@@ -39,3 +39,4 @@ export { ActionPlanCatalogPanel } from "./BrowserCanonicalActionPlanPanel";
 export * from "./LocalHealthPlanOutline";
 export * from "./AgendaBoard";
 export * from "./AgendaResultSummary";
+export * from "./ProcessPanel";

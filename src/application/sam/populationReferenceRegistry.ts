@@ -2,6 +2,7 @@ import type { PopulationReference } from "../../domain/sam";
 import { ATARFE_POPULATION_2022 } from "../../../fixtures/population/atarfe-population-2022";
 import { ATARFE_UNDER16_POPULATION_2025 } from "../../../fixtures/population/atarfe-under16-population-2025";
 import { ATARFE_POPULATION_2025 } from "../../../fixtures/population/atarfe-population-2025";
+import { ATARFE_SINGLE_AGE_BDU_2025 } from "../../../fixtures/population/atarfe-school-population-2025";
 import { FUENTE_VAQUEROS_POPULATION_2025 } from "../../../fixtures/population/fuente-vaqueros-population-2025";
 import { ZAGRA_POPULATION_2025 } from "../../../fixtures/population/zagra-population-2025";
 
@@ -76,4 +77,12 @@ const REGISTRY: Readonly<Record<string, PopulationReferenceSet>> = {
 export function getPopulationReferenceSet(municipalityId: string): PopulationReferenceSet {
   const canonicalKey = MUNICIPALITY_ALIASES[municipalityId] ?? municipalityId;
   return REGISTRY[canonicalKey] ?? {};
+}
+
+/** Población por edad simple registrada para un municipio (hoy solo Atarfe, 6–17 años). */
+export interface SingleAgePopulation { source: string; counts: Readonly<Record<number, number>> }
+
+export function getSingleAgePopulation(municipalityId: string): SingleAgePopulation | undefined {
+  const canonicalKey = MUNICIPALITY_ALIASES[municipalityId] ?? municipalityId;
+  return canonicalKey === "18022" ? ATARFE_SINGLE_AGE_BDU_2025 : undefined;
 }
