@@ -1487,7 +1487,17 @@ export default function App() {
   const handleProcessMilestonesChange = useCallback((next: ProcessMilestone[]) => {
     setWorkspace((prev) => ({ ...prev, processMilestones: next, updatedAt: new Date().toISOString() }));
   }, [setWorkspace]);
-  const processSlides = useMemo(() => buildProcessPresentation(workspace), [workspace]);
+  const processSlides = useMemo(() => {
+    // El CSV original del IBSE se lee solo en memoria para el análisis por edad; no se guarda nada derivado.
+    const ibseDocId = workspace.studySourceDocumentIds?.ibseStudy;
+    const original = (workspace.documentOriginals ?? []).find((o) => ibseDocId ? o.documentId === ibseDocId : /ibse/i.test(o.name) && /\.csv$/i.test(o.name));
+    let ibseCsvText: string | undefined;
+    if (original && workspace.ibseStudy) {
+      try { ibseCsvText = new TextDecoder("utf-8").decode(Uint8Array.from(atob(original.base64), (c) => c.charCodeAt(0))); } catch { ibseCsvText = undefined; }
+    }
+    const surveyYear = workspace.ibseStudy ? new Date(workspace.ibseStudy.exportedAt ?? workspace.ibseStudy.createdAt).getFullYear() : undefined;
+    return buildProcessPresentation(workspace, { ibseCsvText, surveyYear });
+  }, [workspace]);
 
   const handleAgendaChange = useCallback((next: AgendaActuation[]) => {
     setWorkspace((prev) => ({ ...prev, agendaActuations: next, updatedAt: new Date().toISOString() }));

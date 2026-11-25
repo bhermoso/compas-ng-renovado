@@ -26,3 +26,14 @@ export const ATARFE_SCHOOL_POPULATION_2025: PopulationReference = {
   ageGroupLabel: "6 a 17 años (universo escolar)",
   extractedAt: "2026-06-29",
 };
+
+/**
+ * Personas por edad simple de 6 a 17 años, mismo origen que el universo escolar
+ * (MTI-BDU, CAP Atarfe 21046, a 31/12/2025). Son las cifras declaradas arriba,
+ * sin estimar ni interpolar. Es población con tarjeta sanitaria asignada al
+ * centro, no padrón: se declara así donde se use.
+ */
+export const ATARFE_SINGLE_AGE_BDU_2025 = {
+  source: "MTI-BDU — Poblaciones por Edad, 31 de diciembre de 2025, CAP Atarfe",
+  counts: { 6: 206, 7: 201, 8: 210, 9: 271, 10: 230, 11: 255, 12: 232, 13: 245, 14: 226, 15: 247, 16: 262, 17: 262 } as Readonly<Record<number, number>>,
+} as const;

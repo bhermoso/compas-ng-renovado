@@ -3,6 +3,11 @@ import type { ExternalHealthProfile, ProfileResult } from "../../domain/health-p
 import { milestoneKindLabel, sortMilestones, type ProcessMilestoneKind } from "../../domain/process/ProcessMilestone";
 import { activeExternalProfile } from "../health-profile/selectExternalProfile";
 import { chosenProposals } from "../health-profile/profileChoices";
+import type { SampleQualityAssessment } from "../../domain/sam";
+import { assessSample, parseAgeBandLabel } from "../sam/assessSample";
+import { ageBandsForMunicipality } from "../sam/ageBandsForMunicipality";
+import { getSingleAgePopulation } from "../sam/populationReferenceRegistry";
+import { analyzeIBSEYouth, type IBSEYouthAnalysis } from "../ibse/analyzeIBSEYouth";
 
 /**
  * Presentación del proceso local de salud. Solo reproduce lo que ya está en el
@@ -34,6 +39,10 @@ export type Slide =
   | { type: "sections"; eyebrow: string; title: string; unit: string; period: string; bars: Array<{ section: string; value: number; label: string }>; source: string }
   | { type: "ibse"; n: number; nValid: number; factors: Array<{ label: string; value: number }>; strata: Array<{ label: string; nValid: number; mean: number }>; highlights: Figure[]; source: string }
   | { type: "sample"; cells: Array<{ ageBand: string; male: number; female: number }>; assigned: number; source: string }
+  | { type: "tripyramid"; assessment: SampleQualityAssessment; focusBands: string[]; source: string }
+  | { type: "youth-coverage"; analysis: IBSEYouthAnalysis }
+  | { type: "youth-ibse"; analysis: IBSEYouthAnalysis }
+  | { type: "youth-factors"; analysis: IBSEYouthAnalysis }
   | { type: "conclusions"; items: Array<{ id: string; headline: string }>; total: number; profileTitle: string }
   | { type: "recommendations"; items: Array<{ id: string; name: string; kind: string }>; profileTitle: string }
   | { type: "closing"; municipality: string };
@@ -111,7 +120,22 @@ function sectionSeries(results: ProfileResult[]) {
   }).filter((s) => s.bars.length > 1);
 }
 
-export function buildProcessPresentation(workspace: MunicipalityWorkspace): Slide[] {
+/** Pasos internos de una diapositiva: cada pulsación revela una capa antes de avanzar. */
+export function slideSteps(slide: Slide): number {
+  if (slide.type === "tripyramid") return 4;
+  if (slide.type === "youth-coverage") return 2;
+  return 1;
+}
+
+/** Bandas quinquenales que se solapan con la franja joven analizada. */
+function bandsOverlapping(labels: string[], minAge: number, maxAge: number): string[] {
+  return labels.filter((l) => {
+    const b = parseAgeBandLabel(l);
+    return b !== null && b.min <= maxAge && b.max >= minAge;
+  });
+}
+
+export function buildProcessPresentation(workspace: MunicipalityWorkspace, options: { ibseCsvText?: string; surveyYear?: number } = {}): Slide[] {
   const identity = workspace.municipality.identity;
   const profile: ExternalHealthProfile | undefined = activeExternalProfile(workspace);
   const slides: Slide[] = [{
@@ -152,8 +176,37 @@ export function buildProcessPresentation(workspace: MunicipalityWorkspace): Slid
         ],
         strata, highlights: wellbeing, source: `Monitor de bienestar socioemocional · ${ibse.sourceFileName}`,
       });
-      const cells = (ibse.ageSexObserved?.cells ?? []).filter((c) => c.male + c.female > 0);
-      if (cells.length > 1) slides.push({ type: "sample", cells, assigned: ibse.ageSexObserved!.assignedCount, source: `Monitor de bienestar socioemocional · ${ibse.sourceFileName}` });
+      const observedCells = ibse.ageSexObserved?.cells ?? [];
+      const cells = observedCells.filter((c) => c.male + c.female > 0);
+      const youthPopulation = getSingleAgePopulation(identity.id);
+      const youthAges = youthPopulation ? Object.keys(youthPopulation.counts).map(Number) : [];
+      const youth = youthPopulation && options.ibseCsvText
+        ? (() => {
+          const ages = observedAgesFrom(options.ibseCsvText!, youthAges);
+          return ages.length ? analyzeIBSEYouth({
+            csvText: options.ibseCsvText!, municipalityId: identity.id, ageBands: ageBandsForMunicipality(identity.id),
+            population: youthPopulation, minAge: Math.min(...ages), maxAge: Math.max(...youthAges), surveyYear: options.surveyYear,
+          }) : undefined;
+        })()
+        : undefined;
+      const first = cells[0] ? parseAgeBandLabel(cells[0].ageBand) : null;
+      const last = observedCells.length ? parseAgeBandLabel(observedCells[observedCells.length - 1].ageBand) : null;
+      const sam = first && last
+        ? assessSample({ instrumentId: "ibse", municipalityId: identity.id, observedCells, ageRange: { min: first.min, max: last.max } })
+        : undefined;
+      if (sam?.status === "evaluable" && sam.assessment.composition) {
+        const labels = (sam.assessment.populationReference.ageSexMatrix ?? []).map((m) => m.ageBand);
+        slides.push({
+          type: "tripyramid", assessment: sam.assessment,
+          focusBands: youth ? bandsOverlapping(labels, youth.minAge, youth.maxAge) : [],
+          source: `${sam.assessment.populationReference.source} · Monitor de bienestar socioemocional · ${ibse.sourceFileName}`,
+        });
+      } else if (cells.length > 1) {
+        slides.push({ type: "sample", cells, assigned: ibse.ageSexObserved!.assignedCount, source: `Monitor de bienestar socioemocional · ${ibse.sourceFileName}` });
+      }
+      if (youth) {
+        slides.push({ type: "youth-coverage", analysis: youth }, { type: "youth-ibse", analysis: youth }, { type: "youth-factors", analysis: youth });
+      }
     }
 
     const comparison = municipalComparisons(profile.results);
@@ -175,4 +228,17 @@ export function buildProcessPresentation(workspace: MunicipalityWorkspace): Slid
 
   slides.push({ type: "closing", municipality: identity.name });
   return slides;
+}
+
+/** Edades de la franja con población registrada que tienen alguna respuesta en el CSV. */
+function observedAgesFrom(csvText: string, ages: number[]): number[] {
+  const lines = csvText.split(/\r?\n/);
+  const idx = lines[0]?.split(",").indexOf("edad") ?? -1;
+  if (idx === -1) return [];
+  const seen = new Set<number>();
+  for (const line of lines.slice(1)) {
+    const age = parseInt(line.split(",")[idx] ?? "", 10);
+    if (ages.includes(age)) seen.add(age);
+  }
+  return [...seen].sort((a, b) => a - b);
 }

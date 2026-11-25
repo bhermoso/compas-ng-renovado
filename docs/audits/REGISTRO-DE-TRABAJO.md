@@ -47,6 +47,20 @@ Suite: 2990 pruebas; lint sin avisos.
 diapositivas renderizadas a 1600×900). No comprobado aún con el expediente real
 publicado.
 
+**Ampliación del mismo día: franja joven del Monitor.** Decisión del responsable:
+analizar el Monitor como muestra, con SAM, y estudiar con detalle a los jóvenes.
+Hecho observado: el Monitor no es censo de los jóvenes de Atarfe; respuestas
+válidas frente a la población con tarjeta sanitaria del CAP Atarfe (MTI-BDU,
+31/12/2025): 13 años, 3 de 245; 14, 55 de 226; 15, 87 de 247; 16, 49 de 262;
+17, 40 de 262. La presentación añade la tripirámide SAM revelada por pasos
+(padrón, afijación ideal, muestra y foco en las bandas jóvenes), la cobertura por
+edad simple con el tamaño de referencia de Cochran y el margen conseguido, el IBSE
+total por edad y sexo con intervalo del 95 % (corrección por población finita,
+desde 10 respuestas) y los cuatro factores de la franja frente a las edades
+mayores. Las respuestas individuales se leen del CSV original solo en memoria.
+Los intervalos suponen selección aleatoria, que el Monitor no tuvo, y así se
+declara en cada diapositiva. Suite: 2993 pruebas.
+
 ---
 
 ## 2026-11-24 (noche) · Priorización de Atarfe: bloqueo falso y aviso de evidencia
