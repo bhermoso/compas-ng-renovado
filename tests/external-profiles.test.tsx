@@ -135,7 +135,7 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
   const p=externalProfileFixture();
   const html=renderToStaticMarkup(createElement(ExternalProfileDashboard,{municipalityId:p.municipalityId,municipalityName:'Municipio de pruebas',library:{profiles:[p],attachments:[],activeId:p.id},authorName:'Pruebas',onSave:async()=>{}}));
   // Decisión del autor (2026-11-01): los datos epidemiológicos no se cuestionan; COMPÁS no añade advertencias propias.
-  expect(html).not.toContain('Antecedente histórico');expect(html).not.toContain('no describe por sí solo');expect(html).toContain('Denominador no documentado');expect(html).toContain('Atlas ficticio');expect(html).toContain('Gestión y versiones');expect(html).toContain('Laboratorio experimental');expect(html).not.toContain('Descargar esta revisión · Word');expect(html).toContain('Exportar presentación COMPÁS · PDF');
+  expect(html).not.toContain('Antecedente histórico');expect(html).not.toContain('no describe por sí solo');expect(html).toContain('Denominador no documentado');expect(html).toContain('Atlas ficticio');expect(html).toContain('Gestión y versiones');expect(html).toContain('Laboratorio experimental');expect(html).not.toContain('Descargar esta revisión · Word');expect(html).toContain('Exportar Perfil a PDF');
   expect(html).not.toContain('prevalencia actual');
  });
  it('una v0.2 importada mantiene la v0.1 activa y en revisión hasta promoción explícita',()=>{
@@ -209,7 +209,7 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
    municipalityId:'alfacar',municipalityName:'Alfacar',
    library:{profiles:[p],attachments:[],activeId:p.id},authorName:'Pruebas',onSave:async()=>{}
   }));
-  expect(html).toContain('Exportar presentación COMPÁS · PDF');
+  expect(html).toContain('Exportar Perfil a PDF');
   expect(html).toContain('PDF original no adjunto a esta versión.');
   expect(html).toContain('Borrador técnico: pendiente de validación.');
   expect(html).not.toContain('Perfil completo · PDF');
@@ -234,7 +234,7 @@ describe('Perfil externo: documentos, versiones y presentación',()=>{
   expect(html).toContain('Contenido literal aportado por el equipo.');
   expect(html).toContain('epd-print-topics');
   expect(html).toContain('epd-screen-topics');
-  expect(html).toContain('Exportar presentación COMPÁS · PDF');
+  expect(html).toContain('Exportar Perfil a PDF');
  });
  it('reconoce un perfil anterior de COMPÁS sin exigir que se convierta en perfil externo',()=>{
   const html=renderToStaticMarkup(createElement(ExternalProfileDashboard,{

@@ -86,13 +86,27 @@ function SectionBody({ section, structure, chapters, discarded }: {
   return <ProfileText paragraphs={section.paragraphs} renderText={withCitations} />;
 }
 
+type OriginalPdf = { url: string; name: string; edition: string; differentRevision: boolean };
+
+export function ProfileOriginalPdf({ pdf }: { pdf: OriginalPdf }) {
+  return (
+    <div className="epr-pdf">
+      <p role="note" className="epr-pdf__edition"><strong>{pdf.edition}</strong>
+        {pdf.differentRevision && <span>El archivo corresponde a una edición distinta del Perfil consultado.</span>}
+      </p>
+      <iframe title={`PDF original · ${pdf.name}`} src={pdf.url} />
+      <p className="ep-help"><a href={pdf.url} target="_blank" rel="noopener noreferrer">Abrir el PDF en otra pestaña</a> si el visor no carga.</p>
+    </div>
+  );
+}
+
 /**
  * Lector del Perfil: índice navegable y texto con su estructura reconocida.
  * El texto es el del perfil guardado; la estructura solo cambia la presentación.
  */
 export function ProfileReader({ structure, pdf, title, statusLabel, discarded, onExport, printable = false }: {
   structure: ProfileStructure;
-  pdf?: { url: string; name: string; edition: string; differentRevision: boolean };
+  pdf?: OriginalPdf;
   title: string;
   statusLabel?: string;
   discarded?: ReadonlySet<string>;
@@ -236,13 +250,7 @@ export function ProfileReader({ structure, pdf, title, statusLabel, discarded, o
         )}
       </div>
       {mode === "pdf" && pdf ? (
-        <div className="epr-pdf">
-          <p role="note" className="epr-pdf__edition"><strong>{pdf.edition}</strong>
-            {pdf.differentRevision && <span>El texto navegable corresponde a una revisión posterior o distinta.</span>}
-          </p>
-          <iframe title={`PDF original · ${pdf.name}`} src={pdf.url} />
-          <p className="ep-help"><a href={pdf.url} target="_blank" rel="noopener noreferrer">Abrir el PDF en otra pestaña</a> si el visor no carga.</p>
-        </div>
+        <ProfileOriginalPdf pdf={pdf} />
       ) : (
         <div className="epr-layout">
           <nav className="epr-toc" aria-label="Índice del perfil">

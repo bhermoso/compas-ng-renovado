@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import { parseProfileStructure, prefillFromStructure } from '../../application/health-profile/profileStructure';
-import { ProfileReader } from './ProfileReader';
+import { ProfileOriginalPdf, ProfileReader } from './ProfileReader';
 import { ProfileChoiceMenu } from './ProfileChoiceMenu';
 import { discardedProposals, pendingProposals, profileProposals } from '../../application/health-profile/profileChoices';
 import type { ExternalHealthProfile, ExternalProfileLibrary, ProfileAttachment, ProfileResult } from '../../domain/health-profile/ExternalHealthProfile';
@@ -398,14 +398,14 @@ export function ExternalProfileDashboard({compact=false,municipalityId,municipal
     </p>
     <div className="ep-complete-download pdp-noprint">
       <div><strong>Perfil de Salud Local completo</strong><span>Datos, interpretación, conclusiones y recomendaciones de esta versión. La exportación de COMPÁS no sustituye el PDF original.</span></div>
-      <button type="button" className="ep-primary" disabled={busy} onClick={exportProfilePdf}>↓ {structure ? 'Exportar presentación COMPÁS · PDF' : 'Exportar resultados disponibles · PDF'}</button>
+      <button type="button" className="ep-primary" disabled={busy} onClick={exportProfilePdf}>↓ {structure ? 'Exportar Perfil a PDF' : 'Exportar resultados disponibles · PDF'}</button>
       {pdf && fileUrls[pdf.id] ? <a className="ep-original-download" href={fileUrls[pdf.id]} download={pdf.name}>↓ Descargar PDF original · {pdf.name}</a> : <span className="ep-help">PDF original no adjunto a esta versión.</span>}
     </div>
     <div ref={fullProfileRef}><ProfileResultsDashboard profile={selected} municipalityName={municipalityName} structure={structure} discarded={discarded} pdfUrl={pdf ? fileUrls[pdf.id] : undefined} pdfName={pdf?.name} onOpenReader={anchor=>{setReaderAnchor(anchor);setTab('document');}}/></div></main>}
    {tab==='document'&&<main className="ep-main ep-main--document"><section className="ep-document-view"><h2>{selected.title}</h2>
     {selected.revisionOf&&<p className="ep-help">El texto puede contener cambios de esta revisión. Los archivos adjuntos siguen siendo los originales aportados.</p>}
     {structure ? <ProfileReader key={selected.id} structure={structure} title={selected.title} pdf={originalPdf} discarded={discarded} onExport={exportProfilePdf}/>
-     : pdf&&fileUrls[pdf.id] ? <><p><a href={fileUrls[pdf.id]} target="_blank" rel="noopener noreferrer">Abrir PDF original en otra pestaña</a></p><iframe title="PDF original del Perfil de Salud Local" src={fileUrls[pdf.id]}/></>
+     : originalPdf ? <ProfileOriginalPdf pdf={originalPdf}/>
      : <p>No hay texto extraíble. Consulta el archivo original o incorpora una transcripción.</p>}
    </section></main>}
    {tab==='choice'&&<main className="ep-main ep-main--choice"><ProfileChoiceMenu key={selected.id} profile={selected} authorName={authorName} busy={busy} onSave={next=>commit({...library,profiles:library.profiles.map(p=>p.id===next.id?next:p)},'Elección registrada en Firebase.')}/></main>}

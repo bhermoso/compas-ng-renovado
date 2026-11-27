@@ -45,6 +45,16 @@ describe("parseProfileStructure · Perfil de Zagra", () => {
         expect(s.keyFigures.some((k) => k.value === "843")).toBe(true);
         for (const k of s.keyFigures) expect(fixture(file)).toContain(k.value);
       });
+      it("exporta las conclusiones, recomendaciones y referencias de esta edición", () => {
+        const html = renderToStaticMarkup(createElement(ProfileReader, {
+          structure: s, title: "Perfil de Zagra", printable: true,
+        }));
+        for (const { id } of [...s.conclusions, ...s.recommendations]) {
+          expect(html.match(new RegExp(`id="epr-${id}"`, "g"))).toHaveLength(1);
+        }
+        expect(html).toContain("H. Referencias");
+        expect(html).toContain("Instituto de Estadística y Cartografía de Andalucía");
+      });
     });
   }
   it("un texto sin estructura RELAS queda como texto, sin inventar conclusiones", () => {
