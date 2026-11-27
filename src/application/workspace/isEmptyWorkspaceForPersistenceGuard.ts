@@ -56,6 +56,7 @@ export function isEmptyWorkspaceForPersistenceGuard(
     (workspace.indicatorWorksheets?.length ?? 0) === 0 &&
     (workspace.agendaActuations?.length ?? 0) === 0 &&
     (workspace.processMilestones?.length ?? 0) === 0 &&
+    workspace.processPresentation === undefined &&
     (workspace.actuationTemplates?.length ?? 0) === 0 &&
     (workspace.historialEstadosTerritorial?.length ?? 0) === 0 &&
     workspace.validatedPSL === undefined &&

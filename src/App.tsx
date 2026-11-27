@@ -6,6 +6,7 @@ import type { ProfileUpdateOutcome } from "./ui/components/ProfileUpdaterPanel";
 import { appendExternalProfile, deleteExternalProfileVersion } from "./application/health-profile/externalProfiles";
 import { activeExternalProfile } from "./application/health-profile/selectExternalProfile";
 import { buildProcessPresentation } from "./application/process/processPresentation";
+import type { ProcessPresentationPackage } from "./domain/process/ProcessPresentationPackage";
 import type { ProcessMilestone } from "./domain/process/ProcessMilestone";
 import { isTerritorialStatisticsSnapshot } from "./application/territorial-statistics/snapshots";
 import { parseDeclaredDate, withDocumentDate } from "./application/document-files/documentDate";
@@ -1487,6 +1488,32 @@ export default function App() {
   const handleProcessMilestonesChange = useCallback((next: ProcessMilestone[]) => {
     setWorkspace((prev) => ({ ...prev, processMilestones: next, updatedAt: new Date().toISOString() }));
   }, [setWorkspace]);
+  async function handleSaveProcessPresentation(incoming: ProcessPresentationPackage | undefined) {
+    const municipalityId = workspace.municipality.identity.id;
+    if (!documentWriteAllowed || !remoteClient.auth.currentUser || pendingIndexedDbHydrationId || remoteHydratedMunicipalityId !== municipalityId) {
+      throw new Error("Recupera el expediente compartido con permiso de edición.");
+    }
+    const profile = activeExternalProfile(workspace);
+    if (incoming && incoming.municipalityId !== municipalityId) {
+      throw new Error("La presentación pertenece a otro expediente.");
+    }
+    if (incoming && (!profile || incoming.profileTitle !== profile.title)) {
+      throw new Error("La presentación corresponde a otra revisión. Comprueba cuál es el Perfil vigente.");
+    }
+    if (profileSaveInFlightRef.current) throw new Error("Espera a que termine el guardado en curso.");
+    const processPresentation = incoming && profile ? { ...incoming, profileId: profile.id } : undefined;
+    const updatedAt = new Date().toISOString();
+    const next = { ...workspace, processPresentation, updatedAt };
+    profileSaveInFlightRef.current = true;
+    try {
+      await saveReviewedWorkspace(next, undefined, workspace);
+      setWorkspace(current => current.municipality.identity.id === municipalityId
+        ? current === workspace ? next : { ...current, processPresentation, updatedAt }
+        : current);
+    } finally {
+      profileSaveInFlightRef.current = false;
+    }
+  }
   const processSlides = useMemo(() => {
     // El CSV original del IBSE se lee solo en memoria para el análisis por edad; no se guarda nada derivado.
     const ibseDocId = workspace.studySourceDocumentIds?.ibseStudy;
@@ -4180,7 +4207,9 @@ export default function App() {
             slides={processSlides}
             authorName={remoteClient.auth.currentUser?.displayName || remoteClient.auth.currentUser?.email || ""}
             onChange={documentWriteAllowed ? handleProcessMilestonesChange : undefined}
-            onGoToCycle={() => setView("inicio")}
+            savedPresentation={workspace.processPresentation}
+            onSavePresentation={documentWriteAllowed ? handleSaveProcessPresentation : undefined}
+            onGoToCycle={() => setView(processSlides.some(slide => slide.type === "documentary-page") ? "priorizacion" : "inicio")}
           />
         )}
         {/* ── ③ Análisis territorial — interpretación territorial (Nivel 2) ── */}

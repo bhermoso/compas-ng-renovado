@@ -3,6 +3,9 @@ import {
   buildProcessPresentation, conclusionHeadline, parseSpanishNumber, recommendationLabel,
 } from "../src/application/process/processPresentation";
 import { isProcessMilestone, sortMilestones, type ProcessMilestone } from "../src/domain/process/ProcessMilestone";
+import { readProcessPresentationPackage } from "../src/domain/process/ProcessPresentationPackage";
+import { createCompleteMunicipalityWorkspace } from "../src/application/workspace";
+import { parseWorkspaceJSON, serializeWorkspaceForStorage } from "../src/infrastructure/persistence/local-storage";
 import type { MunicipalityWorkspace } from "../src/domain/workspace";
 
 const result = (over: Record<string, unknown>) => ({ unit: "%", source: "Fuente", page: "", period: "2024", caution: "", scale: "Municipio", ...over });
@@ -48,6 +51,37 @@ function workspace(extra: Partial<MunicipalityWorkspace> = {}): MunicipalityWork
 }
 
 describe("presentación del proceso", () => {
+  it("proyecta una presentación guardada de la revisión vigente y conserva la elección explícita", () => {
+    const ws = workspace();
+    const profile = { ...ws.externalProfileLibrary!.profiles[0], status: "review" as const, validatedAt: undefined };
+    profile.choices = profile.choices?.filter(choice => choice.target !== "R1");
+    const document = {
+      schema: "compas-process-presentation/v1", municipalityId: "villa", profileTitle: profile.title,
+      pages: [{ kind: "table", title: "Informe de Salud", source: "Informe de ensayo, tabla 3",
+        columns: ["Patología", "Villa", "Provincia"], rows: [["Asma", "1.508,96", "1.003,2"]] }],
+    };
+    const processPresentation = { ...readProcessPresentationPackage(JSON.stringify(document)), profileId: profile.id };
+    const complete = createCompleteMunicipalityWorkspace({ id: "villa", name: "Villa" });
+    const externalProfileLibrary = { activeId: profile.id, profiles: [profile], attachments: [] };
+    const restored = parseWorkspaceJSON(serializeWorkspaceForStorage({ ...complete, externalProfileLibrary, processPresentation }));
+    expect(restored?.processPresentation).toEqual(processPresentation);
+    const slides = buildProcessPresentation(restored!);
+    expect(slides[0]).toMatchObject({ type: "cover", inReview: true });
+    expect(slides.find(slide => slide.type === "documentary-page")?.page).toEqual(document.pages[0]);
+    expect(slides.some(slide => slide.type === "figures" || slide.type === "recommendations")).toBe(false);
+    expect(slides.at(-1)).toMatchObject({ goToPrioritization: true, pendingChoices: 1 });
+    expect(buildProcessPresentation({ ...restored!, processPresentation: { ...processPresentation, profileId: "anterior" } })
+      .some(slide => slide.type === "documentary-page")).toBe(false);
+    expect(buildProcessPresentation({ ...restored!, processPresentation: { ...processPresentation, municipalityId: "otra" } })
+      .some(slide => slide.type === "documentary-page")).toBe(false);
+  });
+
+  it("rechaza las tablas con filas que no corresponden a sus encabezados", () => {
+    const raw = { schema: "compas-process-presentation/v1", municipalityId: "villa", profileTitle: "Perfil",
+      pages: [{ kind: "table", title: "Informe", source: "Fuente", columns: ["Indicador", "Villa"], rows: [["Asma"]] }] };
+    expect(() => readProcessPresentationPackage(JSON.stringify(raw))).toThrow(/formato de presentación/);
+  });
+
   it("lee números con el formato español de la fuente", () => {
     expect(parseSpanishNumber("1.508,96")).toBe(1508.96);
     expect(parseSpanishNumber("+16,4")).toBe(16.4);

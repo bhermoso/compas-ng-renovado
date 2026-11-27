@@ -130,6 +130,7 @@ export interface MunicipalityWorkspace {
   indicatorWorksheets?: IndicatorWorksheet[];
   /** Hitos del proceso local de salud registrados por el equipo (fase 00, Proceso). */
   processMilestones?: import("../process/ProcessMilestone").ProcessMilestone[];
+  processPresentation?: import("../process/ProcessPresentationPackage").StoredProcessPresentation;
   /** Agenda de actuaciones por entornos (CONTRACT-AGENDA-ACTUATIONS). Se guarda con el expediente. */
   agendaActuations?: AgendaActuation[];
   /** Actuaciones-tipo propias de este expediente (CONTRACT-ACTUATION-TEMPLATES). */

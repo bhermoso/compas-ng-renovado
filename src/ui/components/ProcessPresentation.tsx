@@ -190,7 +190,7 @@ function SlideView({ slide, onGoToCycle, step }: { slide: Slide; onGoToCycle: ()
           <hr className="pp-rule" />
           <h1>{slide.municipality}</h1>
           <p className="pp-cover__sub">Proceso local de salud{slide.province ? ` · ${slide.province}` : ""}</p>
-          {slide.profileTitle && <p className="pp-cover__profile">{slide.profileTitle}{slide.validatedAt ? ` · validado el ${longDate(slide.validatedAt)}` : ""}</p>}
+          {slide.profileTitle && <p className="pp-cover__profile">{slide.profileTitle}{slide.validatedAt ? ` · validado el ${longDate(slide.validatedAt)}` : ""}{slide.inReview && " · En revisión"}</p>}
           <div className="pp-logos"><InstitutionalLogoBand variant="cover" ids={LOGOS} /></div>
         </section>
       );
@@ -364,6 +364,30 @@ function SlideView({ slide, onGoToCycle, step }: { slide: Slide; onGoToCycle: ()
           <Foot>{`${slide.profileTitle}. Propuestas para la deliberación del Grupo Motor, no prioridades adoptadas.`}</Foot>
         </section>
       );
+    case "documentary-page": {
+      const { page } = slide;
+      return (
+        <section className="pp-slide pp-documentary">
+          <h2>{page.title}</h2>
+          {page.introduction && <p className="pp-documentary__intro">{page.introduction}</p>}
+          {page.kind === "notes" ? (
+            <dl className="pp-documentary__notes">
+              {page.entries.map((entry, i) => (
+                <div key={i}><dt>{entry.heading}</dt><dd>{entry.text}</dd></div>
+              ))}
+            </dl>
+          ) : (
+            <table className="pp-documentary__table" aria-label={page.title}>
+              <thead><tr>{page.columns.map((column, i) => <th key={i} scope="col">{column}</th>)}</tr></thead>
+              <tbody>{page.rows.map(([label, ...cells], i) => (
+                <tr key={i}><th scope="row">{label}</th>{cells.map((cell, j) => <td key={j}>{cell}</td>)}</tr>
+              ))}</tbody>
+            </table>
+          )}
+          <Foot>{page.source}</Foot>
+        </section>
+      );
+    }
     case "closing":
       return (
         <section className="pp-slide pp-cover pp-closing">
@@ -371,7 +395,8 @@ function SlideView({ slide, onGoToCycle, step }: { slide: Slide; onGoToCycle: ()
           <hr className="pp-rule" />
           <h1>Del Perfil a la acción</h1>
           <p className="pp-cover__sub">{slide.municipality} · priorizar y planificar</p>
-          <button type="button" className="pp-cta" onClick={onGoToCycle}>Ir al ciclo de planificación →</button>
+          {!!slide.pendingChoices && <p className="pp-cover__profile">Conclusiones y recomendaciones pendientes de seleccionar · {slide.pendingChoices}</p>}
+          <button type="button" className="pp-cta" onClick={onGoToCycle}>{slide.goToPrioritization ? "Ir a Priorización" : "Ir al ciclo de planificación →"}</button>
         </section>
       );
   }
