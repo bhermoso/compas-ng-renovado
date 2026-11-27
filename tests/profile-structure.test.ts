@@ -192,7 +192,8 @@ describe("Apertura sin número en el Perfil completo", () => {
   it("enlaza el original disponible sin alterar el texto incorporado", () => {
     const structure = parseProfileStructure(alfacarLike);
     const html = renderToStaticMarkup(createElement(ProfileReader, {
-      structure, title: "Alfacar", pdfUrl: "blob:https://example.test/perfil-original",
+      structure, title: "Alfacar",
+      pdf: { url: "blob:https://example.test/perfil-original", name: "Alfacar.pdf", edition: "PDF original", differentRevision: false },
     }));
     expect(html).toContain("Abrir el PDF original para cotejar la apertura");
     expect(html).toContain('href="blob:https://example.test/perfil-original"');

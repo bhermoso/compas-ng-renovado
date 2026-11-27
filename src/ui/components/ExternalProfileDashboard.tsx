@@ -1,7 +1,9 @@
 import { externalProfileDocument } from '../../application/health-profile/externalProfileDocument';
-import { auditProfileCustody, findUnpublishedValueConflicts } from '../../application/health-profile/profileCustodyAudit';
+import { auditProfileCustody, findUnpublishedValueConflicts, profileAttachmentEdition } from '../../application/health-profile/profileCustodyAudit';
 import { prepareZagraHistoricalRevision, ZAGRA_HISTORICAL_RESULTS } from '../../application/health-profile/zagraHistoricalEvidence';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { parseProfileStructure, prefillFromStructure } from '../../application/health-profile/profileStructure';
 import { ProfileReader } from './ProfileReader';
 import { ProfileChoiceMenu } from './ProfileChoiceMenu';
@@ -124,6 +126,13 @@ export function ExternalProfileDashboard({compact=false,municipalityId,municipal
   return()=>window.clearTimeout(timer);
  },[tab,readerAnchor]);
  const pdf=files.find(f=>f.mimeType==='application/pdf');
+ const pdfEdition=pdf ? profileAttachmentEdition(pdf.name) : undefined;
+ const originalPdf=pdf && fileUrls[pdf.id] ? {
+  url: fileUrls[pdf.id],
+  name: pdf.name,
+  edition: ['PDF original', pdfEdition?.version ? `revisión ${pdfEdition.version}` : pdf.name, pdfEdition?.date].filter(Boolean).join(' · '),
+  differentRevision: Boolean(pdfEdition?.version && custody?.currentVersion && pdfEdition.version !== custody.currentVersion),
+ } : undefined;
  async function loadFiles(list: FileList | null) {
   if(!list?.length)return;
   if(draft&&!window.confirm('Se sustituirá el borrador sin guardar. Las versiones guardadas se conservan. ¿Continuar?'))return;
@@ -235,14 +244,41 @@ export function ExternalProfileDashboard({compact=false,municipalityId,municipal
   } catch {setError('No se ha podido preparar la descarga. Los originales y el perfil guardado siguen disponibles.');setMessage('');}
   finally {setBusy(false);}
  }
+
+ function exportProfilePdf() {
+  if (!selected) return;
+  if (!structure) {
+   printCompleteProfile(fullProfileRef.current, selected.title);
+   return;
+  }
+  setError('');
+  const documentBody = document.createElement('div');
+  const root = createRoot(documentBody);
+  try {
+   const statusLabel = [
+    selected.archivedAt ? 'Revisión archivada' : selected.id === active?.id ? 'Revisión vigente' : 'Revisión no vigente',
+    selected.status === 'validated' ? 'Validada técnicamente' : 'En revisión técnica',
+   ].join(' · ');
+   flushSync(() => root.render(
+    <ProfileReader structure={structure} title={selected.title} statusLabel={statusLabel} discarded={discarded} printable />
+   ));
+   if (!printCompleteProfile(documentBody, selected.title)) {
+    setError('No se pudo abrir la impresión del Perfil.');
+   }
+  } catch {
+   setError('No se pudo preparar el Perfil para impresión.');
+  } finally {
+   root.unmount();
+  }
+ }
  async function commit(next:ExternalProfileLibrary,success:string) {
   setBusy(true);setError('');setMessage('Guardando en Firebase…');
   try{await onSave(next, progress => setMessage(progress));setMessage(success);}catch(e){setError(e instanceof Error?e.message:'No se ha podido guardar en Firebase.');setMessage('');}finally{setBusy(false);}
  }
  function patch(change:Partial<ExternalHealthProfile>){setDraft(p=>p?{...p,...change}:p);}
  const spaces = selected ? ([
-  ['results','Perfil', `${selected.results.length} indicadores · ${selected.id===library.activeId?'versión vigente':'revisión no vigente'}`],
   ['document','Documento completo', structure ? 'Lectura por apartados' : pdf ? 'PDF original adjunto' : 'Sin texto extraíble'],
+  ['results','Perfil en datos', `${selected.results.length} indicadores · ${selected.id===library.activeId?'versión vigente':'revisión no vigente'}`],
   ['choice','Elección del equipo técnico', proposalCount ? `${proposalCount-pendingChoices.length} de ${proposalCount} resueltas` : 'Sin conclusiones ni recomendaciones reconocibles'],
   ['versions','Gestión y versiones', `${library.profiles.length} ${library.profiles.length===1?'versión':'versiones'} · ${selected.status==='validated'?'validada':'en revisión'}`],
   ...(onRunProfileUpdates ? [['updater','Actualizador de perfiles','Nuevas fuentes, en una revisión aparte'] as const] : []),
@@ -362,13 +398,13 @@ export function ExternalProfileDashboard({compact=false,municipalityId,municipal
     </p>
     <div className="ep-complete-download pdp-noprint">
       <div><strong>Perfil de Salud Local completo</strong><span>Datos, interpretación, conclusiones y recomendaciones de esta versión. La exportación de COMPÁS no sustituye el PDF original.</span></div>
-      <button type="button" className="ep-primary" onClick={()=>printCompleteProfile(fullProfileRef.current,`${selected.title} · ${municipalityName}`)}>↓ Exportar presentación COMPÁS · PDF</button>
+      <button type="button" className="ep-primary" disabled={busy} onClick={exportProfilePdf}>↓ {structure ? 'Exportar presentación COMPÁS · PDF' : 'Exportar resultados disponibles · PDF'}</button>
       {pdf && fileUrls[pdf.id] ? <a className="ep-original-download" href={fileUrls[pdf.id]} download={pdf.name}>↓ Descargar PDF original · {pdf.name}</a> : <span className="ep-help">PDF original no adjunto a esta versión.</span>}
     </div>
     <div ref={fullProfileRef}><ProfileResultsDashboard profile={selected} municipalityName={municipalityName} structure={structure} discarded={discarded} pdfUrl={pdf ? fileUrls[pdf.id] : undefined} pdfName={pdf?.name} onOpenReader={anchor=>{setReaderAnchor(anchor);setTab('document');}}/></div></main>}
    {tab==='document'&&<main className="ep-main ep-main--document"><section className="ep-document-view"><h2>{selected.title}</h2>
     {selected.revisionOf&&<p className="ep-help">El texto puede contener cambios de esta revisión. Los archivos adjuntos siguen siendo los originales aportados.</p>}
-    {structure ? <ProfileReader structure={structure} title={selected.title} pdfUrl={pdf ? fileUrls[pdf.id] : undefined} discarded={discarded}/>
+    {structure ? <ProfileReader key={selected.id} structure={structure} title={selected.title} pdf={originalPdf} discarded={discarded} onExport={exportProfilePdf}/>
      : pdf&&fileUrls[pdf.id] ? <><p><a href={fileUrls[pdf.id]} target="_blank" rel="noopener noreferrer">Abrir PDF original en otra pestaña</a></p><iframe title="PDF original del Perfil de Salud Local" src={fileUrls[pdf.id]}/></>
      : <p>No hay texto extraíble. Consulta el archivo original o incorpora una transcripción.</p>}
    </section></main>}
