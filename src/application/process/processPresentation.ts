@@ -1,8 +1,9 @@
 import type { MunicipalityWorkspace } from "../../domain/workspace";
 import type { ExternalHealthProfile, ProfileResult } from "../../domain/health-profile/ExternalHealthProfile";
 import { milestoneKindLabel, sortMilestones, type ProcessMilestoneKind } from "../../domain/process/ProcessMilestone";
+import { isStoredProcessPresentation, type ProcessPresentationPage } from "../../domain/process/ProcessPresentationPackage";
 import { activeExternalProfile } from "../health-profile/selectExternalProfile";
-import { chosenProposals } from "../health-profile/profileChoices";
+import { chosenProposals, pendingProposals } from "../health-profile/profileChoices";
 import type { SampleQualityAssessment } from "../../domain/sam";
 import { assessSample, parseAgeBandLabel } from "../sam/assessSample";
 import { ageBandsForMunicipality } from "../sam/ageBandsForMunicipality";
@@ -31,7 +32,7 @@ export interface Figure {
 export interface TimelineItem { date: string; kindLabel: string; title: string; kind: ProcessMilestoneKind | "validacion"; }
 
 export type Slide =
-  | { type: "cover"; municipality: string; province?: string; profileTitle?: string; validatedAt?: string }
+  | { type: "cover"; municipality: string; province?: string; profileTitle?: string; validatedAt?: string; inReview?: boolean }
   | { type: "timeline"; items: TimelineItem[] }
   | { type: "figures"; eyebrow: string; title: string; figures: Figure[]; source: string }
   | { type: "comparison"; eyebrow: string; title: string; rows: Figure[]; source: string }
@@ -45,7 +46,8 @@ export type Slide =
   | { type: "youth-factors"; analysis: IBSEYouthAnalysis }
   | { type: "conclusions"; items: Array<{ id: string; headline: string }>; total: number; profileTitle: string }
   | { type: "recommendations"; items: Array<{ id: string; name: string; kind: string }>; profileTitle: string }
-  | { type: "closing"; municipality: string };
+  | { type: "documentary-page"; page: ProcessPresentationPage }
+  | { type: "closing"; municipality: string; goToPrioritization?: boolean; pendingChoices?: number };
 
 /** «1.508,96» → 1508.96; «+16,4» → 16.4. Sin número legible, undefined. */
 export function parseSpanishNumber(value: string): number | undefined {
@@ -135,12 +137,29 @@ function bandsOverlapping(labels: string[], minAge: number, maxAge: number): str
   });
 }
 
+function addChosenProposals(slides: Slide[], profile: ExternalHealthProfile) {
+  const chosen = chosenProposals(profile);
+  const conclusions = profile.findings.map(conclusionHeadline).filter(c => chosen.has(c.id));
+  // Reparto equilibrado, como mucho cuatro por diapositiva: 9 → 3 + 3 + 3.
+  const pages = Math.ceil(conclusions.length / 4);
+  const perPage = Math.ceil(conclusions.length / Math.max(1, pages));
+  for (let i = 0; i < conclusions.length; i += perPage) {
+    slides.push({ type: "conclusions", items: conclusions.slice(i, i + perPage), total: conclusions.length, profileTitle: profile.title });
+  }
+  const recommendations = profile.areas.filter(a => chosen.has(a.id)).map(recommendationLabel);
+  if (recommendations.length > 0) slides.push({ type: "recommendations", items: recommendations, profileTitle: profile.title });
+}
+
 export function buildProcessPresentation(workspace: MunicipalityWorkspace, options: { ibseCsvText?: string; surveyYear?: number } = {}): Slide[] {
   const identity = workspace.municipality.identity;
   const profile: ExternalHealthProfile | undefined = activeExternalProfile(workspace);
+  const stored = workspace.processPresentation;
+  const custom = profile && isStoredProcessPresentation(stored) && stored.municipalityId === identity.id &&
+    stored.profileId === profile.id ? stored : undefined;
   const slides: Slide[] = [{
     type: "cover", municipality: identity.name, province: identity.province,
     profileTitle: profile?.title, validatedAt: profile?.status === "validated" ? profile.validatedAt : undefined,
+    ...(custom && profile?.status === "review" ? { inReview: true } : {}),
   }];
 
   const items: TimelineItem[] = sortMilestones(workspace.processMilestones ?? []).map((m) => ({
@@ -151,6 +170,13 @@ export function buildProcessPresentation(workspace: MunicipalityWorkspace, optio
   }
   items.sort((a, b) => a.date.localeCompare(b.date));
   if (items.length > 0) slides.push({ type: "timeline", items });
+
+  if (custom && profile) {
+    slides.push(...custom.pages.map(page => ({ type: "documentary-page" as const, page })));
+    addChosenProposals(slides, profile);
+    slides.push({ type: "closing", municipality: identity.name, goToPrioritization: true, pendingChoices: pendingProposals(profile).length });
+    return slides;
+  }
 
   if (profile) {
     const profileSource = profile.title;
@@ -217,16 +243,7 @@ export function buildProcessPresentation(workspace: MunicipalityWorkspace, optio
       slides.push({ type: "sections", eyebrow: "Perfil de Salud Local · secciones censales", title: s.title, unit: s.unit, period: s.period, bars: s.bars, source: `${s.source} · ${profileSource}` });
     }
 
-    const chosen = chosenProposals(profile);
-    const conclusions = profile.findings.map(conclusionHeadline).filter((c) => chosen.has(c.id));
-    // Reparto equilibrado, como mucho cuatro por diapositiva: 9 → 3 + 3 + 3, no 4 + 4 + 1.
-    const pages = Math.ceil(conclusions.length / 4);
-    const perPage = Math.ceil(conclusions.length / Math.max(1, pages));
-    for (let i = 0; i < conclusions.length; i += perPage) {
-      slides.push({ type: "conclusions", items: conclusions.slice(i, i + perPage), total: conclusions.length, profileTitle: profileSource });
-    }
-    const recommendations = profile.areas.filter((a) => chosen.has(a.id)).map(recommendationLabel);
-    if (recommendations.length > 0) slides.push({ type: "recommendations", items: recommendations, profileTitle: profileSource });
+    addChosenProposals(slides, profile);
   }
 
   slides.push({ type: "closing", municipality: identity.name });

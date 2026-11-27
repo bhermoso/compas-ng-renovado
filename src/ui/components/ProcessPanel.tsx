@@ -4,6 +4,10 @@ import {
   type ProcessMilestone, type ProcessMilestoneKind,
 } from "../../domain/process/ProcessMilestone";
 import type { Slide } from "../../application/process/processPresentation";
+import {
+  MAX_PROCESS_PRESENTATION_BYTES, readProcessPresentationPackage, type ProcessPresentationPackage,
+  type StoredProcessPresentation,
+} from "../../domain/process/ProcessPresentationPackage";
 import { ProcessPresentation } from "./ProcessPresentation";
 
 interface ProcessPanelProps {
@@ -13,6 +17,8 @@ interface ProcessPanelProps {
   authorName: string;
   /** Sin permiso de escritura, los hitos se consultan pero no se editan. */
   onChange?: (next: ProcessMilestone[]) => void;
+  savedPresentation?: StoredProcessPresentation;
+  onSavePresentation?: (presentation: ProcessPresentationPackage | undefined) => Promise<void>;
   onGoToCycle: () => void;
 }
 
@@ -23,10 +29,13 @@ function shortDate(iso: string): string {
   return Number.isNaN(d.getTime()) ? iso : d.toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
-export function ProcessPanel({ municipalityName, milestones, slides, authorName, onChange, onGoToCycle }: ProcessPanelProps) {
+export function ProcessPanel({ municipalityName, milestones, slides, authorName, onChange, savedPresentation, onSavePresentation, onGoToCycle }: ProcessPanelProps) {
   const [draft, setDraft] = useState(EMPTY);
   const [error, setError] = useState<string | null>(null);
   const [presenting, setPresenting] = useState(false);
+  const [savingPresentation, setSavingPresentation] = useState(false);
+  const [presentationMessage, setPresentationMessage] = useState("");
+  const [presentationError, setPresentationError] = useState("");
   const ordered = useMemo(() => sortMilestones(milestones), [milestones]);
 
   const add = () => {
@@ -51,6 +60,23 @@ export function ProcessPanel({ municipalityName, milestones, slides, authorName,
     onChange(milestones.filter((x) => x.id !== m.id));
   };
 
+  async function changePresentation(file?: File) {
+    if (!onSavePresentation) return;
+    setSavingPresentation(true);
+    setPresentationMessage("");
+    setPresentationError("");
+    try {
+      if (file && file.size > MAX_PROCESS_PRESENTATION_BYTES) throw new Error("El archivo supera el límite de 64 kB.");
+      const presentation = file ? readProcessPresentationPackage(await file.text()) : undefined;
+      await onSavePresentation(presentation);
+      setPresentationMessage(file ? "Presentación guardada en el expediente compartido." : "Presentación retirada del expediente.");
+    } catch (error) {
+      setPresentationError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSavingPresentation(false);
+    }
+  }
+
   return (
     <section className="workspace-panel process-panel">
       <div className="panel-header">
@@ -62,9 +88,32 @@ export function ProcessPanel({ municipalityName, milestones, slides, authorName,
       </div>
       <p className="panel-note">
         Talleres y sesiones con fecha: el impulso, la presentación del Perfil, la priorización y el Plan de Acción.
-        La presentación reúne estos hitos, los resultados del Perfil vigente, el estudio IBSE y las conclusiones y
-        recomendaciones elegidas.
+        La presentación reúne estos hitos y las conclusiones y recomendaciones elegidas del Perfil vigente.
+        Incluye las fuentes que se han preparado para el expediente.
       </p>
+
+      {(onSavePresentation || savedPresentation) && <details className="process-deck">
+        <summary>Presentación del expediente</summary>
+        {savedPresentation && <p className="panel-note">
+          {slides.some(slide => slide.type === "documentary-page")
+            ? `Asociada a «${savedPresentation.profileTitle}».`
+            : `La presentación guardada corresponde a «${savedPresentation.profileTitle}». Para volver a proyectarla, recupera esa revisión o carga una presentación de la revisión vigente.`}
+        </p>}
+        {onSavePresentation && <div className="process-deck__actions">
+          <label>{savedPresentation ? "Reemplazar presentación (JSON)" : "Cargar presentación (JSON)"}
+            <input type="file" accept=".json,application/json" disabled={savingPresentation} onChange={event => {
+              const file = event.currentTarget.files?.[0];
+              event.currentTarget.value = "";
+              if (file) void changePresentation(file);
+            }} />
+          </label>
+          {savedPresentation && <button type="button" className="secondary-button" disabled={savingPresentation} onClick={() => {
+            if (window.confirm("¿Retirar la presentación guardada de este expediente?")) void changePresentation();
+          }}>Retirar presentación</button>}
+        </div>}
+        {presentationMessage && <p role="status">{presentationMessage}</p>}
+        {presentationError && <p role="alert" className="process-form__error">{presentationError}</p>}
+      </details>}
 
       {ordered.length === 0
         ? <p className="empty-state">Todavía no hay hitos registrados.</p>
