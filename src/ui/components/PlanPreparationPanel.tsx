@@ -63,7 +63,9 @@ function SavedDraftReadOnly({draft}: {draft: PlanPreparationDraft}) {
  </details>;
 }
 
-export function PlanPreparationPanel({module, municipalityId, municipalityName, draft, onChange, review, onReviewChange, canEditProposal=true, canReview=false, reviewIsCurrent=true, renderWorksheet, persistenceMessage}: {
+export function PlanPreparationPanel({module, municipalityId, municipalityName, draft, onChange, review, onReviewChange, canEditProposal=true, canReview=false, reviewIsCurrent=true, renderWorksheet, persistenceMessage, adoption}: {
+ /** Relación de la línea con la decisión del Grupo Motor; sin valor, no se muestra. */
+ adoption?: "adopted" | "consultation";
  persistenceMessage?: string;
  /** Nombre visible del ámbito; si falta, se usa su identificador. */
  municipalityName?: string;
@@ -85,7 +87,8 @@ export function PlanPreparationPanel({module, municipalityId, municipalityName, 
   </section>;
  }
  const fourBlocks = module.generalObjectives.length === 4 && module.generalObjectives.every(general => Boolean(general.thematicBlockName));
- const directTerritorialEdit = canEditProposal && !canReview;
+ const consultation = adoption === "consultation";
+ const directTerritorialEdit = (canEditProposal && !canReview) || consultation;
  const emphasized = (text: string) => cleanActionPlanProposalText([proposalStrategicText, ...Object.values(proposalObjectiveTexts), ...proposalBlocks.map(b => b.text)].find(candidate => plainProposalText(candidate) === cleanActionPlanProposalText(text)) ?? text);
  const territorialText = (id: string, text: string) => draft?.decisions[id]?.status === "modified" ? cleanActionPlanProposalText(draft.decisions[id].text ?? text) : emphasized(text);
  const consolidatedText = (id: string, text: string) => consolidatedTextFor(text, draft?.decisions[id], reviewIsCurrent ? review?.decisions[id] : undefined);
@@ -285,18 +288,20 @@ export function PlanPreparationPanel({module, municipalityId, municipalityName, 
    <span className="eyebrow">Línea estratégica</span>
    <strong>{module.title}</strong>
    <small>{module.generalObjectives.length} objetivos generales · {specificCount} objetivos específicos e indicadores</small>
+   {adoption && <span className="pcm-line-fold__adoption" data-adoption={adoption}>{consultation ? "Solo consulta" : "Adoptada por el Grupo Motor"}</span>}
   </summary>
   <header className="pcm-editorial-header">
-   <p className="eyebrow">{directTerritorialEdit ? "Plan de Acción · edición territorial directa" : "Preparación del Plan · borrador editable"}</p>
+   <p className="eyebrow">{consultation ? "Plan de Acción · solo consulta" : directTerritorialEdit ? "Plan de Acción · edición territorial directa" : "Preparación del Plan · borrador editable"}</p>
    <h2>{module.title}</h2>
    <p className="pcm-provenance">{module.sourceLabel}<br /><span>Versión de referencia · {module.sourceDate}</span></p>
   </header>
-  <details className="pcm-guidance-fold"><summary>Cómo revisar y editar</summary>
+  {consultation && <p className="panel-note">El Grupo Motor no ha adoptado esta línea. Puedes consultar sus objetivos, indicadores y fichas; para incorporarla al Plan, el Grupo Motor debe adoptarla en «Priorización».</p>}
+  {!consultation && <details className="pcm-guidance-fold"><summary>Cómo revisar y editar</summary>
   <aside className="pcm-guidance" aria-label="Cómo revisar la propuesta">
    <p><strong>{directTerritorialEdit ? "Edición directa del territorio" : canReview ? "Edición y revisión administrativa" : "Cómo revisar el Plan"}</strong></p>
    {directTerritorialEdit ? <><p>Selecciona, excluye o modifica objetivos e indicadores. Cuando modificas una redacción, <strong>ese texto pasa a ser el vigente para este territorio</strong>; no queda pendiente de una revisión administrativa posterior.</p><p>La eventual aprobación del Grupo Motor es una fase distinta y posterior.</p></> : canReview ? <><p>Puedes modificar directamente cualquier objetivo o indicador y guardar la nueva redacción como texto consolidado.</p><p>La consolidación administrativa <strong>no constituye aprobación del Grupo Motor</strong>.</p></> : <><p>Selecciona y modifica los elementos del Plan.</p><p>Estas elecciones <strong>no constituyen aprobación del Grupo Motor</strong>.</p></>}
   </aside>
-  </details>
+  </details>}
   <section className="pcm-strategic" aria-label="Objetivo estratégico vigente">
    <h3>{directTerritorialEdit ? "Objetivo estratégico vigente" : "Objetivo estratégico propuesto"}</h3>
    <p><ProposalText text={canReview ? consolidatedText(module.id, module.strategicObjective) : territorialText(module.id, module.strategicObjective)}/></p>
@@ -356,7 +361,7 @@ export function PlanPreparationPanel({module, municipalityId, municipalityName, 
    </fieldset>
   </section>
   </details>
-  <p role="status">{persistenceMessage ?? (directTerritorialEdit ? (draft ? "Cambios consolidados en el expediente de este territorio." : "Sin cambios territoriales guardados. Las modificaciones se guardan directamente en este expediente.") : (draft ? "Borrador guardado en este navegador. Para cambiar de equipo, conserva y traslada el expediente." : "Sin elecciones guardadas. Los cambios se guardan en este navegador."))}</p>
+  <p role="status">{persistenceMessage ?? (consultation ? (draft ? "Hay trabajo guardado en esta línea: se conserva sin cambios." : "Sin trabajo guardado en esta línea.") : directTerritorialEdit ? (draft ? "Cambios consolidados en el expediente de este territorio." : "Sin cambios territoriales guardados. Las modificaciones se guardan directamente en este expediente.") : (draft ? "Borrador guardado en este navegador. Para cambiar de equipo, conserva y traslada el expediente." : "Sin elecciones guardadas. Los cambios se guardan en este navegador."))}</p>
  </details>
  </article>;
 }

@@ -65,8 +65,10 @@ export function ProfilePlanTracePanel({ options, links, onSave, onRemove }: {
         }}>Quitar vínculo</button>}
       </li>;
     })}</ul>}
-    {options.recommendations.length === 0 ? <p>Selecciona recomendaciones en el Perfil vigente para poder vincularlas.</p>
-      : options.priorities.length === 0 ? <p>Registra una selección vigente del Grupo Motor en «Participación y prioridades».</p>
+    {options.recommendations.length === 0 ? <p>El Perfil vigente no tiene recomendaciones elegidas por el equipo técnico: no hay recomendaciones que vincular a un indicador.</p>
+      : options.priorities.length === 0 ? <p>{options.selection?.ownPriorities?.length && !options.selection.selectedScenarioIds.length
+        ? "Las prioridades del Grupo Motor son propias y no proceden de recomendaciones del Perfil: no se vinculan aquí."
+        : "Para vincular, el Grupo Motor debe adoptar recomendaciones del Perfil en una decisión vigente («Priorización»)."}</p>
       : onSave && <form onSubmit={save}>
         <fieldset disabled={busy}>
           <legend>Vincular una recomendación elegida</legend>
