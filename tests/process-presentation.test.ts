@@ -146,3 +146,24 @@ describe("reparto de conclusiones", () => {
     expect(sizes).toEqual([3, 3, 3]);
   });
 });
+
+describe("recorrido con muchos hitos", () => {
+  it("reparte quince hitos en tres diapositivas de cinco, en orden", () => {
+    const milestones: ProcessMilestone[] = Array.from({ length: 15 }, (_, i) => ({
+      id: `h${i}`, kind: "otro", date: `${2010 + i}-01-01`, title: `Hito ${i + 1}`, createdAt: "2026-11-28",
+    }));
+    const ws = workspace({ processMilestones: milestones });
+    ws.externalProfileLibrary!.profiles[0].status = "review";
+    const timelines = buildProcessPresentation(ws).filter((s) => s.type === "timeline");
+    expect(timelines.map((s) => s.type === "timeline" ? [s.items.length, s.page, s.pages] : [])).toEqual([[5, 1, 3], [5, 2, 3], [5, 3, 3]]);
+    const first = timelines[0];
+    expect(first.type === "timeline" && first.items[0].title).toBe("Hito 1");
+  });
+
+  it("con pocos hitos queda una sola diapositiva sin numeración", () => {
+    const slides = buildProcessPresentation(workspace({ processMilestones: [{ id: "a", kind: "impulso", date: "2026-02-27", title: "Taller", createdAt: "x" }] }));
+    const t = slides.filter((s) => s.type === "timeline");
+    expect(t.length).toBe(1);
+    expect(t[0].type === "timeline" && t[0].pages).toBeUndefined();
+  });
+});

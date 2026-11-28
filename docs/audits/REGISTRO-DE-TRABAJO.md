@@ -22,6 +22,54 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-28 · Revisión de #238 a #240, hitos de Loja, decisión del Grupo Motor de Atarfe y recorrido por páginas
+
+Pages servía `c444e50` al empezar; sirve el commit de fusión de esta rama al terminar.
+
+**Cambios fusionados sin entrada en este registro (hechos observados en el historial).**
+- #238 (27/11/2026, `cce1147`): Proceso admite una presentación preparada por
+  expediente (`compas-process-presentation/v1`, JSON de hasta 64 kB), guardada en
+  `processPresentation` y ligada al identificador de la revisión vigente del
+  Perfil. Loja tiene cargada una de 7 páginas, ligada a su revisión 0.7.0.
+- #239 (`6d1300d`, `725b8f8`): el lector del Perfil abre primero el Perfil y
+  ordena el índice en datos, cuerpo y anexos; el PDF imprime la revisión completa
+  aunque haya una búsqueda activa e identifica el original por nombre, edición y
+  fecha. Aviso del propio PR: la presentación de Proceso y las decisiones técnicas
+  dependen del identificador de revisión; al activar una revisión nueva hay que
+  volver a cargar la presentación y comprobar la cadena de prioridades, objetivos
+  e indicadores.
+- #240 (fusionado hoy, `eb94a4c`): la navegación no recorta «Encuestas» y el visor
+  de Proceso se ajusta al área disponible y bloquea el desplazamiento del fondo.
+
+**Datos del expediente registrados hoy en Firestore `compas-98dd7`** (desde la
+aplicación publicada; copia confirmada).
+- Loja: 15 hitos de su historia RELAS con fecha documentada en el expediente,
+  entre ellos el Panel Municipal de Salud de la EASP (encuesta telefónica con
+  dos muestras aleatorias de la Base de Datos de Usuarios, 387 encuestas). Dos
+  fechas no son exactas y lo declara su nota: el Panel (primera semana de octubre
+  de 2012, sin día) y la encuesta de hábitos de 2019 (fecha de la programación).
+  Sin registrar por falta de fecha: II Encuentro (2011), priorización Hanlon
+  (2021–2022), borrador del Plan (2022), Semanas de la Salud de 2013 y 2017,
+  adhesión a «Por 1 millón de pasos» (2025) y la sesión del 27/11/2026.
+- Atarfe: selección del Grupo Motor (decisión del responsable, sesión del
+  26/11/2026): una sola línea en el I Plan Local de Salud 2027–2030, Bienestar
+  emocional y salud mental; prioridades R1, R2, R3 y R6 del Perfil 0.10.0,
+  vinculadas a esa línea. La motivación usa datos literales del Perfil; la
+  influencia ciudadana deja constancia de que no hubo priorización ciudadana.
+  COMPÁS fija como fecha de la selección la del registro (28/11/2026).
+
+**Cambio de esta rama.** El recorrido de la presentación muestra como mucho seis
+hitos por diapositiva, repartidos por igual (15 → 5 + 5 + 5), con los años y la
+página en el encabezado. Suite: 3004 pruebas; lint sin avisos.
+
+**Pendiente.** Revisar el «Borrador automático» de actuaciones del Plan de
+Acción, que aparece con la selección vigente: según la cadena del Art. 16 bis,
+las actuaciones son de las agendas anuales y COMPÁS no genera contenido.
+Estructurar en el Plan de Acción de Atarfe los objetivos e indicadores de la
+línea elegida. Elección y validación de Loja, Zagra y Alfacar.
+
+---
+
 ## 2026-11-25 · Fase 00 «Proceso»: hitos y presentación del Perfil
 
 Pages servía `b68e180` al empezar; sirve el mismo hasta fusionar esta rama.
