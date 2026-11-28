@@ -168,6 +168,7 @@ import type { AgendaActuation } from "./domain/agenda/AgendaActuation";
 import { removeSupersededValidatedPlan, type PlanDocument } from "./domain/action-plan-catalog/PlanDocument";
 import type { ProfilePlanLink } from "./application/action-plan/profilePlanLinks";
 import { openIndicatorFicha } from "./ui/components/openIndicatorFicha";
+import { planIndicatorOptions } from "./application/action-plan/planIndicatorOptions";
 import "./App.css";
 
 // ── Tipos de ámbito territorial ──────────────────────────────
@@ -4092,6 +4093,8 @@ export default function App() {
               onWorksheetChange={handleIndicatorWorksheetChange}
               onSave={handleSaveActionPlanModuleReview}
               onOpenIndicatorFicha={(code) => { setPlanTab("lineas"); openIndicatorFicha(code); }}
+              agendaActuations={workspace.agendaActuations ?? []}
+              onGoToAgenda={() => setView("agenda")}
               groupMotor={(() => {
                 const selection = workspace.deliberativePrioritySelection;
                 if (!selection) return { state: "none" as const };
@@ -4346,6 +4349,11 @@ export default function App() {
             onTemplatesChange={handleActuationTemplatesChange}
             focusId={agendaFocusId}
             onGoToPlan={() => setView("plan")}
+            planIndicators={planIndicatorOptions(
+              municipality.id,
+              (runtime.lectura ? runtime.eligibleActionPlanModules : []).map((item) => item.module.id),
+              workspace.planPreparationDrafts ?? [],
+            )}
           />
           </WorkspaceDisclosure>
         )}

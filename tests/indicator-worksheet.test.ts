@@ -78,20 +78,18 @@ describe("Fichas cumplimentables — integridad y entrega", () => {
     );
   });
 
-  it("Word conserva texto, cero observado y ausencia de datos; la ficha individual excluye otras actuaciones", async () => {
+  it("Word conserva texto, cero observado y ausencia de datos; lista las actuaciones de la agenda", async () => {
     const sheet = createIndicatorWorksheet(context);
     sheet.values.owner = "Responsable de prueba & equipo";
-    sheet.actions = [
-      { id: "a1", values: { name: "Primera actuación" }, activities: [{ id: "act-1", values: { name: "Sesión piloto", evidence: "Registro de asistencia" } }], returns: [{ id: "r1", values: { numerator: "0" } }] },
-      { id: "a2", values: { name: "Segunda actuación" }, returns: [] },
-    ];
-    const buffer = await Packer.toBuffer(buildIndicatorWorksheetDocument(sheet, "Pendiente del Grupo Motor", true, "a1"));
+    sheet.returns = [{ id: "r1", values: { actuation: "Taller de prueba", numerator: "0" } }];
+    const agenda = [{ id: "ag1", municipalityId: "m", setting: null, order: 0, origin: "manual" as const, name: "Taller de prueba",
+      identification: {}, strategic: { mainIndicator: `${context.indicatorCode} · indicador` }, population: {}, responsibles: { responsible: "Centro de salud" },
+      tracking: { status: "planificada" as const }, result: { nextCycleDecision: "no-decidido" as const }, createdAt: "", updatedAt: "" }];
+    const buffer = await Packer.toBuffer(buildIndicatorWorksheetDocument(sheet, "Pendiente del Grupo Motor", true, agenda));
     const { value } = await mammoth.extractRawText({ buffer });
     expect(value).toContain("Responsable de prueba & equipo");
-    expect(value).toContain("Primera actuación");
-    expect(value).toContain("Sesión piloto");
-    expect(value).toContain("Registro de asistencia");
-    expect(value).not.toContain("Segunda actuación");
+    expect(value).toContain("Taller de prueba · Planificada · Centro de salud");
+    expect(value).not.toContain("Ficha de actuación anterior");
     expect(value).toContain("\n0\n");
     expect(value).toContain("[Pendiente de cumplimentar]");
     expect(value).toContain("la referencia actual ha cambiado");

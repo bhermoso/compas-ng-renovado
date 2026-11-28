@@ -2,6 +2,7 @@
 
 > Estado: CONCEPTUAL. Fecha: 2026-10-19.
 > Decisiones del autor (2026-10-19): se conservan los cuatro entornos del histórico; la agenda admite alta manual además del volcado desde el Plan de Acción; la ficha es completa y se presenta por bloques; el bloque de resultado vive en el expediente (Firebase) y alimenta la agenda y el seguimiento y evaluación.
+> Decisión del responsable (2026-11-28): la ficha del indicador del Plan de Acción es solo de medición. Las actuaciones se registran en la agenda y declaran a qué indicador del Plan contribuyen; desaparece el volcado desde el Plan (§4).
 > Decisión del autor (2026-10-19, posterior): las agendas anuales no forman parte del Plan de Acción. Se conservan como instrumento propio de ejecución, con entidad separada del plan. La guía rápida de planes locales de salud de la Junta de Andalucía (2014) las sitúa en la fase de ejecución del Plan de Acción; COMPÁS no sigue ese criterio.
 
 ## 1. Propósito
@@ -11,7 +12,7 @@ Dar al equipo técnico un registro de las actuaciones del municipio, organizado 
 ## 2. Relación con otros contratos
 
 - `CONTRACT-INSTITUTIONAL-LIFECYCLE`: el `AgendaDraft` sigue siendo un objeto derivado y efímero que recibe la validación formal como registro externo. Este contrato no lo modifica. La actuación es otro objeto: un registro persistido. Cómo se relaciona la validación formal de la agenda con las actuaciones registradas queda sin decidir y se resuelve por separado.
-- Plan de Acción vigente (`CONTRACT-ACTION-PLAN-CATALOG`, `IndicatorWorksheet`): las actuaciones del plan ya tienen ficha, actividades, entregas de datos y consolidación del indicador (`WorksheetAction`). Esos datos viven en el plan y la agenda no los copia. La agenda no es parte del Plan de Acción: es un instrumento separado, con su propio registro y su propio ciclo. La actuación de agenda puede vincularse a una actuación de la ficha del plan (`linkedAction`), pero el vínculo es una referencia y no una pertenencia. En el documento del Plan Local de Salud las actuaciones y la agenda ocupan su propia sección (VIII), separada del Plan de Acción (VII), según `CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT` §3.1 bis. Si las actuaciones dejan de recogerse en las fichas del plan, el volcado deja de tener origen y la agenda sigue funcionando por alta manual.
+- Plan de Acción vigente (`CONTRACT-ACTION-PLAN-CATALOG`, `IndicatorWorksheet`): desde el 2026-11-28 la ficha del indicador es solo de medición (definición, entregas de datos y consolidación). Las actuaciones viven en la agenda y declaran el indicador al que contribuyen (§4). La agenda no es parte del Plan de Acción: es un instrumento separado, con su propio registro y su propio ciclo. El vínculo con un indicador del Plan es una referencia, no una pertenencia. En el documento del Plan Local de Salud las actuaciones y la agenda ocupan su propia sección (VIII), separada del Plan de Acción (VII), según `CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT` §3.1 bis.
 - Repositorio de actuaciones-tipo (`CONTRACT-ACTUATION-TEMPLATES`): una actuación puede crearse adaptando una plantilla. La actuación es una copia y guarda `templateRef` como referencia de procedencia.
 - Seguimiento y evaluación: puede leer el bloque de resultado de las actuaciones. No lo copia ni lo duplica. La vista Evaluación no incorpora la agenda ni su resumen: la agenda se trabaja en su propia vista (decisión del autor, 2026-10-20).
 
@@ -21,12 +22,16 @@ Cuatro entornos, con los nombres del histórico: sanitario, comunitario, educati
 
 ## 4. Origen de las actuaciones
 
-1. Alta manual.
-2. Volcado desde el Plan de Acción. Cada actuación del plan genera como máximo un registro de agenda, vinculado a ella. Entra «sin asignar», porque el plan no declara entorno. El volcado no inventa entorno, trimestre ni prioridad.
+1. Alta manual, desde una actuación-tipo o por importación del histórico.
+2. El volcado desde el Plan de Acción se retiró el 2026-11-28: el Plan ya no registra actuaciones.
 
-### Fuente única de cada dato
+### Vínculo con el Plan de Acción
 
-En un registro vinculado, los datos que el plan ya recoge se leen del plan y no se copian: nombre, descripción (contribución), responsable, población, calendario y recursos. Se muestran en la ficha como lectura, con la indicación de dónde se editan. El resultado de un indicador no se lee ni se muestra en la actuación (§6). Todo lo demás se guarda en el registro de agenda. En un registro manual, todos los campos se guardan en el registro de agenda.
+La actuación declara a qué indicador del Plan contribuye en «Vínculo estratégico»: un selector ofrece los indicadores incorporados en las líneas adoptadas por el Grupo Motor y guarda «código · indicador» en el indicador principal, con su línea y objetivo. Puede declarar indicadores secundarios con el mismo formato. La ficha del indicador y el mapa de vínculos del Plan leen esa declaración; no la copian.
+
+### Registros vinculados anteriores
+
+Un registro vinculado a una ficha de actuación del Plan anterior al 2026-11-28 (`linkedAction`) sigue leyendo del Plan los datos que este recoge (nombre, descripción, responsable, población, calendario y recursos). No se crean registros vinculados nuevos. El resultado de un indicador no se lee ni se muestra en la actuación (§6).
 
 ## 5. Ficha por bloques
 
@@ -39,7 +44,7 @@ En un registro vinculado, los datos que el plan ya recoge se leen del plan y no 
 | Seguimiento | estado, prioridad, fecha prevista y real, recursos, evidencia, observaciones |
 | Resultado | lo realizado según su registro propio, resultado observado de la actuación, fuente de verificación, barreras, facilitadores, aprendizajes, decisión para el siguiente ciclo |
 
-En un registro manual solo el nombre es obligatorio. En uno vinculado el nombre procede del plan. Un campo vacío se muestra como «sin dato». No se rellena ni se aproxima.
+Solo el nombre es obligatorio (en un registro vinculado anterior, el nombre procede del plan). Un campo vacío se muestra como «sin dato». No se rellena ni se aproxima.
 
 ## 6. Bloque de resultado
 

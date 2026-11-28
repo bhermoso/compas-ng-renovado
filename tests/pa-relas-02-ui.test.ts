@@ -49,7 +49,8 @@ describe("PA-RELAS-02 — representación editorial", () => {
     expect(html).toContain("Puedes examinar su arquitectura");
     expect(html).not.toContain("Aceptar todo");
     expect(html.match(/Ver ficha técnica propuesta/g)).toHaveLength(specific);
-    expect(html.match(/Gestionar actuaciones/g)).toHaveLength(specific);
+    expect(html.match(/Ficha del indicador · /g)).toHaveLength(specific);
+    expect(html).not.toContain("Gestionar actuaciones");
     expect(html).toContain("Método de cálculo");
     expect(html).toContain("Criterio de calidad");
   });
@@ -97,7 +98,7 @@ describe("PA-RELAS-02 — representación editorial", () => {
     expect(html).not.toContain("Acción administrativa");
   });
 
-  it("muestra un árbol operativo que vincula objetivo, indicador, actuación y actividad", () => {
+  it("muestra un árbol que vincula objetivo, indicador y actuación de la agenda (28/11/2026)", () => {
     // Módulo común de Envejecimiento en un municipio cualquiera, con un borrador explícito.
     const module = municipalActionPlanModule("alfacar", HEALTHY_AGING_MODULE);
     const general = module.generalObjectives[0];
@@ -126,27 +127,14 @@ describe("PA-RELAS-02 — representación editorial", () => {
       unit: first.indicator.unit,
       source: module.sourceLabel,
     });
-    sheet.actions = [{
-      id: "action-tree",
-      values: {
-        name: "Actuación conectada al indicador",
-        owner: "Centro de salud",
-        contribution: "Ejecuta la actividad que alimenta el indicador.",
-        schedule: "Primer semestre",
-        resources: "Equipo profesional y sala comunitaria",
-        requestedData: "Personas participantes y sesiones realizadas",
-        source: "Registro de actividad",
-      },
-      activities: [{
-        id: "activity-tree",
-        values: {
-          name: "Taller inicial verificable",
-          status: "planificado",
-          schedule: "2027",
-          evidence: "Registro de asistencia",
-        },
-      }],
-      returns: [{ id: "return-tree", values: { period: "2027" } }],
+    const agendaActuations = [{
+      id: "agenda-tree", municipalityId: "alfacar", setting: null, order: 0, origin: "manual" as const,
+      name: "Actuación conectada al indicador",
+      identification: { year: 2027, description: "Ejecuta la actividad que alimenta el indicador." },
+      strategic: { mainIndicator: `${first.indicator.displayCode ?? first.indicator.code} · ${first.indicator.title}` },
+      population: {}, responsibles: { responsible: "Centro de salud" },
+      tracking: { status: "planificada" as const, resources: "Equipo profesional y sala comunitaria" },
+      result: { nextCycleDecision: "no-decidido" as const }, createdAt: "", updatedAt: "",
     }];
 
     const html = renderToStaticMarkup(createElement(ActionPlanCatalogPanel, {
@@ -158,16 +146,16 @@ describe("PA-RELAS-02 — representación editorial", () => {
       drafts: [draft],
       onDraftChange: () => {},
       worksheets: [sheet],
+      agendaActuations,
       onWorksheetChange: () => {},
       onSave: () => [],
     }));
 
-    expect(html).toContain("Árbol operativo de objetivos, indicadores y actividades");
+    expect(html).toContain("Árbol de objetivos, indicadores y actuaciones de la agenda");
     expect(html).toContain("Objetivo específico");
     expect(html).toContain("Indicador de seguimiento");
-    expect(html).toContain("Actuación → actividades → entregas");
+    expect(html).toContain("Actuación de la agenda");
     expect(html).toContain("Actuación conectada al indicador");
-    expect(html).toContain("Taller inicial verificable");
-    expect(html).toContain("1 entrega registrada");
+    expect(html).toContain("1 actuación en la agenda");
   });
 });

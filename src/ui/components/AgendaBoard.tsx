@@ -5,10 +5,11 @@ import {
   type AgendaActuation, type AgendaSetting,
 } from "../../domain/agenda/AgendaActuation";
 import {
-  addManualActuation, buildActuationBoard, duplicateManualActuation, importActuationsFromPlan,
-  listPlanActions, moveActuation, readActuation, removeActuation,
+  addManualActuation, buildActuationBoard, duplicateManualActuation,
+  moveActuation, readActuation, removeActuation,
 } from "../../application/agenda/agendaActuations";
 import { ActuationFicha } from "./ActuationFicha";
+import type { PlanIndicatorOption } from "../../application/action-plan/planIndicatorOptions";
 import { ActuationTemplatePicker } from "./ActuationTemplatePicker";
 import type { ActuationTemplate } from "../../domain/agenda/ActuationTemplate";
 import { agendaToCsv } from "../../application/agenda/agendaCsv";
@@ -23,6 +24,8 @@ interface Props {
   municipalityName: string;
   actuations: readonly AgendaActuation[];
   worksheets: readonly IndicatorWorksheet[];
+  /** Indicadores de las líneas adoptadas del Plan: la ficha de la actuación declara a cuál contribuye. */
+  planIndicators?: readonly PlanIndicatorOption[];
   onChange: (next: AgendaActuation[]) => void;
   /** Actuaciones-tipo propias de este expediente. */
   templates?: readonly ActuationTemplate[];
@@ -39,7 +42,7 @@ const COLUMNS: { key: Column; label: string }[] = [
 const toSetting = (c: Column): AgendaSetting | null => (c === "unassigned" ? null : c);
 const newId = () => `act-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 
-export function AgendaBoard({ municipalityId, municipalityName, actuations, worksheets, onChange, templates = [], onTemplatesChange, focusId, onGoToPlan }: Props) {
+export function AgendaBoard({ municipalityId, municipalityName, actuations, worksheets, onChange, templates = [], onTemplatesChange, focusId, onGoToPlan, planIndicators = [] }: Props) {
   const [tab, setTab] = useState<"municipio" | "tipo">("municipio");
   const [yearFilter, setYearFilter] = useState("");
   const [settingFilter, setSettingFilter] = useState<"" | AgendaSetting>("");
@@ -58,11 +61,6 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
   const [histPick, setHistPick] = useState(0);
 
   const board = useMemo(() => buildActuationBoard(actuations), [actuations]);
-  const pendingFromPlan = useMemo(
-    () => listPlanActions(worksheets).filter((ref) =>
-      !actuations.some((a) => a.linkedAction?.worksheetKey === ref.worksheetKey && a.linkedAction.actionId === ref.actionId)).length,
-    [worksheets, actuations]
-  );
   const opened = actuations.find((a) => a.id === openId);
   const now = () => new Date().toISOString();
 
@@ -159,10 +157,10 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
         </p>
       </div>
 
-      {worksheets.length === 0 && (
+      {planIndicators.length === 0 && (
         <div className="agenda-notice" role="note">
-          <strong>Aviso: no hay Plan de Acción cargado.</strong>{" "}
-          Puedes consultar la agenda anual y las actuaciones-tipo sin él. Para vincular las actuaciones con líneas, objetivos e indicadores, completa antes el Plan de Acción.
+          <strong>Aviso: el Plan de Acción no tiene todavía indicadores incorporados.</strong>{" "}
+          Puedes consultar la agenda anual y las actuaciones-tipo sin él. Para declarar a qué indicador contribuye cada actuación, incorpora antes los objetivos e indicadores de las líneas adoptadas.
           {onGoToPlan && <> <button type="button" onClick={onGoToPlan}>Ir al Plan de Acción</button></>}
         </div>
       )}
@@ -207,13 +205,6 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
           <button type="button" className="agenda-primary" onClick={() => setCreating(true)}>Nueva actuación</button>
         )}
         <button type="button" onClick={() => setTab("tipo")}>Desde actuación-tipo</button>
-        <button type="button" disabled={pendingFromPlan === 0} onClick={() => {
-          const out = importActuationsFromPlan(actuations, { municipalityId, worksheets, now: now(), newId });
-          onChange(out.list);
-          setMessage(`${out.added} actuaciones traídas del Plan de Acción, sin asignar.`);
-        }}>
-          Traer actuaciones del Plan de Acción{pendingFromPlan > 0 ? ` (${pendingFromPlan})` : ""}
-        </button>
         <button type="button" disabled={actuations.length === 0} onClick={() => {
           const blob = new Blob([agendaToCsv(actuations, worksheets)], { type: "text/csv;charset=utf-8" });
           const link = document.createElement("a");
@@ -250,7 +241,6 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
             <button type="button" onClick={() => setHistSources([])}>Cancelar</button>
           </span>
         )}
-        {pendingFromPlan === 0 && <span className="panel-note">{listPlanActions(worksheets).length === 0 ? "El Plan de Acción aún no tiene actuaciones." : "Todas las actuaciones del plan están ya en la agenda."}</span>}
       </div>
       <div className="agenda-filters" role="search">
         <label><span className="agenda-sr">Filtrar por año</span>
@@ -338,6 +328,7 @@ export function AgendaBoard({ municipalityId, municipalityName, actuations, work
           key={opened.id}
           actuation={opened}
           worksheets={worksheets}
+          planIndicators={planIndicators}
           onClose={() => setOpenId(undefined)}
           onSaveAsTemplate={onTemplatesChange ? (a, name) => {
             const tpl = templateFromActuation(a, name, { id: `tipo-${newId()}`, municipalityName, now: now() });

@@ -10,7 +10,7 @@ export function ActionPlanCatalogPanel(props:LegacyActionPlanCatalogPanelProps){
  const drafts=props.drafts;
  return <div className="action-plan-workspace">
   {props.section === 'resultante' && <GroupMotorPlanNotice groupMotor={props.groupMotor} adoptedTitles={modules.map(m=>m.title)}/>}
-  {props.section !== 'lineas' && <DefinitiveActionPlanPreview municipalityId={props.municipalityId} municipalityName={props.municipalityName} modules={modules} drafts={drafts} worksheets={props.worksheets} validatedActionPlans={props.validatedActionPlans} onValidatePlan={props.onValidatePlan} onDeletePlanVersion={props.onDeletePlanVersion} onDraftChange={props.onDraftChange} profileTrace={props.profileTrace} onOpenIndicatorFicha={props.onOpenIndicatorFicha}/>}
+  {props.section !== 'lineas' && <DefinitiveActionPlanPreview municipalityId={props.municipalityId} municipalityName={props.municipalityName} modules={modules} drafts={drafts} worksheets={props.worksheets} agendaActuations={props.agendaActuations} validatedActionPlans={props.validatedActionPlans} onValidatePlan={props.onValidatePlan} onDeletePlanVersion={props.onDeletePlanVersion} onDraftChange={props.onDraftChange} profileTrace={props.profileTrace} onOpenIndicatorFicha={props.onOpenIndicatorFicha}/>}
   {props.section !== 'resultante' && <LegacyActionPlanCatalogPanel {...props} drafts={drafts}/>}
  </div>;
 }

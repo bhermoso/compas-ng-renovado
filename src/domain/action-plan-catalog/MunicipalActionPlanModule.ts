@@ -1,4 +1,4 @@
-import { HEALTHY_AGING_MODULE, type ActionPlanCatalogModule } from "./ActionPlanCatalog";
+import { ATARFE_EMOTIONAL_WELLBEING_MODULE, EMOTIONAL_WELLBEING_MODULE, HEALTHY_AGING_MODULE, type ActionPlanCatalogModule } from "./ActionPlanCatalog";
 import { AGING_FOUR_BLOCKS_BASE, type PlanPreparationDraft } from "./PlanPreparationDraft";
 
 export const ZAGRA_ACTION_PLAN_VERSION = "zagra-cuatro-bloques-2026-10-28";
@@ -60,6 +60,7 @@ export const ZAGRA_AGING_PROPOSAL: ActionPlanCatalogModule = {
 };
 
 export function municipalActionPlanModule(municipalityId: string, original: ActionPlanCatalogModule): ActionPlanCatalogModule {
+  if (original.id === EMOTIONAL_WELLBEING_MODULE.id) return municipalityId === "atarfe" ? ATARFE_EMOTIONAL_WELLBEING_MODULE : original;
   if (original.id !== HEALTHY_AGING_MODULE.id) return original;
   if (municipalityId === "zagra") return ZAGRA_AGING_PROPOSAL;
   return COMMON_AGING_FOUR_BLOCKS;

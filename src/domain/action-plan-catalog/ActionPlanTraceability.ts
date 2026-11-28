@@ -3,6 +3,51 @@ import { resolvedPlanDecisionText } from "./DefinitiveActionPlanProjection";
 import type { IndicatorWorksheet, WorksheetAction } from "./IndicatorWorksheet";
 import { worksheetKey, type WorksheetContext } from "./IndicatorWorksheet";
 import { thematicBlockNameFor } from "./PlanPreparationDraft";
+import type { AgendaActuation } from "../agenda/AgendaActuation";
+
+/**
+ * Desde el 28/11/2026 la ficha del indicador es solo de medición y las
+ * actuaciones se registran en la Agenda, que declara a qué indicador
+ * contribuyen (`strategic.mainIndicator` o `secondaryIndicators`, con el código
+ * al principio). La trazabilidad lee esas actuaciones; las fichas de actuación
+ * antiguas solo se leen si tienen contenido.
+ */
+export function agendaActuationsForIndicator(actuations: readonly AgendaActuation[], indicatorCode: string, displayCode?: string): AgendaActuation[] {
+  const codes = [indicatorCode, displayCode].filter((c): c is string => Boolean(c));
+  const declares = (value?: string) => Boolean(value) && codes.some((code) => value!.trim() === code || value!.trim().startsWith(`${code} `));
+  return actuations.filter((a) => declares(a.strategic?.mainIndicator) || (a.strategic?.secondaryIndicators ?? []).some(declares));
+}
+
+function agendaSummary(actuation: AgendaActuation): ActionPlanLinkedActionSummary {
+  const schedule = [actuation.identification?.year, actuation.identification?.quarter, actuation.tracking?.plannedDate].filter(Boolean).join(" · ");
+  const owner = [actuation.responsibles?.responsible, actuation.responsibles?.organisation].filter(Boolean).join(" · ");
+  const missingFields = [
+    [owner, "responsable"],
+    [schedule, "calendario"],
+    [actuation.tracking?.resources, "recursos"],
+  ].filter(([value]) => !clean(value)).map(([, label]) => label as string);
+  return {
+    id: actuation.id,
+    name: clean(actuation.name) || "Actuación pendiente de nombrar",
+    agreement: actuation.tracking?.status ?? "planificada",
+    owner: owner || "Pendiente",
+    schedule: schedule || "Pendiente",
+    resources: clean(actuation.tracking?.resources) || "Pendiente",
+    population: clean(actuation.population?.population) || "Pendiente",
+    contribution: clean(actuation.identification?.description) || "Pendiente de describir",
+    requestedData: "Se registra en la ficha del indicador (entregas de datos)",
+    source: clean(actuation.result?.verificationSource) || "Pendiente de fuente o justificante",
+    deliveryCount: 0,
+    activities: [],
+    missingFields,
+    isUsableFicha: missingFields.length === 0,
+  };
+}
+
+/** Ficha de actuación antigua con algún dato escrito (las vacías no cuentan). */
+export function legacyActionHasContent(action: WorksheetAction): boolean {
+  return Object.values(action.values).some((v) => clean(v)) || (action.activities ?? []).length > 0 || action.returns.length > 0;
+}
 
 export type ActionPlanIndicatorRole = "action-plan";
 
@@ -115,7 +160,8 @@ function contextForLink(link: Pick<ActionPlanTraceabilityLink, "moduleId" | "mod
 export function buildActionPlanTraceability(
   municipalityId: string,
   active: DefinitiveActionPlanModuleProjection[],
-  worksheets: IndicatorWorksheet[] = []
+  worksheets: IndicatorWorksheet[] = [],
+  agendaActuations: readonly AgendaActuation[] = []
 ): ActionPlanTraceabilityLink[] {
   const byKey = new Map(worksheets.map((sheet) => [worksheetKey(sheet.context), sheet]));
   return active.flatMap(({ module, moduleDecision, rows }) =>
@@ -144,15 +190,16 @@ export function buildActionPlanTraceability(
           source: module.sourceLabel,
         });
         const sheet = byKey.get(key);
-        const actionCards = (sheet?.actions ?? []).map(actionSummary);
+        const legacyCards = (sheet?.actions ?? []).filter(legacyActionHasContent).map(actionSummary);
+        const agendaCards = agendaActuationsForIndicator(agendaActuations, row.specific.indicator.code, row.specific.indicator.displayCode).map(agendaSummary);
+        const actionCards = [...agendaCards, ...legacyCards];
         const pendingSummary: string[] = [];
         if (!sheet) pendingSummary.push("ficha de indicador pendiente");
-        if (sheet && actionCards.length === 0) pendingSummary.push("actuaciones pendientes");
+        if (actionCards.length === 0) pendingSummary.push("sin actuaciones de la agenda vinculadas");
         for (const action of actionCards) {
           if (action.missingFields.length > 0) {
             pendingSummary.push(`${action.name}: falta ${action.missingFields.join(", ")}`);
           }
-          if (action.activities.length === 0) pendingSummary.push(`${action.name}: actividades pendientes`);
         }
         return {
           ...base,

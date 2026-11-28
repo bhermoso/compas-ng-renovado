@@ -5,7 +5,7 @@ import { profilePlanBaselineText } from "./profilePlanLinks";
 type PlanParagraph = { text: string; heading?: boolean };
 
 const fichaStatusText = (status: string) =>
- status === "missing" ? "pendiente" : status === "draft" ? "abierta" : "registrada";
+ status === "missing" ? "pendiente" : "abierta";
 
 /** Plan de Acción: líneas, objetivos, indicadores y su medición. No incluye actuaciones. */
 export function planActionParagraphs(plan: PlanDocument): PlanParagraph[] {

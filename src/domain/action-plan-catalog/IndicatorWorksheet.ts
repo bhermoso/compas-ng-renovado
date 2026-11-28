@@ -70,6 +70,17 @@ export const returnFields = [
   ["review", "Comprobación de la entrega: quién, cuándo y correcciones pendientes"],
 ] as const;
 
+/**
+ * Entregas de datos del indicador (desde el 28/11/2026). La ficha del indicador
+ * es solo de medición: las actuaciones se registran en la Agenda, y cada entrega
+ * puede indicar de qué actuación procede.
+ */
+export const indicatorReturnFields = [
+  ["actuation", "Actuación de la agenda que aporta los datos (si procede)"],
+  ...returnFields.filter(([key]) => key !== "activity"),
+  ["activity", "Actividad realizada: personas únicas y asistencias por separado"],
+] as const;
+
 export const consolidationFields = [
   ["period", "Periodo de consolidación"],
   ["numerator", "Numerador o recuento consolidado, sin duplicados"],
@@ -106,7 +117,10 @@ export interface WorksheetConsolidation extends WorksheetReturn {
 export interface IndicatorWorksheet {
   context: WorksheetContext;
   values: WorksheetValues;
+  /** Fichas de actuación anteriores al 28/11/2026: solo lectura; las actuaciones viven en la Agenda. */
   actions: WorksheetAction[];
+  /** Entregas de datos del indicador, por periodo. */
+  returns?: WorksheetReturn[];
   consolidations: WorksheetConsolidation[];
   updatedAt: string;
 }

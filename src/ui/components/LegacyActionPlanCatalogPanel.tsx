@@ -1,3 +1,4 @@
+import type { AgendaActuation } from "../../domain/agenda/AgendaActuation";
 import { actionPlanElementCode } from "../../domain/action-plan-catalog/ActionPlanNotation";
 import { PlanPreparationPanel, SupportDocumentLink } from "./PlanPreparationPanel";
 import { type PlanPreparationDraft } from "../../domain/action-plan-catalog/PlanPreparationDraft";
@@ -47,6 +48,9 @@ export interface LegacyActionPlanCatalogPanelProps {
    * vigente, quedan para consulta (decisión del responsable, 28/11/2026).
    */
   groupMotor?: GroupMotorPlanState;
+  /** Actuaciones de la agenda: la ficha del indicador muestra las que declaran contribuir a él. */
+  agendaActuations?: AgendaActuation[];
+  onGoToAgenda?: () => void;
 }
 
 export interface GroupMotorPlanState {
@@ -338,7 +342,7 @@ export function LegacyActionPlanCatalogPanel(props: LegacyActionPlanCatalogPanel
     };
     return <IndicatorWorksheetEditor key={worksheetKey(context)} context={context} module={module} reviewNotice={reviewNotice}
       sheet={props.worksheets.find((sheet) => worksheetKey(sheet.context) === worksheetKey(context))}
-      onChange={props.onWorksheetChange} />;
+      onChange={props.onWorksheetChange} agendaActuations={props.agendaActuations} onGoToAgenda={props.onGoToAgenda} />;
   };
   const renderWorksheet = worksheetRenderer(false);
   const directTerritorialEdit = Boolean(props.onDraftChange);

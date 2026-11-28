@@ -10,12 +10,15 @@ import {
 } from "./PlanPreparationDraft";
 import { buildActionPlanTraceability, type ActionPlanTraceabilityLink } from "./ActionPlanTraceability";
 import type { IndicatorWorksheet } from "./IndicatorWorksheet";
+import type { AgendaActuation } from "../agenda/AgendaActuation";
 import type { ProfilePlanLinkDetail } from "../../application/action-plan/profilePlanLinks";
 
 export interface PlanDocumentOptions {
  unaddressedNeeds?: UnaddressedNeed[];
  evaluationFramework?: PLSEvaluationFramework;
  worksheets?: IndicatorWorksheet[];
+ /** Actuaciones de la agenda: la trazabilidad lee las que declaran contribuir a cada indicador. */
+ agendaActuations?: readonly AgendaActuation[];
  profilePlanLinks?: ProfilePlanLinkDetail[];
 }
 
@@ -87,7 +90,7 @@ export function buildPlanDocument(
  const draftOptions = optionsFromDrafts(active);
  const unaddressedNeeds = normaliseUnaddressedNeedsForPlan(options.unaddressedNeeds ?? draftOptions.unaddressedNeeds);
  const evaluationFramework = normaliseEvaluationFramework(options.evaluationFramework ?? draftOptions.evaluationFramework);
- const traceabilityLinks = buildActionPlanTraceability(municipalityId, active, options.worksheets);
+ const traceabilityLinks = buildActionPlanTraceability(municipalityId, active, options.worksheets, options.agendaActuations);
  return {
   schemaVersion: 1,
   municipalityId,
