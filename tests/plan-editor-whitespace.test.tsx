@@ -36,7 +36,7 @@ describe("Plan editor preserves typed whitespace", () => {
     expect(find(render(), label)!.value).toBe(typed);
     expect(draft!.decisions[id].text).toBe(typed);
    }
-   find(render(), `Guardar redacción vigente · ${visibleId}`)!.onClick!();
+   expect(find(render(), `Guardar redacción vigente · ${visibleId}`)).toBeUndefined();
    draft = JSON.parse(JSON.stringify(draft)) as PlanPreparationDraft;
    expect(find(render(), label)!.value).toBe(typed);
    expect(draft.decisions[id].text).toBe(typed);

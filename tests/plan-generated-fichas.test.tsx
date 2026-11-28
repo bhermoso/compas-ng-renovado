@@ -10,7 +10,7 @@ describe("plan generado: acceso a la ficha de cada indicador", () => {
 
   it("cada ficha de indicador tiene un id al que enlaza el plan generado", () => {
     expect(panel).toContain("id={`ficha-${indicator.code}`}");
-    expect(preview).toContain("document.getElementById(`ficha-${indicatorCode}`)");
+    expect(read("src/ui/components/openIndicatorFicha.ts")).toContain("document.getElementById(`ficha-${indicatorCode}`)");
   });
 
   it("el plan generado muestra el estado de la ficha y el botón solo con indicador incluido", () => {

@@ -357,7 +357,6 @@ h3 {
 .pcm-save-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
 .pcm-save-row button { padding: 7px 11px; border: 1px solid #0f766e; border-radius: 5px; background: #ecfdf5; color: #115e59; font-weight: 700; cursor: pointer; }
 .pcm-save-row button:hover { background: #d1fae5; }
-.pcm-save-confirmation { color: #047857; font-size: 0.78rem; font-weight: 700; }
 .pcm-generation-actions { margin: 12px 0; }
 .pcm-generation-actions button:disabled { opacity: 0.55; cursor: not-allowed; }
 .pcm-generation-prompt { margin: 10px 0 0; padding: 12px 14px; border-left: 4px solid var(--azul); background: #f4f9fd; color: var(--azul-profundo); }
@@ -11784,7 +11783,6 @@ h3 {
   border-radius:0;font-weight:600;
 }
 .pcm-save-row button:hover {background:var(--fondo-principal)}
-.pcm-save-confirmation {color:var(--texto-secundario);font-weight:500}
 .plan-tabs {gap:0;border-bottom:1px solid var(--borde)}
 .plan-tabs__tab,.plan-tabs__tab--active {
   background:transparent;border:0;border-bottom:2px solid transparent;

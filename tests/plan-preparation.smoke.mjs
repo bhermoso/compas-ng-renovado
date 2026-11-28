@@ -29,7 +29,6 @@ try{
  const ind=panel.locator('.pcm-specific').first().locator('.pcm-sheet');await ind.locator(':scope > summary').click();
  await panel.getByLabel('Estado del Plan ENV-I1.1',{exact:true}).selectOption('modified');
  await panel.getByLabel('Redacción vigente · ENV-I1.1',{exact:true}).fill('INDICADOR SOLO DE PRUEBA');
- await panel.getByRole('button',{name:'Guardar redacción vigente · ENV-I1.1',exact:true}).click();
  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('compas-ng:workspace:loja')).planPreparationDrafts?.[0]?.decisions['ENV-I5.1']?.text==='INDICADOR SOLO DE PRUEBA');
  const sheet=ind.locator('.indicator-worksheet');await sheet.locator(':scope > summary').click();
  await sheet.locator('.planning-instruments > summary').click();

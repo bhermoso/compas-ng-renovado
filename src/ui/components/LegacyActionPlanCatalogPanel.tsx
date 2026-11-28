@@ -39,6 +39,8 @@ export interface LegacyActionPlanCatalogPanelProps {
   worksheets: IndicatorWorksheet[];
   onWorksheetChange: (sheet: IndicatorWorksheet) => void;
   onSave: (review: MunicipalActionPlanModuleReview) => readonly string[];
+  /** Muestra la ficha de un indicador desde el Plan resultante. */
+  onOpenIndicatorFicha?: (indicatorCode: string) => void;
 }
 
 const decisionLabels: Record<CatalogDecisionStatus, string> = {
@@ -352,7 +354,7 @@ export function LegacyActionPlanCatalogPanel(props: LegacyActionPlanCatalogPanel
             }}>Preparar cuatro bloques y conservar la versión anterior</button>
               : <p role="alert">Versión desconocida: requiere revisión documental antes de migrar. El borrador anterior se conserva sin cambios.</p>}
           </section>}
-          <PlanPreparationPanel municipalityId={props.municipalityId} module={module}
+          <PlanPreparationPanel municipalityId={props.municipalityId} municipalityName={props.municipalityName} module={module}
             draft={savedDraft} onChange={props.onDraftChange!} renderWorksheet={worksheetRenderer(true)}/>
         </div>;
       })}
