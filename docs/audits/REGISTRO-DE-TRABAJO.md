@@ -100,6 +100,23 @@ Monitor 2026; GRAFA y GRUSE) como variante territorial, con los mismos textos de
 objetivos e indicadores y la misma versión 0.2, de modo que su borrador sigue
 compatible. Suite: 3022 pruebas.
 
+**Hecho observado antes de F5.** Las tres fichas de actuación existentes (Atarfe
+BEM-I6.1; Zagra ENV-I9.1 y ENV-I2.1) están vacías: sin nombre, campos,
+actividades ni entregas. No hay nada que trasladar a la Agenda.
+
+**Cambios (F5).** La ficha del indicador queda solo de medición: definición,
+instrumento, responsable, línea de base, meta, entregas de datos por periodo (con
+la actuación de la que proceden, si consta) y consolidación. Se retiran las
+fichas de actuación, sus actividades y las propuestas de actuación. La ficha
+muestra las actuaciones de la Agenda que declaran contribuir al indicador y
+lleva a la Agenda. En la Agenda se retira «Traer actuaciones del Plan de Acción»
+y la ficha de la actuación ofrece un selector con los indicadores incorporados en
+las líneas adoptadas. El mapa de vínculos, el Word/PDF del Plan y la compilación
+del Plan Local de Salud leen las actuaciones de la Agenda. Las fichas de
+actuación anteriores con contenido se leen como solo lectura. Contratos:
+CONTRACT-ACTION-PLAN-CATALOG 1.3, CONTRACT-AGENDA-ACTUATIONS (§2, §4) y
+CONTRACT-LOCAL-HEALTH-PLAN-DOCUMENT. Suite: 3025 pruebas.
+
 ---
 
 ## 2026-11-28 (tarde) · Acceso discreto a la administración y fecha de la decisión del Grupo Motor

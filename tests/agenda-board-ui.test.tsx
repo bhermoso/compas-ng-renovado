@@ -16,7 +16,9 @@ describe("AgendaBoard", () => {
       municipalityId: "m", municipalityName: "X", actuations: [], worksheets: [], onChange: noop,
     }));
     for (const c of ["Sin asignar", "Entorno sanitario", "Entorno laboral"]) expect(html).toContain(c);
-    expect(html).toContain("El Plan de Acción aún no tiene actuaciones.");
+    // Desde el 28/11/2026 las actuaciones no se traen del Plan: se registran aquí y declaran su indicador.
+    expect(html).toContain("el Plan de Acción no tiene todavía indicadores incorporados");
+    expect(html).not.toContain("Traer actuaciones del Plan de Acción");
     expect(html).toContain("Nueva actuación");
     expect(html).toContain("Importar agenda del histórico (.json)");
   });

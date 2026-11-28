@@ -1,3 +1,4 @@
+import type { AgendaActuation } from "../../domain/agenda/AgendaActuation";
 import { PlanDocumentActions } from "./PlanDocumentActions";
 import { openIndicatorFicha } from "./openIndicatorFicha";
 import { useMemo, useState } from "react";
@@ -19,9 +20,7 @@ import { describeProfilePlanLink, profilePlanLinkKey, profilePlanOptions, type P
 import { ProfilePlanTracePanel, type ProfilePlanLinkInput, type ProfilePlanTraceContext } from "./ProfilePlanTracePanel";
 
 function fichaStatusLabel(status: ActionPlanTraceabilityLink["indicatorFichaStatus"]): string {
-  if (status === "missing") return "ficha pendiente";
-  if (status === "draft") return "ficha abierta sin actuaciones";
-  return "ficha con actuaciones vinculadas";
+  return status === "missing" ? "ficha pendiente" : "ficha abierta";
 }
 
 function UnaddressedNeedsEditor({
@@ -207,7 +206,7 @@ function groupTraceabilityByBlock(links: ActionPlanTraceabilityLink[]): Array<{
   return Array.from(byBlock.values());
 }
 
-export function DefinitiveActionPlanPreview({municipalityId, municipalityName: visibleName, modules, drafts, worksheets = [], validatedActionPlans, onValidatePlan, onDeletePlanVersion, onDraftChange, profileTrace, onOpenIndicatorFicha}: {
+export function DefinitiveActionPlanPreview({municipalityId, municipalityName: visibleName, modules, drafts, worksheets = [], agendaActuations = [], validatedActionPlans, onValidatePlan, onDeletePlanVersion, onDraftChange, profileTrace, onOpenIndicatorFicha}: {
   /** Muestra la ficha del indicador, que está en otra sección del Plan. */
   onOpenIndicatorFicha?: (indicatorCode: string) => void;
   validatedActionPlans?: import("../../domain/action-plan-catalog/PlanDocument").PlanDocument[];
@@ -219,11 +218,12 @@ export function DefinitiveActionPlanPreview({municipalityId, municipalityName: v
   modules: ActionPlanCatalogModule[];
   drafts?: PlanPreparationDraft[];
   worksheets?: IndicatorWorksheet[];
+  agendaActuations?: AgendaActuation[];
   profileTrace?: ProfilePlanTraceContext;
 }) {
   const municipalityName = visibleName ?? municipalityId;
   const active = useMemo(() => buildDefinitiveActionPlanProjection(municipalityId, modules, drafts), [municipalityId, modules, drafts]);
-  const traceability = useMemo(() => buildActionPlanTraceability(municipalityId, active, worksheets), [municipalityId, active, worksheets]);
+  const traceability = useMemo(() => buildActionPlanTraceability(municipalityId, active, worksheets, agendaActuations), [municipalityId, active, worksheets, agendaActuations]);
   const sources = profileTrace && profilePlanOptions(profileTrace.workspace, profileTrace.lectura, traceability);
   const links = profileTrace?.workspace.profilePlanLinks ?? [];
   const linked = sources ? links.flatMap(link => {
@@ -256,12 +256,12 @@ export function DefinitiveActionPlanPreview({municipalityId, municipalityName: v
   const selectedObjectives = active.reduce((total, item) => total + item.rows.length, 0);
   const selectedIndicators = active.reduce((total, item) => total + item.rows.filter(row => row.indicatorIncluded).length, 0);
   const linkedActionCards = traceability.reduce((total, link) => total + link.actionCards.length, 0);
-  const linkedActivities = traceability.reduce((total, link) => total + link.actionCards.reduce((sum, action) => sum + action.activities.length, 0), 0);
+  const openFichas = traceability.filter((link) => link.indicatorFichaStatus !== "missing").length;
   const hasSelectableContent = selectedObjectives > 0 || selectedIndicators > 0;
 
   return <section className="workspace-panel pcm-definitive-plan" aria-label={`Plan de Acción resultante · ${municipalityName}`}>
     {incompatibleDrafts.length > 0 && <p role="alert">Hay borradores con una versión pendiente de compatibilidad. Se conservan y no se incorporan a esta proyección ni a su exportación.</p>}
-    <PlanDocumentActions key={`documento-${municipalityId}`} municipalityId={municipalityId} active={active} versions={validatedActionPlans} worksheets={worksheets} profilePlanLinks={linked} onValidate={onValidatePlan} onDeleteVersion={onDeletePlanVersion}/>
+    <PlanDocumentActions key={`documento-${municipalityId}`} municipalityId={municipalityId} active={active} versions={validatedActionPlans} worksheets={worksheets} agendaActuations={agendaActuations} profilePlanLinks={linked} onValidate={onValidatePlan} onDeleteVersion={onDeletePlanVersion}/>
     {sources && <ProfilePlanTracePanel key={`perfil-${municipalityId}`} options={sources} links={links}
       onSave={profileTrace?.onChange ? saveLink : undefined}
       onRemove={profileTrace?.onChange && (link => profileTrace.onChange!(links.filter(item => profilePlanLinkKey(item) !== profilePlanLinkKey(link))))} />}
@@ -286,12 +286,12 @@ export function DefinitiveActionPlanPreview({municipalityId, municipalityName: v
         <summary className="pcm-module__header pcm-fold-summary">
           <span>
             <span className="eyebrow">Mapa de vínculos</span>
-            <strong>Árbol operativo de objetivos, indicadores y actividades</strong>
+            <strong>Árbol de objetivos, indicadores y actuaciones de la agenda</strong>
           </span>
-          <span className="status-pill">{linkedActionCards} fichas · {linkedActivities} actividades</span>
+          <span className="status-pill">{openFichas} {openFichas === 1 ? "ficha" : "fichas"} de indicador · {linkedActionCards} {linkedActionCards === 1 ? "actuación" : "actuaciones"} en la agenda</span>
         </summary>
-        <p className="panel-note">Cada rama conserva la cadena línea estratégica → bloque → objetivo → indicador → ficha → actuación → actividades y entregas. Si falta una pieza, se declara como pendiente.</p>
-        <p className="panel-note">Las fichas de actuación se muestran aquí como fuente de datos del indicador. El resultado de cada indicador no se atribuye a actuaciones concretas, y la gestión de las actuaciones y de las agendas anuales se hace en la vista Agenda, separada del Plan de Acción.</p>
+        <p className="panel-note">Cada rama conserva la cadena línea estratégica → objetivo → indicador → ficha de medición, y muestra las actuaciones de la agenda que declaran contribuir a cada indicador. Si falta una pieza, se declara como pendiente.</p>
+        <p className="panel-note">Las actuaciones se registran y se gestionan en la Agenda, separada del Plan de Acción (Art. 16 bis). El resultado de cada indicador no se atribuye a actuaciones concretas.</p>
         <div className="pcm-operational-tree" aria-label="Árbol operativo de actividades vinculadas a objetivos e indicadores">
           {active.map(({ module, moduleDecision }) => {
             const moduleLinks = traceability.filter((link) => link.moduleId === module.id);
@@ -327,31 +327,17 @@ export function DefinitiveActionPlanPreview({municipalityId, municipalityName: v
                           <p>{fichaStatusLabel(link.indicatorFichaStatus)} · {countLabel(link.actionCards.length, "actuación", "actuaciones")} · {countLabel(link.consolidationCount, "consolidación", "consolidaciones")}</p>
                         </div>
                         {link.actionCards.length === 0 ? (
-                          <p className="pcm-tree-empty">Sin actuaciones vinculadas todavía.</p>
+                          <p className="pcm-tree-empty">Ninguna actuación de la agenda declara contribuir a este indicador.</p>
                         ) : (
                           <div className="pcm-tree-actions">
                             {link.actionCards.map((action) => (
                               <article className="pcm-tree-action" key={action.id}>
-                                <span className="pcm-tree-node__label">Actuación → actividades → entregas</span>
+                                <span className="pcm-tree-node__label">Actuación de la agenda</span>
                                 <h5>{action.name}</h5>
                                 <dl>
                                   <div><dt>Responsable</dt><dd>{action.owner}</dd></div>
                                   <div><dt>Calendario</dt><dd>{action.schedule}</dd></div>
-                                  <div><dt>Datos que entrega</dt><dd>{action.requestedData}</dd></div>
                                 </dl>
-                                {action.activities.length > 0 ? (
-                                  <ul className="pcm-tree-activities">
-                                    {action.activities.map((activity) => (
-                                      <li key={activity.id}>
-                                        <strong>{activity.name}</strong>
-                                        <span>{activity.status} · {activity.schedule} · evidencia: {activity.evidence}</span>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                ) : (
-                                  <p className="pcm-tree-empty">Actividad concreta pendiente.</p>
-                                )}
-                                <p className="pcm-tree-deliveries">{countLabel(action.deliveryCount, "entrega registrada", "entregas registradas")}.</p>
                                 {action.missingFields.length > 0 && (
                                   <p className="pcm-tree-empty">Falta completar: {action.missingFields.join(", ")}.</p>
                                 )}
@@ -373,13 +359,13 @@ export function DefinitiveActionPlanPreview({municipalityId, municipalityName: v
             <p className="pcm-source">{link.moduleTitle} · {link.thematicBlock} · {link.objectiveCode}</p>
             <p><strong>Objetivo:</strong> {link.objectiveTitle}</p>
             <p><strong>Ficha del indicador:</strong> {fichaStatusLabel(link.indicatorFichaStatus)}</p>
-            <p><strong>Actuaciones:</strong> {link.actionCards.length} · <strong>Actividades:</strong> {link.actionCards.reduce((total, action) => total + action.activities.length, 0)} · <strong>Entregas:</strong> {link.actionCards.reduce((total, action) => total + action.deliveryCount, 0)} · <strong>Consolidaciones:</strong> {link.consolidationCount}</p>
+            <p><strong>Actuaciones en la agenda:</strong> {link.actionCards.length} · <strong>Consolidaciones:</strong> {link.consolidationCount}</p>
             {link.actionCards.length > 0 && <ul>
               {link.actionCards.map((action) => <li key={action.id}>
                 <strong>{action.name}</strong> · Responsable: {action.owner}; calendario: {action.schedule}; recursos: {action.resources}.
               </li>)}
             </ul>}
-            {link.pendingSummary.length > 0 ? <p className="panel-note">Pendiente: {link.pendingSummary.join("; ")}</p> : <p className="panel-note">Fichas registradas sin campos obligatorios pendientes.</p>}
+            {link.pendingSummary.length > 0 ? <p className="panel-note">Pendiente: {link.pendingSummary.join("; ")}</p> : <p className="panel-note">Sin pendientes.</p>}
           </article>)}
         </div>
       </details>

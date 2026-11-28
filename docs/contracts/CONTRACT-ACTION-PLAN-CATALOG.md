@@ -1,6 +1,6 @@
 # CONTRATO DEL CATÁLOGO TEMÁTICO DEL PLAN DE ACCIÓN
 
-> PA-RELAS-02 · Versión 1.2 — 2026-11-21 (versión 1.1: 2026-11-09; versión 1.0: 2026-09-04)  
+> PA-RELAS-02 · Versión 1.3 — 2026-11-28 (versión 1.2: 2026-11-21; versión 1.1: 2026-11-09; versión 1.0: 2026-09-04)  
 > Estado: VIGENTE
 
 ## 1. Posición en la cadena
@@ -138,7 +138,9 @@ entrega habilita preparación y revisión metodológica, no aprobación automát
 
 ## 8. Actuaciones fuera del Plan de Acción — actualización autorizada 2026-10-19
 
-El Plan de Acción lo componen líneas estratégicas, objetivos e indicadores. Las actuaciones y las agendas anuales son un instrumento separado (`CONTRACT-AGENDA-ACTUATIONS`). Las fichas de actuación de la ficha del indicador se conservan como instrumento de recogida de datos para consolidar el indicador; no convierten las actuaciones en parte del Plan de Acción ni permiten atribuirles una parte del resultado del indicador. No se retira ninguna función.
+El Plan de Acción lo componen líneas estratégicas, objetivos e indicadores. Las actuaciones y las agendas anuales son un instrumento separado (`CONTRACT-AGENDA-ACTUATIONS`). La ficha del indicador es solo de medición (decisión del responsable, 2026-11-28): definición, instrumento, responsable de la consolidación, línea de base, meta, entregas de datos por periodo y consolidación. Las actuaciones, con responsable, calendario y recursos, se registran en la Agenda y declaran a qué indicador contribuyen; la ficha y el mapa de vínculos las muestran como lectura. Las fichas de actuación anteriores con contenido se conservan como solo lectura. Ninguna actuación recibe una parte del resultado del indicador.
+
+Desde la misma fecha, el Plan sigue la decisión vigente del Grupo Motor: solo se editan y entran en el Plan resultante las líneas adoptadas; las demás, y todas si no hay decisión vigente, quedan para consulta. El catálogo común no lleva hallazgos de ningún territorio; la procedencia territorial se conserva como variante del municipio (Bienestar emocional en Atarfe).
 
 ## 9. La EPVSA como módulo y ampliación del catálogo — actualización autorizada 2026-10-21
 

@@ -1,3 +1,4 @@
+import type { PlanIndicatorOption } from "../../application/action-plan/planIndicatorOptions";
 import { useEffect, useState } from "react";
 import type { IndicatorWorksheet } from "../../domain/action-plan-catalog/IndicatorWorksheet";
 import {
@@ -8,6 +9,8 @@ import {
 import { readActuation } from "../../application/agenda/agendaActuations";
 
 interface Props {
+  /** Indicadores de las líneas adoptadas del Plan de Acción. */
+  planIndicators?: readonly PlanIndicatorOption[];
   actuation: AgendaActuation;
   worksheets: readonly IndicatorWorksheet[];
   onSave: (next: AgendaActuation) => void;
@@ -40,7 +43,7 @@ function ReadOnly({ label, value, hint }: { label: string; value?: string; hint?
   );
 }
 
-export function ActuationFicha({ actuation, worksheets, onSave, onClose, onSaveAsTemplate }: Props) {
+export function ActuationFicha({ actuation, worksheets, onSave, onClose, onSaveAsTemplate, planIndicators = [] }: Props) {
   const [draft, setDraft] = useState<AgendaActuation>(actuation);
   const [templateName, setTemplateName] = useState<string | null>(null);
   const reading = readActuation(actuation, worksheets);
@@ -179,6 +182,18 @@ export function ActuationFicha({ actuation, worksheets, onSave, onClose, onSaveA
 
       <details>
         <summary>Vínculo estratégico</summary>
+        {planIndicators.length > 0 && field("Indicador del Plan de Acción al que contribuye", (
+          <select value={planIndicators.find((o) => (draft.strategic.mainIndicator ?? "").startsWith(`${o.code} `))?.code ?? ""}
+            onChange={(e) => {
+              const option = planIndicators.find((o) => o.code === e.target.value);
+              set("strategic", option
+                ? { framework: "Plan de Acción", line: option.line, objective: option.objective, mainIndicator: `${option.code} · ${option.label}` }
+                : { mainIndicator: undefined });
+            }}>
+            <option value="">Sin vincular a un indicador del Plan</option>
+            {planIndicators.map((o) => <option key={o.code} value={o.code}>{o.code} · {o.label}</option>)}
+          </select>
+        ))}
         {textInput("strategic", "framework", "Marco estratégico")}
         {textInput("strategic", "line", "Línea")}
         {textInput("strategic", "objective", "Objetivo", true)}
