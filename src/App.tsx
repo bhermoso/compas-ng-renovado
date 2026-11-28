@@ -4257,6 +4257,11 @@ export default function App() {
                 selection={workspace.deliberativePrioritySelection}
                 lectura={runtime.lectura}
                 isStale={runtime.prioritySelectionIsStale}
+                onWithdraw={documentWriteAllowed ? () => setWorkspace((prev) => {
+                  const next = { ...prev, updatedAt: new Date().toISOString() };
+                  delete next.deliberativePrioritySelection;
+                  return next;
+                }) : undefined}
               />
               {runtime.lectura ? (
                 <DeliberativePrioritySelectionPanel
