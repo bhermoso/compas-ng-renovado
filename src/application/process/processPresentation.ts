@@ -33,7 +33,7 @@ export interface TimelineItem { date: string; kindLabel: string; title: string; 
 
 export type Slide =
   | { type: "cover"; municipality: string; province?: string; profileTitle?: string; validatedAt?: string; inReview?: boolean }
-  | { type: "timeline"; items: TimelineItem[] }
+  | { type: "timeline"; items: TimelineItem[]; page?: number; pages?: number }
   | { type: "figures"; eyebrow: string; title: string; figures: Figure[]; source: string }
   | { type: "comparison"; eyebrow: string; title: string; rows: Figure[]; source: string }
   | { type: "pairs"; eyebrow: string; title: string; rows: Array<{ title: string; women: Figure; men: Figure }>; source: string }
@@ -150,6 +150,8 @@ function addChosenProposals(slides: Slide[], profile: ExternalHealthProfile) {
   if (recommendations.length > 0) slides.push({ type: "recommendations", items: recommendations, profileTitle: profile.title });
 }
 
+export const MAX_TIMELINE_ITEMS = 6;
+
 export function buildProcessPresentation(workspace: MunicipalityWorkspace, options: { ibseCsvText?: string; surveyYear?: number } = {}): Slide[] {
   const identity = workspace.municipality.identity;
   const profile: ExternalHealthProfile | undefined = activeExternalProfile(workspace);
@@ -169,7 +171,12 @@ export function buildProcessPresentation(workspace: MunicipalityWorkspace, optio
     items.push({ date: profile.validatedAt.slice(0, 10), kind: "validacion", kindLabel: "Perfil de Salud Local", title: "Validación técnica del Perfil" });
   }
   items.sort((a, b) => a.date.localeCompare(b.date));
-  if (items.length > 0) slides.push({ type: "timeline", items });
+  // Como mucho seis hitos por diapositiva, repartidos por igual (15 → 5 + 5 + 5).
+  const timelinePages = Math.ceil(items.length / MAX_TIMELINE_ITEMS);
+  const perTimelinePage = Math.ceil(items.length / Math.max(1, timelinePages));
+  for (let i = 0, page = 1; i < items.length; i += perTimelinePage, page++) {
+    slides.push({ type: "timeline", items: items.slice(i, i + perTimelinePage), ...(timelinePages > 1 ? { page, pages: timelinePages } : {}) });
+  }
 
   if (custom && profile) {
     slides.push(...custom.pages.map(page => ({ type: "documentary-page" as const, page })));

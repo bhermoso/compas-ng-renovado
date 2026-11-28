@@ -197,7 +197,10 @@ function SlideView({ slide, onGoToCycle, step }: { slide: Slide; onGoToCycle: ()
     case "timeline":
       return (
         <section className="pp-slide">
-          <p className="pp-eyebrow">Recorrido</p>
+          <p className="pp-eyebrow">
+            Recorrido · {slide.items[0].date.slice(0, 4)}{slide.items[slide.items.length - 1].date.slice(0, 4) !== slide.items[0].date.slice(0, 4) ? `–${slide.items[slide.items.length - 1].date.slice(0, 4)}` : ""}
+            {slide.pages ? ` · ${slide.page} de ${slide.pages}` : ""}
+          </p>
           <h2>De dónde venimos</h2>
           <ol className="pp-timeline" style={{ gridTemplateColumns: `repeat(${slide.items.length}, 1fr)` }}>
             {slide.items.map((item, i) => (
