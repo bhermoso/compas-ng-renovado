@@ -2,7 +2,10 @@ import { useState } from "react";
 import type { LecturaEstrategicaLocal } from "../../domain/strategic-scenario";
 import type { ThematicPrioritisation } from "../../domain/thematic-prioritisation";
 import { THEMATIC_TOPICS } from "../../domain/thematic-prioritisation";
-import type { DeliberativePrioritySelection } from "../../domain/deliberative-prioritisation";
+import { OWN_PRIORITY_ORIGIN_LABELS, type DeliberativePrioritySelection, type GroupMotorOwnPriority } from "../../domain/deliberative-prioritisation";
+
+type OwnPriorityDraft = Omit<GroupMotorOwnPriority, "id">;
+const EMPTY_OWN: OwnPriorityDraft = { title: "", origin: "group-motor-deliberation", citizenTopicIds: [], catalogModuleIds: [], rationale: "" };
 import { ACTION_PLAN_CATALOG } from "../../domain/action-plan-catalog";
 
 interface DeliberativePrioritySelectionPanelProps {
@@ -13,6 +16,7 @@ interface DeliberativePrioritySelectionPanelProps {
   onSave: (input: {
     selectedScenarioIds: string[];
     catalogModuleLinks: Array<{ scenarioId: string; moduleId: string }>;
+    ownPriorities: OwnPriorityDraft[];
     deliberationRationale: string;
     citizenInfluenceStatement: string;
     decidedBy: string;
@@ -28,6 +32,9 @@ export function DeliberativePrioritySelectionPanel({
 }: DeliberativePrioritySelectionPanelProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>(selection?.selectedScenarioIds ?? []);
   const [catalogModuleLinks, setCatalogModuleLinks] = useState(selection?.catalogModuleLinks ?? []);
+  const [ownPriorities, setOwnPriorities] = useState<OwnPriorityDraft[]>(
+    (selection?.ownPriorities ?? []).map(({ id: _id, ...rest }) => rest)
+  );
   const [rationale, setRationale] = useState(selection?.deliberationRationale ?? "");
   const [citizenInfluence, setCitizenInfluence] = useState(selection?.citizenInfluenceStatement ?? "");
   const [decidedBy, setDecidedBy] = useState(selection?.decidedBy ?? "");
@@ -52,11 +59,20 @@ export function DeliberativePrioritySelectionPanel({
     });
   }
 
+  function updateOwn(index: number, patch: Partial<OwnPriorityDraft>) {
+    setOwnPriorities((current) => current.map((own, i) => (i === index ? { ...own, ...patch } : own)));
+  }
+
+  function toggleIn(list: string[], id: string): string[] {
+    return list.includes(id) ? list.filter((x) => x !== id) : [...list, id];
+  }
+
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setViolations(onSave({
       selectedScenarioIds: selectedIds,
       catalogModuleLinks,
+      ownPriorities,
       deliberationRationale: rationale,
       citizenInfluenceStatement: citizenInfluence,
       decidedBy,
@@ -90,7 +106,13 @@ export function DeliberativePrioritySelectionPanel({
 
       <form className="deliberative-selection__form" onSubmit={submit}>
         <fieldset>
-          <legend>Candidaturas de la lectura estratégica</legend>
+          <legend>Recomendaciones del Perfil vigente</legend>
+          {lectura.escenarios.length === 0 && (
+            <p className="empty-state">
+              El Perfil vigente no tiene recomendaciones elegidas por el equipo técnico. El Grupo Motor puede
+              registrar igualmente sus prioridades propias.
+            </p>
+          )}
           {lectura.escenarios.map((scenario) => {
             const selected = selectedIds.includes(scenario.id);
             return (
@@ -119,6 +141,66 @@ export function DeliberativePrioritySelectionPanel({
           })}
         </fieldset>
 
+        <fieldset className="deliberative-selection__own">
+          <legend>Prioridades propias del Grupo Motor (no proceden del Perfil)</legend>
+          <p className="panel-note">
+            Prioridades que el Grupo Motor adopta por priorización ciudadana o por su propia deliberación, sin una
+            recomendación del Perfil que las respalde. Se registran con su origen y su motivación.
+          </p>
+          {ownPriorities.map((own, index) => (
+            <div key={index} className="deliberative-selection__own-item">
+              <label>
+                <span className="deliberative-selection__label">Prioridad</span>
+                <input value={own.title} onChange={(event) => updateOwn(index, { title: event.target.value })} />
+              </label>
+              <div className="deliberative-selection__own-origin" role="radiogroup" aria-label="Origen de la prioridad">
+                {(Object.keys(OWN_PRIORITY_ORIGIN_LABELS) as OwnPriorityDraft["origin"][]).map((origin) => (
+                  <label key={origin}>
+                    <input
+                      type="radio"
+                      name={`own-origin-${index}`}
+                      checked={own.origin === origin}
+                      onChange={() => updateOwn(index, { origin, citizenTopicIds: origin === "citizen-prioritisation" ? own.citizenTopicIds : [] })}
+                    />
+                    <span>{OWN_PRIORITY_ORIGIN_LABELS[origin]}</span>
+                  </label>
+                ))}
+              </div>
+              {own.origin === "citizen-prioritisation" && (
+                <fieldset className="deliberative-selection__catalog-links">
+                  <legend>Temáticas de la priorización ciudadana en las que se apoya</legend>
+                  {citizenTopicIds.length === 0 && <p className="empty-state">No consta una priorización ciudadana registrada.</p>}
+                  {citizenTopicIds.map((id) => (
+                    <label key={id}>
+                      <input type="checkbox" checked={own.citizenTopicIds.includes(id)} onChange={() => updateOwn(index, { citizenTopicIds: toggleIn(own.citizenTopicIds, id) })} />
+                      <span>{THEMATIC_TOPICS.find((topic) => topic.id === id)?.label ?? id}</span>
+                    </label>
+                  ))}
+                </fieldset>
+              )}
+              <fieldset className="deliberative-selection__catalog-links">
+                <legend>Líneas del catálogo que la desarrollan</legend>
+                {ACTION_PLAN_CATALOG.map((module) => (
+                  <label key={module.id}>
+                    <input type="checkbox" checked={own.catalogModuleIds.includes(module.id)} onChange={() => updateOwn(index, { catalogModuleIds: toggleIn(own.catalogModuleIds, module.id) })} />
+                    <span>{module.title}</span>
+                  </label>
+                ))}
+              </fieldset>
+              <label>
+                <span className="deliberative-selection__label">Motivación de esta prioridad</span>
+                <textarea rows={3} value={own.rationale} onChange={(event) => updateOwn(index, { rationale: event.target.value })} />
+              </label>
+              <button type="button" className="deliberative-selection__own-remove" onClick={() => setOwnPriorities((current) => current.filter((_, i) => i !== index))}>
+                Quitar esta prioridad
+              </button>
+            </div>
+          ))}
+          <button type="button" className="deliberative-selection__own-add" onClick={() => setOwnPriorities((current) => [...current, { ...EMPTY_OWN }])}>
+            Añadir prioridad propia
+          </button>
+        </fieldset>
+
         <div>
           <p className="deliberative-selection__label">Priorización ciudadana disponible</p>
           {citizenTopicIds.length > 0 ? (
@@ -135,7 +217,7 @@ export function DeliberativePrioritySelectionPanel({
         </div>
 
         <label>
-          <span className="deliberative-selection__label">Motivación de la selección</span>
+          <span className="deliberative-selection__label">Motivación de la decisión en su conjunto</span>
           <textarea value={rationale} onChange={(event) => setRationale(event.target.value)} rows={4} />
         </label>
         <label>

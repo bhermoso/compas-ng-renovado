@@ -459,9 +459,15 @@ export function getEligibleActionPlanModules(
   const selectedIds = new Set(selection.selectedScenarioIds);
   const links = selection.catalogModuleLinks ?? [];
   return ACTION_PLAN_CATALOG.flatMap((module) => {
-    const sourceScenarioIds = links
-      .filter((link) => link.moduleId === module.id && selectedIds.has(link.scenarioId))
-      .map((link) => link.scenarioId);
+    const sourceScenarioIds = [
+      ...links
+        .filter((link) => link.moduleId === module.id && selectedIds.has(link.scenarioId))
+        .map((link) => link.scenarioId),
+      // Prioridades propias del Grupo Motor (no proceden del Perfil).
+      ...(selection.ownPriorities ?? [])
+        .filter((own) => own.catalogModuleIds.includes(module.id))
+        .map((own) => own.id),
+    ];
     return sourceScenarioIds.length > 0 ? [{ module, sourceScenarioIds }] : [];
   });
 }

@@ -22,9 +22,11 @@ describe("Plan de Acción con el diseño de Inicio", () => {
     expect(block).toContain('className={`plan-page__section hp-phase hp-phase--${index + 1}`}');
     expect(block).toContain("open={planTab === section.id}");
     expect(block).toContain('{planTab === section.id && <div className="plan-page__body">{section.body()}</div>}');
-    for (const title of ["Líneas e indicadores", "Plan resultante", "Lectura estratégica", "Participación y prioridades", "Borrador de actuaciones"]) {
+    for (const title of ["Líneas e indicadores", "Plan resultante", "Lectura estratégica", "Participación y prioridades"]) {
       expect(block).toContain(`title: "${title}"`);
     }
+    // El borrador automático de actuaciones se retiró el 28/11/2026: COMPÁS no genera actuaciones (Art. 16 bis).
+    expect(block).not.toContain('title: "Borrador de actuaciones"');
   });
 
   it("la sección abierta ocupa el ancho completo y el interior no anida cajas", () => {

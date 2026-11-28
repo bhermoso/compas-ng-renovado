@@ -8,6 +8,8 @@ interface PrioritizationPanelProps {
   hasInsufficientEvidence?: boolean;
   /** Referencia exacta de la versión externa que alimenta esta proyección. */
   externalSource?: { id: string; title: string; status: "review" | "validated"; limitations: string[] };
+  /** Decisión vigente del Grupo Motor: qué recomendaciones adoptó como prioridad. */
+  groupMotorDecision?: { adoptedAreaIds: string[]; decidedBy: string; decidedAt: string };
 }
 
 export function PrioritizationPanel({
@@ -16,6 +18,7 @@ export function PrioritizationPanel({
   pslIsStale,
   hasInsufficientEvidence = false,
   externalSource,
+  groupMotorDecision,
 }: PrioritizationPanelProps) {
   const needsValidationWarning = pslStatus !== "validated" && pslStatus !== "approved" || pslIsStale;
 
@@ -71,15 +74,19 @@ export function PrioritizationPanel({
 
           {candidates.length === 0 ? (
             <p className="empty-state">
-              Sin áreas candidatas. Incorpora documentación territorial para generar
-              candidaturas técnicas de priorización.
+              {externalSource
+                ? "El Perfil vigente no tiene recomendaciones elegidas por el equipo técnico. Elígelas en «Perfil de Salud Local» o registra las prioridades propias del Grupo Motor en «Decisión del Grupo Motor»."
+                : "Sin áreas candidatas. Incorpora documentación territorial para generar candidaturas técnicas de priorización."}
             </p>
           ) : (
             <div className="document-list">
-              {candidates.map((priority) => (
+              {candidates.map((priority) => {
+                const adopted = groupMotorDecision?.adoptedAreaIds.includes(priority.sourceAreaId);
+                const state = groupMotorDecision == null ? "Pendiente de deliberación" : adopted ? "Adoptada por el Grupo Motor" : "No adoptada por el Grupo Motor";
+                return (
                 <article className="document-row" key={priority.id}>
                   <div>
-                    <p className="document-kind">{externalSource ? "Recomendación del Perfil · pendiente de deliberación" : "Área candidata para deliberación"}</p>
+                    <p className="document-kind">{externalSource ? `Recomendación del Perfil · ${state.toLowerCase()}` : "Área candidata para deliberación"}</p>
                     <h3>{priority.title}</h3>
                     <p>{externalSource
                       ? "El Perfil formula esta recomendación. Su posible conversión en prioridad requiere decisión y fundamento del Grupo Motor."
@@ -97,9 +104,10 @@ export function PrioritizationPanel({
                       ))}
                     </ul>
                   </div>
-                  <span className="status-pill">Pendiente de deliberación</span>
+                  <span className="status-pill">{state}</span>
                 </article>
-              ))}
+                );
+              })}
             </div>
           )}
 

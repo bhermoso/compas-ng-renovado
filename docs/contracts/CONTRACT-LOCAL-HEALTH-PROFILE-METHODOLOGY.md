@@ -1,7 +1,7 @@
 # CONTRACT-LOCAL-HEALTH-PROFILE-METHODOLOGY
 
 > Contrato metodológico canónico del Perfil de Salud Local (PSL) en COMPÁS.
-> Versión 3.0.1 — 2026-11-24 (historial en el registro de revisiones)
+> Versión 3.1.0 — 2026-11-28 (historial en el registro de revisiones)
 > Estado: VIGENTE. Contrato rector del Perfil.
 >
 > Este contrato define qué es metodológicamente un Perfil de Salud Local, qué
@@ -478,6 +478,8 @@ El Perfil llega hasta las recomendaciones. La priorización corresponde al Grupo
 
 **Solo el Perfil vigente.** La priorización y el Plan de Acción leen únicamente la revisión vigente del Perfil y sus conclusiones y recomendaciones elegidas. No leen borradores, revisiones históricas, propuestas descartadas ni piezas intermedias del expediente. Cambiar de revisión vigente es una acción explícita y no modifica por sí misma la priorización ni el Plan (I-LHPM-23).
 
+**Prioridades propias del Grupo Motor.** La priorización es del Grupo Motor, y su decisión es soberana: puede adoptar prioridades que no procedan de una recomendación del Perfil, por priorización ciudadana o por su propia deliberación. Se registran con su origen y su motivación, y se presentan siempre como prioridades que no proceden del Perfil; el Perfil no se modifica para darles respaldo. Es la única excepción a I-LHPM-23.
+
 ### Art. 16 ter. Conclusiones y recomendaciones como menú elegible
 
 Las conclusiones y las recomendaciones del Perfil se presentan al equipo técnico como un menú. El equipo elige cuáles asume y descarta las demás.
@@ -862,11 +864,11 @@ El panel de salud usa el núcleo común de indicadores, declara sus comparadores
 
 **I-LHPM-23 — Solo el Perfil vigente alimenta los pasos posteriores**
 
-La priorización y el Plan de Acción leen solo la revisión vigente del Perfil y sus conclusiones y recomendaciones elegidas; nunca borradores, revisiones históricas, propuestas descartadas ni piezas intermedias.
+La priorización y el Plan de Acción leen solo la revisión vigente del Perfil y sus conclusiones y recomendaciones elegidas; nunca borradores, revisiones históricas, propuestas descartadas ni piezas intermedias. Excepción: las prioridades propias del Grupo Motor (Art. 16 bis), que no proceden del Perfil, se registran con su origen —priorización ciudadana o deliberación del Grupo Motor— y su motivación, y se presentan siempre como tales.
 
 *Consecuencia si se viola:* el Plan se apoya en un diagnóstico que nadie ha validado o que ya fue sustituido.
 
-*Fuente:* Art. 16 bis. Regla procedente del antiguo CONTRACT-MIT-PSL, incorporada en la v3.0.0.
+*Fuente:* Art. 16 bis. Regla procedente del antiguo CONTRACT-MIT-PSL, incorporada en la v3.0.0. Excepción de las prioridades propias del Grupo Motor: decisión del responsable del 2026-11-28.
 
 **I-LHPM-24 — Clasificación única de las afirmaciones**
 
@@ -918,6 +920,7 @@ Pasaron a `docs/historico/contratos-perfil/` el 2026-11-23, como historial y sin
 | 2026-11-17 | 2.4.0 | Art. 17 quater: desarrollo del dominio de determinantes sociales y del eje de desigualdad mediante `CONTRACT-TERRITORIAL-STATISTICS` (catálogo de 37 indicadores con ficha y tabla por provincia; descarga del INE y del IECA conservada como material para la revisión, sin modificar la vigente). Motivo: los cuatro Perfiles vigentes usan una parte pequeña de la estadística oficial disponible (sin Gini, P80/P20 ni fuentes de ingreso). Encargo del autor del 2026-11-17 | COMPÁS |
 | 2026-11-18 | 2.5.0 | Nuevo Art. 4 quater: el Perfil es un informe de salud basado en los determinantes sociales, con el marco de la Comisión sobre Determinantes Sociales de la Salud de la OMS (Solar e Irwin, 2010) adaptado por la Comisión para Reducir las Desigualdades Sociales en Salud en España (2010). Art. 17 ter: seis páginas de datos en el orden del marco (portada; contexto y población; ejes de desigualdad; condiciones de vida; servicios; salud y bienestar), con compatibilidad para los Perfiles anteriores. Decisión del autor del 2026-11-18: «que el perfil de salud local sea verdaderamente un informe de salud basado en los determinantes sociales de la salud» | COMPÁS |
 | 2026-11-21 | 2.5.1 | Retirada de Granada-Zaidín de COMPÁS (decisión del responsable, 2026-11-21): deja de ser caso de referencia. La disposición transitoria del Art. 16 quater (incluida la nota sobre `chosenClosing.ts`) y la hipótesis abierta sobre el número de conclusiones se refieren a los expedientes de prueba Zagra, Atarfe y Loja. Sin cambios de doctrina. | COMPÁS |
+| 2026-11-28 | 3.1.0 | Art. 16 bis e I-LHPM-23: el Grupo Motor puede adoptar prioridades propias que no proceden del Perfil, por priorización ciudadana o por su propia deliberación, registradas con su origen y su motivación y presentadas siempre como tales. Decisión del responsable del 2026-11-28 (casos de Atarfe y Zagra) | COMPÁS |
 | 2026-11-24 | 3.0.1 | Alcance: el Actualizador de perfiles, única excepción regulada a la regla de que COMPÁS no reescribe el Perfil; su resultado es una revisión nueva que valida el equipo técnico. Decisión del responsable del 2026-11-24 («el perfil se genera fuera, pero se actualiza dentro») | COMPÁS |
 | 2026-11-23 | 3.0.0 | Reforma de la gobernanza del Perfil: cuatro documentos en lugar de doce (este contrato, el de elaboración, entrega y conservación, el del actualizador y la guía de escritura); los demás pasan a histórico. Alcance: el Perfil de COMPÁS lo redacte quien lo redacte; quien redacta propone, el equipo técnico elige y COMPÁS conserva, muestra y comprueba (Alcance, Art. 16). El menú de conclusiones y recomendaciones lo presenta COMPÁS sobre el Perfil cargado, antes de validarlo (Art. 16 ter). Localiza Salud, fuente exclusiva de la lectura de activos (Art. 9). Clasificación única de las afirmaciones por los tipos del Art. 8 y los grados del Art. 8 bis (Art. 8, I-LHPM-24). Regla nueva: la priorización y el Plan leen solo el Perfil vigente (Art. 16 bis, I-LHPM-23). Se retiran los artículos escritos para el generador (Art. 8 ter, regla 3; disposición transitoria del Art. 16 quater). Seis páginas en I-LHPM-10; H-LHPM-1 y H-LHPM-6 cerradas; ESA 2030 y PESMAA en los marcos (Art. 7); «COMPÁS» sin «NG»; registro ordenado. Decisiones del responsable del 2026-11-23 | COMPÁS |
 
