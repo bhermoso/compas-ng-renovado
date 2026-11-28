@@ -7,6 +7,12 @@ import type { ExternalHealthProfile, ExternalProfileLibrary } from "../../domain
 const revision = (s: string) => /\brevisi[oó]n\s+(\d+\.\d+(?:\.\d+)?)/i.exec(s)?.[1];
 const fileRevision = (s: string) => /(?:^|[_\s-])v(\d+)[._-](\d+)(?:[._-](\d+))?/i.exec(s)?.slice(1).filter(Boolean).join(".");
 
+export function profileAttachmentEdition(name: string) {
+  const version = fileRevision(name);
+  const date = /(?:^|[_\s-])(\d{4})-(\d{2})-(\d{2})(?=[._\s-]|$)/.exec(name);
+  return { version, date: date ? [date[3], date[2], date[1]].join("/") : undefined };
+}
+
 export interface ProfileCustodyAudit {
   declaredRevisions: string[];
   missingRevisions: string[];
