@@ -12076,12 +12076,10 @@ h3 {
 @media (max-width: 420px) {
   .app-nav__context-label { display: none; }
 }
-/* Escritorio: las nueve pestañas caben siempre en la barra. Sin desplazamiento
-   horizontal oculto; las etiquetas largas pasan a dos líneas antes que esconder
-   Implantación, Evaluación o el Gestor de Encuestas. */
-@media (min-width: 761px) {
-  .app-nav .app-nav__inner { padding-inline: 24px; gap: 12px; }
-  .app-nav .app-nav__tabs { overflow: visible; gap: 2px; justify-content: space-between; }
+/* La barra crece si la tipografía o el espacio disponible requieren otra fila. */
+@media (min-width: 1024px) {
+  .app-nav .app-nav__inner { height: auto; min-height: 56px; padding: 4px 16px; gap: 12px; }
+  .app-nav .app-nav__tabs { flex-wrap: wrap; overflow: visible; gap: 2px; justify-content: space-between; }
   .app-nav .app-nav__tab {
     flex: 0 1 auto;
     min-width: min-content;
@@ -12089,31 +12087,20 @@ h3 {
     text-wrap: balance;
     text-align: left;
     line-height: 1.15;
-    padding: 6px 8px;
+    padding: 6px;
     gap: 0;
     font-size: .84rem;
   }
   .app-nav .app-nav__tab .app-nav__phase { min-width: 1.9em; margin-right: 6px; flex-shrink: 0; }
-  .app-nav .app-nav__label-line { white-space: nowrap; }
+  .app-nav .app-nav__label-line { display: block; white-space: nowrap; }
 }
-@media (min-width: 961px) and (max-width: 1100px) {
-  .app-nav .app-nav__tab { font-size: .78rem; padding: 5px 6px; }
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .app-nav .app-nav__tab { font-size: .78rem; padding: 5px; }
 }
-/* Por debajo de 960 px las nueve pestañas no caben legibles: selector «Ir a». */
-@media (min-width: 761px) and (max-width: 960px) {
+@media (max-width: 1023px) {
   .app-nav .app-nav__tabs { display: none; }
   .app-nav .app-nav__menu { display: flex; width: 100%; gap: 8px; align-items: center; font-size: .82rem; }
-  .app-nav .app-nav__menu select { flex: 1; min-width: 0; min-height: 36px; padding: 4px 8px; border: 1px solid var(--borde); background: var(--blanco); color: var(--texto-principal); }
-}
-@media (max-width: 760px) {
-  .app-nav .app-nav__tabs,
-  .app-nav__secondary-context,
-  .app-nav__municipality-sep { display: none; }
-  .app-nav--home .app-nav__municipality-row { flex-wrap: wrap; overflow: visible; padding-inline: 12px; }
-  .app-nav--home .app-nav__municipality-name { white-space: normal; flex-shrink: 1; }
-  .app-nav .app-nav__inner { padding: 5px 12px; }
-  .app-nav__menu { display: flex; width: 100%; gap: 8px; align-items: center; font-size: .82rem; }
-  .app-nav__menu select {
+  .app-nav .app-nav__menu select {
     flex: 1;
     min-width: 0;
     min-height: 36px;
@@ -12122,6 +12109,13 @@ h3 {
     background: var(--blanco);
     color: var(--texto-principal);
   }
+}
+@media (max-width: 760px) {
+  .app-nav__secondary-context,
+  .app-nav__municipality-sep { display: none; }
+  .app-nav--home .app-nav__municipality-row { flex-wrap: wrap; overflow: visible; padding-inline: 12px; }
+  .app-nav--home .app-nav__municipality-name { white-space: normal; flex-shrink: 1; }
+  .app-nav .app-nav__inner { padding: 5px 12px; }
 }
 
 /* Borrador de una versión antigua: aviso y redacción guardada en solo lectura. */

@@ -1,20 +1,21 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-// Las nueve pestañas deben verse en escritorio: ninguna queda escondida tras
-// un desplazamiento horizontal de la barra (regresión observada a 1280–1920 px).
+// La incorporación de Proceso amplió la barra a diez accesos.
 describe("Navegación principal en escritorio", () => {
   const css = readFileSync("src/App.css", "utf8");
   const app = readFileSync("src/App.tsx", "utf8");
 
-  it("no oculta pestañas tras un desplazamiento horizontal a partir de 961 px", () => {
-    const block = css.slice(css.indexOf("@media (min-width: 761px) {\n  .app-nav .app-nav__inner"));
-    expect(block).toMatch(/\.app-nav \.app-nav__tabs \{ overflow: visible;/);
-    expect(block).toMatch(/min-width: min-content;/);
+  it("permite filas adicionales en escritorio sin ocultar accesos", () => {
+    const block = css.slice(css.indexOf("@media (min-width: 1024px) {\n  .app-nav .app-nav__inner"));
+    expect(block).toMatch(/\.app-nav \.app-nav__inner \{ height: auto; min-height: 56px;/);
+    expect(block).toMatch(/\.app-nav \.app-nav__tabs \{ flex-wrap: wrap; overflow: visible;/);
+    expect(block).toMatch(/@media \(min-width: 1024px\) and \(max-width: 1279px\)/);
   });
 
-  it("entre 761 y 960 px usa el selector «Ir a» en lugar de la fila de pestañas", () => {
-    expect(css).toMatch(/@media \(min-width: 761px\) and \(max-width: 960px\) \{\s*\.app-nav \.app-nav__tabs \{ display: none; \}/);
+  it("en anchos menores conserva Encuestas en el selector «Ir a»", () => {
+    expect(css).toMatch(/@media \(max-width: 1023px\) \{\s*\.app-nav \.app-nav__tabs \{ display: none; \}\s*\.app-nav \.app-nav__menu \{ display: flex;/);
+    expect(app).toMatch(/\{ id: "ges",\s*label: "Gestor de Encuestas" \}/);
   });
 
   it("parte las etiquetas largas en dos líneas fijas, nunca en tres", () => {
@@ -24,6 +25,6 @@ describe("Navegación principal en escritorio", () => {
       ["Plan Local de Salud", "Plan Local", "de Salud"],
       ["Gestor de Encuestas", "Gestor de", "Encuestas"],
     ]) expect(app).toContain(`"${label}": ["${a}", "${b}"]`);
-    expect(css).toMatch(/\.app-nav__label-line \{ white-space: nowrap; \}/);
+    expect(css).toMatch(/\.app-nav__label-line \{ display: block; white-space: nowrap; \}/);
   });
 });
