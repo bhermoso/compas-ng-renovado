@@ -8,7 +8,9 @@ import { THEMATIC_TOPICS } from "../../domain/thematic-prioritisation";
  * adoptadas, prioridades propias (no proceden del Perfil) y líneas del Plan.
  * Solo muestra lo registrado; no interpreta ni completa.
  */
-export function GroupMotorDecisionSummary({ selection, lectura, isStale, registerHint }: {
+export function GroupMotorDecisionSummary({ selection, lectura, isStale, registerHint, onWithdraw }: {
+  /** Retira un registro erróneo (no una decisión que se quiera cambiar: esa se actualiza). */
+  onWithdraw?: () => void;
   selection?: DeliberativePrioritySelection;
   lectura?: LecturaEstrategicaLocal;
   isStale: boolean;
@@ -76,6 +78,18 @@ export function GroupMotorDecisionSummary({ selection, lectura, isStale, registe
         <p>{selection.deliberationRationale}</p>
         <p>{selection.citizenInfluenceStatement}</p>
       </details>
+      {onWithdraw && (
+        <details className="priority-decision__withdraw">
+          <summary>Retirar un registro erróneo</summary>
+          <p className="panel-note">
+            Para cambiar la decisión, actualízala en el formulario. Retira el registro solo si no recoge
+            una decisión real del Grupo Motor: el expediente quedará sin decisión registrada.
+          </p>
+          <button type="button" onClick={() => {
+            if (window.confirm(`¿Retirar el registro atribuido a ${selection.decidedBy} el ${new Date(selection.decidedAt).toLocaleDateString("es-ES")}? El expediente quedará sin decisión del Grupo Motor. No se puede deshacer salvo restaurando una copia.`)) onWithdraw();
+          }}>Retirar este registro</button>
+        </details>
+      )}
     </section>
   );
 }

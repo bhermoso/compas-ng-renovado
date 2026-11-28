@@ -74,6 +74,15 @@ Perfil al indicador» explica por qué no hay vínculos posibles (Perfil sin
 recomendaciones elegidas, prioridades propias o decisión no vigente). Suite:
 3018 pruebas; lint sin avisos.
 
+**Hecho y decisión (28/11/2026).** Ni Alfacar ni Loja han priorizado. El
+registro de Alfacar del 1/10/2026 («Consenso del GM», sin temáticas ciudadanas,
+un escenario del generador antiguo vinculado a Envejecimiento) no recoge una
+decisión real; el responsable ordena retirarlo. La priorización temática
+ciudadana de Alfacar (3/11/2026, 241 papeletas completas) no se toca.
+
+**Cambio.** «Retirar un registro erróneo» en Priorización → «Decisión del Grupo
+Motor», con confirmación; no aparece en el Plan. Suite: 3019 pruebas.
+
 ---
 
 ## 2026-11-28 (tarde) · Acceso discreto a la administración y fecha de la decisión del Grupo Motor
