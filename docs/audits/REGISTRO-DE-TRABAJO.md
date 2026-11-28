@@ -83,6 +83,15 @@ ciudadana de Alfacar (3/11/2026, 241 papeletas completas) no se toca.
 **Cambio.** «Retirar un registro erróneo» en Priorización → «Decisión del Grupo
 Motor», con confirmación; no aparece en el Plan. Suite: 3019 pruebas.
 
+**Cambios (F3).** Se retiran del Plan la «Lectura estratégica» automática y la
+repetición de Priorización (temáticas, resumen ciudadano y su edición); queda
+la sección «Decisión del Grupo Motor», con enlace a Priorización. Las
+necesidades no priorizadas (G-PLS-7) se documentan una sola vez, en el Plan
+resultante, sin pedir identificador; en cada línea queda su marco de
+evaluación. «Generar Plan de Acción» e «Imprimir» se retiran: la vista
+consolidada se muestra siempre y el documento sale de las descargas en Word y
+PDF. Suite: 3021 pruebas.
+
 ---
 
 ## 2026-11-28 (tarde) · Acceso discreto a la administración y fecha de la decisión del Grupo Motor

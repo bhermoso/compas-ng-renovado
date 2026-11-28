@@ -4105,31 +4105,21 @@ export default function App() {
             { id: "lineas", title: "Líneas e indicadores", summary: "Catálogo RELAS · selección y redacción del territorio", body: () => catalog("lineas") },
             { id: "resultante", title: "Plan resultante", summary: validated === 0 ? "Ninguna versión validada" : validated === 1 ? "1 versión validada" : `${validated} versiones validadas`, body: () => catalog("resultante") },
           ];
-          if (runtime.lectura) {
-            const lectura = runtime.lectura;
-            sections.push(
-              { id: "lectura", title: "Lectura estratégica", summary: "Lectura Estratégica Local del Perfil vigente", body: () => <LecturaEstrategicaView lectura={lectura} /> },
-              { id: "prioridades", title: "Participación y prioridades", summary: "Encuesta ciudadana y selección del Grupo Motor", body: () => (
-                <>
-                  <ThematicPrioritisationPanel
-                    savedIds={runtime.workspace.thematicPrioritisation?.selectedTopicIds ?? []}
-                    onOpen={handleOpenThematicModal}
-                  />
-                  <CitizenParticipationSummary
-                    study={runtime.workspace.thematicPrioritisationStudy}
-                    municipalityId={runtime.workspace.municipality.identity.id}
-                    municipalityName={runtime.workspace.municipality.identity.name}
-                  />
-                  <GroupMotorDecisionSummary
-                    selection={workspace.deliberativePrioritySelection}
-                    lectura={lectura}
-                    isStale={runtime.prioritySelectionIsStale}
-                    registerHint="La decisión se registra y se modifica en «Priorización»."
-                  />
-                </>
-              ) },
-            );
-          }
+          // La lectura estratégica automática y la repetición de Priorización se retiraron del Plan
+          // el 28/11/2026 (F3): el Plan solo muestra la decisión del Grupo Motor, que se registra en Priorización.
+          sections.push(
+            { id: "prioridades", title: "Decisión del Grupo Motor", summary: "Prioridades y líneas adoptadas", body: () => (
+              <>
+                <GroupMotorDecisionSummary
+                  selection={workspace.deliberativePrioritySelection}
+                  lectura={runtime.lectura ?? undefined}
+                  isStale={runtime.prioritySelectionIsStale}
+                  registerHint="La decisión se registra y se modifica en «Priorización»."
+                />
+                <p><button type="button" className="tp-panel__open-btn" onClick={() => setView("priorizacion")}>Ir a «Priorización»</button></p>
+              </>
+            ) },
+          );
           return (
             <section key="plan" className="hp plan-page workspace-page" aria-labelledby="workspace-cover-title" style={{"--plan-cols": sections.length} as CSSProperties}>
               <CompasCover

@@ -205,8 +205,9 @@ describe("DefinitiveActionPlanPreview — unaddressedNeeds editor (Pieza 3b)", (
       />
     );
     // Input fields should be value=""
-    const idLabelPos = html.indexOf("Identificador único");
-    expect(idLabelPos).toBeGreaterThan(-1);
+    // El identificador se deriva del título (F3, 28/11/2026): no se pide.
+    expect(html).not.toContain("Identificador único");
+    expect(html.indexOf("Título de la necesidad")).toBeGreaterThan(-1);
     // There should be empty inputs after the label
     expect(html).toContain('value=""');
   });

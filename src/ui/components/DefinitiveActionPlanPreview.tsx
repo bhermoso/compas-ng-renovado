@@ -1,6 +1,6 @@
 import { PlanDocumentActions } from "./PlanDocumentActions";
 import { openIndicatorFicha } from "./openIndicatorFicha";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import type { ActionPlanCatalogModule } from "../../domain/action-plan-catalog/ActionPlanCatalog";
 import {
   buildDefinitiveActionPlanProjection,
@@ -34,7 +34,6 @@ function UnaddressedNeedsEditor({
   const targetItem = active.find((item) => item.draft);
   const currentNeeds = targetItem?.draft?.unaddressedNeeds;
 
-  const [newId, setNewId] = useState("");
   const [newTitle, setNewTitle] = useState("");
   const [newJustification, setNewJustification] = useState("");
   const [message, setMessage] = useState("");
@@ -48,8 +47,12 @@ function UnaddressedNeedsEditor({
   }
 
   function handleAddNeed() {
+    // Identificador interno estable, derivado del título; no se pide a quien registra.
+    const base = newTitle.trim().toLocaleLowerCase("es").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "necesidad";
+    let id = `necesidad-${base}`;
+    for (let n = 2; (currentNeeds ?? []).some((item) => item.id === id); n += 1) id = `necesidad-${base}-${n}`;
     const need: UnaddressedNeed = {
-      id: newId.trim(),
+      id,
       title: newTitle.trim(),
       justification: newJustification.trim(),
     };
@@ -63,7 +66,6 @@ function UnaddressedNeedsEditor({
       need,
     ];
     onDraftChange({ ...draft, unaddressedNeeds: needs });
-    setNewId("");
     setNewTitle("");
     setNewJustification("");
     setMessage("Necesidad registrada.");
@@ -148,15 +150,6 @@ function UnaddressedNeedsEditor({
           Añadir necesidad no priorizada
         </legend>
         <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-          <label style={{ display: "flex", flexDirection: "column", gap: "0.2rem", fontSize: "0.875rem" }}>
-            Identificador único
-            <input
-              value={newId}
-              onChange={(e) => setNewId(e.target.value)}
-              placeholder="p.ej. n-salud-mental"
-              style={{ padding: "0.35rem 0.5rem", border: "1px solid var(--borde)", borderRadius: "4px" }}
-            />
-          </label>
           <label style={{ display: "flex", flexDirection: "column", gap: "0.2rem", fontSize: "0.875rem" }}>
             Título de la necesidad
             <input
@@ -264,32 +257,7 @@ export function DefinitiveActionPlanPreview({municipalityId, municipalityName: v
   const selectedIndicators = active.reduce((total, item) => total + item.rows.filter(row => row.indicatorIncluded).length, 0);
   const linkedActionCards = traceability.reduce((total, link) => total + link.actionCards.length, 0);
   const linkedActivities = traceability.reduce((total, link) => total + link.actionCards.reduce((sum, action) => sum + action.activities.length, 0), 0);
-  const generationSignature = JSON.stringify(active.map(({ module, draft, rows }) => ({
-    moduleId: module.id,
-    version: module.version,
-    updatedAt: draft?.updatedAt,
-    rows: rows.map(row => ({
-      objective: row.specific.code,
-      objectiveText: resolvedPlanDecisionText(row.objectiveDecision, row.specific.title),
-      indicator: row.specific.indicator.code,
-      indicatorIncluded: row.indicatorIncluded,
-      indicatorText: resolvedPlanDecisionText(row.indicatorDecision, row.specific.indicator.title),
-    })),
-  })));
-  const [generatedSignature, setGeneratedSignature] = useState<string | null>(null);
-  const resultRef = useRef<HTMLDivElement | null>(null);
   const hasSelectableContent = selectedObjectives > 0 || selectedIndicators > 0;
-  const generated = hasSelectableContent && generatedSignature === generationSignature;
-
-  function generatePlan() {
-    setGeneratedSignature(generationSignature);
-    window.setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
-  }
-
-  function printGeneratedPlan() {
-    if (!generated) generatePlan();
-    window.setTimeout(() => window.print(), 0);
-  }
 
   return <section className="workspace-panel pcm-definitive-plan" aria-label={`Plan de Acción resultante · ${municipalityName}`}>
     {incompatibleDrafts.length > 0 && <p role="alert">Hay borradores con una versión pendiente de compatibilidad. Se conservan y no se incorporan a esta proyección ni a su exportación.</p>}
@@ -416,21 +384,11 @@ export function DefinitiveActionPlanPreview({municipalityId, municipalityName: v
         </div>
       </details>
       {pending > 0 && <div className="phase-blocked-notice"><strong>Versión todavía no cerrable</strong><p>Quedan {pending} elementos pendientes dentro de las líneas que ya estás trabajando. Puedes ver el resultado actual, pero conviene resolverlos antes de declarar el Plan definitivo.</p></div>}
-      <div className="backup-panel__actions pcm-generation-actions">
-        <button type="button" disabled={!hasSelectableContent} onClick={generatePlan}>Generar Plan de Acción</button>
-        <button type="button" disabled={!hasSelectableContent} onClick={printGeneratedPlan}>Imprimir / guardar como PDF</button>
-
-      </div>
       {!hasSelectableContent ? (
-        <p className="panel-note">Selecciona o modifica al menos un objetivo específico o indicador para generar el Plan de Acción.</p>
-      ) : !generated ? (
-        <div className="pcm-generation-prompt">
-          <strong>Selección preparada</strong>
-          <p>Pulsa “Generar Plan de Acción” para componer la versión de trabajo con los objetivos e indicadores incluidos.</p>
-        </div>
+        <p className="panel-note">Incluye o modifica al menos un objetivo específico o indicador para componer el Plan de Acción.</p>
       ) : (
-        <div className="pcm-generated-plan" ref={resultRef} aria-live="polite">
-          <p role="status">Plan generado con la selección actual.</p>
+        <div className="pcm-generated-plan">
+          <p className="panel-note">Plan de Acción con la selección actual. Para obtener el documento, usa las descargas en Word o PDF de arriba.</p>
           {active.map(({module, moduleDecision, rows}) => rows.length > 0 && <article key={module.id} className="pcm-module">
             <h3>{module.title}</h3>
             <p><strong>Objetivo estratégico:</strong> {resolvedPlanDecisionText(moduleDecision, module.strategicObjective)} {moduleDecision?.status === "modified" && <span className="status-pill">Modificado</span>}</p>
