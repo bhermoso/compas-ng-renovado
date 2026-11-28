@@ -128,17 +128,12 @@ describe("Preparación independiente del Plan", () => {
  expect(changes).toHaveLength(2);
  expect(changes[1].decisions["ENV-OE5.2"]).toMatchObject({status: "modified", sourceText: source, text: "Texto definitivo de prueba"});
  });
- it("guarda necesidades no priorizadas y marco de evaluación para el futuro PLS", () => {
+ it("guarda el marco de evaluación de la línea; las necesidades no priorizadas se documentan en el Plan resultante", () => {
  const changes: PlanPreparationDraft[] = [];
+ const withNeeds: PlanPreparationDraft = {...draft, unaddressedNeeds: [{id: "necesidad-movilidad-segura", title: "Movilidad segura", justification: "Queda fuera por falta de recursos este ciclo"}]};
+ changes.push(withNeeds);
  const first = PlanPreparationPanel({module: AGING_FOUR_BLOCKS_BASE, municipalityId: draft.municipalityId, draft, onChange: next => changes.push(next), renderWorksheet: () => null});
- const needs = findElement(first, element => element.type === "textarea" && element.props["aria-label"] === "Necesidades diagnosticadas no priorizadas");
- expect(needs).toBeDefined();
- (needs!.props.onChange as (event: {target: {value: string}}) => void)({target: {value: "Movilidad segura — Queda fuera por falta de recursos este ciclo"}});
- expect(changes[0].unaddressedNeeds?.[0]).toMatchObject({
-  title: "Movilidad segura",
-  justification: "Queda fuera por falta de recursos este ciclo",
- });
- expect(changes[0].decisions).toEqual(draft.decisions);
+ expect(findElement(first, element => element.type === "textarea" && element.props["aria-label"] === "Necesidades diagnosticadas no priorizadas")).toBeUndefined();
 
  const second = PlanPreparationPanel({module: AGING_FOUR_BLOCKS_BASE, municipalityId: draft.municipalityId, draft: changes[0], onChange: next => changes.push(next), renderWorksheet: () => null});
  const questions = findElement(second, element => element.type === "textarea" && element.props["aria-label"] === "Preguntas de evaluación");

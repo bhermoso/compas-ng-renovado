@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { getSupportDocument, type SupportDocument } from "../../domain/strategy/SupportDocuments";
 import { documentAccessUrl } from "./documentAccessUtils";
 import type { ActionPlanCatalogModule, CatalogElementProvenance, CatalogGeneralObjectiveTemplate, CatalogSpecificObjectiveTemplate } from "../../domain/action-plan-catalog/ActionPlanCatalog";
-import type { PLSEvaluationFramework, UnaddressedNeed } from "../../domain/health-plan";
+import type { PLSEvaluationFramework } from "../../domain/health-plan";
 import { planDecisionWithStatus } from "../../domain/action-plan-catalog/PlanPreparationDraft";
 import {
   cleanActionPlanProposalText,
@@ -113,23 +113,6 @@ export function PlanPreparationPanel({module, municipalityId, municipalityName, 
    evaluationFramework: draft?.evaluationFramework,
    ...patch,
   });
- }
-
- function parseUnaddressedNeeds(value: string): UnaddressedNeed[] | undefined {
-  const lines = value.split(/\r?\n/g).map(line => line.trim()).filter(Boolean);
-  if (!lines.length) return undefined;
-  return lines.map((line, index) => {
-   const [title, ...rest] = line.split(/\s+[—-]\s+|:\s+/);
-   return {
-    id: `unaddressed-${index + 1}`,
-    title: cleanActionPlanProposalText(title),
-    justification: cleanActionPlanProposalText(rest.join(" — ")),
-   };
-  });
- }
-
- function formatUnaddressedNeeds(needs: UnaddressedNeed[] | undefined): string {
-  return (needs ?? []).map(need => `${need.title} — ${need.justification}`).join("\n");
  }
 
  function updateEvaluationFramework(patch: Partial<PLSEvaluationFramework>) {
@@ -347,11 +330,9 @@ export function PlanPreparationPanel({module, municipalityId, municipalityName, 
     })}
    </details>;
   })}
-  <details className="pcm-fold-block"><summary><strong>Cierre para el Plan Local de Salud</strong> <small>necesidades no priorizadas y marco de evaluación</small></summary>
-  <section className="pcm-pls-readiness" aria-label="Cierre para el Plan Local de Salud">
-   <h3>Cierre para el Plan Local de Salud</h3>
-   <label><input type="checkbox" checked={draft?.unaddressedNeeds?.length === 0} disabled={!canEditProposal} onChange={e => emitDraftPatch({unaddressedNeeds: e.target.checked ? [] : undefined})}/> Todas las necesidades diagnosticadas quedan incorporadas al Plan de Acción</label>
-   <label>Necesidades diagnosticadas no priorizadas<textarea aria-label="Necesidades diagnosticadas no priorizadas" rows={4} disabled={!canEditProposal || draft?.unaddressedNeeds?.length === 0} value={formatUnaddressedNeeds(draft?.unaddressedNeeds)} placeholder="Necesidad identificada — Justificación de no priorización" onChange={e => emitDraftPatch({unaddressedNeeds: parseUnaddressedNeeds(e.target.value)})}/></label>
+  <details className="pcm-fold-block"><summary><strong>Marco de evaluación de la línea</strong> <small>preguntas, momentos, responsable y línea base</small></summary>
+  <section className="pcm-pls-readiness" aria-label="Marco de evaluación de la línea">
+   <p className="panel-note">Las necesidades diagnosticadas que no se priorizan se documentan una sola vez, para todo el Plan, en «Plan resultante».</p>
    <fieldset className="pcm-admin-review">
     <legend>Marco de evaluación</legend>
     <label>Preguntas de evaluación<textarea aria-label="Preguntas de evaluación" rows={3} disabled={!canEditProposal} value={(draft?.evaluationFramework?.evaluationQuestions ?? []).join("\n")} onChange={e => updateEvaluationFramework({evaluationQuestions: e.target.value.split(/\r?\n/g).map(cleanActionPlanProposalText).filter(Boolean)})}/></label>

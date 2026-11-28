@@ -52,8 +52,7 @@ try{
  assert.deepEqual(after.evidenceStore.atoms,before.evidenceStore.atoms);
  assert.deepEqual(after.actionPlanModuleReviews,before.actionPlanModuleReviews);
  const res=await result();
- await res.getByRole('button',{name:'Generar Plan de Acción',exact:true}).click();
- await res.getByText('Plan generado con la selección actual.',{exact:true}).waitFor();
+ await res.locator('.pcm-generated-plan').waitFor();
  assert.match(await res.locator('.pcm-generated-plan').innerText(),/ENV-OE1\.1[\s\S]*ENV-I1\.1/);
  assert.match(await res.locator('.pcm-generated-plan').innerText(),/ENV-OE1\.2[\s\S]*ENV-I1\.2/);
  if(process.env.COMPAS_TEST_SCREENSHOT) await page.screenshot({path:process.env.COMPAS_TEST_SCREENSHOT});
