@@ -435,13 +435,13 @@ export function ProcessPresentation({ slides, onClose, onGoToCycle, initialIndex
   }, [back, forward, go, onClose, slides.length]);
 
   useEffect(() => {
-    const fit = () => {
-      const el = stageRef.current;
-      if (el) setScale(Math.max(0.1, Math.min(el.clientWidth / 1600, el.clientHeight / 900)));
-    };
-    fit();
-    const observer = new ResizeObserver(fit);
-    if (stageRef.current) observer.observe(stageRef.current);
+    const stage = stageRef.current;
+    if (!stage) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      setScale(Math.max(0.1, Math.min(width / 1600, height / 900)));
+    });
+    observer.observe(stage);
     return () => observer.disconnect();
   }, []);
 
