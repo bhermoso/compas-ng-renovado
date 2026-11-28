@@ -163,7 +163,7 @@ import {
   isModuleReviewStale,
   type MunicipalActionPlanModuleReview,
 } from "./domain/action-plan-catalog";
-import { LocalHealthPlanningCycle, DocumentIngestionPanel, DocumentRepositoryPanel, EvidenceStorePanel, HealthReportViewer, EstudiosComplementariosPanel, ActivosSaludPanel, ThematicPrioritisationPanel, CitizenParticipationSummary, ThematicPrioritisationModal, PipelineTracePanel, LT1Panel, OITPanel, ReconciliacionPanel, PrioritizationPanel, LecturaEstrategicaView, PAIView, DeliberativePrioritySelectionPanel, ActionPlanCatalogPanel, GESPanel, LocalHealthPlanOutline, AgendaBoard, ProcessPanel } from "./ui/components";
+import { LocalHealthPlanningCycle, DocumentIngestionPanel, DocumentRepositoryPanel, EvidenceStorePanel, HealthReportViewer, EstudiosComplementariosPanel, ActivosSaludPanel, ThematicPrioritisationPanel, CitizenParticipationSummary, ThematicPrioritisationModal, PipelineTracePanel, LT1Panel, OITPanel, ReconciliacionPanel, PrioritizationPanel, LecturaEstrategicaView, PAIView, DeliberativePrioritySelectionPanel, ActionPlanCatalogPanel, GESPanel, LocalHealthPlanOutline, AgendaBoard, ProcessPanel, GroupMotorDecisionSummary } from "./ui/components";
 import type { AgendaActuation } from "./domain/agenda/AgendaActuation";
 import { removeSupersededValidatedPlan, type PlanDocument } from "./domain/action-plan-catalog/PlanDocument";
 import type { ProfilePlanLink } from "./application/action-plan/profilePlanLinks";
@@ -1339,6 +1339,7 @@ export default function App() {
   const handleSaveDeliberativePrioritySelection = useCallback((input: {
     selectedScenarioIds: string[];
     catalogModuleLinks: Array<{ scenarioId: string; moduleId: string }>;
+    ownPriorities: Array<Omit<import("./domain/deliberative-prioritisation").GroupMotorOwnPriority, "id">>;
     deliberationRationale: string;
     citizenInfluenceStatement: string;
     decidedBy: string;
@@ -4111,19 +4112,14 @@ export default function App() {
                     municipalityId={runtime.workspace.municipality.identity.id}
                     municipalityName={runtime.workspace.municipality.identity.name}
                   />
-                  <DeliberativePrioritySelectionPanel
-                    key={`${lectura.id}-${workspace.deliberativePrioritySelection?.id ?? "pending"}`}
-                    lectura={lectura}
-                    citizenPrioritisation={workspace.thematicPrioritisation}
+                  <GroupMotorDecisionSummary
                     selection={workspace.deliberativePrioritySelection}
+                    lectura={lectura}
                     isStale={runtime.prioritySelectionIsStale}
-                    onSave={handleSaveDeliberativePrioritySelection}
+                    registerHint="La decisión se registra y se modifica en «Priorización»."
                   />
                 </>
               ) },
-              { id: "borrador", title: "Borrador de actuaciones", summary: runtime.pai ? "Borrador automático disponible" : "Requiere una selección vigente del Grupo Motor", body: () => runtime.pai
-                ? <PAIView pai={runtime.pai} />
-                : <p className="panel-note">El borrador automático de actuaciones se genera cuando el Grupo Motor registra una selección vigente. La edición directa de objetivos e indicadores se guarda en «Líneas e indicadores».</p> },
             );
           }
           return (
@@ -4236,7 +4232,36 @@ export default function App() {
               pslStatus={runtime.psl.status}
               pslIsStale={runtime.pslIsStale}
               hasInsufficientEvidence={pipelineIsEmpty && !activeExternalProfile(workspace)}
+              groupMotorDecision={(() => {
+                const selection = workspace.deliberativePrioritySelection;
+                if (!selection || runtime.prioritySelectionIsStale) return undefined;
+                const prefix = `escenario-${selection.sourcePSLId}-`;
+                return {
+                  adoptedAreaIds: selection.selectedScenarioIds.filter((id) => id.startsWith(prefix)).map((id) => id.slice(prefix.length)),
+                  decidedBy: selection.decidedBy,
+                  decidedAt: selection.decidedAt,
+                };
+              })()}
             />
+            </WorkspaceDisclosure>
+            <WorkspaceDisclosure title="Decisión del Grupo Motor">
+              <GroupMotorDecisionSummary
+                selection={workspace.deliberativePrioritySelection}
+                lectura={runtime.lectura}
+                isStale={runtime.prioritySelectionIsStale}
+              />
+              {runtime.lectura ? (
+                <DeliberativePrioritySelectionPanel
+                  key={`${runtime.lectura.id}-${workspace.deliberativePrioritySelection?.id ?? "pending"}`}
+                  lectura={runtime.lectura}
+                  citizenPrioritisation={workspace.thematicPrioritisation}
+                  selection={workspace.deliberativePrioritySelection}
+                  isStale={runtime.prioritySelectionIsStale}
+                  onSave={handleSaveDeliberativePrioritySelection}
+                />
+              ) : (
+                <p className="panel-note">Para registrar la decisión hace falta un Perfil de Salud Local vigente en el expediente.</p>
+              )}
             </WorkspaceDisclosure>
             <WorkspaceDisclosure title="Participación ciudadana">
             <ThematicPrioritisationPanel

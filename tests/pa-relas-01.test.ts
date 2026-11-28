@@ -48,7 +48,7 @@ describe("PA-RELAS-01 — compuerta deliberativa MTE → PAI", () => {
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.violations).toEqual(expect.arrayContaining([
-        expect.stringContaining("al menos una candidatura"),
+        expect.stringContaining("al menos una recomendación del Perfil o registrar una prioridad propia"),
         expect.stringContaining("motivación"),
         expect.stringContaining("conocimiento ciudadano"),
         expect.stringContaining("Grupo Motor"),

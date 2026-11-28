@@ -22,6 +22,35 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-28 (mediodía) · Decisión soberana del Grupo Motor y retirada del borrador automático
+
+Pages servía `7b1da3e` al empezar.
+
+**Hechos observados** (expedientes reales en Firestore `compas-98dd7`). En Atarfe,
+la pestaña Priorización mostraba R1 a R8 «pendiente de deliberación» aunque la
+selección del Grupo Motor estaba registrada; solo se veía en Plan de Acción. En
+Zagra (Perfil 0.6.0 en revisión, sin propuestas elegidas) no había candidaturas
+y el formulario no permitía registrar nada: exigía al menos una recomendación
+del Perfil. El «Borrador de actuaciones» del Plan (motor PAI) repetía el texto de
+cada recomendación como actuación, añadía alineaciones por coincidencia de
+palabras (p. ej., el eje de maltrato del Plan de Personas Mayores para R1) e
+ignoraba la línea del catálogo elegida.
+
+**Decisiones del responsable (28/11/2026).** Retirar el borrador automático de
+actuaciones del Plan de Acción. La decisión del Grupo Motor es soberana: admite
+prioridades propias que no proceden del Perfil, por priorización ciudadana o por
+deliberación, con su origen y su motivación (contrato metodológico 3.1.0,
+excepción a I-LHPM-23). La decisión se registra en Priorización.
+
+**Cambios.** `ownPriorities` en la selección del Grupo Motor (reglas G-DPS-8 y
+G-DPS-9); sus líneas del catálogo pasan al Plan de Acción. Priorización tiene una
+sección «Decisión del Grupo Motor» con el resumen y el formulario; las
+recomendaciones muestran si fueron adoptadas; sin propuestas elegidas, el aviso
+dice la causa real. El Plan muestra el resumen y remite a Priorización. Se retira
+la sección «Borrador de actuaciones». Suite: 3007 pruebas; lint sin avisos.
+
+---
+
 ## 2026-11-28 · Revisión de #238 a #240, hitos de Loja, decisión del Grupo Motor de Atarfe y recorrido por páginas
 
 Pages servía `c444e50` al empezar; sirve el commit de fusión de esta rama al terminar.

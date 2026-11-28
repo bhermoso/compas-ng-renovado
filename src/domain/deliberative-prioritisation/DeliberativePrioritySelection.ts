@@ -6,6 +6,29 @@ import type { ThematicPrioritisation } from "../thematic-prioritisation";
  * Conserva por separado las candidaturas técnicas, la evidencia ciudadana
  * disponible y la selección humana. El sistema nunca rellena esta entidad.
  */
+/**
+ * Prioridad que el Grupo Motor adopta sin que proceda de una recomendación del
+ * Perfil: por priorización ciudadana o por su propia deliberación. Excepción
+ * regulada a I-LHPM-23 (decisión del responsable de 28/11/2026): se registra
+ * con su origen y su motivación, y se presenta siempre como «no procede del
+ * Perfil».
+ */
+export interface GroupMotorOwnPriority {
+  id: string;
+  title: string;
+  origin: "citizen-prioritisation" | "group-motor-deliberation";
+  /** Temáticas de la priorización ciudadana en las que se apoya (origen ciudadano). */
+  citizenTopicIds: string[];
+  /** Líneas del catálogo del Plan de Acción que desarrollan esta prioridad. */
+  catalogModuleIds: string[];
+  rationale: string;
+}
+
+export const OWN_PRIORITY_ORIGIN_LABELS: Record<GroupMotorOwnPriority["origin"], string> = {
+  "citizen-prioritisation": "Priorización ciudadana",
+  "group-motor-deliberation": "Deliberación del Grupo Motor",
+};
+
 export interface DeliberativePrioritySelection {
   id: string;
   municipalityId: string;
@@ -16,6 +39,8 @@ export interface DeliberativePrioritySelection {
   selectedScenarioIds: string[];
   /** Relación explícita y humana entre una prioridad seleccionada y un módulo catalogado. */
   catalogModuleLinks?: Array<{ scenarioId: string; moduleId: string }>;
+  /** Prioridades soberanas del Grupo Motor que no proceden del Perfil. */
+  ownPriorities?: GroupMotorOwnPriority[];
   citizenTopicIds: string[];
   sourceCitizenPrioritisationUpdatedAt?: string;
   deliberationRationale: string;
@@ -35,6 +60,7 @@ export interface CreateDeliberativePrioritySelectionInput {
   citizenPrioritisation?: ThematicPrioritisation;
   selectedScenarioIds: readonly string[];
   catalogModuleLinks?: readonly { scenarioId: string; moduleId: string }[];
+  ownPriorities?: readonly Omit<GroupMotorOwnPriority, "id">[];
   deliberationRationale: string;
   citizenInfluenceStatement: string;
   decidedBy: string;
@@ -51,12 +77,28 @@ export function createDeliberativePrioritySelection(
     (input.catalogModuleLinks ?? []).map((link) => [`${link.scenarioId}:${link.moduleId}`, { ...link }])
   ).values()];
   const violations: string[] = [];
+  const citizenSelected = new Set(input.citizenPrioritisation?.selectedTopicIds ?? []);
+  const ownPriorities: GroupMotorOwnPriority[] = (input.ownPriorities ?? []).map((own, index) => ({
+    id: `propia-${index + 1}`,
+    title: own.title.trim(),
+    origin: own.origin,
+    citizenTopicIds: own.origin === "citizen-prioritisation" ? [...new Set(own.citizenTopicIds)] : [],
+    catalogModuleIds: [...new Set(own.catalogModuleIds)],
+    rationale: own.rationale.trim(),
+  }));
 
-  if (!input.lectura.hasTranslatableContent || candidateScenarioIds.length === 0) {
-    violations.push("G-DPS-1: la Lectura Estratégica no contiene candidaturas seleccionables");
+  if (ownPriorities.length === 0 && (!input.lectura.hasTranslatableContent || candidateScenarioIds.length === 0)) {
+    violations.push("G-DPS-1: la Lectura Estratégica no contiene candidaturas seleccionables y no se ha registrado ninguna prioridad propia");
   }
-  if (selectedScenarioIds.length === 0) {
-    violations.push("G-DPS-2: el Grupo Motor debe seleccionar al menos una candidatura");
+  if (selectedScenarioIds.length === 0 && ownPriorities.length === 0) {
+    violations.push("G-DPS-2: el Grupo Motor debe seleccionar al menos una recomendación del Perfil o registrar una prioridad propia");
+  }
+  if (ownPriorities.some((own) => own.title.length === 0 || own.rationale.length === 0)) {
+    violations.push("G-DPS-8: cada prioridad propia necesita un título y su motivación");
+  }
+  if (ownPriorities.some((own) => own.origin === "citizen-prioritisation" &&
+    (own.citizenTopicIds.length === 0 || own.citizenTopicIds.some((id) => !citizenSelected.has(id))))) {
+    violations.push("G-DPS-9: una prioridad de origen ciudadano debe apoyarse en temáticas registradas en la priorización ciudadana");
   }
   if (selectedScenarioIds.some((id) => !candidateIds.has(id))) {
     violations.push("G-DPS-3: la selección contiene candidaturas ajenas a la Lectura Estratégica");
@@ -88,6 +130,7 @@ export function createDeliberativePrioritySelection(
       candidateScenarioIds,
       selectedScenarioIds,
       catalogModuleLinks,
+      ...(ownPriorities.length > 0 ? { ownPriorities } : {}),
       citizenTopicIds: [...(input.citizenPrioritisation?.selectedTopicIds ?? [])],
       sourceCitizenPrioritisationUpdatedAt: input.citizenPrioritisation?.updatedAt,
       deliberationRationale: input.deliberationRationale.trim(),
@@ -130,7 +173,7 @@ export function doesDeliberativePrioritySelectionMatchLectura(
     selection.sourcePSLVersion === lectura.sourcePSLVersion &&
     selection.candidateScenarioIds.length === currentCandidateIds.length &&
     selection.candidateScenarioIds.every((id, index) => id === currentCandidateIds[index]) &&
-    selection.selectedScenarioIds.length > 0 &&
+    (selection.selectedScenarioIds.length > 0 || (selection.ownPriorities?.length ?? 0) > 0) &&
     selection.selectedScenarioIds.every((id) => candidateIds.has(id))
   );
 }
