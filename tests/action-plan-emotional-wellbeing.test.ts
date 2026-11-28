@@ -33,10 +33,24 @@ describe("Línea «Bienestar emocional y salud mental» (versión 0.2)", () => {
     }
   });
 
-  it("se ofrece igual a cualquier municipio, sin adaptación territorial previa", () => {
-    for (const id of ["atarfe", "loja", "zagra", "municipio-nuevo-2027"]) {
+  it("el catálogo común no lleva hallazgos de ningún territorio (decisión del responsable, 28/11/2026)", () => {
+    for (const id of ["loja", "zagra", "alfacar", "municipio-nuevo-2027"]) {
       expect(municipalActionPlanModule(id, m)).toBe(m);
     }
+    const text = JSON.stringify(m);
+    for (const term of ["Atarfe", "GRAFA", "GRUSE"]) expect(text).not.toContain(term);
+  });
+
+  it("Atarfe conserva su procedencia territorial con los mismos textos del catálogo", () => {
+    const atarfe = municipalActionPlanModule("atarfe", m);
+    expect(atarfe).not.toBe(m);
+    expect(atarfe.version).toBe(m.version);
+    const titles = (mod: typeof m) => mod.generalObjectives.flatMap((g) => [g.code, g.title, ...g.specificObjectives.flatMap((o) => [o.code, o.title, o.indicator.code, o.indicator.title])]);
+    expect(titles(atarfe)).toEqual(titles(m));
+    const prov = (code: string) => atarfe.generalObjectives.flatMap((g) => g.specificObjectives).find((o) => o.code === code)?.provenance?.source;
+    expect(prov("BEM-OE1.2")).toContain("Perfil de Salud Local de Atarfe (C3 y C4)");
+    expect(prov("BEM-OE5.2")).toContain("GRAFA, GRUSE");
+    expect(atarfe.sourceLabel).toContain("Monitor de bienestar socioemocional de Atarfe 2026");
   });
 
   it("cada objetivo e indicador declara su procedencia, con fuente y tipo", () => {

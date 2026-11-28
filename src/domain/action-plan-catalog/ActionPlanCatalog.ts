@@ -242,7 +242,7 @@ const BEM_EMOTIONAL_WELLBEING_BASE: ActionPlanCatalogModule = {
   version: "0.2",
   title: "Bienestar emocional y salud mental",
   strategicObjective: "Mejorar el bienestar emocional de la población y prevenir los problemas de salud mental, fortaleciendo los factores que lo protegen —vínculos, competencias personales, participación, entornos y activos comunitarios— y reduciendo las diferencias de bienestar entre grupos de población.",
-  sourceLabel: "Propuesta COMPÁS a partir del I Plan Estratégico de Salud Mental y Adicciones de Andalucía 2026–2029 (líneas 1, 2 y 5), la Estrategia de Promoción de una Vida Saludable en Andalucía (objetivos 1.4, 1.6 y 1.7), la Estrategia de Salud Mental del SNS 2022–2026 (líneas 2, 3 y 8) y el Monitor de bienestar socioemocional de Atarfe 2026. Cada objetivo e indicador declara su procedencia (literal, adaptada o propia)",
+  sourceLabel: "Propuesta COMPÁS a partir del I Plan Estratégico de Salud Mental y Adicciones de Andalucía 2026–2029 (líneas 1, 2 y 5), la Estrategia de Promoción de una Vida Saludable en Andalucía (objetivos 1.4, 1.6 y 1.7) y la Estrategia de Salud Mental del SNS 2022–2026 (líneas 2, 3 y 8). Cada objetivo e indicador declara su procedencia (literal, adaptada o propia)",
   sourceDate: "2026-11-10",
   cautions: [
     "Línea en construcción (versión 0.2): propuesta para revisión técnica y deliberación del Grupo Motor; no es un módulo validado.",
@@ -290,12 +290,12 @@ export const BEM_PROVENANCE: Readonly<Record<string, CatalogElementProvenance>> 
   "BEM-OG1": ada("PESMA-A, OE01; EPVSA, OE 1.4 «Incrementar la percepción de calidad de vida y de bienestar emocional». La reducción de desigualdades es añadido de COMPÁS."),
   "BEM-OE1.1": ada("PESMA-A, OE01; EPVSA, OE 1.4."),
   "BEM-I1.1": ada("PESMA-A, OE1, indicador 2: «Índice de Bienestar Emocional (IBSE). Población > 16 años» (Encuesta Andaluza de Salud, 2023); COMPÁS lo mide en el monitor municipal. La EPVSA mide el OE 1.4 con SF-12, Kidscreen y felicidad declarada."),
-  "BEM-OE1.2": pro("Hallazgos del Perfil de Salud Local de Atarfe (C3 y C4); sin objetivo equivalente en las estrategias de referencia."),
+  "BEM-OE1.2": pro("Propio de COMPÁS: reducir las diferencias de bienestar entre mujeres y hombres y entre grupos de edad; sin objetivo equivalente en las estrategias de referencia. Procede cuando el Perfil de Salud Local del municipio muestra esas diferencias."),
   "BEM-I1.2": pro("Monitor municipal de bienestar socioemocional (IBSE)."),
-  "BEM-OE1.3": pro("Hallazgo del Monitor de Atarfe 2026: Control (energía y tranquilidad) es el factor más bajo."),
+  "BEM-OE1.3": pro("Propio de COMPÁS, a partir del factor Control (energía y tranquilidad) del IBSE. Procede cuando el monitor municipal lo sitúa entre los factores más bajos."),
   "BEM-I1.3": pro("Pregunta «tranquilo/a y relajado/a» del IBSE."),
   "BEM-OG2": ada("EPVSA, indicador 1.4.5 (apoyo social y afectivo); SNS, objetivo 2.2.4 («capital social»). La EPVSA no nombra la soledad no deseada."),
-  "BEM-OE2.1": pro("Hallazgo del Perfil de Salud Local de Atarfe (C5)."),
+  "BEM-OE2.1": pro("Propio de COMPÁS, a partir de la pregunta «solo/a» del IBSE; concreta en la soledad el OG2 (EPVSA, indicador 1.4.5; SNS, objetivo 2.2.4)."),
   "BEM-I2.1": pro("Pregunta «solo/a» del IBSE."),
   "BEM-OE2.2": ada("EPVSA, OE 1.4, indicador de impacto 1.4.5: «Disminución del porcentaje de población adulta que considera bajo su apoyo social y afectivo»."),
   "BEM-I2.2": lit("EPVSA, indicador 1.4.5: «Porcentaje de población adulta que percibe como bajo su apoyo social y afectivo» (Encuesta Andaluza de Salud, Duke-UNC-11)."),
@@ -311,12 +311,12 @@ export const BEM_PROVENANCE: Readonly<Record<string, CatalogElementProvenance>> 
   "BEM-I4.1": ada("EPVSA, P04: «Número acumulativo de activos registrados y validados en el mapa de activos para la salud de Andalucía»; COMPÁS lo limita a la temática de bienestar emocional."),
   "BEM-OE4.2": ada("EPVSA, OE 1.7: «Incrementar las recomendaciones a la ciudadanía sobre activos comunitarios que facilitan una vida saludable»."),
   "BEM-I4.2": ada("EPVSA, indicador 1.7.1 (recomendaciones desde el SSPA); COMPÁS lo extiende a servicios sociales y educativos. La EPVSA declara que el SSPA aún no dispone de herramienta para contarlas."),
-  "BEM-OE4.3": pro("Hallazgo del Perfil de Salud Local de Atarfe (C7)."),
+  "BEM-OE4.3": pro("Propio de COMPÁS. Procede cuando el Perfil de Salud Local identifica grupos de población sin recursos registrados."),
   "BEM-I4.3": pro("Registro de activos del Plan."),
   "BEM-OG5": ada("PESMA-A, OE02 «Mejorar la detección y atención precoz de las personas con problemas de adicciones y/o salud mental» y OE05 (coordinación entre salud mental, adicciones y atención primaria); SNS, objetivo 2.2.5."),
   "BEM-OE5.1": pro("Inspirado en PESMA-A, OE02 y programa P.02.CT02 (formación del personal técnico de juventud)."),
   "BEM-I5.1": pro("Registro formativo del Plan."),
-  "BEM-OE5.2": pro("Intervenciones grupales de atención primaria existentes en Atarfe (GRAFA, GRUSE); PESMA-A, OE05."),
+  "BEM-OE5.2": pro("PESMA-A, OE05 (coordinación entre salud mental, adicciones y atención primaria), aplicado a las intervenciones grupales de atención primaria disponibles en el municipio."),
   "BEM-I5.2": pro("Registro de orientación del Plan."),
   "BEM-OG6": ada("PESMA-A, OE04 «Disminuir las conductas suicidas y su impacto social»; SNS, línea 3."),
   "BEM-OE6.1": ada("SNS, objetivo 3.1.2 «Detectar precozmente y prevenir el riesgo suicida»; PESMA-A, P.04.01 (fomentar la formación sobre la conducta suicida)."),
@@ -355,6 +355,26 @@ function withProvenance(
 }
 
 export const EMOTIONAL_WELLBEING_MODULE: ActionPlanCatalogModule = withProvenance(BEM_EMOTIONAL_WELLBEING_BASE, BEM_PROVENANCE);
+
+/**
+ * Procedencia territorial de Atarfe (decisión del responsable, 28/11/2026): el
+ * catálogo común lleva redacción y procedencia genéricas; los hallazgos de Atarfe
+ * que motivaron estos objetivos se conservan solo en su expediente. Los textos de
+ * objetivos e indicadores son los del catálogo común, por lo que el borrador de
+ * Atarfe sigue siendo compatible.
+ */
+const BEM_ATARFE_PROVENANCE: Readonly<Record<string, CatalogElementProvenance>> = {
+  ...BEM_PROVENANCE,
+  "BEM-OE1.2": pro("Hallazgos del Perfil de Salud Local de Atarfe (C3 y C4); sin objetivo equivalente en las estrategias de referencia."),
+  "BEM-OE1.3": pro("Hallazgo del Monitor de Atarfe 2026: Control (energía y tranquilidad) es el factor más bajo."),
+  "BEM-OE2.1": pro("Hallazgo del Perfil de Salud Local de Atarfe (C5)."),
+  "BEM-OE4.3": pro("Hallazgo del Perfil de Salud Local de Atarfe (C7)."),
+  "BEM-OE5.2": pro("Intervenciones grupales de atención primaria existentes en Atarfe (GRAFA, GRUSE); PESMA-A, OE05."),
+};
+export const ATARFE_EMOTIONAL_WELLBEING_MODULE: ActionPlanCatalogModule = withProvenance({
+  ...BEM_EMOTIONAL_WELLBEING_BASE,
+  sourceLabel: "Propuesta COMPÁS a partir del I Plan Estratégico de Salud Mental y Adicciones de Andalucía 2026–2029 (líneas 1, 2 y 5), la Estrategia de Promoción de una Vida Saludable en Andalucía (objetivos 1.4, 1.6 y 1.7), la Estrategia de Salud Mental del SNS 2022–2026 (líneas 2, 3 y 8) y el Monitor de bienestar socioemocional de Atarfe 2026. Cada objetivo e indicador declara su procedencia (literal, adaptada o propia)",
+}, BEM_ATARFE_PROVENANCE);
 
 // ── Procedencia de las líneas de envejecimiento saludable y de adicciones ─────
 // Ambas son líneas estructurales del catálogo de COMPÁS, comunes a todos los

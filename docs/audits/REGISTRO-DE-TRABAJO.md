@@ -92,6 +92,14 @@ evaluación. «Generar Plan de Acción» e «Imprimir» se retiran: la vista
 consolidada se muestra siempre y el documento sale de las descargas en Word y
 PDF. Suite: 3021 pruebas.
 
+**Cambios (F4).** La línea común Bienestar emocional queda sin hallazgos de
+ningún territorio: la fuente de la línea ya no cita el Monitor de Atarfe y
+BEM-OE1.2, OE1.3, OE2.1, OE4.3 y OE5.2 declaran una procedencia genérica (cuándo
+procede el objetivo). Atarfe conserva su procedencia (Perfil C3, C4, C5 y C7;
+Monitor 2026; GRAFA y GRUSE) como variante territorial, con los mismos textos de
+objetivos e indicadores y la misma versión 0.2, de modo que su borrador sigue
+compatible. Suite: 3022 pruebas.
+
 ---
 
 ## 2026-11-28 (tarde) · Acceso discreto a la administración y fecha de la decisión del Grupo Motor
