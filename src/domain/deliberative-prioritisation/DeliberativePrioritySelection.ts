@@ -65,6 +65,8 @@ export interface CreateDeliberativePrioritySelectionInput {
   citizenInfluenceStatement: string;
   decidedBy: string;
   now?: string;
+  /** Fecha en que el Grupo Motor adoptó la decisión (AAAA-MM-DD); si falta, la del registro. */
+  decisionDate?: string;
 }
 
 export function createDeliberativePrioritySelection(
@@ -116,9 +118,23 @@ export function createDeliberativePrioritySelection(
     violations.push("G-DPS-6: debe identificarse al Grupo Motor que adopta la selección");
   }
 
+  const registeredAt = input.now ?? new Date().toISOString();
+  const decisionDate = input.decisionDate?.trim();
+  if (decisionDate) {
+    const valid = /^\d{4}-\d{2}-\d{2}$/.test(decisionDate)
+      && !Number.isNaN(Date.parse(`${decisionDate}T00:00:00Z`))
+      && new Date(`${decisionDate}T00:00:00Z`).toISOString().slice(0, 10) === decisionDate;
+    if (!valid) {
+      violations.push("G-DPS-10: la fecha de la decisión debe ser una fecha válida (AAAA-MM-DD)");
+    } else if (decisionDate > registeredAt.slice(0, 10)) {
+      violations.push("G-DPS-10: la fecha de la decisión no puede ser posterior a la de su registro");
+    }
+  }
+
   if (violations.length > 0) return { ok: false, violations };
 
-  const decidedAt = input.now ?? new Date().toISOString();
+  // Mediodía UTC: la fecha se muestra igual en cualquier huso horario español.
+  const decidedAt = decisionDate ? `${decisionDate}T12:00:00.000Z` : registeredAt;
   return {
     ok: true,
     selection: {

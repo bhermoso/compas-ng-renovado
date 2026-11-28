@@ -48,3 +48,22 @@
   padding:16px 0;margin:16px 0;
 }
 .admin-accounts li{border:0;border-bottom:1px solid var(--borde);border-radius:0;padding:12px 0}
+
+/* Acceso de administración dentro de COMPÁS completo: discreto, en una esquina,
+   sin ocupar una franja propia sobre la aplicación. */
+.admin-full-nav--floating{
+  position:fixed;left:14px;bottom:14px;z-index:1500;
+  display:block;padding:0;background:transparent;border:0;
+}
+.admin-full-nav--floating button{
+  appearance:none;display:inline-flex;align-items:center;gap:6px;
+  padding:5px 11px;border:1px solid var(--borde);border-radius:999px;
+  background:rgba(255,255,255,.92);color:var(--texto-secundario);
+  font-family:inherit;font-size:12px;font-weight:600;line-height:1.2;letter-spacing:.02em;cursor:pointer;
+  box-shadow:0 1px 3px rgba(15,31,51,.12);opacity:.7;transition:opacity .2s,color .2s,border-color .2s;
+}
+.admin-full-nav--floating button:hover,.admin-full-nav--floating button:focus-visible{
+  opacity:1;color:var(--azul);border-color:var(--azul);
+}
+.admin-full-nav--floating button:focus-visible{outline:3px solid var(--amarillo);outline-offset:2px}
+@media print{.admin-full-nav--floating{display:none}}

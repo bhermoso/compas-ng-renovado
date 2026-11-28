@@ -22,6 +22,28 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-28 (tarde) · Acceso discreto a la administración y fecha de la decisión del Grupo Motor
+
+Pages servía `fbc98b8`.
+
+**Hechos observados.** Dentro de COMPÁS completo, el administrador veía una franja
+oscura a todo el ancho («Administración general · COMPAS completo»). La prueba del
+contrato rector seguía esperando la versión 3.0.1 y fallaba en `master` desde #242.
+El formulario de la decisión del Grupo Motor fechaba la decisión el día del
+registro: la de Atarfe consta como 28/11/2026, aunque se adoptó en la sesión del
+26/11/2026, y la de Zagra (28/10/2026) habría quedado con la fecha de hoy.
+
+**Decisión del responsable (28/11/2026).** Hacer discreto el acceso a la
+administración.
+
+**Cambios.** Botón flotante pequeño «⚙ Administración» en la esquina inferior
+izquierda, en lugar de la franja. Prueba del contrato rector corregida. Campo
+«Fecha de la decisión» en el formulario del Grupo Motor (regla G-DPS-10: fecha
+válida y no posterior al registro); sin fecha se conserva la del registro.
+Suite: 3010 pruebas; lint sin avisos.
+
+---
+
 ## 2026-11-28 (mediodía) · Decisión soberana del Grupo Motor y retirada del borrador automático
 
 Pages servía `7b1da3e` al empezar.
