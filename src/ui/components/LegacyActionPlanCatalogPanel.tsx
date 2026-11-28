@@ -41,6 +41,34 @@ export interface LegacyActionPlanCatalogPanelProps {
   onSave: (review: MunicipalActionPlanModuleReview) => readonly string[];
   /** Muestra la ficha de un indicador desde el Plan resultante. */
   onOpenIndicatorFicha?: (indicatorCode: string) => void;
+  /**
+   * Estado de la decisión del Grupo Motor. Solo las líneas que adopta una
+   * decisión vigente son editables; las demás, y todas si no hay decisión
+   * vigente, quedan para consulta (decisión del responsable, 28/11/2026).
+   */
+  groupMotor?: GroupMotorPlanState;
+}
+
+export interface GroupMotorPlanState {
+  state: "current" | "stale" | "none";
+  decidedBy?: string;
+  decidedAt?: string;
+}
+
+/** Aviso común a «Líneas e indicadores» y «Plan resultante». */
+export function GroupMotorPlanNotice({ groupMotor, adoptedTitles }: { groupMotor?: GroupMotorPlanState; adoptedTitles: string[] }) {
+  const state = groupMotor?.state ?? "none";
+  if (state === "current") {
+    const date = groupMotor?.decidedAt ? new Date(groupMotor.decidedAt).toLocaleDateString("es-ES") : undefined;
+    return <p className="pcm-group-motor-notice" data-state="current">
+      <strong>Líneas adoptadas por el Grupo Motor{date ? ` el ${date}` : ""}:</strong> {adoptedTitles.length > 0 ? adoptedTitles.join(" · ") : "ninguna línea del catálogo"}.
+      {" "}Solo estas se editan; las demás quedan para consulta. La decisión se registra y se modifica en «Priorización».
+    </p>;
+  }
+  return <p className="pcm-group-motor-notice" data-state={state}>
+    <strong>{state === "stale" ? "La decisión registrada del Grupo Motor no corresponde al Perfil vigente." : "El Grupo Motor no ha registrado su decisión."}</strong>
+    {" "}Las líneas del catálogo quedan para consulta hasta que se registre en «Priorización». El trabajo ya guardado se conserva.
+  </p>;
 }
 
 const decisionLabels: Record<CatalogDecisionStatus, string> = {
@@ -314,6 +342,13 @@ export function LegacyActionPlanCatalogPanel(props: LegacyActionPlanCatalogPanel
   };
   const renderWorksheet = worksheetRenderer(false);
   const directTerritorialEdit = Boolean(props.onDraftChange);
+  const adopted = new Set(props.eligibleModules.map((item) => item.module.id));
+  const orderedCatalog = [...ACTION_PLAN_CATALOG].sort((a, b) => Number(adopted.has(b.id)) - Number(adopted.has(a.id)));
+  // En las líneas de consulta no se edita la ficha; si existe, se avisa de que se conserva.
+  const consultationWorksheet: RenderWorksheet = (module, _general, specific) =>
+    props.worksheets.some((sheet) => sheet.context.municipalityId === props.municipalityId && sheet.context.moduleId === module.id && sheet.context.indicatorCode === specific.indicator.code)
+      ? <p className="panel-note">Este indicador tiene una ficha guardada. Se conserva y vuelve a editarse cuando el Grupo Motor adopte la línea.</p>
+      : null;
   return (
     <div className="pcm-root">
       <section className="workspace-panel pcm-catalog-header">
@@ -334,8 +369,10 @@ export function LegacyActionPlanCatalogPanel(props: LegacyActionPlanCatalogPanel
         </p>
         </details>
       </section>
-      {props.onDraftChange && ACTION_PLAN_CATALOG.map(original => {
+      {props.onDraftChange && <GroupMotorPlanNotice groupMotor={props.groupMotor} adoptedTitles={ACTION_PLAN_CATALOG.filter(m => adopted.has(m.id)).map(m => m.title)} />}
+      {props.onDraftChange && orderedCatalog.map(original => {
         const module = municipalActionPlanModule(props.municipalityId, original);
+        const editable = adopted.has(original.id);
         const savedDraft = props.drafts?.find(d => d.moduleId === module.id && d.municipalityId === props.municipalityId);
         const incompatible = Boolean(savedDraft && savedDraft.version !== module.version);
         const canRegroup = incompatible && original.id === HEALTHY_AGING_MODULE.id && savedDraft?.version === HEALTHY_AGING_MODULE.version;
@@ -343,7 +380,7 @@ export function LegacyActionPlanCatalogPanel(props: LegacyActionPlanCatalogPanel
           {incompatible && <section className="workspace-panel pcm-compatibility-notice" aria-label={`Versiones del módulo ${module.title}`}>
             <h3>{module.title} · nueva organización del catálogo</h3>
             <p>El expediente conserva un borrador de versión {savedDraft?.version}. La plantilla disponible es {module.version}. No se sustituye ni se valida automáticamente ningún contenido.</p>
-            {canRegroup ? <button type="button" onClick={() => {
+            {canRegroup && editable ? <button type="button" onClick={() => {
               if (!window.confirm("¿Preparar la estructura de cuatro bloques en este expediente? Se conservará íntegro el borrador anterior; las redacciones, fichas e indicadores se mantienen y los nuevos bloques quedan pendientes de revisión.")) return;
               try {
                 const next = prepareMunicipalActionPlanDraft(props.municipalityId, module, savedDraft);
@@ -352,10 +389,12 @@ export function LegacyActionPlanCatalogPanel(props: LegacyActionPlanCatalogPanel
                 window.alert(error instanceof Error ? error.message : "No se pudo preparar la nueva estructura.");
               }
             }}>Preparar cuatro bloques y conservar la versión anterior</button>
+              : canRegroup ? <p className="panel-note">La línea no está adoptada por el Grupo Motor: la nueva estructura se prepara cuando la adopte.</p>
               : <p role="alert">Versión desconocida: requiere revisión documental antes de migrar. El borrador anterior se conserva sin cambios.</p>}
           </section>}
           <PlanPreparationPanel municipalityId={props.municipalityId} municipalityName={props.municipalityName} module={module}
-            draft={savedDraft} onChange={props.onDraftChange!} renderWorksheet={worksheetRenderer(true)}/>
+            draft={savedDraft} onChange={props.onDraftChange!} canEditProposal={editable} adoption={editable ? "adopted" : "consultation"}
+            renderWorksheet={editable ? worksheetRenderer(true) : consultationWorksheet}/>
         </div>;
       })}
       {!directTerritorialEdit && <>

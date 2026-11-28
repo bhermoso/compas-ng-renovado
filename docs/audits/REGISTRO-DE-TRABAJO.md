@@ -58,6 +58,22 @@ código». Textos: nombre del municipio en lugar de su identificador; «Incluir 
 línea completa en el Plan» / «Excluir la línea del Plan». Suite: 3014 pruebas;
 lint sin avisos.
 
+**Decisión del responsable (28/11/2026, F2).** Un mismo criterio para los cuatro
+expedientes: sin decisión vigente del Grupo Motor, todas las líneas quedan para
+consulta. Estado al aplicarlo: Atarfe (Bienestar emocional) y Zagra (Bienestar
+emocional y Envejecimiento) tienen decisión vigente; Loja no tiene decisión
+registrada; la de Alfacar (1/10/2026, «Consenso del GM», vinculada a
+Envejecimiento) se apoya en un Perfil que ya no es el vigente.
+
+**Cambios (F2).** Las líneas adoptadas por la decisión vigente van primero y son
+editables, con la marca «Adoptada por el Grupo Motor»; las demás, plegadas y
+«Solo consulta», sin perder lo guardado. Aviso común con la fecha de la decisión
+o con su ausencia. El Plan resultante y sus documentos reúnen solo las líneas
+adoptadas, y no se declaran «listos» con una línea adoptada sin trabajar. «Del
+Perfil al indicador» explica por qué no hay vínculos posibles (Perfil sin
+recomendaciones elegidas, prioridades propias o decisión no vigente). Suite:
+3018 pruebas; lint sin avisos.
+
 ---
 
 ## 2026-11-28 (tarde) · Acceso discreto a la administración y fecha de la decisión del Grupo Motor

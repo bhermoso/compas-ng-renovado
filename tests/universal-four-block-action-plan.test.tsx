@@ -120,10 +120,16 @@ describe("Plan de Acción común para cualquier expediente", () => {
   it("muestra botón de conversión pero no modifica el borrador antiguo al abrir",()=>{
     const old=previousDraft("loja"),before=JSON.stringify(old);
     let changes=0;
+    // Con la línea adoptada por el Grupo Motor se ofrece la conversión; sin adoptar, solo consulta.
     const html=renderToStaticMarkup(<ActionPlanCatalogPanel municipalityId="loja"
-      eligibleModules={[]} reviews={[]} worksheets={[]} drafts={[old]}
+      eligibleModules={[{module:HEALTHY_AGING_MODULE,sourceScenarioIds:["propia-1"]}]} reviews={[]} worksheets={[]} drafts={[old]}
       onDraftChange={()=>changes++} onSave={()=>[]}/>);
     expect(html).toContain("Preparar cuatro bloques y conservar la versión anterior");
+    const consult=renderToStaticMarkup(<ActionPlanCatalogPanel municipalityId="loja"
+      eligibleModules={[]} reviews={[]} worksheets={[]} drafts={[old]}
+      onDraftChange={()=>changes++} onSave={()=>[]}/>);
+    expect(consult).not.toContain("Preparar cuatro bloques y conservar la versión anterior");
+    expect(consult).toContain("la nueva estructura se prepara cuando la adopte");
     expect(html).toContain("no se puede editar");
     expect(changes).toBe(0);
     expect(JSON.stringify(old)).toBe(before);

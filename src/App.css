@@ -12133,3 +12133,9 @@ h3 {
 .pcm-legacy-draft__saved dt { font-size: .78rem; font-weight: 700; color: var(--texto-secundario); font-variant-numeric: tabular-nums; }
 .pcm-legacy-draft__saved dd { margin: 2px 0 0; line-height: 1.5; }
 .pcm-legacy-draft__saved dd small { display: block; margin-top: 2px; color: var(--texto-secundario); }
+
+/* Plan de Acción · relación de cada línea con la decisión del Grupo Motor (28/11/2026) */
+.pcm-group-motor-notice { margin: 0 0 14px; padding: 10px 14px; border-left: 3px solid var(--azul); background: var(--fondo-principal); color: var(--texto-principal); font-size: .92rem; }
+.pcm-group-motor-notice[data-state="none"], .pcm-group-motor-notice[data-state="stale"] { border-left-color: var(--amarillo); }
+.pcm-line-fold__adoption { font-size: .75rem; font-weight: 600; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--borde); color: var(--texto-secundario); }
+.pcm-line-fold__adoption[data-adoption="adopted"] { border-color: var(--azul); color: var(--azul); }

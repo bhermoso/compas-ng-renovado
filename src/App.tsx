@@ -4092,6 +4092,12 @@ export default function App() {
               onWorksheetChange={handleIndicatorWorksheetChange}
               onSave={handleSaveActionPlanModuleReview}
               onOpenIndicatorFicha={(code) => { setPlanTab("lineas"); openIndicatorFicha(code); }}
+              groupMotor={(() => {
+                const selection = workspace.deliberativePrioritySelection;
+                if (!selection) return { state: "none" as const };
+                if (!runtime.lectura || runtime.prioritySelectionIsStale) return { state: "stale" as const };
+                return { state: "current" as const, decidedBy: selection.decidedBy, decidedAt: selection.decidedAt };
+              })()}
             />
           );
           const validated = (workspace.validatedActionPlans ?? []).length;

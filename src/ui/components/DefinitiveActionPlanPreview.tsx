@@ -258,6 +258,8 @@ export function DefinitiveActionPlanPreview({municipalityId, municipalityName: v
 
   const incompatibleDrafts = drafts?.filter(draft => draft.municipalityId === municipalityId && modules.some(module => module.id === draft.moduleId && module.version !== draft.version)) ?? [];
   const pending = active.reduce((total, item) => total + pendingPreparationDecisionCount(item.module, item.draft), 0);
+  // Líneas adoptadas que todavía no tienen ningún objetivo incorporado.
+  const idleModules = modules.filter(module => !active.some(item => item.module.id === module.id && item.rows.length > 0));
   const selectedObjectives = active.reduce((total, item) => total + item.rows.length, 0);
   const selectedIndicators = active.reduce((total, item) => total + item.rows.filter(row => row.indicatorIncluded).length, 0);
   const linkedActionCards = traceability.reduce((total, link) => total + link.actionCards.length, 0);
@@ -303,10 +305,14 @@ export function DefinitiveActionPlanPreview({municipalityId, municipalityName: v
         <p className="eyebrow">Vista consolidada del borrador territorial</p>
         <h2>Plan de Acción resultante · {municipalityName}</h2>
       </div>
-      <span className="status-pill">{pending === 0 && active.length > 0 ? "Listo para versión definitiva" : `${pending} pendientes`}</span>
+      <span className="status-pill">{modules.length === 0 ? "Sin líneas adoptadas" : pending === 0 && idleModules.length === 0 ? "Listo para versión definitiva" : pending > 0 ? `${pending} pendientes` : `${idleModules.length === 1 ? "1 línea adoptada" : `${idleModules.length} líneas adoptadas`} sin trabajar`}</span>
     </div>
+    {modules.length > 0 && idleModules.length > 0 && <p className="phase-blocked-notice" role="status">
+      Línea{idleModules.length === 1 ? "" : "s"} adoptada{idleModules.length === 1 ? "" : "s"} por el Grupo Motor sin objetivos incorporados todavía: {idleModules.map(m => m.title).join(" · ")}. Se trabaja{idleModules.length === 1 ? "" : "n"} en «Líneas e indicadores».
+    </p>}
     <p className="panel-note">Esta vista utiliza únicamente los elementos marcados como <strong>Incluir</strong> o <strong>Modificar</strong>. Los modificados conservan su redacción territorial; los excluidos no se incorporan.</p>
-    {active.length === 0 ? <p>No hay todavía líneas con decisiones territoriales. Selecciona o modifica elementos para construir el Plan de Acción.</p> : <>
+    {modules.length === 0 ? <p>El Plan resultante reúne las líneas que adopta el Grupo Motor. No hay ninguna línea adoptada en una decisión vigente.</p>
+    : active.length === 0 ? <p>No hay todavía líneas con decisiones territoriales. Selecciona o modifica elementos para construir el Plan de Acción.</p> : <>
       <p><strong>{selectedObjectives}</strong> objetivos específicos seleccionados · <strong>{selectedIndicators}</strong> indicadores seleccionados.</p>
       <details className="pcm-traceability-map" aria-label="Mapa de vínculos del Plan de Acción">
         <summary className="pcm-module__header pcm-fold-summary">
