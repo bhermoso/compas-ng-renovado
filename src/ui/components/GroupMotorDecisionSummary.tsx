@@ -39,7 +39,7 @@ export function GroupMotorDecisionSummary({ selection, lectura, isStale, registe
       <p className="eyebrow">Decisión del Grupo Motor</p>
       <h2>Prioridades adoptadas</h2>
       <p className="panel-note">
-        Adoptada por {selection.decidedBy} · registrada el {new Date(selection.decidedAt).toLocaleDateString("es-ES")}.
+        Adoptada por {selection.decidedBy} el {new Date(selection.decidedAt).toLocaleDateString("es-ES")}.
         {registerHint ? ` ${registerHint}` : ""}
       </p>
       {isStale && (
