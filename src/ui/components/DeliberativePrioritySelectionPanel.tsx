@@ -20,6 +20,7 @@ interface DeliberativePrioritySelectionPanelProps {
     deliberationRationale: string;
     citizenInfluenceStatement: string;
     decidedBy: string;
+    decisionDate: string;
   }) => readonly string[];
 }
 
@@ -38,6 +39,9 @@ export function DeliberativePrioritySelectionPanel({
   const [rationale, setRationale] = useState(selection?.deliberationRationale ?? "");
   const [citizenInfluence, setCitizenInfluence] = useState(selection?.citizenInfluenceStatement ?? "");
   const [decidedBy, setDecidedBy] = useState(selection?.decidedBy ?? "");
+  const [decisionDate, setDecisionDate] = useState(
+    selection?.decidedAt.slice(0, 10) ?? new Date().toISOString().slice(0, 10),
+  );
   const [violations, setViolations] = useState<readonly string[]>([]);
 
   function toggleScenario(id: string) {
@@ -76,6 +80,7 @@ export function DeliberativePrioritySelectionPanel({
       deliberationRationale: rationale,
       citizenInfluenceStatement: citizenInfluence,
       decidedBy,
+      decisionDate,
     }));
   }
 
@@ -232,6 +237,15 @@ export function DeliberativePrioritySelectionPanel({
         <label>
           <span className="deliberative-selection__label">Grupo Motor que adopta la decisión</span>
           <input value={decidedBy} onChange={(event) => setDecidedBy(event.target.value)} />
+        </label>
+        <label>
+          <span className="deliberative-selection__label">Fecha de la decisión</span>
+          <input
+            type="date"
+            value={decisionDate}
+            max={new Date().toISOString().slice(0, 10)}
+            onChange={(event) => setDecisionDate(event.target.value)}
+          />
         </label>
 
         {violations.length > 0 && (
