@@ -167,6 +167,7 @@ import { LocalHealthPlanningCycle, DocumentIngestionPanel, DocumentRepositoryPan
 import type { AgendaActuation } from "./domain/agenda/AgendaActuation";
 import { removeSupersededValidatedPlan, type PlanDocument } from "./domain/action-plan-catalog/PlanDocument";
 import type { ProfilePlanLink } from "./application/action-plan/profilePlanLinks";
+import { openIndicatorFicha } from "./ui/components/openIndicatorFicha";
 import "./App.css";
 
 // ── Tipos de ámbito territorial ──────────────────────────────
@@ -4090,6 +4091,7 @@ export default function App() {
               worksheets={workspace.indicatorWorksheets ?? []}
               onWorksheetChange={handleIndicatorWorksheetChange}
               onSave={handleSaveActionPlanModuleReview}
+              onOpenIndicatorFicha={(code) => { setPlanTab("lineas"); openIndicatorFicha(code); }}
             />
           );
           const validated = (workspace.validatedActionPlans ?? []).length;

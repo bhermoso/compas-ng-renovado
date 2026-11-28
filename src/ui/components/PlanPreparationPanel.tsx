@@ -63,8 +63,10 @@ function SavedDraftReadOnly({draft}: {draft: PlanPreparationDraft}) {
  </details>;
 }
 
-export function PlanPreparationPanel({module, municipalityId, draft, onChange, review, onReviewChange, canEditProposal=true, canReview=false, reviewIsCurrent=true, renderWorksheet, persistenceMessage}: {
+export function PlanPreparationPanel({module, municipalityId, municipalityName, draft, onChange, review, onReviewChange, canEditProposal=true, canReview=false, reviewIsCurrent=true, renderWorksheet, persistenceMessage}: {
  persistenceMessage?: string;
+ /** Nombre visible del ámbito; si falta, se usa su identificador. */
+ municipalityName?: string;
  module: ActionPlanCatalogModule;
  municipalityId: string;
  draft?: PlanPreparationDraft;
@@ -239,7 +241,7 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
   return <div className="pcm-decision">
    {alwaysShowEditor && <p className="panel-note"><strong>Propuesta inicial de objetivo general:</strong> {cleanSource}</p>}
    <label><span>{statusLabel}</span><select disabled={!canEditProposal} aria-label={statusAriaLabel} value={decision?.status ?? "pending"} onChange={e => updateDraftDecision(id, source, e.target.value as PlanPreparationDecision["status"], undefined, ancestors)}><option value="pending">{directTerritorialEdit ? "Sin incorporar" : "Pendiente"}</option><option value="included">Incluir</option><option value="excluded">Excluir</option><option value="modified">Modificar</option></select></label>
-   {(decision?.status === "modified" || alwaysShowEditor) && canEditProposal && <label>{textLabel}<textarea aria-label={textLabel} value={textareaText} rows={3} onChange={e => updateDraftDecision(id, source, "modified", e.target.value, ancestors)}/><span className="pcm-save-row"><button type="button" onClick={() => updateDraftDecision(id, source, "modified", textareaText, ancestors)} aria-label={`Guardar redacción vigente · ${actionPlanElementCode(module,id)}`}>Guardar redacción</button>{alwaysShowEditor && textareaText !== cleanSource && <button type="button" onClick={() => updateDraftDecision(id, source, "modified", cleanSource, ancestors)} aria-label={`Usar propuesta inicial · ${actionPlanElementCode(module,id)}`}>Usar propuesta inicial</button>}{decision?.status === "modified" && <span className="pcm-save-confirmation" role="status">Guardado en el expediente local</span>}</span>{!textareaText.trim() && <p role="alert">Completa la redacción.</p>}<span className="panel-note">{alwaysShowEditor && decision?.status !== "modified" ? "Propuesta inicial del objetivo general. Edítala o pulsa Guardar redacción para incorporarla al expediente." : directTerritorialEdit ? "La nueva redacción pasa a ser el texto vigente de este territorio y se guarda directamente en su expediente." : "La redacción queda registrada en el expediente."}</span></label>}
+   {(decision?.status === "modified" || alwaysShowEditor) && canEditProposal && <label>{textLabel}<textarea aria-label={textLabel} value={textareaText} rows={3} onChange={e => updateDraftDecision(id, source, "modified", e.target.value, ancestors)}/>{alwaysShowEditor && textareaText !== cleanSource && <span className="pcm-save-row"><button type="button" onClick={() => updateDraftDecision(id, source, "modified", cleanSource, ancestors)} aria-label={`Usar propuesta inicial · ${actionPlanElementCode(module,id)}`}>Usar propuesta inicial</button></span>}{!textareaText.trim() && <p role="alert">Completa la redacción.</p>}<span className="panel-note">{alwaysShowEditor && decision?.status !== "modified" ? "Propuesta inicial del objetivo general. Si la editas, tu redacción pasa a ser la vigente y se guarda en el expediente al escribir." : directTerritorialEdit ? "La nueva redacción pasa a ser el texto vigente de este territorio y se guarda en su expediente al escribir." : "La redacción queda registrada en el expediente al escribir."}</span></label>}
    {decision?.status === "modified" && !canEditProposal && <p className="panel-note"><strong>Redacción territorial:</strong> {proposedTextFor(decision, source)}</p>}
    {excluded && <p className="panel-note">Fuera del Plan porque un elemento superior está excluido. Se conservan la elección individual, la ficha y las actuaciones.</p>}
    {stale && <p role="status">La referencia de partida ha cambiado. Se conserva la redacción territorial anterior para que pueda revisarse.</p>}
@@ -301,9 +303,9 @@ export function PlanPreparationPanel({module, municipalityId, draft, onChange, r
    <ElementProvenance p={module.strategicObjectiveProvenance}/>
   </section>
   {canEditProposal && <div className="pcm-bulk-actions" role="group" aria-label={`Incorporación de propuestas de ${module.title}`}>
-   <button type="button" onClick={() => applyModuleSelection("included")}>Incorporar módulo completo al borrador</button>
-   <button type="button" onClick={() => applyModuleSelection("excluded")}>Excluir módulo del borrador</button>
-   <p className="panel-note">Se guardan únicamente decisiones de preparación para {municipalityId}. Se respetan las redacciones locales modificadas al incorporar. El catálogo es común a todos los expedientes: no trae datos de seguimiento ni acuerdos de ningún territorio, y no aprueba el Plan.</p>
+   <button type="button" onClick={() => applyModuleSelection("included")}>{directTerritorialEdit ? "Incluir la línea completa en el Plan" : "Incorporar módulo completo al borrador"}</button>
+   <button type="button" onClick={() => applyModuleSelection("excluded")}>{directTerritorialEdit ? "Excluir la línea del Plan" : "Excluir módulo del borrador"}</button>
+   <p className="panel-note">Las decisiones se guardan en el expediente de {municipalityName ?? municipalityId}. Al incluir la línea completa se respetan las redacciones modificadas. El catálogo es común a todos los expedientes: no trae datos de seguimiento ni acuerdos de ningún territorio, y no aprueba el Plan.</p>
   </div>}
   {control(module.id, module.strategicObjective, [])}
   {module.generalObjectives.map(general => {

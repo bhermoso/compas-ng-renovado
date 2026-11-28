@@ -22,6 +22,44 @@ recoge una afirmación hecha en una conversación, indica si se ha comprobado.
 
 ---
 
+## 2026-11-28 (tarde) · Revisión a fondo del Plan de Acción · F1, mecánica
+
+Pages servía `f867ce7`. Revisión del código y de la aplicación publicada con
+Atarfe, Zagra y Loja tal como están en Firestore.
+
+**Hechos observados.** (1) «Líneas e indicadores» muestra las tres líneas del
+catálogo, editables, en todo expediente: la revisión limitada a las líneas
+adoptadas existe en el código pero nunca se pinta. (2) «Listo para versión
+definitiva» solo cuenta las líneas trabajadas (Zagra lo muestra sin trabajo en
+Bienestar emocional, que adoptó). (3) «Del Perfil al indicador» no admite
+prioridades propias y remite a «Participación y prioridades». (4) La línea común
+Bienestar emocional cita hallazgos de Atarfe (BEM-OE1.2, OE1.3, OE2.1, OE4.3,
+OE5.2 y la fuente de la línea). (5) «Abrir ficha» no hacía nada: la ficha está
+en otra sección, sin pintar. (6) «Guardar redacción» no añadía nada: el texto se
+guarda al escribir. (7) «Generar Plan de Acción» solo muestra la selección;
+«Imprimir» duplica la descarga en PDF. (8) Tras «Generar», el panel «Documento
+independiente del Plan de Acción» aparecía dos veces: dos hermanos con la misma
+clave. (9) G-PLS-7 se registra en dos sitios, uno por línea. (10) «Lectura
+estratégica» es el motor antiguo, con alineaciones por coincidencia de palabras
+(R1 de Atarfe → Eje 3 del Plan de Personas Mayores). (11) «Participación y
+prioridades» repite Priorización y permite editarla. (12) Las fichas del
+indicador registran actuaciones (responsable, calendario, recursos), que el
+Art. 16 bis asigna a las agendas anuales; la Agenda tiene su propio registro.
+
+**Decisiones del responsable (28/11/2026).** Líneas no adoptadas: solo consulta,
+plegadas. Catálogo BEM: redacción y procedencia genéricas; lo específico pasa a
+redacción territorial del borrador de Atarfe. Ficha del indicador: solo
+medición; las actuaciones, a la Agenda, vinculadas al indicador.
+
+**Cambios (F1).** «Abrir ficha» abre «Líneas e indicadores» y la ficha. Claves
+distintas para los paneles del Plan resultante. Se retira «Guardar redacción».
+Sin bloques con nombre, ni la vista ni el Word/PDF escriben «Bloque temático ·
+código». Textos: nombre del municipio en lugar de su identificador; «Incluir la
+línea completa en el Plan» / «Excluir la línea del Plan». Suite: 3014 pruebas;
+lint sin avisos.
+
+---
+
 ## 2026-11-28 (tarde) · Acceso discreto a la administración y fecha de la decisión del Grupo Motor
 
 Pages servía `fbc98b8`.

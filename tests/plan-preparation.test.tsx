@@ -122,8 +122,8 @@ describe("Preparación independiente del Plan", () => {
  const second = PlanPreparationPanel({module: AGING_FOUR_BLOCKS_BASE, municipalityId: draft.municipalityId, draft: changes[0], canEditProposal: true, onChange: next => changes.push(next), renderWorksheet: () => null});
  const textarea = findElement(second, element => element.type === "textarea" && element.props["aria-label"] === `Redacción vigente · ${code}`);
  expect(textarea).toBeDefined();
- const saveButton = findElement(second, element => element.type === "button" && String(element.props["aria-label"] ?? "").includes(code));
- expect(saveButton).toBeDefined();
+ // La redacción se guarda al escribir: no hay botón «Guardar redacción».
+ expect(findElement(second, element => element.type === "button" && String(element.props["aria-label"] ?? "").startsWith("Guardar redacción"))).toBeUndefined();
  (textarea!.props.onChange as (event: {target: {value: string}}) => void)({target: {value: "Texto definitivo de prueba"}});
  expect(changes).toHaveLength(2);
  expect(changes[1].decisions["ENV-OE5.2"]).toMatchObject({status: "modified", sourceText: source, text: "Texto definitivo de prueba"});

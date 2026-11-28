@@ -69,10 +69,10 @@ export function buildPlanDocument(
    const group = groups.get(general.code);
    if (!group) continue;
    const first = group[0];
-   const blockName = thematicBlockNameFor(first.general.code, module) ?? first.general.code;
+   const blockName = thematicBlockNameFor(first.general.code, module);
+   const generalText = "Objetivo general · "+(first.general.displayCode ?? first.general.code)+" · "+resolvedPlanDecisionText(first.generalDecision,first.general.title);
    paragraphs.push(
-    {text:"Bloque temático · "+blockName,heading:true},
-    {text:"Objetivo general · "+(first.general.displayCode ?? first.general.code)+" · "+resolvedPlanDecisionText(first.generalDecision,first.general.title)},
+    ...(blockName ? [{text:"Bloque temático · "+blockName,heading:true},{text:generalText}] : [{text:generalText,heading:true}]),
     ...(!first.generalDecision || first.generalDecision.status === "pending" ? [{text:"Bloque pendiente de revisión."}] : [])
    );
    const orderedGroup = [...group].sort((left, right) =>

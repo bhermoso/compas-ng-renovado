@@ -1,4 +1,5 @@
 import { PlanDocumentActions } from "./PlanDocumentActions";
+import { openIndicatorFicha } from "./openIndicatorFicha";
 import { useMemo, useRef, useState } from "react";
 import type { ActionPlanCatalogModule } from "../../domain/action-plan-catalog/ActionPlanCatalog";
 import {
@@ -16,16 +17,6 @@ import { validateActionPlanUnaddressedNeeds } from "../../application/action-pla
 import type { UnaddressedNeed } from "../../domain/health-plan";
 import { describeProfilePlanLink, profilePlanLinkKey, profilePlanOptions, type ProfilePlanLink } from "../../application/action-plan/profilePlanLinks";
 import { ProfilePlanTracePanel, type ProfilePlanLinkInput, type ProfilePlanTraceContext } from "./ProfilePlanTracePanel";
-
-/** Abre la ficha del indicador (y los desplegables que la contienen) y la muestra. */
-function openIndicatorFicha(indicatorCode: string) {
-  const target = document.getElementById(`ficha-${indicatorCode}`);
-  if (!target) return;
-  for (let node: HTMLElement | null = target; node; node = node.parentElement) {
-    if (node instanceof HTMLDetailsElement) node.open = true;
-  }
-  target.scrollIntoView({ behavior: "smooth", block: "start" });
-}
 
 function fichaStatusLabel(status: ActionPlanTraceabilityLink["indicatorFichaStatus"]): string {
   if (status === "missing") return "ficha pendiente";
@@ -223,7 +214,9 @@ function groupTraceabilityByBlock(links: ActionPlanTraceabilityLink[]): Array<{
   return Array.from(byBlock.values());
 }
 
-export function DefinitiveActionPlanPreview({municipalityId, municipalityName: visibleName, modules, drafts, worksheets = [], validatedActionPlans, onValidatePlan, onDeletePlanVersion, onDraftChange, profileTrace}: {
+export function DefinitiveActionPlanPreview({municipalityId, municipalityName: visibleName, modules, drafts, worksheets = [], validatedActionPlans, onValidatePlan, onDeletePlanVersion, onDraftChange, profileTrace, onOpenIndicatorFicha}: {
+  /** Muestra la ficha del indicador, que está en otra sección del Plan. */
+  onOpenIndicatorFicha?: (indicatorCode: string) => void;
   validatedActionPlans?: import("../../domain/action-plan-catalog/PlanDocument").PlanDocument[];
   onValidatePlan?: (document: import("../../domain/action-plan-catalog/PlanDocument").PlanDocument) => boolean;
   onDeletePlanVersion?: (document: import("../../domain/action-plan-catalog/PlanDocument").PlanDocument) => Promise<boolean>;
@@ -298,8 +291,8 @@ export function DefinitiveActionPlanPreview({municipalityId, municipalityName: v
 
   return <section className="workspace-panel pcm-definitive-plan" aria-label={`Plan de Acción resultante · ${municipalityName}`}>
     {incompatibleDrafts.length > 0 && <p role="alert">Hay borradores con una versión pendiente de compatibilidad. Se conservan y no se incorporan a esta proyección ni a su exportación.</p>}
-    <PlanDocumentActions key={municipalityId} municipalityId={municipalityId} active={active} versions={validatedActionPlans} worksheets={worksheets} profilePlanLinks={linked} onValidate={onValidatePlan} onDeleteVersion={onDeletePlanVersion}/>
-    {sources && <ProfilePlanTracePanel key={municipalityId} options={sources} links={links}
+    <PlanDocumentActions key={`documento-${municipalityId}`} municipalityId={municipalityId} active={active} versions={validatedActionPlans} worksheets={worksheets} profilePlanLinks={linked} onValidate={onValidatePlan} onDeleteVersion={onDeletePlanVersion}/>
+    {sources && <ProfilePlanTracePanel key={`perfil-${municipalityId}`} options={sources} links={links}
       onSave={profileTrace?.onChange ? saveLink : undefined}
       onRemove={profileTrace?.onChange && (link => profileTrace.onChange!(links.filter(item => profilePlanLinkKey(item) !== profilePlanLinkKey(link))))} />}
     {onDraftChange && active.some((item) => item.draft) && (
@@ -442,7 +435,7 @@ export function DefinitiveActionPlanPreview({municipalityId, municipalityName: v
               if (!group.length) return null;
               const generalText = resolvedPlanDecisionText(group[0].generalDecision, general.title);
               return <section key={general.code} className="pcm-plan-block">
-                <h4>Bloque temático · {thematicBlockNameFor(general.code, module) ?? general.code}</h4>
+                {thematicBlockNameFor(general.code, module) && <h4>Bloque temático · {thematicBlockNameFor(general.code, module)}</h4>}
                 {(!group[0].generalDecision || group[0].generalDecision.status === "pending") && <p className="panel-note">Bloque pendiente de revisión.</p>}
                 <p className="panel-note"><strong>Objetivo general · {general.displayCode ?? general.code}:</strong> {generalText}</p>
                 <ol className="pcm-generated-objectives">
@@ -456,7 +449,7 @@ export function DefinitiveActionPlanPreview({municipalityId, municipalityName: v
                         const link = traceability.find((item) => item.indicatorCode === row.specific.indicator.code);
                         return link ? <p className="panel-note pcm-preview-ficha">
                           Ficha del indicador: {fichaStatusLabel(link.indicatorFichaStatus)} · {countLabel(link.actionCards.length, "actuación", "actuaciones")}.{" "}
-                          <button type="button" className="pcm-preview-ficha__open" onClick={() => openIndicatorFicha(row.specific.indicator.code)}>Abrir ficha</button>
+                          <button type="button" className="pcm-preview-ficha__open" onClick={() => (onOpenIndicatorFicha ?? openIndicatorFicha)(row.specific.indicator.code)}>Abrir ficha</button>
                         </p> : null;
                       })()}
                     </li>;
